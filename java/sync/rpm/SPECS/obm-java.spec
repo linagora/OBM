@@ -69,6 +69,7 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-sync
 # copie du web-inf de obm-sync
 WEB_INF=`find services/target -name WEB-INF `
 cp -r ${WEB_INF} $RPM_BUILD_ROOT%{_datadir}/obm-sync
+rm $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/slf4j-api-*.jar
 # postinst pour obm-sync
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
 # sample jetty
