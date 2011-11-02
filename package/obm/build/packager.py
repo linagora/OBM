@@ -112,7 +112,7 @@ class Packager(object):
         logging.info("Building package %s" % self.package.name)
         command = None
         if self.package_type == "deb":
-            command = ["debuild", "--no-tgz-check", "-us", "-uc", "-sa"]
+            command = 'debuild --no-tgz-check -us -uc -sa'
         elif self.package_type == "rpm":
             distname, version, id = platform.linux_distribution() 
             # If we're not building on RedHat/CentOS, we need to make sure we're
