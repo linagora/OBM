@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import platform
@@ -105,6 +106,36 @@ class Packager(object):
             spec = self._get_spec_path()
             self.changelog_updater.update(self.package.name, spec)
 
+    def _move_rpms_to_target_dir(self):
+        # rpmbuild builds the RPMs in subdirectories, move them back to
+        # the build directory
+        rpms_to_move = {}
+        for root, dirs, files in os.walk(self._target_dir):
+            for f in files:
+                if f.endswith(".rpm"):
+                    src_path = os.path.join(root, f)
+                    target_path = os.path.join(self.build_dir, f)
+                    rpms_to_move[src_path] = target_path
+        generated_rpms = []
+        for src_path, target_path in rpms_to_move.items():
+            if target_path != src_path:
+                os.rename(src_path, target_path)
+            generated_rpms.append(target_path)
+        if not generated_rpms:
+            raise PackagingError("No RPM package generated!")
+        logging.info("Created %d RPM package(s)" % len(generated_rpms))
+        for rpm in sorted(generated_rpms):
+            logging.info("Created RPM package: %s" % rpm)
+
+    def _list_debs(self):
+        # Lists the Debian packages generated
+        generated_debs = sorted(glob.glob("%s/*.deb" % self.build_dir))
+        if not generated_debs:
+            raise PackagingError("No Debian package generated!")
+        logging.info("Created %d Debian package(s)" % len(generated_debs))
+        for deb in generated_debs:
+            logging.info("Created Debian package: %s" % deb)
+
     def build(self):
         """
         Builds the package itself.
@@ -134,3 +165,7 @@ class Packager(object):
                     self.package_type)
         subp.check_call(command, cwd=self._target_dir, stdout=sys.stdout,
                 stderr=sys.stderr, shell=True)
+        if self.package_type == "rpm":
+            self._move_rpms_to_target_dir()
+        elif self.package_type == "deb":
+            self._list_debs()
