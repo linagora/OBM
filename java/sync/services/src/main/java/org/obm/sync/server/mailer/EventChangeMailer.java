@@ -11,7 +11,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.sync.Messages;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
@@ -296,18 +295,18 @@ public class EventChangeMailer extends AbstractMailer {
 	
 	private String participationState(ParticipationState state, Locale locale){
 		if(ParticipationState.ACCEPTED.equals(state)){
-			return new Messages(locale).participationStateAccepted();
+			return getMessages(locale).participationStateAccepted();
 		} else {
-			return new Messages(locale).participationStateDeclined();
+			return getMessages(locale).participationStateDeclined();
 		}
 	}
 
 	private String newUserTitle(String owner, String title, Locale locale) {
-		return new Messages(locale).newEventTitle(owner, title);
+		return getMessages(locale).newEventTitle(owner, title);
 	}
 	
 	private String updateParticipationStateTitle(String title, Locale locale) {
-		return new Messages(locale).updateParticipationStateTitle(title);
+		return getMessages(locale).updateParticipationStateTitle(title);
 	}
 	
 	private String notifyNewUserBodyTxt(Event event, Locale locale, TimeZone timezone) throws IOException, TemplateException {
@@ -419,11 +418,11 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String removedUserTitle(String owner, String title, Locale locale) {
-		return new Messages(locale).canceledEventTitle(owner, title);
+		return getMessages(locale).canceledEventTitle(owner, title);
 	}
 
 	private String updateUserTitle(String owner, String title, Locale locale) {
-		return new Messages(locale).updatedEventTitle(owner, title);
+		return getMessages(locale).updatedEventTitle(owner, title);
 	}
 
 	/* package */ void setMailService(MailService mailService) {

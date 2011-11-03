@@ -2,6 +2,7 @@ package org.obm.sync.server.mailer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.mail.Address;
@@ -9,7 +10,7 @@ import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-
+import org.obm.sync.Messages;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.template.ITemplateLoader;
 
@@ -58,6 +59,10 @@ public abstract class AbstractMailer {
 		template.process(datamodel, stringWriter);
 		stringWriter.flush();
 		return stringWriter.toString();
+	}
+	
+	public Messages getMessages(Locale locale) {
+		return new Messages(constantService, locale);
 	}
 	
 }

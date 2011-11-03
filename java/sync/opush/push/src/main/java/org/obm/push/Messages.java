@@ -5,26 +5,27 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
+import org.obm.configuration.ObmConfigurationService;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class Messages {
 
 	private ResourceBundle bundle;
-	private final Locale locale;
-
-	public Messages(Locale locale) {
-		this.locale = locale;
-		bundle = ResourceBundle.getBundle("Messages", this.locale);
+	
+	@Inject
+	private Messages(ObmConfigurationService configurationService) {
+		bundle = configurationService.getResourceBundle(Locale.getDefault());
 	}
 	
 	private String getString(String key, Object... arguments) {
 		String isoEncodedString = bundle.getString(key);
 		String string = new String(isoEncodedString.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
-		MessageFormat format = new MessageFormat(string, locale);
+		MessageFormat format = new MessageFormat(string, bundle.getLocale());
 		return format.format(arguments);
 	}
 	

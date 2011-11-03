@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Locale;
 
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.address.AddressList;
@@ -37,9 +36,9 @@ public class ErrorsManager implements IErrorsManager {
 	private final Messages messages;
 	
 	@Inject
-	private ErrorsManager(IEmailManager manager) {
+	private ErrorsManager(IEmailManager manager, Messages messages) {
 		this.manager = manager;
-		messages = new Messages(Locale.getDefault());
+		this.messages = messages;
 	}
 
 	/**

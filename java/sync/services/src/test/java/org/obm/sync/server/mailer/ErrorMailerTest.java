@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
@@ -106,6 +107,8 @@ public class ErrorMailerTest {
 
 			ConstantService constantService = EasyMock.createMock(ConstantService.class);
 			EasyMock.expect(constantService.getObmSyncMailer(getMockAccessToken())).andReturn("x-obm-sync@test.tlse.lng").once();
+			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
+					ResourceBundle.getBundle("Messages", Locale.FRENCH));
 			Capture<MimeMessage> capturedMessage = new Capture<MimeMessage>();
 			EasyMock.replay(constantService);
 			List<InternetAddress> expectedRecipients = getExpectedRecipients();

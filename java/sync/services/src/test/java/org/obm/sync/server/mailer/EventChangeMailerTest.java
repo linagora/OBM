@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import javax.mail.BodyPart;
@@ -167,6 +168,8 @@ public class EventChangeMailerTest {
 		private MimeMessage test() throws MessagingException {
 			ConstantService constantService = EasyMock.createMock(ConstantService.class);
 			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
+			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
+					ResourceBundle.getBundle("Messages", Locale.FRENCH));
 			Capture<MimeMessage> capturedMessage = new Capture<MimeMessage>();
 			EasyMock.replay(constantService);
 			List<InternetAddress> expectedRecipients = getExpectedRecipients();

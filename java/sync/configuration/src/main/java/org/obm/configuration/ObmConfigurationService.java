@@ -18,10 +18,13 @@
 package org.obm.configuration;
 
 import java.io.InputStream;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
+import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.common.collect.ImmutableMap;
@@ -85,6 +88,10 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 			}
 		}
 		return defaultUnit;
+	}
+	
+	public ResourceBundle getResourceBundle(Locale locale) {
+		return ResourceBundle.getBundle("Messages", locale, new Control());
 	}
 
 }

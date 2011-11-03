@@ -15,7 +15,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.sync.Messages;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.handler.ErrorMail;
 import org.obm.sync.server.template.ITemplateLoader;
@@ -89,7 +88,7 @@ public class ErrorMailer extends AbstractMailer {
 
 
 	private String connectorVersionErrorTitle(Locale locale) {
-		return new Messages(locale).connectorVersionErrorTitle();
+		return getMessages(locale).connectorVersionErrorTitle();
 	}
 	
 	

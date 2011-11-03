@@ -4,16 +4,16 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.obm.configuration.ObmConfigurationService;
+
 import com.google.common.base.Charsets;
 
 public class Messages {
 
 	private ResourceBundle bundle;
-	private final Locale locale;
 
-	public Messages(Locale locale) {
-		this.locale = locale;
-		bundle = ResourceBundle.getBundle("Messages", this.locale);
+	public Messages(ObmConfigurationService configurationservice, Locale locale) {
+		bundle = configurationservice.getResourceBundle(locale);
 	}
 	
 	public String newEventTitle(String owner, String title) {
@@ -23,7 +23,7 @@ public class Messages {
 	private String getString(String key, Object... arguments) {
 		String isoEncodedString = bundle.getString(key);
 		String string = new String(isoEncodedString.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
-		MessageFormat format = new MessageFormat(string, locale);
+		MessageFormat format = new MessageFormat(string, bundle.getLocale());
 		return format.format(arguments);
 	}
 
