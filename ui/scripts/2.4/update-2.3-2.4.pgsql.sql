@@ -380,6 +380,13 @@ CREATE TABLE opush_synced_item (
        item_id		INTEGER NOT NULL
 );
 
+CREATE TABLE opush_event_mapping (
+       id               SERIAL PRIMARY KEY,
+       device_id        INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
+       event_id         INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE,
+       event_uid        VARCHAR(300) NOT NULL
+);
+
 DELETE FROM opush_invitation_mapping;
 ALTER TABLE opush_invitation_mapping DROP COLUMN event_uid;
 ALTER TABLE opush_invitation_mapping ADD COLUMN event_uid INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE;

@@ -3841,6 +3841,17 @@ CREATE TABLE `opush_invitation_mapping` (
 	CONSTRAINT `opush_invitation_mapping_event_id_fkey` FOREIGN KEY (`event_uid`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `opush_event_mapping` (
+       `id`              INTEGER NOT NULL auto_increment,
+       `device_id`       INTEGER NOT NULL,
+       `event_id`        INTEGER NOT NULL,
+       `event_uid`       VARCHAR(300) NOT NULL,
+       PRIMARY KEY  (`id`),
+       KEY `opush_event_mapping_device_id_opush_device_id_fkey` (`device_id`),
+       KEY `opush_event_mapping_event_id_event_id_fkey` (`event_id`),
+       CONSTRAINT `opush_event_mapping_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE,
+       CONSTRAINT `opush_event_mapping_event_id_event_id_fkey` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for `calendarcolor`

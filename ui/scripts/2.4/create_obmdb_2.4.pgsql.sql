@@ -11649,6 +11649,12 @@ CREATE TABLE opush_invitation_mapping (
         sync_key VARCHAR(64) REFERENCES opush_sync_state(sync_key) ON DELETE CASCADE
 );
 
+CREATE TABLE opush_event_mapping (
+       id               SERIAL PRIMARY KEY,
+       device_id        INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
+       event_id         INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE,
+       event_uid        VARCHAR(300) NOT NULL
+);
 
 --
 -- Table structure for `calendarcolor`
