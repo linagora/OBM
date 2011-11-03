@@ -320,7 +320,8 @@ CREATE TABLE `opush_event_mapping` (
        KEY `opush_event_mapping_device_id_opush_device_id_fkey` (`device_id`),
        KEY `opush_event_mapping_event_id_event_id_fkey` (`event_id`),
        CONSTRAINT `opush_event_mapping_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE,
-       CONSTRAINT `opush_event_mapping_event_id_event_id_fkey` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE
+       CONSTRAINT `opush_event_mapping_event_id_event_id_fkey` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE,
+       CONSTRAINT `opush_event_mapping_unique` UNIQUE KEY (`device_id`,`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DELETE FROM `opush_invitation_mapping`;

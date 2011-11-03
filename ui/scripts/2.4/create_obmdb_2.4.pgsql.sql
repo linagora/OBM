@@ -11653,7 +11653,8 @@ CREATE TABLE opush_event_mapping (
        id               SERIAL PRIMARY KEY,
        device_id        INTEGER NOT NULL REFERENCES opush_device(id) ON DELETE CASCADE,
        event_id         INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE,
-       event_uid        VARCHAR(300) NOT NULL
+       event_uid        VARCHAR(300) NOT NULL,
+       UNIQUE (device_id, event_id)
 );
 
 --
