@@ -196,15 +196,30 @@ public class EventTest {
 	@Test
 	public void testEventClone() {
 		Event newEvent = createOneEvent(5);
-		EventRecurrence recurrence = createRecurrence(newEvent);
-		newEvent.setRecurrence(recurrence);
-		
 		Event clone = newEvent.clone();
 		Assert.assertEquals(clone, newEvent);
 	}
 	
 	@Test
+	public void testModifiedEventClone() {
+		Event newEvent = createOneEvent(5);
+		Event clone = newEvent.clone();
+		clone.setDescription("event updated");
+		Assert.assertNotSame(clone, newEvent);
+	}
+	
+	@Test
 	public void testEventRecurrenceClone() {
+		Event newEvent = createOneEvent(5);
+		EventRecurrence recurrence = createRecurrence(newEvent);
+		newEvent.setRecurrence(recurrence);
+		
+		Event eventCloned = newEvent.clone();
+		Assert.assertEquals(newEvent, eventCloned);
+	}
+	
+	@Test
+	public void testModifiedEventRecurrenceClone() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createRecurrence(newEvent);
 		recurrence.setFrequence(10);
@@ -214,11 +229,18 @@ public class EventTest {
 		EventRecurrence recurrenceCloned = eventCloned.getRecurrence();
 		recurrenceCloned.setFrequence(25);
 		
-		Assert.assertFalse(newEvent.equals(eventCloned));
+		Assert.assertNotSame(newEvent, eventCloned);
 	}
 	
 	@Test
-	public void testHasImportantChangesEvent() {
+	public void testHasNotImportantChangesEvent() {
+		Event newEvent = createOneEvent(5);
+		Event updateEvent = newEvent.clone();
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventRecurrence() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createRecurrence(newEvent);
 		newEvent.setRecurrence(recurrence);
@@ -233,7 +255,7 @@ public class EventTest {
 	}
 
 	@Test
-	public void testHasImportantChangesEventWithNothingModification() {
+	public void testHasNotImportantChangesEventRecurrence() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createRecurrence(newEvent);
 		newEvent.setRecurrence(recurrence);
@@ -244,7 +266,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testHasImportantChangesEventAddAttendees() {
+	public void testHasNotImportantChangesEventAdddingAttendees() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createRecurrence(newEvent);
 		newEvent.setRecurrence(recurrence);
@@ -256,7 +278,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testHasImportantChangesEventWithAddingAttendeeAndUpdatedLocation() {
+	public void testHasImportantChangesEventWithAddingAttendeesAndUpdatedLocation() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createRecurrence(newEvent);
 		newEvent.setRecurrence(recurrence);
@@ -310,6 +332,47 @@ public class EventTest {
 		updateRecurrence.getEventExceptions().get(0).setDate(calendarUpdate.getTime());
 		
 		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasNotImportantChangesEventWithNullImportantParameter() {
+		Event newEvent = createOneEvent(5);
+		newEvent.setLocation(null);
+		Event updateEvent = newEvent.clone();
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasNotImportantChangesEventWithEmptyImportantChange() {
+		Event newEvent = createOneEvent(5);
+		newEvent.setLocation("");
+		Event updateEvent = newEvent.clone();
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventWithNullImportantChangeToEventCloned() {
+		Event newEvent = createOneEvent(5);
+		Event updateEvent = newEvent.clone();
+		updateEvent.setLocation(null);
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasImportantChangesEventWithEmptyImportantChangeToEventCloned() {
+		Event newEvent = createOneEvent(5);
+		Event updateEvent = newEvent.clone();
+		updateEvent.setLocation("");
+		Assert.assertTrue(updateEvent.hasImportantChanges(newEvent));
+	}
+	
+	@Test
+	public void testHasNotImportantChangesEventCompareEmptyAndNullImportantChange() {
+		Event newEvent = createOneEvent(5);
+		newEvent.setLocation(null);
+		Event updateEvent = newEvent.clone();
+		updateEvent.setLocation("");
+		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
 	}
 	
 	private Event createOneEvent(int nbAttendees) {

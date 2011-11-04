@@ -413,12 +413,15 @@ public class Event implements Indexed<Integer> {
 	
 	public boolean hasImportantChanges(Event event) {
 		ComparatorUsingEventHasImportantChanges comparator = new ComparatorUsingEventHasImportantChanges();
+		boolean hasImportantChanges = false;
 		if (comparator.equals(this, event)) {
 			if (this.recurrence != null) {
-				return this.recurrence.hasImportantChanges(event.getRecurrence());
+				hasImportantChanges =  this.recurrence.hasImportantChanges(event.getRecurrence());
 			}
+		} else {
+			hasImportantChanges = true;
 		}
-		return true;
+		return hasImportantChanges;
 	}
 
 	@Override
