@@ -108,8 +108,7 @@ public class LDAPAuthService implements IAuthentificationService {
 				bind = new InitialDirContext(bindenv);
 				ret = true;
 			} catch (Exception e) {
-				logger.error(e.getMessage() + " (with password "
-						+ clearTextPassword + " and dn: " + dn + ")", e);
+				logger.error(e.getMessage() + " with dn: " + dn + ")", e);
 			} finally {
 				if (bind != null) {
 					try {

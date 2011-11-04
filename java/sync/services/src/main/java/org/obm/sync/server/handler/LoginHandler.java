@@ -102,8 +102,7 @@ public class LoginHandler implements ISyncHandler {
 				versionValidator.checkObmConnectorVersion(token);
 				responder.sendToken(token);
 			} else {
-				responder.sendError("Login failed for user '" + login
-						+ "' with password '" + pass + "'");
+				responder.sendError("Login failed for user '" + login + "'");
 			}
 		} catch (OBMConnectorVersionException e) {
 			logger.error(e.getToken().getOrigin() + " isn't longer suppored.");
