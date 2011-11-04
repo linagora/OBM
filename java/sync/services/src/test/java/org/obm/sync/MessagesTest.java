@@ -26,8 +26,12 @@ public class MessagesTest {
 	@Test
 	public void testResourceBundleZhNotExist() {
 		Messages messages = new Messages(new ObmConfigurationService(), Locale.CHINESE);
+		String expectedMessage = "Nouvel événement de owner sur OBM : title";
+		if (Locale.getDefault() == Locale.ENGLISH) {
+			expectedMessage = "New event created by owner on OBM: title";
+		}
 		String message = messages.newEventTitle("owner", "title");
-		Assert.assertEquals("Nouvel événement de owner sur OBM : title", message);
+		Assert.assertEquals(expectedMessage, message);
 	}
 	
 }
