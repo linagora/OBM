@@ -34,18 +34,28 @@ public class EventServiceImpl implements EventService {
 	public MSEvent convertEventToMSEvent(BackendSession bs, Event event)
 			throws DaoException {
 		MSEventUid msEventUid = getMsEventUidFor(event, bs.getDevice());
+		if (msEventUid == null) {
+			msEventUid = createMsEventUidFromEventExtId(event);
+		}
 		MSEvent msEvent = eventConverter.convert(bs, event, msEventUid);
 		return msEvent;
 	}
 	
 	private MSEventUid getMsEventUidFor(Event event, Device device) throws DaoException {
+		if (event.getObmId() == null || event.getObmId().getIndex() == null) {
+			return null;
+		}
 		MSEventUid msEventUidFromDatabase = calendarDao.getMsEventUidFor(event.getObmId(), device);
 		if (msEventUidFromDatabase != null) {
 			return msEventUidFromDatabase;
 		}
-		MSEventUid convertedFromExtId = new MSEventUid(convertExtIdAsHex(event.getExtId()));
+		MSEventUid convertedFromExtId = createMsEventUidFromEventExtId(event);
 		calendarDao.insertObmIdMSEventUidMapping(event.getObmId(), convertedFromExtId, device);
 		return convertedFromExtId;
+	}
+
+	private MSEventUid createMsEventUidFromEventExtId(Event event) {
+		return new MSEventUid(convertExtIdAsHex(event.getExtId()));
 	}
 	
 	private String convertExtIdAsHex(EventExtId extId) {
