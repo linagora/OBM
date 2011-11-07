@@ -54,7 +54,7 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.items.AddressBookChangesResponse;
-import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.mailingList.MLEmail;
@@ -249,8 +249,8 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendContactChanges(ContactChangesResponse cc) {
-		return sendDom(biw.writeChanges(cc));
+	public String sendContactChanges(ContactChanges contactChanges) {
+		return sendDom(biw.writeChanges(contactChanges));
 	}
 
 	public String sendCategories(List<Category> ret) {

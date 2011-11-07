@@ -158,7 +158,9 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 
 		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.getContactsChanged(bs, lastSync);
 		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
-				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted());
+				hierarchyItemsChanges.getItemsAddedOrUpdated(),
+				hierarchyItemsChanges.getItemsDeleted());
+		
 		return new FolderSyncResponse(
 				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
 	}
