@@ -8,7 +8,7 @@ Homepage: http://www.obm.org
 
 Package: obm-full
 Architecture: all
-Depends: obm-storage, obm-ldap, obm-ui, obm-cyrus, obm-postfix, obm-services, obm-locator, obm-solr, obm-filter, obm-satellite, obm-sync, opush
+Depends: obm (= ${binary:Version}), obm-filter (= ${binary:Version}), obm-satellite (= ${binary:Version}), obm-sync (= ${binary:Version}), opush (= ${binary:Version}), ${misc:Depends}
 Description: Open Business Management, a groupware solution (metapackage)
  This package is a metapackage that, when installed, guarantees that you have
  all the different components of OBM installed. Removing this package won't
@@ -21,7 +21,7 @@ Description: Open Business Management, a groupware solution (metapackage)
 
 Package: obm
 Architecture: all
-Depends: obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator, ${misc:Depends}, obm-solr
+Depends: obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator (= ${binary:Version}), obm-solr (= ${binary:Version}), ${misc:Depends}
 Description: web interface for Open Business Management (metapackage)
  This package is a metapackage that, when installed, guarantees that you have
  the components necessary for the OBM web interface installed. Removing this
@@ -62,7 +62,7 @@ Description: database for Open Business Management
 Package: obm-core
 Architecture: all
 Pre-Depends: debconf
-Depends:  obm-conf (= ${binary:Version}), php5-cli, php5-pgsql | php5-mysql, tzdata, php5-curl, php-apc ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), php5-cli, php5-pgsql | php5-mysql, tzdata, php5-curl, php-apc, ${misc:Depends}
 Description: web interface for Open Business Management
  This package contains the web interface for OBM. It has no dependency on the
  other services needed by OBM, such as obm-storage.
@@ -171,7 +171,7 @@ Description: email content checker configuration for OBM
 Package: obm-samba
 Architecture: all
 Pre-Depends: obm-storage (= ${binary:Version})
-Depends:  obm-munin-node, ${misc:Depends}, obm-ldap
+Depends:  obm-munin-node, obm-ldap, ${misc:Depends}
 Description: Samba configuration for OBM
  This package configures Samba for OBM.
  .
