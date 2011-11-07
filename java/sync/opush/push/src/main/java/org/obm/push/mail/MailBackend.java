@@ -14,8 +14,9 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.dom.Message;
 import org.columba.ristretto.message.Address;
+import org.columba.ristretto.parser.ParserException;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.EmailConfiguration;
@@ -45,6 +46,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
+import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.book.BookClient;
@@ -64,15 +66,18 @@ public class MailBackend extends ObmSyncBackend {
 
 	private final IEmailManager emailManager;
 	private final IInvitationFilterManager filterManager;
+	private final Mime4jUtils mime4jUtils;
 
 	@Inject
 	/*package*/ MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, 
 			IInvitationFilterManager filterManager, 
-			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient)  {
+			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient,
+			Mime4jUtils mime4jUtils)  {
 		
 		super(collectionDao, bookClient, calendarClient, todoClient);
 		this.emailManager = emailManager;
 		this.filterManager = filterManager;
+		this.mime4jUtils = mime4jUtils;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
@@ -341,9 +346,16 @@ public class MailBackend extends ObmSyncBackend {
 
 	public void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent) throws ProcessingEmailException {
 		try {
-			SendEmailHandler handler = new SendEmailHandler(getUserEmail(bs));
-			send(bs, mailContent, handler, saveInSent);
+			Message message = mime4jUtils.parseMessage(mailContent);
+			SendEmail sendEmail = new SendEmail(getUserEmail(bs), message);
+			send(bs, sendEmail, saveInSent);
 		} catch (UnknownObmSyncServerException e) {
+			throw new ProcessingEmailException(e);
+		} catch (MimeException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (ParserException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -369,12 +381,12 @@ public class MailBackend extends ObmSyncBackend {
 
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
-				ReplyEmailHandler reh = new ReplyEmailHandler(getUserEmail(bs), mail.get(0));
-				send(bs, mailContent, reh, saveInSent);
+				Message message = mime4jUtils.parseMessage(mailContent);
+				ReplyEmail replyEmail = new ReplyEmail(mime4jUtils, getUserEmail(bs), mail.get(0), message);
+				send(bs, replyEmail, saveInSent);
 				emailManager.setAnsweredFlag(bs, collectionPath, uid);
 			} else {
-				SendEmailHandler handler = new SendEmailHandler(getUserEmail(bs));
-				send(bs, mailContent, handler, saveInSent);
+				sendEmail(bs, mailContent, saveInSent);
 			}
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
@@ -383,6 +395,12 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (UnknownObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
+		} catch (MimeException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (ParserException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -400,18 +418,18 @@ public class MailBackend extends ObmSyncBackend {
 					getCalendarClient(), collectionName, uids);
 
 			if (mail.size() > 0) {
-				ForwardEmailHandler reh = new ForwardEmailHandler(
-						getUserEmail(bs), mail.get(0));
-				send(bs, mailContent, reh, saveInSent);
+				Message message = mime4jUtils.parseMessage(mailContent);
+				InputStream originMail = mail.get(0);
+				ForwardEmail forwardEmail = 
+						new ForwardEmail(mime4jUtils, getUserEmail(bs), originMail, message);
+				send(bs, forwardEmail, saveInSent);
 				try{
 					emailManager.setAnsweredFlag(bs, collectionName, uid);
 				} catch (Throwable e) {
 					logger.info("Can't set Answered Flag to mail["+uid+"]");
 				}
 			} else {
-				SendEmailHandler handler = new SendEmailHandler(
-						getUserEmail(bs));
-				send(bs, mailContent, handler, saveInSent);
+				sendEmail(bs, mailContent, saveInSent);
 			}
 		} catch (NumberFormatException e) {
 			throw new ProcessingEmailException(e);
@@ -422,6 +440,12 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (UnknownObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
+		} catch (MimeException e) {
+			throw new ProcessingEmailException(e);
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (ParserException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -438,30 +462,18 @@ public class MailBackend extends ObmSyncBackend {
 		}
 	}
 
-	private void send(BackendSession bs, byte[] mailContent, SendEmailHandler handler, Boolean saveInSent) throws ProcessingEmailException {
-		InputStream emailData = null;
+	private void send(BackendSession bs, SendEmail sendEmail, Boolean saveInSent) throws ProcessingEmailException {
 		try {
-			MimeStreamParser parser = new MimeStreamParser();
-			parser.setContentHandler(handler);
-			parser.parse(new ByteArrayInputStream(mailContent));
-			emailData = new ByteArrayInputStream(FileUtils.streamBytes(handler.getMessage(), true));
-			emailData.mark(emailData.available());
-			
-			Boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(emailData);
-			emailData.reset();
+			Boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
 
-			Address from = getAddress(handler.getFrom());
-			if(!handler.isInvitation()  &&  isScheduleMeeting){
-				emailManager.sendEmail(bs, from, handler.getTo(),
-						handler.getCc(), handler.getCci(), emailData, saveInSent);	
+			Address from = getAddress(sendEmail.getFrom());
+			if(!sendEmail.isInvitation() && isScheduleMeeting){
+				emailManager.sendEmail(bs, from, sendEmail.getTo(),
+						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
 			}
 		} catch (TNEFConverterException e) {
-			throw new ProcessingEmailException(e);
-		} catch (MimeException e) {
-			throw new ProcessingEmailException(e);
-		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (StoreEmailException e) {
 			throw new ProcessingEmailException(e);
@@ -469,10 +481,6 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (SmtpInvalidRcptException e) {
 			throw new ProcessingEmailException(e);
-		} finally {
-			if(emailData != null){
-				try{emailData.close();} catch (Throwable e) {}
-			}
 		}
 	}
 

@@ -1,5 +1,7 @@
 package org.obm.push.mail;
 
+import static org.obm.push.mail.MailTestsUtils.loadEmail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -14,6 +16,7 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.calendar.CalendarClient;
@@ -46,18 +49,14 @@ public class MailBackendTest {
 		emailManager.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class), EasyMock.anyBoolean());
 		EasyMock.expectLastCall().once();
 		
-		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null);
+		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null, new Mime4jUtils());
 
 		EasyMock.replay(emailManager, calendarClient, backendSession);
 
-		InputStream emailStream = loadDataFile("bigEml.eml");
+		InputStream emailStream = loadEmail(getClass(), "bigEml.eml");
 		mailBackend.sendEmail(backendSession, ByteStreams.toByteArray(emailStream), true);
 		
 		EasyMock.verify(emailManager, calendarClient, backendSession);
 	}
 	
-	protected InputStream loadDataFile(String name) {
-		return getClass().getClassLoader().getResourceAsStream(
-				"eml/" + name);
-	}
 }

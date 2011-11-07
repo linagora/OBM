@@ -20,7 +20,7 @@ import com.google.inject.Singleton;
 public class SmartReplyHandler extends MailRequestHandler {
 
 	@Inject
-	protected SmartReplyHandler(IContentsImporter contentsImporter,
+	/* package */ SmartReplyHandler(IContentsImporter contentsImporter,
 			IErrorsManager errorManager, MailProtocol mailProtocol) {
 		
 		super(contentsImporter, errorManager, mailProtocol);

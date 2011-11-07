@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
@@ -134,23 +131,8 @@ public class MailMessageLoader {
 	}
 	
 	private void fetchMimeData(final MSEmail mm, final long messageId) {
-		try {
-			final InputStream mimeData = storeClient.uidFetchMessage(messageId);
-
-			final SendEmailHandler handler = new SendEmailHandler("");
-			final MimeConfig config = new MimeConfig();
-			config.setMaxContentLen(Integer.MAX_VALUE);
-			config.setMaxLineLen(Integer.MAX_VALUE);
-			final MimeStreamParser parser = new MimeStreamParser(config);
-			parser.setContentHandler(handler);
-			parser.parse(mimeData);
-
-			mm.setMimeData(handler.getMessage());
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		} catch (MimeException e) {
-			logger.error(e.getMessage(), e);
-		}
+		final InputStream mimeData = storeClient.uidFetchMessage(messageId);
+		mm.setMimeData(mimeData);
 	}
 
 	private MSEmail convertMailMessageToMSEmail(final MailMessage mailMessage, final BackendSession bs, 

@@ -75,7 +75,7 @@ public class ErrorsManager implements IErrorsManager {
 		
 		Multipart multipart = mime4jUtils.getMixedMultiPart();
 
-		BodyPart part = Mime4jUtils.createTextPart(body.toString(), "plain");
+		BodyPart part = mime4jUtils.createTextPart(body.toString(), "plain");
 		multipart.addBodyPart(part);
 		mime4jUtils.attach(multipart, errorMail, "error_message.eml",
 				"message/rfc822");
@@ -86,7 +86,7 @@ public class ErrorsManager implements IErrorsManager {
 
 	private Message prepareMessage(BackendSession bs, String subject, String body) throws ParseException, UnsupportedEncodingException {
 		Message mm = prepareMessageHeaders(bs, subject);
-		TextBody part = Mime4jUtils.createBody(body);
+		TextBody part = mime4jUtils.createBody(body);
 		mm.setBody(part);
 		return mm;
 	}

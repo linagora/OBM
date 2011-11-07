@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageWriter;
@@ -38,12 +39,14 @@ import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 
+import com.google.common.base.Charsets;
+
 public class Mime4jUtils {
 
 	private MessageBuilder messageBuilder;
 	private MessageWriter messageWriter;
 
-	private Mime4jUtils() {
+	public Mime4jUtils() {
 		MessageServiceFactoryImpl messageServiceFactory = new MessageServiceFactoryImpl();
 		messageBuilder = messageServiceFactory.newMessageBuilder();
 		messageWriter = messageServiceFactory.newMessageWriter();
@@ -53,6 +56,11 @@ public class Mime4jUtils {
 		return messageBuilder.newMessage();
 	}
 
+	public Message parseMessage(byte[] data) throws MimeException, IOException {
+		ByteArrayInputStream stream = new ByteArrayInputStream(data);
+		return parseMessage(stream);
+	}
+	
 	public Message parseMessage(InputStream in) throws MimeException, IOException {
 		return messageBuilder.parseMessage(in);
 	}
@@ -72,7 +80,7 @@ public class Mime4jUtils {
 	/**
 	 * Creates a text part from the specified string.
 	 */
-	public static BodyPart createTextPart(String text, String subtype) throws UnsupportedEncodingException {
+	public BodyPart createTextPart(String text, String subtype) throws UnsupportedEncodingException {
 		TextBody body = createBody(text);
 		// Create a text/plain body part
 		BodyPart bodyPart = new BodyPart();
@@ -82,7 +90,7 @@ public class Mime4jUtils {
 		return bodyPart;
 	}
 
-	public static TextBody createBody(String text) throws UnsupportedEncodingException {
+	public TextBody createBody(String text) throws UnsupportedEncodingException {
 		text.replace("\r\n", "\n").replace("\n", "\r\n");
 		BasicBodyFactory bodyFactory = new BasicBodyFactory();
 		// Use UTF-8 to encode the specified text
@@ -90,14 +98,21 @@ public class Mime4jUtils {
 		return body;
 	}
 	
-	public InputStream toInputStream(Message message) throws IOException{
+	public InputStream toInputStream(Body message) throws IOException{
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		messageWriter.writeBody(message, out);
 		message.dispose();
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 
-	private static BodyPart createBinaryPart(StorageBodyFactory bodyFactory,
+	public String toString(Body message) throws IOException{
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		messageWriter.writeBody(message, out);
+		message.dispose();
+		return new String(out.toByteArray(), Charsets.UTF_8);
+	}
+	
+	private BodyPart createBinaryPart(StorageBodyFactory bodyFactory,
 			InputStream in, String mimeType, String fileName)
 			throws IOException {
 		// Create a binary message body from the stream
@@ -121,7 +136,7 @@ public class Mime4jUtils {
 	/**
 	 * Stores the specified stream in a Storage object.
 	 */
-	private static Storage storeStream(StorageProvider storageProvider,
+	private Storage storeStream(StorageProvider storageProvider,
 			InputStream in) throws IOException {
 		// An output stream that is capable of building a Storage object.
 		StorageOutputStream out = storageProvider.createStorageOutputStream();
