@@ -7,53 +7,41 @@ Group:          Development/Languages
 License:        AGPLv3
 URL:            http://www.obm.org
 Source0:        %{name}-%{version}.tar.gz
-#Source1:        %{name}-httpd.conf
-Source2:	%{name}-core.cron.d
-Source3:	%{name}-admin.sh
-Source4:	%{name}-config.sh
-Source5:	%{name}-ldap.sh
-Source6:	%{name}-mysql.sh
-#Source7:	%{name}-satellite.sh
-Source8:	mysql.sql
-Source9:	%{name}-core.sh
-Source10:	mysql-obm-2.2.sql
-#Source11:	pgsql.sql
-Source12:	%{name}-cyrus.sh
-Source13:	%{name}-postfix.sh
-Source14:       %{name}-pgsql.sh
-#Source15:       pgsql-obm-2.2.sql
-Source16:	%{name}-sysusers.sh
-Source17:	%{name}-ui.sh
-Source18:	pgadmin.sh
-Source19:	myadmin.sh
+Source1:        %{name}-core.cron.d
+Source2:        %{name}-admin.sh
+Source3:        %{name}-config.sh
+Source4:        %{name}-ldap.sh
+Source5:        %{name}-mysql.sh
+Source6:        %{name}-core.sh
+Source7:        %{name}-cyrus.sh
+Source8:        %{name}-postfix.sh
+Source9:        %{name}-pgsql.sh
+Source10:       %{name}-sysusers.sh
+Source11:       %{name}-ui.sh
+Source12:       pgadmin.sh
+Source13:       myadmin.sh
 
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildARch:      noarch
-#BuildRequires:  usermode
-#Provides:	obm-core
 Requires:       %{name}-config = %{version}-%{release}
-#Requires:       %{name}-MySQL = %{version}-%{release} OR %{name}-PostgreSQL = %{version}-%{release}
 Requires:       %{name}-DataBase = %{version}-%{release} 
-Requires:	%{name}-services = %{version}-%{release}
-Requires:	%{name}-ldap = %{version}-%{release}
-Requires:	%{name}-postfix = %{version}-%{release}
-Requires:	%{name}-cyrus = %{version}-%{release}
-Requires:	%{name}-ui = %{version}-%{release}
-Requires:	%{name}-core = %{version}-%{release}
-Requires:	%{name}-support = %{version}-%{release}
+Requires:       %{name}-services = %{version}-%{release}
+Requires:       %{name}-ldap = %{version}-%{release}
+Requires:       %{name}-postfix = %{version}-%{release}
+Requires:       %{name}-cyrus = %{version}-%{release}
+Requires:       %{name}-ui = %{version}-%{release}
+Requires:       %{name}-core = %{version}-%{release}
+Requires:       %{name}-support = %{version}-%{release}
 Requires:       %{name}-ca
 Requires:       %{name}-cert
 Requires:       %{name}-solr
-
-#Requires(post):	vixie-cron
 
 %package        full
 Summary:        obm full installation
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
-#Requires:       %{name}-MySQL = %{version}-%{release} OR %{name}-PostgreSQL = %{version}-%{release}
 Requires:       %{name}-PostgreSQL = %{version}-%{release}
 Requires:       %{name}-services = %{version}-%{release}
 Requires:       %{name}-ldap = %{version}-%{release}
@@ -66,12 +54,7 @@ Requires:       %{name}-ca
 Requires:       %{name}-cert
 Requires:       %{name}-solr
 Requires:       %{name}-sync
-#Requires:       %{name}-caldav
 Requires:       opush
-#Requires:       minig
-#Requires:       minig-conf
-#Requires:       minig-storage
-#Requires:       minig-backend
 
 %description    full
 The %{name}-full package is full installation
@@ -205,22 +188,6 @@ Requires:       perl-Digest-SHA
 %description	-n perl-OBM
 perl-OBM package contains OBM libs for perl
 
-#%package	-n perl-ObmSatellite
-#Summary:        Perl libraries for OBM-Satellite
-#Group:          Development/Libraries
-#License:        GPL+ or Artistic
-#
-#BuildARch:	noarch
-#BuildRequires:  perl(ExtUtils::MakeMaker)
-#Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-#Requires:	perl-LDAP
-#Requires:	perl-Net-CIDR
-#Requires:	perl-Net-Server
-#
-#%description    -n perl-ObmSatellite
-#perl-ObmSatellite package contains OBM-Satellite libraries for perl
-
-
 %package	ldap
 Summary:	OBM ldap configuration
 Group:		Development/Tools
@@ -231,20 +198,6 @@ Requires:	openldap-clients
 
 %description	ldap
 Configuration of OpenLDAP
-
-#%package        Satellite
-#Summary:        OBM Satellite configuration
-#Group:          Development/Tools
-#
-#Requires:       %{name}-config = %{version}-%{release}
-#Requires:	perl-ObmSatellite = %{version}-%{release}
-#Requires(post):	chkconfig
-#Requires(preun):chkconfig
-#Requires(preun):initscripts
-#
-#%description    Satellite
-#The package %{name}-Satellite contains satellite configuration
-#files for OBM.
 
 %package	postfix
 Summary:        OBM Postfix installation
@@ -328,9 +281,9 @@ find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
 
 #obm-config
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -p -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/%{name}-config
-install -p -m 755 %{SOURCE16} $RPM_BUILD_ROOT%{_bindir}/%{name}-sysusers
-install -p -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/%{name}-admin
+install -p -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/%{name}-config
+install -p -m 755 %{SOURCE10} $RPM_BUILD_ROOT%{_bindir}/%{name}-sysusers
+install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/%{name}-admin
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 cp -a conf/* $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
@@ -374,17 +327,17 @@ cd $RPM_BUILD_ROOT%{_sysconfdir}
 ln -s %{_sysconfdir}/%{name} $RPM_BUILD_ROOT%{_datadir}/%{name}/conf
 cd -
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/obm-core
+install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/obm-core
 
 cp conf/modules/module.inc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/modules
 cp conf/themes/login.html.sample $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/themes
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -p -m 755 %{SOURCE9} $RPM_BUILD_ROOT%{_bindir}/obm-core
+install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/obm-core
 
 #obm-ui
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -p -m 755 %{SOURCE17} $RPM_BUILD_ROOT%{_bindir}/%{name}-ui
+install -p -m 755 %{SOURCE11} $RPM_BUILD_ROOT%{_bindir}/%{name}-ui
 install -p -m 644 doc/conf/apache-virtualhost_obm.conf.sample $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 # obm-services
@@ -406,68 +359,34 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/openldap/schema
 install -p -m 644 doc/conf/ldap_samba.schema.3.0.24.sample $RPM_BUILD_ROOT%{_sysconfdir}/openldap/schema/samba.schema
 install -p -m 644 doc/conf/ldap_obm.schema.sample $RPM_BUILD_ROOT%{_sysconfdir}/openldap/schema/obm.schema
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -p -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/obm-ldap
+install -p -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/obm-ldap
 
 #obm-postfix
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
-install -p -m 755 %{SOURCE13} $RPM_BUILD_ROOT%{_bindir}/obm-postfix
+install -p -m 755 %{SOURCE8} $RPM_BUILD_ROOT%{_bindir}/obm-postfix
 
 # obm-mysql
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-MySQL-%{version}
-install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/%{name}-mysql
-install -p -m 755 %{SOURCE19} $RPM_BUILD_ROOT%{_bindir}/myadmin.lib
-#install -p -m 644 %{SOURCE8} $RPM_BUILD_ROOT%{_docdir}/%{name}-MySQL-%{version}/mysql.sql
-#install -p -m 644 %{SOURCE10} $RPM_BUILD_ROOT%{_docdir}/%{name}-MySQL-%{version}/mysql-obm-2.2.sql
+install -p -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/%{name}-mysql
+install -p -m 755 %{SOURCE13} $RPM_BUILD_ROOT%{_bindir}/myadmin.lib
 
 # obm-pgsql
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-PostgreSQL-%{version}
-install -p -m 755 %{SOURCE14} $RPM_BUILD_ROOT%{_bindir}/%{name}-pgsql
-install -p -m 755 %{SOURCE18} $RPM_BUILD_ROOT%{_bindir}/pgadmin.lib
-#install -p -m 644 %{SOURCE11} $RPM_BUILD_ROOT%{_docdir}/%{name}-PostgreSQL-%{version}/pgsql.sql
-#install -p -m 644 %{SOURCE15} $RPM_BUILD_ROOT%{_docdir}/%{name}-PostgreSQL-%{version}/pgsql-obm-2.2.sql
+install -p -m 755 %{SOURCE9} $RPM_BUILD_ROOT%{_bindir}/%{name}-pgsql
+install -p -m 755 %{SOURCE12} $RPM_BUILD_ROOT%{_bindir}/pgadmin.lib
 
 # obm-cyrus
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-install -p -m 755 %{SOURCE12} $RPM_BUILD_ROOT%{_bindir}/%{name}-cyrus
-
-## obm-stallite stuff
-#mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-satellite
-#mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
-#mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-satellite
-#mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
-#install -p -m 755 auto/obmSatellite/obmSatellite.pl $RPM_BUILD_ROOT%{_datadir}/obm-satellite
-#install -p -m 755 auto/obmSatellite/init-obmSatellite.sample $RPM_BUILD_ROOT%{_sysconfdir}/init.d/obmSatellite
-#sed -i -e "s#^OBMPATH.*#OBMPATH=\"%{_datadir}/%{name}-satellite\"#" $RPM_BUILD_ROOT%{_sysconfdir}/init.d/obmSatellite
-#sed -i -e "s#^daemon_path.*#daemon_path=\"\$OBMPATH/obmSatellite.pl\"#" $RPM_BUILD_ROOT%{_sysconfdir}/init.d/obmSatellite
-#install -p -m 600 auto/obmSatellite/obmSatellite.cf.sample $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-satellite/%{name}Satellite.cf
-#sed -i -e "s#^cyrus_service.*#cyrus_service	%{_sysconfdir}/init.d/cyrus-imapd#" $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-satellite/%{name}Satellite.cf
-#sed -i -e "s#cyrus_partition_root.*#cyrus_partition_root	%{_localstatedir}/spool/imap#" $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-satellite/%{name}Satellite.cf
-#install -p -m 755 %{SOURCE7} $RPM_BUILD_ROOT%{_bindir}/obm-satellite
-## deplacer dans le postinst
-#pushd $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-satellite/
-#ln -s %{_sysconfdir}/%{name}-satellite/%{name}Satellite.cf $RPM_BUILD_ROOT%{_datadir}/obm-satellite/%{name}Satellite.cf
-#popd
-
-# Add self auth on wrapper script
-#ln -sf consolehelper $RPM_BUILD_ROOT%{_bindir}/%{name}-config
+install -p -m 755 %{SOURCE7} $RPM_BUILD_ROOT%{_bindir}/%{name}-cyrus
 
 # Remove version-controle-internal file ---> useless
 find $RPM_BUILD_ROOT -name '.cvsignore' -exec rm -rf {} ';'
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-#%post		-n %{name}-Satellite
-#/sbin/chkconfig --add obmSatellite
-#
-#%preun		-n %{name}-Satellite
-#if [ $1 = 0 ] ; then
-#/sbin/service obmSatellite stop >/dev/null 2>&1
-#/sbin/chkconfig --del obmSatellite
-#fi
 
 %post		-n %{name}-ui
 sed -i -e "s/^# chkconfig: - 85 15$/# chkconfig: 2345 85 15/" /etc/init.d/httpd
@@ -517,10 +436,6 @@ chkconfig --add httpd
 %{perl_vendorlib}/OBM
 %{_mandir}/man3/*.3pm*
 
-#%files          -n perl-ObmSatellite
-#%defattr(-,root,root,-)
-#%{perl_vendorlib}/ObmSatellite
-
 %files		-n %{name}-ui
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %{_bindir}/%{name}-ui
@@ -539,9 +454,6 @@ chkconfig --add httpd
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}_conf.inc
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}-rpm.conf
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/automateLdapMapping.xml
-#%ghost %{_sysconfdir}/%{name}/%{name}-rpm.conf
-#%config(noreplace) %{_sysconfdir}/pam.d/%{name}
-#%config(noreplace) %{_sysconfdir}/security/console.apps/%{name}
 
 %files		-n %{name}-PostgreSQL91
 
@@ -549,8 +461,6 @@ chkconfig --add httpd
 
 %files		-n %{name}-MySQL
 %defattr(-,root,root,-)
-#%doc %{_docdir}/%{name}-MySQL-%{version}/mysql.sql
-#%doc %{_docdir}/%{name}-MySQL-%{version}/mysql-obm-2.2.sql
 %{_bindir}/obm-mysql
 %{_bindir}/myadmin.lib
 
@@ -561,8 +471,6 @@ fi
 
 %files          -n %{name}-PostgreSQL
 %defattr(-,root,root,-)
-#%doc %{_docdir}/%{name}-PostgreSQL-%{version}/pgsql.sql
-#%doc %{_docdir}/%{name}-PostgreSQL-%{version}/pgsql-obm-2.2.sql
 %{_bindir}/obm-pgsql
 
 %post           -n %{name}-PostgreSQL
@@ -590,14 +498,6 @@ fi
 %{_sysconfdir}/openldap/schema/obm.schema
 %{_sysconfdir}/openldap/schema/samba.schema
 %{_bindir}/%{name}-ldap
-
-#%files		-n %{name}-Satellite
-#%defattr(-,root,root,-)
-#%{_bindir}/%{name}-satellite
-#%{_datadir}/%{name}-satellite
-#%{_localstatedir}/log/%{name}
-#%config(noreplace) %{_sysconfdir}/%{name}-satellite/%{name}Satellite.cf
-#%{_sysconfdir}/init.d/obmSatellite
 
 %files		-n %{name}-postfix
 %{_bindir}/%{name}-postfix
