@@ -21,13 +21,14 @@ import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.calendar.TodoClient;
-import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 
 import com.google.inject.Inject;
@@ -37,7 +38,7 @@ import com.google.inject.Singleton;
 public class ContactsBackend extends ObmSyncBackend {
 
 	private final ContactConfiguration contactConfiguration;
-
+	
 	@Inject
 	private ContactsBackend(ContactConfiguration contactConfiguration, CollectionDao collectionDao, BookClient bookClient, 
 			CalendarClient calendarClient, TodoClient todoClient) {
@@ -49,6 +50,7 @@ public class ContactsBackend extends ObmSyncBackend {
 	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
+			
 		FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
 		
 		for (Folder folder: folderChanges.getUpdated()) {
@@ -59,6 +61,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			String toString = collectionIdToString(collectionId);
 			itemsDeleted.add( new ItemChange(toString) );
 		}
+		
 		return new HierarchyItemsChanges(itemsChanged, itemsDeleted, folderChanges.getLastSync());
 	}
 	
@@ -73,72 +76,124 @@ public class ContactsBackend extends ObmSyncBackend {
 			bc.logout(token);
 		}
 	}
-	
-	private ItemChange createItemChange(BackendSession bs, Folder folder) throws DaoException {
-		ItemChange itemChange = new ItemChange();
-		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\" + folder.getName();
-		String serverId;
-		try {
-			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
-			serverId = collectionIdToString(collectionId);
-		} catch (CollectionNotFoundException e) {
-			serverId = createCollectionMapping(bs.getDevice(), col);
-			itemChange.setIsNew(true);
-		}
 
-		itemChange.setServerId(serverId);
-		itemChange.setParentId("0");
-		itemChange.setDisplayName(folder.getName());
-		itemChange.setItemType(getItemType(folder));
-		return itemChange;
+	private ItemChange createItemChange(BackendSession bs, Folder folder) throws DaoException {
+		boolean isNew = false;
+		String collectionPath = getCollectionPath(bs, folder.getName());
+		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+		if (serverId == null) {
+			serverId = createCollectionMapping(bs.getDevice(), collectionPath);
+			isNew = true;
+		}
+		String parentId = getParentId(bs, folder);
+		FolderType itemType = getItemType(folder);
+		return new ItemChange(serverId, parentId, folder.getName(), itemType, isNew);
 	}
 
+	private String getCollectionPath(BackendSession bs, String folderName)  {
+		if (isDefaultFolder(folderName)) {
+			return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\\\" + folderName;
+		} else {
+			return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\\\" + 
+						contactConfiguration.getDefaultAddressBookName() + "\\\\" + folderName;
+		}
+	}
+	
+	private String getServerIdFromCollectionPath(BackendSession bs, String collectionPath) throws DaoException {
+		try {
+			Integer collectionId = getCollectionIdFor(bs.getDevice(), collectionPath);
+			return collectionIdToString(collectionId);
+		} catch (CollectionNotFoundException e) {
+			return null;
+		}	
+	}
+	
+	private String getParentId(BackendSession bs, Folder folder) throws DaoException {
+		if (isDefaultFolder(folder.getName())) {
+			return contactConfiguration.getDefaultParentId(); 
+		} else {
+			String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
+			return getServerIdFromCollectionPath(bs, collectionPath);
+		}
+	}
+	
 	private FolderType getItemType(Folder folder) {
-		if (folder.getName().equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName())) {
+		if (isDefaultFolder(folder.getName())) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {
-			return FolderType.USER_CREATED_CONTACTS_FOLDER;
+			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		}
 	}
 	
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
+	private boolean isDefaultFolder(String folderName) {
+		if (folderName.equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer defaultCollectionId) throws UnknownObmSyncServerException, DaoException {
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);
-		
+
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
-		Date lastSync = null;
-		
 		try {
-			ContactChangesResponse changes = bc.getSync(token, BookType.contacts, state.getLastSync());
-			for (Contact c: changes.getUpdated()) {
-				ItemChange change = getContactChange(collectionId, c);
+			ContactChanges changes = bc.listContactsChanged(token, state.getLastSync());
+			List<AddressBook> addressBooks = bc.listAllBooks(token);
+			
+			for (Contact contact: changes.getUpdated()) {
+				ItemChange change = getContactChange(defaultCollectionId, contact, bs, addressBooks);
 				addUpd.add(change);
 			}
 
-			for (Integer del: changes.getRemoved()) {
-				ItemChange change = getItemChange(collectionId, "" + del);
+			for (Integer remove: changes.getRemoved()) {
+				ItemChange change = getItemChange(defaultCollectionId, String.valueOf(remove));
 				deletions.add(change);
 			}
-			lastSync = changes.getLastSync();
+			
+			return new DataDelta(addUpd, deletions, changes.getLastSync());
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} finally {
 			bc.logout(token);
 		}
-		return new DataDelta(addUpd, deletions, lastSync);
 	}
 
-	private ItemChange getContactChange( Integer collectionId,
-			Contact c) {
+	private ItemChange getContactChange(Integer defaultCollectionId, Contact c, BackendSession bs, List<AddressBook> addressBooks) throws DaoException {
 		ItemChange ic = new ItemChange();
-		ic.setServerId(getServerIdFor(collectionId, ""
-				+ c.getUid()));
-		MSContact cal = new ContactConverter().convert(c);
-		ic.setData(cal);
+		Integer collectionId = findAddressBookCollectionId(c.getFolderId(), bs, addressBooks);
+		if (collectionId != null) {
+			ic.setServerId( getServerIdFor(collectionId, String.valueOf(c.getUid())) );
+		} else {
+			ic.setServerId( getServerIdFor(defaultCollectionId, String.valueOf(c.getUid())) );
+		}
+		ic.setData( new ContactConverter().convert(c) );
 		return ic;
 	}
 
+	private Integer findAddressBookCollectionId(Integer folderId, BackendSession bs, List<AddressBook> addressBooks) throws DaoException {
+		AddressBook addressBook = findAddressBookFromId(folderId, addressBooks);
+		if (addressBook != null) {
+			String colllectionPath = getCollectionPath(bs, addressBook.getName());
+			try {
+				return getCollectionIdFor(bs.getDevice(), colllectionPath);
+			} catch (CollectionNotFoundException e) {
+				logger.warn("Address book not found, so, adding contact to defaut address book");
+			}	
+		}
+		return null;
+	}
+	
+	private AddressBook findAddressBookFromId(Integer folderId, List<AddressBook> addressBooks) {
+		for (AddressBook addressBook: addressBooks) {
+			if (addressBook.getUid().equals(folderId)) {
+				return addressBook;
+			}
+		}
+		return null;
+	}
+	
 	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, MSContact data) throws UnknownObmSyncServerException {
 		logger.info("create contact ({} | {}) in collectionId {}", 
 				new Object[]{data.getFirstName(), data.getLastName(), collectionId});

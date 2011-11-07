@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.ContactConfiguration;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -36,12 +38,13 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
-import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
+import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
@@ -69,14 +72,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ObmHelper obmHelper;
 	private final ContactMerger contactMerger;
 	private final ConstantService configuration;
+	private final ContactConfiguration contactConfiguration;
 
 	@Inject
-	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, ConstantService configuration) {
+	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
+			ConstantService configuration, ContactConfiguration contactConfiguration) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
 		this.obmHelper = obmHelper;
 		this.configuration = configuration;
+		this.contactConfiguration = contactConfiguration;
 	}
 
 	@Override
@@ -100,7 +106,11 @@ public class AddressBookBindingImpl implements IAddressBook {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return contactDao.findAddressBooks(con, token);
+			List<AddressBook> addressBooks = contactDao.findAddressBooks(con, token);
+			addressBooks.add(
+					new AddressBook(contactConfiguration.getAddressBookUsersName(), 
+							contactConfiguration.getAddressBookUserId(), true));
+			return addressBooks;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault("error finding addressbooks ");
@@ -111,44 +121,9 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	@Override
 	@Transactional
-	public ContactChangesResponse getSync(AccessToken token, BookType book, Date d)
-			throws ServerFault {
-		try {
-			logger.info(LogUtils.prefix(token) + "AddressBook : getSync()");
-			return getSync(book, d, token);
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault("error find contacts ");
-		}
-	}
-	
-	private ContactChangesResponse getSync(BookType book, Date timestamp, AccessToken token) throws ServerFault {
-		ContactChangesResponse response = new ContactChangesResponse();
-		Connection connection = null;
-		try {
-			if (book == BookType.users) {
-				response.setChanges(getUsersChanges(token, timestamp));
-			} else {
-				response.setChanges(getContactsChanges(token, timestamp));
-			}
-			connection = obmHelper.getConnection();
-			response.setLastSync(obmHelper.selectNow(connection));
-		} catch (Throwable t) {
-			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
-			throw new ServerFault(t);
-		} finally {
-			obmHelper.cleanup(connection, null, null);
-		}
-		return response;
-	}
-
-	private ContactChanges getUsersChanges(AccessToken token, Date timestamp) {
-		ContactChanges changes = new ContactChanges();
-		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC, GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
-			changes.setUpdated(userDao.findUpdatedUsers(timestamp, token).getContacts());
-			changes.setRemoved(userDao.findRemovalCandidates(timestamp, token));			
-		}
-		return changes;
+	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
+		logger.info(LogUtils.prefix(token) + "AddressBook : listContactsChanged");
+		return getContactsChanges(token, lastSync);
 	}
 	
 	@Override
@@ -182,9 +157,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return response;
 	}
 	
-	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) {
-		ContactChanges changes = new ContactChanges();
-		
+	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) throws ServerFault {
 		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
 
 		ContactUpdates userUpdates = new ContactUpdates();
@@ -196,13 +169,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 		Set<Integer> removalCandidates = contactDao.findRemovalCandidates(timestamp, token);
 		
-		List<Contact> updated = getUpdatedContacts(contactUpdates, userUpdates);
-		changes.setUpdated(updated);
-		
-		Set<Integer> removed = getRemovedContacts(contactUpdates, userUpdates, removalCandidates);
-		changes.setRemoved(removed);
-		
-		return changes;
+		return new ContactChanges(getUpdatedContacts(contactUpdates, userUpdates),
+				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), contactDao.getLastSync());
 	}
 	
 	private Set<Integer> getRemovedContacts(ContactUpdates contactUpdates,
@@ -461,11 +429,29 @@ public class AddressBookBindingImpl implements IAddressBook {
 		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
 		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
 				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
-			updated.addAll(userDao.findUpdatedFolders(timestamp));
+			updated.addAll(createAddressBookForUsers(timestamp));
 		}
 		
 		Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
 		return new FolderChanges(updated, removed, contactDao.getLastSync());
+	}
+	
+	private boolean isFirstSync(Date timestamp) {
+		if (timestamp == null || DateHelper.asDate("0").equals(timestamp) || 
+				(DateUtils.getEpochPlusOneSecondCalendar().getTime().getTime() == timestamp.getTime())) {
+			return true;
+		}
+		return false;
+	}
+	
+	/* package */private List<Folder> createAddressBookForUsers(Date timestamp) {
+		if (isFirstSync(timestamp)) {
+			Folder folder = new Folder();
+			folder.setUid(contactConfiguration.getAddressBookUserId());
+			folder.setName(contactConfiguration.getAddressBookUsersName());
+			return ImmutableList.of(folder);
+		}
+		return ImmutableList.of();
 	}
 	
 }

@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
-import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
@@ -138,16 +137,16 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public Document writeChanges(ContactChangesResponse cc) {
+	public Document writeChanges(ContactChanges contactChanges) {
 		Document doc = null;
 		try {
 			doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/contact-changes.xsd",
 					"contact-changes");
 			Element root = doc.getDocumentElement();
-			root.setAttribute("lastSync", DateHelper.asString(cc.getLastSync()));
+			root.setAttribute("lastSync", DateHelper.asString(contactChanges.getLastSync()));
 
-			createContactChanges(cc.getChanges(), root);
+			createContactChanges(contactChanges, root);
 
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);

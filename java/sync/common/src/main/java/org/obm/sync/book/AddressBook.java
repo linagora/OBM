@@ -1,5 +1,7 @@
 package org.obm.sync.book;
 
+import com.google.common.base.Objects;
+
 public class AddressBook {
 
 	private String name;
@@ -31,11 +33,6 @@ public class AddressBook {
 	public void setUid(Integer uid) {
 		this.uid = uid;
 	}
-	
-	@Override
-	public String toString() {
-		return "AddressBook '" + name + "' (" + uid + ")";
-	}
 
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
@@ -44,4 +41,28 @@ public class AddressBook {
 	public boolean isReadOnly() {
 		return readOnly;
 	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(uid);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof AddressBook) {
+			AddressBook that = (AddressBook) object;
+			return Objects.equal(this.uid, that.uid);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("name", name)
+			.add("uid", uid)
+			.add("readOnly", readOnly)
+			.toString();
+	}
+	
 }

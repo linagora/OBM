@@ -49,7 +49,9 @@ public class ContentsExporter implements IContentsExporter {
 		this.invitationFilterManager = invitationFilterManager;
 	}
 
-	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
+	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) 
+			throws UnknownObmSyncServerException, DaoException {
+		
 		return contactsBackend.getContentChanges(bs, state, collectionId);
 	}
 

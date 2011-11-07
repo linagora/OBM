@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.utils.DisplayNameUtils;
+import com.google.common.base.Objects;
 
 public class Contact {
 
@@ -295,6 +296,15 @@ public class Contact {
 	
 	public void updateWebSites(HashSet<Website> websites) {
 		this.websites = websites;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("commonname", commonname)
+			.add("firstname", firstname)
+			.toString();
 	}
 	
 }

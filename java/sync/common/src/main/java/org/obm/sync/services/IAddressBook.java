@@ -11,7 +11,7 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.items.AddressBookChangesResponse;
-import org.obm.sync.items.ContactChangesResponse;
+import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 
 public interface IAddressBook {
@@ -35,10 +35,9 @@ public interface IAddressBook {
 	List<AddressBook> listAllBooks(AccessToken token) throws ServerFault;
 
 	/**
-	 * get a list of updated and removed contacts sync given date for a given BookType
+	 * list of updated and removed contacts sync given date
 	 */
-	ContactChangesResponse getSync(AccessToken token, BookType book, Date date)
-			throws ServerFault;
+	ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault;
 
 	
 	/**

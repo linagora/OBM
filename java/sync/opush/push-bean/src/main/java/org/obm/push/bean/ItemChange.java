@@ -16,11 +16,21 @@ public class ItemChange implements Serializable {
 	private IApplicationData data;
 
 	public ItemChange() {
-		this(null);
+		this(null, null, null, null, false);
 	}
 	
 	public ItemChange(String serverId) {
+		this(serverId, null, null, null, false);
+	}
+
+	public ItemChange(String serverId, String parentId, String displayName,
+			FolderType itemType, boolean isNew) {
+		super();
 		this.serverId = serverId;
+		this.parentId = parentId;
+		this.displayName = displayName;
+		this.itemType = itemType;
+		this.isNew = isNew;
 	}
 	
 	public String getServerId() {
