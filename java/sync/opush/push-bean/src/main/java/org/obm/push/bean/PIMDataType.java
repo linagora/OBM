@@ -1,36 +1,36 @@
 package org.obm.push.bean;
 
+import org.obm.push.exception.PIMDataTypeNotFoundException;
+
 public enum PIMDataType {
 
-	EMAIL, CALENDAR, CONTACTS, TASKS, FOLDER;
+	EMAIL("Email"), 
+	CALENDAR("Calendar"), 
+	CONTACTS("Contacts"), 
+	TASKS("Tasks");
+	
+	private final String xmlValue;
 
-	public String asXmlValue() {
-		switch (this) {
-		case CALENDAR:
-			return "Calendar";
-		case CONTACTS:
-			return "Contacts";
-		case TASKS:
-			return "Tasks";
-		case EMAIL:
-			return "Email";
-		default :
-			return "";
-		}
+	private PIMDataType(String xmlValue) {
+		this.xmlValue = xmlValue;
 	}
 	
-	public static PIMDataType getPIMDataType(String collectionPath) {
+	public static PIMDataType getPIMDataType(String collectionPath) throws PIMDataTypeNotFoundException {
 		if (collectionPath.contains("\\calendar\\")) {
 			return PIMDataType.CALENDAR;
 		} else if (collectionPath.contains("\\contacts")) {
 			return PIMDataType.CONTACTS;
-		} else if (collectionPath.contains("\\email\\")) {
+		} else if (collectionPath.contains("\\email")) {
 			return PIMDataType.EMAIL;
-		} else if (collectionPath.contains("\\tasks\\")) {
+		} else if (collectionPath.contains("\\tasks")) {
 			return PIMDataType.TASKS;
 		} else {
-			return PIMDataType.FOLDER;
+			throw new PIMDataTypeNotFoundException("PIMDataType " + collectionPath + " not found.");
 		}
+	}
+
+	public String asXmlValue() {
+		return xmlValue;
 	}
 
 }

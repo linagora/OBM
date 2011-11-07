@@ -18,6 +18,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
@@ -56,7 +57,9 @@ public class SyncDecoder {
 				.build();
 	}
 
-	public Sync decodeSync(Document doc, BackendSession backendSession) throws PartialException, ProtocolException, DaoException {
+	public Sync decodeSync(Document doc, BackendSession backendSession) 
+			throws PartialException, ProtocolException, DaoException, PIMDataTypeNotFoundException {
+		
 		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
 		ret.setWait(getWait(root));
@@ -92,7 +95,7 @@ public class SyncDecoder {
 	}
 
 	private SyncCollection getCollection(Credentials credentials, Device device, Element col, boolean isPartial)
-			throws PartialException, ProtocolException, DaoException{
+			throws PartialException, ProtocolException, DaoException, PIMDataTypeNotFoundException{
 		
 		SyncCollection collection = new SyncCollection();
 		Integer collectionId = getCollectionId(col);

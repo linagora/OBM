@@ -59,8 +59,6 @@ public class ContentsImporter implements IContentsImporter {
 		case CALENDAR:
 			resultServerId = calBackend.createOrUpdate(bs, collectionId, serverId, data);
 			break;
-		case FOLDER:
-			break;
 		}
 		return resultServerId;
 	}
@@ -90,8 +88,6 @@ public class ContentsImporter implements IContentsImporter {
 		case TASKS:
 			calBackend.delete(bs, collectionId, serverId);
 			break;
-		case FOLDER:
-			break;
 		}
 	}
 
@@ -103,7 +99,6 @@ public class ContentsImporter implements IContentsImporter {
 		case CALENDAR:
 		case CONTACTS:
 		case TASKS:
-		case FOLDER:
 			break;
 		}
 		return null;

@@ -50,7 +50,7 @@ public class SyncHandlerTest {
 		String expectedString = "éàâ";
 		int collectionId = 0;
 		String syncKey = "1";
-		SyncState syncState = new SyncState("");
+		SyncState syncState = new SyncState(PIMDataType.CALENDAR);
 		SyncCollection syncCollection = new SyncCollection();
 		BackendSession bs = EasyMock.createMock(BackendSession.class);
 		
