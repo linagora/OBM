@@ -1,7 +1,7 @@
 Source: obm-satellite
 Section: misc
 Priority: extra
-Maintainer: Ronan Lanore <ronan.lanore@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends: debhelper (>=5), po-debconf, cdbs
 Standards-Version: 3.8.0
 Homepage: http://www.obm.org

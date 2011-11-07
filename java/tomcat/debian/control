@@ -1,7 +1,7 @@
 Source: obm-tomcat
 Section: net
 Priority: optional
-Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends-Indep: ant, ant-optional, sun-java6-jdk
 Build-Depends: cdbs, debhelper (>= 5.0)
 Standards-Version: 3.8.4

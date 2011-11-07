@@ -1,7 +1,7 @@
 Source: obm-solr
 Section: net
 Priority: optional
-Maintainer: Ronan Lanore <ronan.lanore@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends-Indep: ant
 Build-Depends: cdbs, debhelper (>> 5), sun-java6-jdk
 Standards-Version: 3.7.8

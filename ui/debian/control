@@ -1,7 +1,7 @@
 Source: obm
 Section: misc
 Priority: extra
-Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends: debhelper (>= 5), po-debconf, cdbs, bash
 Standards-Version: 3.8.0
 Homepage: http://www.obm.org

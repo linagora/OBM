@@ -1,7 +1,7 @@
 Source: obm-caldav
 Section: net
 Priority: optional
-Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends: cdbs, debhelper (>> 5.0.0), sun-java6-jdk, obm-eclipse (>=3.5.0-obm1), bash
 Standards-Version: 3.8.3
 

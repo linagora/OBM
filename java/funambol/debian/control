@@ -1,7 +1,7 @@
 Source: obm-funambol
 Section: net
 Priority: optional
-Maintainer: Sylvain Garcia <sylvain.garcia@obm.org>
+Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends-Indep: cdbs, ant, ant-optional, debhelper (>= 5.0), sun-java6-jdk
 Standards-Version: 3.8.3
 Homepage: http://www.obm.org
