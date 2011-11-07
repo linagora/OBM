@@ -301,5 +301,13 @@ public class ContactsBackend extends ObmSyncBackend {
 		logout(token);
 		return ret;
 	}
+
+	public void createDefaultContactFolder(BackendSession bs) throws DaoException {
+		String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
+		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+		if (serverId == null) {
+			createCollectionMapping(bs.getDevice(), collectionPath);
+		}
+	}
 	
 }
