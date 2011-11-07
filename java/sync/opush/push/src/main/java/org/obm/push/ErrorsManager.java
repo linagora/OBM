@@ -4,16 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.field.address.AddressList;
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.dom.address.AddressList;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.Message;
-import org.apache.james.mime4j.message.Multipart;
-import org.apache.james.mime4j.message.TextBody;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.QuotaExceededException;
@@ -22,7 +26,6 @@ import org.obm.push.utils.Mime4jUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -34,10 +37,13 @@ public class ErrorsManager implements IErrorsManager {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final IEmailManager manager;
 	private final Messages messages;
+
+	private final Mime4jUtils mime4jUtils;
 	
 	@Inject
-	private ErrorsManager(IEmailManager manager, Messages messages) {
+	private ErrorsManager(IEmailManager manager, Messages messages, Mime4jUtils mime4jUtils) {
 		this.manager = manager;
+		this.mime4jUtils = mime4jUtils;
 		this.messages = messages;
 	}
 
@@ -57,40 +63,40 @@ public class ErrorsManager implements IErrorsManager {
 		}
 		try {
 			Message mm = prepareMessage(bs, subject, body.toString(), new ByteArrayInputStream(errorMail));
-			InputStream in = Mime4jUtils.toInputStream(mm);
+			InputStream in = mime4jUtils.toInputStream(mm);
 			manager.storeInInbox(bs, in, false);
 		} catch (Throwable e) {
 			logger.error("Error during storing error mail in the inbox folder", e);
 		}
 	}
 
-	private Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException {
+	private Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
 		Message mm = prepareMessageHeaders(bs, subject);
 		
-		Multipart multipart = new Multipart("mixed");
+		Multipart multipart = mime4jUtils.getMixedMultiPart();
 
 		BodyPart part = Mime4jUtils.createTextPart(body.toString(), "plain");
 		multipart.addBodyPart(part);
-		Mime4jUtils.attach(multipart, errorMail, "error_message.eml",
+		mime4jUtils.attach(multipart, errorMail, "error_message.eml",
 				"message/rfc822");
 
-		mm.setMultipart(multipart);
+		mm.setBody(multipart);
 		return mm;
 	}
 
-	private Message prepareMessage(BackendSession bs, String subject, String body) {
+	private Message prepareMessage(BackendSession bs, String subject, String body) throws ParseException, UnsupportedEncodingException {
 		Message mm = prepareMessageHeaders(bs, subject);
 		TextBody part = Mime4jUtils.createBody(body);
-		mm.setBody(part, "text/plain", ImmutableMap.of("charset", "UTF-8"));
+		mm.setBody(part);
 		return mm;
 	}
 	
-	private Message prepareMessageHeaders(BackendSession bs, String subject) {
-		Message mm = Mime4jUtils.getNewMessage();
+	private Message prepareMessageHeaders(BackendSession bs, String subject) throws ParseException {
+		Message mm = mime4jUtils.getNewMessage();
 		mm.createMessageId(getHostname());
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));
-		mm.setTo(Mailbox.parse(bs.getCredentials().getUser().getEmail()));
+		mm.setTo(AddressBuilder.DEFAULT.parseMailbox(bs.getCredentials().getUser().getEmail()));
 		return mm;
 	}
 
@@ -109,22 +115,22 @@ public class ErrorsManager implements IErrorsManager {
 		
 		try {
 			Message mm = buildErrorMessage(bs, e.getLoadedData(), e.getQuota());
-			InputStream in = Mime4jUtils.toInputStream(mm);
+			InputStream in = mime4jUtils.toInputStream(mm);
 			manager.storeInInbox(bs, in, false);
 		} catch (Throwable t) {
 			logger.error("Error during storing error mail in the inbox folder", t);
 		}
 	}
 
-	private Message buildErrorMessage(BackendSession bs, byte[] truncatedData, int maxSize) throws MimeIOException, IOException {
+	private Message buildErrorMessage(BackendSession bs, byte[] truncatedData, int maxSize) throws MimeIOException, IOException, MimeException {
 		String subject = messages.mailTooLargeTitle();
 		String previousMessageReferenceText = buildPreviousMessageReferenceText(truncatedData);
 		String errorMessage = messages.mailTooLargeBodyStructure(maxSize, previousMessageReferenceText);
 		return prepareMessage(bs, subject, errorMessage);
 	}
 	
-	private String buildPreviousMessageReferenceText(byte[] truncatedData) throws MimeIOException, IOException {
-		Message message = new Message(new ByteArrayInputStream(truncatedData));
+	private String buildPreviousMessageReferenceText(byte[] truncatedData) throws MimeIOException, IOException, MimeException {
+		Message message = mime4jUtils.parseMessage(new ByteArrayInputStream(truncatedData));
 		String messageId = message.getMessageId();
 		String subject = message.getSubject();
 		String to = addressListToString(message.getTo());

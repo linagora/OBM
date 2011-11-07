@@ -32,7 +32,7 @@
 		<freemarker.version>2.3.18</freemarker.version>
 		<jsoup.version>1.6.1</jsoup.version>
 		<guice.version>3.0</guice.version>
-		<apache-mime4j.version>0.6.1</apache-mime4j.version>
+		<apache-mime4j.version>0.7.1</apache-mime4j.version>
 	</properties>
 
 	<repositories>
@@ -401,15 +401,19 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${commons-io.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.james</groupId>
-				<artifactId>apache-mime4j</artifactId>
-				<version>${apache-mime4j.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
-					</exclusion>
-				</exclusions>
+			  <groupId>org.apache.james</groupId>
+			  <artifactId>apache-mime4j-core</artifactId>
+			  <version>${apache-mime4j.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.apache.james</groupId>
+			  <artifactId>apache-mime4j-storage</artifactId>
+			  <version>${apache-mime4j.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.apache.james</groupId>
+			  <artifactId>apache-mime4j-dom</artifactId>
+			  <version>${apache-mime4j.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

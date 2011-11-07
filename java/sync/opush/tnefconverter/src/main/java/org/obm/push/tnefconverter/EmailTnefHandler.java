@@ -14,9 +14,9 @@ import net.freeutils.tnef.TNEFUtils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.parser.ContentHandler;
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.Field;
 import org.columba.ristretto.coder.EncodedWord;
 import org.columba.ristretto.message.Address;
 import org.columba.ristretto.parser.AddressParser;

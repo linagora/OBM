@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
+import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.columba.ristretto.io.CharSequenceSource;
 import org.columba.ristretto.message.LocalMimePart;
 import org.columba.ristretto.message.MimeHeader;

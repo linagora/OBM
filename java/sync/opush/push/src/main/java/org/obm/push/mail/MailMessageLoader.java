@@ -29,8 +29,8 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
@@ -138,7 +138,7 @@ public class MailMessageLoader {
 			final InputStream mimeData = storeClient.uidFetchMessage(messageId);
 
 			final SendEmailHandler handler = new SendEmailHandler("");
-			final MimeEntityConfig config = new MimeEntityConfig();
+			final MimeConfig config = new MimeConfig();
 			config.setMaxContentLen(Integer.MAX_VALUE);
 			config.setMaxLineLen(Integer.MAX_VALUE);
 			final MimeStreamParser parser = new MimeStreamParser(config);

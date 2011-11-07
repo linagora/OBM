@@ -21,34 +21,50 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.james.mime4j.message.BinaryBody;
-import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.MessageBuilder;
+import org.apache.james.mime4j.dom.MessageWriter;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.Message;
-import org.apache.james.mime4j.message.Multipart;
-import org.apache.james.mime4j.message.TextBody;
+import org.apache.james.mime4j.message.MessageServiceFactoryImpl;
 import org.apache.james.mime4j.storage.Storage;
+import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 
 public class Mime4jUtils {
 
+	private MessageBuilder messageBuilder;
+	private MessageWriter messageWriter;
+
 	private Mime4jUtils() {
+		MessageServiceFactoryImpl messageServiceFactory = new MessageServiceFactoryImpl();
+		messageBuilder = messageServiceFactory.newMessageBuilder();
+		messageWriter = messageServiceFactory.newMessageWriter();
 	}
 
-	public static Message getNewMessage() {
-		return new Message();
+	public Message getNewMessage() {
+		return messageBuilder.newMessage();
 	}
 
-	public static Multipart getMixedMultiPart() {
-		return new Multipart("mixed");
+	public Message parseMessage(InputStream in) throws MimeException, IOException {
+		return messageBuilder.parseMessage(in);
+	}
+	
+	public Multipart getMixedMultiPart() {
+		return messageBuilder.newMultipart("mixed");
 	}
 
-	public static void attach(Multipart multipart, InputStream in,
+	public void attach(Multipart multipart, InputStream in,
 			String fileName, String mimeType) throws FileNotFoundException,
 			IOException {
-		BodyFactory bodyFactory = new BodyFactory();
+		StorageBodyFactory bodyFactory = new StorageBodyFactory();
 		BodyPart attach = createBinaryPart(bodyFactory, in, mimeType, fileName);
 		multipart.addBodyPart(attach);
 	}
@@ -56,7 +72,7 @@ public class Mime4jUtils {
 	/**
 	 * Creates a text part from the specified string.
 	 */
-	public static BodyPart createTextPart(String text, String subtype) {
+	public static BodyPart createTextPart(String text, String subtype) throws UnsupportedEncodingException {
 		TextBody body = createBody(text);
 		// Create a text/plain body part
 		BodyPart bodyPart = new BodyPart();
@@ -66,22 +82,22 @@ public class Mime4jUtils {
 		return bodyPart;
 	}
 
-	public static TextBody createBody(String text) {
+	public static TextBody createBody(String text) throws UnsupportedEncodingException {
 		text.replace("\r\n", "\n").replace("\n", "\r\n");
-		BodyFactory bodyFactory = new BodyFactory();
+		BasicBodyFactory bodyFactory = new BasicBodyFactory();
 		// Use UTF-8 to encode the specified text
 		TextBody body = bodyFactory.textBody(text, "UTF-8");
 		return body;
 	}
 	
-	public static InputStream toInputStream(Message message) throws IOException{
+	public InputStream toInputStream(Message message) throws IOException{
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		message.writeTo(out);
+		messageWriter.writeBody(message, out);
 		message.dispose();
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 
-	private static BodyPart createBinaryPart(BodyFactory bodyFactory,
+	private static BodyPart createBinaryPart(StorageBodyFactory bodyFactory,
 			InputStream in, String mimeType, String fileName)
 			throws IOException {
 		// Create a binary message body from the stream
