@@ -9,24 +9,18 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class HierarchyExporter implements IHierarchyExporter {
-
-	private static final Logger logger = LoggerFactory.getLogger(HierarchyExporter.class);
 
 	private final FolderBackend folderExporter;
 	private final MailBackend mailExporter;
@@ -42,18 +36,6 @@ public class HierarchyExporter implements IHierarchyExporter {
 		this.mailExporter = mailExporter;
 		this.calendarExporter = calendarExporter;
 		this.contactsBackend = contactsBackend;
-	}
-
-	@Override
-	public void configure(SyncState state, String dataClass,
-			Integer filterType, int i, int j) {
-		logger.info("configure(bs, " + dataClass + ", " + filterType + ", "
-				+ state + ", " + i + ", " + j + ")");
-		if (dataClass != null) {
-			state.setDataType(PIMDataType.valueOf(dataClass.toUpperCase()));
-		} else {
-			state.setDataType(null);
-		}
 	}
 
 	private List<ItemChange> getTasksChanges(BackendSession bs) throws DaoException {

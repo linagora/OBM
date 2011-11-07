@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -15,9 +14,6 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
  * 
  */
 public interface IHierarchyExporter {
-
-	void configure(SyncState state, String dataClass, Integer filterType,
-			int i, int j);
 
 	String getRootFolderUrl(BackendSession bs);
 
