@@ -37,6 +37,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 public interface CollectionDao {
@@ -57,10 +58,12 @@ public interface CollectionDao {
 	 */
 	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
 
-	SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException;
+	SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException, PIMDataTypeNotFoundException;
 	
 	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
 
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
+
+	Date findLastSyncDateFromKey(String syncKey) throws DaoException, CollectionNotFoundException;
 	
 }
