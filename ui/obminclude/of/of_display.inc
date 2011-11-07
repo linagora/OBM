@@ -1025,7 +1025,6 @@ function display_head($p_module, $standard=true) {
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
   global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path, $params;
   global $ico_html, $ico_ical;
-  global $obm_version;
 
   $css = $css_obm;
 
@@ -1043,15 +1042,15 @@ function display_head($p_module, $standard=true) {
 
   if (is_array($extra_css)) {
     foreach($extra_css as $css_file) {
-      $dis_extra_css .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file?version=$obm_version\" />";
+      $dis_extra_css .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
     }
   } elseif (isset($extra_css)) {
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css?version=$obm_version\" />";
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
   }
 
   if (is_array($extra_js_include)) {
     foreach($extra_js_include as $js_file) {
-      $js_include .= "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file?version=$obm_version\" ></script>\n";
+      $js_include .= "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file\" ></script>\n";
     }
   }
   if(is_array($GLOBALS['js']['vars'])) {
@@ -1082,12 +1081,12 @@ function display_head($p_module, $standard=true) {
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm?version=$obm_version\" media=\"print\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm\" media=\"print\" />
   $dis_extra_css
-  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js?version=$obm_version\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js\" ></script>
   <script type=\"text/javascript\">
   //<![CDATA[
   var obm = Obm = {};
@@ -1138,11 +1137,11 @@ function display_head($p_module, $standard=true) {
   $obm_vars
   // ]]>
   </script> 
-  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/dropdown.js?version=$obm_version\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/dropdown.js\" ></script>
   $js_include
 
   <script type=\"text/javascript\">

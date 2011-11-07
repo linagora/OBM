@@ -7,21 +7,21 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-global $path, $resources_path;
+global $path, $resources_path, $obm_version;
 
 $theme_path = "$resources_path/themes/default/images";
 $internal_theme_path = "$path/../resources/themes/default/images";
 
 // CSS
-$css_obm = "$resources_path/themes/default/styles/style.css";
-$css_print_obm = "$resources_path/themes/default/styles/print.css";
-$css_calendar = "$resources_path/themes/default/styles/calendar.css";
-$css_contact = "$resources_path/themes/default/styles/contact.css";
-$css_organizationalchart = "$resources_path/themes/default/styles/organizationalchart.css";
-$css_portal = "$resources_path/themes/default/styles/portal.css";
-$css_ext_color_picker = "$resources_path/themes/default/styles/mooRainbow.css" ;
-$css_tools = "$resources_path/themes/default/styles/tools.css";
-$css_host = "$resources_path/themes/default/styles/host.css";
+$css_obm = "$resources_path/themes/default/styles/style.css?version=$obm_version";
+$css_print_obm = "$resources_path/themes/default/styles/print.css?version=$obm_version";
+$css_calendar = "$resources_path/themes/default/styles/calendar.css?version=$obm_version";
+$css_contact = "$resources_path/themes/default/styles/contact.css?version=$obm_version";
+$css_organizationalchart = "$resources_path/themes/default/styles/organizationalchart.css?version=$obm_version";
+$css_portal = "$resources_path/themes/default/styles/portal.css?version=$obm_version";
+$css_ext_color_picker = "$resources_path/themes/default/styles/mooRainbow.css?version=$obm_version" ;
+$css_tools = "$resources_path/themes/default/styles/tools.css?version=$obm_version";
+$css_host = "$resources_path/themes/default/styles/host.css?version=$obm_version";
 
 // Templates 
 $login_template = "$path/../resources/themes/default/templates/login.tpl";
