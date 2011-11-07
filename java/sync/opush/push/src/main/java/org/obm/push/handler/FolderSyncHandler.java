@@ -91,6 +91,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		
 		if (isFirstSync(folderSyncRequest)) {
 
+			hierarchyExporter.initHierarchyFolder(bs);
 			return getFolderSyncResponse(bs, 
 					DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		} else {
@@ -111,7 +112,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	private FolderSyncResponse getFolderSyncResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
 			UnknownObmSyncServerException, InvalidServerId {
 		
-		HierarchyItemsChanges hierarchyItemsChanges = getFolderChanges(bs, lastSync);
+		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(bs, lastSync);
 		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
 				hierarchyItemsChanges.getItemsAddedOrUpdated(),
 				hierarchyItemsChanges.getItemsDeleted());
@@ -123,19 +124,13 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	private FolderSyncResponse getFolderSyncContactsResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
 		UnknownObmSyncServerException, InvalidServerId {
 
-		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.getContactsChanged(bs, lastSync);
+		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.listContactFoldersChanged(bs, lastSync);
 		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
 				hierarchyItemsChanges.getItemsAddedOrUpdated(),
 				hierarchyItemsChanges.getItemsDeleted());
 		
 		return new FolderSyncResponse(
 				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
-	}
-	
-	private HierarchyItemsChanges getFolderChanges(BackendSession bs, Date lastSync) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-		
-		return hierarchyExporter.getChanged(bs, lastSync);
 	}
 	
 	private int getCollectionId(BackendSession bs) throws DaoException {
