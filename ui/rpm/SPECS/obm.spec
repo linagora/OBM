@@ -39,7 +39,7 @@ Requires:       %{name}-cert
 Requires:       %{name}-solr
 
 %package        full
-Summary:        obm full installation
+Summary:        Open Business Management, a groupware solution (metapackage)
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires:       %{name}-PostgreSQL = %{version}-%{release}
@@ -57,39 +57,56 @@ Requires:       %{name}-sync
 Requires:       opush
 
 %description    full
-The %{name}-full package is full installation
-for all in one server.
+This package is a metapackage that, when installed, guarantees that you have
+all the different components of OBM installed. Removing this package won't
+remove OBM from your system.
 
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %description
-OBM is a global Groupware, Messaging, CRM and Project application.
-It is mainly used as an Exchange Or Notes/Domino Mail and groupware replacement
-but also as simple contact databases to full CRM.
-OBM advanced shared calendar and contacts has connectors with MS Outlook,
-Thunderbird/Lightning or PDA.
+This package is a metapackage that, when installed, guarantees that you have
+the components necessary for the OBM web interface installed. Removing this
+package won't remove OBM from your system.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 
 %package	config
-Summary:	OBM common configuration
+Summary:	configuration system for Open Business Management
 Group:		Development/Tools
 
 %description	config
-The %{name}-config package contains OBM configuration files
-for %{name} related packages.
+This package generates the main OBM configuration file.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package        core
-Summary:        OBM common 
+Summary:        web interface for Open Business Management
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires(post):        vixie-cron
 Requires:       php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap
 
-%description    core  
-The %{name}-core package contains OBM files
-for %{name} related packages.
+%description    core
+This package contains the web interface for OBM. It has no dependency on the
+other services needed by OBM, such as obm-storage.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	MySQL
-Summary:	MySQL common files for OBM
+Summary:	MySQL backend for OBM
 Group:		Development/Tools
 
 Requires:	%{name}-config = %{version}-%{release}
@@ -100,11 +117,15 @@ Conflicts:	%{name}-PostgreSQL
 Provides:	%{name}-DataBase = %{version}-%{release}
 
 %description	MySQL
-The %{name}-MySQL package contains MySQL schemes and configuration
-file for %{name} package.
+This package is the MySQL database backend for OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	PostgreSQL
-Summary:	PostgreSQL common files for OBM
+Summary:	PostgreSQL backend for OBM
 Group:		Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
@@ -114,8 +135,13 @@ Conflicts:      %{name}-MySQL
 Provides:       %{name}-DataBase = %{version}-%{release}
 
 %description	PostgreSQL
-The %{name}-PostgreSQL package contains PostgreSQL schemas and configuration
+This package contains PostgreSQL schemas and configuration
 files for %{name} package.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	PostgreSQL91
 Summary:	PostgreSQL 9.1 common files for OBM
@@ -128,8 +154,13 @@ Conflicts:      %{name}-PostgreSQL83
 Provides:       %{name}-PostgreSQL-virtual
 
 %description	PostgreSQL91
-The %{name}-PostgreSQL91 package contains PostgreSQL 9.1 schemas and configuration
+This package contains PostgreSQL 9.1 schemas and configuration
 files for %{name} package. Support for PostgreSQL 9.1 is experimental, use at your own risk.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	PostgreSQL83
 Summary:	PostgreSQL (8.3+) common files for OBM
@@ -142,11 +173,16 @@ Conflicts:      %{name}-PostgreSQL91
 Provides:       %{name}-PostgreSQL-virtual
 
 %description	PostgreSQL83
-The %{name}-PostgreSQL83 package contains PostgreSQL (8.3+) schemas and configuration
+This package contains PostgreSQL (8.3+) schemas and configuration
 file for %{name} package.
 
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
 %package        ui
-Summary:        apache2 configuration for OBM
+Summary:        web interface configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
@@ -155,11 +191,15 @@ Requires: 	php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap,
 Requires(pre):  httpd
 
 %description    ui
-The %{name}-ui package configure Apache OBM
-file for %{name} package.
+This package configures Apache to serve OBM components (obm-ui, obm-storage, opush).
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	services
-Summary:	OBM script to manage services
+Summary:	integration of OBM with LDAP/Postfix/Cyrus
 Group:		Development/Tools
 
 Requires:	%{name}-config = %{version}-%{release}
@@ -170,10 +210,16 @@ Requires:	perl-LDAP
 Requires:	perl-XML-Simple
 
 %description	services
-The %{name}-services package contains perl script to manage services.
+This package is responsible for propagating changes in OBM to third-party
+software used by OBM, namely Open LDAP, Postfix and Cyrus.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	-n perl-OBM
-Summary:	Perl libraries for OBM
+Summary:	library for the integration of OBM with LDAP/Postfix/Cyrus
 Group:		Development/Libraries
 License:        GPL+ or Artistic
 #Requires:       %{name} = %{version}-%{release}
@@ -186,10 +232,16 @@ Requires:	perl-Class-Singleton
 Requires:       perl-Digest-SHA
 
 %description	-n perl-OBM
-perl-OBM package contains OBM libs for perl
+This package is responsible for propagating changes in OBM to third-party
+software used by OBM, namely Open LDAP, Postfix and Cyrus.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	ldap
-Summary:	OBM ldap configuration
+Summary:	LDAP configuration for OBM
 Group:		Development/Tools
 
 Requires:	%{name}-config = %{version}-%{release}
@@ -197,10 +249,16 @@ Requires:	openldap-servers
 Requires:	openldap-clients
 
 %description	ldap
-Configuration of OpenLDAP
+This package is responsible for propagating changes in OBM to third-party
+software used by OBM, namely Open LDAP, Postfix and Cyrus.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	postfix
-Summary:        OBM Postfix installation
+Summary:        Postfix configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-config = %{version}-%{release}
@@ -209,11 +267,15 @@ Requires:	postfix
 Conflicts:	sendmail
 
 %description    postfix
-The package %{name}-postfix contains postfix configuration
-files for OBM.
+This package configures Postfix for OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	cyrus
-Summary:        OBM Cyrus installation
+Summary:        Cyrus/SASL configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-config = %{version}-%{release}
@@ -222,11 +284,15 @@ Requires:	cyrus-imapd
 Requires:	cyrus-imapd-utils
 
 %description    cyrus
-The package %{name}-cyrus contains cyrus configuration
-files for OBM.
+This package configures Cyrus/SASL for OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package        support
-Summary:        OBM Support addons
+Summary:        OBM support utilities (metapackage)
 Group:          Development/Tools
 
 Requires:       vim-enhanced
@@ -243,8 +309,13 @@ Requires:       screen
 Requires:       openldap-clients
 
 %description    support
-The package %{name}-support contains dependencies
-for OBM support
+This package pulls in various tools (vim, telnet...) useful for OBM
+administrators.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %prep
 %setup -q -n %{name}-%{version} 
