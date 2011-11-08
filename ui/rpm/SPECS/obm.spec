@@ -132,7 +132,7 @@ Provides:       %{name}-DataBase = %{version}-%{release}
 
 %description	PostgreSQL
 The %{name}-PostgreSQL package contains PostgreSQL schemas and configuration
-file for %{name} package.
+files for %{name} package.
 
 %package	PostgreSQL91
 Summary:	PostgreSQL 9.1 common files for OBM
@@ -146,7 +146,7 @@ Provides:       %{name}-PostgreSQL-virtual
 
 %description	PostgreSQL91
 The %{name}-PostgreSQL91 package contains PostgreSQL 9.1 schemas and configuration
-file for %{name} package.
+files for %{name} package. Support for PostgreSQL 9.1 is experimental, use at your own risk.
 
 %package	PostgreSQL83
 Summary:	PostgreSQL (8.3+) common files for OBM
