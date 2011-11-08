@@ -124,7 +124,11 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Transactional
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
 		logger.info(LogUtils.prefix(token) + "AddressBook : listContactsChanged");
-		return getContactsChanges(token, lastSync);
+		try {
+			return getContactsChanges(token, lastSync);
+		} catch (SQLException e) {
+			throw new ServerFault(e);
+		}
 	}
 	
 	@Override
@@ -158,7 +162,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return response;
 	}
 	
-	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) throws ServerFault {
+	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) throws ServerFault, SQLException {
 		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
 
 		ContactUpdates userUpdates = new ContactUpdates();
@@ -458,16 +462,23 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		Set<Integer> removal = new HashSet<Integer>();
-		ContactUpdates contactUpdates = null;
-		if (addressBookId == contactConfiguration.getAddressBookUserId()) {
-			contactUpdates = userDao.findUpdatedUsers(lastSync, token);
-			removal = userDao.findRemovalCandidates(lastSync, token);
-		} else {
-			contactUpdates = contactDao.findUpdatedContacts(lastSync, addressBookId, token);
-			removal = contactDao.findRemovalCandidates(lastSync, addressBookId, token);
+		try {
+			Set<Integer> removal = new HashSet<Integer>();
+			ContactUpdates contactUpdates = null;
+			
+			if (addressBookId == contactConfiguration.getAddressBookUserId()) {
+				contactUpdates = userDao.findUpdatedUsers(lastSync, token);
+				removal = userDao.findRemovalCandidates(lastSync, token);
+			} else {
+				contactUpdates = contactDao.findUpdatedContacts(lastSync, addressBookId, token);
+				removal = contactDao.findRemovalCandidates(lastSync, addressBookId, token);
+			}
+			
+			return new ContactChanges(contactUpdates.getContacts(), removal, getLastSync());
+	
+		} catch (SQLException ex) {
+			throw new ServerFault(ex);
 		}
-		return new ContactChanges(contactUpdates.getContacts(), removal, getLastSync());
 	}
 	
 	private Date getLastSync() throws ServerFault {
