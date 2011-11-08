@@ -41,18 +41,7 @@ Requires:       %{name}-solr
 %package        full
 Summary:        Open Business Management, a groupware solution (metapackage)
 Group:          Development/Tools
-Requires:       %{name}-config = %{version}-%{release}
-Requires:       %{name}-PostgreSQL = %{version}-%{release}
-Requires:       %{name}-services = %{version}-%{release}
-Requires:       %{name}-ldap = %{version}-%{release}
-Requires:       %{name}-postfix = %{version}-%{release}
-Requires:       %{name}-cyrus = %{version}-%{release}
-Requires:       %{name}-ui = %{version}-%{release}
-Requires:       %{name}-core = %{version}-%{release}
-Requires:       %{name}-support = %{version}-%{release}
-Requires:       %{name}-ca
-Requires:       %{name}-cert
-Requires:       %{name}-solr
+Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-sync
 Requires:       opush
 
