@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -170,7 +171,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		Set<Integer> removalCandidates = contactDao.findRemovalCandidates(timestamp, token);
 		
 		return new ContactChanges(getUpdatedContacts(contactUpdates, userUpdates),
-				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), contactDao.getLastSync());
+				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), getLastSync());
 	}
 	
 	private Set<Integer> getRemovedContacts(ContactUpdates contactUpdates,
@@ -433,7 +434,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 		
 		Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
-		return new FolderChanges(updated, removed, contactDao.getLastSync());
+		return new FolderChanges(updated, removed, getLastSync());
 	}
 	
 	private boolean isFirstSync(Date timestamp) {
@@ -444,7 +445,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return false;
 	}
 	
-	/* package */private List<Folder> createAddressBookForUsers(Date timestamp) {
+	private List<Folder> createAddressBookForUsers(Date timestamp) {
 		if (isFirstSync(timestamp)) {
 			Folder folder = new Folder();
 			folder.setUid(contactConfiguration.getAddressBookUserId());
@@ -455,8 +456,30 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
+	@Transactional
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		return null;
+		Set<Integer> removal = new HashSet<Integer>();
+		ContactUpdates contactUpdates = null;
+		if (addressBookId == contactConfiguration.getAddressBookUserId()) {
+			contactUpdates = userDao.findUpdatedUsers(lastSync, token);
+			removal = userDao.findRemovalCandidates(lastSync, token);
+		} else {
+			contactUpdates = contactDao.findUpdatedContacts(lastSync, addressBookId, token);
+			removal = contactDao.findRemovalCandidates(lastSync, addressBookId, token);
+		}
+		return new ContactChanges(contactUpdates.getContacts(), removal, getLastSync());
+	}
+	
+	private Date getLastSync() throws ServerFault {
+		Connection connection = null;
+		try {
+			connection = obmHelper.getConnection();
+			return obmHelper.selectNow(connection);
+		} catch (SQLException ex) {
+			throw new ServerFault(ex);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
+		}
 	}
 	
 }

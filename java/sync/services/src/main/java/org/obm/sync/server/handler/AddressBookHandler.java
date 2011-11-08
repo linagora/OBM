@@ -165,7 +165,13 @@ public class AddressBookHandler extends SecureSyncHandler {
 
 	private void listContactsChanged(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
-		ContactChanges contactChanges = binding.listContactsChanged(at, lastSync);
+		String addressBookId = p(params, "addressBookId");
+		ContactChanges contactChanges = null;
+		if (addressBookId == null) {
+			contactChanges = binding.listContactsChanged(at, lastSync);
+		} else {
+			contactChanges = binding.listContactsChanged(at, lastSync, Integer.valueOf(addressBookId));
+		}
 		responder.sendContactChanges(contactChanges);
 	}
 
