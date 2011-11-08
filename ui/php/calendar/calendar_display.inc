@@ -3810,7 +3810,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
     
   } else {
     $users_id = is_array($entities['user']) ? $entities['user'] : array();
-    $contacts_id = is_array($entities['contact']) ? $entities['contact'] : array();
     $res_id = is_array($entities['resource']) ? $entities['resource'] : array();
     $groups_id = is_array($entities['group']) ? $entities['group'] : array();
     $documents_id = is_array($entities['document']) ? $entities['document'] : array();
