@@ -133,5 +133,7 @@ public interface IAddressBook {
 	 * @throws ServerFault 
 	 */
 	FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault;
+
+	ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
 	
 }

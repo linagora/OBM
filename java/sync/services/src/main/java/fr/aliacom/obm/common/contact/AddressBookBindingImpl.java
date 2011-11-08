@@ -453,5 +453,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 		return ImmutableList.of();
 	}
+
+	@Override
+	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
+		return null;
+	}
 	
 }
