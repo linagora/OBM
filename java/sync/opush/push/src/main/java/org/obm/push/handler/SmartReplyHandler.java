@@ -31,7 +31,7 @@ public class SmartReplyHandler extends MailRequestHandler {
 		SmtpInvalidRcptException, CollectionNotFoundException, IMAPException, DaoException, UnknownObmSyncServerException {
 		
 		contentsImporter.replyEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
-				Integer.getInteger(mailRequest.getCollectionId()), mailRequest.getServerId());
+				Integer.valueOf(mailRequest.getCollectionId()), mailRequest.getServerId());
 	}
 	
 }

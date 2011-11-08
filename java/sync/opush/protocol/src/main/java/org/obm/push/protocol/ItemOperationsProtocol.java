@@ -56,7 +56,7 @@ public class ItemOperationsProtocol {
 			String reference = DOMUtils.getElementText(fetchNode, "FileReference");
 			String collectionId = DOMUtils.getElementText(fetchNode, "CollectionId");
 			String serverId = DOMUtils.getElementText(fetchNode, "ServerId");
-			Integer type = Integer.getInteger(DOMUtils.getElementText(fetchNode, "Type"));
+			Integer type = Integer.valueOf(DOMUtils.getElementText(fetchNode, "Type"));
 
 			Fetch fetch = new Fetch();
 			fetch.setStoreName(storeName);
