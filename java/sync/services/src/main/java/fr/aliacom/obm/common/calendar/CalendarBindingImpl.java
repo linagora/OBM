@@ -508,7 +508,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) throws SQLException, FindException {
+	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) throws SQLException, FindException, ServerFault {
 		Event ev = calendarDao.createEvent(token, calendar, event, false);
 		return calendarDao.removeEvent(token, ev, event.getType(), event.getSequence());
 	}
