@@ -875,24 +875,27 @@ public class ContactDao {
 	/**
 	 * @return the contact with the given id if it is not archived
 	 * @throws ContactNotFoundException 
+	 * @throws SQLException 
 	 */
-	public Contact findContact(AccessToken token, int id) throws ContactNotFoundException {
+	public Contact findContact(AccessToken token, int contactId) throws ContactNotFoundException, SQLException {
 		String q = "SELECT "
 			+ CONTACT_SELECT_FIELDS
 			+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
-			+ "contact_id=? AND contactentity_contact_id=contact_id AND contact_archive != 1";
-
-		int idx = 1;
-		Contact ret = null;
+			+ "contact_id = ? AND contactentity_contact_id = contact_id AND contact_archive != 1";
 
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+		
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-			ps.setInt(idx++, id);
+
+			int idx = 1;
+			ps.setInt(idx++, contactId);
 			rs = ps.executeQuery();
+
+			Contact ret = null;
 			if (rs.next()) {
 				ret = contactFromCursor(rs);
 				Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
@@ -905,15 +908,15 @@ public class ContactDao {
 				loadBirthday(con, entityContact);
 				loadAnniversary(con, entityContact);
 			}
+			
 			if (ret == null) {
-				throw new ContactNotFoundException("Contact " + id + " not found");
+				throw new ContactNotFoundException("Contact " + contactId + " not found");
 			}
-		} catch (SQLException se) {
-			logger.error(se.getMessage(), se);
+			return ret;
+		
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		return ret;
 	}
 
 	/**

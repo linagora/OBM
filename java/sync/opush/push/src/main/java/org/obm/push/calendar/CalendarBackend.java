@@ -581,7 +581,7 @@ public class CalendarBackend extends ObmSyncBackend {
 
 
 	private Event getEventFromServerId(AbstractEventSyncClient calCli, AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
-		Integer itemId = getItemIdFor(serverId);
+		Integer itemId = getItemIdFromServerId(serverId);
 		if (itemId == null) {
 			return null;
 		}

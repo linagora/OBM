@@ -92,8 +92,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 			getAddressBookSync(token, params, responder);
 		} else if ("createContactInBook".equals(method)) {
 			createContactInBook(token, params, responder);
-		} else if ("getContactInBook".equals(method)) {
-			getContactInBook(token, params, responder);
 		} else if ("modifyContactInBook".equals(method)) {
 			modifyContactInBook(token, params, responder);
 		} else if ("removeContactInBook".equals(method)) {
@@ -123,14 +121,13 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return BookType.valueOf(params.getParameter("book"));
 	}
 
-	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		String contactId = p(params, "id");
-		Contact ret = binding.getContactFromId(at, type(params), contactId);
-		if (ret != null) {
-			responder.sendContact(ret);
-		} else {
-			responder.sendError("contact with id " + contactId + " not found.");
-		}
+	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws ServerFault, ContactNotFoundException {
+		
+		Integer contactId = Integer.valueOf( p(params, "contactId") );
+		Integer addressBookId = Integer.valueOf( p(params, "addressBookId") );
+		Contact ret = binding.getContactFromId(at, addressBookId, contactId);
+		responder.sendContact(ret);
 	}
 
 	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) 
@@ -239,18 +236,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);
 		responder.sendContact(ret);		
-	}
-
-	private void getContactInBook(AccessToken token, ParametersSource params,
-			XmlResponder responder) throws ServerFault {
-		
-		String contactId = p(params, "id");
-		Contact ret = binding.getContactInBook(token, getBookId(params), contactId);
-		if (ret != null) {
-			responder.sendContact(ret);
-		} else {
-			responder.sendError("contact with id " + contactId + " not found.");
-		}
 	}
 
 	private void createContactInBook(AccessToken token,
