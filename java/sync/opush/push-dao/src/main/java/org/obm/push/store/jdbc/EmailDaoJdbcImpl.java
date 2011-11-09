@@ -46,7 +46,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 				ps.setInt(1, collectionId);
 				ps.setInt(2, devId);
 				ps.setLong(3, email.getUid());
-				ps.setTimestamp(4, new Timestamp(lastSync.getTime()));
+				ps.setTimestamp(4, new Timestamp(email.getDate().getTime()));
 				ps.addBatch();
 			}
 			ps.executeBatch();

@@ -50,17 +50,17 @@ public class EmailSync implements IEmailSync {
 	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
 		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
 		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emailsFromIMAP);
-		Set<Email> emailsToSync = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
-		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), emailsToSync, emailsFromIMAP);
-		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges);
+		Set<Email> newAndUpdatedEmails = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
+		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), newAndUpdatedEmails);
+		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges, alreadySyncedEmails);
 		return mailChanges;
 	}
 
-	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges) {
+	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges, Set<Email> alreadySyncedEmails) {
 		logger.info("Synchronization date {}", syncStartDate);
 		logger.info("{} email(s) from imap", emailsFromIMAP.size());
-		logger.info("{} email(s) will be updated to pda", mailChanges.getUpdatedEmailFromImap().size());
-		logger.info("{} email(s) will be updated to db", mailChanges.getUpdatedEmailToDB().size());
+		logger.info("{} new or updated emails", mailChanges.getNewAndUpdatedEmails().size());
+		logger.info("{} already synced emails", alreadySyncedEmails.size());
 	}
 
 	private Set<Email> getImapEmails(StoreClient imapStore, Date windows) {

@@ -150,7 +150,7 @@ public class MailBackend extends ObmSyncBackend {
 		MailChanges mailChanges = getSync(bs, state, collectionId, filter);
 		try {
 			emailManager.updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
-					mailChanges.getRemovedToLong(), mailChanges.getUpdatedEmailToDB());
+					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
 			return getDataDelta(bs, collectionId, mailChanges);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
@@ -160,16 +160,19 @@ public class MailBackend extends ObmSyncBackend {
 	private DataDelta getDataDelta(BackendSession bs, Integer collectionId, MailChanges mailChanges) 
 			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
-		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getUpdatedEmailFromImapToLong());
-		List<ItemChange> itemsToDelete = buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedToLong());
+		List<ItemChange> itemChanges = fetchMails(bs, collectionId, getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids());
+		List<ItemChange> itemsToDelete = buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
 		return new DataDelta(itemChanges, itemsToDelete, mailChanges.getLastSync());
 	}
 
-	private List<ItemChange> fetchMails(BackendSession bs, Integer collectionId, String collection, Collection<Long> updated) throws ProcessingEmailException {
+	private List<ItemChange> fetchMails(
+			BackendSession bs, Integer collectionId, String collection, 
+			Collection<Long> emailsUids) throws ProcessingEmailException {
+		
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
-		List<MSEmail> msMails;
 		try {
-			msMails = emailManager.fetchMails(bs, getCalendarClient(), collectionId, collection, updated);
+			List<MSEmail> msMails = 
+					emailManager.fetchMails(bs, getCalendarClient(), collectionId, collection, emailsUids);
 			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}

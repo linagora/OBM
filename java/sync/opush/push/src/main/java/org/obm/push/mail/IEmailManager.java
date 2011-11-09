@@ -56,7 +56,7 @@ public interface IEmailManager {
 	
 	String locateImap(BackendSession bs);
 
-	void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedToLong, Collection<Email> updatedToLong)
+	void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailsIds, Collection<Email> updated)
 			throws DaoException;
 
 }

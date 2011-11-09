@@ -486,7 +486,9 @@ public class EmailManager implements IEmailManager {
 		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
 		Set<Email> modifiedEmails = findModifiedEmails(allEmailsToMark, alreadySyncedEmails);
 		Set<Email> emailsNeverTrackedBefore = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
+		logger.info("mark {} updated mail(s) as synced", modifiedEmails.size());
 		emailDao.updateSyncEntriesStatus(devId, collectionId, modifiedEmails);
+		logger.info("mark {} new mail(s) as synced", emailsNeverTrackedBefore.size());
 		emailDao.createSyncEntries(devId, collectionId, emailsNeverTrackedBefore, lastSync);
 	}
 
@@ -532,14 +534,14 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailUids,
-			Collection<Email> updatedEmails) throws DaoException {
+			Collection<Email> newAndUpdatedEmails) throws DaoException {
 		
 		if (removedEmailUids != null && !removedEmailUids.isEmpty()) {
 			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedEmailUids);
 		}
 		
-		if (updatedEmails != null && !updatedEmails.isEmpty()) {
-			markEmailsAsSynced(devId, collectionId, lastSync, updatedEmails);
+		if (newAndUpdatedEmails != null && !newAndUpdatedEmails.isEmpty()) {
+			markEmailsAsSynced(devId, collectionId, lastSync, newAndUpdatedEmails);
 		}
 	}
 

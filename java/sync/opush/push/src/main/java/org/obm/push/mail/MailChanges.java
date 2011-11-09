@@ -11,15 +11,13 @@ import org.obm.push.utils.index.IndexUtils;
 public class MailChanges {
 	
 	private final Set<Email> removed;
-	private final Set<Email> updatedEmailsFromIMAP;
-	private final Set<Email> updatedEmailsToDB;
+	private final Set<Email> newAndUpdatedEmails;
 	
 	private Date lastSync;
 	
-	public MailChanges(Set<Email> removedEmails, Set<Email> updatedEmailsFromImap, Set<Email> updatedEmailsToDB) {
+	public MailChanges(Set<Email> removedEmails, Set<Email> newAndUpdatedEmails) {
 		this.removed = removedEmails;
-		this.updatedEmailsFromIMAP = updatedEmailsFromImap;
-		this.updatedEmailsToDB = updatedEmailsToDB;
+		this.newAndUpdatedEmails = newAndUpdatedEmails;
 		this.lastSync = DateUtils.getCurrentDate();
 	}
 	
@@ -27,24 +25,8 @@ public class MailChanges {
 		return removed;
 	}
 
-	public void addRemoved(Collection<Email> removed) {
-		this.removed.addAll(removed);
-	}
-
-	public Set<Email> getUpdatedEmailFromImap() {
-		return updatedEmailsFromIMAP;
-	}
-
-	public void addUpdated(Collection<Email> updated) {
-		this.updatedEmailsFromIMAP.addAll(updated);
-	}
-	
-	public void addUpdated(Email uid){
-		this.updatedEmailsFromIMAP.add(uid);
-	}
-
-	public void addRemoved(Email uid){
-		this.removed.add(uid);
+	public Set<Email> getNewAndUpdatedEmails() {
+		return newAndUpdatedEmails;
 	}
 
 	public Date getLastSync() {
@@ -55,16 +37,12 @@ public class MailChanges {
 		this.lastSync = lastSync;
 	}
 	
-	public Collection<Long> getRemovedToLong() {
+	public Collection<Long> getRemovedEmailsUids() {
 		return IndexUtils.listIndexes(getRemoved());
 	}
 	
-	public Collection<Long> getUpdatedEmailFromImapToLong() {
-		return IndexUtils.listIndexes(getUpdatedEmailFromImap());
-	}
-	
-	public Set<Email> getUpdatedEmailToDB() {
-		return updatedEmailsToDB;
+	public Collection<Long> getNewEmailsUids() {
+		return IndexUtils.listIndexes(getNewAndUpdatedEmails());
 	}
 	
 }
