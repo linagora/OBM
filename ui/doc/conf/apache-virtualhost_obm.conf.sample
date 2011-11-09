@@ -7,7 +7,6 @@ NameVirtualHost *:443
    
    
     Timeout 3000
-    ProxyTimeout 3000
     
     # SSL
     SSLEngine on
