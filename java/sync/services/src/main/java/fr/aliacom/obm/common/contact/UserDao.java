@@ -30,9 +30,9 @@ import java.util.Set;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
+import org.obm.sync.exception.ContactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

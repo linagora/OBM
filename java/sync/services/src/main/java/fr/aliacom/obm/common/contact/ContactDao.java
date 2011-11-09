@@ -54,7 +54,6 @@ import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Address;
@@ -73,6 +72,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.slf4j.Logger;
@@ -331,19 +331,18 @@ public class ContactDao {
 		return c;
 	}
 
-	private Contact createContactInAddressBook(Connection con, AccessToken at, Contact c, int addressBookId) {
+	private Contact createContactInAddressBook(Connection con, AccessToken at, Contact c, int addressBookId) 
+			throws ServerFault, SQLException {
+		
 		try {
-			EventObmId anniversaryId = createOrUpdateDate(at, con, c, c
-					.getAnniversary(), ANNIVERSARY_FIELD);
+			EventObmId anniversaryId = createOrUpdateDate(at, con, c, c.getAnniversary(), ANNIVERSARY_FIELD);
 			c.setAnniversaryId(anniversaryId);
 
-			EventObmId birthdayId = createOrUpdateDate(at, con, c,
-					c.getBirthday(), BIRTHDAY_FIELD);
+			EventObmId birthdayId = createOrUpdateDate(at, con, c, c.getBirthday(), BIRTHDAY_FIELD);
 			c.setBirthdayId(birthdayId);
 
 			int contactId = insertIntoContact(con, at, c, addressBookId);
-			LinkedEntity le = obmHelper.linkEntity(con, "ContactEntity",
-					"contact_id", contactId);
+			LinkedEntity le = obmHelper.linkEntity(con, "ContactEntity", "contact_id", contactId);
 			c.setEntityId(le.getEntityId());
 
 			createOrUpdatePhones(con, c.getEntityId(), c.getPhones());
@@ -352,12 +351,12 @@ public class ContactDao {
 			createOrUpdateWebsites(con, c);
 			createOrUpdateIMIdentifiers(con, c.getEntityId(), c.getImIdentifiers());
 			c.setUid(contactId);
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+		} catch (FindException e) {
+			throw new ServerFault(e.getMessage());
+		} catch (EventNotFoundException e) {
+			throw new ServerFault(e.getMessage());
 		}
-
 		indexContact(at, c);
-
 		return c;
 	}
 
@@ -371,25 +370,12 @@ public class ContactDao {
 		}
 	}
 
-	public Contact createContact(AccessToken at, Contact c) throws SQLException {
-		Connection con = null;
-		try {
-			con = obmHelper.getConnection();
-			createContact(at, con, c);
-		} finally {
-			obmHelper.cleanup(con, null, null);
-		}
-		return c;
-	}
-
-
-	public Contact createContact(AccessToken at, Connection con, Contact c)
-	throws SQLException {
+	public Contact createContact(AccessToken at, Connection con, Contact c) throws SQLException, ServerFault {
 		int addressbookId = chooseAddressBookFromContact(con, at, c);
 		return createContactInAddressBook(con, at, c, addressbookId);
 	}
 
-	public Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId) throws SQLException {
+	public Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId) throws SQLException, ServerFault {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
@@ -482,7 +468,7 @@ public class ContactDao {
 
 	private EventObmId createEventForContactDate(AccessToken at,
 			Connection con, Contact c, Date date) throws SQLException,
-			FindException {
+			FindException, ServerFault {
 		logger.info("eventId == null");
 		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
 				getEvent(at, displayName(c), date), true);

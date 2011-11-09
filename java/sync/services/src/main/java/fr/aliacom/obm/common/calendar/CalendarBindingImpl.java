@@ -1147,6 +1147,8 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ImportICalendarException(e);
 		} catch (SQLException e) {
 			throw new ImportICalendarException(e);
+		} catch (ServerFault e) {
+			throw new ImportICalendarException(e);
 		}
 		return false;
 	}

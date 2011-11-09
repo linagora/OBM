@@ -28,7 +28,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CalendarDao {
 
-	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException,  SQLException ;
+	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException,  SQLException, ServerFault ;
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
@@ -73,7 +73,7 @@ public interface CalendarDao {
 	
 	Event removeEventByExtId(AccessToken token, ObmUser calendar, EventExtId eventExtId, int sequence) throws SQLException;
 
-	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException;
+	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException, ServerFault;
 
 	void modifyEvent(Connection con, AccessToken at,  String calendar, Event ev,
 			boolean updateAttendees, Boolean useObmUser)

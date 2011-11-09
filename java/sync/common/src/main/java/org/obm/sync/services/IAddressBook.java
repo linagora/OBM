@@ -6,12 +6,13 @@ import java.util.List;
 import javax.naming.NoPermissionException;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.exception.ContactAlreadyExistException;
+import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -52,24 +53,8 @@ public interface IAddressBook {
 	/**
 	 * Create the given contact into given book if book is writable
 	 */
-	Contact createContact(AccessToken token, BookType book, Contact contact) 
-		throws ServerFault;
-
-	/**
-	 * Create the given contact into given book if book is writable
-	 */
-	Contact createContactInBook(AccessToken token, int addressBookId, Contact contact) 
-		throws ServerFault;
-
-	
-	/**
-	 * try to create the given contact : if it finds a similar contact,
-	 * no contact will be created, but the first similar contact will be return
-	 * 
-	 * Please use it only if you know what you are doing.
-	 */
-	Contact createContactWithoutDuplicate(AccessToken token,
-			BookType book, Contact contact) throws ServerFault;
+	Contact createContact(AccessToken token, Integer addressBook, Contact contact) 
+			throws ServerFault, ContactAlreadyExistException, NoPermissionException;
 
 	/**
 	 * modify existing contact with data provided if possible.
