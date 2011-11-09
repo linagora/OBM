@@ -1,6 +1,7 @@
 package org.obm.push.protocol.data;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +19,7 @@ import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
@@ -26,6 +28,9 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import com.google.common.base.Charsets;
+import com.google.common.primitives.Bytes;
 
 public class EmailEncoder implements IDataEncoder {
 
@@ -278,13 +283,51 @@ public class EmailEncoder implements IDataEncoder {
 			Element tz = DOMUtils.createElement(mr, "Email:TimeZone");
 			// taken from exchange 2k7 : eastern greenland, gmt+0, no dst
 			tz.setTextContent("xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==");
-			DOMUtils.createElementAndText(mr, "Email:GlobalObjId", 
-					Base64.encodeBase64String(invi.getExtId().serializeToString().getBytes()));
-
+			MSEventUid eventUid = invi.getUid();
+			if (eventUid != null) {
+				DOMUtils.createElementAndText(mr, "Email:GlobalObjId",
+						msEventUidToGlobalObjId(eventUid));
+			} else {
+				throw new InvalidParameterException("a MSEvent must have an UID");
+			}
 			appendRecurence(mr, invi);
 		}
 	}
 
+	/* package */ String msEventUidToGlobalObjId(MSEventUid msEventUid) {
+		String eventUidAsString = msEventUid.serializeToString();
+		byte[] eventUidAsBytes = eventUidAsString.getBytes(Charsets.US_ASCII);
+		byte[] preambule = buildByteSequence(
+				0x4, 0x0, 0x0, 0x0, 0x82, 0x0, 0xE0, 0, 0x74, 0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08,
+				0x0, 0x0, 0x0, 0x0,
+				0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+		
+		byte[] marker = "vCal-Uid".getBytes(Charsets.US_ASCII);
+		byte[] markerEnd = buildByteSequence(0x1, 0x0, 0x0, 0x0);
+		byte[] dataEnd = buildByteSequence(0x0);
+		byte[] length = toByteArray(
+				marker.length + markerEnd.length + eventUidAsBytes.length + dataEnd.length);
+		byte[] result = Bytes.concat(preambule, length, marker, markerEnd, eventUidAsBytes, dataEnd);
+		return Base64.encodeBase64String(result);
+	}
+	
+	/* package*/ byte[] buildByteSequence(int... bytes) {
+		byte[] byteArray = new byte[bytes.length];
+		int i = 0;
+		for (int b: bytes) {
+			byteArray[i++] = (byte) b;
+		}
+		return byteArray;
+	}
+	
+	private byte[] toByteArray(int value) {
+		return new byte[] {
+		        (byte) value,
+		        (byte) (value >> 8),
+		        (byte) (value >> 16),
+		        (byte) (value >> 24)};
+	}
+	
 	private void appendRecurence(Element parent, MSEvent invi) {
 		Recurrence recur = invi.getRecurrence();
 		if (recur != null) {

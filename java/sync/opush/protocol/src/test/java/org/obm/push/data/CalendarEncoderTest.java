@@ -16,10 +16,10 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.data.CalendarEncoder;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.w3c.dom.Document;
 
@@ -37,7 +37,7 @@ public class CalendarEncoderTest {
 		event.setSensitivity(CalendarSensitivity.NORMAL);
 		event.setBusyStatus(CalendarBusyStatus.FREE);
 		event.setAllDayEvent(false);
-		event.setExtId(new EventExtId("FAC000123D"));
+		event.setUid(new MSEventUid("FAC000123D"));
 		return event;
 	}
 
@@ -67,7 +67,7 @@ public class CalendarEncoderTest {
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>");
 		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<Calendar:UID>46414330303031323344</Calendar:UID>");
 		expected.append("<AirSyncBase:Body>");
 		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
 		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
@@ -101,7 +101,7 @@ public class CalendarEncoderTest {
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>");
 		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<Calendar:UID>46414330303031323344</Calendar:UID>");
 		expected.append("<Calendar:Attendees>");
 		expected.append("<Calendar:Attendee>");
 		expected.append("<Calendar:AttendeeEmail>adrien@test.tlse.lng</Calendar:AttendeeEmail>");
