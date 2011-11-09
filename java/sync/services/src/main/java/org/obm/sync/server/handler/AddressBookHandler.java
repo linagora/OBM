@@ -90,8 +90,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 			searchContactInGroup(token, params, responder);
 		} else if ("getAddressBookSync".equals(method)) {
 			getAddressBookSync(token, params, responder);
-		} else if ("modifyContactInBook".equals(method)) {
-			modifyContactInBook(token, params, responder);
 		} else if ("unsubscribeBook".equals(method)) {
 			unsubscribeBook(token, params, responder);
 		} else if ("listAddressBooksChanged".equals(method)) {
@@ -135,10 +133,21 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendContact(ret);
 	}
 
-	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
-		Contact contact = getContactFromParams(params);
-		Contact ret = binding.modifyContact(at, type(params), contact);
-		responder.sendContact(ret);
+	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) 
+			throws NoPermissionException, ServerFault, ContactNotFoundException {
+		
+		try {
+			Integer addressBookId = Integer.valueOf( p(params, "addressBookId") );
+			Contact contact = getContactFromParams(params);
+			Contact ret = binding.modifyContact(at, addressBookId, contact);
+			responder.sendContact(ret);
+		} catch (SAXException e) {
+			throw new ServerFault(e);
+		} catch (IOException e) {
+			throw new ServerFault(e);
+		} catch (FactoryConfigurationError e) {
+			throw new ServerFault(e);
+		}
 	}
 
 	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) 
@@ -228,12 +237,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(p(params, "bookId"));
 	}
 	
-	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
-		Contact contact = getContactFromParams(params);
-		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);
-		responder.sendContact(ret);		
-	}
-
 	private void getAddressBookSync(AccessToken token, ParametersSource params,
 			XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
