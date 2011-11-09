@@ -105,9 +105,9 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendBoolean(ret);
 	}
 
-	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
+	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
-		KeyList ret = binding.getContactTwinKeys(at, type(params), contact);
+		KeyList ret = binding.getContactTwinKeys(at, contact);
 		responder.sendKeyList(ret);
 	}
 

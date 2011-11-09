@@ -55,7 +55,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
-import fr.aliacom.obm.common.StoreException;
 import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -214,20 +213,11 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	private boolean contactAlreadyExist(AccessToken token, Contact contact) {
-		List<String> duplicates = contactDao.findContactTwinKeys(token, contact);
-		if (duplicates != null && !duplicates.isEmpty()) {
+		KeyList duplicates = getContactTwinKeys(token, contact);
+		if (duplicates.getKeys() != null && !duplicates.getKeys().isEmpty()) {
 			return true;
 		}
 		return false;
-	}
-
-	private void checkContactsAddressBook(AccessToken token, BookType book) throws StoreException {
-		if (isReadOnly(token, book)) {
-			throw new StoreException("users not writable");
-		}
-		if (book != BookType.contacts) {
-			throw new StoreException("booktype not supported");
-		}
 	}
 
 	@Override
@@ -289,19 +279,9 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public KeyList getContactTwinKeys(AccessToken token, BookType book, Contact contact)
-		throws ServerFault {
-
-		try {
-			checkContactsAddressBook(token, book);
-			
-			List<String> keys = contactDao.findContactTwinKeys(token, contact);
-			return new KeyList(keys);
-
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
-		}
+	public KeyList getContactTwinKeys(AccessToken token, Contact contact) {
+		List<String> keys = contactDao.findContactTwinKeys(token, contact);
+		return new KeyList(keys);
 	}
 
 	@Override

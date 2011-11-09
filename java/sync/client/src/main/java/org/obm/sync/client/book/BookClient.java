@@ -67,12 +67,10 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public KeyList getContactTwinKeys(AccessToken token, BookType book, Contact contact) throws ServerFault {
+	public KeyList getContactTwinKeys(AccessToken token, Contact contact) {
 		Multimap<String, String> params = initParams(token);
-		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute(token, "/book/getContactTwinKeys", params);
-		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseKeyList(doc);
 	}
 

@@ -83,8 +83,7 @@ public interface IAddressBook {
 	/**
 	 * Search contact similar to the given one.
 	 */
-	KeyList getContactTwinKeys(AccessToken token, BookType book,
-			Contact contact) throws ServerFault;
+	KeyList getContactTwinKeys(AccessToken token, Contact contact);
 
 	/**
 	 * Search contacts in a group, based on a solr query
