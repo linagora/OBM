@@ -90,18 +90,13 @@ public class MailBackend extends ObmSyncBackend {
 		ic.setDisplayName(bs.getLoginAtDomain() + " " + imapFolder);
 		ic.setItemType(type);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("obm:\\\\");
-		sb.append(bs.getLoginAtDomain());
-		sb.append("\\email\\");
-		sb.append(imapFolder);
-		String s = buildPath(bs, imapFolder);
+		String imapPath = buildPath(bs, imapFolder);
 		String serverId;
 		try {
-			Integer collectionId = getCollectionIdFor(bs.getDevice(), s);
+			Integer collectionId = getCollectionIdFor(bs.getDevice(), imapPath);
 			serverId = collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
-			serverId = createCollectionMapping(bs.getDevice(), sb.toString());
+			serverId = createCollectionMapping(bs.getDevice(), imapPath);
 			ic.setIsNew(true);
 		}
 
