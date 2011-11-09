@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.naming.NoPermissionException;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.utils.DateUtils;
@@ -295,23 +297,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	@Override
 	@Transactional
-	public Contact removeContact(AccessToken token, BookType book, String uid) throws ServerFault, ContactNotFoundException { 
-		try {
-			Integer integerUid = Integer.valueOf(uid);
-			
-			checkContactsAddressBook(token, book);
-
-			Contact c = contactDao.removeContact(token, integerUid);
-			logger.info(LogUtils.prefix(token) + "contact[" + uid + "] removed (archived)");
-			return c;
-		} catch (NumberFormatException e) {
-			throw new ContactNotFoundException("contact uid [" + uid +"] is not an integer");
-		} catch (StoreException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
-		} catch (SQLException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
+	public Contact removeContact(AccessToken token, Integer addressBookId, Integer contactId) 
+			throws ServerFault, ContactNotFoundException, NoPermissionException {
+		
+		if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
+			throw new NoPermissionException("no permission to delete an user obm contact.");
+		} else {
+			try {
+				return contactDao.removeContact(token, contactId);
+			} catch (SQLException e) {
+				throw new ServerFault(e);
+			}
 		}
 	}
 
@@ -399,13 +395,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e);
 		}
-	}
-	
-	@Override
-	@Transactional
-	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid) 
-			throws ServerFault, ContactNotFoundException {
-		return removeContact(token, BookType.contacts, uid);
 	}
 	
 	@Override

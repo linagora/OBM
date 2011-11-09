@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.sync.auth.AccessToken;
@@ -94,8 +95,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 			createContactInBook(token, params, responder);
 		} else if ("modifyContactInBook".equals(method)) {
 			modifyContactInBook(token, params, responder);
-		} else if ("removeContactInBook".equals(method)) {
-			removeContactInBook(token, params, responder);
 		} else if ("unsubscribeBook".equals(method)) {
 			unsubscribeBook(token, params, responder);
 		} else if ("listAddressBooksChanged".equals(method)) {
@@ -131,9 +130,11 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, ContactNotFoundException {
+			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		Contact ret = binding.removeContact(at, type(params), p(params, "id"));
+		Integer contactId = Integer.valueOf(p(params, "contactId"));
+		Integer addressBookId = Integer.valueOf(p(params, "addressBookId"));
+		Contact ret = binding.removeContact(at, addressBookId, contactId);
 		responder.sendContact(ret);
 	}
 
@@ -225,13 +226,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(p(params, "bookId"));
 	}
 	
-	private void removeContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, ContactNotFoundException {
-		
-		Contact ret = binding.removeContactInBook(token, getBookId(params), p(params, "id"));
-		responder.sendContact(ret);
-	}
-
 	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);

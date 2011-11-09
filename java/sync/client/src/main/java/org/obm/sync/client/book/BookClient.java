@@ -3,6 +3,8 @@ package org.obm.sync.client.book;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.NoPermissionException;
+
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -136,12 +138,14 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public Contact removeContact(AccessToken token, BookType book, String uid) throws ServerFault, ContactNotFoundException {
+	public Contact removeContact(AccessToken token, Integer addressBookId , Integer contactId) 
+			throws ServerFault, ContactNotFoundException, NoPermissionException {
+		
 		Multimap<String, String> params = initParams(token);
-		params.put("book", book.toString());
-		params.put("id", uid);
+		params.put("addressBookId", String.valueOf(addressBookId));
+		params.put("contactId", String.valueOf(contactId));
 		Document doc = execute(token, "/book/removeContact", params);
-		exceptionFactory.checkContactNotFoundException(doc);
+		exceptionFactory.checkRemoveContactException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -201,16 +205,6 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
-	@Override
-	public Contact removeContactInBook(AccessToken token, int addressBookId, String uid) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("id", uid);
-		Document doc = execute(token, "/book/removeContactInBook", params);
-		exceptionFactory.checkServerFaultException(doc);
-		return respParser.parseContact(doc.getDocumentElement());
-	}
-
 	@Override
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
