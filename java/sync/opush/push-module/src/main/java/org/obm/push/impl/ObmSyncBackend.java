@@ -138,11 +138,22 @@ public class ObmSyncBackend {
 		return sb.toString();
 	}
 
-	protected Integer getItemIdFor(String serverId) {
-		int idx = serverId.lastIndexOf(":");
-		return Integer.parseInt(serverId.substring(idx + 1));
+	protected Integer getItemIdFromServerId(String serverId) {
+		String[] idx = serverId.split(":");
+		if (idx.length == 2) {
+			return Integer.parseInt(idx[1]);
+		}
+		return null;
 	}
 
+	protected Integer getCollectionIdFromServerId(String serverId) {
+		String[] idx = serverId.split(":");
+		if (idx.length == 2) {
+			return Integer.parseInt(idx[0]);
+		}
+		return null;
+	}
+	
 	protected String createCollectionMapping(Device device, String col) throws DaoException {
 		return collectionDao.addCollectionMapping(device, col).toString();
 	}
