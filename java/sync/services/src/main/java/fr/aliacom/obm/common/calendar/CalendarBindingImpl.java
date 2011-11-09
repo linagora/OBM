@@ -523,7 +523,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) throws SQLException, FindException {
+	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) throws SQLException, FindException, ServerFault {
 		Event ev = calendarDao.createEvent(token, calendar, event, false);
 		return calendarDao.removeEvent(token, ev, event.getType(), event.getSequence());
 	}
@@ -1161,6 +1161,8 @@ public class CalendarBindingImpl implements ICalendar {
 		} catch (FindException e) {
 			throw new ImportICalendarException(e);
 		} catch (SQLException e) {
+			throw new ImportICalendarException(e);
+		} catch (ServerFault e) {
 			throw new ImportICalendarException(e);
 		}
 		return false;
