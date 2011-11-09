@@ -46,23 +46,23 @@ public class ContentsImporter implements IContentsImporter {
 	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 		
-		String id = null;
+		String resultServerId = null;
 		switch (data.getType()) {
 		case CONTACTS:
-			id = contactBackend.createOrUpdate(bs, collectionId, serverId, (MSContact) data);
+			resultServerId = contactBackend.createOrUpdate(bs, collectionId, serverId, (MSContact) data);
 			break;
 		case EMAIL:
-			id = mailBackend.createOrUpdate(bs, collectionId, serverId,
+			resultServerId = mailBackend.createOrUpdate(bs, collectionId, serverId,
 					clientId, (MSEmail) data);
 			break;
 		case TASKS:
 		case CALENDAR:
-			id = calBackend.createOrUpdate(bs, collectionId, serverId, data);
+			resultServerId = calBackend.createOrUpdate(bs, collectionId, serverId, data);
 			break;
 		case FOLDER:
 			break;
 		}
-		return id;
+		return resultServerId;
 	}
 
 	@Override

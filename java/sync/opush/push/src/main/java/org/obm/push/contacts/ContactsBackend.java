@@ -105,18 +105,18 @@ public class ContactsBackend extends ObmSyncBackend {
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);
 
-		String id = null;
+		String itemId = null;
 		try {
 			if (serverId != null) {
 				int idx = serverId.lastIndexOf(":");
-				id = serverId.substring(idx + 1);
+				itemId = serverId.substring(idx + 1);
 				Contact convertedContact = new ContactConverter().contact(data);
-				convertedContact.setUid(Integer.parseInt(id));
+				convertedContact.setUid(Integer.parseInt(itemId));
 				bc.modifyContact(token, BookType.contacts, convertedContact);
 			} else {
 				Contact createdContact = bc.createContactWithoutDuplicate(token, BookType.contacts,
 						new ContactConverter().contact(data));
-				id = createdContact.getUid().toString();
+				itemId = createdContact.getUid().toString();
 			}
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
@@ -124,7 +124,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			bc.logout(token);
 		}
 
-		return getServerIdFor(collectionId, id);
+		return getServerIdFor(collectionId, itemId);
 	}
 
 	public void delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, ServerItemNotFoundException {

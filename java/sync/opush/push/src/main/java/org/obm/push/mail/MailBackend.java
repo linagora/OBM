@@ -292,7 +292,7 @@ public class MailBackend extends ObmSyncBackend {
 				Long mailUid = getEmailUidFromServerId(serverId);
 				emailManager.updateReadFlag(bs, collectionPath, mailUid, data.isRead());
 			}
-			return null;
+			return serverId;
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
