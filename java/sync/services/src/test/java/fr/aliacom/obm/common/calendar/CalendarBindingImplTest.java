@@ -691,4 +691,57 @@ public class CalendarBindingImplTest {
 		Event result = events.get(0);
 		return result;
 	}
+	
+	@Test
+	public void testCreateExternalEventCalendarOwnerWithDeclinedPartState() throws FindException, ServerFault, EventAlreadyExistException, SQLException {
+		String calendar = "cal1";
+		String domainName = "domain1";
+		String userEmail = "user@domain1";
+		EventExtId extId = new EventExtId("extId");
+		boolean notification = false;
+		
+		Attendee calOwner = getFakeAttendee(userEmail);
+		calOwner.setState(ParticipationState.DECLINED);
+		
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(false);
+		event.setExtId(extId);
+		event.setSequence(0);
+		event.addAttendee(calOwner);
+		
+		
+		Event eventCreated = new Event();
+		eventCreated.setType(EventType.VEVENT);
+		eventCreated.setInternalEvent(false);
+		eventCreated.setExtId(extId);
+		eventCreated.setSequence(0);
+		eventCreated.addAttendee(calOwner);
+		EventObmId obmId = new EventObmId(1);
+		eventCreated.setUid(obmId);
+		
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+		
+		AccessToken accessToken = mockAccessToken(calendar, domainName);
+		Helper helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+		
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(null).once();
+		expect(calendarDao.createEvent(accessToken, calendar, event, false)).andReturn(eventCreated).once();
+		expect(calendarDao.removeEvent(accessToken, eventCreated, eventCreated.getType(), eventCreated.getSequence())).andReturn(eventCreated).once();
+		eventChangeHandler.updateParticipationState(eventCreated, obmUser, calOwner.getState(), notification);
+		EasyMock.expectLastCall().once();
+		
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+		
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null);
+		calendarService.createEvent(accessToken, calendar, event, notification);
+		
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+		
+	}
 }

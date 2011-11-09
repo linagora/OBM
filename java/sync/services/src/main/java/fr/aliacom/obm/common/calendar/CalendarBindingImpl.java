@@ -473,9 +473,9 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			if (isEventDeclinedForCalendarOwner(attendee)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : external event["+ event.getTitle() + "] refused, mark event as deleted");
-				calendarDao.removeEvent(token, event, event.getType(), event.getSequence());
-				notifyOrganizerForExternalEvent(token, calendar, event, notification);
-				return event;
+				Event ev = createEventAsDeleted(token, calendar, event);
+				notifyOrganizerForExternalEvent(token, calendar, ev, notification);
+				return ev;
 			} else {
 				changeOrganizerParticipationStateToAccepted(event);
 				Event ev = calendarDao.createEvent(token, calendar, event, false);
@@ -489,6 +489,11 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
+	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) throws SQLException, FindException {
+		Event ev = calendarDao.createEvent(token, calendar, event, false);
+		return calendarDao.removeEvent(token, ev, event.getType(), event.getSequence());
+	}
+
 	private void changeOrganizerParticipationStateToAccepted(Event event) {
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
