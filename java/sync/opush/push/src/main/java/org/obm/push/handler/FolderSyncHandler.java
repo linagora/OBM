@@ -71,8 +71,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (InvalidServerId e) {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
-		} catch (CollectionNotFoundException e) {
-			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		}
 	}
 
@@ -86,13 +84,12 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 	
 	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws InvalidSyncKeyException, 
-		DaoException, UnknownObmSyncServerException, InvalidServerId, CollectionNotFoundException {
+		DaoException, UnknownObmSyncServerException, InvalidServerId {
 		
 		if (isFirstSync(folderSyncRequest)) {
 
 			hierarchyExporter.initHierarchyFolder(bs);
-			return getFolderSyncResponse(bs, 
-					DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			return getFolderSyncResponse(bs, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		} else {
 			
 			Date lastSyncDate = getLastSyncDate(folderSyncRequest);
@@ -100,9 +97,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private Date getLastSyncDate(FolderSyncRequest folderSyncRequest) 
-			throws CollectionNotFoundException, DaoException, InvalidSyncKeyException {
-		
+	private Date getLastSyncDate(FolderSyncRequest folderSyncRequest) throws DaoException, InvalidSyncKeyException {
 		String syncKey = folderSyncRequest.getSyncKey();
 		Date lastSyncDate = stMachine.getLastSyncDate(syncKey);
 		if (lastSyncDate == null) {
@@ -115,14 +110,14 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		return folderSyncRequest.getSyncKey().equals("0");
 	}
 
-	private FolderSyncResponse getFolderSyncResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
+	private FolderSyncResponse getFolderSyncResponse(BackendSession bs, Date lastSync) throws DaoException, 
 			UnknownObmSyncServerException, InvalidServerId {
 		
 		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(bs, lastSync);
 		return createFolderSyncResponse(bs, hierarchyItemsChanges);
 	}
 	
-	private FolderSyncResponse getFolderSyncContactsResponse(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, 
+	private FolderSyncResponse getFolderSyncContactsResponse(BackendSession bs, Date lastSync) throws DaoException, 
 		UnknownObmSyncServerException, InvalidServerId {
 
 		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.listContactFoldersChanged(bs, lastSync);

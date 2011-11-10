@@ -298,7 +298,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public Date findLastSyncDateFromKey(String syncKey) throws DaoException, CollectionNotFoundException {
+	public Date findLastSyncDateFromKey(String syncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;

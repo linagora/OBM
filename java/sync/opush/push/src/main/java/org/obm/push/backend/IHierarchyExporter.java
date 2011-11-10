@@ -17,11 +17,11 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(BackendSession bs);
 
-	HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+	HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException;
 
 	int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException;
 
-	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
+	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException;
 
 	void initHierarchyFolder(BackendSession bs) throws DaoException;
 
