@@ -297,28 +297,29 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public void delete(BackendSession bs, String serverId) 
-			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException {
-		
+	public String delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, DaoException {
 		Integer contactId = getItemIdFromServerId(serverId);
 		Integer collectionId = getCollectionIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
-			removeContact(bs, addressBookId, contactId);
+			Contact contact = removeContact(bs, addressBookId, contactId);
+			return getServerIdFor(collectionId, String.valueOf(contact.getUid()));
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
+			return null;
 		} catch (ContactNotFoundException e) {
-			throw new ServerItemNotFoundException(e.getMessage());
+			logger.warn(e.getMessage());
+			return null;
 		}
 	}
 
-	private void removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
+	private Contact removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
 			throws UnknownObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
 		IAddressBook bc = getBookClient();
 		AccessToken token = login(bs);
 		try {
-			bc.removeContact(token, addressBookId, contactId);
+			return bc.removeContact(token, addressBookId, contactId);
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} finally {
