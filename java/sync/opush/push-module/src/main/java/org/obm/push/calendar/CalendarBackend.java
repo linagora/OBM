@@ -103,7 +103,7 @@ public class CalendarBackend extends ObmSyncBackend {
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+			throws DaoException, UnknownObmSyncServerException {
 
 		if (!bs.checkHint("hint.multipleCalendars", false)) {
 			return getDefaultCalendarItemChange(bs);
@@ -112,8 +112,7 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 
-	private List<ItemChange> getCalendarList(BackendSession bs) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
-
+	private List<ItemChange> getCalendarList(BackendSession bs) throws DaoException, UnknownObmSyncServerException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		ICalendar cc = getCalendarClient();
 		AccessToken token = login(bs);
@@ -137,6 +136,8 @@ public class CalendarBackend extends ObmSyncBackend {
 			}
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage());
 		} finally {
 			logout(token);
 		}

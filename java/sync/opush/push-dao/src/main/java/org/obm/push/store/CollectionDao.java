@@ -64,6 +64,6 @@ public interface CollectionDao {
 
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
 
-	Date findLastSyncDateFromKey(String syncKey) throws DaoException, CollectionNotFoundException;
+	Date findLastSyncDateFromKey(String syncKey) throws DaoException;
 	
 }

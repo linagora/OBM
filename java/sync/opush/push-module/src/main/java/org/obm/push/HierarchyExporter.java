@@ -73,7 +73,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 		return calendarExporter.getHierarchyTaskChanges(bs);
 	}
 
-	private List<ItemChange> getCalendarChanges(BackendSession bs) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	private List<ItemChange> getCalendarChanges(BackendSession bs) throws DaoException, UnknownObmSyncServerException {
 		return calendarExporter.getHierarchyChanges(bs);
 	}
 
@@ -82,7 +82,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	public HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		LinkedList<ItemChange> allItemsChanged = new LinkedList<ItemChange>();
 		
 		allItemsChanged.addAll(getCalendarChanges(bs));
@@ -98,7 +98,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 	
 	@Override
-	public HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException {
+	public HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		return contactsBackend.getHierarchyChanges(bs, lastSync);
 	}
 	
