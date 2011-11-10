@@ -335,6 +335,7 @@ public class Contact {
 			.add("uid", uid)
 			.add("commonname", commonname)
 			.add("firstname", firstname)
+			.add("folderId", folderId)
 			.toString();
 	}
 	
