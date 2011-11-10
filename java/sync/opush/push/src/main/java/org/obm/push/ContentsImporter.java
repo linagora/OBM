@@ -64,9 +64,10 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+	public String importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 		
+		String serverIdDeleted = serverId;
 		switch (type) {
 		case CALENDAR:
 			Event event = calBackend.getEventFromServerId(bs, serverId);
@@ -76,7 +77,7 @@ public class ContentsImporter implements IContentsImporter {
 			}
 			break;
 		case CONTACTS:
-			contactBackend.delete(bs, serverId);
+			serverIdDeleted = contactBackend.delete(bs, serverId);
 			break;
 		case EMAIL:
 			Long emailUid = mailBackend.getEmailUidFromServerId(serverId);
@@ -89,6 +90,7 @@ public class ContentsImporter implements IContentsImporter {
 			calBackend.delete(bs, collectionId, serverId);
 			break;
 		}
+		return serverIdDeleted;
 	}
 
 	public String importMoveItem(BackendSession bs, PIMDataType type,
