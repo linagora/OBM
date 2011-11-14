@@ -81,7 +81,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("lastSync", DateHelper.asString(lastSync));
-		Document doc = execute(token, "/book/listContactsChanged", params);
+		Document doc = execute(token, "/book/listAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}
@@ -201,7 +201,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, String> params = initParams(token);
 		params.put("lastSync", DateHelper.asString(lastSync));
 		params.put("bookId", String.valueOf(addressBookId));
-		Document doc = execute(token, "/book/listContactsChanged", params);
+		Document doc = execute(token, "/book/listAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}

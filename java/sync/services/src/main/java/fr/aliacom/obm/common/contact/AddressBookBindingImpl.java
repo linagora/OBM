@@ -340,7 +340,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private boolean isFirstSync(Date timestamp) {
 		if (timestamp == null || DateHelper.asDate("0").equals(timestamp) || 
-				(DateUtils.getEpochPlusOneSecondCalendar().getTime().getTime() == timestamp.getTime())) {
+				(DateUtils.getEpochCalendar().getTime().getTime() == timestamp.getTime())) {
 			return true;
 		}
 		return false;
