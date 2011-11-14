@@ -38,7 +38,7 @@ public class FolderSyncProtocol {
 		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
 		
 		for (ItemChange itemChange: folderSyncResponse.getItemsAddedAndUpdated()) {
-			Element addedOrUpdated = null;
+			Element addedOrUpdated;
 			if (itemChange.isNew()) {
 				addedOrUpdated = DOMUtils.createElement(changes, "Add");
 			} else {
