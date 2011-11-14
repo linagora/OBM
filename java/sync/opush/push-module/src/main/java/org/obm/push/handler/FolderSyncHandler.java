@@ -42,6 +42,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -130,12 +131,13 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	private Date getLastSyncDate(FolderSyncRequest folderSyncRequest) throws DaoException, InvalidSyncKeyException {
+		
 		String syncKey = folderSyncRequest.getSyncKey();
-		Date lastSyncDate = stMachine.getLastSyncDate(syncKey);
-		if (lastSyncDate == null) {
+		SyncState syncState = stMachine.getSyncState(syncKey);
+		if (syncState == null) {
 			throw new InvalidSyncKeyException(syncKey);
 		}
-		return lastSyncDate;
+		return syncState.getLastSync();
 	}
 
 	private boolean isFirstSync(FolderSyncRequest folderSyncRequest) {

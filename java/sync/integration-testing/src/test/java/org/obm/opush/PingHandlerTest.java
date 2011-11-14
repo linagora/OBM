@@ -37,6 +37,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -287,7 +288,8 @@ public class PingHandlerTest {
 				anyObject(BackendSession.class), 
 				anyObject(FilterType.class),
 				anyInt(),
-				anyObject(SyncState.class)))
+				anyObject(SyncState.class),
+				anyObject(PIMDataType.class)))
 			.andReturn(1).times(2);
 	}
 
@@ -297,7 +299,8 @@ public class PingHandlerTest {
 				anyObject(BackendSession.class), 
 				anyObject(FilterType.class),
 				anyInt(),
-				anyObject(SyncState.class)))
+				anyObject(SyncState.class),
+				anyObject(PIMDataType.class)))
 			.andReturn(0).anyTimes();
 	}
 	
