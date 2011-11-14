@@ -397,7 +397,7 @@ CREATE OR REPLACE FUNCTION generate_uuid()
 $BODY$
  SELECT CAST(md5(current_database()|| user ||current_timestamp ||random()) as uuid)
 $BODY$
-  LANGUAGE 'sql' VOLATILE
+  LANGUAGE 'sql' VOLATILE;
 
 UPDATE event SET event_ext_id=generate_uuid() WHERE event_ext_id IS NULL;
 ALTER TABLE event ALTER event_ext_id SET NOT NULL;
