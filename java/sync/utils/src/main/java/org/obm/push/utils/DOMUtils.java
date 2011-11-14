@@ -24,10 +24,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.html.dom.HTMLDocumentImpl;
+import org.cyberneko.html.parsers.DOMFragmentParser;
+import org.cyberneko.html.parsers.DOMParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -282,6 +286,19 @@ public final class DOMUtils {
 		return ret;
 	}
 
+	public static DocumentFragment parseHtmlAsFragment(final InputSource source) throws SAXException, IOException {
+		final DOMFragmentParser parser = new DOMFragmentParser();
+		DocumentFragment frag = new HTMLDocumentImpl().createDocumentFragment();
+		parser.parse(source,frag);
+		return frag;
+	}
+
+	public static Document parseHtmlAsDocument(final InputSource source) throws SAXException, IOException {
+		final DOMParser parser = new DOMParser();
+		parser.parse(source);
+		return parser.getDocument();
+	}
+
 	public static Document createDoc(String namespace, String rootElement)
 			throws FactoryConfigurationError {
 		lock();
@@ -306,4 +323,5 @@ public final class DOMUtils {
 	public static Document cloneDOM(Document doc) {
 		return (Document) doc.cloneNode(true);
 	}
+	
 }

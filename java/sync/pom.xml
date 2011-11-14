@@ -415,6 +415,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 			  <artifactId>apache-mime4j-dom</artifactId>
 			  <version>${apache-mime4j.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>nekohtml</groupId>
+				<artifactId>nekohtml</artifactId>
+				<version>0.9.5</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 </project>
