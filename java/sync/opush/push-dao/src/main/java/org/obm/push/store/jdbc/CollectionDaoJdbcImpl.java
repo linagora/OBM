@@ -229,9 +229,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return ret;
 	}
 	
-	public int getCollectionMapping(Device device,
-			String collection) throws CollectionNotFoundException, DaoException {
-		final Integer devDbId = device.getDatabaseId();
+	public Integer getCollectionMapping(Device device, String collection) throws DaoException {
+		Integer devDbId = device.getDatabaseId();
 		Integer ret = null;
 
 		Connection con = null;
@@ -243,7 +242,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setInt(1, devDbId);
 			ps.setString(2, collection);
 			rs = ps.executeQuery();
-
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
@@ -251,9 +249,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
-		}
-		if (ret == null) {
-			throw new CollectionNotFoundException();
 		}
 		return ret;
 	}
