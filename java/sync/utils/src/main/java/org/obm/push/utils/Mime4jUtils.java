@@ -38,6 +38,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MessageServiceFactoryImpl;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
@@ -61,8 +62,8 @@ public class Mime4jUtils {
 		messageWriter = messageServiceFactory.newMessageWriter();
 	}
 
-	public Message createMessage() {
-		return messageBuilder.newMessage();
+	public MessageImpl createMessage() {
+		return new MessageImpl();
 	}
 
 	public Message parseMessage(byte[] data) throws MimeException, IOException {
