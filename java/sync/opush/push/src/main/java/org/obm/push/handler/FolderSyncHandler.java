@@ -127,8 +127,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			throws DaoException, InvalidServerId {
 		
 		String newSyncKey = allocateNewSyncKey(bs, hierarchyItemsChanges);
-		return new FolderSyncResponse(
-				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
+		return new FolderSyncResponse(hierarchyItemsChanges, newSyncKey);
 	}
 
 	private String allocateNewSyncKey(BackendSession bs, HierarchyItemsChanges hierarchyItemsChanges) 
