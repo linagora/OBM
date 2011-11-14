@@ -149,10 +149,10 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, 
+			PIMDataType dataType) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
-		AbstractEventSyncClient cc = getEventSyncClient(state.getDataType());
+		AbstractEventSyncClient cc = getEventSyncClient(dataType);
 		AccessToken token = login(cc, bs);
 		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();

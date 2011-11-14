@@ -11,11 +11,11 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -24,6 +24,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class StateMachine {
 
+	private static final Logger logger = LoggerFactory.getLogger(StateMachine.class);
+	
 	private final CollectionDao collectionDao;
 	private final ItemTrackingDao itemTrackingDao;
 
@@ -33,14 +35,10 @@ public class StateMachine {
 		this.itemTrackingDao = itemTrackingDao;
 	}
 
-	public SyncState getSyncState(String syncKey) throws CollectionNotFoundException, DaoException, PIMDataTypeNotFoundException {
+	public SyncState getSyncState(String syncKey) throws DaoException {
 		return collectionDao.findStateForKey(syncKey);
 	}
 
-	public Date getLastSyncDate(String syncKey) throws DaoException {
-		return collectionDao.findLastSyncDateFromKey(syncKey);
-	}
-	
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
 		
@@ -56,6 +54,7 @@ public class StateMachine {
 			itemTrackingDao.markAsDeleted(newState, itemChangesAsServerIdSet(deletedItems));
 		}
 		
+		log(bs, newState);
 		return newSk;
 	}
 
@@ -66,7 +65,13 @@ public class StateMachine {
 		}
 		return ids;
 	}
-	
+
+	private void log(BackendSession bs, SyncState newState) {
+		String collectionPath = "obm:\\\\" + bs.getUser().getLoginAtDomain();
+		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
+				new Object[]{newState.getKey(), collectionPath, newState.getLastSync()});
+	}
+
 	private Set<ServerId> listNewItems(Collection<ItemChange> changes) throws InvalidServerId {
 		HashSet<ServerId> serverIds = Sets.newHashSet();
 		for (ItemChange change: changes) {

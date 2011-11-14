@@ -49,46 +49,51 @@ public class ContentsExporter implements IContentsExporter {
 		this.invitationFilterManager = invitationFilterManager;
 	}
 
-	private DataDelta getTasksChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException  {
-		return this.calBackend.getContentChanges(bs, state, collectionId, filterType);
-	}
-
-	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
-		return calBackend.getContentChanges(bs, state, collectionId, filterType);
-	}
-
-	private int getItemEstimateSize(BackendSession bs, SyncState syncState, FilterType filterType, Integer collectionId)
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+	private DataDelta getTasksChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, 
+			PIMDataType dataType) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException  {
 		
-		DataDelta dataDelta = getChanged(bs, syncState, filterType, collectionId);
-		return getCount(bs, syncState, collectionId, dataDelta);
+		return this.calBackend.getContentChanges(bs, state, collectionId, filterType, dataType);
+	}
+
+	private DataDelta getCalendarChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, 
+			PIMDataType dataType) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+		
+		return calBackend.getContentChanges(bs, state, collectionId, filterType, dataType);
+	}
+
+	private int getItemEstimateSize(BackendSession bs, SyncState syncState, FilterType filterType, Integer collectionId, 
+			PIMDataType dataType) throws DaoException, CollectionNotFoundException, 
+			UnknownObmSyncServerException, ProcessingEmailException {
+		
+		DataDelta dataDelta = getChanged(bs, syncState, filterType, collectionId, dataType);
+		return getCount(bs, syncState, collectionId, dataDelta, dataType);
 	}
 	
-	private int getItemEmailEstimateSize(BackendSession bs, SyncState syncState, FilterType filterType, Integer collectionId) 
+	private int getItemEmailEstimateSize(BackendSession bs, SyncState syncState, FilterType filterType, Integer collectionId, PIMDataType dataType) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException {
 		
 		DataDelta unfilteredDelta = mailBackend.getMailChanges(bs, syncState, collectionId, filterType);
 		DataDelta filteredDelta = invitationFilterManager.filterInvitation(bs, syncState, collectionId, unfilteredDelta);
-		return getCount(bs, syncState, collectionId, filteredDelta);
+		return getCount(bs, syncState, collectionId, filteredDelta, dataType);
 	}
 
-	private int getCount(BackendSession bs, SyncState syncState, Integer collectionId, DataDelta delta) throws DaoException {
-		int filterCount = invitationFilterManager.getCountFilterChanges(bs, syncState.getKey(), syncState.getDataType(), collectionId);
+	private int getCount(BackendSession bs, SyncState syncState, Integer collectionId, DataDelta delta, PIMDataType dataType) 
+			throws DaoException {
+		
+		int filterCount = invitationFilterManager.getCountFilterChanges(bs, syncState.getKey(), dataType, collectionId);
 		int count = delta.getItemEstimateSize() + filterCount;
 		logger.info("{} email(s) changes", count);
 		return count;
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
+	public DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId, PIMDataType dataType) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		DataDelta delta = null;
-		switch (state.getDataType()) {
+		switch (dataType) {
 		case CALENDAR:
-			delta = getCalendarChanges(bs, state, collectionId, filterType);
+			delta = getCalendarChanges(bs, state, collectionId, filterType, dataType);
 			invitationFilterManager.filterEvent(bs, state, collectionId, delta);
 			break;
 		case CONTACTS:
@@ -100,7 +105,7 @@ public class ContentsExporter implements IContentsExporter {
 			invitationFilterManager.createOrUpdateInvitation(bs, state, collectionId, unfilteredChanges);
 			break;
 		case TASKS:
-			delta = getTasksChanges(bs, state, collectionId, filterType);
+			delta = getTasksChanges(bs, state, collectionId, filterType, dataType);
 			break;
 		}
 		return delta;
@@ -144,17 +149,19 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
-		if (state.getDataType() != null) {
-			switch (state.getDataType()) {
+	public int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state, PIMDataType dataType)
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
+		
+		if (dataType != null) {
+			switch (dataType) {
 			case CALENDAR:
-				return getItemEstimateSize(bs, state, filterType, collectionId);
+				return getItemEstimateSize(bs, state, filterType, collectionId, dataType);
 			case CONTACTS:
-				return getItemEstimateSize(bs, state, filterType, collectionId);
+				return getItemEstimateSize(bs, state, filterType, collectionId, dataType);
 			case EMAIL:
-				return getItemEmailEstimateSize(bs, state, filterType, collectionId);
+				return getItemEmailEstimateSize(bs, state, filterType, collectionId, dataType);
 			case TASKS:
-				return getItemEstimateSize(bs, state, filterType, collectionId);
+				return getItemEstimateSize(bs, state, filterType, collectionId, dataType);
 			}
 		}
 		return 0;

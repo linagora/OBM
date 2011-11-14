@@ -192,7 +192,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), bs.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), c.getCollectionId());
+			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getOptions().getFilterType(), 
+					c.getCollectionId(), c.getDataType());
+			
 			lastSync = delta.getSyncDate();
 		} else {
 			lastSync = c.getSyncState().getLastSync();
@@ -290,7 +292,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
-		UnknownObmSyncServerException, ProcessingEmailException, PIMDataTypeNotFoundException {
+		UnknownObmSyncServerException, ProcessingEmailException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
@@ -310,8 +312,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				Map<String, String> processedClientIds = processModification(bs, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
-				String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
-				SyncState syncState = new SyncState(PIMDataType.getPIMDataType(collectionPath), collection.getSyncKey());
+				SyncState syncState = new SyncState(collection.getSyncKey());
 				collection.setSyncState(syncState);
 			}
 			
@@ -407,14 +408,12 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (InvalidServerId e) {
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);			
-		} catch (PIMDataTypeNotFoundException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId, PIMDataTypeNotFoundException {
+			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -428,7 +427,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(BackendSession bs,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnknownObmSyncServerException, ProcessingEmailException, PIMDataTypeNotFoundException {
+			UnknownObmSyncServerException, ProcessingEmailException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if ("0".equals(syncCollection.getSyncKey())) {
@@ -441,7 +440,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void handleDataSync(BackendSession bs, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId, PIMDataTypeNotFoundException {
+			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
 		
 		SyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
 		if (st == null) {
@@ -453,7 +452,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(bs, syncCollection, processedClientIds, syncCollectionResponse);
 			} else {
-				List<ItemChange> itemChanges = contentsExporter.fetch(bs, syncCollection.getSyncState().getDataType(), syncCollection.getFetchIds());
+				List<ItemChange> itemChanges = contentsExporter.fetch(bs, syncCollection.getDataType(), syncCollection.getFetchIds());
 				syncCollectionResponse.setItemChanges(itemChanges);
 			}
 			identifyNewItems(syncCollectionResponse, st);

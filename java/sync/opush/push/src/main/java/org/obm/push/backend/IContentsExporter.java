@@ -22,7 +22,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
  */
 public interface IContentsExporter {
 
-	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
+	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId, PIMDataType pimDataType) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
 	List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType,
@@ -36,7 +36,7 @@ public interface IContentsExporter {
 
 	boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException;
 
-	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 
+	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state, PIMDataType dataType) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException;
 	
 }

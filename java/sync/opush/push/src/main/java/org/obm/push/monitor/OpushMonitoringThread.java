@@ -45,10 +45,8 @@ public class OpushMonitoringThread {
 			for (SyncCollection syncCollection : monitoredCollections) {
 			
 				try {
-					int count = contentsExporter.getItemEstimateSize(backendSession,
-							syncCollection.getOptions().getFilterType(),
-							syncCollection.getCollectionId(),
-							syncCollection.getSyncState());
+					int count = contentsExporter.getItemEstimateSize(backendSession, syncCollection.getOptions().getFilterType(),
+							syncCollection.getCollectionId(), syncCollection.getSyncState(), syncCollection.getDataType());
 					
 					if (count > 0) {
 						addPushNotification(pushNotifyList, ccl);

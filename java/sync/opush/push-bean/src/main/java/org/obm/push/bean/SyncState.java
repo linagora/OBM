@@ -18,32 +18,17 @@ public class SyncState implements Serializable {
 	private Date lastSync;
 	private boolean lastSyncFiltred;
 	private String key;
-	private PIMDataType dataType;
 	private int id;
 
-	public SyncState(PIMDataType dataType) {
-		this(dataType, null, null);
-	}
-	
-	public SyncState(PIMDataType dataType, Date lastSync) {
-		this(dataType, null, lastSync);
-	}
-	
-	public SyncState(PIMDataType dataType, String key) {
-		this(dataType, key, null);
-	}
-	
-	public SyncState(String newSk, Date lastSync) {
-		this(null, newSk, lastSync);
+	public SyncState(String syncKey) {
+		this(syncKey, null);
 	}
 
-	public SyncState(PIMDataType dataType, String key, Date lastSync) {
+	public SyncState(String key, Date lastSync) {
 		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		this.lastSyncFiltred = false;
-		this.dataType = dataType;
 		this.key = key;
 	}
-
 
 	public Date getLastSync() {
 		return lastSync;
@@ -69,14 +54,6 @@ public class SyncState implements Serializable {
 		this.lastSyncFiltred = lastSyncFiltred;
 	}
 
-	public PIMDataType getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(PIMDataType dataType) {
-		this.dataType = dataType;
-	}
-	
 	public void updatingLastSync(FilterType filterType) {
 		if (filterType != null) {
 			Calendar calendar = filterType.getFilteredDate();
@@ -97,7 +74,7 @@ public class SyncState implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(lastSync, lastSyncFiltred, key, dataType, id);
+		return Objects.hashCode(lastSync, lastSyncFiltred, key, id);
 	}
 	
 	@Override
@@ -107,7 +84,6 @@ public class SyncState implements Serializable {
 			return Objects.equal(this.lastSync, that.lastSync)
 				&& Objects.equal(this.lastSyncFiltred, that.lastSyncFiltred)
 				&& Objects.equal(this.key, that.key)
-				&& Objects.equal(this.dataType, that.dataType)
 				&& Objects.equal(this.id, that.id);
 		}
 		return false;
@@ -119,7 +95,6 @@ public class SyncState implements Serializable {
 			.add("lastSync", lastSync)
 			.add("lastSyncFiltred", lastSyncFiltred)
 			.add("key", key)
-			.add("dataType", dataType)
 			.add("id", id)
 			.toString();
 	}

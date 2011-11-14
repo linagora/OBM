@@ -89,15 +89,15 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
-		UnknownObmSyncServerException, ProcessingEmailException {
+		UnknownObmSyncServerException, ProcessingEmailException, CollectionNotFoundException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
 			
+			Integer collectionId = syncCollection.getCollectionId();
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			try {
-				Integer collectionId = syncCollection.getCollectionId();
-				String collectionPath = collectionDao.getCollectionPath(collectionId);
 				syncCollection.setCollectionPath(collectionPath);
 				syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
 			
@@ -108,16 +108,14 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				}
 				
 				int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);
-				int count = contentsExporter.getItemEstimateSize(bs, syncCollection.getOptions().getFilterType(), collectionId, state);
+				int count = contentsExporter.getItemEstimateSize(bs, syncCollection.getOptions().getFilterType(), collectionId, state, 
+						syncCollection.getDataType());
 			
 				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
 
 			} catch (PIMDataTypeNotFoundException e) {
-				logger.warn(e.getMessage());
-			} catch (CollectionNotFoundException e) {
-				logger.warn(e.getMessage());
-			}
-			
+				throw new CollectionNotFoundException("Collection path {" + collectionPath + "} not found.");
+			}			
 		}
 		
 		return new GetItemEstimateResponse(estimates);
