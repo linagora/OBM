@@ -137,28 +137,26 @@ public class ContactsBackend extends ObmSyncBackend {
 	public DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) 
 			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
 		
-		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
-		if (addressBookId != null) {
+		Integer addressBookId = findAddressBookIdFromCollectionId(bs,collectionId);
+		ContactChanges contactChanges = listContactsChanged(bs,state.getLastSync(), addressBookId);
 
-			ContactChanges contactChanges = listContactsChanged(bs, state.getLastSync(), addressBookId);
-			
-			List<ItemChange> addUpd = new LinkedList<ItemChange>();
-			for (Contact contact: contactChanges.getUpdated()) {
-				addUpd.add( convertContactToItemChange(collectionId, contact) );
-			}
-			
-			List<ItemChange> deletions = new LinkedList<ItemChange>();
-			for (Integer remove: contactChanges.getRemoved()) {
-				ItemChange change = getItemChange(collectionId, String.valueOf(remove));
-				deletions.add(change);
-			}
-			
-			return new DataDelta(addUpd, deletions, contactChanges.getLastSync());
+		List<ItemChange> addUpd = new LinkedList<ItemChange>();
+		for (Contact contact : contactChanges.getUpdated()) {
+			addUpd.add(convertContactToItemChange(collectionId, contact));
 		}
-		throw new CollectionNotFoundException(collectionId);
+
+		List<ItemChange> deletions = new LinkedList<ItemChange>();
+		for (Integer remove : contactChanges.getRemoved()) {
+			ItemChange change = getItemChange(collectionId, String.valueOf(remove));
+			deletions.add(change);
+		}
+
+		return new DataDelta(addUpd, deletions, contactChanges.getLastSync());
 	}
 
-	private Integer findAddressBookIdFromCollectionId(BackendSession bs, Integer collectionId) throws UnknownObmSyncServerException, DaoException {
+	private Integer findAddressBookIdFromCollectionId(BackendSession bs, Integer collectionId) 
+			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
+		
 		List<AddressBook> addressBooks = listAddressBooks(bs);
 		for (AddressBook addressBook: addressBooks) {
 			String colllectionPath = getCollectionPath(bs, addressBook.getName());
@@ -171,7 +169,7 @@ public class ContactsBackend extends ObmSyncBackend {
 				logger.warn(e.getMessage());
 			}
 		}
-		return null;
+		throw new CollectionNotFoundException(collectionId);
 	}
 	
 	private List<AddressBook> listAddressBooks(BackendSession bs) throws UnknownObmSyncServerException {
@@ -206,7 +204,7 @@ public class ContactsBackend extends ObmSyncBackend {
 	}
 
 	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, MSContact data)
-			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException {
+			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException, CollectionNotFoundException {
 		
 		Integer contactId = getItemIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
@@ -262,7 +260,9 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public String delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, DaoException {
+	public String delete(BackendSession bs, String serverId) 
+			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
+		
 		Integer contactId = getItemIdFromServerId(serverId);
 		Integer collectionId = getCollectionIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
@@ -292,7 +292,9 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) {
+	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) 
+			throws CollectionNotFoundException, UnknownObmSyncServerException, DaoException {
+		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		for (String serverId: fetchServerIds) {
 			try {
@@ -301,17 +303,11 @@ public class ContactsBackend extends ObmSyncBackend {
 				Integer collectionId = getCollectionIdFromServerId(serverId);
 				Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 				
-				if (contactId != null && addressBookId != null) {
-					Contact contact = getContactFromId(bs, addressBookId, contactId);
-					ret.add( convertContactToItemChange(collectionId, contact) );
-				}
+				Contact contact = getContactFromId(bs, addressBookId, contactId);
+				ret.add( convertContactToItemChange(collectionId, contact) );
 				
-			} catch (UnknownObmSyncServerException e) {
-				logger.error(e.getMessage());
-			} catch (DaoException e) {
-				logger.error(e.getMessage());
 			} catch (ContactNotFoundException e) {
-				logger.warn(e.getMessage());
+				logger.error(e.getMessage());
 			}
 		}
 		return ret;
