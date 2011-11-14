@@ -324,14 +324,18 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional
 	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
-		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
-		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
-				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
-			updated.addAll(createAddressBookForUsers(timestamp));
+		try {
+			List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
+			if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+					GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+				updated.addAll(createAddressBookForUsers(timestamp));
+			}
+			
+			Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
+			return new FolderChanges(updated, removed, getLastSync());	
+		} catch (SQLException ex) {
+			throw new ServerFault(ex.getMessage());
 		}
-		
-		Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
-		return new FolderChanges(updated, removed, getLastSync());
 	}
 	
 	private boolean isFirstSync(Date timestamp) {
