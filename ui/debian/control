@@ -9,68 +9,65 @@ Homepage: http://www.obm.org
 Package: obm-full
 Architecture: all
 Depends: obm-storage, obm-ldap, obm-ui, obm-cyrus, obm-postfix, obm-services, obm-locator, obm-solr, obm-filter, obm-satellite, obm-sync, opush
-Description: installation of Open Business Management
- Install of obm, all in one server.
+Description: OBM all-in-one
+ Installation of OBM all-in-one server.
 
 Package: obm
 Architecture: all
 Depends: obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator, ${misc:Depends}, obm-solr
-Description: installation of Open Business Management
- full installation of Open Business Management
- Instalation of OBM
+Description: OBM 
+ Installation of OBM
 
 Package: obm-conf
 Architecture: all
 Pre-Depends: libconfig-inifiles-perl, libio-zlib-perl
 Depends: ucf, ${misc:Depends}
 Description: OBM conf
- obm_conf.ini generation
- Instalation of obm_conf.ini
+ OBM configuration generation
+ Installation of obm_conf.ini
 
 Package: obm-storage
 Architecture: all
-Pre-Depends: obm-core (= ${binary:Version}), dbconfig-common, obm-conf (= ${binary:Version}), postgresql-8.4 | postgresql-8.3 | mysql-server
+Pre-Depends: obm-core (= ${binary:Version}), dbconfig-common, obm-conf (= ${binary:Version}), postgresql (>= 8.3) | mysql-server
 Depends: obm-locator, obm-munin-node, ${misc:Depends}
 Description: OBM storage multidb
- DB of Open Business Management
- Instalation of db PostgreSQL or MySQL
-
+ Database files for OBM
+ Installation on top of PostgreSQL or MySQL
+ Support for postgresql 9.x is experimental, use at your own risk.
 
 Package: obm-core
 Architecture: all
 Pre-Depends: debconf
 Depends:  obm-conf (= ${binary:Version}), php5-cli, php5-pgsql | php5-mysql, tzdata, php5-curl, php-apc ${misc:Depends}
 Description: OBM core
- core of Open Business Management
+ OBM core files
 
 Package: obm-certs
 Architecture: all
 Pre-Depends: obm-ca, obm-conf (= ${binary:Version})
 Depends:  openssl, ${misc:Depends}
-Description: OBM certificat
- Certicat generation for OBM
- Instalation of OBM
+Description: OBM certificates
+ Certificate generation for OBM
 
 Package: obm-ui
 Architecture: all
 Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php5, apache2, libapache2-mod-php5, php5-pgsql | php5-mysql, php5-gd, php-db, obm-munin-master, ${misc:Depends}
 Recommends: php5-imagick
-Description: OBM Web Interface
- Web of Open Business Management
- Instalation of OBM
+Description: OBM web interface
+ Installation of OBM web interface and apache vhost configuration
 
 Package: libobm-perl
 Section: perl
 Architecture: all
 Depends: libnet-telnet-perl, libcyrus-imap-perl23|libcyrus-imap-perl22, libnet-server-perl, libcrypt-smbhash-perl, libdigest-sha1-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, libclass-singleton-perl, libdbi-perl, libdbd-pg-perl | libdbd-mysql-perl, libsasl2-modules, libio-socket-ssl-perl, libxml-simple-perl, liblog-log4perl-perl, ${perl:Depends}, ${misc:Depends}
-Description: module OBM perl
- module OBM perl for obm-services
+Description: OBM perl library
+ OBM perl library for obm-services
 
 Package: obm-services
 Architecture: all
 Depends:  obm-conf (= ${binary:Version}), sudo, libobm-perl (= ${binary:Version}), obm-munin-node, ${misc:Depends}
 Description: OBM Automate
- Instalation of OBM automate
+ Installation of OBM automate
 
 Package: obm-ldap
 Architecture: all
@@ -78,41 +75,33 @@ Depends:  obm-conf (= ${binary:Version}), slapd, ldap-utils, obm-munin-node, ${m
 Description: OBM Ldap
  Configuration of obm-ldap
 
-
 Package: obm-cyrus
 Architecture: all
 Pre-depends: obm-satellite
 Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, obm-munin-node, ${misc:Depends}
 Description: OBM Cyrus / SASL
- Configuration of Cyrus and SASL
+ Configuration of Cyrus and SASL for OBM
 
 Package: obm-postfix
 Architecture: all
 Pre-depends: obm-satellite
 Depends:  postfix, obm-munin-node, ${misc:Depends}
 Description: OBM Postfix
- Configuration of obm-postfix
+ Configuration of postfix for OBM
 
 Package: obm-filter
 Architecture: all
 Pre-Depends: amavisd-new
 Depends: obm-postfix (= ${binary:Version}), clamav-daemon, spamassassin, lha, arj, unrar, zoo, nomarch, lzop, cabextract, bzip2, libnet-dns-perl, libmail-spf-query-perl, ${misc:Depends}
 Description: OBM Filter
- Configuration of Amavisd-new, clamav and SpamAssassin for obm
+ Configuration of Amavisd-new, clamav and SpamAssassin for OBM
 
 Package: obm-samba
 Architecture: all
 Pre-Depends: obm-storage (= ${binary:Version})
 Depends:  obm-munin-node, ${misc:Depends}, obm-ldap
 Description: OBM Samba
- Configuration of obm-samba
-
-#Package: obm-support
-#Architecture: all
-#Depends: emacs22-nox | emacs21-nox, nxml-mode, vim, less, telnet, binutils, dnsutils, lsof, strace, tcpdump, lynx, mutt, screen, ldap-utils, ${misc:Depends}
-#Recommends: slocate | locate
-#Description: OBM Support
-# Tools to help support of OBM
+ Configuration of samba for OBM
 
 Package: obm-munin-master
 Architecture: all

@@ -79,7 +79,7 @@ for all in one server.
 
 
 %description
-OBM is a global Groupware, Messaging, CRM and Project appliation.
+OBM is a global Groupware, Messaging, CRM and Project application.
 It is mainly used as an Exchange Or Notes/Domino Mail and groupware replacement
 but also as simple contact databases to full CRM.
 OBM advanced shared calendar and contacts has connectors with MS Outlook,
@@ -124,14 +124,42 @@ file for %{name} package.
 Summary:	PostgreSQL common files for OBM
 Group:		Development/Tools
 
-Requires:	%{name}-core = %{version}-%{release}
-Requires:	%{name}-config = %{version}-%{release}
-Requires:	postgresql-server >= 8.3
+Requires:       %{name}-core = %{version}-%{release}
+Requires:       %{name}-config = %{version}-%{release}
+Requires:       %{name}-PostgreSQL-virtual
 Conflicts:      %{name}-MySQL
 Provides:       %{name}-DataBase = %{version}-%{release}
 
 %description	PostgreSQL
-The %{name}-PostgreSQL package contains PostgreSQL schemes and configuration
+The %{name}-PostgreSQL package contains PostgreSQL schemas and configuration
+files for %{name} package.
+
+%package	PostgreSQL91
+Summary:	PostgreSQL 9.1 common files for OBM
+Group:		Development/Tools
+
+Requires:       %{name}-core = %{version}-%{release}
+Requires:       %{name}-config = %{version}-%{release}
+Requires:       postgresql91-server
+Conflicts:      %{name}-PostgreSQL83
+Provides:       %{name}-PostgreSQL-virtual
+
+%description	PostgreSQL91
+The %{name}-PostgreSQL91 package contains PostgreSQL 9.1 schemas and configuration
+files for %{name} package. Support for PostgreSQL 9.1 is experimental, use at your own risk.
+
+%package	PostgreSQL83
+Summary:	PostgreSQL (8.3+) common files for OBM
+Group:		Development/Tools
+
+Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-config = %{version}-%{release}
+Requires:	postgresql-server >= 8.3
+Conflicts:      %{name}-PostgreSQL91
+Provides:       %{name}-PostgreSQL-virtual
+
+%description	PostgreSQL83
+The %{name}-PostgreSQL83 package contains PostgreSQL (8.3+) schemas and configuration
 file for %{name} package.
 
 %package        ui
@@ -248,7 +276,6 @@ files for OBM.
 Summary:        OBM Support addons
 Group:          Development/Tools
 
-#Requires:       emacs-nox, emacs-nxml-mode
 Requires:       vim-enhanced
 Requires:       less
 Requires:       telnet
@@ -515,6 +542,10 @@ chkconfig --add httpd
 #%ghost %{_sysconfdir}/%{name}/%{name}-rpm.conf
 #%config(noreplace) %{_sysconfdir}/pam.d/%{name}
 #%config(noreplace) %{_sysconfdir}/security/console.apps/%{name}
+
+%files		-n %{name}-PostgreSQL91
+
+%files		-n %{name}-PostgreSQL83
 
 %files		-n %{name}-MySQL
 %defattr(-,root,root,-)

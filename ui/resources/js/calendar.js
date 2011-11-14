@@ -2065,6 +2065,15 @@ Obm.CalendarQuickForm = new Class({
       return false;
     }
 
+    /*
+    * daylight savings diff between the startdate of the grid and the date of the selected row
+    */
+    var getMonthlyGridDate = function(containerIdSplit) {
+      var d = obm.calendarManager.startTime + containerIdSplit[1].toInt()*86400;
+      d = d + ( obm.timeZoneParser.getTimeZoneOffset(obm.calendarManager.startTime*1000) - obm.timeZoneParser.getTimeZoneOffset(d*1000) ) / 1000 ;
+      return d;
+    };
+
     var type = str[0];
     $('sel_template').style.display ='';
     if ($chk($('template_id'))) {
@@ -2085,12 +2094,12 @@ Obm.CalendarQuickForm = new Class({
       this.setDefaultFormValues(d,1, 3600);
     } else if (type == 'dayContainer' || type == 'more') { // Month view
       if(!obm.calendarManager.write) return false;
-      var d = obm.calendarManager.startTime + str[1].toInt()*86400;
+      var d = getMonthlyGridDate(str);
       this.setDefaultFormValues(d,1, 3600);
     } else if (type == 'dayMonthLabel') {
       var dayContainer = target.parentNode.id.split('_');
 			if(!obm.calendarManager.write) return false;
-			var d = obm.calendarManager.startTime + dayContainer[1].toInt()*86400;
+			var d = getMonthlyGridDate(str);
 			this.setDefaultFormValues(d,1, 3600);
     } else {
       $('sel_template').style.display ='none';
