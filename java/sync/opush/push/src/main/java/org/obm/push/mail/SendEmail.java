@@ -32,14 +32,15 @@ public class SendEmail {
 	private final Set<Address> cc;
 	private final Set<Address> cci;
 	private final String from;
+	protected final Message originalMessage;
 	protected Message message; 
 	protected byte[] mimeData;
 	private boolean hasFromField;
 	private boolean invitation;
 
-
 	public SendEmail(String defaultFrom, Message message) throws ParserException, MimeException {
 		this.from = defaultFrom;
+		this.originalMessage = message;
 		this.message = message;
 		
 		this.to = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getTo()));

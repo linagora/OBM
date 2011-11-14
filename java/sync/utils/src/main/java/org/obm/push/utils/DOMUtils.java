@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,8 +20,10 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -238,6 +241,17 @@ public final class DOMUtils {
 		return el;
 	}
 
+
+	public static String serializeHtmlDocument(final Document replyHtmlDoc)
+			throws TransformerConfigurationException,
+			TransformerFactoryConfigurationError, TransformerException {
+		Transformer transformer = fac.newTransformer();
+		StringWriter buffer = new StringWriter();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.transform(new DOMSource(replyHtmlDoc), new StreamResult(buffer));
+		return buffer.toString();
+	}
+	
 	public static void serialise(Document doc, OutputStream out, boolean pretty)
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
@@ -22,6 +24,7 @@ import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.IInvitationFilterManager;
+import org.obm.push.OpushConfigurationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -67,17 +70,19 @@ public class MailBackend extends ObmSyncBackend {
 	private final IEmailManager emailManager;
 	private final IInvitationFilterManager filterManager;
 	private final Mime4jUtils mime4jUtils;
+	private final OpushConfigurationService configurationService;
 
 	@Inject
 	/*package*/ MailBackend(IEmailManager emailManager,	CollectionDao collectionDao, 
 			IInvitationFilterManager filterManager, 
 			BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient,
-			Mime4jUtils mime4jUtils)  {
+			Mime4jUtils mime4jUtils, OpushConfigurationService configurationService)  {
 		
 		super(collectionDao, bookClient, calendarClient, todoClient);
 		this.emailManager = emailManager;
 		this.filterManager = filterManager;
 		this.mime4jUtils = mime4jUtils;
+		this.configurationService = configurationService;
 	}
 
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
@@ -382,7 +387,7 @@ public class MailBackend extends ObmSyncBackend {
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
 				Message message = mime4jUtils.parseMessage(mailContent);
-				ReplyEmail replyEmail = new ReplyEmail(mime4jUtils, getUserEmail(bs), mail.get(0), message);
+				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message);
 				send(bs, replyEmail, saveInSent);
 				emailManager.setAnsweredFlag(bs, collectionPath, uid);
 			} else {
@@ -401,6 +406,8 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ParserException e) {
+			throw new ProcessingEmailException(e);
+		} catch (TransformerException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -421,7 +428,7 @@ public class MailBackend extends ObmSyncBackend {
 				Message message = mime4jUtils.parseMessage(mailContent);
 				InputStream originMail = mail.get(0);
 				ForwardEmail forwardEmail = 
-						new ForwardEmail(mime4jUtils, getUserEmail(bs), originMail, message);
+						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message);
 				send(bs, forwardEmail, saveInSent);
 				try{
 					emailManager.setAnsweredFlag(bs, collectionName, uid);

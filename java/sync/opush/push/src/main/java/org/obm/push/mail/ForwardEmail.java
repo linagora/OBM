@@ -12,25 +12,24 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.columba.ristretto.parser.ParserException;
+import org.obm.push.OpushConfigurationService;
 import org.obm.push.utils.Mime4jUtils;
-
-import com.google.common.base.Charsets;
 
 public class ForwardEmail extends SendEmail {
 
-	private static final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 	private static final String FORWARD_FILENAME = "forwarded_message.eml";
 	private Multipart mixedMultiPart;
 
-	public ForwardEmail(Mime4jUtils mime4jUtils, String defaultFrom, InputStream forwarded, Message message) throws FileNotFoundException, IOException, ParserException, MimeException {
+	public ForwardEmail(OpushConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, InputStream forwarded, Message message) throws FileNotFoundException, IOException, ParserException, MimeException {
 		super(defaultFrom, message);
 		
 		mixedMultiPart = mime4jUtils.createMultiPartMixed();
-		mixedMultiPart.addBodyPart(this.message);
+		mixedMultiPart.addBodyPart(this.originalMessage);
 		mime4jUtils.attach(mixedMultiPart, forwarded, FORWARD_FILENAME, ContentTypeField.TYPE_TEXT_PLAIN);
 		
 		MessageImpl newMessage = mime4jUtils.createMessage();
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(DEFAULT_ENCODING);
+		Charset defaultEncoding = configuration.getDefaultEncoding();
+		Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(defaultEncoding);
 		newMessage.setMultipart(mixedMultiPart,params);
 		
 		mimeData = serializeMimeData(newMessage).toByteArray();

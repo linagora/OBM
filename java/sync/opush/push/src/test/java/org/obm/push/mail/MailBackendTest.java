@@ -1,6 +1,7 @@
 package org.obm.push.mail;
 
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
+import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,7 @@ public class MailBackendTest {
 		emailManager.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class), EasyMock.anyBoolean());
 		EasyMock.expectLastCall().once();
 		
-		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null, new Mime4jUtils());
+		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null, new Mime4jUtils(), mockOpushConfigurationService());
 
 		EasyMock.replay(emailManager, calendarClient, backendSession);
 
