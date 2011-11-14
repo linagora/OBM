@@ -14,7 +14,6 @@ import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.Responder;
@@ -135,21 +134,20 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	private String allocateNewSyncKey(BackendSession bs, HierarchyItemsChanges hierarchyItemsChanges) 
 			throws DaoException, InvalidServerId {
 		
-		return stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
+		return stMachine.allocateNewSyncKey(bs, getOrAddCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
 				hierarchyItemsChanges.getItemsAddedOrUpdated(),
 				hierarchyItemsChanges.getItemsDeleted());
 	}
 	
-	private int getCollectionId(BackendSession bs) throws DaoException {
-		return getOrAddCollectionId(bs.getDevice(), hierarchyExporter.getRootFolderUrl(bs));
-	}
-
-	private int getOrAddCollectionId(Device deviceId, String rootFolderUrl) throws DaoException {
-		try {
-			return collectionDao.getCollectionMapping(deviceId, rootFolderUrl);
-		} catch (CollectionNotFoundException e) {
-			return collectionDao.addCollectionMapping(deviceId, rootFolderUrl);
+	private int getOrAddCollectionId(BackendSession bs) throws DaoException {
+		Device device = bs.getDevice();
+		String rootFolderUrl = hierarchyExporter.getRootFolderUrl(bs);
+		
+		Integer collectionId = collectionDao.getCollectionMapping(device, rootFolderUrl);
+		if (collectionId == null) {
+			collectionId = collectionDao.addCollectionMapping(device, rootFolderUrl);
 		}
+		return collectionId;
 	}
 
 }
