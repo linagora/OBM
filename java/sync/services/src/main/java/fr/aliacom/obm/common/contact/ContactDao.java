@@ -809,10 +809,9 @@ public class ContactDao {
 	}
 
 	public boolean hasRightsOn(AccessToken token, int contactUid) {
-
-		String q = "select contact_usercreate="
-			+ token.getObmId()
-			+ " or urights.entityright_write=1 or grights.entityright_write=1 or prights.entityright_write=1 "
+		
+		String q = "select contact_usercreate=? or a.owner=? "
+			+ "or urights.entityright_write=1 or grights.entityright_write=1 or prights.entityright_write=1 "
 			+ "FROM Contact "
 			+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
 			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
@@ -836,6 +835,8 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 			int idx = 1;
 
+			ps.setInt(idx++, token.getObmId());
+			ps.setInt(idx++, token.getObmId());
 			ps.setInt(idx++, token.getObmId());
 			ps.setInt(idx++, token.getObmId());
 			ps.setInt(idx++, contactUid);
