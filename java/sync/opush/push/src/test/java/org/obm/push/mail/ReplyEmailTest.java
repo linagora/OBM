@@ -9,6 +9,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
@@ -72,8 +73,8 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
 		Assertions.assertThat(message.isMultipart()).isFalse();
+		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
 		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
@@ -124,28 +125,35 @@ public class ReplyEmailTest {
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
 		Assertions.assertThat(messageAsString).contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).contains("response html").containsIgnoringCase("</blockquote>");
+		Assertions.assertThat(messageAsString).containsIgnoringCase("<b>response html</b>").containsIgnoringCase("</blockquote>");
 	}
 
 	@Test
 	public void testReplyBothToText() throws IOException, MimeException, ParserException, TransformerException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
-		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response html and text");
+		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
 		Assertions.assertThat(message.isMultipart()).isTrue();
 		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
 		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
-		String messageAsString = mime4jUtils.toString(message.getBody());
-		Assertions.assertThat(messageAsString).contains("response html and text").contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("Content-Type: text/plain").contains("Content-Type: text/html");
+		Multipart multipart = (Multipart) message.getBody();
+		Assertions.assertThat(multipart.getBodyParts()).hasSize(2);
+		Entity plainTextPart = multipart.getBodyParts().get(0);
+		Entity htmlTextPart = multipart.getBodyParts().get(1);
+		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
+		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
+		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
+		String textHtmlAsString = mime4jUtils.toString(htmlTextPart.getBody());
+		Assertions.assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
 	}
 	
 	@Test
 	public void testReplyBothToHtml() throws IOException, MimeException, ParserException, TransformerException {
 		MSEmail original = MailTestsUtils.createMSEmailHtmlText("origin\nCordialement");
-		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response html and text");
+		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
@@ -154,22 +162,29 @@ public class ReplyEmailTest {
 		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		String messageAsString = mime4jUtils.toString(message.getBody());
 		Assertions.assertThat(messageAsString).contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("response html and text");
+		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("response html");
 	}
 	
 	@Test
 	public void testReplyBothToBoth() throws IOException, MimeException, ParserException, TransformerException {
 		MSEmail original = MailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
-		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response html and text");
+		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text","response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
 		Assertions.assertThat(message.isMultipart()).isTrue();
 		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
 		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
-		String messageAsString = mime4jUtils.toString(message.getBody());
-		Assertions.assertThat(messageAsString).contains("response html and text").contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("Content-Type: text/plain").contains("Content-Type: text/html");
+		Multipart multipart = (Multipart) message.getBody();
+		Assertions.assertThat(multipart.getBodyParts()).hasSize(2);
+		Entity plainTextPart = multipart.getBodyParts().get(0);
+		Entity htmlTextPart = multipart.getBodyParts().get(1);
+		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
+		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
+		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
+		String textHtmlAsString = mime4jUtils.toString(htmlTextPart.getBody());
+		Assertions.assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
 	}
 	
 	@Test
@@ -208,9 +223,10 @@ public class ReplyEmailTest {
         byte[] dataRead = new byte[5];
         binaryPart.getInputStream().read(dataRead);
         Assertions.assertThat(dataRead).isEqualTo(dataToSend);
-        
-		String messageAsString = mime4jUtils.toString(message.getBody());
-		Assertions.assertThat(messageAsString).contains("response text").contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("Content-Type: text/plain");
+
+		Entity plainTextPart = parts.getBodyParts().get(1);
+		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
+		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
 	}
 }

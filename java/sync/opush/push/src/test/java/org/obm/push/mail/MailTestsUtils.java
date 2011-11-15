@@ -70,6 +70,7 @@ public class MailTestsUtils {
 	public static MSEmail createMSEmailPlainTextASCII(String content) {
 		return createMSEmailPlainText(content, Charsets.US_ASCII);
 	}
+	
 
 	private static String htmlBold(String content) {
 		return "<b>"+content+"</b>";
@@ -125,22 +126,28 @@ public class MailTestsUtils {
 		msg.setBody(mime4jUtils.createBody(htmlBold(html)), "text/html");
 		return msg;
 	}
-	
-	public static MessageImpl createMessageTextAndHtml(Mime4jUtils mime4jUtils, String text) throws UnsupportedEncodingException {
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(Charsets.UTF_8);
+
+	public static MessageImpl createMessageTextAndHtml(Mime4jUtils mime4jUtils,
+			String text, String html) throws UnsupportedEncodingException {
+		Map<String, String> params = mime4jUtils
+				.getContentTypeHeaderParams(Charsets.UTF_8);
 		String boundary = MimeUtil.createUniqueBoundary();
 		params.put(ContentTypeField.PARAM_BOUNDARY, boundary);
 
 		MessageImpl msg = mime4jUtils.createMessage();
-		Multipart bodyMulti = createMultipartTextAndHtml(mime4jUtils, text);
+		Multipart bodyMulti = MailTestsUtils.createMultipartTextAndHtml(
+				mime4jUtils, text, html);
 		msg.setBody(bodyMulti, "multipart/alternative", params);
 		return msg;
 	}
-	
-	public static Multipart createMultipartTextAndHtml(Mime4jUtils mime4jUtils,String text) throws UnsupportedEncodingException {
+
+	public static Multipart createMultipartTextAndHtml(Mime4jUtils mime4jUtils,
+			String text, String html) throws UnsupportedEncodingException {
 		Multipart msg = mime4jUtils.createMultipartAlternative();
-		msg.addBodyPart(mime4jUtils.bodyToBodyPart(mime4jUtils.createBody(text), ContentTypeField.TYPE_TEXT_PLAIN));
-		msg.addBodyPart(mime4jUtils.bodyToBodyPart(mime4jUtils.createBody(htmlBold(text)), "text/html"));
+		msg.addBodyPart(mime4jUtils.bodyToBodyPart(
+				mime4jUtils.createBody(text), ContentTypeField.TYPE_TEXT_PLAIN));
+		msg.addBodyPart(mime4jUtils.bodyToBodyPart(
+				mime4jUtils.createBody(html), "text/html"));
 		return msg;
 	}
 
@@ -152,7 +159,6 @@ public class MailTestsUtils {
         msg.setMultipart(multi);
         return msg;
 	}
-
 
 	private static BodyPart createImagePart(byte[] data) throws IOException {
 		StorageBodyFactory bodyFactory = new StorageBodyFactory();

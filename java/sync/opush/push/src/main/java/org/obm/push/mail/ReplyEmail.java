@@ -74,9 +74,9 @@ public class ReplyEmail extends SendEmail {
 
 		Multipart multipart = (Multipart)originalMessage.getBody();
 		TextBody quotedBodyText = quoteBodyText(originalEmail, multipart);
-		TextBody quotedBodyHtmlOverText = quoteBodyHtml(originalEmail, multipart);
+		TextBody quotedBodyTextOverHtml = quoteBodyHtml(originalEmail, multipart);
 		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart);
-		return buildSingleOrMultipartMessage(quotedBodyText, quotedBodyHtmlOverText, quotedBodyHtmlOverHtml);	
+		return buildSingleOrMultipartMessage(quotedBodyText, quotedBodyTextOverHtml, quotedBodyHtmlOverHtml);	
 	}
 
 	private boolean nothingToQuote(String repliedEmail, String repliedEmailAsHtml) {
