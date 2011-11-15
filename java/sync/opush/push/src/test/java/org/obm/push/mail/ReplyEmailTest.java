@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
@@ -45,7 +46,6 @@ public class ReplyEmailTest {
 	@Test
 	public void testReplyCopyOfAddress() throws IOException, MimeException, ParserException, TransformerException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-
 		Message reply = loadMimeMessage(getClass(), "plainText.eml");
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 	
@@ -170,5 +170,47 @@ public class ReplyEmailTest {
 		String messageAsString = mime4jUtils.toString(message.getBody());
 		Assertions.assertThat(messageAsString).contains("response html and text").contains("origin").contains("Cordialement");
 		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("Content-Type: text/plain").contains("Content-Type: text/html");
+	}
+	
+	@Test
+	public void testReplyTextToMixed() throws IOException, MimeException, ParserException, TransformerException {
+		MSEmail original = MailTestsUtils.createMSEmailMultipartMixed("origin\nCordialement");
+		Message reply = MailTestsUtils.createMessagePlainText(mime4jUtils, "response text");
+		
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
+		Message message = replyEmail.getMimeMessage();
+		Assertions.assertThat(message.isMultipart()).isFalse();
+		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		TextBody body = (TextBody) message.getBody();
+		String messageAsString = mime4jUtils.toString(body);
+		Assertions.assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
+	}
+	
+	@Test
+	public void testReplyMixedToText() throws IOException, MimeException, ParserException, TransformerException {
+		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		byte[] dataToSend = new byte[]{0,1,2,3,4};
+		Message reply = MailTestsUtils.createMessageMultipartMixed(mime4jUtils, "response text", dataToSend);
+
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
+		Message message = replyEmail.getMimeMessage();
+		Assertions.assertThat(message.isMultipart()).isTrue();
+		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
+		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		
+		Multipart parts = (Multipart) message.getBody();
+		Assertions.assertThat(parts.getCount()).isEqualTo(2);
+		Assertions.assertThat(mime4jUtils.getAttachmentCount(parts)).isEqualTo(1);
+		Assertions.assertThat(mime4jUtils.getAttachmentContentTypeList(parts)).containsOnly("image/png");
+		
+		BinaryBody binaryPart = (BinaryBody) parts.getBodyParts().get(0).getBody();
+        byte[] dataRead = new byte[5];
+        binaryPart.getInputStream().read(dataRead);
+        Assertions.assertThat(dataRead).isEqualTo(dataToSend);
+        
+		String messageAsString = mime4jUtils.toString(message.getBody());
+		Assertions.assertThat(messageAsString).contains("response text").contains("origin").contains("Cordialement");
+		Assertions.assertThat(messageAsString).containsIgnoringCase("Content-Type: text/plain");
 	}
 }

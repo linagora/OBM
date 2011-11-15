@@ -5,23 +5,33 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.storage.Storage;
+import org.apache.james.mime4j.storage.StorageBodyFactory;
+import org.apache.james.mime4j.storage.StorageOutputStream;
+import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.columba.ristretto.message.Address;
 import org.columba.ristretto.parser.ParserException;
 import org.easymock.EasyMock;
 import org.obm.push.OpushConfigurationService;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MethodAttachment;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
 
 public class MailTestsUtils {
 
@@ -82,6 +92,28 @@ public class MailTestsUtils {
 		return original;
 	}
 	
+	public static MSEmail createMSEmailMultipartMixed(String content) {
+		MSEmail original = createMSEmailMultipartAlt(content);
+		
+		Set<MSAttachement> attached = Sets.newHashSet();
+		attached.add(attach("/test/file.png"));
+		attached.add(attach("/test/file2.png"));
+		original.setAttachements(attached);
+		return original;
+	}
+
+	public static MSAttachement attach(String file){
+		MSAttachement attach = new MSAttachement();
+		attach.setContentId(String.valueOf(Math.random()));
+		attach.setDisplayName("picture");
+		attach.setContentLocation(file);
+		attach.setEstimatedDataSize(50000);
+		attach.setFileReference(file);
+		attach.setIsInline("isInLineTrue");
+		attach.setMethod(MethodAttachment.EmbeddedMessage);
+		return attach;
+	}
+	
 	public static MessageImpl createMessagePlainText(Mime4jUtils mime4jUtils,String text) throws UnsupportedEncodingException {
 		MessageImpl msg = mime4jUtils.createMessage();
 		msg.setBody(mime4jUtils.createBody(text), ContentTypeField.TYPE_TEXT_PLAIN);
@@ -111,7 +143,37 @@ public class MailTestsUtils {
 		msg.addBodyPart(mime4jUtils.bodyToBodyPart(mime4jUtils.createBody(htmlBold(text)), "text/html"));
 		return msg;
 	}
-	
+
+	public static MessageImpl createMessageMultipartMixed(Mime4jUtils mime4jUtils, String text, byte[] imageData) throws IOException {
+		Multipart multi = mime4jUtils.createMultipartMixed();
+		multi.addBodyPart(mime4jUtils.bodyToBodyPart(mime4jUtils.createBody(text), ContentTypeField.TYPE_TEXT_PLAIN));
+        multi.addBodyPart(MailTestsUtils.createImagePart(imageData));
+        MessageImpl msg = mime4jUtils.createMessage();
+        msg.setMultipart(multi);
+        return msg;
+	}
+
+
+	private static BodyPart createImagePart(byte[] data) throws IOException {
+		StorageBodyFactory bodyFactory = new StorageBodyFactory();
+		StorageProvider storageProvider = bodyFactory.getStorageProvider();
+		StorageOutputStream out = storageProvider.createStorageOutputStream();
+		out.write(data);
+		Storage storage = out.toStorage();
+		BinaryBody body = bodyFactory.binaryBody(storage);
+		
+        // Create a body part with the correct MIME-type and transfer encoding
+        BodyPart bodyPart = new BodyPart();
+        bodyPart.setBody(body, "image/png");
+        bodyPart.setContentTransferEncoding("base64");
+
+        // Specify a filename in the Content-Disposition header (implicitly sets
+        // the disposition type to "attachment")
+        bodyPart.setFilename("smiley.png");
+
+        return bodyPart;
+	}
+
 	public static Address addr(String addr) throws ParserException {
 		return Address.parse(addr);
 	}

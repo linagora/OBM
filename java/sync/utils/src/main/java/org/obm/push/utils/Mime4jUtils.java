@@ -75,7 +75,7 @@ public class Mime4jUtils {
 		return messageBuilder.parseMessage(in);
 	}
 	
-	public Multipart createMultiPartMixed() {
+	public Multipart createMultipartMixed() {
 		return messageBuilder.newMultipart(MimeContentType.MULTIPART_MIXED.getSubType());
 	}
 	

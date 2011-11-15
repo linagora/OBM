@@ -23,7 +23,7 @@ public class ForwardEmail extends SendEmail {
 	public ForwardEmail(OpushConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, InputStream forwarded, Message message) throws FileNotFoundException, IOException, ParserException, MimeException {
 		super(defaultFrom, message);
 		
-		mixedMultiPart = mime4jUtils.createMultiPartMixed();
+		mixedMultiPart = mime4jUtils.createMultipartMixed();
 		mixedMultiPart.addBodyPart(this.originalMessage);
 		mime4jUtils.attach(mixedMultiPart, forwarded, FORWARD_FILENAME, ContentTypeField.TYPE_TEXT_PLAIN);
 		

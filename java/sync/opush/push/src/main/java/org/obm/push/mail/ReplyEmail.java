@@ -35,12 +35,14 @@ public class ReplyEmail extends SendEmail {
 
 	private final Mime4jUtils mime4jUtils;
 	private final OpushConfigurationService configuration;
+	private Entity originTextPlainPart;
+	private Entity originTextHtmlPart;
 	
 	public ReplyEmail(OpushConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail originMail, Message message) throws ParserException, MimeException, IOException, TransformerException {
 		super(defaultFrom, message);
 		this.configuration = configuration;
 		this.mime4jUtils = mime4jUtils;
-		message = quoteAndAppendRepliedMail(originMail);
+		this.message = quoteAndAppendRepliedMail(originMail);
 	}
 
 	private Message quoteAndAppendRepliedMail(MSEmail originMail) throws IOException, TransformerException {
@@ -52,19 +54,13 @@ public class ReplyEmail extends SendEmail {
 		}
 
 		if (originalMessage.isMultipart()) {
-			Multipart multipart = (Multipart)originalMessage.getBody();
-			if (isMultipartAlternative(multipart)) {
-
-				return quoteAndReplyMultipartAlternative(originalEmail, 
-						originalEmailAsHtml, multipart);
-			}
-			//TODO: handle multipart/mixed
+			return quoteAndReplyMultipart(originalEmail, originalEmailAsHtml);
 		} else {
 			String mimeType = originalMessage.getMimeType();
-			if (mimeType.equalsIgnoreCase("text/plain") && originalEmail != null) {
+			if (mime4jUtils.isMessagePlainText(originalMessage) && originalEmail != null) {
 				return createMessageWithBody(mimeType,
 						appendQuotedMailToPlainText((TextBody)originalMessage.getBody(), originalEmail));
-			} else if (mimeType.equalsIgnoreCase("text/html") && originalEmailAsHtml != null) {
+			} else if (mime4jUtils.isMessageHtmlText(originalMessage) && originalEmailAsHtml != null) {
 				return createMessageWithBody(mimeType,
 						appendRepliedMailToHtml((TextBody)originalMessage.getBody(), originalEmailAsHtml));
 			}
@@ -72,49 +68,18 @@ public class ReplyEmail extends SendEmail {
 		return message;
 	}
 
-	private Message quoteAndReplyMultipartAlternative(String originalEmail,
-			String originalEmailAsHtml, Multipart multipart)
-			throws IOException, TransformerException {
-		TextBody modifiedBodyText = null;
-		TextBody modifiedBodyHtmlOverText = null;
-		TextBody modifiedBodyHtmlOverHtml = null;
-		
-		Entity plainTextPart = mime4jUtils.getFirstTextPlainPart(multipart);
-		if (plainTextPart != null) {
-			modifiedBodyText = quotePlainTextPart(originalEmail, plainTextPart);
-		}
-		
-		Entity htmlTextPart = mime4jUtils.getFirstTextHTMLPart(multipart);
-		if (htmlTextPart != null) {
-			modifiedBodyHtmlOverText = quoteHtmlTextPart(originalEmail, htmlTextPart);
-			modifiedBodyHtmlOverHtml = quoteHtmlTextPart(originalEmailAsHtml, htmlTextPart);
-		}
+	private Message quoteAndReplyMultipart(String originalEmail,
+			String originalEmailAsHtml)
+					throws IOException, TransformerException {
 
-		return buildSingleOrMultipartMessage(modifiedBodyText, modifiedBodyHtmlOverText, modifiedBodyHtmlOverHtml);
+		Multipart multipart = (Multipart)originalMessage.getBody();
+		TextBody quotedBodyText = quoteBodyText(originalEmail, multipart);
+		TextBody quotedBodyHtmlOverText = quoteBodyHtml(originalEmail, multipart);
+		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart);
+		return buildSingleOrMultipartMessage(quotedBodyText, quotedBodyHtmlOverText, quotedBodyHtmlOverHtml);	
 	}
 
-	private TextBody quoteHtmlTextPart(String repliedEmailAsHtml, Entity htmlTextPart) 
-			throws IOException, TransformerException {
-		if (repliedEmailAsHtml != null) {		
-			return appendRepliedMailToHtml((TextBody)htmlTextPart.getBody(), repliedEmailAsHtml);
-		}
-		return null;
-	}
-
-	private TextBody quotePlainTextPart(String repliedEmail, Entity plainTextPart) 
-			throws IOException {
-		if (repliedEmail != null) {
-			return appendQuotedMailToPlainText((TextBody)plainTextPart.getBody(), repliedEmail);
-		}
-		return null;
-	}
-
-	private boolean isMultipartAlternative(Multipart multipart) {
-		return multipart.getSubType().equalsIgnoreCase("alternative");
-	}
-
-	private boolean nothingToQuote(String repliedEmail,
-			String repliedEmailAsHtml) {
+	private boolean nothingToQuote(String repliedEmail, String repliedEmailAsHtml) {
 		return repliedEmail == null && repliedEmailAsHtml == null;
 	}
 
@@ -126,7 +91,9 @@ public class ReplyEmail extends SendEmail {
 		TextBody modifiedBodyHtmlPrefered = getPreferedHtmlPart(modifiedBodyHtmlOverText,modifiedBodyHtmlOverHtml); 
 
 		if (modifiedBodyText != null && modifiedBodyHtmlPrefered != null) {
-			return createTwoPartsMultipartAlternative(modifiedBodyText, modifiedBodyHtmlPrefered);
+			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, false);
+		} else if (this.mime4jUtils.isMessageMultipartMixed(this.originalMessage)) {
+			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, true);
 		} else {
 			if (modifiedBodyText != null) {
 				return createMessageWithBody(ContentTypeField.TYPE_TEXT_PLAIN, modifiedBodyText);
@@ -143,25 +110,82 @@ public class ReplyEmail extends SendEmail {
 		return newMessage;
 	}
 
-	private TextBody getPreferedHtmlPart(TextBody modifiedBodyHtmlOverText,	TextBody modifiedBodyHtmlOverHtml) {
+	private Message createMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean createMixed) {
+		Multipart multipartReply = createMultipartMixedOrAlternative(createMixed);
 		
+		if (modifiedBodyText != null){
+			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText,ContentTypeField.TYPE_TEXT_PLAIN));
+		}
+		if (modifiedBodyHtmlPrefered != null){
+			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered,"text/html"));
+		}
+		
+		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+		MessageImpl newMessage = mime4jUtils.createMessage();
+		newMessage.setBody(multipartReply, originalMessage.getMimeType(), params);
+		return newMessage;
+	}
+
+	private Multipart createMultipartMixedOrAlternative(boolean createMixed) {
+		Multipart multipartReply;
+		if (createMixed) {
+			multipartReply = this.mime4jUtils.createMultipartMixed();
+			copyOriginalMessagePartsToMultipartMessage(multipartReply);
+		} else {
+			multipartReply = this.mime4jUtils.createMultipartAlternative();
+		}
+		return multipartReply;
+	}
+
+	private void copyOriginalMessagePartsToMultipartMessage(Multipart multipart) {
+		Multipart originalMultipart = (Multipart)originalMessage.getBody();
+		for (Entity part: originalMultipart.getBodyParts()) {
+			if (includePart(part)) {
+				multipart.addBodyPart(part);
+			}
+		}
+	}
+
+	private boolean includePart(Entity part) {
+		if (part.equals(originTextPlainPart) || part.equals(originTextHtmlPart)) {
+			return false;
+		}
+		return true;
+	}
+
+	private TextBody getPreferedHtmlPart(TextBody modifiedBodyHtmlOverText,	TextBody modifiedBodyHtmlOverHtml) {
 		if (modifiedBodyHtmlOverText == null && modifiedBodyHtmlOverHtml == null){
 			return null;
 		}
 		return Objects.firstNonNull(modifiedBodyHtmlOverHtml, modifiedBodyHtmlOverText);
 	}
+	
+	private TextBody quoteBodyText(String originalText, Multipart multipart) 
+			throws IOException {
+		Entity textPlainPart = mime4jUtils.getFirstTextPlainPart(multipart);
+		if (textPlainPart != null && originalText != null) {
+			setOriginTextPlainPart(textPlainPart);
+			return appendQuotedMailToPlainText((TextBody)textPlainPart.getBody(), originalText);
+		}
+		return null;
+	}
+	
+	private void setOriginTextPlainPart(Entity textPlainPart) {
+		this.originTextPlainPart = textPlainPart;
+	}
 
-	private Message createTwoPartsMultipartAlternative(TextBody modifiedBodyText,
-			TextBody modifiedBodyHtml) {
-		Multipart multipartReply = this.mime4jUtils.createMultipartAlternative();
-		multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText,ContentTypeField.TYPE_TEXT_PLAIN));
-		multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtml,"text/html"));
-		
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
-		MessageImpl newMessage = mime4jUtils.createMessage();
-		newMessage.setBody(multipartReply, originalMessage.getMimeType(), params);
-		
-		return newMessage;
+	private TextBody quoteBodyHtml(String originalHtml, Multipart multipart) 
+			throws IOException, TransformerException {
+		Entity textHtmlPart = this.mime4jUtils.getFirstTextHTMLPart(multipart);
+		if (textHtmlPart != null && originalHtml != null) {
+			setTextHtmlPart(textHtmlPart);
+			return appendRepliedMailToHtml((TextBody)textHtmlPart.getBody(), originalHtml);
+		}
+		return null;
+	}
+	
+	private void setTextHtmlPart(Entity htmlTextPart) {
+		this.originTextHtmlPart = htmlTextPart;
 	}
 
 	private TextBody appendQuotedMailToPlainText(TextBody plainTextPart, String repliedEmail) throws IOException {
@@ -183,15 +207,17 @@ public class ReplyEmail extends SendEmail {
 			final InputSource originalSource = new InputSource(new StringReader(repliedEmail));
 
 			final Document replyHtmlDoc = DOMUtils.parseHtmlAsDocument(replySource);
+
 			final Node originalHtmlNode = DOMUtils.parseHtmlAsFragment(originalSource);
 
 			final Element quoteBlock = insertIntoQuoteblock(replyHtmlDoc, originalHtmlNode);
 			final Element bodyNode = DOMUtils.getUniqueElement(replyHtmlDoc.getDocumentElement(), "BODY");
 			bodyNode.appendChild(quoteBlock);
 
-			String buffer = DOMUtils.serializeHtmlDocument(replyHtmlDoc);
+			final String docAsText = DOMUtils.serializeHtmlDocument(replyHtmlDoc);
+
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
-			return basicBodyFactory.textBody(buffer, htmlPart.getMimeCharset());
+			return basicBodyFactory.textBody(docAsText, htmlPart.getMimeCharset());
 		} catch (SAXException e) {
 			e.printStackTrace();
 		}
