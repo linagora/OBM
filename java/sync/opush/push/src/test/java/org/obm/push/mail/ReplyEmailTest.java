@@ -5,8 +5,6 @@ import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Entity;
@@ -18,6 +16,7 @@ import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.exception.NotQuotableEmailException;
 import org.obm.push.utils.Mime4jUtils;
 
 
@@ -31,7 +30,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testJira2362() throws IOException, MimeException, ParserException, TransformerException {
+	public void testJira2362() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
 		Message reply = loadMimeMessage(getClass(), "jira-2362.eml");
 		
@@ -45,7 +44,7 @@ public class ReplyEmailTest {
 	}
 
 	@Test
-	public void testReplyCopyOfAddress() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyCopyOfAddress() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
 		Message reply = loadMimeMessage(getClass(), "plainText.eml");
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
@@ -57,7 +56,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyEncodingShouldBeUTF8() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyEncodingShouldBeUTF8() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		Message reply = loadMimeMessage(getClass(), "plainText.eml");
 		MSEmail original = MailTestsUtils.createMSEmailPlainTextASCII("origin");
 
@@ -67,7 +66,7 @@ public class ReplyEmailTest {
 	}
 
 	@Test
-	public void testReplyTextToText() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyTextToText() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
 
@@ -82,7 +81,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyHtmlToHtml() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyHtmlToHtml() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailHtmlText("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessageHtml(mime4jUtils,"response text");
 
@@ -98,7 +97,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyTextToBoth() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyTextToBoth() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
 
@@ -113,7 +112,7 @@ public class ReplyEmailTest {
 	}
 
 	@Test
-	public void testReplyHtmlToBoth() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyHtmlToBoth() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessageHtml(mime4jUtils, "<b>response html</b>");
 
@@ -129,7 +128,7 @@ public class ReplyEmailTest {
 	}
 
 	@Test
-	public void testReplyBothToText() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyBothToText() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
@@ -151,7 +150,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyBothToHtml() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyBothToHtml() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailHtmlText("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
@@ -166,7 +165,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyBothToBoth() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyBothToBoth() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text","response html");
 		
@@ -188,7 +187,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyTextToMixed() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyTextToMixed() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailMultipartMixed("origin\nCordialement");
 		Message reply = MailTestsUtils.createMessagePlainText(mime4jUtils, "response text");
 		
@@ -203,7 +202,7 @@ public class ReplyEmailTest {
 	}
 	
 	@Test
-	public void testReplyMixedToText() throws IOException, MimeException, ParserException, TransformerException {
+	public void testReplyMixedToText() throws IOException, MimeException, ParserException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
 		byte[] dataToSend = new byte[]{0,1,2,3,4};
 		Message reply = MailTestsUtils.createMessageMultipartMixed(mime4jUtils, "response text", dataToSend);

@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
@@ -35,6 +33,7 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.NotQuotableEmailException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -407,7 +406,7 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (ParserException e) {
 			throw new ProcessingEmailException(e);
-		} catch (TransformerException e) {
+		} catch (NotQuotableEmailException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}

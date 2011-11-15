@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 public class SendEmail {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final Set<Address> to;
 	private final Set<Address> cc;
