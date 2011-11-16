@@ -36,10 +36,23 @@ class Vcalendar_Reader_OBM {
     $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,$status);
     $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,$status,'',null,null,true);
     $ids = array();
+    $indexed = array();
     while($noRepeatEvent->next_record()) {
       $ids[] = $noRepeatEvent->f('event_id');
-      $this->eventSets[] = $noRepeatEvent->Record;
+      $indexed[$noRepeatEvent->f('event_id')] = $noRepeatEvent->Record;
+      $this->eventSets[] =& $indexed[$noRepeatEvent->f('event_id')];
     }
+    if ( count($ids) ) {
+      $parents = array();
+      $parentsRes = run_query_calendar_get_parent_event($ids);
+      while ( $parentsRes->next_record() ) {
+	if ( array_key_exists($parentsRes->f("eventexception_child_id"), $indexed) ) {
+	  $indexed[$parentsRes->f("eventexception_child_id")]["event_eventexception_date"] = $parentsRes->f("eventexception_date");
+	  $indexed[$parentsRes->f("eventexception_child_id")]["event_is_exception"] = true;
+	}
+      }
+    }
+
     while($repeatEvent->next_record()) {
       $ids[] = $repeatEvent->f('event_id');
       $this->eventSets[] = $repeatEvent->Record;
@@ -109,9 +122,7 @@ class Vcalendar_Reader_OBM {
      $attendees = run_query_get_events_attendee(array_keys($this->vevents));
     if ( strcasecmp($method,"REPLY") == 0 && $this->entities && is_array($this->entities) && count($this->entities) && array_key_exists("user",$this->entities) && is_array($this->entities["user"]) ) {
       $userId = reset(array_keys($this->entities["user"]));
-//       print_r($this->entities);
       while($attendees->next_record()) {
-//        print_r($attendees->Record);
 
        if ( $attendees->f('eventlink_entity_id') == $userId ) {
          $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
@@ -123,20 +134,17 @@ class Vcalendar_Reader_OBM {
        $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
      }
     }
-    
+    /* this only adds exceptions that have been deleted. Those that have been changed have their own ics*/
     if(count($this->vevents) > 0) {
-      $exceptions = run_query_get_events_exception(array_keys($this->vevents));
+      $exceptions = run_query_get_events_exception(array_keys($this->vevents),NULL,NULL,TRUE);
       while($exceptions->next_record()) {
         $date = new Of_Date($exceptions->f('eventexception_date'));
         $timezone = $exceptions->f('event_timezone');
         if ($timezone) $date->setOriginalTimeZone($timezone);
         $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $date);
-        $enddate = clone $date;
-        $enddate->addSecond(3600);
-        $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $enddate);
-
       }    
     }
+    
     foreach($this->vevents as $id => $vevent) {
       VCalendar_Utils::privatizeEvent($this->vevents[$id]);
     }

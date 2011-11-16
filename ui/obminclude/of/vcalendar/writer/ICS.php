@@ -234,10 +234,13 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeExdate($name, $value) {
+    if ( !is_array($value) && $value ) {
+      $value = array($value);
+    }
     if(is_array($value)) {
       foreach($value as $exdate) {
         $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($exdate))."\r\n";
-      } 
+      }
     }
   }
   

@@ -4220,6 +4220,28 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
   return null;
 }
 
+/*
+* select the eventexception row & the parent event row of given exception ids
+*
+* @param array $ids list of child ( = exceptions events ) ids . Eg: array(234,567)
+* @return SQL xquery resultCursor
+*/
+function run_query_calendar_get_parent_event($ids) {
+  $selected_ids = implode(",",$ids);
+  $obm_q = new DB_OBM;
+  $query = "SELECT
+    event_duration,
+    event_timezone,
+    eventexception_parent_id,
+    eventexception_child_id,
+    eventexception_date
+    FROM EventException
+    INNER JOIN Event ON eventexception_parent_id = event_id
+    WHERE eventexception_child_id IN ($selected_ids) ";
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_parent_event()');
+    $obm_q->xquery($query);
+    return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
@@ -4464,10 +4486,11 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
  * Get all exceptions for an array of events
  * 
  * @param array $events 
+ * @param boolean $no_child if set to true, only exceptions that does not refer to a child event in Event table are selected
  * @access public
  * @return void
  */
-function run_query_get_events_exception($events,$start_time = NULL,$end_time = NULL) {
+function run_query_get_events_exception($events,$start_time = NULL,$end_time = NULL, $no_child = false) {
   global $cdg_sql;
   $obm_q = new DB_OBM;
   $event_list = implode(',',$events);
@@ -4477,6 +4500,10 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   if(!is_null($end_time)) {
     $end = "AND eventexception_date <= '$end_time'";
   }
+  if ( $no_child ) {
+    $child_null = "AND eventexception_child_id is null";
+  }
+
   $query = "SELECT
     event_duration,
     event_timezone,
@@ -4486,7 +4513,7 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     FROM EventException
     INNER JOIN Event ON eventexception_parent_id = event_id
     WHERE eventexception_parent_id IN ($event_list) 
-    $start $end";
+    $start $end $child_null";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
   $obm_q->xquery($query);
   return $obm_q;
