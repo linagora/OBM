@@ -225,7 +225,6 @@ public class EmailManager implements IEmailManager {
 			logger.info("delete conv id = ", uid);
 			store.uidStore(Arrays.asList(uid), fl, true);
 			store.expunge();
-			deleteEmails(devId, collectionId, Arrays.asList(uid));
 		} finally {
 			store.logout();
 		}
