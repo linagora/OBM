@@ -7,9 +7,6 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.transaction.SystemException;
-
-import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.JDBCUtils;
@@ -28,9 +25,9 @@ public class LocatorDbHelper {
 		this.dbcp = dbcp;
 	}
 	
-	public static synchronized LocatorDbHelper getInstance() throws SystemException {
+	public static synchronized LocatorDbHelper getInstance() {
 		if (instance == null) {
-			instance = new LocatorDbHelper(new DBCP(new TransactionProvider().get()));
+			instance = new LocatorDbHelper(new DBCP());
 		}
 		return instance;
 	}

@@ -16,6 +16,10 @@
 
 package org.obm.dbcp.jdbc;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 
 public class PgSqlJDBCDriver implements IJDBCDriver {
 
@@ -39,4 +43,25 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 		return "SET TIME ZONE 'GMT'";
 	}
 
+	@Override
+	public String getDataSourceClassName() {
+		return "org.postgresql.xa.PGXADataSource";
+	}
+
+	@Override
+	public String getUniqueName() {
+		return "pgsql";
+	}
+
+	@Override
+	public Map<String, String> getDriverProperties(String login, String password, String dbName, String dbHost) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		builder.put("user", login);
+		builder.put("password", password);
+		builder.put("databaseName", dbName);
+		builder.put("serverName", dbHost);
+		return builder.build();
+		
+		
+	}
 }

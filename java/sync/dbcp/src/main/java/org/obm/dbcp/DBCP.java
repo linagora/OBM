@@ -21,8 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.transaction.TransactionManager;
-
 import org.obm.dbcp.impl.ObmConfIni;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 import org.obm.dbcp.jdbc.MySqlJDBCDriver;
@@ -50,10 +48,10 @@ public class DBCP implements IDBCP{
 	private String dbName;
 
 	@Inject
-	public DBCP(TransactionManager transactionManager) {
+	public DBCP() {
 		logger.info("Starting OBM connection pool...");
 		readObmConfIni();
-		createDataSource(transactionManager);
+		createDataSource();
 	}
 	
 	private void readObmConfIni() {
@@ -66,10 +64,10 @@ public class DBCP implements IDBCP{
 		logger.info("dbtype from obm_conf.ini is " + dbType);
 	}
 
-	private void createDataSource(TransactionManager transactionManager) {
+	private void createDataSource() {
 		try {
 			IJDBCDriver cf = buildJDBCConnectionFactory(dbType);
-			ds = new DBConnectionPool(transactionManager, cf, dbHost, dbName, login, password);
+			ds = new DBConnectionPool(cf, dbHost, dbName, login, password);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		}
