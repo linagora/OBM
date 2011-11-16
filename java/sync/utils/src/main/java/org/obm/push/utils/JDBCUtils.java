@@ -109,4 +109,8 @@ public class JDBCUtils {
 	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
 		return new Date(rs.getTimestamp(fieldName).getTime());
 	}
+	
+	public static java.sql.Date getDateWithoutTime(Date lastSync) {
+		return new java.sql.Date(lastSync.getTime());
+	}
 }
