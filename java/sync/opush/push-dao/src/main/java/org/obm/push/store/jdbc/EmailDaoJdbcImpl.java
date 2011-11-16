@@ -17,6 +17,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.store.EmailDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.LongIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.LongSQLCollectionHelper;
@@ -241,7 +242,8 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			ps = con.prepareStatement("SELECT mail_uid, is_read, timestamp FROM opush_sync_mail WHERE collection_id = ? AND device_id = ? AND timestamp >= ?");
 			ps.setInt(1, collectionId);
 			ps.setInt(2, devId);
-			ps.setTimestamp(3, new Timestamp(syncState.getLastSync().getTime()));
+			Date lastSync = syncState.getLastSync();
+			ps.setDate(3, JDBCUtils.getDateWithoutTime(lastSync), DateUtils.getCurrentGMTCalendar());
 			evrs = ps.executeQuery();
 			while (evrs.next()) {
 				long uid = evrs.getLong("mail_uid");
