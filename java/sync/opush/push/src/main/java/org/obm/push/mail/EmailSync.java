@@ -17,8 +17,8 @@
 package org.obm.push.mail;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.minig.imap.FastFetch;
@@ -38,6 +38,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailSync implements IEmailSync {
 
+	private final class UidComparator implements Comparator<Email> {
+		@Override
+		public int compare(Email o1, Email o2) {
+			return (int) (o1.getUid() - o2.getUid());
+		}
+	}
+
 	private final static Logger logger = LoggerFactory.getLogger(EmailSync.class);
 	private final EmailDao emailDao;
 
@@ -49,11 +56,19 @@ public class EmailSync implements IEmailSync {
 	@Override
 	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
 		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
-		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emailsFromIMAP);
+		Set<Email> alreadySyncedEmails = emailDao.listSyncedEmails(devId, collectionId, state);
 		Set<Email> newAndUpdatedEmails = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
-		MailChanges mailChanges = new MailChanges(new HashSet<Email>(), newAndUpdatedEmails);
+		Set<Email> deletedEmails = findDeletedEmails(emailsFromIMAP, alreadySyncedEmails);
+		MailChanges mailChanges = new MailChanges(deletedEmails, newAndUpdatedEmails);
 		loggerInfo(state.getLastSync(), emailsFromIMAP, mailChanges, alreadySyncedEmails);
 		return mailChanges;
+	}
+
+	private Set<Email> findDeletedEmails(Set<Email> emailsFromIMAP, Set<Email> alreadySyncedEmails) {
+		Set<Email> deletedEmails = 
+				org.obm.push.utils.collection.Sets.difference(
+						alreadySyncedEmails, emailsFromIMAP, new UidComparator());
+		return deletedEmails;
 	}
 
 	private void loggerInfo(Date syncStartDate, Set<Email> emailsFromIMAP, MailChanges mailChanges, Set<Email> alreadySyncedEmails) {
