@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 
 public interface ISyncHandler {
 
-	void handle(String method, ParametersSource params, XmlResponder responder)	throws Exception;
+	void handle(Request request, XmlResponder responder)	throws Exception;
 
 }

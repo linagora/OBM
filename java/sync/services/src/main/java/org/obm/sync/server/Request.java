@@ -34,6 +34,7 @@ package org.obm.sync.server;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -42,15 +43,43 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
-public class ParametersSource {
+public class Request {
 
 	private HttpServletRequest req;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ParametersSource.class);
+	private String handlerName;
 
-	public ParametersSource(HttpServletRequest req) {
+	private String method;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(Request.class);
+
+	public Request(HttpServletRequest req) {
 		this.req = req;
+		parseQuery();
+	}
+
+	private void parseQuery() {
+		String uri = req.getPathInfo();
+
+		// This is not an error, we want to display the status in this case
+		if (uri == null || uri.equals("/"))
+			return;
+
+		String uriToSplit;
+		if (uri.startsWith("/"))
+			uriToSplit = uri.substring(1);
+		else
+			uriToSplit = uri;
+
+		String[] splitQuery = uriToSplit.split("/");
+		if (splitQuery.length != 2) {
+			throw new QueryFormatException(
+					"Expected query to be like '/obm-sync/services/$handler/$method'");
+		}
+		this.handlerName = splitQuery[0];
+
+		this.method = splitQuery[1];
 	}
 
 	public String getParameter(String name) {
@@ -60,7 +89,15 @@ public class ParametersSource {
 	public String[] getParameterValues(String name) {
 		return req.getParameterValues(name);
 	}
-	
+
+	public String getHandlerName() {
+		return handlerName;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
 	public String getClientIP() {
 		String xForwardedFor = req.getHeader("X-Forwarded-For");
 		if (StringUtils.isBlank(xForwardedFor)) {
@@ -99,4 +136,15 @@ public class ParametersSource {
 		}
 	}
 
+	public void createSession() {
+	    destroySession();
+		req.getSession(true);
+	}
+	
+	public void destroySession() {
+	   HttpSession session = req.getSession(false);
+	   if (session != null) {
+	       session.invalidate();
+	   }
+	}
 }

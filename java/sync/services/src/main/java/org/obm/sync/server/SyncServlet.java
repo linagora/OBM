@@ -65,75 +65,36 @@ public class SyncServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		Request request;
+		XmlResponder responder = new XmlResponder(req, resp);
 
-		XmlResponder responder = new XmlResponder(resp);
-
-		final String uri = req.getRequestURI();
-		final String query = extractQuery(uri);
-
-		if (query == null) {
-			responder.sendError(new Exception("Invalid request uri: " + uri));
-			return;
-		}
-		
-		if (query.length() == 0) {
-			showSyncStatus(resp);
-		} else {
-			try {
-				handleQuery(query, req, responder);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				responder.sendError(e);
+		try {
+			request = new Request(req);
+			if (request.getHandlerName() == null) {
+				showSyncStatus(resp);
+			} else {
+				String handlerName = request.getHandlerName();
+				ISyncHandler handler = injector.getInstance(SyncHandlers.class).getHandlers().
+						get(handlerName);
+				if (handler == null) {
+					logger.error("no handler for {}", handlerName);
+					responder.sendError(new Exception("no handler for " + handlerName));
+				}
+				else {
+					long t = System.nanoTime();
+					handler.handle(request, responder);
+					final long elapsedTime = (System.nanoTime() - t) / 1000000;
+					logger.info("handler responded to {}/{} in {}ms.", new Object[]{handlerName,
+							request.getMethod(), elapsedTime});
+				}
 			}
+
+		}
+		catch(Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			responder.sendError(ex);
 		}
 
-	}
-
-	private String extractQuery(String uri) {
-		// /obm-sync/services
-		int idx = uri.indexOf("/services");
-
-		if (idx < 0) {
-			logger.warn("Invalid request uri: " + uri);
-			return null;
-		}
-
-		idx += "/services".length();
-		String query = uri.substring(idx);
-		return query;
-	}
-
-	private void handleQuery(String query, HttpServletRequest req,
-			XmlResponder responder) throws Exception {
-		String[] q = query.split("/");
-		if (q.length != 3) {
-			logger.error("Query without 3 parts: " + query);
-			responder.sendError(new Exception("Query without 3 parts: " + query));
-		} else {
-			final String handlerKey = q[1];
-			final ISyncHandler handler = injector.getInstance(SyncHandlers.class).getHandlers().get(handlerKey);
-			if (handler == null) {
-				logger.error("no handler for " + handlerKey);
-				responder.sendError(new Exception("no handler for " + handlerKey));
-				return;
-			}
-			
-			final String lastQueryPart = q[2];
-			final String method = extractMethod(lastQueryPart);
-			long t = System.nanoTime();
-			handler.handle(method, new ParametersSource(req), responder);
-			final long elapsedTime = (System.nanoTime() - t) / 1000000;
-			logger.info("handler responded to " + handlerKey + "/" + method	+ " in " + elapsedTime + "ms.");
-		}
-
-	}
-
-	private String extractMethod(final String lastQueryPart) {
-		int indexOfSeparator = lastQueryPart.lastIndexOf('?');
-		if (indexOfSeparator != -1) {
-			return lastQueryPart.substring(0, indexOfSeparator);
-		}
-		return lastQueryPart;
 	}
 
 	private void showSyncStatus(HttpServletResponse resp) {

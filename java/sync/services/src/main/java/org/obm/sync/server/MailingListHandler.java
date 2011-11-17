@@ -59,32 +59,33 @@ public class MailingListHandler extends SecureSyncHandler {
 	}
 
 	@Override
-	public void handle(String method, ParametersSource params,
-			XmlResponder responder) throws Exception {
-		AccessToken at = getCheckedToken(params);
+	public void handle(Request request, XmlResponder responder) throws Exception {
+		AccessToken at = getCheckedToken(request);
+
+		String method = request.getMethod();
 		if ("getMailingListFromId".equals(method)) {
-			getMailingListFromId(at, params, responder);
+			getMailingListFromId(at, request, responder);
 		} else if ("listAllMailingList".equals(method)) {
 			listAllMailingList(at, responder);
 		} else if ("createMailingList".equals(method)) {
-			createMailingList(at, params, responder);
+			createMailingList(at, request, responder);
 		} else if ("modifyMailingList".equals(method)) {
-			modifyMailingList(at, params, responder);
+			modifyMailingList(at, request, responder);
 		} else if ("removeMailingList".equals(method)) {
-			removeMailingList(at, params, responder);
+			removeMailingList(at, request, responder);
 		} else if ("addEmails".equals(method)) {
-			addEmails(at, params, responder);
+			addEmails(at, request, responder);
 		} else if ("removeEmail".equals(method)) {
-			removeEmail(at, params, responder);
+			removeEmail(at, request, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
 	}
 
-	private void removeEmail(AccessToken token, ParametersSource params, XmlResponder responder) {
+	private void removeEmail(AccessToken token, Request request, XmlResponder responder) {
 		try {
-			String mailingListId = p(params, "mailingListId");
-			String mailingListEmailId = p(params, "mailingListEmailId");
+			String mailingListId = p(request, "mailingListId");
+			String mailingListEmailId = p(request, "mailingListEmailId");
 			binding.removeEmail(token, Integer.parseInt(mailingListId),
 					Integer.parseInt(mailingListEmailId));
 		} catch (Exception e) {
@@ -93,10 +94,10 @@ public class MailingListHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void addEmails(AccessToken token, ParametersSource params, XmlResponder responder) {
+	private void addEmails(AccessToken token, Request request, XmlResponder responder) {
 		try {
-			String mailingListId = p(params, "mailingListId");
-			String mailingListEmails = p(params, "mailingListEmails");
+			String mailingListId = p(request, "mailingListId");
+			String mailingListEmails = p(request, "mailingListEmails");
 			List<MLEmail> ret = binding.addEmails(token, Integer.parseInt(mailingListId),
 					parser.parseMailingListEmails(mailingListEmails));
 			responder.sendListMailingListEmails(ret);
@@ -106,10 +107,10 @@ public class MailingListHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void getMailingListFromId(AccessToken token, ParametersSource params,
+	private void getMailingListFromId(AccessToken token, Request request,
 			XmlResponder responder) {
 		try {
-			String id = p(params, "id");
+			String id = p(request, "id");
 
 			MailingList ret = binding.getMailingListFromId(token,
 					Integer.parseInt(id));
@@ -137,11 +138,11 @@ public class MailingListHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void createMailingList(AccessToken token, ParametersSource params,
+	private void createMailingList(AccessToken token, Request request,
 			XmlResponder responder) {
 		try {
 			MailingList ret = binding.createMailingList(token,
-					parser.parseMailingList(p(params, "mailingList")));
+					parser.parseMailingList(p(request, "mailingList")));
 			responder.sendMailingList(ret);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -149,10 +150,10 @@ public class MailingListHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void modifyMailingList(AccessToken token, ParametersSource params,
+	private void modifyMailingList(AccessToken token, Request request,
 			XmlResponder responder) {
 		try {
-			String ct = p(params, "mailingList");
+			String ct = p(request, "mailingList");
 			MailingList ret = binding.modifyMailingList(token,
 					parser.parseMailingList(ct));
 			responder.sendMailingList(ret);
@@ -162,10 +163,10 @@ public class MailingListHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void removeMailingList(AccessToken token, ParametersSource params,
+	private void removeMailingList(AccessToken token, Request request,
 			XmlResponder responder) {
 		try {
-			String id = p(params, "id");
+			String id = p(request, "id");
 			binding.removeMailingList(token, Integer.parseInt(id));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

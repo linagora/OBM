@@ -51,7 +51,7 @@ import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DateHelper;
@@ -81,87 +81,88 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	@Override
-	public void handle(String method, ParametersSource params, XmlResponder responder) throws Exception {
+	public void handle(Request request, XmlResponder responder) throws Exception {
 		
-		AccessToken token = getCheckedToken(params);
+		AccessToken token = getCheckedToken(request);
 		
+		String method = request.getMethod();
 		if ("isReadOnly".equals(method)) {
-			isReadOnly(token, params, responder);
+			isReadOnly(token, request, responder);
 		} else if ("listBooks".equals(method)) {
 			listBooks(token, responder);
 		} else if ("listAllBooks".equals(method)) {
 			listAllBooks(token, responder);
 		} else if ("listAllChanges".equals(method)) {
-			listContactsChanged(token, params, responder);
+			listContactsChanged(token, request, responder);
 		} else if ("createContact".equals(method)) {
-			createContact(token, params, responder);
+			createContact(token, request, responder);
 		} else if ("createContactInBook".equals(method)) {
-			createContact(token, params, responder);
+			createContact(token, request, responder);
 		} else if ("modifyContact".equals(method)) {
-			modifyContact(token, params, responder);
+			modifyContact(token, request, responder);
 		} else if ("removeContact".equals(method)) {
-			removeContact(token, params, responder);
+			removeContact(token, request, responder);
 		} else if ("getContactFromId".equals(method)) {
-			getContactFromId(token, params, responder);
+			getContactFromId(token, request, responder);
 		} else if ("getContactTwinKeys".equals(method)) {
-			getContactTwinKeys(token, params, responder);
+			getContactTwinKeys(token, request, responder);
 		} else if ("searchContact".equals(method)) {
-			searchContact(token, params, responder);
+			searchContact(token, request, responder);
 		} else if ("searchContactInGroup".equals(method)) {
-			searchContactInGroup(token, params, responder);
+			searchContactInGroup(token, request, responder);
 		} else if ("getAddressBookSync".equals(method)) {
-			getAddressBookSync(token, params, responder);
+			getAddressBookSync(token, request, responder);
 		} else if ("unsubscribeBook".equals(method)) {
-			unsubscribeBook(token, params, responder);
+			unsubscribeBook(token, request, responder);
 		} else if ("listAddressBooksChanged".equals(method)) {
-			listAddressBooksChanged(token, params, responder);
+			listAddressBooksChanged(token, request, responder);
 		} else if ("searchContactsInSynchronizedAddressBooks".equals(method)) {
-			searchContactsInSynchronizedAddressBooks(token, params, responder);
+			searchContactsInSynchronizedAddressBooks(token, request, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
 	}
 
-	private void unsubscribeBook(AccessToken token, ParametersSource params,
+	private void unsubscribeBook(AccessToken token, Request request,
 			XmlResponder responder) throws ServerFault {
-		boolean ret = binding.unsubscribeBook(token, getBookId(params));
+		boolean ret = binding.unsubscribeBook(token, getBookId(request));
 		responder.sendBoolean(ret);
 	}
 
-	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError {
-		Contact contact = getContactFromParams(params);
+	private void getContactTwinKeys(AccessToken at, Request request, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError {
+		Contact contact = getContactFromParams(request);
 		KeyList ret = binding.getContactTwinKeys(at, contact);
 		responder.sendKeyList(ret);
 	}
 
-	private BookType type(ParametersSource params) {
-		return BookType.valueOf(params.getParameter("book"));
+	private BookType type(Request request) {
+		return BookType.valueOf(request.getParameter("book"));
 	}
 
-	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private void getContactFromId(AccessToken at, Request request, XmlResponder responder) 
 			throws ServerFault, ContactNotFoundException {
 		
-		Integer contactId = Integer.valueOf( p(params, "id") );
-		Integer addressBookId = getBookId(params);
+		Integer contactId = Integer.valueOf(p(request, "id") );
+		Integer addressBookId = getBookId(request);
 		Contact ret = binding.getContactFromId(at, addressBookId, contactId);
 		responder.sendContact(ret);
 	}
 
-	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private void removeContact(AccessToken at, Request request, XmlResponder responder) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		Integer contactId = Integer.valueOf(p(params, "id"));
-		Integer addressBookId = getBookId(params);
+		Integer contactId = Integer.valueOf(p(request, "id"));
+		Integer addressBookId = getBookId(request);
 		Contact ret = binding.removeContact(at, addressBookId, contactId);
 		responder.sendContact(ret);
 	}
 
-	private void modifyContact(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private void modifyContact(AccessToken at, Request request, XmlResponder responder) 
 			throws NoPermissionException, ServerFault, ContactNotFoundException {
 		
 		try {
-			Integer addressBookId = getBookId(params);
-			Contact contact = getContactFromParams(params);
+			Integer addressBookId = getBookId(request);
+			Contact contact = getContactFromParams(request);
 			Contact ret = binding.modifyContact(at, addressBookId, contact);
 			responder.sendContact(ret);
 		} catch (SAXException e) {
@@ -173,12 +174,12 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 
-	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private void createContact(AccessToken at, Request request, XmlResponder responder) 
 			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
 		
 		try {
-			Integer addressBookId = getBookId(params);	
-			Contact contact = getContactFromParams(params);
+			Integer addressBookId = getBookId(request);	
+			Contact contact = getContactFromParams(request);
 			Contact ret = binding.createContact(at, addressBookId, contact);
 			responder.sendContact(ret);
 		} catch (SAXException e) {
@@ -190,14 +191,14 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 	
-	private Contact getContactFromParams(ParametersSource params)
+	private Contact getContactFromParams(Request request)
 			throws SAXException, IOException, FactoryConfigurationError {
-		return bip.parseContact(p(params, "contact"));
+		return bip.parseContact(p(request, "contact"));
 	}
-
-	private void listContactsChanged(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		Date lastSync = getLastSyncFromParams(params);
-		String addressBookId = p(params, "bookId");
+	
+    private void listContactsChanged(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		Date lastSync = getLastSyncFromRequest(request);
+		String addressBookId = p(request, "bookId");
 		ContactChanges contactChanges = null;
 		if (addressBookId == null) {
 			contactChanges = binding.listContactsChanged(at, lastSync);
@@ -207,8 +208,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendContactChanges(contactChanges);
 	}
 
-	private Date getLastSyncFromParams(ParametersSource params) {
-		return DateHelper.asDate(p(params, "lastSync"));
+	private Date getLastSyncFromRequest(Request request) {
+		return DateHelper.asDate(p(request, "lastSync"));
 	}
 
 	private void listBooks(AccessToken at, XmlResponder responder) throws ServerFault {
@@ -225,22 +226,22 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendListAddressBooks(ret);
 	}
 	
-	private void isReadOnly(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		boolean ret = binding.isReadOnly(at, type(params));
+	private void isReadOnly(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		boolean ret = binding.isReadOnly(at, type(request));
 		responder.sendBoolean(ret);
 	}
 
-	private void searchContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		String query = p(params, "query");
-		int limit = Integer.parseInt(p(params, "limit"));
+	private void searchContact(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		String query = p(request, "query");
+		int limit = Integer.parseInt(p(request, "limit"));
 		List<Contact> ret = binding.searchContact(at, query, limit);
 		responder.sendListContact(ret);
 	}
 
-	private void searchContactInGroup(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		String query = p(params, "query");
-		int limit = Integer.valueOf(p(params, "limit"));
-		int groupId = Integer.valueOf(p(params, "group"));
+	private void searchContactInGroup(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		String query = p(request, "query");
+		int limit = Integer.valueOf(p(request, "limit"));
+		int groupId = Integer.valueOf(p(request, "group"));
 		AddressBook book = getAddressBookFromUid(at, groupId);
 		List<Contact> ret = binding.searchContactInGroup(at, book, query, limit);
 		responder.sendListContact(ret);
@@ -256,10 +257,10 @@ public class AddressBookHandler extends SecureSyncHandler {
 		throw new RuntimeException("book with uid " + uid + " not found");
 	}
 
-	private Integer getBookId(ParametersSource params) {
-		String bookId = p(params, "bookId");
+	private Integer getBookId(Request request) {
+		String bookId = p(request, "bookId");
 		if (bookId == null) {
-			if (isUsersBookType(params)) {
+			if (isUsersBookType(request)) {
 				return contactConfiguration.getAddressBookUserId();
 			} else {
 				return null;
@@ -268,8 +269,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(bookId);
 	}
 
-	private Boolean isUsersBookType(ParametersSource params) {
-		BookType bookType = type(params);
+	private Boolean isUsersBookType(Request request) {
+		BookType bookType = type(request);
 		if (bookType == null) {
 			return null;
 		}
@@ -280,24 +281,24 @@ public class AddressBookHandler extends SecureSyncHandler {
 		}
 	}
 	
-	private void getAddressBookSync(AccessToken token, ParametersSource params,
+	private void getAddressBookSync(AccessToken token, Request request,
 			XmlResponder responder) throws ServerFault {
-		Date lastSync = getLastSyncFromParams(params);
+		Date lastSync = getLastSyncFromRequest(request);
 		AddressBookChangesResponse response = binding.getAddressBookSync(token, lastSync);
 		responder.sendAddressBookChanges(response);	
 	}
 	
-	private void listAddressBooksChanged(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault {
-		Date lastSync = getLastSyncFromParams(params);
+	private void listAddressBooksChanged(AccessToken token, Request request, XmlResponder responder) throws ServerFault {
+		Date lastSync = getLastSyncFromRequest(request);
 		FolderChanges folderChanges = binding.listAddressBooksChanged(token, lastSync);
 		responder.sendlistAddressBooksChanged(folderChanges);	
 	}
 	
-	private void searchContactsInSynchronizedAddressBooks(AccessToken token, ParametersSource params, 
+	private void searchContactsInSynchronizedAddressBooks(AccessToken token, Request request, 
 			XmlResponder responder) throws ServerFault {
 		
-		String query = p(params, "query");
-		int limit = Integer.parseInt(p(params, "limit"));
+		String query = p(request, "query");
+		int limit = Integer.parseInt(p(request, "limit"));
 		List<Contact> ret = binding.searchContactsInSynchronizedAddressBooks(token, query, limit);
 		responder.sendListContact(ret);
 	}

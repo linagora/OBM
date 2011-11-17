@@ -33,7 +33,7 @@ package org.obm.sync.server.handler;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +50,11 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 		sessions = sessionManagement;
 	}
 
-	protected String p(ParametersSource params, String name) {
+	protected String p(Request params, String name) {
 		return params.getParameter(name);
 	}
 
-	protected int i(ParametersSource params, String name, int defaultValue) {
+	protected int i(Request params, String name, int defaultValue) {
 		String text = params.getParameter(name);
 		if (Strings.isNullOrEmpty(text)) {
 			return defaultValue;
@@ -63,13 +63,13 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 		}
 	}
 
-	private AccessToken getToken(ParametersSource params) {
+	private AccessToken getToken(Request params) {
 		AccessToken at = new AccessToken(0, "unused");
 		at.setSessionId(params.getParameter("sid"));
 		return at;
 	}
 
-	protected AccessToken getCheckedToken(ParametersSource params)
+	protected AccessToken getCheckedToken(Request params)
 			throws AuthFault {
 		AccessToken token = getToken(params);
 		sessions.checkToken(token);

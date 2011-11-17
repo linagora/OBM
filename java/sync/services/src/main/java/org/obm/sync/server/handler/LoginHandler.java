@@ -34,7 +34,7 @@ package org.obm.sync.server.handler;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBindingImpl;
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.server.mailer.ErrorMailer;
 import org.slf4j.Logger;
@@ -74,14 +74,14 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	@Override
-	public void handle(String method, ParametersSource params,
+	public void handle(Request request,
 			XmlResponder responder) throws Exception {
-		logger.info("method: " + method);
+		String method = request.getMethod();
 
 		if ("doLogin".equals(method)) {
-			doLogin(params, responder);
+			doLogin(request, responder);
 		} else if ("doLogout".equals(method)) {
-			doLogout(params);
+			doLogout(request);
 		} else {
 			responder.sendError("unsupported method: " + method);
 			return;
@@ -89,18 +89,21 @@ public class LoginHandler implements ISyncHandler {
 
 	}
 
-	private void doLogout(ParametersSource params) {
-		binding.logout(params.getParameter("sid"));
+	private void doLogout(Request request) {
+		request.destroySession();
+		binding.logout(request.getParameter("sid"));
 	}
 
-	private void doLogin(ParametersSource params, XmlResponder responder) {
 		
-		String login = params.getParameter("login");
-		String pass = params.getParameter("password");
-		String origin = params.getParameter("origin");
-		boolean isPasswordHashed = params.getParameter("isPasswordHashed") != null ? Boolean
-				.valueOf(params.getParameter("isPasswordHashed")) : false;
-		
+	private void doLogin(Request request, XmlResponder responder) {
+		request.createSession();
+		String login = request.getParameter("login");
+		String pass = request.getParameter("password");
+		String origin = request.getParameter("origin");
+	    
+        boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null ? Boolean
+				.valueOf(request.getParameter("isPasswordHashed")) : false;
+	
 		try {
 			if (origin == null) {
 				responder.sendError("login refused with null origin");
@@ -108,11 +111,11 @@ public class LoginHandler implements ISyncHandler {
 			}
 		
 			if (logger.isDebugEnabled()) {
-				params.dumpHeaders();
+				request.dumpHeaders();
 			}
 			
-			AccessToken token = binding.logUserIn(login, pass, origin, params.getClientIP(), params.getRemoteIP(),
-					params.getLemonLdapLogin(), params.getLemonLdapDomain(), isPasswordHashed);
+			AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+					request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
 			
 			if (token != null) {
 				versionValidator.checkObmConnectorVersion(token);

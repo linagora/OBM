@@ -61,7 +61,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.ImportICalendarException;
 import org.obm.push.utils.DOMUtils;
@@ -119,103 +119,103 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	@Override
-	public void handle(String method, ParametersSource params,
+	public void handle(Request request,
 			XmlResponder responder) throws Exception {
 		
-		AccessToken at = getCheckedToken(params);
-		String res = searchAndInvokeMethod(method, params, responder, at);
+		AccessToken at = getCheckedToken(request);
+		String res = searchAndInvokeMethod(request, responder, at);
 		logger.debug(LogUtils.prefix(at) + res);
 	}
 
-	private String searchAndInvokeMethod(String method, ParametersSource params, 
-			XmlResponder responder, AccessToken at) 
+	private String searchAndInvokeMethod(Request request, XmlResponder responder, AccessToken at)
 		throws ServerFault, SAXException,
 			IOException, FactoryConfigurationError, Exception {
+		String method = request.getMethod();
 		if (method.equals("getSync")) {
-			return getSync(at, params, responder);
+			return getSync(at, request, responder);
 		} else if (method.equals("getSyncInRange")) {
-			return getSyncInRange(at, params, responder);
+			return getSyncInRange(at, request, responder);
 		} else if (method.equals("getSyncWithSortedChanges")) {
-			return getSyncWithSortedChanges(at, params, responder);
+			return getSyncWithSortedChanges(at, request, responder);
 		} else if (method.equals("getSyncEventDate")) {
-			return getSyncEventDate(at, params, responder);
+			return getSyncEventDate(at, request, responder);
 		} else if (method.equals("removeEvent")) {
-			return removeEvent(at, params, responder);
+			return removeEvent(at, request, responder);
 		} else if (method.equals("removeEventByExtId")) {
-			return removeEventByExtId(at, params, responder);
+			return removeEventByExtId(at, request, responder);
 		} else if (method.equals("modifyEvent")) {
-			return modifyEvent(at, params, responder);
+			return modifyEvent(at, request, responder);
 		} else if (method.equals("createEvent")) {
-			return createEvent(at, params, responder);
+			return createEvent(at, request, responder);
 		} else if (method.equals("getEventFromId")) {
-			return getEventFromId(at, params, responder);
+			return getEventFromId(at, request, responder);
 		} else if (method.equals("listCalendars")) {
 			return listCalendars(at, responder);
 		} else if (method.equals("listCategories")) {
 			return listCategories(at, responder);
 		} else if (method.equals("getEventTwinKeys")) {
-			return getEventTwinKeys(at, params, responder);
+			return getEventTwinKeys(at, request, responder);
 		} else if (method.equals("getRefusedKeys")) {
-			return getRefusedKeys(at, params, responder);
+			return getRefusedKeys(at, request, responder);
 		} else if (method.equals("getUserEmail")) {
 			return getUserEmail(at, responder);
 		} else if (method.equals("getEventFromExtId")) {
-			return getEventFromExtId(at, params, responder);
+			return getEventFromExtId(at, request, responder);
 		} else if (method.equals("getEventObmIdFromExtId")) {
-			return getEventObmIdFromExtId(at, params, responder);
+			return getEventObmIdFromExtId(at, request, responder);
 		} else if (method.equals("getListEventsFromIntervalDate")) {
-			return getListEventsFromIntervalDate(at, params, responder);
+			return getListEventsFromIntervalDate(at, request, responder);
 		} else if (method.equals("getAllEvents")) {
-			return getAllEvents(at, params, responder);
+			return getAllEvents(at, request, responder);
 		} else if (method.equals("parseEvent")) {
-			return parseEvent(at, params, responder);
+			return parseEvent(at, request, responder);
 		} else if (method.equals("parseEvents")) {
-			return parseEvents(at, params, responder);
+			return parseEvents(at, request, responder);
 		} else if (method.equals("parseICS")) {
-			return parseICS(at, params, responder);
+			return parseICS(at, request, responder);
 		} else if (method.equals("parseICSFreeBusy")) {
-			return parseICSFreeBusy(at, params, responder);
+			return parseICSFreeBusy(at, request, responder);
 		} else if (method
 				.equals("getEventParticipationStateWithAlertFromIntervalDate")) {
-			return getEventParticipationStateWithAlertFromIntervalDate(at, params,
+			return getEventParticipationStateWithAlertFromIntervalDate(at, request,
 					responder);
 		} else if (method
 				.equals("getEventTimeUpdateNotRefusedFromIntervalDate")) {
-			return getEventTimeUpdateNotRefusedFromIntervalDate(at, params, responder);
+			return getEventTimeUpdateNotRefusedFromIntervalDate(at, request, responder);
 		} else if (method.equals("getLastUpdate")) {
-			return getLastUpdate(at, params, responder);
+			return getLastUpdate(at, request, responder);
 		} else if (method.equals("isWritableCalendar")) {
-			return isWritableCalendar(at, params, responder);
+			return isWritableCalendar(at, request, responder);
 		} else if (method.equals("getFreeBusy")) {
-			return getFreeBusy(at, params, responder);
+			return getFreeBusy(at, request, responder);
 		} else if (method.equals("parseFreeBusyToICS")) {
-			return parseFreeBusyToICS(at, params, responder);
+			return parseFreeBusyToICS(at, request, responder);
 		} else if (method.equals("changeParticipationState")) {
-			return changeParticipationState(at, params, responder);
+			return changeParticipationState(at, request, responder);
 		} else if (method.equals("importICalendar")) {
-			return importICalendar(at, params, responder);
+			return importICalendar(at, request, responder);
 		} else if (method.equals("purge")) {
-			return purge(at, params, responder);
+			return purge(at, request, responder);
 		}
 		else if (method.equals("getCalendarMetadata")) {
-			return getCalendarMetadata(at, params, responder);
+			return getCalendarMetadata(at, request, responder);
 		} else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
 		}
 	} 
 
-	private String getCalendarMetadata(AccessToken at, ParametersSource params,
+	private String getCalendarMetadata(AccessToken at, Request request,
 			XmlResponder responder) throws ServerFault {
-		String[] calendarEmails = params.getParameterValues("calendar");
+		String[] calendarEmails = request.getParameterValues("calendar");
 		CalendarInfo[] lc = binding.getCalendarMetadata(at, calendarEmails);
 		return responder.sendCalendarInformations(lc);
 	}
 
 	private String parseFreeBusyToICS(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
-		String fbAsString = params.getParameter("freebusy");
+		String fbAsString = request.getParameter("freebusy");
 		Document doc = DOMUtils.parse(fbAsString);
 		FreeBusy fb = cip.parseFreeBusy(doc.getDocumentElement());
 		String ics = binding.parseFreeBusyToICS(at, fb);
@@ -223,9 +223,9 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getFreeBusy(
-			AccessToken at, ParametersSource params,	XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
-		String fbAsString = params.getParameter("freebusyrequest");
+		String fbAsString = request.getParameter("freebusyrequest");
 		Document doc = DOMUtils.parse(fbAsString);
 		FreeBusyRequest fb = cip.parseFreeBusyRequest(doc.getDocumentElement());
 		List<FreeBusy> ev = binding.getFreeBusy(at, fb);
@@ -233,15 +233,15 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String parseICSFreeBusy(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
-		String ics = params.getParameter("ics");
+		String ics = request.getParameter("ics");
 		FreeBusyRequest freeBusy = binding.parseICSFreeBusy(at, ics);
 		return responder.sendFreeBusyRequest(freeBusy);
 	}
 
-	private String getCalendar(AccessToken accessToken, ParametersSource params) {
-		String calendar = params.getParameter("calendar");
+	private String getCalendar(AccessToken accessToken, Request request) {
+		String calendar = request.getParameter("calendar");
 		if (calendar.contains("@")) {
 			return calendar;
 		} else {
@@ -250,19 +250,19 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String getLastUpdate(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
-		Date d = binding.getLastUpdate(at, getCalendar(at, params));
+		Date d = binding.getLastUpdate(at, getCalendar(at, request));
 		return responder.sendLong(d.getTime());
 	}
 
 	private String getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
-		String calendar = getCalendar(at, params);
-		Date start = DateHelper.asDate(params.getParameter("start"));
+			AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		String calendar = getCalendar(at, request);
+		Date start = DateHelper.asDate(request.getParameter("start"));
 		Date end = null;
 		if (StringUtils.isNotEmpty("end")) {
-			end = DateHelper.asDate(params.getParameter("end"));
+			end = DateHelper.asDate(request.getParameter("end"));
 		}
 		List<EventTimeUpdate> e = 
 			binding.getEventTimeUpdateNotRefusedFromIntervalDate(at, calendar, start, end);
@@ -271,74 +271,74 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
 		List<EventParticipationState> e = 
 			binding.getEventParticipationStateWithAlertFromIntervalDate(at,
-				getCalendar(at, params), 
-				DateHelper.asDate(params.getParameter("start")),
-				DateHelper.asDate(params.getParameter("end")));
+				getCalendar(at, request),
+				DateHelper.asDate(request.getParameter("start")),
+				DateHelper.asDate(request.getParameter("end")));
 
 		return responder.sendListEventParticipationState(e);
 	}
 
 	private String parseICS(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, Exception {
-		String ics = params.getParameter("ics");
+		String ics = request.getParameter("ics");
 		List<Event> events = binding.parseICS(at, ics);
 		return responder.sendListEvent(events);
 	}
 
 	private String parseEvents(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
-		List<Event> events = getEvents(params);
+		List<Event> events = getEvents(request);
 		String ics = binding.parseEvents(at, events);
 		return responder.sendString(ics);
 	}
 
 	private String parseEvent(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws SAXException, IOException, FactoryConfigurationError, ServerFault {
-		Event event = getEvent(params);
+		Event event = getEvent(request);
 		String ics = binding.parseEvent(at, event);
 		return responder.sendString(ics);
 	}
 
 	private String getAllEvents(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
 			List<Event> e = 
-				binding.getAllEvents(at, getCalendar(at, params), 
-						EventType.valueOf(params.getParameter("eventType")));
+				binding.getAllEvents(at, getCalendar(at, request),
+						EventType.valueOf(request.getParameter("eventType")));
 			return responder.sendListEvent(e);
 	}
 
 	private String getListEventsFromIntervalDate(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
 		List<Event> e = binding.getListEventsFromIntervalDate(at, 
-				getCalendar(at, params), 
-				DateHelper.asDate(params.getParameter("start")), 
-				DateHelper.asDate(params.getParameter("end")));
+				getCalendar(at, request),
+				DateHelper.asDate(request.getParameter("start")),
+				DateHelper.asDate(request.getParameter("end")));
 
 		return responder.sendListEvent(e);
 	}
 
-	private String getEventObmIdFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String getEventObmIdFromExtId(AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, EventNotFoundException {
 		
-		EventObmId id = binding.getEventObmIdFromExtId(at, getCalendar(at, params), getExtId(params, "extId"));
+		EventObmId id = binding.getEventObmIdFromExtId(at, getCalendar(at, request), getExtId(request, "extId"));
 		if (id != null) {
 			return responder.sendInt(id.getObmId());
 		}
 		return responder.sendError("not found");		
 	}
 	
-	private String getEventFromExtId(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String getEventFromExtId(AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, EventNotFoundException {
-		Event e = binding.getEventFromExtId(at, getCalendar(at, params), getExtId(params, "extId"));
+		Event e = binding.getEventFromExtId(at, getCalendar(at, request), getExtId(request, "extId"));
 		return responder.sendEvent(e);
 	}
 
@@ -352,17 +352,17 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCategories(ret);
 	}
 
-	private String getRefusedKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String getRefusedKeys(AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault {
 		KeyList ret = binding.getRefusedKeys(at, 
-				getCalendar(at, params), 
-				DateHelper.asDate(params.getParameter("since")));
+				getCalendar(at, request),
+				DateHelper.asDate(request.getParameter("since")));
 		return responder.sendKeyList(ret);
 	}
 
-	private String getEventTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String getEventTwinKeys(AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
-		KeyList kl = binding.getEventTwinKeys(at, getCalendar(at, params), getEvent(params));
+		KeyList kl = binding.getEventTwinKeys(at, getCalendar(at, request), getEvent(request));
 		return responder.sendKeyList(kl);
 	}
 
@@ -371,47 +371,47 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarInformations(lc);
 	}
 
-	private String getEventFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String getEventFromId(AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, EventNotFoundException {
-		Event e = binding.getEventFromId(at, getCalendar(at, params), getObmId(params, "id"));
+		Event e = binding.getEventFromId(at, getCalendar(at, request), getObmId(request, "id"));
 		return responder.sendEvent(e);
 	}
 
 	private String createEvent(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException {
-		EventObmId ev = binding.createEvent(at,	getCalendar(at, params), getEvent(params), getNotificationOption(params));
+		EventObmId ev = binding.createEvent(at,	getCalendar(at, request), getEvent(request), getNotificationOption(request));
 		return responder.sendInt(ev.getObmId());
 	}
 	
-	private Event getEvent(ParametersSource params) throws SAXException,
+	private Event getEvent(Request request) throws SAXException,
 			IOException, FactoryConfigurationError {
-		Document doc = DOMUtils.parse(p(params, "event"));
+		Document doc = DOMUtils.parse(p(request, "event"));
 		Event toModify = cip.parseEvent(doc.getDocumentElement());
 		return toModify;
 	}
 
-	private boolean getNotificationOption(ParametersSource params) {
-		String notificationParam = params.getParameter("notification");
+	private boolean getNotificationOption(Request request) {
+		String notificationParam = request.getParameter("notification");
 		if (notificationParam != null) {
 			return Boolean.valueOf(notificationParam);
 		}
 		return true;
 	}
 	
-	private List<Event> getEvents(ParametersSource params) throws SAXException,
+	private List<Event> getEvents(Request request) throws SAXException,
 			IOException, FactoryConfigurationError {
-		Document doc = DOMUtils.parse(p(params, "events"));
+		Document doc = DOMUtils.parse(p(request, "events"));
 		List<Event> toModify = cip.parseListEvents(doc.getDocumentElement());
 		return toModify;
 	}
 
 	private String modifyEvent(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
-		Event ev = binding.modifyEvent(at, getCalendar(at, params),
-				getEvent(params), Boolean.valueOf(params.getParameter("updateAttendees")), 
-				getNotificationOption(params)
+		Event ev = binding.modifyEvent(at, getCalendar(at, request),
+				getEvent(request), Boolean.valueOf(request.getParameter("updateAttendees")),
+				getNotificationOption(request)
 				);
 		if (ev != null) {
 			return responder.sendEvent(ev);
@@ -419,23 +419,23 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendError("Event did not exist.");
 	}
 	
-	private String removeEvent(AccessToken at, ParametersSource params, XmlResponder responder) 
+	private String removeEvent(AccessToken at, Request request, XmlResponder responder) 
 			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
-		String calendar = getCalendar(at, params);
-		EventObmId obmId = getObmId(params, "id");
-		int sequence = i(params, "sequence", 0);
-		binding.removeEventById(at, calendar, obmId, sequence, getNotificationOption(params));
+		String calendar = getCalendar(at, request);
+		EventObmId obmId = getObmId(request, "id");
+		int sequence = i(request, "sequence", 0);
+		binding.removeEventById(at, calendar, obmId, sequence, getNotificationOption(request));
 		return responder.sendBoolean(true);
 	}
 	
 	private String removeEventByExtId(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault {
-		Event ev = binding.removeEventByExtId(at, getCalendar(at, params),
-				getExtId(params, "extId"), 
-				i(params, "sequence", 0),
-				getNotificationOption(params));
+		Event ev = binding.removeEventByExtId(at, getCalendar(at, request),
+				getExtId(request, "extId"),
+				i(request, "sequence", 0),
+				getNotificationOption(request));
 		if (ev != null) {
 			return responder.sendEvent(ev);
 		}
@@ -444,120 +444,119 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getSyncEventDate(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault {
 		EventChanges ret = binding.getSyncEventDate(at, 
-				getCalendar(at, params), 
-				DateHelper.asDate(params.getParameter("lastSync")));
+				getCalendar(at, request),
+				DateHelper.asDate(request.getParameter("lastSync")));
 		return responder.sendCalendarChanges(ret);
 	}
 
 	private String getSyncWithSortedChanges(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
 			EventChanges ret = binding.getSyncWithSortedChanges(at, 
-					getCalendar(at, params), 
-					DateHelper.asDate(params.getParameter("lastSync")));
+					getCalendar(at, request),
+					DateHelper.asDate(request.getParameter("lastSync")));
 			return responder.sendCalendarChanges(ret);
 	}
 
-	
 	private String getSync(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault {
 			EventChanges ret = binding.getSync(at, 
-					getCalendar(at, params), 
-					DateHelper.asDate(params.getParameter("lastSync")));
+					getCalendar(at, request),
+					DateHelper.asDate(request.getParameter("lastSync")));
 			return responder.sendCalendarChanges(ret);
 	}
 	
 	private String getSyncInRange(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 	throws ServerFault {
-		final Date after = DateHelper.asDate(params.getParameter("syncRangeAfter"));
-		final Date before = DateHelper.asDate(params.getParameter("syncRangeBefore"));
+		final Date after = DateHelper.asDate(request.getParameter("syncRangeAfter"));
+		final Date before = DateHelper.asDate(request.getParameter("syncRangeBefore"));
 		SyncRange syncRange = null;
 		if(after != null || before != null){
 			syncRange = new SyncRange(before, after);
 		}
 		EventChanges ret = binding.getSyncInRange(at, 
-				getCalendar(at, params), 
-				DateHelper.asDate(params.getParameter("lastSync")), syncRange);
+				getCalendar(at, request),
+				DateHelper.asDate(request.getParameter("lastSync")), syncRange);
 		return responder.sendCalendarChanges(ret);
 	}
 
 	private String isWritableCalendar(
-			AccessToken at, ParametersSource params, XmlResponder responder) 
+			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault {
-		boolean ret = binding.isWritableCalendar(at, getCalendar(at, params));
+		boolean ret = binding.isWritableCalendar(at, getCalendar(at, request));
 		logger.info("isWritable(" + at.getUserEmail() + ", "
-				+ getCalendar(at, params) + ") => " + ret);
+				+ getCalendar(at, request) + ") => " + ret);
 		return responder.sendBoolean(ret);
 	}
 	
 	private String changeParticipationState(AccessToken at,
-			ParametersSource params, XmlResponder responder) throws ServerFault, ParseException, EventNotFoundException {
+			Request request, XmlResponder responder) throws ServerFault, ParseException, EventNotFoundException {
 		
-		boolean recursive = getRecursive(params);
+		boolean recursive = getRecursive(request);
 		boolean success = false;
 		
 		if (recursive) {
-			success = binding.changeParticipationState(at, getCalendar(at, params),
-					getExtId(params, "extId"), 
-					getParticipationState(params),
-					i(params, "sequence", 0),
-					getNotificationOption(params));
+			success = binding.changeParticipationState(at, getCalendar(at, request),
+					getExtId(request, "extId"), 
+					getParticipationState(request),
+					i(request, "sequence", 0),
+					getNotificationOption(request));
 		} else {
-			success = binding.changeParticipationState(at, getCalendar(at, params),
-					getExtId(params, "extId"), getRecurrenceId(params),
-					getParticipationState(params),
-					i(params, "sequence", 0),
-					getNotificationOption(params));
+			success = binding.changeParticipationState(at, getCalendar(at, request),
+					getExtId(request, "extId"), getRecurrenceId(request),
+					getParticipationState(request),
+					i(request, "sequence", 0),
+					getNotificationOption(request));
 		}
 		return responder.sendBoolean(success);
 	}
 	
-	private String importICalendar(final AccessToken token, final ParametersSource params, 
+	private String importICalendar(final AccessToken token, final Request request,
 			XmlResponder responder) throws ImportICalendarException, ServerFault {
-		final String calendar = params.getParameter("calendar");
-		final String ics = params.getParameter("ics");
+		final String calendar = request.getParameter("calendar");
+		final String ics = request.getParameter("ics");
 		
 		int countEvent = binding.importICalendar(token, calendar, ics);
 		return responder.sendInt(countEvent);
 	}
 	
-	private String purge(final AccessToken at, final ParametersSource params, final XmlResponder responder) throws ServerFault {
-		binding.purge(at, getCalendar(at, params));
+	private String purge(final AccessToken at, final Request request, final XmlResponder responder) throws ServerFault {
+		binding.purge(at, getCalendar(at, request));
 		return responder.sendBoolean(true);
 	}
 	
-	private EventExtId getExtId(ParametersSource params, String tagName) {
-		return new EventExtId(params.getParameter(tagName));
+	private EventExtId getExtId(Request request, String tagName) {
+		return new EventExtId(request.getParameter(tagName));
 	}
 	
-	private EventObmId getObmId(ParametersSource params, String tagName) {
-		return new EventObmId(params.getParameter(tagName));
+	private EventObmId getObmId(Request request, String tagName) {
+		return new EventObmId(request.getParameter(tagName));
 	}
 	
-	private RecurrenceId getRecurrenceId(ParametersSource params) {
-		String recurrenceIdParam = params.getParameter("recurrenceId");
+	private RecurrenceId getRecurrenceId(Request request) {
+		String recurrenceIdParam = request.getParameter("recurrenceId");
 		if (recurrenceIdParam != null) {
 				return new RecurrenceId(recurrenceIdParam);
 		}
 		return null;
 	}
 	
-	private Boolean getRecursive(ParametersSource params) {
-		String recursiveParam = params.getParameter("recursive");
+	private Boolean getRecursive(Request request) {
+		String recursiveParam = request.getParameter("recursive");
 		if(recursiveParam != null) {
 			return Boolean.valueOf(recursiveParam);
 		}
 		return true;
 	}
 
-	private ParticipationState getParticipationState(ParametersSource params) {
-		ParticipationState status = ParticipationState.getValueOf(params.getParameter("state"));
-		String comment = params.getParameter("comment");
+	private ParticipationState getParticipationState(Request request) {
+		ParticipationState status = ParticipationState.getValueOf(request.getParameter("state"));
+		String comment = request.getParameter("comment");
 		status.setComment(new Comment(comment));
 		return status;
 	}

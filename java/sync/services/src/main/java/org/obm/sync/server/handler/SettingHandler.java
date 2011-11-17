@@ -36,7 +36,7 @@ import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.server.ParametersSource;
+import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.VacationSettings;
@@ -64,17 +64,19 @@ public class SettingHandler extends SecureSyncHandler {
 	}
 
 	@Override
-	public void handle(String method, ParametersSource params, XmlResponder responder)
+	public void handle(Request request, XmlResponder responder)
 		throws Exception {
-		AccessToken at = getCheckedToken(params);
+		AccessToken at = getCheckedToken(request);
+
+		String method = request.getMethod();
 		if ("getSettings".equals(method)) {
 			getSettings(at, responder);
 		} else if ("setVacationSettings".equals(method)) {
-			setVacationSettings(at, params, responder);
+			setVacationSettings(at, request, responder);
 		} else if ("getVacationSettings".equals(method)) {
 			getVacationSettings(at, responder);
 		} else if ("setEmailForwarding".equals(method)) {
-			setEmailForwarding(at, params, responder);
+			setEmailForwarding(at, request, responder);
 		} else if ("getEmailForwarding".equals(method)) {
 			getEmailForwarding(at, responder);
 		} else {
@@ -89,12 +91,12 @@ public class SettingHandler extends SecureSyncHandler {
 
 	}
 
-	private void setEmailForwarding(AccessToken at, ParametersSource params,
+	private void setEmailForwarding(AccessToken at, Request request,
 			XmlResponder responder) throws ServerFault {
 		ForwardingSettings fs = new ForwardingSettings();
-		fs.setEnabled(Boolean.valueOf(params.getParameter("enabled")));
-		fs.setLocalCopy(Boolean.valueOf(params.getParameter("localCopy")));
-		fs.setEmail(params.getParameter("email"));
+		fs.setEnabled(Boolean.valueOf(request.getParameter("enabled")));
+		fs.setLocalCopy(Boolean.valueOf(request.getParameter("localCopy")));
+		fs.setEmail(request.getParameter("email"));
 		binding.setEmailForwarding(at, fs);
 		responder.sendString("Forwarding settings saved");
 	}
@@ -105,29 +107,29 @@ public class SettingHandler extends SecureSyncHandler {
 		responder.sendVacation(vs);
 	}
 
-	private void setVacationSettings(AccessToken at, ParametersSource params,
+	private void setVacationSettings(AccessToken at, Request request,
 			XmlResponder responder) throws ServerFault {
 		VacationSettings vs = new VacationSettings();
-		vs.setEnabled(Boolean.valueOf(params.getParameter("enabled")));
+		vs.setEnabled(Boolean.valueOf(request.getParameter("enabled")));
 		if (vs.isEnabled()) {
 			long l;
 			Date d;
 
-			String s = params.getParameter("start");
+			String s = request.getParameter("start");
 			if (s != null) {
 				l = Long.parseLong(s);
 				d = new Date(l);
 				vs.setStart(d);
 			}
 
-			s = params.getParameter("end");
+			s = request.getParameter("end");
 			if (s != null) {
 				l = Long.parseLong(s);
 				d = new Date(l);
 				vs.setEnd(d);
 			}
 
-			vs.setText(params.getParameter("text"));
+			vs.setText(request.getParameter("text"));
 		}
 		binding.setVacationSettings(at, vs);
 		responder.sendString("Vacation settings stored");

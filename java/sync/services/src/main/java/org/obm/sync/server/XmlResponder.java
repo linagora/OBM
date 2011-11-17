@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.utils.DOMUtils;
@@ -72,6 +74,7 @@ import com.google.common.base.Strings;
 
 public class XmlResponder {
 
+	private HttpServletRequest request;
 	private HttpServletResponse resp;
 	private Logger logger =  LoggerFactory.getLogger(getClass());
 	private CalendarItemsWriter ciw;
@@ -79,7 +82,8 @@ public class XmlResponder {
 	private SettingItemsWriter siw;
 	private MailingListItemsWriter mliw;
 
-	public XmlResponder(HttpServletResponse resp) {
+	public XmlResponder(HttpServletRequest request, HttpServletResponse resp) {
+		this.request = request;
 		this.resp = resp;
 		this.ciw = new CalendarItemsWriter();
 		this.biw = new BookItemsWriter();
@@ -97,7 +101,7 @@ public class XmlResponder {
 			if(!Strings.isNullOrEmpty(type)){
 				DOMUtils.createElementAndText(root, "type", type);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -124,20 +128,30 @@ public class XmlResponder {
 			v.setAttribute("major", version.getMajor());
 			v.setAttribute("minor", version.getMinor());
 			v.setAttribute("release", version.getRelease());
-			DOMUtils.createElementAndText(root, "email", at.getUserEmail());
+			
+            DOMUtils.createElementAndText(root, "email", at.getUserEmail());
 			
 			Element domain = DOMUtils.createElementAndText(root, "domain", at.getDomain().getName());
 			domain.setAttribute("uuid", at.getDomain().getUuid());
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 		return res;
 	}
 
-	private String sendDom(Document doc) {
+	private void copyCookies() {
+		if (request.getCookies() != null) {
+			for (Cookie cookie : request.getCookies()) {
+				resp.addCookie(cookie);
+			}
+		}
+	}
+
+	private String emitResponse(Document doc) {
 		String res = "";
 		try {
+			copyCookies();
 			resp.setContentType("text/xml;charset=UTF-8");
 			DOMUtils.serialize(doc, resp.getOutputStream());
 
@@ -174,7 +188,7 @@ public class XmlResponder {
 			for (String value : ret) {
 				DOMUtils.createElementAndText(root, "value", value);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -190,7 +204,7 @@ public class XmlResponder {
 			for (String key : ret.getKeys()) {
 				DOMUtils.createElementAndText(root, "key", key);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -198,11 +212,11 @@ public class XmlResponder {
 	}
 
 	public String sendEvent(Event event) {
-		return sendDom(ciw.getXMLDocumentFrom(event));
+		return emitResponse(ciw.getXMLDocumentFrom(event));
 	}
 
 	public String sendCalendarChanges(EventChanges eventChanges) {
-		return sendDom(ciw.getXMLDocumentFrom(eventChanges));
+		return emitResponse(ciw.getXMLDocumentFrom(eventChanges));
 	}
 
 	public String sendCalendarInformations(CalendarInfo[] lc) {
@@ -215,7 +229,7 @@ public class XmlResponder {
 			for (CalendarInfo ci : lc) {
 				ciw.appendInfo(root, ci);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -229,7 +243,7 @@ public class XmlResponder {
 					"http://www.obm.org/xsd/sync/contact.xsd", "contact");
 			Element root = doc.getDocumentElement();
 			biw.appendContact(root, contact);
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -237,7 +251,7 @@ public class XmlResponder {
 	}
 
 	public String sendContactChanges(ContactChanges contactChanges) {
-		return sendDom(biw.writeChanges(contactChanges));
+		return emitResponse(biw.writeChanges(contactChanges));
 	}
 
 	public String sendCategories(List<Category> ret) {
@@ -249,7 +263,7 @@ public class XmlResponder {
 			for (Category c : ret) {
 				ciw.appendCategory(root, c);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -265,7 +279,7 @@ public class XmlResponder {
 			for (AddressBook book: ret) {
 				biw.appendAddressBook(root, book);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -273,7 +287,7 @@ public class XmlResponder {
 	}
 
 	public String sendListEvent(List<Event> events) {
-		return sendDom(ciw.getXMLDocumentFrom(events));
+		return emitResponse(ciw.getXMLDocumentFrom(events));
 	}
 
 	public String sendListEventTimeUpdate(List<EventTimeUpdate> evs) {
@@ -286,7 +300,7 @@ public class XmlResponder {
 			for (EventTimeUpdate etu : evs) {
 				ciw.appendEventTimeUpdate(root, etu);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -302,7 +316,7 @@ public class XmlResponder {
 			for (Contact contact : ret) {
 				biw.appendContact(root, contact);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -319,7 +333,7 @@ public class XmlResponder {
 			for (Entry<String, String> entry : ret.entrySet()) {
 				siw.appendSetting(root, entry.getKey(), entry.getValue());
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -336,7 +350,7 @@ public class XmlResponder {
 			for (EventParticipationState etu : e) {
 				ciw.appendEventParticipationState(root, etu);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -350,7 +364,7 @@ public class XmlResponder {
 					"http://www.obm.org/xsd/sync/contact.xsd", "folder");
 			Element root = doc.getDocumentElement();
 			biw.appendFolder(root, ret);
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -365,7 +379,7 @@ public class XmlResponder {
 			"freeBusyRequest");
 			Element root = doc.getDocumentElement();
 			ciw.appendFreeBusyRequest(root, freeBusy);
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -382,7 +396,7 @@ public class XmlResponder {
 				Element e = DOMUtils.createElement(root, "freebusy");
 				ciw.appendFreeBusy(e, fb);
 			}
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -390,18 +404,18 @@ public class XmlResponder {
 	}
 
 	public String sendVacation(VacationSettings vs) {
-		return sendDom(siw.getVacationDOM(vs));
+		return emitResponse(siw.getVacationDOM(vs));
 	}
 
 	public String sendEmailForwarding(ForwardingSettings fs) {
-		return sendDom(siw.getForwardingDOM(fs));
+		return emitResponse(siw.getForwardingDOM(fs));
 	}
 
 	public String sendMailingList(MailingList ml) {
 		String res = "";
 		try {
 			Document doc = mliw.getMailingListsAsXML(ml);
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -412,7 +426,7 @@ public class XmlResponder {
 		String res = "";
 		try {
 			Document doc = mliw.getMailingListsAsXML(ret.toArray(new MailingList[0]));
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -423,7 +437,7 @@ public class XmlResponder {
 		String res = "";
 		try {
 			Document doc = mliw.getMailingListEmailsAsXML(ret);
-			res = sendDom(doc);
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
@@ -431,11 +445,11 @@ public class XmlResponder {
 	}
 
 	public void sendAddressBookChanges(AddressBookChangesResponse response) {
-		sendDom(biw.writeAddressBookChanges(response));
+		emitResponse(biw.writeAddressBookChanges(response));
 	}
 
 	public void sendlistAddressBooksChanged(FolderChanges folderChanges) {
-		sendDom(biw.writeListAddressBooksChanged(folderChanges));
+		emitResponse(biw.writeListAddressBooksChanged(folderChanges));
 	}
 
 }
