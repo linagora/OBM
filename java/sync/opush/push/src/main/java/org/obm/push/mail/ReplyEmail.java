@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
@@ -42,9 +43,19 @@ public class ReplyEmail extends SendEmail {
 		super(defaultFrom, message);
 		this.configuration = configuration;
 		this.mime4jUtils = mime4jUtils;
-		this.message = quoteAndAppendRepliedMail(originMail);
+		setNewMessage(quoteAndAppendRepliedMail(originMail));
 	}
 
+	private void setNewMessage(Message newMessage) throws ParserException, MimeException {
+		newMessage.setSender(this.message.getSender());
+		newMessage.setSubject(this.message.getSubject());
+		newMessage.setBcc(this.message.getBcc());
+		newMessage.setCc(this.message.getCc());
+		newMessage.setTo(this.message.getTo());
+		newMessage.setFrom(this.message.getFrom());
+		setMessage(newMessage);
+	}
+	
 	private Message quoteAndAppendRepliedMail(MSEmail originMail) throws NotQuotableEmailException {
 		String originalEmail = originMail.getBody().getValue(MSEmailBodyType.PlainText);
 		String originalEmailAsHtml = originMail.getBody().getValue(MSEmailBodyType.HTML);
@@ -59,10 +70,10 @@ public class ReplyEmail extends SendEmail {
 			String mimeType = originalMessage.getMimeType();
 			if (mime4jUtils.isMessagePlainText(originalMessage) && originalEmail != null) {
 				return createMessageWithBody(mimeType,
-						appendQuotedMailToPlainText((TextBody)originalMessage.getBody(), originalEmail));
+						appendQuotedMailToPlainText((TextBody)originalMessage.getBody(), originalEmail.trim()));
 			} else if (mime4jUtils.isMessageHtmlText(originalMessage) && originalEmailAsHtml != null) {
 				return createMessageWithBody(mimeType,
-						appendRepliedMailToHtml((TextBody)originalMessage.getBody(), originalEmailAsHtml));
+						appendRepliedMailToHtml((TextBody)originalMessage.getBody(), originalEmailAsHtml.trim()));
 			}
 		}
 		return message;
@@ -74,8 +85,8 @@ public class ReplyEmail extends SendEmail {
 
 		Multipart multipart = (Multipart)originalMessage.getBody();
 		TextBody quotedBodyText = quoteBodyText(originalEmail, multipart);
-		TextBody quotedBodyTextOverHtml = quoteBodyHtml(originalEmail, multipart);
-		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart);
+		TextBody quotedBodyTextOverHtml = quoteBodyHtml(originalEmail, multipart, false);
+		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart, true);
 		return buildSingleOrMultipartMessage(quotedBodyText, quotedBodyTextOverHtml, quotedBodyHtmlOverHtml);	
 	}
 
@@ -164,7 +175,7 @@ public class ReplyEmail extends SendEmail {
 		Entity textPlainPart = mime4jUtils.getFirstTextPlainPart(multipart);
 		if (textPlainPart != null && originalText != null) {
 			setOriginTextPlainPart(textPlainPart);
-			return appendQuotedMailToPlainText((TextBody)textPlainPart.getBody(), originalText);
+			return appendQuotedMailToPlainText((TextBody)textPlainPart.getBody(), originalText.trim());
 		}
 		return null;
 	}
@@ -173,18 +184,29 @@ public class ReplyEmail extends SendEmail {
 		this.originTextPlainPart = textPlainPart;
 	}
 
-	private TextBody quoteBodyHtml(String originalHtml, Multipart multipart) 
+	private TextBody quoteBodyHtml(String originalText, Multipart multipart, boolean originalIsHtml) 
 			throws NotQuotableEmailException {
 		Entity textHtmlPart = this.mime4jUtils.getFirstTextHTMLPart(multipart);
-		if (textHtmlPart != null && originalHtml != null) {
+		if (textHtmlPart != null && originalText != null) {
 			setTextHtmlPart(textHtmlPart);
-			return appendRepliedMailToHtml((TextBody)textHtmlPart.getBody(), originalHtml);
+			String htmlToQuote = originalIsHtml ? originalText.trim() : encodeTxtInHtml(originalText.trim());
+			return appendRepliedMailToHtml((TextBody)textHtmlPart.getBody(), htmlToQuote);
 		}
 		return null;
 	}
 	
 	private void setTextHtmlPart(Entity htmlTextPart) {
 		this.originTextHtmlPart = htmlTextPart;
+	}
+	
+	private String encodeTxtInHtml(String originalText) {
+		StringBuilder stringBuilder = new StringBuilder();
+		String lineHtml;
+		for (String line: Splitter.on('\n').split(originalText)) {
+			lineHtml = StringEscapeUtils.escapeHtml(line);
+			stringBuilder.append(lineHtml).append("<BR/>");
+		}
+		return stringBuilder.toString();
 	}
 
 	private TextBody appendQuotedMailToPlainText(TextBody plainTextPart, String repliedEmail) throws NotQuotableEmailException {
@@ -210,7 +232,6 @@ public class ReplyEmail extends SendEmail {
 			final InputSource originalSource = new InputSource(new StringReader(repliedEmail));
 
 			final Document replyHtmlDoc = DOMUtils.parseHtmlAsDocument(replySource);
-
 			final Node originalHtmlNode = DOMUtils.parseHtmlAsFragment(originalSource);
 
 			final Element quoteBlock = insertIntoQuoteblock(replyHtmlDoc, originalHtmlNode);

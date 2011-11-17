@@ -28,9 +28,9 @@ public class SendEmail {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final Set<Address> to;
-	private final Set<Address> cc;
-	private final Set<Address> cci;
+	private Set<Address> to;
+	private Set<Address> cc;
+	private Set<Address> cci;
 	private final String from;
 	protected final Message originalMessage;
 	protected Message message; 
@@ -41,15 +41,8 @@ public class SendEmail {
 	public SendEmail(String defaultFrom, Message message) throws ParserException, MimeException {
 		this.from = defaultFrom;
 		this.originalMessage = message;
-		this.message = message;
 		
-		this.to = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getTo()));
-		this.cc = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getCc()));
-		this.cci = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getBcc()));
-		filterHeaders(message.getHeader());
-		lookForInvitation(message);
-		this.hasFromField = false;
-		this.mimeData = serializeMimeData().toByteArray();
+		setMessage(message);
 	}
 
 	private void lookForInvitation(Entity entity) {
@@ -160,4 +153,14 @@ public class SendEmail {
 		return message;
 	}
 	
+	protected void setMessage(Message messageToSend) throws ParserException, MimeException {
+		this.message = messageToSend;
+		this.to = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getTo()));
+		this.cc = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getCc()));
+		this.cci = Sets.newHashSet(convertAddressListToRistretoAddresses(message.getBcc()));
+		filterHeaders(message.getHeader());
+		lookForInvitation(message);
+		this.hasFromField = false;
+		this.mimeData = serializeMimeData().toByteArray();
+	}
 }
