@@ -10,6 +10,11 @@ Package: obm-autoconf
 Architecture: all
 Pre-Depends: obm-conf
 Depends: obm-tomcat,  obm-munin-node
-Description: Thunderbird autoconfiguration service
- This java application provides the data need to autoconfigure
- thunderbird clients.
+Description: Icedove/Thunderbird autoconfiguration service for Open Business Management
+ This package contains a J2EE web service to autoconfigure Icedove/Thunderbird
+ clients for use with OBM.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.

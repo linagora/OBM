@@ -9,13 +9,24 @@ Homepage: http://www.obm.org
 Package: obm-satellite
 Architecture: all
 Depends: obm-conf ,libobmsatellite-perl (= ${binary:Version}), obm-munin-node, ucf, obm-certs, ${misc:Depends}
-Description: OBM Satellite installation
- OBM Satellote is small daemon to manage cyrus partion and postifx map
+Description: integration of OBM with Cyrus and Postfix
+ This package contains a daemon which manages Cyrus partitions and Postfix maps
+ for OBM. This package needs to be installed on each server containing
+ obm-postfix or obm-cyrus.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-Package: libobmsatellite-perl
 Section: perl
 Architecture: all
 Depends: libnet-server-perl, libnet-ldap-perl, libunicode-maputf8-perl, libio-socket-ssl-perl, libclass-singleton-perl, libxml-simple-perl, liblog-log4perl-perl, libmime-lite-perl, libmailtools-perl, libmime-types-perl, ${perl:Depends}, ${misc:Depends}
-Description: OBM satellite perl module
- Lib of obm-satellite
-
+Description: library for the integration of OBM with Cyrus and Postfix
+ This package contains the library used by obm-satellite to interact with Cyrus
+ and Postfix.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.

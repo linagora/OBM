@@ -9,5 +9,10 @@ Package: obm-jetty
 Architecture: all
 Pre-Depends: jetty
 Provides: obm-jetty
-Description: This package configures Jetty server. 
+Description: configuration for Jetty for Open Business Management
  It allows Jetty Server to start after its install and changes the port. 
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.

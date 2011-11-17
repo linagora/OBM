@@ -8,6 +8,10 @@ Standards-Version: 3.8.0
 Package: obm-ca
 Architecture: all
 Depends: openssl
-Description: OBM CA management scripts
- Script to manage a certification authority within obm
-
+Description: certification authority management for Open Business Management
+ This package contains scripts to handle SSL certificates for OBM.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.

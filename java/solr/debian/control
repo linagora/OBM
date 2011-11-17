@@ -9,6 +9,11 @@ Standards-Version: 3.7.8
 Package: obm-solr
 Architecture: all
 Depends: obm-tomcat, python-psycopg2, python-mysqldb, obm-conf
-Description: Solr indexing server
- Solr is an indexing web service based on lucene, configured as
- multicore for holding minig-backend index.
+Description: Solr indexing server for Open Business Management
+ Solr is an indexing web service based on Lucene, used to index contacts and
+ events in OBM.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.

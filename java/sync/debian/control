@@ -11,8 +11,14 @@ Package: obm-sync
 Architecture: all
 Pre-Depends: obm-conf, obm-tomcat
 Depends: obm-munin-node
-Description: OBM Sync server
- J2EE web application used to access OBM data from icedove, outlook, etc.
+Description: synchronization application for Open Business Management
+ This package contains a J2EE web application used to synchronize OBM data with
+ Icedove/Thunderbird, Outlook, etc.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 Package: opush
 Architecture: all
@@ -20,8 +26,14 @@ Depends: obm-conf, sun-java6-jdk, obm-jetty
 Provides: obm-opush
 Replaces: obm-opush ( << 2.3.3-1 )
 Conflicts: obm-opush ( << 2.3.3-1 )
-Description: Active Sync server
- o-push server is an Active Sync server for OBM.
+Description: Active Sync server for Open Business Management
+ This package synchronizes a Jetty web application to synchronize OBM data with
+ PDA and smartphones.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 Package: obm-opush
 Architecture: all
@@ -29,9 +41,20 @@ Depends: opush
 Description: Transitional package for opush
  This is a transitional package for opush, and can be safely removed
  after the installation is complete.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 Package: obm-locator
 Architecture: all
 Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty
-Description: Locator web services
-  Locator server for OBM.
+Description: Locator for Open Business Management
+ This package is a J2EE web service, which allows can be queried to retrieve
+ the location of an OBM component.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
