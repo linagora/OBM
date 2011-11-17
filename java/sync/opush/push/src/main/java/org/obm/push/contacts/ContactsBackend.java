@@ -1,8 +1,10 @@
 package org.obm.push.contacts;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.naming.NoPermissionException;
 
@@ -55,8 +57,10 @@ public class ContactsBackend extends ObmSyncBackend {
 			
 		FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
 		
-		for (Folder folder: folderChanges.getUpdated()) {
-			itemsChanged.add( createItemChange(bs, folder) );
+		Iterator<Folder> folderChangesSorted = 
+				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
+		while (folderChangesSorted.hasNext()) {
+			itemsChanged.add( createItemChange(bs, folderChangesSorted.next()) );
 		}
 		
 		for (Integer collectionId: folderChanges.getRemoved()) {
@@ -67,6 +71,12 @@ public class ContactsBackend extends ObmSyncBackend {
 		return new HierarchyItemsChanges(itemsChanged, itemsDeleted, folderChanges.getLastSync());
 	}
 	
+	private Iterator<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
+		TreeSet<Folder> treeSet = new TreeSet<Folder>( new ComparatorUsingFolderName(defaultAddressBookName) );
+		treeSet.addAll(folderChanges.getUpdated());
+		return treeSet.iterator();
+	}
+
 	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);

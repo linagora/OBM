@@ -72,11 +72,6 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 	
 	@Override
-	public void initHierarchyFolder(BackendSession bs) throws DaoException {
-		contactsBackend.createDefaultContactFolder(bs);
-	}
-	
-	@Override
 	public int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException {
 		return folderExporter.getServerIdFor(bs);
 	}
