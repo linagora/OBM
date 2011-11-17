@@ -496,7 +496,7 @@ if ($action == 'search') {
       if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
         run_query_calendar_quick_event_update($params);
       } else {
-        $id = run_query_calendar_event_exception_insert($params,$eve_q);
+        $id = run_query_calendar_event_exception_insert($params,$eve_q,true);
         if ( !$id ) {
 	  $id = $params['calendar_id'];
         }
@@ -549,7 +549,7 @@ if ($action == 'search') {
     if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
     	$deleted_evt_ids = run_query_calendar_delete($params,false);
     } else {
-      	run_query_calendar_event_exception_insert($params);
+      	run_query_calendar_event_exception_insert($params,'',true);
     }
 	
     json_ok_msg("$l_event : $l_delete_ok");

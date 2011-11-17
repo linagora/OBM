@@ -481,10 +481,10 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     //$retour = run_query_calendar_touch_event($event_id);
 
     // Send mail
-    if ($owner_notification == 'true') {
-      OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
-    }
-
+    $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
+    // Notify Observers  
+    OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
+    
   }
 
   return $retour;    
@@ -2376,7 +2376,7 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
  * @access public
  * @return mixed exception id if an exception event has been created in the event table, null otherwise
  */
-function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
+function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $from_quick_action = false) {
   global $cdg_sql, $obm;
 
   $title = sql_parse_text($calendar['title']);
@@ -2522,9 +2522,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(3)');
   $obm_q->query($query);
 
-  // Send mail session var
-  $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
-
   if ( $exception_id ) {
     $newEvent = OBM_EventFactory::getInstance()->getById($exception_id);
     $idsToIndex = array($id, $exception_id);
@@ -2532,8 +2529,14 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $newEvent = OBM_EventFactory::getInstance()->getById($id);
     $idsToIndex = array($id);
   }
-  // Notify Observers
-  OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+  
+  if($from_quick_action) {
+  	// Send mail session var
+  	$GLOBALS['send_notification_mail'] = $calendar['send_mail'];
+  	// Notify Observers
+  	OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+  }
+  
   // SOLR
   foreach ( $idsToIndex as $id ) {
     run_query_calendar_solr_store($id);
