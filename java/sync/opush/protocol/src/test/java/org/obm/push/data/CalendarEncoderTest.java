@@ -67,7 +67,7 @@ public class CalendarEncoderTest {
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>");
 		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:UID>46414330303031323344</Calendar:UID>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
 		expected.append("<AirSyncBase:Body>");
 		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
 		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
@@ -101,7 +101,7 @@ public class CalendarEncoderTest {
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>");
 		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:UID>46414330303031323344</Calendar:UID>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
 		expected.append("<Calendar:Attendees>");
 		expected.append("<Calendar:Attendee>");
 		expected.append("<Calendar:AttendeeEmail>adrien@test.tlse.lng</Calendar:AttendeeEmail>");

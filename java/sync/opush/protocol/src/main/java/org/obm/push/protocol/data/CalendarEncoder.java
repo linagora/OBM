@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.binary.Hex;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
@@ -20,8 +19,6 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
-
-import com.google.common.base.Charsets;
 
 public class CalendarEncoder extends Encoder implements IDataEncoder {
 
@@ -63,8 +60,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 		MSEventUid eventUid = ev.getUid();
 		if (eventUid != null) {
-			String eventUidAsString = eventUid.serializeToString();
-			s(p, "Calendar:UID", Hex.encodeHexString(eventUidAsString.getBytes(Charsets.US_ASCII)));
+			s(p, "Calendar:UID", eventUid.serializeToString());
 		} else {
 			throw new InvalidParameterException("a MSEvent must have an UID");
 		}
