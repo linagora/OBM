@@ -1,7 +1,7 @@
 Name: obm-tomcat
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
-Summary: OBM TOMCAT.
+Summary: the Tomcat web application server for Open Business Management
 Vendor: obm.org
 URL: http://www.obm.org
 Group: Applications/File
@@ -18,7 +18,13 @@ Requires(preun): chkconfig
 Requires(preun): initscripts
 
 %description -n obm-tomcat
-OBM Tomcat.
+This package contains the 6.0.20 version of the Apache Tomcat application
+server for OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %define _lib                   lib
 %define _libdir                %{_exec_prefix}/%{_lib}

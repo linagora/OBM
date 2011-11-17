@@ -1,7 +1,7 @@
 Name: obm-solr
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
-Summary: OBM solr
+Summary: Solr indexing server for Open Business Management
 Vendor: obm.org
 URL: http://www.minig.org
 Group: Applications/File
@@ -16,7 +16,13 @@ Requires:        obm-tomcat
 
 
 %description
-Solr for OBM Minig.
+Solr is an indexing web service based on Lucene, used to index contacts and
+events in OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %define _lib                   lib
 %define _libdir                %{_exec_prefix}/%{_lib}

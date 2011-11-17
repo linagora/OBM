@@ -1,7 +1,7 @@
 Name:           obm-satellite
 Version:        %{obm_version}
 Release:        %{obm_release}%{?dist}
-Summary:        Open Business Management Satellite
+Summary:        integration of OBM with Cyrus and Postfix
 
 Group:          Development/Languages
 License:        GPLv2
@@ -20,13 +20,19 @@ Requires:       obm-cert
 
 
 %description
-OBM satellite is daemon to handle cyrus partition and postfix maps.
+This package contains a daemon which manages Cyrus partitions and Postfix maps
+for OBM. This package needs to be installed on each server containing
+obm-postfix or obm-cyrus.
 
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 
 
 %package        -n perl-ObmSatellite
-Summary:        Perl libraries for OBM-Satellite
+Summary:        library for the integration of OBM with Cyrus and Postfix
 Group:          Development/Libraries
 License:        GPL2
 
@@ -40,7 +46,13 @@ Requires:       perl-Class-Singleton
 Requires:       perl-Digest-SHA
 
 %description    -n perl-ObmSatellite
-perl-ObmSatellite package contains OBM-Satellite libraries for perl
+This package contains the library used by obm-satellite to interact with Cyrus
+and Postfix.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 
 

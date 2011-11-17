@@ -1,7 +1,7 @@
 Name: obm-sync
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
-Summary: OBM JAVA.
+Summary: synchronization application for Open Business Management
 Vendor: obm.org
 URL: http://www.obm.org
 Group: Applications/File
@@ -19,38 +19,61 @@ Requires: obm-tomcat
 Requires: obm-config
 
 %description
-OBM sync
+This package contains a J2EE web application used to synchronize OBM data with
+Icedove/Thunderbird, Outlook, etc.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %define _lib                   lib
 %define _libdir                %{_exec_prefix}/%{_lib}
 
 %package -n opush
-Summary: OBM ActiveSync connector
+Summary: Active Sync server for Open Business Management
 Group:	Development/Tools
 Requires: java-devel >= 1.6.0
 Requires: obm-config
 Requires: obm-jetty
 
 %description -n opush
-OBM ActiveSync web services
+This package synchronizes a Jetty web application to synchronize OBM data with
+PDA and smartphones.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package -n obm-locator
-Summary: OBM Java component
+Summary: Locator for Open Business Management
 Group:	Development/Tools
 Requires: java-devel >= 1.6.0
 Requires: obm-config
 Requires: obm-jetty
 
 %description -n obm-locator
-Locate obm-sync server for user.
+This package is a J2EE web service, which allows can be queried to retrieve
+the location of an OBM component.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package -n obm-jetty
-Summary: OBM Jetty configuration
+Summary: configuration for Jetty for Open Business Management
 Group:	Development/Tools
 Requires: jetty6
 
 %description -n obm-jetty
-jetty configuration file for OBM
+It allows Jetty Server to start after its install and changes the port.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %prep
 %setup -q -n obm-java-%{version}

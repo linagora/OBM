@@ -20,25 +20,32 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 OBM certificate SSL
 
 %package	-n obm-ca
-Summary:	Genrerate CA and CS
+Summary:	certification authority management for Open Business Management
 Group:		Development/Tools
 Requires:	openssl
 
 %description 	-n obm-ca
-OBM CA management scripts
- Script to manage a certification authority within obm
+This package contains scripts to handle SSL certificates for OBM.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package	-n obm-cert
-Summary:	OBM certificat
+Summary:	configuration script for obm-ca
 Group:		Development/Tools
 Requires:	obm-ca
 Requires:	obm-config
 Requires:	mod_ssl
 
 %description	-n obm-cert
-OBM certificates
-Certicate generation for OBM
-Installation of OBM
+This package contains a configuration script for obm-ca
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %prep
 %setup -q -n obm-ca-%{version} 
