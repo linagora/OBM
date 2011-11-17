@@ -19,8 +19,8 @@ function run_query_calendar_detail($calendar_id) {
   if(preg_match('/^OBM-/', $calendar_id)) {
     $get_id = "event_ext_id = '".addslashes($calendar_id)."'";
   } else {
-    $calendar_id = sql_parse_id($calendar_id, true);
-    $get_id = "event_id $calendar_id";
+    $parsed_calendar_id = sql_parse_id($calendar_id, true);
+    $get_id = "event_id $parsed_calendar_id";
   }
 
   $obm_q = new DB_OBM;
@@ -82,7 +82,92 @@ function run_query_calendar_detail($calendar_id) {
     WHERE event_type='VEVENT'
     AND $get_id
     $multidomain";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
+  $obm_q->query($query);
+  if ( !$obm_q->num_rows() ) {
+    return run_query_calendar_detail_without_usercreate($calendar_id);
+  }
+  $obm_q->next_record();
 
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return events details, without the inner jointure on event_usercreate field :
+// if the usercreate is deleted other users can't see the event anymore (M3190)
+//
+// Parameters:
+//   - $calendar_id (can be Event table dependant if is_numeric(), or world-wide
+//                   unique if begins with "OBM-")
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_detail_without_usercreate($calendar_id) {
+  global $cdg_sql;
+
+  if(preg_match('/^OBM-/', $calendar_id)) {
+    $get_id = "event_ext_id = '".addslashes($calendar_id)."'";
+  } else {
+    $calendar_id = sql_parse_id($calendar_id, true);
+    $get_id = "event_id $calendar_id";
+  }
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type; 
+  $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('event');
+  $eventexception_sql_if = sql_if($db_type, 'ee.eventexception_parent_id IS  NULL', '0', '1');
+  $query = "SELECT
+    event_id,
+    event_ext_id,
+    event_userupdate,
+    event_usercreate,
+    e.evententity_entity_id AS event_entity_id,
+    '' AS usercreate,
+    u.userobm_login AS userupdate,
+    $timeupdate,
+    $timecreate,
+    event_owner,
+    o.userobm_lastname AS owner_lastname,
+    o.userobm_firstname AS owner_firstname,
+    d.domain_name AS owner_domain,
+    event_opacity,
+    event_title,
+    event_description,
+    event_properties,
+    event_repeatfrequence,
+    event_location,
+    event_category1_id,
+    eventcategory1_label,
+    event_privacy,
+    event_priority,
+    event_repeatkind,
+    event_duration,
+    event_repeatdays,
+    event_allday,
+    event_tag_id,
+    eventtag_color,
+    eventtag_label,
+    event_endrepeat,
+    event_domain_id,
+    event_origin,
+    event_allow_documents,
+    event_date,
+    $eventexception_sql_if AS event_is_exception,
+    ee.eventexception_parent_id AS event_eventexception_parent_id,
+    ee.eventexception_date AS event_eventexception_date,
+    event_sequence
+    FROM
+    Event
+    INNER JOIN EventEntity AS e ON event_id = evententity_event_id
+    LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+    LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
+    INNER JOIN UserObm AS o ON event_owner = o.userobm_id
+    INNER JOIN Domain AS d ON d.domain_id = o.userobm_domain_id
+    LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
+    LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
+    WHERE event_type='VEVENT'
+    AND $get_id
+    $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
