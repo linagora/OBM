@@ -1,3 +1,9 @@
+obm-funambol (2.4.0.0~rc13) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Tue, 18 Nov 2011 13:08:04 +0000
+
 obm-funambol (2.4.0.0~rc12) stable; urgency=low
 
   * New upstream release.
