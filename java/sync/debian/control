@@ -12,7 +12,7 @@ Architecture: all
 Pre-Depends: obm-conf, obm-tomcat
 Depends: obm-munin-node
 Description: synchronization application for Open Business Management
- This package contains a J2EE web application used to synchronize OBM data with
+ This package contains a J2E web application used to synchronize OBM data with
  Icedove/Thunderbird, Outlook, etc.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to
@@ -51,7 +51,7 @@ Package: obm-locator
 Architecture: all
 Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty
 Description: Locator for Open Business Management
- This package is a J2EE web service, which allows can be queried to retrieve
+ This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to

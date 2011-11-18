@@ -19,7 +19,7 @@ Requires: obm-tomcat
 Requires: obm-config
 
 %description
-This package contains a J2EE web application used to synchronize OBM data with
+This package contains a J2E web application used to synchronize OBM data with
 Icedove/Thunderbird, Outlook, etc.
 
 OBM is a global groupware, messaging and CRM application. It is intended to
@@ -54,7 +54,7 @@ Requires: obm-config
 Requires: obm-jetty
 
 %description -n obm-locator
-This package is a J2EE web service, which allows can be queried to retrieve
+This package is a J2E web service, which allows can be queried to retrieve
 the location of an OBM component.
 
 OBM is a global groupware, messaging and CRM application. It is intended to
