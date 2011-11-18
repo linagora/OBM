@@ -19,52 +19,6 @@ import sys
 
 import obm.build as ob
 
-def read_packages(config, checkout_dir):
-    """
-    Parses the package names for the configuration file and returns a list of
-    :class:`Package` objects. The *config* argument should be an instance of
-    :class:`ConfigParser.RawConfigParser`. The *checkout_dir* argument is the
-    directory where the files should be checkout out.
-    """
-    package_names = config.get('global', 'packages')
-    packages = []
-    for package_name in set(package_names.split(",")):
-        stripped_package_name = package_name.strip()
-
-        package_section_name = "package:%s" % stripped_package_name
-
-        package_path = None
-
-        end_of_path = None
-        if config.has_option(package_section_name, 'path'):
-            end_of_path = config.get(package_section_name, 'path')
-        else:
-            end_of_path = stripped_package_name
-        package_path = os.path.join(checkout_dir, end_of_path)
-
-        sub_packages = []
-        if config.has_option(package_section_name, 'sub-packages'): 
-            sub_package_names = config.get(package_section_name, 'sub-packages')
-            for sub_package_name in set(sub_package_names.split(",")):
-                stripped_sub_package_name = sub_package_name.strip()
-                
-                sub_package_section_name = "sub-package:%s" %\
-                        stripped_sub_package_name
-                if config.has_option(sub_package_section_name, 'source_path'):
-                    end_of_sub_package_path = config.get(sub_package_section_name,
-                            'source_path')
-                else:
-                    end_of_sub_package_path = stripped_sub_package_name
-                sub_package_path = os.path.join(package_path,
-                        end_of_sub_package_path)
-                sub_package = ob.SubPackage(stripped_sub_package_name,
-                        sub_package_path)
-                sub_packages.append(sub_package)
-
-        package = ob.Package(stripped_package_name, package_path, sub_packages)
-        packages.append(package)
-    return packages
-
 def build_argument_parser(args):
     """
     Builds the argument parser. The *args* parameters should be a list of parameters to
@@ -76,7 +30,7 @@ def build_argument_parser(args):
             default=False, action='store_true', dest='on_commit')
 
     parser.add_argument('-c', '--config', help='build configuration file',
-            default='build.cfg', dest='configuration_file')
+            default='build.cfg', dest='configuration_file', type=file)
 
     parser.add_argument('-V', '--version', help='version of OBM',
             default='2.4.0', dest='obm_version')
@@ -151,19 +105,6 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
         changelog_updater, version, release) for p in packages]
     return packagers
 
-def read_config(config_file):
-    """
-    Reads the configuration file *config_file*, which should be a path to a file
-    relative to the build script. Returns an instance of
-    :class:`ConfigParser.RawConfigParser`.
-    """
-    config_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-            config_file)
-    config = ConfigParser.RawConfigParser()
-    with open(config_filepath) as config_fd:
-        config.readfp(config_fd)
-    return config
-
 def assert_package_option_is_correct(usage, package_names, available_packages):
     """
     Checks that the list of packages selected is correct. If it's not the case,
@@ -196,13 +137,13 @@ def main():
     argument_parser = build_argument_parser(sys.argv)
     args = argument_parser.parse_args()
 
-    config = read_config(args.configuration_file)
+    config = ob.read_config(args.configuration_file)
 
     packages_dir = os.path.join(args.work_dir, args.package_type)
 
     checkout_dir = os.path.dirname(os.path.abspath('.'))
 
-    available_packages = read_packages(config, checkout_dir)
+    available_packages = ob.read_packages(config, checkout_dir)
 
     package_names = set(args.packages)
     assert_package_option_is_correct(argument_parser.format_usage(),

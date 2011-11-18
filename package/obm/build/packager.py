@@ -9,6 +9,7 @@ import sys
 import tarfile
 
 from packaging_error import PackagingError
+from package import get_changelog
 
 class Packager(object):
     """
@@ -37,11 +38,11 @@ class Packager(object):
         """
         if self.package_type == 'deb':
             self._copy()
-            self._update_deb_changelog()
+            self._update_changelog()
         elif self.package_type == 'rpm':
             self._copy()
             self._tar_all_sources()
-            self._update_rpm_changelog()
+            self._update_changelog()
         else:
             raise PackagingError("Unknown packaging type: %s" % \
                     self.package_type)
@@ -86,7 +87,7 @@ class Packager(object):
             self.package.path, self._target_dir))
         shutil.copytree(self.package.path, self._target_dir)
 
-    def _update_deb_changelog(self):
+    def _update_changelog(self):
         """
         Triggers the overwrite of the changelog. The value of
         *changelog_update_mode* determines whether the changelog updated is the
@@ -94,17 +95,11 @@ class Packager(object):
         in the build directory (`'update_changelog_in_build'`).
         """
         if self.changelog_updater:
-            debian_parent_dir = self._target_dir
-            changelog = os.path.join(debian_parent_dir, 'debian', 'changelog')
+            changelog = get_changelog(self.package.name, self.package_type, self._target_dir)
             if not os.path.exists(changelog):
                 raise PackagingError("No changelog for package %s (expected to "
                         "find one in %s)" % (self.package.name, changelog))
             self.changelog_updater.update(self.package.name, changelog)
-
-    def _update_rpm_changelog(self):
-        if self.changelog_updater:
-            spec = self._get_spec_path()
-            self.changelog_updater.update(self.package.name, spec)
 
     def _move_rpms_to_target_dir(self):
         # rpmbuild builds the RPMs in subdirectories, move them back to
