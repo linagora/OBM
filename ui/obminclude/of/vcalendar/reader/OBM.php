@@ -138,7 +138,7 @@ class Vcalendar_Reader_OBM {
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents),NULL,NULL,TRUE);
       while($exceptions->next_record()) {
-        $date = new Of_Date($exceptions->f('eventexception_date'));
+        $date = new Of_Date($exceptions->f('eventexception_date'), "GMT");
         $timezone = $exceptions->f('event_timezone');
         if ($timezone) $date->setOriginalTimeZone($timezone);
         $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $date);
