@@ -415,17 +415,17 @@ public class MailBackend extends ObmSyncBackend {
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
-			String collectionName = getCollectionPathFor(Integer
-					.parseInt(collectionId));
+			Integer collectionIdInt = Integer.parseInt(collectionId);
+			String collectionName = getCollectionPathFor(collectionIdInt);
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<InputStream> mail = emailManager.fetchMIMEMails(bs,
-					getCalendarClient(), collectionName, uids);
+
+			List<MSEmail> mail = emailManager.fetchMails(bs, getCalendarClient(), collectionIdInt, collectionName, uids);
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				InputStream originMail = mail.get(0);
+				MSEmail originMail = mail.get(0);
 				ForwardEmail forwardEmail = 
 						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message);
 				send(bs, forwardEmail, saveInSent);

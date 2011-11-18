@@ -83,18 +83,17 @@ public class ReplyEmailTest {
 	@Test
 	public void testReplyTextToTextFormated() throws IOException, MimeException, ParserException {
 		String replyText = "response text\r\r\rEnvoyé à partir de mon SuperPhone"; 
-		String replyTextExpected = "response text\r\n\r\n\r\nEnvoyé à partir de mon SuperPhone"; 
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
-		MessageImpl reply = MailTestsUtils.createMessagePlainText(mime4jUtils,replyText);
+		Message reply = MailTestsUtils.createMessagePlainText(mime4jUtils,replyText);
 
-		ReplyEmail replyEmail = new ReplyEmail(mime4jUtils, "from@linagora.test", original, reply);
-		MessageImpl message = replyEmail.getMimeMessage();
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
+		Message message = replyEmail.getMimeMessage();
 		Assertions.assertThat(message.isMultipart()).isFalse();
 		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
 		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains(replyTextExpected);
+		Assertions.assertThat(messageAsString).contains(replyText);
 		Assertions.assertThat(messageAsString).contains("\n> origin").contains("\n> Cordialement");
 	}
 	
