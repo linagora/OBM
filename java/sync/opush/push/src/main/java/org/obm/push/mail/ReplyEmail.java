@@ -22,7 +22,7 @@ public class ReplyEmail extends SendEmail {
 	public ReplyEmail(Mime4jUtils mime4jUtils, String defaultFrom, MSEmail originMail, Message message) throws ParserException, IOException, MimeException {
 		super(defaultFrom, message);
 		Body modifiedBody = quoteAndAppendRepliedMail(originMail);
-		Message newMessage = mime4jUtils.getNewMessage();
+		Message newMessage = mime4jUtils.createMessage();
 		newMessage.setBody(modifiedBody);
 		this.message = newMessage;
 	}

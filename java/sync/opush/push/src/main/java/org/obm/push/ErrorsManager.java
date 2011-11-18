@@ -73,7 +73,7 @@ public class ErrorsManager implements IErrorsManager {
 	private Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
 		Message mm = prepareMessageHeaders(bs, subject);
 		
-		Multipart multipart = mime4jUtils.getMixedMultiPart();
+		Multipart multipart = mime4jUtils.createMultiPartMixed();
 
 		BodyPart part = mime4jUtils.createTextPart(body.toString(), "plain");
 		multipart.addBodyPart(part);
@@ -92,7 +92,7 @@ public class ErrorsManager implements IErrorsManager {
 	}
 	
 	private Message prepareMessageHeaders(BackendSession bs, String subject) throws ParseException {
-		Message mm = mime4jUtils.getNewMessage();
+		Message mm = mime4jUtils.createMessage();
 		mm.createMessageId(getHostname());
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));

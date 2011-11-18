@@ -19,10 +19,10 @@ public class ForwardEmail extends SendEmail {
 	public ForwardEmail(Mime4jUtils mime4jUtils, String defaultFrom, InputStream forwarded, Message message) throws FileNotFoundException, IOException, ParserException, MimeException {
 		super(defaultFrom, message);
 		
-		mixedMultiPart = mime4jUtils.getMixedMultiPart();
+		mixedMultiPart = mime4jUtils.createMultiPartMixed();
 		mixedMultiPart.addBodyPart(this.message);
 		mime4jUtils.attach(mixedMultiPart, forwarded, forwardFilename, "rfc822");
-		Message newMessage = mime4jUtils.getNewMessage();
+		Message newMessage = mime4jUtils.createMessage();
 		newMessage.setBody(mixedMultiPart);
 		mimeData = serializeMimeData(newMessage).toByteArray();
 	}
