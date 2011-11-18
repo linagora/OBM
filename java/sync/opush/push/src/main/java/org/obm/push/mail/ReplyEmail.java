@@ -1,7 +1,9 @@
 package org.obm.push.mail;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.TransformerException;
@@ -33,6 +35,8 @@ import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
 
 public class ReplyEmail extends SendEmail {
+
+	private final static String EMAIL_LINEBREAKER = "\r\n";
 
 	private final Mime4jUtils mime4jUtils;
 	private final OpushConfigurationService configuration;
@@ -210,22 +214,40 @@ public class ReplyEmail extends SendEmail {
 	}
 
 	private TextBody appendQuotedMailToPlainText(TextBody plainTextPart, String repliedEmail) throws NotQuotableEmailException {
-		try {
-			String newMailContent = CharStreams.toString(plainTextPart.getReader());
-			StringBuilder stringBuilder = new StringBuilder(newMailContent);
-			
-			stringBuilder.append('\n');
-			for (String line: Splitter.on('\n').split(repliedEmail)) {
-				stringBuilder.append("\n> ").append(line);
-			}
+		try {	
+			StringBuilder bodyTextPlainBuilder = new StringBuilder();
+			Reader plainTextReader = plainTextPart.getReader();
+			bodyTextPlainBuilder.append(cleanLineBreaks(plainTextReader));
+			bodyTextPlainBuilder.append(quoteOnLineBreaks(repliedEmail));
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
-			return basicBodyFactory.textBody(stringBuilder.toString(), plainTextPart.getMimeCharset());
+			return basicBodyFactory.textBody(bodyTextPlainBuilder.toString(), plainTextPart.getMimeCharset());
 		} catch (IOException e) {
 			logger.error(e.getMessage(),e);
 			throw new NotQuotableEmailException("Text part isn't quotable", e);
 		}
 	}
+
+	private String quoteOnLineBreaks(String toQuote) throws IOException {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(EMAIL_LINEBREAKER);
+
+		List<String> linesWithoutTermination = CharStreams.readLines(new StringReader(toQuote));
+		for (String line: linesWithoutTermination) {
+			stringBuilder.append(EMAIL_LINEBREAKER).append("> ").append(line);
+		}
+		return stringBuilder.toString();
+	}
 	
+	private String cleanLineBreaks(Reader content) throws IOException {
+		// RFC 2821 2.3.7 : \r and \n are not supposed to be encountered alone 
+		List<String> linesWithoutTermination = CharStreams.readLines(content);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String line : linesWithoutTermination) {
+			stringBuilder.append(line).append(EMAIL_LINEBREAKER);
+		}
+		return stringBuilder.toString();
+	}
+
 	private TextBody appendRepliedMailToHtml(TextBody htmlPart, String repliedEmail) throws NotQuotableEmailException {
 		try {
 			final InputSource replySource = new InputSource(htmlPart.getReader());
@@ -262,5 +284,4 @@ public class ReplyEmail extends SendEmail {
         quoteBlock.appendChild(originalNodeToQuote);
         return quoteBlock;
 	}
-	
 }

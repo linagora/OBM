@@ -453,6 +453,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (ParserException e) {
 			throw new ProcessingEmailException(e);
+		} catch (NotQuotableEmailException e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 
