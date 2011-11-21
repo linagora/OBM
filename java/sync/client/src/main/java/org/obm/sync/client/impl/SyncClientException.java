@@ -61,7 +61,11 @@ public class SyncClientException {
 	}
 
 	private boolean documentIsError(Document doc) {
-		return doc.getDocumentElement().getNodeName().equals("error");
+		boolean isError = true;
+		if (doc != null && doc.getDocumentElement() != null) {
+			isError = doc.getDocumentElement().getNodeName().equals("error");
+		}
+		return isError;
 	}
 	
 	private String getErrorMessage(Document doc) {
