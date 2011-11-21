@@ -19,6 +19,7 @@ import org.columba.ristretto.message.Address;
 import org.minig.imap.IMAPException;
 import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.IInvitationFilterManager;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
@@ -130,6 +131,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 	
@@ -178,6 +181,8 @@ public class MailBackend extends ObmSyncBackend {
 			}
 			return itch.build();
 		} catch (IMAPException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
@@ -236,6 +241,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 
@@ -264,6 +271,8 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		}		
 	}
@@ -295,6 +304,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 
@@ -313,6 +324,8 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
@@ -369,6 +382,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (UnknownObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 
@@ -405,6 +420,8 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (UnknownObmSyncServerException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -481,6 +498,8 @@ public class MailBackend extends ObmSyncBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 
@@ -536,6 +555,8 @@ public class MailBackend extends ObmSyncBackend {
 				throw new ProcessingEmailException(e);
 			} catch (DaoException e) {
 				throw new ProcessingEmailException(e);
+			} catch (LocatorClientException e) {
+				throw new ProcessingEmailException(e);
 			}
 		}
 		
@@ -560,6 +581,8 @@ public class MailBackend extends ObmSyncBackend {
 		} catch (IMAPException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}

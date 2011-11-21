@@ -1,5 +1,6 @@
 package org.obm.sync;
 
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 
 import com.google.inject.Inject;
@@ -22,7 +23,7 @@ public class ObmSmtpConfImpl implements ObmSmtpConf {
 	}
 	
 	@Override
-	public String getServerAddr(String domain) {
+	public String getServerAddr(String domain) throws LocatorClientException {
 		return locatorService.getServiceLocation("mail/smtp_out", domain);
 	}
 	

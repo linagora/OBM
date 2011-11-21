@@ -46,6 +46,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
@@ -1359,7 +1360,9 @@ public class ContactDao {
 		return ret;
 	}
 
-	private List<Contact> searchContact(AccessToken at, List<AddressBook> addrBooks, Connection con, String querys, int limit) throws MalformedURLException, SQLException {
+	private List<Contact> searchContact(AccessToken at, List<AddressBook> addrBooks, Connection con, String querys, int limit) 
+			throws MalformedURLException, SQLException, LocatorClientException {
+		
 		List<Contact> ret = new LinkedList<Contact>();
 		Set<Integer> evtIds = new HashSet<Integer>();
 

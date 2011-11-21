@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
@@ -72,7 +73,7 @@ public class SolrHelper {
 			debugTimer.cancel();
 		}
 
-		public SolrHelper createClient(AccessToken at) throws MalformedURLException {
+		public SolrHelper createClient(AccessToken at) throws MalformedURLException, LocatorClientException {
 			return new SolrHelper(at, locatorService, client, executor, contactIndexerFactory, eventIndexerFactory);
 		}
 	}
@@ -85,7 +86,8 @@ public class SolrHelper {
 	private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
 
 	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, ExecutorService executor, 
-			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) throws MalformedURLException {
+			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) 
+					throws MalformedURLException, LocatorClientException {
 		
 		this.eventIndexerFactory = eventIndexerFactory;
 		this.domain = at.getDomainId();

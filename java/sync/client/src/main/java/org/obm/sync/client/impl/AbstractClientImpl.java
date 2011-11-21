@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
 
+import javax.xml.parsers.FactoryConfigurationError;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodRetryHandler;
@@ -12,6 +14,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.obm.locator.LocatorClientException;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
@@ -22,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -63,21 +67,24 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return ret;
 	}
 
-	protected Document execute(AccessToken token, String action,
-			Multimap<String, String> parameters) {
-		
-		PostMethod pm = new PostMethod(getBackendUrl(token.getUserWithDomain()) + action);
-		pm.setRequestHeader("Content-Type",
-				"application/x-www-form-urlencoded; charset=utf-8");
+	protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
+		PostMethod pm = null;
 		try {
+			pm = getPostMethod(token, action);
 			InputStream is = executeStream(pm, parameters);
 			if (is != null) {
 				return DOMUtils.parse(is);
 			}
-		} catch (Exception e) {
+		} catch (LocatorClientException e) {
+			logger.error(e.getMessage(), e);
+		} catch (SAXException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (FactoryConfigurationError e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			pm.releaseConnection();
+			releaseConnection(pm);
 		}
 		return null;
 	}
@@ -114,12 +121,14 @@ public abstract class AbstractClientImpl implements ISyncClient {
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
-		PostMethod pm = new PostMethod(getBackendUrl(at.getUserWithDomain()) + action);
-		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+		PostMethod pm = null; 
 		try {
+			pm = getPostMethod(at, action);
 			executeStream(pm, parameters);
+		} catch (LocatorClientException e) {
+			logger.error(e.getMessage(), e);
 		} finally {
-			pm.releaseConnection();
+			releaseConnection(pm);
 		}
 	}
 
@@ -153,9 +162,22 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		executeVoid(at, "/login/doLogout", params);
 	}
 	
-	private String getBackendUrl(String loginAtDomain) {
+	private String getBackendUrl(String loginAtDomain) throws LocatorClientException {
 		Locator locator = getLocator();
 		return locator.backendUrl(loginAtDomain);
+	}
+	
+	private PostMethod getPostMethod(AccessToken at, String action) throws LocatorClientException {
+		String backendUrl = getBackendUrl(at.getUserWithDomain());
+		PostMethod pm = new PostMethod(backendUrl + action );
+		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+		return pm;
+	}
+	
+	private void releaseConnection(PostMethod pm){
+		if (pm != null) {
+			pm.releaseConnection();
+		}
 	}
 
 }

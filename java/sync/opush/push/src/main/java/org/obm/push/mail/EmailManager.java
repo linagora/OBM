@@ -39,6 +39,7 @@ import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
@@ -95,14 +96,14 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public String locateImap(BackendSession bs) {
+	public String locateImap(BackendSession bs) throws LocatorClientException {
 		String locateImap = locatorService.
 				getServiceLocation("mail/imap_frontend", bs.getLoginAtDomain());
 		logger.info("Using {} as imap host.", locateImap);
 		return locateImap;
 	}
 
-	private StoreClient getImapClient(BackendSession bs) {
+	private StoreClient getImapClient(BackendSession bs) throws LocatorClientException {
 		final String imapHost = locateImap(bs);
 		final String login = getLogin(bs);
 		StoreClient storeClient = new StoreClient(imapHost, 143, login, bs.getPassword()); 
@@ -127,7 +128,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public MailChanges getSync(BackendSession bs, SyncState syncState, Integer deviceId, Integer collectionId, String collectionName) 
-			throws IMAPException, DaoException {
+			throws IMAPException, DaoException, LocatorClientException {
 		
 		StoreClient store = getImapClient(bs);
 		try {
@@ -141,7 +142,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public List<MSEmail> fetchMails(BackendSession bs, AbstractEventSyncClient calendarClient, Integer collectionId, 
-			String collectionName, Collection<Long> uids) throws IMAPException {
+			String collectionName, Collection<Long> uids) throws IMAPException, LocatorClientException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
 		final StoreClient store = getImapClient(bs);
@@ -167,7 +168,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws IMAPException {
+	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws IMAPException, LocatorClientException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -184,7 +185,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public String parseMailBoxName(BackendSession bs, String collectionName) throws IMAPException {
+	public String parseMailBoxName(BackendSession bs, String collectionName) throws IMAPException, LocatorClientException {
 		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent
 		StoreClient store = getImapClient(bs);
 		try {
@@ -213,7 +214,7 @@ public class EmailManager implements IEmailManager {
 	 
 	@Override
 	public void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) 
-			throws IMAPException, DaoException {
+			throws IMAPException, DaoException, LocatorClientException {
 		
 		StoreClient store = getImapClient(bs);
 		try {
@@ -232,7 +233,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
-			Long uid) throws IMAPException, DaoException {
+			Long uid) throws IMAPException, DaoException, LocatorClientException {
 		
 		StoreClient store = getImapClient(bs);
 		Collection<Long> newUid = null;
@@ -261,7 +262,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public List<InputStream> fetchMIMEMails(BackendSession bs, AbstractEventSyncClient calendarClient, String collectionName, 
-			Set<Long> uids) throws IMAPException {
+			Set<Long> uids) throws IMAPException, LocatorClientException {
 		
 		List<InputStream> mails = new LinkedList<InputStream>();
 		StoreClient store = getImapClient(bs);
@@ -284,7 +285,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws IMAPException {
+	public void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws IMAPException, LocatorClientException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -327,6 +328,8 @@ public class EmailManager implements IEmailManager {
 			
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
 		} finally {
 			closeStream(streamMail);
 		}
@@ -347,7 +350,7 @@ public class EmailManager implements IEmailManager {
 	}
 	
 	@Override
-	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws IMAPException {
+	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws IMAPException, LocatorClientException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
@@ -360,7 +363,9 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public void purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws IMAPException, DaoException {
+	public void purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) 
+			throws IMAPException, DaoException, LocatorClientException {
+		
 		long time = System.currentTimeMillis();
 		StoreClient store = getImapClient(bs);
 		try {
@@ -383,7 +388,9 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws StoreEmailException {
+	public Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) 
+			throws StoreEmailException, LocatorClientException {
+		
 		logger.info("Store mail in folder[Inbox]");
 		StoreClient store = getImapClient(bs);
 		try {
@@ -405,7 +412,7 @@ public class EmailManager implements IEmailManager {
 	 * @return the imap uid of the mail
 	 * @throws StoreEmailException
 	 */
-	private Long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException {
+	private Long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException, LocatorClientException {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);

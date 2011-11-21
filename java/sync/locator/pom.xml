@@ -32,6 +32,10 @@
 			<artifactId>common</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

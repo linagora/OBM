@@ -11,6 +11,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.obm.locator.LocatorClientException;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -25,7 +27,7 @@ public class ObmSmtpProvider {
 	}
 	
 	public void sendMessage(String domain, Charset charset, String from, String subject, 
-							String HtmlMessage, Collection<String> recipients) throws MessagingException {
+							String HtmlMessage, Collection<String> recipients) throws MessagingException, LocatorClientException {
 		Session session = buildSession(domain);
 		MimeMessage message = prepareMessage(session, charset, from, subject, HtmlMessage, recipients);
 		sendEmail(session, message);
@@ -58,7 +60,7 @@ public class ObmSmtpProvider {
 		}
     }
 
-	private Session buildSession(String domain) {
+	private Session buildSession(String domain) throws LocatorClientException {
 		Properties properties = new Properties();
 		properties.put("mail.smtp.host", conf.getServerAddr(domain));	
 		properties.put("mail.smtp.port", conf.getServerPort(domain));

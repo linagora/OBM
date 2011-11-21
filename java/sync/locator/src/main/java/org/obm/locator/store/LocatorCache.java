@@ -5,9 +5,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.ObmConfigurationService;
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,11 +20,14 @@ import com.google.inject.Singleton;
 @Singleton
 public class LocatorCache implements LocatorService {
 
+	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
+	private static final String DEFAULT_VALUE = new String();
+	
 	private final Map<Key, String> store;
 	private final LocatorClientImpl locatorClientImpl;
 
 	@Inject
-	private LocatorCache(ObmConfigurationService obmConfigurationService, LocatorClientImpl locatorClientImpl) {
+	/* package */ LocatorCache(ObmConfigurationService obmConfigurationService, LocatorClientImpl locatorClientImpl) {
 		this.locatorClientImpl = locatorClientImpl;
 		this.store = createStore(obmConfigurationService.getLocatorCacheTimeout(), 
 							   obmConfigurationService.getLocatorCacheTimeUnit()); 
@@ -32,15 +39,32 @@ public class LocatorCache implements LocatorService {
 	    .makeComputingMap(new Function<Key, String>() {
 	        @Override
 	        public String apply(Key key) {
-	            return locatorClientImpl.
-	            		getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
+	            String value = getServiceLocation(key);
+	        	if (value != null) {
+	        		return value;
+	        	}
+	        	return DEFAULT_VALUE;
 	        }
 	    });
 	}
 
+	private String getServiceLocation(Key key) {
+    	try {
+			return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
+    	} catch (LocatorClientException e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	@Override
-	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) {
-		return store.get(new Key(serviceSlashProperty, loginAtDomain));
+	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
+		Key key = new Key(serviceSlashProperty, loginAtDomain);
+		String value = store.get(key);
+		if (value == DEFAULT_VALUE) {
+			throw new LocatorClientException("No host for { " + key.toString() + " }");
+		}
+		return value;
 	}
 	
 	private class Key implements Serializable {
@@ -61,35 +85,28 @@ public class LocatorCache implements LocatorService {
 		}
 
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((loginAtDomain == null) ? 0 : loginAtDomain.hashCode());
-			result = prime * result + ((serviceSlashProperty == null) ? 0 : serviceSlashProperty.hashCode());
-			return result;
+		public int hashCode(){
+			return Objects.hashCode(serviceSlashProperty, loginAtDomain);
+		}
+		
+		@Override
+		public boolean equals(Object object){
+			if (object instanceof Key) {
+				Key that = (Key) object;
+				return Objects.equal(this.serviceSlashProperty, that.serviceSlashProperty)
+					&& Objects.equal(this.loginAtDomain, that.loginAtDomain);
+			}
+			return false;
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Key other = (Key) obj;
-			if (loginAtDomain == null) {
-				if (other.loginAtDomain != null)
-					return false;
-			} else if (!loginAtDomain.equals(other.loginAtDomain))
-				return false;
-			if (serviceSlashProperty == null) {
-				if (other.serviceSlashProperty != null)
-					return false;
-			} else if (!serviceSlashProperty.equals(other.serviceSlashProperty))
-				return false;
-			return true;
+		public String toString() {
+			return Objects.toStringHelper(this)
+				.add("serviceSlashProperty", serviceSlashProperty)
+				.add("loginAtDomain", loginAtDomain)
+				.toString();
 		}
+		
 	}
 
 }

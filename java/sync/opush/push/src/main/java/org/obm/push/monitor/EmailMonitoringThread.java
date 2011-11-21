@@ -9,6 +9,7 @@ import org.minig.imap.IdleClient;
 import org.minig.imap.idle.IIdleCallback;
 import org.minig.imap.idle.IdleLine;
 import org.minig.imap.idle.IdleTag;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
@@ -48,7 +49,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 		collectionName = backend.getCollectionPathFor(collectionId);
 	}
 
-	public synchronized void startIdle() throws IMAPException {
+	public synchronized void startIdle() throws IMAPException, LocatorClientException {
 		if (store == null) {
 			store = getIdleClient(bs);
 			store.login(emailManager.getActivateTLS());
@@ -92,7 +93,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 		pushNotifyList.add(new PushNotification(ccl));
 	}
 	
-	private IdleClient getIdleClient(BackendSession bs) {
+	private IdleClient getIdleClient(BackendSession bs) throws LocatorClientException {
 		String login = bs.getLoginAtDomain();
 		boolean useDomain = emailManager.getLoginWithDomain();
 		if (!useDomain) {
@@ -120,6 +121,9 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 			try {
 				startIdle();
 			} catch (IMAPException e) {
+				logger.error("SEND ERROR TO PDA",e );
+				//TODO SEND ERROR TO PDA
+			} catch (LocatorClientException e) {
 				logger.error("SEND ERROR TO PDA",e );
 				//TODO SEND ERROR TO PDA
 			}	

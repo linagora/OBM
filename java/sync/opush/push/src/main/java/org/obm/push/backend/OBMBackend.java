@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.minig.imap.IMAPException;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
@@ -106,6 +107,8 @@ public class OBMBackend implements IBackend {
 		} catch (DaoException e) {
 			stopIdle(emt, collectionId, e);
 		} catch (IMAPException e) {
+			stopIdle(emt, collectionId, e);
+		} catch (LocatorClientException e) {
 			stopIdle(emt, collectionId, e);
 		}
 	}

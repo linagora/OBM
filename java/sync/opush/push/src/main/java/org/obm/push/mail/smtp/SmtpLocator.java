@@ -1,6 +1,7 @@
 package org.obm.push.mail.smtp;
 
 import org.columba.ristretto.smtp.SMTPProtocol;
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SmtpLocatorException;
@@ -21,16 +22,15 @@ public class SmtpLocator {
 		this.locatorService = locatorService;
 	}
 	
-	public SMTPProtocol getSmtpClient(BackendSession bs)
-			throws SmtpLocatorException {
-		String smtpHost = locatorService.getServiceLocation("mail/smtp_out",
-				bs.getLoginAtDomain());
-		if (smtpHost == null) {
-			throw new SmtpLocatorException("Smtp server cannot be discovered");
+	public SMTPProtocol getSmtpClient(BackendSession bs) throws SmtpLocatorException {
+		try {
+			String smtpHost = locatorService.getServiceLocation("mail/smtp_out", bs.getLoginAtDomain());
+			logger.info("Using " + smtpHost + " as smtp host.");
+			SMTPProtocol proto = new SMTPProtocol(smtpHost);
+			return proto;
+		} catch (LocatorClientException e) {
+			throw new SmtpLocatorException("Smtp server cannot be discovered", e);
 		}
-		logger.info("Using " + smtpHost + " as smtp host.");
-		SMTPProtocol proto = new SMTPProtocol(smtpHost);
-		return proto;
 	}
 
 }
