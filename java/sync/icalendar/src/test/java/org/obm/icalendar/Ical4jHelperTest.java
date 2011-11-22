@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.utils;
+package org.obm.icalendar;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -89,6 +89,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.junit.internal.matchers.TypeSafeMatcher;
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;

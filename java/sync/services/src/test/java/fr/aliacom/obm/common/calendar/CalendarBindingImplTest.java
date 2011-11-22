@@ -53,6 +53,7 @@ import org.easymock.EasyMock;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -73,7 +74,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
-import fr.aliacom.obm.utils.Ical4jHelper;
 
 public class CalendarBindingImplTest {
 

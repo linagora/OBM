@@ -138,6 +138,11 @@
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>icalendar</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

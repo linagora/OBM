@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.utils;
+package org.obm.icalendar;
 
 import java.io.IOException;
 import java.io.StringReader;

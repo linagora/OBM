@@ -54,6 +54,7 @@ import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.DateTime;
 
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
@@ -104,7 +105,6 @@ import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;

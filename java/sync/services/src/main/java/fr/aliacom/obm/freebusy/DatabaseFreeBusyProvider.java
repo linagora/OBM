@@ -33,6 +33,7 @@ package fr.aliacom.obm.freebusy;
 
 import java.util.List;
 
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 
@@ -44,7 +45,6 @@ import fr.aliacom.obm.common.domain.DomainDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.Ical4jHelper;
 
 /**
  * Retrieves freebusy data from the local database.

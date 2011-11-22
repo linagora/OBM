@@ -61,6 +61,7 @@ import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -76,7 +77,6 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.utils.Ical4jHelper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 

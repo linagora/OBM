@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
@@ -54,7 +55,6 @@ import com.linagora.obm.sync.Producer;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.utils.Ical4jHelper;
 
 
 public abstract class AbstractEventChangeHandlerTest {
