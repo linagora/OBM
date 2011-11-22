@@ -2324,7 +2324,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
     $ext_id = $event_q->f('event_ext_id');
-    $organizer = $calendar['organizer'] ? $calendar['organizer'] : $obm['uid'];
+    $oldOwner = intval($oldEvent->get("owner")->__toString());
 
     $sequence_number = $event_q->f('event_sequence');
     # Increment sequence number, just like we do in OBM-Sync
@@ -2364,7 +2364,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       $obm[uid],
       'VEVENT',
       '$GLOBALS[c_origin_web]',
-      $organizer,
+      $oldOwner,
       '".Of_Date::getOption('timezone')."',
       '$title',
       '$datebegin',
@@ -2393,9 +2393,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     foreach ($entities as $entity => $data) {
       foreach ($data['entity'] as $entity_id => $entity_data) {
         # Ensure that both the new exception, the recurring event and the old
-        # exceptions have the same participation state
+        # exceptions have the same participation state and organizer.
         run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $entity_data['state']);
-        run_query_calendar_insert_entity_event($entity, $entity_id, $exception_id, $entity_data['state']);
+        run_query_calendar_insert_entity_event($entity, $entity_id, $exception_id, $entity_data['state'], $entity_data['is_organizer']);
       }
     }
   }
