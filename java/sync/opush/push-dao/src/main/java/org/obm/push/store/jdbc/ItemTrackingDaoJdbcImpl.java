@@ -27,6 +27,18 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 	
 	@Override
 	public void markAsSynced(SyncState syncState, Set<ServerId> serverIds) throws DaoException {
+		markItems(syncState, serverIds, true);
+	}
+
+
+	@Override
+	public void markAsDeleted(SyncState syncState, Set<ServerId> serverIds)
+			throws DaoException {
+		markItems(syncState, serverIds, false);
+	}
+	
+	private void markItems(SyncState syncState, Set<ServerId> serverIds, boolean addition)
+			throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -34,11 +46,12 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 			con = dbcp.getConnection();
 			
 			PreparedStatement insert = con.prepareStatement(
-					"INSERT INTO opush_synced_item (sync_state_id, item_id) VALUES (?, ?)");
+					"INSERT INTO opush_synced_item (sync_state_id, item_id, addition) VALUES (?, ?, ?)");
 			for (ServerId serverId: serverIds) {
 				checkServerId(serverId);
 				insert.setInt(1, syncState.getId());
 				insert.setInt(2, serverId.getItemId());
+				insert.setBoolean(3, addition);
 				insert.addBatch();
 			}
 			insert.executeBatch();
@@ -47,7 +60,6 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
-
 	}
 
 	private void checkServerId(ServerId serverId) {
@@ -85,7 +97,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 	private PreparedStatement selectServerId(Connection con)
 			throws SQLException {
 		PreparedStatement select = con.prepareStatement(
-				"SELECT 1 FROM opush_sync_state " +
+				"SELECT item.addition FROM opush_sync_state " +
 				"INNER JOIN opush_sync_state AS states ON " +
 				"(states.last_sync <= opush_sync_state.last_sync " +
 				"AND states.collection_id = opush_sync_state.collection_id " +
@@ -93,7 +105,8 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 				"INNER JOIN opush_synced_item AS item ON (states.id = item.sync_state_id) " +
 				"WHERE item.item_id = ? " +
 				"AND states.id = item.sync_state_id " +
-				"AND opush_sync_state.id = ?");
+				"AND opush_sync_state.id = ? " +
+				"ORDER BY (states.last_sync) DESC LIMIT 1");
 		return select;
 	}
 	
@@ -118,7 +131,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		select.setInt(2, syncState.getId());
 		ResultSet resultSet = select.executeQuery();
 		if (resultSet.next()) {
-			return true;
+			return resultSet.getBoolean("addition");
 		} else {
 			return false;
 		}
