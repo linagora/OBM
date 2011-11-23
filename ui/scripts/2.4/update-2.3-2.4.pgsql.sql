@@ -402,6 +402,11 @@ $BODY$
 UPDATE event SET event_ext_id=generate_uuid() WHERE event_ext_id IS NULL;
 ALTER TABLE event ALTER event_ext_id SET NOT NULL;
 
+ALTER TABLE opush_synced_item ADD COLUMN addition BOOLEAN;
+UPDATE opush_synced_item SET addition='1';
+ALTER TABLE opush_synced_item ALTER addition SET NOT NULL;
+
+
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

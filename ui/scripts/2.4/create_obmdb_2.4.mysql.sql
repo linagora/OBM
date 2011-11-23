@@ -3743,6 +3743,7 @@ CREATE TABLE `opush_synced_item` (
        `id` INTEGER NOT NULL auto_increment,
        `sync_state_id`	  INTEGER NOT NULL,
        `item_id`          INTEGER NOT NULL,
+       `addition`	  BOOLEAN NOT NULL,
        PRIMARY KEY  (`id`),
        KEY `opush_synced_item_sync_state_id_opush_sync_state_id_fkey` (`sync_state_id`),
        CONSTRAINT `opush_synced_item_sync_state_id_opush_sync_state_id_fkey` FOREIGN KEY (`sync_state_id`) REFERENCES `opush_sync_state` (`id`) ON DELETE CASCADE

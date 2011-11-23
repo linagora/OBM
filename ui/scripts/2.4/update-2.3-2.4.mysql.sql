@@ -331,6 +331,10 @@ ALTER TABLE `opush_invitation_mapping` ADD CONSTRAINT `opush_invitation_mapping_
 UPDATE Event SET event_ext_id=UUID() WHERE event_ext_id IS NULL;
 ALTER TABLE Event MODIFY event_ext_id varchar(300) NOT NULL;
 
+ALTER TABLE `opush_synced_item` ADD COLUMN `addition` BOOLEAN;
+UPDATE `opush_synced_item` SET `addition`='1';
+ALTER TABLE `opush_synced_item` MODIFY `addition` BOOLEAN NOT NULL;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------

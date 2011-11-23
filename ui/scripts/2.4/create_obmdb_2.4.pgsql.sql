@@ -11596,7 +11596,8 @@ CREATE TABLE opush_sync_state (
 CREATE TABLE opush_synced_item (
        id		SERIAL PRIMARY KEY,
        sync_state_id	INTEGER NOT NULL REFERENCES opush_sync_state(id) ON DELETE CASCADE,
-       item_id		INTEGER NOT NULL
+       item_id		INTEGER NOT NULL,
+       addition		BOOLEAN NOT NULL
 );
 
 CREATE TABLE opush_sec_policy (
