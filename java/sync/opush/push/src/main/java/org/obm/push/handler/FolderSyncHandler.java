@@ -105,7 +105,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		try {
 			if (isFirstSync(folderSyncRequest)) {
 				List<ItemChange> changed = hierarchyExporter.getChanged(bs);
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
+				ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
 				return new FolderSyncResponse(changed, newSyncKey);
 			} else {
 				String syncKey = folderSyncRequest.getSyncKey();
@@ -114,7 +115,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 					throw new InvalidSyncKeyException(syncKey);
 				}
 				ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
-				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed);
+				ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+				String newSyncKey = stMachine.allocateNewSyncKey(bs, rootFolderCollectionId, null, changed, deleted);
 				return new FolderSyncResponse(changed, newSyncKey);
 			}
 		} catch (CollectionNotFoundException e) {

@@ -39,6 +39,7 @@ import org.obm.sync.calendar.EventObmId;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class SyncHandlerTest {
 	
@@ -87,7 +88,7 @@ public class SyncHandlerTest {
 		StateMachine stateMachine = EasyMock.createMock(StateMachine.class); 
 		stateMachine.getSyncState(syncKey);
 		EasyMock.expectLastCall().andReturn(syncState);
-		stateMachine.allocateNewSyncKey(bs, collectionId, null, itemChanges);
+		stateMachine.allocateNewSyncKey(bs, collectionId, null, itemChanges, ImmutableSet.<ItemChange>of());
 		EasyMock.expectLastCall().andReturn("newSyncKey");
 		
 		IBackend backend = EasyMock.createMock(IBackend.class);

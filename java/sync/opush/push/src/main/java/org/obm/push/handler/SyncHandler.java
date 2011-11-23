@@ -471,7 +471,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				syncCollectionResponse.setItemChanges(itemChanges);
 			}
 			identifyNewItems(syncCollectionResponse, st);
-			String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), syncDate, syncCollectionResponse.getItemChanges());
+			String newSyncKey = 
+					stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), syncDate, 
+							syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion());
 			syncCollectionResponse.setNewSyncKey(newSyncKey);
 		}
 	}
@@ -483,7 +485,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		backend.resetCollection(bs, syncCollection.getCollectionId());
 		syncCollectionResponse.setSyncStateValid(true);
-		String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), null, ImmutableList.<ItemChange>of());
+		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
+		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+		String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), null, changed, deleted);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 

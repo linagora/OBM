@@ -41,7 +41,8 @@ public class StateMachine {
 		return collectionDao.findStateForKey(syncKey);
 	}
 
-	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, Collection<ItemChange> changes) 
+	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, 
+			Collection<ItemChange> changes, Collection<ItemChange> deletedItems) 
 			throws CollectionNotFoundException, DaoException, InvalidServerId {
 		
 		final String newSk = UUID.randomUUID().toString();
@@ -53,10 +54,21 @@ public class StateMachine {
 		if (changes != null && !changes.isEmpty()) {
 			itemTrackingDao.markAsSynced(newState, listNewItems(changes));
 		}
+		if (deletedItems != null && !deletedItems.isEmpty()) {
+			itemTrackingDao.markAsDeleted(newState, itemChangesAsServerIdSet(deletedItems));
+		}
 		
 		return newSk;
 	}
 
+	private Set<ServerId> itemChangesAsServerIdSet(Iterable<ItemChange> changes) throws InvalidServerId {
+		Set<ServerId> ids = Sets.newHashSet();
+		for (ItemChange change: changes) {
+			ids.add(new ServerId(change.getServerId()));
+		}
+		return ids;
+	}
+	
 	private Set<ServerId> listNewItems(Collection<ItemChange> changes) throws InvalidServerId {
 		HashSet<ServerId> serverIds = Sets.newHashSet();
 		for (ItemChange change: changes) {
