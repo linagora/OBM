@@ -56,6 +56,7 @@ import fr.aliacom.obm.utils.Ical4jHelper;
 	EventChangeHandlerTest.DeleteTests.class, 
 	EventChangeHandlerTest.UpdateParticipationTests.class,
 	EventChangeHandlerTest.ComputeAttendeesDiffsTests.class})
+
 public class EventChangeHandlerTest {
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
@@ -135,7 +136,7 @@ public class EventChangeHandlerTest {
 		protected EventChangeMailer expectationAcceptedAttendees(
 				Attendee attendeeAccepted, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedNewUsers( compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -147,7 +148,7 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationRequest(obmUser, event);
-			mailer.notifyNeedActionNewUsers(compareCollections(ImmutableList.of(attendeeNeedAction)), 
+			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
@@ -173,9 +174,9 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationRequest(obmUser, event);
-			mailer.notifyAcceptedNewUsers( compareCollections(ImmutableList.of(attendeeAccepted)), eq(event), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), eq(event), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
-			mailer.notifyNeedActionNewUsers(compareCollections(ImmutableList.of(attendeeNotAccepted)), 
+			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted)), 
 					eq(event), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
@@ -192,7 +193,7 @@ public class EventChangeHandlerTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationRequest(obmUser, event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyNeedActionNewUsers(compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			EasyMock.expectLastCall().once();
 			EasyMock.replay(mailer);
@@ -210,9 +211,9 @@ public class EventChangeHandlerTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationRequest(obmUser, event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedNewUsers(compareCollections(accpetedAttendees), eq(event), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(accpetedAttendees), eq(event), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
-			mailer.notifyNeedActionNewUsers(compareCollections(needActionAttendees), 
+			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(needActionAttendees), 
 					eq(event), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
@@ -221,11 +222,11 @@ public class EventChangeHandlerTest {
 		}
 		
 		@Override
-		protected EventChangeMailer expectationObmUserIsNotOwner(Attendee owner) {
+		protected EventChangeMailer expectationObmUserIsNotOwner(ObmUser synchronizer, Attendee owner) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			List<Attendee> ownerAsList = new ArrayList<Attendee>();
 			ownerAsList.add(owner);
-			mailer.notifyAcceptedNewUsers(eq(ownerAsList), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(synchronizer), eq(ownerAsList), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -284,7 +285,7 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationCancel(obmUser, event);
-			mailer.notifyRemovedUsers(compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
+			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -296,7 +297,7 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationCancel(obmUser, event);
-			mailer.notifyRemovedUsers(compareCollections(ImmutableList.of(attendeeNeedAction)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
+			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -320,7 +321,7 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationCancel(obmUser, event);
-			mailer.notifyRemovedUsers(compareCollections(ImmutableList.of(attendeeNotAccepted, attendeeAccepted )), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
+			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted, attendeeAccepted )), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -336,7 +337,7 @@ public class EventChangeHandlerTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationCancel(obmUser, event);
-			mailer.notifyRemovedUsers(compareCollections(ImmutableList.of(attendee)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
+			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
@@ -356,17 +357,17 @@ public class EventChangeHandlerTest {
 			atts.addAll(accpetedAttendees);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			String ics = ical4jHelper.buildIcsInvitationCancel(obmUser, event);
-			mailer.notifyRemovedUsers(compareCollections(atts), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
+			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(atts), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics));
 			expectLastCall().once();
 			replay(mailer);
 			return mailer;
 		}
 		
 		@Override
-		protected EventChangeMailer expectationObmUserIsNotOwner(Attendee owner) {
+		protected EventChangeMailer expectationObmUserIsNotOwner(ObmUser synchronizer, Attendee owner) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 
-			mailer.notifyOwnerRemovedEvent(eq(owner), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyOwnerRemovedEvent(eq(synchronizer), eq(owner), EasyMock.anyObject(Event.class), eq(LOCALE), eq(TIMEZONE));
 			EasyMock.expectLastCall().once();
 			EasyMock.replay(mailer);
 			return mailer;
@@ -433,7 +434,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyNeedActionUpdateUsers(compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyNeedActionUpdateUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_UPDATE));
 			expectLastCall().once();
 			
@@ -462,7 +463,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedUpdateUsers(compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyAcceptedUpdateUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_UPDATE));
 			
 			expectLastCall().once();
@@ -541,7 +542,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyNeedActionNewUsers(compareCollections(ImmutableList.of(addedAttendee)), 
+			mailer.notifyNeedActionNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), 
 					eq(currentEvent), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_ADD));
 			expectLastCall().once();
 
@@ -574,7 +575,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedNewUsers(compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			expectLastCall().once();
 
 			replay(mailer, ical4jHelper);
@@ -603,7 +604,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(compareCollections(ImmutableList.of(attendee)), 
+			mailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
 					eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			
 			expectLastCall().once();
@@ -637,7 +638,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyAcceptedNewUsers(compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyAcceptedNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 
 			expectLastCall().once();
 
@@ -668,7 +669,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
-			mailer.notifyOwnerUpdate(eq(attendee), eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
+			mailer.notifyOwnerUpdate(eq(defaultObmUser), eq(attendee), eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE));
 			replay(mailer, ical4jHelper);
 
 			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper);

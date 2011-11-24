@@ -78,7 +78,7 @@ public class EventChangeHandler {
 		
 		Collection<Attendee> ownerAsCollection = new ArrayList<Attendee>(1);
 		ownerAsCollection.add(owner);
-		eventChangeMailer.notifyAcceptedNewUsers(ownerAsCollection, event, locale, timezone);
+		eventChangeMailer.notifyAcceptedNewUsers(user, ownerAsCollection, event, locale, timezone);
 	}
 
 	private boolean isUserEventOwner(ObmUser user, Event event) {
@@ -106,12 +106,12 @@ public class EventChangeHandler {
 		
 		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
-			eventChangeMailer.notifyAcceptedNewUsers(accepted, event, locale, timezone);
+			eventChangeMailer.notifyAcceptedNewUsers(user, accepted, event, locale, timezone);
 		}
 		
 		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionNewUsers(notAccepted, event, locale, timezone, ics);
+			eventChangeMailer.notifyNeedActionNewUsers(user, notAccepted, event, locale, timezone, ics);
 		}
 	}
 
@@ -133,7 +133,7 @@ public class EventChangeHandler {
 			Map<AttendeeStateValue, Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
 			final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
 			if (!removedAttendees.isEmpty()) {
-				eventChangeMailer.notifyRemovedUsers(removedAttendees, current, locale, timezone, removedUserIcs);
+				eventChangeMailer.notifyRemovedUsers(user, removedAttendees, current, locale, timezone, removedUserIcs);
 			}
 
 			Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
@@ -144,31 +144,31 @@ public class EventChangeHandler {
 			Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
 			if (!keptAttendees.isEmpty() && hasImportantChanges) {
 				Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
-				notifyAcceptedUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
-				notifyNeedActionUpdateUsers(previous, current, locale, atts, timezone, updateUserIcs);
+				notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs);
+				notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs);
 			}
 			
 			Attendee owner = findOwner(current);
 			if (owner != null && !isUserEventOwner(user, current) && hasImportantChanges) {
-				notifyOwnerUpdate(owner, previous, current, locale, timezone);
+				notifyOwnerUpdate(user, owner, previous, current, locale, timezone);
 			}
 		}
 	}
 	
-	private void notifyAcceptedUpdateUsers(Event previous, Event current, Locale locale, 
+	private void notifyAcceptedUpdateUsers(ObmUser user, Event previous, Event current, Locale locale, 
 			Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone, String ics) {
 		
 		Set<Attendee> attendeesAccepted = atts.get(ParticipationState.ACCEPTED);
 		if (attendeesAccepted != null) {
 			Collection<Attendee> attendeesCanWriteOnCalendar = filterCanWriteOnCalendar(attendeesAccepted);
 			if (attendeesCanWriteOnCalendar != null && !attendeesCanWriteOnCalendar.isEmpty()) {
-				eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(attendeesCanWriteOnCalendar, previous, 
+				eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(user, attendeesCanWriteOnCalendar, previous, 
 						current, locale, timezone);
 			}
 			
 			attendeesAccepted.removeAll(attendeesCanWriteOnCalendar);
 			if (!attendeesAccepted.isEmpty()) {
-				eventChangeMailer.notifyAcceptedUpdateUsers(attendeesAccepted, previous, current, locale, timezone, ics);
+				eventChangeMailer.notifyAcceptedUpdateUsers(user, attendeesAccepted, previous, current, locale, timezone, ics);
 			}
 		}
 	}
@@ -182,11 +182,11 @@ public class EventChangeHandler {
 		});
 	}
 	
-	private void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone) {
-		eventChangeMailer.notifyOwnerUpdate(owner, previous, current, locale, timezone);
+	private void notifyOwnerUpdate(ObmUser user, Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone) {
+		eventChangeMailer.notifyOwnerUpdate(user, owner, previous, current, locale, timezone);
 	}
 	
-	private void notifyNeedActionUpdateUsers(Event previous, Event current,
+	private void notifyNeedActionUpdateUsers(ObmUser user, Event previous, Event current,
 			Locale locale, Map<ParticipationState, Set<Attendee>> atts,
 					TimeZone timezone, String ics) { 
 		
@@ -202,7 +202,7 @@ public class EventChangeHandler {
 		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
 
 		if (notAccepted != null && !notAccepted.isEmpty()) {
-			eventChangeMailer.notifyNeedActionUpdateUsers(notAccepted, previous, current, locale, timezone, ics);
+			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone, ics);
 		}
 	}
 
@@ -219,7 +219,7 @@ public class EventChangeHandler {
 			Set<Attendee> notify = Sets.union(attendeeGroups.get(ParticipationState.NEEDSACTION), attendeeGroups.get(ParticipationState.ACCEPTED));
  			if (!notify.isEmpty()) {
 				UserSettings settings = settingsService.getSettings(user);
-				eventChangeMailer.notifyRemovedUsers(notify, event, settings.locale(), settings.timezone(), removeUserIcs);
+				eventChangeMailer.notifyRemovedUsers(user, notify, event, settings.locale(), settings.timezone(), removeUserIcs);
  			}
 			if (owner != null && !isUserEventOwner(user, event)) {
  				notifyOwnerDelete(user, event, owner);
@@ -234,7 +234,7 @@ public class EventChangeHandler {
 		
 		Collection<Attendee> ownerAsCollection = new ArrayList<Attendee>(1);
 		ownerAsCollection.add(owner);
-		eventChangeMailer.notifyOwnerRemovedEvent(owner, event, locale, timezone);		
+		eventChangeMailer.notifyOwnerRemovedEvent(user, owner, event, locale, timezone);		
 	}
 
 	private boolean eventCreationInvolveNotification(final Event event) {

@@ -100,7 +100,7 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.setOwnerEmail(ownerEmail);
 		event.addAttendee(owner);
 		
-		EventChangeMailer mailer = expectationObmUserIsNotOwner(owner);
+		EventChangeMailer mailer = expectationObmUserIsNotOwner(defaultObmUser, owner);
 
 		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		
@@ -141,7 +141,7 @@ public abstract class AbstractEventChangeHandlerTest {
 	
 	protected abstract EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted, Event event, ObmUser obmUser);
 	
-	protected abstract EventChangeMailer expectationObmUserIsNotOwner(Attendee owner);
+	protected abstract EventChangeMailer expectationObmUserIsNotOwner(ObmUser synchronizer, Attendee owner);
 	
 	public void testNeedActionAttendee() {
 		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);

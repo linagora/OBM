@@ -23,6 +23,8 @@ public class ToolBox {
 	public static ObmUser getDefaultObmUser(){
 		ObmDomain obmDomain = getDefaultObmDomain();
 		ObmUser obmUser = new ObmUser();
+		obmUser.setFirstName("Obm");
+		obmUser.setLastName("User");
 		obmUser.setLogin("user");
 		obmUser.setEmail("user@test");
 		obmUser.setDomain(obmDomain);

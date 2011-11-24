@@ -42,13 +42,13 @@ public class EventChangeMailer extends AbstractMailer {
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}
 	
-	public void notifyNeedActionNewUsers(Collection<Attendee> attendee, Event event, 
+	public void notifyNeedActionNewUsers(final ObmUser user, Collection<Attendee> attendee, Event event, 
 			Locale locale, TimeZone timezone, String ics) throws NotificationException {
 		
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(event), 
+						extractSenderAddress(user), 
 						event.getAttendees(), 
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						inviteNewUserBodyTxt(event, locale, timezone),
@@ -64,11 +64,11 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedNewUsers(Collection<Attendee> attendee, Event event, Locale locale, TimeZone timezone) throws NotificationException {
+	public void notifyAcceptedNewUsers(final ObmUser synchronizer, Collection<Attendee> attendee, Event event, Locale locale, TimeZone timezone) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(event), 
+						extractSenderAddress(synchronizer), 
 						event.getAttendees(), 
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
 						notifyNewUserBodyTxt(event, locale, timezone),
@@ -83,13 +83,13 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	public void notifyRemovedUsers(Collection<Attendee> attendees, Event event, 
+	public void notifyRemovedUsers(final ObmUser synchronizer, Collection<Attendee> attendees, Event event, 
 			Locale locale, final TimeZone timezone, String ics) throws NotificationException {
 		
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(event),
+						extractSenderAddress(synchronizer),
 						event.getAttendees(), 
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale), 
 						removedUserBodyTxt(event, locale, timezone),
@@ -105,13 +105,13 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	public void notifyNeedActionUpdateUsers(Collection<Attendee> attendees, 
+	public void notifyNeedActionUpdateUsers(final ObmUser synchronizer, Collection<Attendee> attendees, 
 			Event previous, Event current, Locale locale,
 			TimeZone timezone, String ics) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(current),
+						extractSenderAddress(synchronizer),
 						current.getAttendees(), 
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
@@ -127,11 +127,11 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedUpdateUsers(Collection<Attendee> attendees, Event previous, Event current, Locale locale, 
+	public void notifyAcceptedUpdateUsers(final ObmUser synchronizer, Collection<Attendee> attendees, Event previous, Event current, Locale locale, 
 			TimeZone timezone, String ics) throws NotificationException {
 
 		try {
-			EventMail mail = getNotifyUpdateUserEventMail(previous, current, locale, timezone, ics);
+			EventMail mail = getNotifyUpdateUserEventMail(synchronizer, previous, current, locale, timezone, ics);
 			sendNotificationMessageToAttendees(attendees, mail);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -142,16 +142,16 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	public void notifyAcceptedUpdateUsersCanWriteOnCalendar(Collection<Attendee> attendees, Event previous, Event current, 
+	public void notifyAcceptedUpdateUsersCanWriteOnCalendar(final ObmUser synchronizer, Collection<Attendee> attendees, Event previous, Event current, 
 			Locale locale, TimeZone timezone) throws NotificationException {
-		notifyAcceptedUpdateUsers(attendees, previous, current, locale, timezone, null);
+		notifyAcceptedUpdateUsers(synchronizer, attendees, previous, current, locale, timezone, null);
 	}
 	
-	private EventMail getNotifyUpdateUserEventMail(Event previous, Event current, Locale locale, TimeZone timezone, String ics) 
+	private EventMail getNotifyUpdateUserEventMail(final ObmUser synchronizer, Event previous, Event current, Locale locale, TimeZone timezone, String ics) 
 			throws UnsupportedEncodingException, IOException, TemplateException {
 		
 		EventMail eventMail = new EventMail(
-				extractSenderAddress(current),
+				extractSenderAddress(synchronizer),
 				current.getAttendees(), 
 				updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 				notifyUpdateUserBodyTxt(previous, current, locale, timezone),
@@ -163,12 +163,12 @@ public class EventChangeMailer extends AbstractMailer {
 		return eventMail;
 	}
 
-	public void notifyOwnerUpdate(Attendee owner, Event previous, Event current, Locale locale,
+	public void notifyOwnerUpdate(final ObmUser synchronizer, Attendee owner, Event previous, Event current, Locale locale,
 			TimeZone timezone) {
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(current),
+						extractSenderAddress(synchronizer),
 						current.getAttendees(), 
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
@@ -208,11 +208,11 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 
-	public void notifyOwnerRemovedEvent(Attendee owner, Event event, Locale locale, TimeZone timezone) {
+	public void notifyOwnerRemovedEvent(final ObmUser synchronizer, Attendee owner, Event event, Locale locale, TimeZone timezone) {
 		try {
 			EventMail mail = 
 				new EventMail(
-						extractSenderAddress(event), 
+						extractSenderAddress(synchronizer), 
 						event.getAttendees(), 
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
 						removedUserBodyTxt(event, locale, timezone),
@@ -228,16 +228,11 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 
 
-	private InternetAddress extractSenderAddress(ObmUser user)
+	private InternetAddress extractSenderAddress(final ObmUser user)
 	throws UnsupportedEncodingException {
 		return new InternetAddress(user.getEmail(), user.getDisplayName());
 	}
 	
-	private InternetAddress extractSenderAddress(Event event)
-			throws UnsupportedEncodingException {
-		return new InternetAddress(event.getOwnerEmail(), event.getOwnerDisplayName());
-	}
-
 	private List<InternetAddress> convertAttendeesToAddresses(Collection<Attendee> attendees) throws UnsupportedEncodingException {
 		List<InternetAddress> internetAddresses = Lists.newArrayList();
 		for (Attendee at: attendees) {
@@ -326,12 +321,12 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 
 	private String updateParticipationStateBodyTxt(Event event,
-			ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
+			final ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
 		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangePlain.tpl", event, attendeeUpdated, newState, locale, timezone);
 	}
 	
 	private String updateParticipationStateBodyHtml(Event event,
-			ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
+			final ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
 		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangeHtml.tpl", event, attendeeUpdated, newState, locale, timezone);
 	}
 	
@@ -378,7 +373,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String applyUpdateParticipationStateOnTemplate(String templateName,
-			Event event, ObmUser attendeeUpdated, ParticipationState newState,  Locale locale, TimeZone timezone) throws IOException, TemplateException {
+			Event event, final ObmUser attendeeUpdated, ParticipationState newState,  Locale locale, TimeZone timezone) throws IOException, TemplateException {
 		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, participationState(newState, locale));
 		Template template = templateLoader.getTemplate(templateName, locale, timezone);
 		return applyTemplate(builder.build(), template);
@@ -408,7 +403,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private Builder<Object, Object> buildUpdateParticipationStateDatamodel(
-			Event event, ObmUser attendeeUpdated, String state) {
+			Event event, final ObmUser attendeeUpdated, String state) {
 				Builder<Object, Object> datamodel = ImmutableMap.builder()
 			.put("user", attendeeUpdated.getDisplayName())
 			.put("participationState", state)

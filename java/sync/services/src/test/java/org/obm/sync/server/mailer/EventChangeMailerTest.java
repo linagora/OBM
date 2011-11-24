@@ -54,6 +54,7 @@ import freemarker.template.Template;
 @SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, 
 	EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, 
 	EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class})
+
 public class EventChangeMailerTest {
 
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
@@ -290,7 +291,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			String ics  = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), event);
-			eventChangeMailer.notifyNeedActionNewUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
+			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Test
@@ -306,7 +307,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_ROUGE?=");
 			checkPlainMessage(parts.plainText);
@@ -373,7 +374,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyAcceptedNewUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
 		}
 		
 		@Test
@@ -391,7 +392,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_ROUGE?=");
 			checkPlainMessage(parts.plainText);
@@ -441,7 +442,7 @@ public class EventChangeMailerTest {
 		
 		@Override
 		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
-			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(before.getAttendees(), 
+			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(ToolBox.getDefaultObmUser(), before.getAttendees(), 
 					before, after, Locale.FRENCH, TIMEZONE);
 		}
 		
@@ -454,7 +455,7 @@ public class EventChangeMailerTest {
 		@Override
 		protected void checkContent(InvitationParts parts) throws IOException, MessagingException { 
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
 			checkPlainMessage(parts.plainText);
@@ -472,7 +473,7 @@ public class EventChangeMailerTest {
 		}
 		
 		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
+			eventChangeMailer.notifyAcceptedUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
 		}
 		
 		@Override
@@ -539,7 +540,7 @@ public class EventChangeMailerTest {
 		protected void checkContent(InvitationParts parts) throws IOException,
 				MessagingException {
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
 
@@ -566,7 +567,7 @@ public class EventChangeMailerTest {
 			}
 			after.setSequence(4);
 			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), after);			
-			eventChangeMailer.notifyNeedActionUpdateUsers(before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics);
+			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Override
@@ -634,7 +635,7 @@ public class EventChangeMailerTest {
 		protected void checkContent(InvitationParts parts) throws IOException,
 				MessagingException {
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
 
@@ -665,7 +666,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getDefaultObmUser(), event);
-			eventChangeMailer.notifyRemovedUsers(event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
+			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
 		}
 		
 		@Override
@@ -731,7 +732,7 @@ public class EventChangeMailerTest {
 		protected void checkContent(InvitationParts parts) throws IOException,
 				MessagingException {
 			checkStringContains(parts.rawMessage, 
-					"From: Raphael ROUGERON <rrougeron@linagora.com>",
+					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Ev=C3=A9nement_annul=C3=A9_par_Raphael");
 
