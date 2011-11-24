@@ -182,7 +182,6 @@ public class Mime4jUtils {
 	}
 
 	public TextBody createBody(String text) throws UnsupportedEncodingException {
-		text.replace("\r\n", "\n").replace("\n", "\r\n");
 		BasicBodyFactory bodyFactory = new BasicBodyFactory();
 		// Use UTF-8 to encode the specified text
 		TextBody body = bodyFactory.textBody(text, "UTF-8");
