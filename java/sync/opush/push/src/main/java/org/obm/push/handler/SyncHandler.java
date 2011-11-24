@@ -353,7 +353,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					change.getData());
 		} catch (ServerItemNotFoundException e) {
 			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
-					e.getServerItemId());
+					e.getServerId());
 		}
 	}
 	
@@ -378,7 +378,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			
 		} catch (ServerItemNotFoundException e) {
 			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
-					e.getServerItemId());
+					e.getServerId());
 		}
 	}
 	
@@ -393,7 +393,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			processedClientIds.put(change.getServerId(), null);
 		} catch (ServerItemNotFoundException e) {
 			logger.info("Item {} not exist on server. The client has sent a malformed or invalid item. Stop sending the item !", 
-					e.getServerItemId());
+					e.getServerId());
 		}
 	}
 
