@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -256,7 +257,7 @@ public class Ical4jHelper {
 		CalendarBuilder builder = new CalendarBuilder();
 		Calendar calendar = builder.build(new UnfoldingReader(new StringReader(ics), true));
 
-		if (calendar != null) {
+		if (calendar != null) {		
 			ComponentList comps = getComponents(calendar, Component.VEVENT);
 			Map<EventExtId, Event> mapEvents = 
 				getEvents(comps, Component.VEVENT, ical4jUser);
@@ -342,7 +343,6 @@ public class Ical4jHelper {
 		appendAllDay(event, vEvent.getStartDate(), vEvent.getEndDate());
 		appendPriority(event, vEvent.getPriority());
 		appendRecurrenceId(event, vEvent.getRecurrenceId());
-
 		appendAttendees(event, vEvent);
 		appendRecurence(event, vEvent);
 		appendAlert(event, vEvent.getAlarms());
@@ -547,9 +547,8 @@ public class Ical4jHelper {
 	}
 
 	private void appendUid(Event event, Uid uid) {
-		if (uid != null) {
-			event.setExtId(new EventExtId(uid.getValue()));
-		}
+		String extIdBaseValue = (uid != null) ? uid.getValue() : UUID.randomUUID().toString();
+		event.setExtId(new EventExtId(extIdBaseValue));
 	}
 
 	private void appendDescription(Event event, Description description) {

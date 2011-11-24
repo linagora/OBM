@@ -785,6 +785,18 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
+	public void testParsingNotConformCalendarFiles() throws IOException, ParserException {
+		final String ics = IOUtils.toString(getStreamICS("calendar_pst.ics"));
+		
+		final List<Event> events = getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
+		for (final Event event: events) {
+			assertNotNull(event.getExtId());
+		}
+		
+		assertEquals(10, events.size());
+	}
+	
+	@Test
 	public void testBuildIcsInvitationReply() {
 		final Event event = buildEvent();
 		final Attendee attendeeReply = event.getAttendees().get(2);
