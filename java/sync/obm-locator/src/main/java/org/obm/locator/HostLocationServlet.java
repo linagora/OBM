@@ -8,6 +8,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.SystemException;
 
 import org.obm.locator.impl.LocatorDbHelper;
 import org.slf4j.Logger;
@@ -26,7 +27,11 @@ public class HostLocationServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		locatorDbHelper = LocatorDbHelper.getInstance();
+		try {
+			locatorDbHelper = LocatorDbHelper.getInstance();
+		} catch (SystemException e) {
+			throw new ServletException(e.getMessage(), e.getCause());
+		}
 	}
 	
 	@Override

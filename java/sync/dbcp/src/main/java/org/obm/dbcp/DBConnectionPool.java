@@ -4,34 +4,57 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.obm.dbcp.jdbc.IJDBCDriver;
+import javax.transaction.TransactionManager;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.dbcp.managed.LocalXAConnectionFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.obm.dbcp.jdbc.IJDBCDriver;
 
 public class DBConnectionPool {
 
+	private final TransactionManager transactionManager;
 	private final PoolingDataSource poolingDataSource;
 	private final IJDBCDriver cf;
 
-	/* package */ DBConnectionPool(IJDBCDriver cf, String dbHost, String dbName,
+	/* package */ DBConnectionPool(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password) {
+		this.transactionManager = transactionManager;
 		this.cf = cf;
-		this.poolingDataSource = buildConnectionFactory(cf, dbHost, dbName, login, password);
+
+		ConnectionFactory connectionFactory = 
+				buildConnectionFactory(cf, dbHost, dbName, login, password);
+
+		poolingDataSource = buildManagedDataSource(connectionFactory);
 	}
 
-	private PoolingDataSource buildConnectionFactory(
+	private ConnectionFactory buildConnectionFactory(
 			IJDBCDriver cf, String dbHost, String dbName, String login,
 			String password) {
-		PoolingDataSource poolds = new PoolingDataSource();
-		poolds.setClassName(cf.getDataSourceClassName());
-		poolds.setUniqueName(cf.getUniqueName());
-		poolds.setMaxPoolSize(10);
-		poolds.setAllowLocalTransactions(true);
-		poolds.getDriverProperties().putAll(cf.getDriverProperties(login, password, dbName, dbHost));
-		poolds.init();
-		return poolds;
+
+		String jdbcUrl = cf.getJDBCUrl(dbHost, dbName);
+		ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(
+				jdbcUrl, login, password);
+		connectionFactory = new LocalXAConnectionFactory(this.transactionManager,
+				connectionFactory);
+
+		return connectionFactory;
 	}
-	
+
+	private PoolingDataSource buildManagedDataSource(
+			ConnectionFactory connectionFactory)
+			throws IllegalStateException {
+
+		GenericObjectPool pool = new GenericObjectPool();
+		PoolableConnectionFactory factory = new PoolableConnectionFactory(
+				connectionFactory, pool, null, null, false, true);
+		pool.setFactory(factory);
+		return new PoolingDataSource(pool);
+	}
+
 	/* package */ Connection getConnection() throws SQLException {
 		Connection connection = poolingDataSource.getConnection();
 		Statement statement = null;
@@ -46,6 +69,10 @@ public class DBConnectionPool {
 			}
 		}
 		return connection;
+	}
+
+	/* package */ TransactionManager getTransactionManager() {
+		return transactionManager;
 	}
 
 }
