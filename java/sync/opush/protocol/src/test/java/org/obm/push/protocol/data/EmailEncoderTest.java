@@ -12,7 +12,7 @@ public class EmailEncoderTest {
 
 	@Before
 	public void setUp() {
-		emailEncoder = new EmailEncoder();
+		emailEncoder = new EmailEncoder(new IntEncoder());
 	}
 	
 	@Test

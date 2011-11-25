@@ -42,8 +42,11 @@ public class EmailEncoder implements IDataEncoder {
 	private HTMLBodyFormatter htmlFormatter;
 	private PlainBodyFormatter plainFormatter;
 
+	private final IntEncoder intEncoder;
+
 	@Inject
-	/* package */ EmailEncoder() {
+	/* package */ EmailEncoder(IntEncoder intEncoder) {
+		this.intEncoder = intEncoder;
 		sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		htmlFormatter = new HTMLBodyFormatter();
@@ -307,7 +310,7 @@ public class EmailEncoder implements IDataEncoder {
 		byte[] marker = "vCal-Uid".getBytes(Charsets.US_ASCII);
 		byte[] markerEnd = buildByteSequence(0x1, 0x0, 0x0, 0x0);
 		byte[] dataEnd = buildByteSequence(0x0);
-		byte[] length = toByteArray(
+		byte[] length = intEncoder.toByteArray(
 				marker.length + markerEnd.length + eventUidAsBytes.length + dataEnd.length);
 		byte[] result = Bytes.concat(preambule, length, marker, markerEnd, eventUidAsBytes, dataEnd);
 		return Base64.encodeBase64String(result);
@@ -320,14 +323,6 @@ public class EmailEncoder implements IDataEncoder {
 			byteArray[i++] = (byte) b;
 		}
 		return byteArray;
-	}
-	
-	private byte[] toByteArray(int value) {
-		return new byte[] {
-		        (byte) value,
-		        (byte) (value >> 8),
-		        (byte) (value >> 16),
-		        (byte) (value >> 24)};
 	}
 	
 	private void appendRecurence(Element parent, MSEvent invi) {
