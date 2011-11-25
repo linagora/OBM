@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
+
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -547,7 +547,7 @@ public class Ical4jHelper {
 	}
 
 	private void appendUid(Event event, Uid uid) {
-		String extIdBaseValue = (uid != null) ? uid.getValue() : UUID.randomUUID().toString();
+		String extIdBaseValue = (uid != null) ? uid.getValue() : EventExtId.generateUid().toString();
 		event.setExtId(new EventExtId(extIdBaseValue));
 	}
 

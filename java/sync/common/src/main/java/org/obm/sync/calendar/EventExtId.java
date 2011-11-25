@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import java.util.UUID;
 
 public class EventExtId implements Serializable {
 
@@ -52,6 +53,10 @@ public class EventExtId implements Serializable {
 		return extId;
 	}
 
+	public static UUID generateUid() {
+		return UUID.randomUUID();
+	}
+	
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof EventExtId) {
