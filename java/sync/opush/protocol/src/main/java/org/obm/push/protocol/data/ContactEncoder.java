@@ -11,11 +11,14 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 public class ContactEncoder implements IDataEncoder {
 
 	private SimpleDateFormat sdf;
 
-	public ContactEncoder() {
+	@Inject
+	private ContactEncoder() {
 		sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}

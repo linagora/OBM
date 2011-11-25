@@ -14,10 +14,14 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 public class TaskEncoder extends Encoder implements IDataEncoder {
 	
 	private SimpleDateFormat sdf;
-	public TaskEncoder() {
+	
+	@Inject
+	private TaskEncoder() {
 		super();
 		//2010-07-08T22:00:00.000Z
 		this.sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'");

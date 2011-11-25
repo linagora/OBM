@@ -1,4 +1,4 @@
-package org.obm.push.data;
+package org.obm.push.protocol.data;
 
 
 import static org.obm.push.TestUtils.getXml;

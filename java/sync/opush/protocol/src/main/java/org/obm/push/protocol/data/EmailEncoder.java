@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
+import com.google.inject.Inject;
 
 public class EmailEncoder implements IDataEncoder {
 
@@ -41,7 +42,8 @@ public class EmailEncoder implements IDataEncoder {
 	private HTMLBodyFormatter htmlFormatter;
 	private PlainBodyFormatter plainFormatter;
 
-	public EmailEncoder() {
+	@Inject
+	/* package */ EmailEncoder() {
 		sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		htmlFormatter = new HTMLBodyFormatter();

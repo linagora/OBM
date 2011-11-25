@@ -21,13 +21,15 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private SimpleDateFormat sdf;
 	
-	
-	public CalendarEncoder() {
+	@Inject
+	/* package */ CalendarEncoder() {
 		super();
 		this.sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 		this.sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
