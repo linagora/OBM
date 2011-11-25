@@ -1,5 +1,6 @@
 package org.obm.push.protocol.bean;
 
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
 
 public class ItemOperationsRequest {
@@ -10,7 +11,7 @@ public class ItemOperationsRequest {
 		private String fileReference;
 		private String collectionId;
 		private String serverId;
-		private Integer type;
+		private MSEmailBodyType type;
 		
 		public Fetch() {
 		}
@@ -47,11 +48,11 @@ public class ItemOperationsRequest {
 			this.serverId = serverId;
 		}
 
-		public Integer getType() {
+		public MSEmailBodyType getType() {
 			return type;
 		}
 		
-		public void setType(Integer type) {
+		public void setType(MSEmailBodyType type) {
 			this.type = type;
 		}
 		

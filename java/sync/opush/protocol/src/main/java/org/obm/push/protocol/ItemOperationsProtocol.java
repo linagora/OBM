@@ -5,6 +5,7 @@ import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -68,10 +69,10 @@ public class ItemOperationsProtocol {
 		return null;
 	}
 
-	private Integer getType(Element fetchNode) {
+	private MSEmailBodyType getType(Element fetchNode) {
 		String typeAsTextInteger = DOMUtils.getElementText(fetchNode, "Type");
 		if (typeAsTextInteger != null) {
-			return Integer.valueOf(typeAsTextInteger);
+			return MSEmailBodyType.getValueOf(Integer.valueOf(typeAsTextInteger));
 		}
 		return null;
 	}

@@ -11,6 +11,7 @@ import org.eclipse.jetty.http.HttpHeaders;
 import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.w3c.dom.Document;
@@ -48,7 +49,7 @@ public class ItemOperationsProtocolTest {
 		Assertions.assertThat(decodedRequest).isNotNull();
 		Assertions.assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
 		Assertions.assertThat(decodedRequest.getFetch().getServerId()).isEqualTo("1400:350025");
-		Assertions.assertThat(decodedRequest.getFetch().getType()).isEqualTo(2);
+		Assertions.assertThat(decodedRequest.getFetch().getType()).isEqualTo(MSEmailBodyType.HTML);
 	}
 
 	@Test

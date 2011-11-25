@@ -166,7 +166,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchResult;
 	}
 
-	private FetchItemResult fetchItem(String serverId, Integer collectionId, Integer type, BackendSession bs) {
+	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, BackendSession bs) {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
 		fetchResult.setServerId(serverId);
@@ -182,7 +182,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 				SyncCollection c = new SyncCollection();
 				c.setCollectionId(collectionId);
 				BodyPreference bp = new BodyPreference();
-				bp.setType(MSEmailBodyType.getValueOf(type));
+				bp.setType(type);
 				SyncCollectionOptions options = new SyncCollectionOptions();
 				options.addBodyPreference(bp);
 				c.setOptions(options);
