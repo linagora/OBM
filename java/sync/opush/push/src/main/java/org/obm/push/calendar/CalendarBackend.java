@@ -283,7 +283,7 @@ public class CalendarBackend extends ObmSyncBackend {
 			if (eventId != null) {
 				event.setUid(eventId);
 				setSequence(oldEvent, event);
-				cc.modifyEvent(token, parseCalendarName(collectionPath), event, true, true);
+				updateCalendarEntity(cc, token, collectionPath, oldEvent, event);
 			} else {
 				eventId = createCalendarEntity(bs, cc, token, collectionPath, event, data);
 			}
@@ -299,6 +299,13 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 		
 		return getServerIdFor(collectionId, eventId);
+	}
+
+	private void updateCalendarEntity(AbstractEventSyncClient cc, AccessToken token, String collectionPath, Event old, Event event) throws ServerFault {
+		if (event.getExtId() == null || event.getExtId().getExtId() == null) {
+			event.setExtId(old.getExtId());
+		}
+		cc.modifyEvent(token, parseCalendarName(collectionPath), event, true, true);
 	}
 
 	private void setSequence(Event oldEvent, Event event) {
