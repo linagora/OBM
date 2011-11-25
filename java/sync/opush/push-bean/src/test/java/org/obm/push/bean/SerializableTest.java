@@ -60,7 +60,7 @@ public class SerializableTest {
 	public void testMSEmail() throws IOException {
 		MSEmail msEmail = new MSEmail();
 		msEmail.setBody(new MSEmailBody());
-		msEmail.setFrom(new MSAddress("toto@titi.com"));
+		msEmail.setFrom(new MSAddress("toto", "toto@titi.com"));
 		msEmail.setAttachements(ImmutableSet.of(new MSAttachement()));
 		msEmail.setMimeData(new ByteArrayInputStream(new byte[0]));
 		objectOutputStream.writeObject(msEmail);
