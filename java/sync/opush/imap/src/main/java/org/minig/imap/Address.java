@@ -16,74 +16,65 @@
 
 package org.minig.imap;
 
-import org.obm.push.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.base.Objects;
 
 public final class Address {
 
-	private static final Logger logger = LoggerFactory.getLogger(Address.class);
-	
-	private String mail;
-	private String displayName;
+	private final String mail;
+	private final String displayName;
 
 	public Address(String mail) {
 		this(null, mail);
 	}
-
+	
 	public Address(String displayName, String mail) {
-		if (displayName != null) {
-			this.displayName = StringUtils.stripAddressForbiddenChars(displayName);
-		}
-		
-		if (mail != null && mail.contains("@")) {
-			this.mail = StringUtils.stripAddressForbiddenChars(mail);
-		} else {
-			// FIXME ...
-			if (logger.isDebugEnabled()) {
-				logger.debug("mail: {} is not a valid email, building a john.doe@minig.org", mail);
-			}
-			this.displayName = StringUtils.stripAddressForbiddenChars(mail);
-			this.mail = "john.doe@minig.org";
-		}
+		this.displayName = formatString(displayName);
+		this.mail = formatMail(mail);
 	}
 
+	private String formatString(String str) {
+		if (str != null) {
+			return str.replace("\"", "").replace("<", "").replace(">", "");
+		}
+		return str;
+	}
+	
+	private String formatMail(String mail) {
+		if (mail != null && mail.contains("@")) {
+			return formatString(mail);
+		}
+		return mail;
+	}
+	
 	public String getMail() {
 		return mail;
 	}
 
 	public String getDisplayName() {
-		return displayName != null ? displayName : mail;
+		return displayName;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(mail, displayName);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Address) {
+			Address that = (Address) object;
+			return Objects.equal(this.mail, that.mail)
+				&& Objects.equal(this.displayName, that.displayName);
+		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return "" + displayName + " <" + mail + ">";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((mail == null) ? 0 : mail.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Address other = (Address) obj;
-		if (mail == null) {
-			if (other.mail != null)
-				return false;
-		} else if (!mail.equals(other.mail))
-			return false;
-		return true;
+		return Objects.toStringHelper(this)
+			.add("mail", mail)
+			.add("displayName", displayName)
+			.toString();
 	}
 
 }
