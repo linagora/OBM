@@ -101,7 +101,7 @@ public class CalendarBindingImplTest {
 	}
 
 	private AccessToken mockAccessToken(String userName, String domainName) {
-		AccessToken accessToken = createMock(AccessToken.class);
+		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
 		expect(accessToken.getDomain()).andReturn(domainName).atLeastOnce();
 		expect(accessToken.getUser()).andReturn(userName).anyTimes();
 		expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
@@ -345,9 +345,9 @@ public class CalendarBindingImplTest {
 		oldEventWithOtherAttendees.setType(EventType.VEVENT);
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
-		eventChangeHandler.delete(obmUser, oldEventNoOtherAttendees, false);
+		eventChangeHandler.delete(obmUser, oldEventNoOtherAttendees, false, accessToken);
 		eventChangeHandler.updateParticipationState(oldEventWithOtherAttendees, obmUser, 
-				ParticipationState.DECLINED, false);
+				ParticipationState.DECLINED, false, accessToken);
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).atLeastOnce();
@@ -464,7 +464,7 @@ public class CalendarBindingImplTest {
 		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(true).atLeastOnce();
 		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1, true)).andReturn(event).atLeastOnce();
 		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
-		eventChangeHandler.update(obmUser, beforeEvent, event, notification, true);
+		eventChangeHandler.update(obmUser, beforeEvent, event, notification, true, accessToken);
 		
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
@@ -515,7 +515,7 @@ public class CalendarBindingImplTest {
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
-
+		
 		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser)
 				.atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
@@ -526,7 +526,7 @@ public class CalendarBindingImplTest {
 				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
 						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
 		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
-		eventChangeHandler.update(obmUser, beforeEvent, event, notification, true);
+		eventChangeHandler.update(obmUser, beforeEvent, event, notification, true, accessToken);
 
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
@@ -739,7 +739,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(null).once();
 		expect(calendarDao.createEvent(accessToken, calendar, event, false)).andReturn(eventCreated).once();
 		expect(calendarDao.removeEvent(accessToken, eventCreated, eventCreated.getType(), eventCreated.getSequence())).andReturn(eventCreated).once();
-		eventChangeHandler.updateParticipationState(eventCreated, obmUser, calOwner.getState(), notification);
+		eventChangeHandler.updateParticipationState(eventCreated, obmUser, calOwner.getState(), notification, accessToken);
 		EasyMock.expectLastCall().once();
 		
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);

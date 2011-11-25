@@ -2,3 +2,4 @@
 target
 .project
 java/.classpath
+.classpath

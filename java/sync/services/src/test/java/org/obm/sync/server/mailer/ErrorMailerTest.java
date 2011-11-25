@@ -77,9 +77,9 @@ public class ErrorMailerTest {
 			
 			MailService mailService = EasyMock.createMock(MailService.class);
 			mailService.sendMessage(
-					EasyMock.anyObject(Session.class),
 					EventChangeHandlerTestsTools.compareCollections(expectedRecipients), 
-					EasyMock.capture(capturedMessage));
+					EasyMock.capture(capturedMessage),
+					EasyMock.anyObject(AccessToken.class));
 			EasyMock.expectLastCall();
 			EasyMock.replay(mailService);
 			return mailService;

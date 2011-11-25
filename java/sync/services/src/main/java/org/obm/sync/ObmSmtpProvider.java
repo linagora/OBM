@@ -1,24 +1,25 @@
 package org.obm.sync;
 
-import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Properties;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.locator.LocatorClientException;
+import org.obm.sync.auth.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class ObmSmtpProvider {
-	
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ObmSmtpProvider.class);
 	private ObmSmtpConf conf;
 	
 	@Inject
@@ -26,40 +27,24 @@ public class ObmSmtpProvider {
 		conf = obmSmtpConf;
 	}
 	
-	public void sendMessage(String domain, Charset charset, String from, String subject, 
-							String HtmlMessage, Collection<String> recipients) throws MessagingException, LocatorClientException {
-		Session session = buildSession(domain);
-		MimeMessage message = prepareMessage(session, charset, from, subject, HtmlMessage, recipients);
-		sendEmail(session, message);
-	}
-	
-	/**
-	 * Prepare the Mime message with the desired contents
-	 */
-	private MimeMessage prepareMessage(Session session, Charset charset,
-					            String from, String subject,
-					            String HtmlMessage, Collection<String> recipients) throws MessagingException {
-		//Multipurpose Internet Mail Extensions
-		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
-		message.setSubject(subject);
-		for (String recipient: recipients) {
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-		}
-		message.setContent(HtmlMessage, "text/html; charset=\"" + charset.displayName() + "\"");
-		return message;
-	}
-	
-	public void sendEmail(Session session, MimeMessage message) throws MessagingException {
-		Transport transport = session.getTransport("smtp");
+	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
+		Transport transport = null;
+		
 		try {
+			Session session = buildSession(token.getDomain());
+			
+			transport = session.getTransport("smtp");
 			transport.connect();
 			transport.sendMessage(message, message.getAllRecipients());
+		} catch (LocatorClientException e) {
+			logger.error("Couldn't send the message", e);
 		} finally {
-			transport.close();
-		}
+			if (transport != null) {
+				transport.close();
+			}
+		} 
     }
-
+	
 	private Session buildSession(String domain) throws LocatorClientException {
 		Properties properties = new Properties();
 		properties.put("mail.smtp.host", conf.getServerAddr(domain));	

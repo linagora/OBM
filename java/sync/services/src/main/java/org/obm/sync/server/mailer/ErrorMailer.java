@@ -58,7 +58,7 @@ public class ErrorMailer extends AbstractMailer {
 							convertAccessTokenToAddresse(at), 
 							connectorVersionErrorTitle(locale), 
 							newUserBodyTxt(version,locale, timezone));
-				sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)));
+				sendNotificationMessage(mail, ImmutableList.of(convertAccessTokenToAddresse(at)), at);
 			}
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -96,9 +96,9 @@ public class ErrorMailer extends AbstractMailer {
 		return applyOBMConnectorVersionOnTemplate("OBMConnectorErrorVersionPlain.tpl", version, locale, timezone);
 	}
 	
-	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses) throws MessagingException {
+	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses, AccessToken token) throws MessagingException {
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(session, addresses, mimeMail);
+		mailService.sendMessage(addresses, mimeMail, token);
 	}
 	
 	private String applyOBMConnectorVersionOnTemplate(String templateName, String version, Locale locale, TimeZone timezone)

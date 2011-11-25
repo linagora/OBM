@@ -11,6 +11,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
@@ -43,7 +44,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	public void notifyNeedActionNewUsers(final ObmUser user, Collection<Attendee> attendee, Event event, 
-			Locale locale, TimeZone timezone, String ics) throws NotificationException {
+			Locale locale, TimeZone timezone, String ics, AccessToken token) throws NotificationException {
 		
 		try {
 			EventMail mail = 
@@ -54,7 +55,7 @@ public class EventChangeMailer extends AbstractMailer {
 						inviteNewUserBodyTxt(event, locale, timezone),
 						inviteNewUserBodyHtml(event, locale, timezone),
 						ics, "REQUEST");
-			sendNotificationMessageToAttendees(attendee, mail);
+			sendNotificationMessageToAttendees(attendee, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -64,7 +65,7 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyAcceptedNewUsers(final ObmUser synchronizer, Collection<Attendee> attendee, Event event, Locale locale, TimeZone timezone) throws NotificationException {
+	public void notifyAcceptedNewUsers(final ObmUser synchronizer, Collection<Attendee> attendee, Event event, Locale locale, TimeZone timezone, AccessToken token) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -73,7 +74,7 @@ public class EventChangeMailer extends AbstractMailer {
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
 						notifyNewUserBodyTxt(event, locale, timezone),
 						notifyNewUserBodyHtml(event, locale, timezone));
-			sendNotificationMessageToAttendees(attendee, mail);
+			sendNotificationMessageToAttendees(attendee, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -84,7 +85,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 
 	public void notifyRemovedUsers(final ObmUser synchronizer, Collection<Attendee> attendees, Event event, 
-			Locale locale, final TimeZone timezone, String ics) throws NotificationException {
+			Locale locale, final TimeZone timezone, String ics, AccessToken token) throws NotificationException {
 		
 		try {
 			EventMail mail = 
@@ -95,7 +96,7 @@ public class EventChangeMailer extends AbstractMailer {
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone), 
 						ics, "CANCEL");
-			sendNotificationMessageToAttendees(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -107,7 +108,7 @@ public class EventChangeMailer extends AbstractMailer {
 
 	public void notifyNeedActionUpdateUsers(final ObmUser synchronizer, Collection<Attendee> attendees, 
 			Event previous, Event current, Locale locale,
-			TimeZone timezone, String ics) throws NotificationException {
+			TimeZone timezone, String ics, AccessToken token) throws NotificationException {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -117,7 +118,7 @@ public class EventChangeMailer extends AbstractMailer {
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
 						ics, "REQUEST");
-			sendNotificationMessageToAttendees(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -128,11 +129,11 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	public void notifyAcceptedUpdateUsers(final ObmUser synchronizer, Collection<Attendee> attendees, Event previous, Event current, Locale locale, 
-			TimeZone timezone, String ics) throws NotificationException {
+			TimeZone timezone, String ics, AccessToken token) throws NotificationException {
 
 		try {
 			EventMail mail = getNotifyUpdateUserEventMail(synchronizer, previous, current, locale, timezone, ics);
-			sendNotificationMessageToAttendees(attendees, mail);
+			sendNotificationMessageToAttendees(attendees, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -143,8 +144,8 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 
 	public void notifyAcceptedUpdateUsersCanWriteOnCalendar(final ObmUser synchronizer, Collection<Attendee> attendees, Event previous, Event current, 
-			Locale locale, TimeZone timezone) throws NotificationException {
-		notifyAcceptedUpdateUsers(synchronizer, attendees, previous, current, locale, timezone, null);
+			Locale locale, TimeZone timezone, AccessToken token) throws NotificationException {
+		notifyAcceptedUpdateUsers(synchronizer, attendees, previous, current, locale, timezone, null, token);
 	}
 	
 	private EventMail getNotifyUpdateUserEventMail(final ObmUser synchronizer, Event previous, Event current, Locale locale, TimeZone timezone, String ics) 
@@ -164,7 +165,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 
 	public void notifyOwnerUpdate(final ObmUser synchronizer, Attendee owner, Event previous, Event current, Locale locale,
-			TimeZone timezone) {
+			TimeZone timezone, AccessToken token) {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -173,7 +174,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale), 
 						notifyUpdateUserBodyTxt(previous, current, locale, timezone),
 						notifyUpdateUserBodyHtml(previous, current, locale, timezone));
-			sendNotificationMessageToAttendee(owner, mail);
+			sendNotificationMessageToAttendee(owner, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -184,7 +185,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser obmUser, 
-			final ParticipationState newState, final Locale locale, final TimeZone timezone, String ics) {
+			final ParticipationState newState, final Locale locale, final TimeZone timezone, String ics, AccessToken token) {
 	
 		try {
 			final EventMail mail = 
@@ -196,7 +197,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateParticipationStateBodyHtml(event, obmUser, newState, locale, timezone),
 						ics, "REPLY"
 						);
-			sendNotificationMessageToOrganizer(organizer, mail);
+			sendNotificationMessageToOrganizer(organizer, mail, token);
 			
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -208,7 +209,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 
-	public void notifyOwnerRemovedEvent(final ObmUser synchronizer, Attendee owner, Event event, Locale locale, TimeZone timezone) {
+	public void notifyOwnerRemovedEvent(final ObmUser synchronizer, Attendee owner, Event event, Locale locale, TimeZone timezone, AccessToken token) {
 		try {
 			EventMail mail = 
 				new EventMail(
@@ -217,7 +218,7 @@ public class EventChangeMailer extends AbstractMailer {
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale),
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone));
-			sendNotificationMessageToAttendee(owner, mail);
+			sendNotificationMessageToAttendee(owner, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -245,10 +246,10 @@ public class EventChangeMailer extends AbstractMailer {
 		return new InternetAddress(attendee.getEmail(), attendee.getDisplayName());
 	}
 	
-	private void sendNotificationMessageToAttendee(Attendee attendee, EventMail mail) throws NotificationException {
+	private void sendNotificationMessageToAttendee(Attendee attendee, EventMail mail, AccessToken token) throws NotificationException {
 		try {
 			InternetAddress add = convertAttendeeToAddresse(attendee);
-			sendNotificationMessage(mail, add);
+			sendNotificationMessage(mail, add, token);
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -256,10 +257,10 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	private void sendNotificationMessageToAttendees(Collection<Attendee> attendees, EventMail mail) throws NotificationException {
+	private void sendNotificationMessageToAttendees(Collection<Attendee> attendees, EventMail mail, AccessToken token) throws NotificationException {
 		try {
 			List<InternetAddress> adds = convertAttendeesToAddresses(attendees);
-			sendNotificationMessage(mail, adds);
+			sendNotificationMessage(mail, adds, token);
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -267,10 +268,10 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	private void sendNotificationMessageToOrganizer(Attendee organizer, EventMail mail) throws NotificationException {
+	private void sendNotificationMessageToOrganizer(Attendee organizer, EventMail mail, AccessToken token) throws NotificationException {
 		try {
 			InternetAddress adds = convertAttendeeToAddresse(organizer);
-			sendNotificationMessage(mail, ImmutableList.of(adds));
+			sendNotificationMessage(mail, ImmutableList.of(adds), token);
 		} catch (MessagingException e) {
 			throw new NotificationException(e);
 		} catch (IOException e) {
@@ -278,14 +279,14 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses) throws MessagingException, IOException{
+	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses, AccessToken token) throws MessagingException, IOException{
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(session, addresses, mimeMail);
+		mailService.sendMessage(addresses, mimeMail, token);
 	}
 	
-	private void sendNotificationMessage(EventMail mail, InternetAddress address) throws MessagingException, IOException{
+	private void sendNotificationMessage(EventMail mail, InternetAddress address, AccessToken token) throws MessagingException, IOException{
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(session, address, mimeMail);
+		mailService.sendMessage(address, mimeMail, token);
 	}
 	
 	private String participationState(ParticipationState state, Locale locale){

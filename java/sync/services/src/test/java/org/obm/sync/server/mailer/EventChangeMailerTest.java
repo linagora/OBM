@@ -14,7 +14,6 @@ import java.util.TimeZone;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -60,8 +59,7 @@ public class EventChangeMailerTest {
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
 	
 	public abstract static class Common {
-		
-		
+				
 		private ITemplateLoader templateLoader;
 		
 		public Common(){
@@ -83,31 +81,27 @@ public class EventChangeMailerTest {
 			return templateLoader;
 		}
 
-		
 		protected AccessToken getStubAccessToken(){
 			AccessToken at = new AccessToken(1, 1, "unitTest");
 			at.setDomain("test.tlse.lng");
 			return at;
 		}
 		
-		
 		protected MailService defineMailServiceExpectations(
 				List<InternetAddress> expectedRecipients,
 				Capture<MimeMessage> capturedMessage) throws MessagingException {
-			
+
 			MailService mailService = EasyMock.createMock(MailService.class);
 			mailService.sendMessage(
-					EasyMock.anyObject(Session.class),
 					EventChangeHandlerTestsTools.compareCollections(expectedRecipients), 
-					EasyMock.capture(capturedMessage));
+					EasyMock.capture(capturedMessage),
+					EasyMock.anyObject(AccessToken.class));
 			EasyMock.expectLastCall();
 			EasyMock.replay(mailService);
 			return mailService;
 		}
-
 		
 		protected abstract List<InternetAddress> getExpectedRecipients() throws AddressException;
-
 
 		protected Attendee createAttendee(String name, String email) {
 			Attendee attendee = new Attendee();
@@ -136,16 +130,13 @@ public class EventChangeMailerTest {
 			public BodyPart applicationIcs;
 		}
 
-		
 		private String getRawMessage(MimeMessage actualMessage)
 		throws IOException, MessagingException,	UnsupportedEncodingException {
-
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			actualMessage.writeTo(output);
 			String rawMessage = new String(output.toByteArray(), Charsets.UTF_8.displayName());
 			return rawMessage;
 		}
-
 
 		protected Event buildTestEvent() {
 			Event event = new Event();
@@ -291,7 +282,8 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			String ics  = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), event);
-			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Test
@@ -374,7 +366,8 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE);
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
 		}
 		
 		@Test
@@ -441,9 +434,9 @@ public class EventChangeMailerTest {
 	public static class NotifyAcceptedUpdateUsersCanWriteOnCalendar extends NotifyAcceptedUpdateUsers {
 		
 		@Override
-		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
+		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after, AccessToken token) {
 			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(ToolBox.getDefaultObmUser(), before.getAttendees(), 
-					before, after, Locale.FRENCH, TIMEZONE);
+					before, after, Locale.FRENCH, TIMEZONE, token);
 		}
 		
 		@Override
@@ -472,12 +465,13 @@ public class EventChangeMailerTest {
 			super.testNotification();
 		}
 		
-		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "");
+		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after, AccessToken token) {
+			eventChangeMailer.notifyAcceptedUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", token);
 		}
 		
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
+			AccessToken token = getStubAccessToken();
 			Event before = buildTestEvent();
 			Event after = before.clone();
 			after.setDate(date(2010, 10, 8, 12, 00));
@@ -485,7 +479,7 @@ public class EventChangeMailerTest {
 			for (Attendee att: before.getAttendees()) {
 				att.setState(ParticipationState.ACCEPTED);
 			}
-			notifyAcceptedUpdateUsers(eventChangeMailer, before, after);
+			notifyAcceptedUpdateUsers(eventChangeMailer, before, after, token);
 		}
 		
 		@Override
@@ -566,8 +560,9 @@ public class EventChangeMailerTest {
 				att.setState(ParticipationState.NEEDSACTION);
 			}
 			after.setSequence(4);
+			AccessToken token = getStubAccessToken();
 			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getDefaultObmUser(), after);			
-			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics);
+			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override
@@ -666,7 +661,8 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getDefaultObmUser(), event);
-			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics);
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override

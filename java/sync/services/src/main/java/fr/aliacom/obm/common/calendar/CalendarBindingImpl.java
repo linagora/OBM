@@ -258,7 +258,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev, boolean notification) throws FindException {
 		if (ev.isInternalEvent()) {
 			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.delete(user, ev, notification);
+			eventChangeHandler.delete(user, ev, notification, token);
 		} else {
 			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED, notification);
 		}
@@ -377,12 +377,12 @@ public class CalendarBindingImpl implements ICalendar {
 
             ObmUser user = userService.getUserFromAccessToken(token);
             if(before.hasChangesOnEventAttributesExceptedEventException(after)) {
-            	eventChangeHandler.update(user, before, after, notification, hasImportantChanges);
+            	eventChangeHandler.update(user, before, after, notification, hasImportantChanges, token);
             } else if(after != null){
             	List<Event> exceptionWithChanges = after.getEventExceptionWithModifiedAttributes(before);
 				for(Event exception : exceptionWithChanges) {
 					Event previousException = before.getEventInstanceWithRecurrenceId(exception.getRecurrenceId());
-					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges);
+					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges, token);
 				}
             }
 
@@ -538,7 +538,7 @@ public class CalendarBindingImpl implements ICalendar {
 		logger.info(LogUtils.prefix(token) + 
 				"Calendar : sending participation notification to organizer of event ["+ ev.getTitle() + "]");
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
-		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, notification);
+		eventChangeHandler.updateParticipationState(ev, calendarOwner, state, notification, token);
 	}
 
 	
@@ -554,7 +554,7 @@ public class CalendarBindingImpl implements ICalendar {
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getObmId());
 			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.create(user, ev, notification);
+			eventChangeHandler.create(user, ev, notification, token);
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
 			return ev;
@@ -1059,7 +1059,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 		if (newEvent != null) {
-			eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState, notification);
+			eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState, notification, token);
 		} else {
 			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
 		}
