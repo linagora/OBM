@@ -31,6 +31,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -41,6 +42,7 @@ import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.conversation.MessageId;
+import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
 import org.obm.mail.message.MailMessageInvitation;
 import org.obm.mail.message.MessageLoader;
@@ -105,7 +107,10 @@ public class MailMessageLoader {
 				fetchMimeData(msEmail, messageId);
 				msEmail.setSmtpId(envelopes.iterator().next().getMessageId());
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return null;
+		} catch (StoreException e) {
 			logger.error(e.getMessage(), e);
 			return null;
 		}
@@ -154,16 +159,16 @@ public class MailMessageLoader {
 		final MSEmail msEmail = new MSEmail();
 		msEmail.setSubject(mailMessage.getSubject());
 		msEmail.setBody(convertMailBodyToMSEmailBody(mailMessage.getBody()));
-		msEmail.setFrom(convertAdressToMSAdress(mailMessage.getSender()));
+		msEmail.setFrom(convertAdressToMSAddress(mailMessage.getSender()));
 		msEmail.setDate(mailMessage.getDate());
 		msEmail.setHeaders(mailMessage.getHeaders());
 		msEmail.setForwardMessage(convertAllMailMessageToMSEmail(mailMessage.getForwardMessage(), bs, uid, collectionId, messageId));
 		msEmail.setAttachements(convertMailMessageAttachmentToMSAttachment(mailMessage, uid, collectionId, messageId));	
 		msEmail.setUid(mailMessage.getUid());
 		
-		msEmail.setTo(convertAllAdressToMSAdress(mailMessage.getTo()));
-		msEmail.setBcc(convertAllAdressToMSAdress(mailMessage.getBcc()));
-		msEmail.setCc(convertAllAdressToMSAdress(mailMessage.getCc()));
+		msEmail.setTo(convertAllAdressToMSAddress(mailMessage.getTo()));
+		msEmail.setBcc(convertAllAdressToMSAddress(mailMessage.getBcc()));
+		msEmail.setCc(convertAllAdressToMSAddress(mailMessage.getCc()));
 		
 		if (this.calendarClient != null && mailMessage.getInvitation() != null) {
 			setInvitation(msEmail, bs, mailMessage.getInvitation(), uid, messageId);
@@ -241,14 +246,19 @@ public class MailMessageLoader {
 		return msEmails;
 	}
 
-	private MSAddress convertAdressToMSAdress(final org.minig.imap.Address adress) {
-		return new MSAddress(adress.getDisplayName(), adress.getMail());
+	private MSAddress convertAdressToMSAddress(Address adress) {
+		if (adress != null) {
+			return new MSAddress(adress.getDisplayName(), adress.getMail());
+		}
+		return null;
 	}
 	
-	private List<MSAddress> convertAllAdressToMSAdress(final List<org.minig.imap.Address> adresses) {
-		final List<MSAddress> msAdresses = new ArrayList<MSAddress>();
-		for (org.minig.imap.Address adress: adresses) {
-			msAdresses.add(convertAdressToMSAdress(adress));
+	private List<MSAddress> convertAllAdressToMSAddress(List<Address> adresses) {
+		List<MSAddress> msAdresses = new ArrayList<MSAddress>();
+		if (adresses != null) {
+			for (Address adress: adresses) {
+				msAdresses.add(convertAdressToMSAddress(adress));
+			}
 		}
 		return msAdresses;
 	}

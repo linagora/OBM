@@ -23,6 +23,10 @@ public final class Address {
 	private final String mail;
 	private final String displayName;
 
+	public Address() {
+		this(null, null);
+	}
+	
 	public Address(String mail) {
 		this(null, mail);
 	}

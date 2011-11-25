@@ -205,10 +205,14 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 
 		parser.consumeToken(pos, env); // Message-ID
 		String mid = new String(parser.getLastReadToken());
-		Envelope ret = new Envelope(d, subject, to, cc, bcc, from != null
-				&& from.size() > 0 ? from.get(0) : new Address(
-				"john.doe@minig.org"), mid, inReplyTo);
-		return ret;
+		
+		Address address = null;
+		if (from != null && from.size() > 0) {
+			address = from.get(0);
+		} else {
+			address = new Address();
+		}
+		return new Envelope(d, subject, to, cc, bcc, address, mid, inReplyTo);
 	}
 
 	private List<Address> parseList(byte[] token, ParenListParser parser) {
