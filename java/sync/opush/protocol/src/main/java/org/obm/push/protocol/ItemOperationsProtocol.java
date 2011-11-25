@@ -56,15 +56,22 @@ public class ItemOperationsProtocol {
 			String reference = DOMUtils.getElementText(fetchNode, "FileReference");
 			String collectionId = DOMUtils.getElementText(fetchNode, "CollectionId");
 			String serverId = DOMUtils.getElementText(fetchNode, "ServerId");
-			Integer type = Integer.valueOf(DOMUtils.getElementText(fetchNode, "Type"));
 
 			Fetch fetch = new Fetch();
 			fetch.setStoreName(storeName);
 			fetch.setFileReference(reference);
 			fetch.setCollectionId(collectionId);
 			fetch.setServerId(serverId);
-			fetch.setType(type);
+			fetch.setType(getType(fetchNode));
 			return fetch;
+		}
+		return null;
+	}
+
+	private Integer getType(Element fetchNode) {
+		String typeAsTextInteger = DOMUtils.getElementText(fetchNode, "Type");
+		if (typeAsTextInteger != null) {
+			return Integer.valueOf(typeAsTextInteger);
 		}
 		return null;
 	}

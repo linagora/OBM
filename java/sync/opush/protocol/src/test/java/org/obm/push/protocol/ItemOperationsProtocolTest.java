@@ -41,13 +41,43 @@ public class ItemOperationsProtocolTest {
 				"</Options>" +
 				"</Fetch>" +
 				"</ItemOperations>");
-		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
-		EasyMock.expect(request.getHeader("MS-ASAcceptMultiPart")).andReturn("T");
-		EasyMock.expect(request.getHeader(HttpHeaders.ACCEPT_ENCODING)).andReturn(null);
+		ActiveSyncRequest request = createDefaultActiveSyncRequestMock();
 		EasyMock.replay(request);
 		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(request, document);
 		EasyMock.verify(request);
 		Assertions.assertThat(decodedRequest).isNotNull();
+		Assertions.assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
+		Assertions.assertThat(decodedRequest.getFetch().getServerId()).isEqualTo("1400:350025");
+		Assertions.assertThat(decodedRequest.getFetch().getType()).isEqualTo(2);
 	}
 
+	@Test
+	public void testNoOptions() throws SAXException, IOException, FactoryConfigurationError {
+		Document document = getXml(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<ItemOperations>" +
+				"<Fetch>" +
+				"<Store>Mailbox</Store>" +
+				"<CollectionId>1400</CollectionId>" +
+				"<ServerId>1400:350025</ServerId>" +
+				"</Fetch>" +
+				"</ItemOperations>");
+		ActiveSyncRequest request = createDefaultActiveSyncRequestMock();
+		EasyMock.replay(request);
+		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(request, document);
+		EasyMock.verify(request);
+		Assertions.assertThat(decodedRequest).isNotNull();
+		Assertions.assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
+		Assertions.assertThat(decodedRequest.getFetch().getServerId()).isEqualTo("1400:350025");
+		Assertions.assertThat(decodedRequest.getFetch().getType()).isNull();
+	}
+
+	private ActiveSyncRequest createDefaultActiveSyncRequestMock() {
+		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
+		EasyMock.expect(request.getHeader("MS-ASAcceptMultiPart")).andReturn("T");
+		EasyMock.expect(request.getHeader(HttpHeaders.ACCEPT_ENCODING)).andReturn(null);
+		return request;
+	}
+
+	
 }
