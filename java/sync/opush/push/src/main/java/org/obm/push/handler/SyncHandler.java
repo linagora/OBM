@@ -440,7 +440,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			UnknownObmSyncServerException, ProcessingEmailException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
-		
 		if ("0".equals(syncCollection.getSyncKey())) {
 			handleInitialSync(bs, syncCollection, syncCollectionResponse);
 		} else {
@@ -501,7 +500,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			change.setIsNew(isItemAddition);
 		}
 	}
-
 	
 	private void sendError(Responder responder, String errorStatus, Exception exception) {
 		sendError(responder, errorStatus, null, exception);

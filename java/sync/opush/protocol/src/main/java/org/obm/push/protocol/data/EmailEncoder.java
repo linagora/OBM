@@ -96,9 +96,9 @@ public class EmailEncoder implements IDataEncoder {
 		}
 
 		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
-			appendAttachments25(parent, mail);
+			appendAttachments25(parent, mail.getAttachements());
 		} else {
-			appendAttachments(parent, mail);
+			appendAttachments(parent, mail.getAttachements());
 		}
 
 		DOMUtils.createElementAndText(parent, "Email:MessageClass", mail
@@ -387,51 +387,32 @@ public class EmailEncoder implements IDataEncoder {
 		}
 	}
 
-	private void appendAttachments(Element parent, MSEmail email) {
-		if (email.getAttachements().size() > 0) {
+	private void appendAttachments(Element parent, Set<MSAttachement> attachments) {
+		if (attachments.size() > 0) {
 			Element atts = DOMUtils.createElement(parent,
 					"AirSyncBase:Attachments");
 
-			Set<MSAttachement> mailAtts = email.getAttachements();
-			for (MSAttachement msAtt : mailAtts) {
-				if (msAtt.getDisplayName() != null
-						&& !msAtt.getDisplayName().endsWith(".ics")) {
-					Element att = DOMUtils.createElement(atts,
-							"AirSyncBase:Attachment");
-					DOMUtils.createElementAndText(att,
-							"AirSyncBase:DisplayName", msAtt.getDisplayName());
-					DOMUtils.createElementAndText(att,
-							"AirSyncBase:FileReference",
-							msAtt.getFileReference());
-					DOMUtils.createElementAndText(att, "AirSyncBase:Method",
-							msAtt.getMethod().asIntString());
-					DOMUtils.createElementAndText(att,
-							"AirSyncBase:EstimatedDataSize", msAtt
-									.getEstimatedDataSize().toString());
-				}
+			for (MSAttachement msAtt : attachments) {
+				Element att = DOMUtils.createElement(atts, "AirSyncBase:Attachment");
+				DOMUtils.createElementAndText(att, "AirSyncBase:DisplayName", msAtt.getDisplayName());
+				DOMUtils.createElementAndText(att, "AirSyncBase:FileReference", msAtt.getFileReference());
+				DOMUtils.createElementAndText(att, "AirSyncBase:Method", msAtt.getMethod().asIntString());
+				DOMUtils.createElementAndText(att, 
+						"AirSyncBase:EstimatedDataSize", msAtt.getEstimatedDataSize().toString());
 			}
 		}
 	}
 
-	private void appendAttachments25(Element parent, MSEmail email) {
-		if (email.getAttachements().size() > 0) {
+	private void appendAttachments25(Element parent, Set<MSAttachement> attachments) {
+		if (attachments.size() > 0) {
 			Element atts = DOMUtils.createElement(parent, "Email:Attachments");
 
-			Set<MSAttachement> mailAtts = email.getAttachements();
-			for (MSAttachement msAtt : mailAtts) {
-				if (msAtt.getDisplayName() != null
-						&& !msAtt.getDisplayName().endsWith(".ics")) {
-					Element att = DOMUtils.createElement(atts,
-							"Email:Attachment");
-					DOMUtils.createElementAndText(att, "Email:DisplayName",
-							msAtt.getDisplayName());
-					DOMUtils.createElementAndText(att, "Email:AttName",
-							msAtt.getFileReference());
-					DOMUtils.createElementAndText(att, "Email:AttMethod", msAtt
-							.getMethod().asIntString());
-					DOMUtils.createElementAndText(att, "Email:AttSize", msAtt
-							.getEstimatedDataSize().toString());
-				}
+			for (MSAttachement msAtt : attachments) {
+				Element att = DOMUtils.createElement(atts, "Email:Attachment");
+				DOMUtils.createElementAndText(att, "Email:DisplayName", msAtt.getDisplayName());
+				DOMUtils.createElementAndText(att, "Email:AttName", msAtt.getFileReference());
+				DOMUtils.createElementAndText(att, "Email:AttMethod", msAtt.getMethod().asIntString());
+				DOMUtils.createElementAndText(att, "Email:AttSize", msAtt.getEstimatedDataSize().toString());
 			}
 		}
 	}

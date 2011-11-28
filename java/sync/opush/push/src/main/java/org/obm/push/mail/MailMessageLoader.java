@@ -223,18 +223,32 @@ public class MailMessageLoader {
 		return null;
 	}
 
-	private Set<MSAttachement> convertMailMessageAttachmentToMSAttachment(final MailMessage mailMessage, 
-			final long uid, final Integer collectionId, final long messageId) {
-		final Set<MSAttachement> msAttachements = new HashSet<MSAttachement>();
+	private Set<MSAttachement> convertMailMessageAttachmentToMSAttachment(MailMessage mailMessage, long uid, 
+			Integer collectionId, long messageId) {
+		
+		Set<MSAttachement> msAttachements = new HashSet<MSAttachement>();
 		for (MailMessageAttachment mailMessageAttachment: mailMessage.getAttachments()) {			
-			if (!mailMessageAttachment.getPart().isInvitation()) {
-				final MSAttachement extractAttachments = extractAttachmentData(mailMessageAttachment.getPart(), uid, collectionId, messageId);
-				if (extractAttachments != null) {
-					msAttachements.add(extractAttachments);	
-				}	
+			
+			IMimePart part = mailMessageAttachment.getPart();
+			if (part != null && !part.isInvitation()) {
+				MSAttachement extractAttachments = extractAttachmentData(part, uid, collectionId, messageId);
+				if (isNotICSAttachments(extractAttachments)) {
+					msAttachements.add(extractAttachments);
+				}
 			}
+			
 		}
 		return msAttachements;
+	}
+
+	private boolean isNotICSAttachments(MSAttachement msAttachment) {
+		if (msAttachment != null) {
+			String displayName = msAttachment.getDisplayName();
+			if (displayName != null && !displayName.endsWith(".ics")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private Set<MSEmail> convertAllMailMessageToMSEmail(final Set<MailMessage> set, final BackendSession bs, 
