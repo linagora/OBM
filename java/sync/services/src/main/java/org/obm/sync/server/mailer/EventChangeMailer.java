@@ -382,7 +382,7 @@ public class EventChangeMailer extends AbstractMailer {
 	private Builder<Object, Object> defineTechnicalData(Builder<Object, Object> builder, Event event) {
 		return builder
 			.put("host", this.baseUrl)
-			.put("calendarId", event.getObmId());
+			.put("calendarId", event.getObmId().serializeToString());
 	}
 
 	private Builder<Object, Object> buildEventDatamodel(Event event) {
