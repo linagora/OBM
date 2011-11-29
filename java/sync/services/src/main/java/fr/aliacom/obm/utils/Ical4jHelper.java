@@ -135,7 +135,7 @@ public class Ical4jHelper {
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
+				VEvent eventExt = buildIcsInvitationVEventException(ee);
 				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
 				calendar.getComponents().add(eventExt);
 			}
@@ -150,7 +150,7 @@ public class Ical4jHelper {
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
+				VEvent eventExt = buildIcsInvitationVEventException(ee);
 				appendUidToICS(eventExt.getProperties(), ee, parentExtId);
 				calendar.getComponents().add(eventExt);
 			}
@@ -188,10 +188,9 @@ public class Ical4jHelper {
 		return foldingWriterToString(calendar);
 	}
 	
-	private VEvent buildIcsInvitationVEvent(ObmUser user, Event event) {
+	private VEvent buildIcsInvitationVEventDefaultValue(Event event) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
-		appendUidToICS(prop, event, null);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
 		appendSequence(prop, event);
@@ -211,9 +210,19 @@ public class Ical4jHelper {
 		appendVAlarmToICS(vEvent.getAlarms(), event);
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
-		if(user != null){
-			appendXObmDomain(user.getDomain(), prop);
-		}
+		return vEvent;
+	}
+	
+	private VEvent buildIcsInvitationVEventException(Event event) {
+		return buildIcsInvitationVEventDefaultValue(event);
+	}
+	
+	
+	private VEvent buildIcsInvitationVEvent(ObmUser user, Event event) {
+		VEvent vEvent = buildIcsInvitationVEventDefaultValue(event);
+		PropertyList prop = vEvent.getProperties();
+		appendUidToICS(prop, event, null);
+		appendXObmDomain(user.getDomain(), prop);
 		return vEvent;
 	}
 	
