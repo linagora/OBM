@@ -49,6 +49,14 @@ public class ItemOperationsResponse {
 			return fetchItemResult;
 		}
 		
+		public byte[] getAttachmentData() {
+			if (fileReferenceFetch != null) {
+				return fileReferenceFetch.attch;
+			} else {
+				return null;
+			}
+		}
+		
 		public static class FetchItemResult {
 			private ItemChange itemChange;
 			private ItemOperationsStatus status;
@@ -170,6 +178,13 @@ public class ItemOperationsResponse {
 	
 	public void setGzip(boolean gzip) {
 		this.gzip = gzip;
+	}
+	
+	public byte[] getAttachmentData() {
+		if (mailboxFetchResult != null) {
+			return mailboxFetchResult.getAttachmentData();
+		}
+		return null;
 	}
 	
 }
