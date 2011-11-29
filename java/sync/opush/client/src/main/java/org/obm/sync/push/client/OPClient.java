@@ -33,18 +33,21 @@ public class OPClient {
 	private ProtocolVersion protocolVersion;
 	private AccountInfos ai;
 
+	private WBXMLTools wbxmlTools;
+
 	static {
 		XTrustProvider.install();
 	}
 
 	public OPClient(String loginAtDomain, String password, String devId,
-			String devType, String userAgent, String url) {
+			String devType, String userAgent, String url, WBXMLTools wbxmlTools) {
 
 		setProtocolVersion(ProtocolVersion.V121);
 		this.ai = new AccountInfos(loginAtDomain, password, devId, devType,
 				url, userAgent);
 
 		this.hc = createHttpClient();
+		this.wbxmlTools = wbxmlTools;
 	}
 
 	public void destroy() {
@@ -93,7 +96,7 @@ public class OPClient {
 
 		DOMUtils.logDom(doc);
 
-		byte[] data = WBXMLTools.toWbxml(namespace, doc);
+		byte[] data = wbxmlTools.toWbxml(namespace, doc);
 		PostMethod pm = null;
 		pm = new PostMethod(ai.getUrl() + "?User=" + ai.getLogin()
 				+ "&DeviceId=" + ai.getDevId() + "&DeviceType="
@@ -170,7 +173,7 @@ public class OPClient {
 							value[j] = all[start++];
 						}
 						if (p == 0) {
-							xml = WBXMLTools.toXml(value);
+							xml = wbxmlTools.toXml(value);
 							DOMUtils.logDom(xml);
 						} else {
 							String file = new String(value);
@@ -179,7 +182,7 @@ public class OPClient {
 
 					}
 				} else if (out.toByteArray().length > 0) {
-					xml = WBXMLTools.toXml(out.toByteArray());
+					xml = wbxmlTools.toXml(out.toByteArray());
 					DOMUtils.logDom(xml);
 				}
 			}

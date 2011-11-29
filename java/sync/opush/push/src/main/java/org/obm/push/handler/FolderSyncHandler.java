@@ -26,6 +26,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -42,10 +43,11 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	protected FolderSyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IHierarchyExporter hierarchyExporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			CollectionDao collectionDao, FolderSyncProtocol protocol) {
+			CollectionDao collectionDao, FolderSyncProtocol protocol,
+			WBXMLTools wbxmlTools) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		
 		this.hierarchyExporter = hierarchyExporter;
 		this.protocol = protocol;

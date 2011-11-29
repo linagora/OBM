@@ -17,6 +17,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -33,9 +34,10 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			Random random, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
-			ProvisionProtocol provisionProtocol) {
+			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools) {
 		
-		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
+		super(backend, encoderFactory, contentsImporter, contentsExporter, 
+				stMachine, collectionDao, wbxmlTools);
 		this.random = random;
 		this.protocol = provisionProtocol;
 	}

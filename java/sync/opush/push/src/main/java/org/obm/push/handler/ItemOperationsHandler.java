@@ -37,6 +37,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.FileUtils;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -53,9 +54,9 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol protocol,
-			CollectionDao collectionDao) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools) {
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		this.protocol = protocol;
 	}
 	

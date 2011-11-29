@@ -52,6 +52,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -98,9 +99,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
-			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao) {
+			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
+			WBXMLTools wbxmlTools) {
 		
-		super(backend, encoderFactory, contentsImporter, contentsExporter, stMachine, collectionDao);
+		super(backend, encoderFactory, contentsImporter, contentsExporter, 
+				stMachine, collectionDao, wbxmlTools);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;

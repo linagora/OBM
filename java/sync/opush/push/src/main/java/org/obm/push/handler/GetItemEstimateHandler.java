@@ -28,6 +28,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -44,10 +45,10 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
-			GetItemEstimateProtocol protocol) {
+			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.protocol = protocol;
 	}

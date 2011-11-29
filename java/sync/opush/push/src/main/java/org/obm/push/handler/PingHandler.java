@@ -28,6 +28,7 @@ import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -48,10 +49,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
-			CollectionDao collectionDao, HearbeatDao hearbeatDao) {
+			CollectionDao collectionDao, HearbeatDao hearbeatDao,
+			WBXMLTools wbxmlTools) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
 		this.hearbeatDao = hearbeatDao;

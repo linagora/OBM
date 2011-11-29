@@ -23,6 +23,7 @@ import org.obm.push.search.ObmSearchContact;
 import org.obm.push.search.ldap.BookSource;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -40,10 +41,11 @@ public class SearchHandler extends WbxmlRequestHandler {
 			BookSource bookSource, ObmSearchContact obmSearchContact,
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			SearchProtocol searchProtocol, CollectionDao collectionDao) {
+			SearchProtocol searchProtocol, CollectionDao collectionDao,
+			WBXMLTools wbxmlTools) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		
 		this.protocol = searchProtocol;
 		this.sources = ImmutableMultimap.of(

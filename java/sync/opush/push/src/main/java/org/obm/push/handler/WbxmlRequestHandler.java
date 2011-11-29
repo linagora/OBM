@@ -38,10 +38,13 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 	protected final StateMachine stMachine;
 	protected final CollectionDao collectionDao;
 
+	private final WBXMLTools wbxmlTools;
+
 	protected WbxmlRequestHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
-			StateMachine stMachine, CollectionDao collectionDao) {
+			StateMachine stMachine, CollectionDao collectionDao,
+			WBXMLTools wbxmlTools) {
 		
 		this.backend = backend;
 		this.encoderFactory = encoderFactory;
@@ -49,6 +52,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 		this.contentsExporter = contentsExporter;
 		this.stMachine = stMachine;
 		this.collectionDao = collectionDao;
+		this.wbxmlTools = wbxmlTools;
 	}
 
 	@Override
@@ -61,7 +65,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 
 		if (input != null && input.length > 0) {
 			try {
-				doc = WBXMLTools.toXml(input);
+				doc = wbxmlTools.toXml(input);
 			} catch (IOException e) {
 				logger.error("Error parsing wbxml data.", e);
 				return;

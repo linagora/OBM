@@ -21,14 +21,16 @@ public class ResponderImpl implements Responder {
 	public static class Factory {
 		
 		private final IntEncoder intEncoder;
+		private final WBXMLTools wbxmlTools;
 
 		@Inject
-		private Factory(IntEncoder intEncoder) {
+		private Factory(IntEncoder intEncoder, WBXMLTools wbxmlTools) {
 			this.intEncoder = intEncoder;
+			this.wbxmlTools = wbxmlTools;
 		}
 		
 		public Responder createResponder(HttpServletResponse resp) {
-			return new ResponderImpl(resp, intEncoder);
+			return new ResponderImpl(resp, intEncoder, wbxmlTools);
 		}
 		
 	}
@@ -38,10 +40,13 @@ public class ResponderImpl implements Responder {
 	private HttpServletResponse resp;
 
 	private final IntEncoder intEncoder;
+
+	private final WBXMLTools wbxmlTools;
 	
-	private ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder) {
+	private ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools) {
 		this.resp = resp;
 		this.intEncoder = intEncoder;
+		this.wbxmlTools = wbxmlTools;
 	}
 
 	@Override
@@ -52,14 +57,14 @@ public class ResponderImpl implements Responder {
 		}
 		
 		try {
-			byte[] wbxml = WBXMLTools.toWbxml(defaultNamespace, doc);
+			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
 			resp.setContentType("application/vnd.ms-sync.wbxml");
 			resp.setContentLength(wbxml.length);
 			
 			ServletOutputStream out = resp.getOutputStream();
 			out.write(wbxml);
 			out.flush();
-			out.close();	
+			out.close();
 		} catch (IOException e) {
 			logger.warn(e.getMessage(), e);
 		} catch (WBXmlException e) {

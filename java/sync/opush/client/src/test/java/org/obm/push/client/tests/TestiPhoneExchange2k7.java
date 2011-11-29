@@ -5,16 +5,15 @@ import java.io.InputStream;
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
-import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 @Ignore("It's necessary to do again all tests")
-public class TestiPhoneExchante2k7 extends AbstractPushTest {
+public class TestiPhoneExchange2k7 extends AbstractPushTest {
 
 	private void decode(String fileName) throws Exception {
 		InputStream in = loadDataFile(fileName);
 		byte[] data = FileUtils.streamBytes(in, true);
-		Document doc = WBXMLTools.toXml(data);
+		Document doc = wbxmlTools.toXml(data);
 		DOMUtils.logDom(doc);
 	}
 	

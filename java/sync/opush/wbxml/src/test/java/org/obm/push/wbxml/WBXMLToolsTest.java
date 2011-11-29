@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.obm.push.utils.DOMUtils;
@@ -13,6 +14,14 @@ import org.xml.sax.SAXException;
 
 
 public class WBXMLToolsTest {
+	
+	private WBXMLTools wbxmlTools;
+
+	@Before
+	public void setUp() {
+		wbxmlTools = new WBXMLTools();
+	}
+	
 	@Test
 	public void testToWbxmlWithAccents() throws IOException, SAXException, FactoryConfigurationError, WBXmlException{
 		String expectedString = "éàâè";
@@ -40,7 +49,7 @@ public class WBXMLToolsTest {
 		ByteArrayInputStream is = new ByteArrayInputStream(xmlActiveSync.getBytes("UTF-8"));		
 		Document doc = DOMUtils.parse(is);
 		
-		byte[] byteDoc = WBXMLTools.toWbxml("AirSync", doc);
+		byte[] byteDoc = wbxmlTools.toWbxml("AirSync", doc);
 
 		Assert.assertThat(new String(byteDoc), 
 				StringContains.containsString(expectedString));

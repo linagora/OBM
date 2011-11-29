@@ -10,6 +10,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;
@@ -22,10 +23,10 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			CollectionDao collectionDao) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools) {
 		
 		super(backend, encoderFactory, contentsImporter, 
-				contentsExporter, stMachine, collectionDao);
+				contentsExporter, stMachine, collectionDao, wbxmlTools);
 	}
 
 	@Override

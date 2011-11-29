@@ -6,6 +6,7 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
+import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProtocolVersion;
 import org.w3c.dom.Document;
@@ -14,6 +15,7 @@ import org.w3c.dom.Document;
 public class AbstractPushTest extends TestCase {
 
 	protected OPClient opc;
+	protected WBXMLTools wbxmlTools;
 
 	protected AbstractPushTest() {
 	}
@@ -40,7 +42,9 @@ public class AbstractPushTest extends TestCase {
 		String userAgent = p(p, "userAgent");
 		String url = p(p, "url");
 
-		opc = new OPClient(login, password, devId, devType, userAgent, url);
+		wbxmlTools = new WBXMLTools();
+		
+		opc = new OPClient(login, password, devId, devType, userAgent, url, wbxmlTools);
 	}
 
 	@Override

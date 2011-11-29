@@ -18,27 +18,23 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-/**
- * Wbxml convertion tools
- * 
- * @author tom
- * 
- */
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class WBXMLTools {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(WBXMLTools.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Inject
+	public WBXMLTools() {
+		super();
+	}
+	
 	/**
 	 * Transforms a wbxml byte array into the corresponding DOM representation
-	 * 
-	 * @param wbxml
-	 * @return
-	 * @throws IOException
 	 */
-	public static Document toXml(byte[] wbxml) throws IOException {
-
-		// storeWbxml(wbxml);
+	public Document toXml(byte[] wbxml) throws IOException {
 
 		WbxmlParser parser = new WbxmlParser();
 		parser.setTagTable(0, TagsTables.CP_0); // AirSync
@@ -76,7 +72,7 @@ public class WBXMLTools {
 
 	}
 
-	private static void storeWbxml(byte[] wbxml) {
+	private void storeWbxml(byte[] wbxml) {
 		FileOutputStream fout = null;
 		try {
 			File tmp = File.createTempFile("debug_", ".wbxml");
@@ -96,7 +92,7 @@ public class WBXMLTools {
 		}
 	}
 
-	public static byte[] toWbxml(String defaultNamespace, Document doc)
+	public byte[] toWbxml(String defaultNamespace, Document doc)
 			throws WBXmlException, IOException {
 		WbxmlEncoder encoder = new WbxmlEncoder(defaultNamespace);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
