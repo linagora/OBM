@@ -1,5 +1,6 @@
 package org.obm.push.handler;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.obm.push.backend.IBackend;
@@ -47,6 +48,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ItemOperationsHandler extends WbxmlRequestHandler {
 
+	private static final String NAMESPACE = "ItemOperations";
 	private final ItemOperationsProtocol protocol;
 
 	@Inject
@@ -68,7 +70,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
 			ItemOperationsResponse response = doTheJob(bs, itemOperationRequest);
 			Document document = protocol.encodeResponse(response, bs);
-			sendResponse(responder, document);
+			sendResponse(responder, document, response);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (UnsupportedStoreException e) {
@@ -82,11 +84,17 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	
 	private void sendErrorResponse(Responder responder, ItemOperationsStatus status, Exception exception) {
 		logger.error(exception.getMessage(), exception);
-		sendResponse(responder, protocol.encodeErrorRespponse(status));
+		responder.sendResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
 	}
 	
-	private void sendResponse(Responder responder, Document document) {
-		responder.sendResponse("ItemOperations", document);
+	private void sendResponse(Responder responder, Document document, ItemOperationsResponse response) {
+		
+		if (response.isMultipart()) {
+			responder.sendMSSyncMultipartResponse(NAMESPACE, document, 
+					Arrays.asList(response.getAttachmentData()), response.isGzip());
+		} else {
+			responder.sendResponse(NAMESPACE, document);
+		}
 	}
 	
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
