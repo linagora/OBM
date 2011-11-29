@@ -1413,7 +1413,12 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
 
 function run_icalendar_obmsync_insert($ics){
   global $obm;
-
+  $userInfo = get_user_info($obm['uid']);
+  
+  if(empty($userInfo["email"])) {
+  	return array(0,__("Couldn't find your Email adress for this domain"));
+  }
+  
   $obmSyncServer = of_domain_get_domain_syncserver($obm['domain_id']);
   if(!count($obmSyncServer)){
     return array(0, __("Couldn't find an obm-sync server for this domain"));
@@ -1421,7 +1426,6 @@ function run_icalendar_obmsync_insert($ics){
   $iterator = new ArrayIterator($obmSyncServer);
   $obmSyncServer = $iterator->current();
   $obmSyncRootPath = "http://".$obmSyncServer[0]["ip"].":8080";
-  $userInfo = get_user_info($obm['uid']);
   $loginPath = "/obm-sync/services/login/doLogin";
   $username = $userInfo["login"];
   $password = $userInfo["password"];

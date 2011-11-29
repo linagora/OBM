@@ -37,7 +37,8 @@ return array(
     "Couldn't login to obm-sync" => "Impossible de se connecter à obm-sync",
     "An unknown error occured during the ics import" => "Une erreur inconnue s'est produite pendant l'import ics",
     "An event from the ics already exists" => "Un évènement de cet ics existe déjà",
-    "Organizer" => "Organisateur"
+    "Organizer" => "Organisateur",
+    "Couldn't find your Email adress for this domain" => "Votre courriel n'a pas été trouvé pour le domaine courant"
 );
 
 ?>
