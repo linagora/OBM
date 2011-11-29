@@ -78,11 +78,14 @@ public class ActiveSyncServlet extends HttpServlet {
 	private DeviceService deviceService;
 	private final User.Factory userFactory;
 
+	private final org.obm.push.impl.ResponderImpl.Factory responderFactory;
+
 	
 	@Inject
 	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
-			IBackend backend, Factory continuationFactory, DeviceService deviceService, 
-			User.Factory userFactory) {
+			IBackend backend, Factory continuationFactory,
+			DeviceService deviceService, User.Factory userFactory,
+			ResponderImpl.Factory responderFactory) {
 		super();
 		this.sessionService = sessionService;
 		this.loggerService = loggerService;
@@ -90,6 +93,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.continuationFactory = continuationFactory;
 		this.deviceService = deviceService;
 		this.userFactory = userFactory;
+		this.responderFactory = responderFactory;
 	}
 
 	@Override
@@ -178,7 +182,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
-		Responder responder = new ResponderImpl(response);
+		Responder responder = responderFactory.createResponder(response);
 		if (c.isError()) {
 			ph.sendError(responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
@@ -311,7 +315,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 
 		sendASHeaders(response);
-		Responder responder = new ResponderImpl(response);
+		Responder responder = responderFactory.createResponder(response);
 		rh.process(continuation, bs, request, responder);
 	}
 	

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
@@ -13,14 +14,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import com.google.inject.Inject;
+
 public class ResponderImpl implements Responder {
 
+	public static class Factory {
+		
+		private final IntEncoder intEncoder;
+
+		@Inject
+		private Factory(IntEncoder intEncoder) {
+			this.intEncoder = intEncoder;
+		}
+		
+		public Responder createResponder(HttpServletResponse resp) {
+			return new ResponderImpl(resp, intEncoder);
+		}
+		
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ResponderImpl.class);
 
 	private HttpServletResponse resp;
 
-	public ResponderImpl(HttpServletResponse resp) {
+	private final IntEncoder intEncoder;
+	
+	private ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder) {
 		this.resp = resp;
+		this.intEncoder = intEncoder;
 	}
 
 	@Override
