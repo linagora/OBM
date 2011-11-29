@@ -19,6 +19,7 @@ Description: integration of OBM with Cyrus and Postfix
  simple contact database. OBM also features integration with PDAs, smartphones,
  Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
+Package: libobmsatellite-perl
 Section: perl
 Architecture: all
 Depends: libnet-server-perl, libnet-ldap-perl, libunicode-maputf8-perl, libio-socket-ssl-perl, libclass-singleton-perl, libxml-simple-perl, liblog-log4perl-perl, libmime-lite-perl, libmailtools-perl, libmime-types-perl, ${perl:Depends}, ${misc:Depends}
