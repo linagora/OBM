@@ -14,7 +14,7 @@ public class Attendee {
 	private int percent;
 	private boolean organizer;
 	private boolean obmUser;
-	private Boolean canWriteOnCalendar;
+	private boolean canWriteOnCalendar;
 	
 	public ParticipationState getState() {
 		return state;

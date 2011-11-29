@@ -2,6 +2,7 @@ package org.obm.sync.calendar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,13 @@ import java.util.Set;
 
 import org.obm.push.utils.collection.Sets;
 
+import com.google.common.base.Equivalence;
+import com.google.common.base.Equivalence.Wrapper;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 public class EventRecurrence {
 
@@ -114,6 +121,44 @@ public class EventRecurrence {
 		Set<Event> difference = Sets.difference(this.getEventExceptions(), recurrence.getEventExceptions(), 
 				new ComparatorUsingEventHasImportantChanges());
 		return !difference.isEmpty();
+	}
+	
+	public List<Event> getEventExceptionWithChangesExceptedOnException(EventRecurrence recurrence) {
+		if (recurrence == null) {
+			return ImmutableList.copyOf(this.getEventExceptions());
+		}
+		Builder<Event> eventExceptionWithChanges = ImmutableList.builder();
+		
+		final AllEventAttributesExceptExceptionsEquivalence equivalence = new AllEventAttributesExceptExceptionsEquivalence();
+		Collection<Wrapper<Event>> recurrenceEquivalenceWrappers = transformToEquivalenceWrapper(recurrence, equivalence);
+		
+		for(Event exp : eventExceptions){
+			Wrapper<Event> r = equivalence.wrap(exp);
+			if(!recurrenceEquivalenceWrappers.contains(r)) {
+				eventExceptionWithChanges.add(exp);
+			}
+		}
+		return eventExceptionWithChanges.build();
+	}
+	
+	private Collection<Wrapper<Event>> transformToEquivalenceWrapper(EventRecurrence recurrence, 
+			final AllEventAttributesExceptExceptionsEquivalence equivalence) {
+		return Collections2.transform(recurrence.getEventExceptions(), new Function<Event, Equivalence.Wrapper<Event>>() {
+			@Override
+			public Equivalence.Wrapper<Event> apply(Event input) {
+				Wrapper<Event> wrapper = equivalence.wrap(input);
+				return wrapper;
+			}
+		});
+	}
+
+	public Event getEventExceptionWithRecurrenceId(Date recurrenceId) {
+		for(Event event : this.eventExceptions){
+			if(recurrenceId.equals(event.getRecurrenceId())) {
+				return event;
+			}
+		}
+		return null;
 	}
 	
 	@Override

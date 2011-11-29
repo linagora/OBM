@@ -144,6 +144,21 @@ public class Ical4jHelper {
 		return foldingWriterToString(calendar);
 	}
 	
+	public String buildIcsInvitationRequestForEventException(ObmUser user, Event event, EventExtId parentExtId) {
+		Calendar calendar = initCalendar();
+		VEvent vEvent = buildIcsInvitationVEvent(user, event);
+		calendar.getComponents().add(vEvent);
+		if (event.getRecurrence() != null) {
+			for (Event ee : event.getRecurrence().getEventExceptions()) {
+				VEvent eventExt = buildIcsInvitationVEvent(null, ee);
+				appendUidToICS(eventExt.getProperties(), ee, parentExtId);
+				calendar.getComponents().add(eventExt);
+			}
+		}
+		calendar.getProperties().add(Method.REQUEST);
+		return foldingWriterToString(calendar);
+	}
+	
 	private String foldingWriterToString(final Calendar calendar) {
 		Writer writer =  new StringWriter();
 		CalendarOutputter calendarOutputter = new CalendarOutputter(true, MAX_FOLD_LENGTH);

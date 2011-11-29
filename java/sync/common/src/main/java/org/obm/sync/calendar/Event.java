@@ -9,6 +9,7 @@ import java.util.List;
 import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
 public class Event implements Indexed<Integer> {
 
@@ -422,6 +423,33 @@ public class Event implements Indexed<Integer> {
 			hasImportantChanges = true;
 		}
 		return hasImportantChanges;
+	}
+	
+	public boolean hasChangesOnEventAttributesExceptedEventException(Event event) {
+		if(event == null){
+			return true;
+		}
+		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
+		return !comparator.doEquivalent(this, event);
+	}
+
+	public List<Event> getEventExceptionWithModifiedAttributes(Event event) {
+		if(this.recurrence == null){
+			return ImmutableList.of();
+		}
+		return this.recurrence.getEventExceptionWithChangesExceptedOnException(event.recurrence);
+	}
+	
+	public Event getEventInstanceWithRecurrenceId(Date recurrenceId){
+		Event instance = recurrence.getEventExceptionWithRecurrenceId(recurrenceId);
+		if(instance == null){
+			instance = clone();
+			instance.date = recurrenceId;
+			instance.recurrenceId = recurrenceId;
+			instance.recurrence = new EventRecurrence();
+			instance.recurrence.setKind(RecurrenceKind.none);
+		}
+		return instance;
 	}
 
 	@Override

@@ -44,7 +44,6 @@ import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.Helper;
 import fr.aliacom.obm.utils.Ical4jHelper;
 
-
 public class CalendarBindingImplTest {
 
 	private class ColdWarFixtures {

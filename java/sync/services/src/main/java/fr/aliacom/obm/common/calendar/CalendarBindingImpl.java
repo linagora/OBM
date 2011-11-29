@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
 import net.fortuna.ical4j.data.ParserException;
 
 import org.apache.commons.lang.StringUtils;
@@ -374,7 +373,15 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 
             ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.update(user, before, after, notification, hasImportantChanges);
+            if(before.hasChangesOnEventAttributesExceptedEventException(after)) {
+            	eventChangeHandler.update(user, before, after, notification, hasImportantChanges);
+            } else if(after != null){
+            	List<Event> exceptionWithChanges = after.getEventExceptionWithModifiedAttributes(before);
+				for(Event exception : exceptionWithChanges) {
+					Event previousException = before.getEventInstanceWithRecurrenceId(exception.getRecurrenceId());
+					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges);
+				}
+            }
 
 			return after;
 		} catch (Throwable e) {

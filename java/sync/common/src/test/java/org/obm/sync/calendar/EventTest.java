@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class EventTest {
 
 	@Test
@@ -374,6 +373,72 @@ public class EventTest {
 		updateEvent.setLocation("");
 		Assert.assertFalse(updateEvent.hasImportantChanges(newEvent));
 	}
+	
+	@Test
+	public void testHasChangesOnAllEventAttributesExceptedExceptionWithoutChanges() {
+		Event ev1 = createOneEvent(3);
+		Event ev2 = ev1.clone();
+		
+		boolean change = ev1.hasChangesOnEventAttributesExceptedEventException(ev2);
+		
+		Assert.assertFalse(change);
+	}
+	
+	@Test
+	public void testHasChangesOnAllEventAttributesExceptedExceptionWithChanges() {
+		Event ev1 = createOneEvent(3);
+		Event ev2 = ev1.clone();
+		
+		ev2.setTitle("Change: "+ev2.getTitle());
+		
+		boolean change = ev1.hasChangesOnEventAttributesExceptedEventException(ev2);
+		
+		Assert.assertTrue(change);
+	}
+	
+	@Test
+	public void getEventInstanceWithRecurrenceIdWithoutExistedException(){
+		Event ev1 = createOneEvent(3);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(ev1.getDate());
+		cal.set(2012, 12, 12);
+		Date recurrenceId = cal.getTime();
+		
+		
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setFrequence(1);
+		ev1.setRecurrence(recurrence);
+		
+		Event instance = ev1.getEventInstanceWithRecurrenceId(recurrenceId);
+		
+		Assert.assertNotNull(instance);
+		Assert.assertEquals(recurrenceId, instance.getDate());
+		Assert.assertEquals(recurrenceId, instance.getRecurrenceId());
+		Assert.assertEquals(RecurrenceKind.none, instance.getRecurrence().getKind());
+	}
+	
+	@Test
+	public void getEventInstanceWithRecurrenceIdWithException(){
+		Calendar cal = Calendar.getInstance();
+		cal.set(2012, 12, 12);
+		Date recurrenceId = cal.getTime();
+		
+		Event ev1 = createOneEvent(3);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setFrequence(1);
+		Event exception = createOneEvent(2);
+		exception.setRecurrenceId(recurrenceId);
+		recurrence.addEventException(exception);		
+		ev1.setRecurrence(recurrence);
+
+		Event instance = ev1.getEventInstanceWithRecurrenceId(recurrenceId);
+		
+		Assert.assertNotNull(instance);
+		Assert.assertEquals(exception, instance);
+	}
+	
 	
 	private Event createOneEvent(int nbAttendees) {
 		Event event = new Event();

@@ -18,7 +18,7 @@
 		<junit.version>4.8.2</junit.version>
 		<easymock.version>3.0</easymock.version>
 		<fest.version>1.4</fest.version>
-		<guava.version>r09</guava.version>
+		<guava.version>10.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.0.1</commons-io.version>
 		<jms.version>1.1</jms.version>
