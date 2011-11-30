@@ -79,6 +79,8 @@ if [ "$1" = "0" ]; then
 fi
 
 %changelog
+* Wed Nov 30 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-tomcat-2.4.0.0-rc14
+- New upstream release.
 * Mon Jun 07 2010 Nicolas Chauvet <nchauvet@linagora.com> - 2.3.0-3
 - Add an exeption to tmpwatch - Fix obmbz#1044
 * Sun Apr 19 2009 Sylvain Garcia <sylvain.garcia[at]obm.org> - 2.2.1-1

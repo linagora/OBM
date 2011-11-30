@@ -75,5 +75,7 @@ ln -s /etc/solr/conf/contact /var/solr/contact/conf
 
 
 %changelog
+* Wed Nov 30 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-solr-2.4.0.0-rc14
+- New upstream release.
 * Wed Feb 25 2009 Sylvain Garcia <sylvain.garcia@obm.org> 1.4-5
 - Initial version
