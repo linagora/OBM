@@ -30,6 +30,7 @@ import net.fortuna.ical4j.data.ParserException;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -203,8 +204,8 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event removeEventById(AccessToken token, String calendar, EventObmId eventId, int sequence, boolean notification)
-			throws ServerFault, EventNotFoundException {
+	public void removeEventById(AccessToken token, String calendar, EventObmId eventId, int sequence, boolean notification)
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
 		try {
 			Event ev = calendarDao.findEventById(token, eventId);
@@ -214,15 +215,15 @@ public class CalendarBindingImpl implements ICalendar {
 			if (owner != null) {
 				if (helper.canWriteOnCalendar(token, calendar)) {
 					if (owner.getEmail().equals(calendarUser.getEmail())) {
-						return cancelEvent(token, calendar, notification, eventId, ev);
+						cancelEvent(token, calendar, notification, eventId, ev);
 					} else {
-						changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
-						return calendarDao.findEventById(token, eventId);
+						changeParticipationStateInternal(
+								token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
 					}
 				}
-				throw new ServerFault(calendar + " has no write right to remove event " + ev.getTitle());
+				throw new NotAllowedException(calendar + " has no write right to remove event " + ev.getTitle());
 			} else {
-				throw new ServerFault("It's not possible to remove an event without owner " + ev.getTitle());
+				throw new NotAllowedException("It's not possible to remove an event without owner " + ev.getTitle());
 			}
 		} catch (ServerFault e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
@@ -236,14 +237,13 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event cancelEvent(AccessToken token, String calendar,
+	private void cancelEvent(AccessToken token, String calendar,
 			boolean notification, EventObmId uid, Event ev) throws SQLException,
 			FindException, EventNotFoundException, ServerFault {
 		
 		Event removed = calendarDao.removeEventById(token, uid, ev.getType(), ev.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
 		notifyOnRemoveEvent(token, calendar, removed, notification);
-		return removed;
 	}
 
 	private Event cancelEventByExtId(AccessToken token, ObmUser calendar, Event event, boolean notification) throws SQLException, FindException {

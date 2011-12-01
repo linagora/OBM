@@ -29,6 +29,7 @@ import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
 import org.obm.push.store.CollectionDao;
+import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -398,6 +399,8 @@ public class CalendarBackend extends ObmSyncBackend {
 				throw new UnknownObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
 				throw new ServerItemNotFoundException(serverId);
+			} catch (NotAllowedException e) {
+				logger.error(e.getMessage(), e);
 			} finally {
 				bc.logout(token);
 			}
