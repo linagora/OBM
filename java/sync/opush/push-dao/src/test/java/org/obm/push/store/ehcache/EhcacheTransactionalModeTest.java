@@ -9,16 +9,32 @@ import net.sf.ehcache.transaction.TransactionException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.push.exception.EhcacheRollbackException;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.guiceberry.GuiceBerryModule;
+import com.google.guiceberry.junit4.GuiceBerryRule;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
 public class EhcacheTransactionalModeTest {
 
+	public static class Module extends AbstractModule {
+		@Override
+		protected void configure() {
+			install(new TransactionalModule());
+			install(new GuiceBerryModule());
+		}
+	}
+	
+	@Rule public final GuiceBerryRule guiceBerry =
+			new GuiceBerryRule(Module.class);
+
+	@Inject private TestClass xaCacheInstance;
+	
 	public static class TestClass {
 
 		@Transactional
@@ -46,12 +62,9 @@ public class EhcacheTransactionalModeTest {
 	private CacheManager manager;
 	private Cache xaCache;
 	private final static String XA_CACHE_NAME = "TEST";
-	private Injector injector;
 
 	@Before
 	public void init() {
-		this.injector = Guice.createInjector(new TransactionalModule());
-		
 		this.manager = CacheManager.create();
 	    this.xaCache = new Cache(
 	            new CacheConfiguration(XA_CACHE_NAME, 1000)
@@ -66,14 +79,12 @@ public class EhcacheTransactionalModeTest {
 	
 	@Test
 	public void callEhcacheMethod() {
-		TestClass xaCacheInstance = getTestClassInstance();
 		xaCacheInstance.put(xaCache, buildElement() );
 		Assert.assertEquals(1, xaCacheInstance.getSizeElement(manager, XA_CACHE_NAME));
 	}
 	
 	@Test
 	public void callEhcacheMethodAndThrowException() {
-		TestClass xaCacheInstance = getTestClassInstance();
 		try {	
 			xaCacheInstance.putAndthrowException(xaCache, buildElement() );
 			Assert.assertTrue(false);
@@ -85,13 +96,8 @@ public class EhcacheTransactionalModeTest {
 	
 	@Test(expected=TransactionException.class)
 	public void callEhcacheMethodWithoutTransactional() {
-		TestClass xaCacheInstance = getTestClassInstance();
 		xaCacheInstance.put(xaCache, buildElement() );	
 		xaCacheInstance.getSizeElementWithoutTransactional(manager, XA_CACHE_NAME);
-	}
-	
-	private TestClass getTestClassInstance () {
-		return injector.getInstance(TestClass.class);
 	}
 	
 	private Element buildElement() {

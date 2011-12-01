@@ -75,9 +75,15 @@
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
 		</dependency>
-		 <dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>common</artifactId>
-                </dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common</artifactId>
+        </dependency>
+		<dependency>
+		    <groupId>com.google.guiceberry</groupId>
+		    <artifactId>guiceberry</artifactId>
+		    <version>3.1.0</version>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
