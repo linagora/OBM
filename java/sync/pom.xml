@@ -225,6 +225,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-nop</artifactId>
 				<version>${slf4j.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
