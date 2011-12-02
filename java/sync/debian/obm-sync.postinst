@@ -15,19 +15,6 @@ if [ ${dbtype} = 'MYSQL' ]; then
   cat > /usr/share/obm-tomcat/applis/obm-sync.xml<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Context docBase="/usr/share/obm-sync/" path="/obm-sync">
-  <Resource auth="Container"
-            className="com.mysql.jdbc.Driver"
-            factory="fr.aliacom.jndi.DataSourceFactory"
-            login="${user}"
-            max="${max_connection}0"
-            name="jdbc/ObmDS"
-            password="${password}"
-            pingQuery="SELECT 1"
-            type="javax.sql.DataSource"
-            url="jdbc:mysql://${host}/${db}?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false&amp;interactiveClient=true&amp;serverTimezone=GMT&amp;useGmtMillisForDatetime=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;characterSetResults=utf8&amp;connectionCollation=utf8_general_ci&amp;dontTrackOpenResources=true"/>
-  <ResourceLink global="UTransaction"
-                name="UserTransaction"
-                type="javax.transaction.UserTransaction"/>
 </Context>
 
 EOF
@@ -35,19 +22,6 @@ else
   cat > /usr/share/obm-tomcat/applis/obm-sync.xml<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Context docBase="/usr/share/obm-sync/" path="/obm-sync">
-  <Resource auth="Container"
-            className="org.postgresql.Driver"
-            factory="fr.aliacom.jndi.DataSourceFactory"
-            login="${user}"
-            max="${max_connection}0"
-            name="jdbc/ObmDS"
-            password="${password}"
-            pingQuery="SELECT 1"
-            type="javax.sql.DataSource"
-            url="jdbc:postgresql://${host}/${db}"/>
-  <ResourceLink global="UTransaction"
-                name="UserTransaction"
-                type="javax.transaction.UserTransaction"/>
 </Context>
 EOF
 
