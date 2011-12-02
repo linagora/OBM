@@ -846,4 +846,12 @@ public class Ical4jHelperTest {
 		}
 	}
 	
+	@Test
+	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {
+		InputStream stream = getStreamICS("OBMFULL-2891.ics");
+		String ics = IOUtils.toString(stream);
+		getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
+		assertTrue(true);
+	}
+	
 }
