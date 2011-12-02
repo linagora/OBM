@@ -938,26 +938,6 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
-  if($repeat_kind == 'weekly') {
-    if($repeat_days == '0000000' || !$repeat_days) {
-      $repeat_days = array('0','0','0','0','0','0','0',);
-      $repeat_days[$datebegin->getWeekday()] = 1;
-      $repeat_days = implode('', $repeat_days);
-    }
-    $days = str_split($repeat_days);
-    $event_day = $datebegin->getWeekday();
-    if($days[$event_day] != 1) {
-      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
-        $datebegin->addDay(1);
-        if($days[$i] == 1) {
-          $datebegin->setWeekday($i);
-          break;
-        }
-      }
-    } 
-  } else {
-    $repeat_days = '0000000';
-  }
 
   $query = "INSERT INTO Event (
     event_ext_id,
@@ -2047,20 +2027,6 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
-  if ($repeat_kind == 'weekly') {
-    $days = str_split($repeat_days);
-    $event_day = $datebegin->getWeekday();
-    if ($days[$event_day] != 1) {
-      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
-        if ($days[$i] == 1) {
-          $datebegin->setWeekday($i);
-          break;
-        }
-      }
-    }
-  } else {
-    $repeat_days = '0000000';
-  }
 	
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
@@ -2872,20 +2838,6 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
-  }
-  if($repeat_kind == 'weekly') {
-    $days = str_split($repeat_days);
-    $event_day = $datebegin->getWeekday();
-    if($days[$event_day] != 1) {
-      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
-        if($days[$i] == 1) {
-          $datebegin->setWeekday($i);
-          break;
-        } 
-      }      
-    } 
-  } else {
-    $repeat_days = '0000000';
   }
   
   if (isset($calendar['template_id'])) {
