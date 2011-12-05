@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
@@ -19,6 +20,7 @@ import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.client.ISyncClient;
+import org.obm.sync.client.exception.ObmSyncClientException;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -71,22 +73,27 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		PostMethod pm = null;
 		try {
 			pm = getPostMethod(token, action);
-			InputStream is = executeStream(pm, parameters);
+			InputStream is = executePostAndGetResultStream(pm, parameters);
 			if (is != null) {
 				return DOMUtils.parse(is);
+			} else {
+				throw new ObmSyncClientException("An error occurs: cannot get the request result stream");
 			}
 		} catch (LocatorClientException e) {
 			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
 		} catch (SAXException e) {
 			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
 		} catch (FactoryConfigurationError e) {
 			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
 		} finally {
 			releaseConnection(pm);
 		}
-		return null;
 	}
 
 	protected void setToken(Multimap<String, String> parameters, AccessToken token) {
@@ -101,32 +108,43 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		return m;
 	}
 
-	private InputStream executeStream(PostMethod pm, Multimap<String, String> parameters) {
+	private InputStream executePostAndGetResultStream(PostMethod pm, Multimap<String, String> parameters) throws HttpException, IOException {
 		InputStream is = null;
-		try {
-			for (Entry<String, String> entry: parameters.entries()) {
-				pm.setParameter(entry.getKey(), entry.getValue());
-			}
-			int ret = hc.executeMethod(pm);
-			if (ret != HttpStatus.SC_OK) {
-				logger.error("method failed:\n" + pm.getStatusLine() + "\n"
-						+ pm.getResponseBodyAsString());
-			} else {
-				is = pm.getResponseBodyAsStream();
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+		setPostMethodParameters(pm, parameters);
+		int httpResultStatus = hc.executeMethod(pm);
+		if (isHttpStatusOK(httpResultStatus)) {
+			is = pm.getResponseBodyAsStream();
+		} else {
+			logger.error("method failed:\n" + pm.getStatusLine() + "\n"
+					+ pm.getResponseBodyAsString());
 		}
 		return is;
+	}
+
+	private boolean isHttpStatusOK(int httpResultStatus) {
+		return httpResultStatus == HttpStatus.SC_OK;
+	}
+
+	private void setPostMethodParameters(PostMethod pm, Multimap<String, String> parameters) {
+		for (Entry<String, String> entry: parameters.entries()) {
+			pm.setParameter(entry.getKey(), entry.getValue());
+		}
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
 		PostMethod pm = null; 
 		try {
 			pm = getPostMethod(at, action);
-			executeStream(pm, parameters);
+			executePostAndGetResultStream(pm, parameters);
 		} catch (LocatorClientException e) {
 			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
+		} catch (HttpException e) {
+			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw new ObmSyncClientException(e.getMessage(), e);
 		} finally {
 			releaseConnection(pm);
 		}
