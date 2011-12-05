@@ -112,6 +112,7 @@ public class XmlResponder {
 			v.setAttribute("minor", version.getMinor());
 			v.setAttribute("release", version.getRelease());
 			DOMUtils.createElementAndText(root, "domain", at.getDomain());
+			DOMUtils.createElementAndText(root, "email", at.getEmail());
 			res = sendDom(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);

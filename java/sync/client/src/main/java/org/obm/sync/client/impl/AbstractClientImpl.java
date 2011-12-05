@@ -144,6 +144,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		
 		Document doc = execute(token, "/login/doLogin", params);
 		Element root = doc.getDocumentElement();
+		String email = DOMUtils.getElementText(root, "email");
 		String sid = DOMUtils.getElementText(root, "sid");
 		Element v = DOMUtils.getUniqueElement(root, "version");
 		MavenVersion version = new MavenVersion();
@@ -154,6 +155,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		}
 		token.setSessionId(sid);
 		token.setVersion(version);
+		token.setEmail(email);
 		return token;
 	}
 
