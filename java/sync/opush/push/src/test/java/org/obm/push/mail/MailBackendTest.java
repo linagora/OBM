@@ -8,6 +8,7 @@ import org.columba.ristretto.message.Address;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -24,7 +25,7 @@ public class MailBackendTest {
 	@Test
 	public void testSendEmailWithBigMail()
 			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException {
-		final String loginAtDomain = "test@test";
+		final LoginAtDomain loginAtDomain = new LoginAtDomain("test@test");
 		final String password = "pass";
 		final AccessToken at = new AccessToken(1, 1, "o-push");
 		
@@ -35,9 +36,9 @@ public class MailBackendTest {
 		EasyMock.expect(backendSession.getLoginAtDomain()).andReturn(loginAtDomain).once();
 		EasyMock.expect(backendSession.getPassword()).andReturn(password).once();
 
-		EasyMock.expect(calendarClient.login(loginAtDomain, password, "o-push"))
+		EasyMock.expect(calendarClient.login(loginAtDomain.getLoginAtDomain(), password, "o-push"))
 				.andReturn(at).once();
-		EasyMock.expect(calendarClient.getUserEmail(at)).andReturn(loginAtDomain).once();
+		EasyMock.expect(calendarClient.getUserEmail(at)).andReturn(loginAtDomain.getLoginAtDomain()).once();
 		calendarClient.logout(at);
 		EasyMock.expectLastCall().once();
 		Set<Address> addrs = Sets.newHashSet();

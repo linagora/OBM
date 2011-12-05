@@ -3,6 +3,7 @@ package org.obm.push.backend;
 import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -31,7 +32,7 @@ public interface IBackend {
 
 	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
 
-	AccessToken login(String userID, String password) throws AuthFault;
+	AccessToken login(LoginAtDomain loginAtDomain, String password) throws AuthFault;
 
 	Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;

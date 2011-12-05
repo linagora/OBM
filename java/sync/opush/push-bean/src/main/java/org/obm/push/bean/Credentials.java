@@ -21,8 +21,8 @@ public class Credentials implements Serializable {
 		return password;
 	}
 
-	public String getLoginAtDomain() {
-		return loginAtDomain.getLoginAtDomain();
+	public LoginAtDomain getLoginAtDomain() {
+		return loginAtDomain;
 	}
 
 	public String getEmail() {

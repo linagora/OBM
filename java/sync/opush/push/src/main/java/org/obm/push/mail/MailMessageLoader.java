@@ -206,7 +206,7 @@ public class MailMessageLoader {
 	private MSEvent getInvitation(BackendSession bs, InputStream invitation) throws IOException {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
-			final AccessToken at = calendarClient.login(bs.getLoginAtDomain(),
+			final AccessToken at = calendarClient.login(bs.getLoginAtDomain().getLoginAtDomain(),
 					bs.getPassword(), ObmSyncBackend.OBM_SYNC_ORIGIN);
 			try {
 				final List<Event> obmEvents = calendarClient.parseICS(at, ics);

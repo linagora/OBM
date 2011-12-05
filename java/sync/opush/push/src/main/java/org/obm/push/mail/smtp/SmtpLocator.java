@@ -24,7 +24,7 @@ public class SmtpLocator {
 	
 	public SMTPProtocol getSmtpClient(BackendSession bs) throws SmtpLocatorException {
 		try {
-			String smtpHost = locatorService.getServiceLocation("mail/smtp_out", bs.getLoginAtDomain());
+			String smtpHost = locatorService.getServiceLocation("mail/smtp_out", bs.getLoginAtDomain().getLoginAtDomain());
 			logger.info("Using " + smtpHost + " as smtp host.");
 			SMTPProtocol proto = new SMTPProtocol(smtpHost);
 			return proto;

@@ -3,6 +3,7 @@ package org.obm.push;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.obm.push.bean.LoginAtDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -22,16 +23,16 @@ public class LoggerService {
 	private LoggerService() {
 	}
 	
-	public void initSession(String loginAtDomain, int requestId, String command) {
+	public void initSession(LoginAtDomain loginAtDomain, int requestId, String command) {
 		Calendar date = Calendar.getInstance();
 		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
 		String now = dateformatter.format(date.getTime());
 
 		closePrecedentLogFile();
-		String sessionId = loginAtDomain+"-"+now;
+		String sessionId = loginAtDomain.getLoginAtDomain() + "-" + now;
 		
 		MDC.put("title", "Opush ActiveSync");
-		MDC.put("user", loginAtDomain);
+		MDC.put("user", loginAtDomain.getLoginAtDomain());
 		MDC.put("sessionId", sessionId);
 		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
 		MDC.put("requestId", String.valueOf(requestId));

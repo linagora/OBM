@@ -37,7 +37,7 @@ public class ObmSearchContact implements ISearchSource {
 	@Override
 	public List<SearchResult> search(BackendSession bs, String query, Integer limit) {
 		BookClient bc = getBookClient();
-		AccessToken token = bc.login(bs.getLoginAtDomain(), bs.getPassword(), "o-push");
+		AccessToken token = bc.login(bs.getLoginAtDomain().getLoginAtDomain(), bs.getPassword(), "o-push");
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		ContactConverter cc = new ContactConverter();
 		try {

@@ -49,11 +49,7 @@ public class BookSource implements ISearchSource {
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		if (conf.isValid()) {
 			DirContext ctx = null;
-			String domain = "";
-			int idx = bs.getLoginAtDomain().indexOf("@");
-			if (idx > 0) {
-				domain = bs.getLoginAtDomain().substring(idx + 1);
-			}
+			String domain = bs.getLoginAtDomain().getDomain();
 			try {
 				ctx = conf.getConnection();
 				LdapUtils u = new LdapUtils(ctx, conf.getBaseDn().replaceAll(

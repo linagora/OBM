@@ -90,7 +90,7 @@ public class ErrorsManager implements IErrorsManager {
 		mm.createMessageId(getHostname());
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));
-		mm.setTo(Mailbox.parse(bs.getLoginAtDomain()));
+		mm.setTo(Mailbox.parse(bs.getLoginAtDomain().getLoginAtDomain()));
 		return mm;
 	}
 

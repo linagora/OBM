@@ -66,7 +66,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	protected void process(IContinuation continuation, BackendSession bs, Document doc, 
 			ActiveSyncRequest request, Responder responder) {
 		
-		logger.info("process(" + bs.getLoginAtDomain() + "/" + bs.getDevType()
+		logger.info("process(" + bs.getLoginAtDomain().getLoginAtDomain() + "/" + bs.getDevType()
 				+ ")");
 		try {
 		

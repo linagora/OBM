@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.utils.JDBCUtils;
@@ -27,12 +28,9 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Device getDevice(String loginAtDomain, String deviceId, String userAgent) 
+	public Device getDevice(LoginAtDomain loginAtDomain, String deviceId, String userAgent) 
 			throws DaoException {
-		String[] parts = loginAtDomain.split("@");
-		String login = parts[0].toLowerCase();
-		String domain = parts[1].toLowerCase();
-
+	
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -43,8 +41,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "WHERE identifier=? AND lower(userobm_login)=? AND lower(domain_name)=?");
 			ps.setString(1, deviceId);
-			ps.setString(2, login);
-			ps.setString(3, domain);
+			ps.setString(2, loginAtDomain.getLogin());
+			ps.setString(3, loginAtDomain.getDomain());
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				Integer databaseId = rs.getInt("id");
@@ -61,11 +59,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		return null;
 	}
 
-	public boolean registerNewDevice(String loginAtDomain, String deviceId,
+	public boolean registerNewDevice(LoginAtDomain loginAtDomain, String deviceId,
 			String deviceType) throws DaoException {
-		String[] parts = loginAtDomain.split("@");
-		String login = parts[0].toLowerCase();
-		String domain = parts[1].toLowerCase();
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -78,8 +73,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "WHERE lower(userobm_login)=? AND lower(domain_name)=?");
 			ps.setString(1, deviceId);
 			ps.setString(2, deviceType);
-			ps.setString(3, login);
-			ps.setString(4, domain);
+			ps.setString(3, loginAtDomain.getLogin());
+			ps.setString(4, loginAtDomain.getDomain());
 			return ps.executeUpdate() != 0;
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -88,10 +83,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		}
 	}
 	
-	public boolean syncAuthorized(String loginAtDomain, String deviceId) throws DaoException {
-		String[] parts = loginAtDomain.split("@");
-		String login = parts[0].toLowerCase();
-		String domain = parts[1].toLowerCase();
+	public boolean syncAuthorized(LoginAtDomain loginAtDomain, String deviceId) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -104,8 +96,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN opush_device od ON device_id=id "
 					+ "WHERE od.identifier=? AND lower(u.userobm_login)=? AND lower(d.domain_name)=?");
 			ps.setString(1, deviceId);
-			ps.setString(2, login);
-			ps.setString(3, domain);
+			ps.setString(2, loginAtDomain.getLogin());
+			ps.setString(3, loginAtDomain.getDomain());
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
