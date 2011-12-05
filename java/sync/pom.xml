@@ -103,6 +103,9 @@
 						<downloadJavadocs>true</downloadJavadocs>
 						<downloadSources>true</downloadSources>
 						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+						<excludes>
+							<exclude>ch.qos.logback:logback-classic</exclude>
+						</excludes>
 						<additionalConfig>
 							<file>
 								<name>.settings/org.eclipse.jdt.core.prefs</name>
@@ -233,6 +236,14 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<artifactId>slf4j-nop</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>test</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>test</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -243,16 +254,19 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-core</artifactId>
 				<version>0.9.29</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
 				<version>0.9.29</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-access</artifactId>
 				<version>0.9.29</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
