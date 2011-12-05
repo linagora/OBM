@@ -74,7 +74,6 @@ import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
-import org.obm.push.protocol.logging.TechnicalLogType;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
@@ -83,7 +82,6 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -157,8 +155,8 @@ public class ActiveSyncServlet extends HttpServlet {
 			}
 
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
-			Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-			logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());
+			/*Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
+			logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());*/
 			Credentials creds = performAuthentification(asrequest, response);
 			if (creds == null) {
 				return;
@@ -262,8 +260,8 @@ public class ActiveSyncServlet extends HttpServlet {
 	private Credentials performAuthentification(ActiveSyncRequest request,
 			HttpServletResponse response) {
 
-		Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-		logger.debug(asXmlRequestMarker, request.getHttpServletRequest().toString());
+		/*Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
+		logger.debug(asXmlRequestMarker, request.getHttpServletRequest().toString());*/
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);

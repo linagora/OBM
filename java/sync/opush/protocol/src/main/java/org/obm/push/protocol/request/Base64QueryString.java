@@ -36,11 +36,8 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
-import org.obm.push.protocol.logging.TechnicalLogType;
-import org.obm.push.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 public class Base64QueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
 
@@ -138,16 +135,20 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 		
 	}
 
+	@SuppressWarnings("unused")
 	private void logRequestInfo(byte[] data, String decodedData){
 
-		Marker asRequestMarker = TechnicalLogType.ACTIVE_SYNC_REQUEST_INFO.getMarker();
+		/*
+		 * This code used to generate technical log using technical-log project 
+		 * 
+		 * Marker asRequestMarker = TechnicalLogType.ACTIVE_SYNC_REQUEST_INFO.getMarker();
 		String dataHexadecimalString = StringUtils.getHexadecimalStringRepresentation(data);
 		
 		String xmlLog = "<rawRequest>"+dataHexadecimalString+"</rawRequest>";
 		xmlLog += "<decodedRequestParameters>"+decodedData+"</decodedRequestParameters>";
 
 		logger.info(asRequestMarker, xmlLog);
-
+		 */
 	}
 
 	private int decodeParameters(int i) {
