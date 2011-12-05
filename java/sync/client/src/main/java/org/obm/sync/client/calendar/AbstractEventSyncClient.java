@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -194,8 +193,8 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public void removeEventById(AccessToken token, String calendar, EventObmId uid, int sequence, boolean notification) 
-			throws ServerFault, EventNotFoundException, NotAllowedException {
+	public Event removeEventById(AccessToken token, String calendar, EventObmId uid, int sequence, boolean notification) 
+			throws ServerFault, EventNotFoundException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
@@ -203,7 +202,8 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/removeEvent", params);
-		exceptionFactory.checkRemoveEventException(doc);
+		exceptionFactory.checkEventNotFoundException(doc);
+		return respParser.parseEvent(doc.getDocumentElement());
 	}
 	
 	@Override

@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang.StringUtils;
-import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -402,14 +401,13 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendError("Event did not exist.");
 	}
 	
-	private String removeEvent(AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, EventNotFoundException, NotAllowedException {
-		
-		String calendar = getCalendar(at, params);
-		EventObmId obmId = getObmId(params, "id");
-		int sequence = i(params, "sequence", 0);
-		binding.removeEventById(at, calendar, obmId, sequence, getNotificationOption(params));
-		return responder.sendBoolean(true);
+	private String removeEvent(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, EventNotFoundException {
+		Event ev = binding.removeEventById(at, getCalendar(at, params), getObmId(params, "id"), i(params, "sequence", 0),
+				getNotificationOption(params));
+		if (ev != null) {
+			return responder.sendEvent(ev);
+		}
+		return responder.sendError("Event did not exist.");
 	}
 	
 	private String removeEventByExtId(

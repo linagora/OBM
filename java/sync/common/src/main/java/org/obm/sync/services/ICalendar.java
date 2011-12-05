@@ -3,7 +3,6 @@ package org.obm.sync.services;
 import java.util.Date;
 import java.util.List;
 
-import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -56,9 +55,10 @@ public interface ICalendar {
 	 * @return the removed event on success, the found event if access rights
 	 *         are too low to remove but enough to read, and null if event was
 	 *         not found
+	 * @throws EventNotFoundException 
 	 */
-	void removeEventById(AccessToken token, String calendar, EventObmId eventId,
-			int sequence, boolean notification) throws ServerFault, EventNotFoundException, NotAllowedException;
+	Event removeEventById(AccessToken token, String calendar, EventObmId eventId,
+			int sequence, boolean notification) throws ServerFault, EventNotFoundException;
 
 	/**
 	 * FIXME: remove this service

@@ -1,6 +1,5 @@
 package org.obm.sync.client.impl;
 
-import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -37,14 +36,6 @@ public class SyncClientException {
 		}
 	}
 	
-	public void checkRemoveEventException(Document doc) throws ServerFault, EventNotFoundException, NotAllowedException {
-		if (documentIsError(doc)) {
-			throwEventNotFoundException(doc);
-			throwNotAllowedException(doc);
-			checkServerFaultException(doc);
-		}
-	}
-	
 	private void throwContactNotFoundException(Document doc) throws ContactNotFoundException {
 		String message = getErrorMessage(doc);
 		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
@@ -66,14 +57,6 @@ public class SyncClientException {
 		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
 		if (EventNotFoundException.class.getName().equals(type)) {
 			throw new EventNotFoundException(message);
-		}
-	}
-	
-	private void throwNotAllowedException(Document doc) throws NotAllowedException {
-		String message = getErrorMessage(doc);
-		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-		if (NotAllowedException.class.getName().equals(type)) {
-			throw new NotAllowedException(message);
 		}
 	}
 
