@@ -345,14 +345,14 @@ public class TodoConverter {
 		ParticipationState oldState = ParticipationState.NEEDSACTION;
 		if (oldEvent != null) {
 			for (Attendee oldAtt : oldEvent.getAttendees()) {
-				if (oldAtt.getEmail().equals(bs.getLoginAtDomain().getLoginAtDomain())) {
+				if (oldAtt.getEmail().equals(bs.getCredentials().getEmail())) {
 					oldState = oldAtt.getState();
 					break;
 				}
 			}
 		}
 		Attendee ret = new Attendee();
-		ret.setEmail(bs.getLoginAtDomain().getLoginAtDomain());
+		ret.setEmail(bs.getCredentials().getEmail());
 		ret.setRequired(ParticipationRole.REQ);
 		ret.setState(status(oldState, AttendeeStatus.ACCEPT));
 		return ret;

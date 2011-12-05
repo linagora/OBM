@@ -151,7 +151,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "event_url, "
 			+ "event_description, now() as last_sync, event_domain_id, evententity_entity_id, "
 			+ "event_sequence, "
-			+ "o.userobm_login as owner, domain_name, o.userobm_firstname as ownerFirstName, o.userobm_lastname as ownerLastName,  o.userobm_commonname as ownerCommonName";
+			+ "o.userobm_login as owner, domain_name, o.userobm_firstname as ownerFirstName, "
+			+ "o.userobm_lastname as ownerLastName,  o.userobm_commonname as ownerCommonName, " 
+			+ "o.userobm_email ";
 
 	private static final String EVENT_INSERT_FIELDS = "event_owner, "
 			+ "event_ext_id, "
@@ -424,8 +426,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		e.setEntityId(evrs.getInt("evententity_entity_id"));
 		e.setOwner(evrs.getString("owner"));
-		e.setOwnerEmail(evrs.getString("owner") + "@"
-				+ evrs.getString("domain_name"));
+		e.setOwnerEmail( getUserObmEmail(evrs, evrs.getString("domain_name")) );
 		e.setOwnerDisplayName(getOwnerDisplayName(evrs));
 		if (evrs.getTimestamp("recurrence_id") != null) {
 			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
@@ -688,7 +689,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return getDisplayName(first, last, common);
 	}
 
-	private String getAttendeeEmail(ResultSet rs, String domainName)
+	private String getUserObmEmail(ResultSet rs, String domainName)
 			throws SQLException {
 		String[] alias = rs.getString("userobm_email").split("\r\n");
 		if (!alias[0].contains("@")) {
@@ -1334,7 +1335,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			AttendeeAlert att = new AttendeeAlert();
 			att.setObmUser(isObmUser);
 			att.setDisplayName(getAttendeeDisplayName(rs));
-			att.setEmail(getAttendeeEmail(rs, domainName));
+			att.setEmail(getUserObmEmail(rs, domainName));
 			att.setState(getAttendeeState(rs));
 			att.setRequired(getAttendeeRequired(rs));
 			att.setPercent(getAttendeePercent(rs));

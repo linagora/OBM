@@ -72,12 +72,12 @@ public class EventConverter {
 
 	private void appendAttendeesAndOrganizer(BackendSession bs, Event e, MSEvent mse) {
 		boolean hasOrganizer = false;
-		for (Attendee at : e.getAttendees()) {
-			if(at.isOrganizer()){
+		for (Attendee at: e.getAttendees()) {
+			if (at.isOrganizer()) {
 				hasOrganizer = true;
 				appendOrganizer(mse, at);
 			} 
-			if(!hasOrganizer && bs.getLoginAtDomain().getLoginAtDomain().equals(at.getEmail())){
+			if (!hasOrganizer && bs.getCredentials().getEmail().equalsIgnoreCase(at.getEmail())) {
 				appendOrganizer(mse, at);
 			}
 			mse.addAttendee(convertAttendee(at));
@@ -423,7 +423,7 @@ public class EventConverter {
 		if (oldEvent != null) {
 			e.setOwnerEmail(oldEvent.getOwnerEmail());
 		} else{
-			e.setOwnerEmail(bs.getLoginAtDomain().getLoginAtDomain());
+			e.setOwnerEmail(bs.getCredentials().getEmail());
 		}
 	}
 
@@ -446,7 +446,7 @@ public class EventConverter {
 				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
 				e.getAttendees().add(attendee);
 			} else {
-				e.getAttendees().add( getOrganizer(bs.getLoginAtDomain().getLoginAtDomain(), null) );
+				e.getAttendees().add( getOrganizer(bs.getCredentials().getEmail(), null) );
 			}	
 		}
 	}

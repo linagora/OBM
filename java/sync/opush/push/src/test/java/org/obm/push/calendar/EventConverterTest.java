@@ -61,7 +61,7 @@ public class EventConverterTest {
 		assertNotNull(event);
 		assertEquals("Windows Mobile 6.1 - HTC", event.getTitle());
 		
-		checkOrganizer(loginAtDomain, organizer);
+		checkOrganizer(backendSession.getCredentials().getEmail(), organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).excludes(organizer);
@@ -113,15 +113,36 @@ public class EventConverterTest {
 		.isEqualTo(new EventExtId(UID));
 	}
 	
+	@Test
+	public void testOwnerloginIsNotEqualsToOwnerEmail() throws SAXException, IOException, FactoryConfigurationError {
+		String loginAtDomain = "LOGIN@obm.lng.org";
+		String email = "EMAIL@obm.lng.org";
+
+		Credentials credentials = new Credentials( 
+				new LoginAtDomain(loginAtDomain), "password", email);
+		BackendSession backendSession = buildBackendSession(credentials);
+		
+		IApplicationData data = getApplicationData("OBMFULL-2907.xml");
+		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
+		
+		Attendee organizer = event.findOrganizer();
+		
+		Assertions.assertThat(loginAtDomain).isNotEqualTo(organizer.getEmail());
+		Assertions.assertThat(email).isEqualTo(organizer.getEmail());
+		
+		Assertions.assertThat(loginAtDomain).isNotEqualTo(event.getOwnerEmail());
+		Assertions.assertThat(email).isEqualTo(event.getOwnerEmail());
+	}
+	
 	private List<Attendee> listAttendeesWithoutOrganizer(Attendee organizer, Event event) {
 		List<Attendee> attendees = Lists.newArrayList(event.getAttendees());
 		attendees.remove(organizer);
 		return attendees;
 	}
 	
-	private void checkOrganizer(String loginAtDomain, Attendee organizer) {
+	private void checkOrganizer(String email, Attendee organizer) {
 		Assert.assertNotNull(organizer);
-		Assert.assertEquals(loginAtDomain, organizer.getEmail());
+		Assert.assertEquals(email, organizer.getEmail());
 		Assert.assertNull(organizer.getDisplayName());
 		Assert.assertEquals(ParticipationState.ACCEPTED, organizer.getState());
 		Assert.assertEquals(ParticipationRole.REQ, organizer.getRequired());
@@ -143,7 +164,11 @@ public class EventConverterTest {
 	
 	private BackendSession buildBackendSession(String userId) {
 		LoginAtDomain loginAtDomain = new LoginAtDomain(userId);
-		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test", "email@domain"),
+		return buildBackendSession(new Credentials(loginAtDomain, "test", "email@domain"));
+	}
+	
+	private BackendSession buildBackendSession(Credentials credentials) {
+		BackendSession bs = new BackendSession(credentials,
 				"Sync", new Device(1, "devType", "devId", new Properties()), new BigDecimal("12.5"));
 		return bs;
 	}
