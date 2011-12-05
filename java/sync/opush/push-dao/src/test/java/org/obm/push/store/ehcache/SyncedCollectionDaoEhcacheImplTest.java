@@ -34,7 +34,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
-		this.credentials = new Credentials("login@domain", "password");
+		this.credentials = new Credentials("login@domain", "password", "email@domain");
 	}
 	
 	@After

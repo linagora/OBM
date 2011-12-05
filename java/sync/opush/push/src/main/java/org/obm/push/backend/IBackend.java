@@ -9,6 +9,8 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.protocol.provisioning.Policy;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 
 public interface IBackend {
 
@@ -29,7 +31,7 @@ public interface IBackend {
 
 	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
 
-	boolean validatePassword(String userID, String password);
+	AccessToken login(String userID, String password) throws AuthFault;
 
 	Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;

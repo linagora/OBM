@@ -141,11 +141,6 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public boolean validatePassword(String loginAtDomain, String password) {
-		return calBackend.validatePassword(loginAtDomain, password);
-	}
-
-	@Override
 	public List<ItemChange> fetchEmails(BackendSession bs, Integer collectionId, Collection<Long> uids) 
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException {
 		return mailBackend.fetchItems(bs, collectionId, uids);

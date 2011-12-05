@@ -12,6 +12,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
@@ -44,17 +45,16 @@ public class ObmSyncBackend {
 		return client.login(session.getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
 	}
 
-	public boolean validatePassword(String loginAtDomain, String password) {
+	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
 		AccessToken token = calendarClient.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
 			if (token == null || token.getSessionId() == null) {
-				logger.info(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
-				return false;
+				throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
 			}
 		} finally {
 			calendarClient.logout(token);
 		}
-		return true;
+		return token;
 	}
 	
 	protected String getDefaultCalendarName(BackendSession bs) {

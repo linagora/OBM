@@ -34,8 +34,6 @@ public interface IContentsExporter {
 	MSAttachementData getEmailAttachement(BackendSession bs,
 			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException;
 
-	boolean validatePassword(String userID, String password);
-
 	boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException;
 
 	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 

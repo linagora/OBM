@@ -42,7 +42,7 @@ public class CalendarEncoderTest {
 	}
 
 	private BackendSession getFakeBackendSession() {
-		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test"),
+		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test", "email@test.tlse.lngr"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;
 	}

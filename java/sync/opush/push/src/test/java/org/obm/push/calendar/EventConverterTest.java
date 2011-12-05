@@ -141,7 +141,7 @@ public class EventConverterTest {
 	}
 	
 	private BackendSession buildBackendSession(String loginAtDomain) {
-		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test"),
+		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test", "email@domain"),
 				"Sync", new Device(1, "devType", "devId", new Properties()), new BigDecimal("12.5"));
 		return bs;
 	}

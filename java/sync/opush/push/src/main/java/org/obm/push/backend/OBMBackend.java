@@ -11,6 +11,7 @@ import org.minig.imap.IMAPException;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -25,6 +26,8 @@ import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
 import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.store.CollectionDao;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,17 +48,20 @@ public class OBMBackend implements IBackend {
 	
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
+
+	private final CalendarBackend calendarBackend;
 	
 	@Inject
 	private OBMBackend(CollectionDao collectionDao, IEmailManager emailManager,
 			IContentsExporter contentsExporter, MailBackend mailBackend,
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
-			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory) {
+			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, CalendarBackend calendarBackend) {
 		
 		this.collectionDao = collectionDao;
 		this.emailManager = emailManager;
 		this.contentsExporter = contentsExporter;
 		this.mailBackend = mailBackend;
+		this.calendarBackend = calendarBackend;
 		
 		this.registeredListeners = Collections
 				.synchronizedSet(new HashSet<ICollectionChangeListener>());
@@ -159,8 +165,8 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public boolean validatePassword(String userID, String password) {
-		return contentsExporter.validatePassword(userID, password);
+	public AccessToken login(String userID, String password) throws AuthFault {
+		return calendarBackend.login(userID, password);
 	}
 
 	@Override

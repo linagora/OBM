@@ -8,11 +8,13 @@ public class Credentials implements Serializable {
 
 	private final String password;
 	private final String loginAtDomain;
+	private final String email;
 
-	public Credentials(String loginAtDomain, String password) {
+	public Credentials(String loginAtDomain, String password, String email) {
 		super();
 		this.loginAtDomain = loginAtDomain;
 		this.password = password;
+		this.email = email;
 	}
 
 	public String getPassword() {
@@ -23,9 +25,13 @@ public class Credentials implements Serializable {
 		return loginAtDomain;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(password, loginAtDomain);
+		return Objects.hashCode(password, loginAtDomain, email);
 	}
 	
 	@Override
@@ -33,7 +39,8 @@ public class Credentials implements Serializable {
 		if (object instanceof Credentials) {
 			Credentials that = (Credentials) object;
 			return Objects.equal(this.password, that.password)
-				&& Objects.equal(this.loginAtDomain, that.loginAtDomain);
+				&& Objects.equal(this.loginAtDomain, that.loginAtDomain)
+				&& Objects.equal(this.email, that.email);
 		}
 		return false;
 	}
@@ -43,8 +50,8 @@ public class Credentials implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("password", password)
 			.add("loginAtDomain", loginAtDomain)
+			.add("email", email)
 			.toString();
-	}	
-	
+	}
 	
 }

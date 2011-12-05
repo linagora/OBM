@@ -49,6 +49,8 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -246,18 +248,13 @@ public class ActiveSyncServlet extends HttpServlet {
 						String deviceType = request.getDeviceType();
 						String userAgent = request.getUserAgent();
 						try {
-							String loginAtDomain = getLoginAtDomain(userId);
-							boolean valid = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent)
-									&& validatePassword(loginAtDomain, password)
-									&& deviceService.syncAuthorized(loginAtDomain, deviceId);
-							if (valid) {
-								logger.debug("login/password ok & the device has been authorized");
-								return new Credentials(loginAtDomain, password);
-							}
+							return login(userId, password, deviceId, deviceType, userAgent);
 						} catch (DaoException e) {
 							logger.error("Database exception while authenticating user", e);
 						} catch (InvalidParameterException e) {
 							//will be logged later
+						} catch (AuthFault e) {
+							logger.error(e.getMessage(), e);
 						}
 					}
 				}
@@ -265,6 +262,21 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 		returnHttpUnauthorized(request.getHttpServletRequest(), response);
 		return null;
+	}
+
+	private Credentials login(String userId, String password, String deviceId, 
+			String deviceType, String userAgent) throws DaoException, AuthFault {
+		
+		String loginAtDomain = getLoginAtDomain(userId);
+		boolean initDevice = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent);
+		boolean syncAutho = deviceService.syncAuthorized(loginAtDomain, deviceId);
+		if (initDevice && syncAutho) {
+			AccessToken accessToken = backend.login(loginAtDomain, password);
+			logger.debug("login/password ok & the device has been authorized");
+			return new Credentials(loginAtDomain, password, accessToken.getEmail());
+		} else {
+			throw new AuthFault("The device has not been authorized");
+		}
 	}
 
 	private void returnHttpUnauthorized(HttpServletRequest httpServletRequest,
@@ -404,8 +416,4 @@ public class ActiveSyncServlet extends HttpServlet {
 		return handlers.get(p.getCommand());
 	}
 
-	private boolean validatePassword(String loginAtDomain, String password) {
-		return backend.validatePassword(loginAtDomain, password);
-	}
-	
 }

@@ -34,7 +34,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
-		this.credentials = new Credentials("login@domain", "password");
+		this.credentials = new Credentials("login@domain", "password", "email@domain");
 	}
 	
 	@After

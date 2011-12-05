@@ -37,7 +37,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
-		this.credentials = new Credentials("login@domain", "password");
+		this.credentials = new Credentials("login@domain", "password", "email@domain");
 	}
 	
 	@After
