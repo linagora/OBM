@@ -15,6 +15,7 @@ import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.LoginAtDomain;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,7 +38,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
-		this.credentials = new Credentials("login@domain", "password", "email@domain");
+		LoginAtDomain loginAtDomain = new LoginAtDomain("login@domain");
+		this.credentials = new Credentials(loginAtDomain, "password", "email@domain");
 	}
 	
 	@After

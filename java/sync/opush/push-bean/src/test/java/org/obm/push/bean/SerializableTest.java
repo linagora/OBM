@@ -91,7 +91,8 @@ public class SerializableTest {
 
 	@Test
 	public void testCredentials() throws IOException {
-		Credentials obj = new Credentials("titi", "tata", "email");
+		LoginAtDomain loginAtDomain = new LoginAtDomain("login@titi");
+		Credentials obj = new Credentials(loginAtDomain, "tata", "email");
 		objectOutputStream.writeObject(obj);
 	}
 	

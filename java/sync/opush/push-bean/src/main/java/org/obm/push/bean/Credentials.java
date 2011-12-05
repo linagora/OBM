@@ -6,11 +6,11 @@ import com.google.common.base.Objects;
 
 public class Credentials implements Serializable {
 
+	private final LoginAtDomain loginAtDomain;
 	private final String password;
-	private final String loginAtDomain;
 	private final String email;
 
-	public Credentials(String loginAtDomain, String password, String email) {
+	public Credentials(LoginAtDomain loginAtDomain, String password, String email) {
 		super();
 		this.loginAtDomain = loginAtDomain;
 		this.password = password;
@@ -22,7 +22,7 @@ public class Credentials implements Serializable {
 	}
 
 	public String getLoginAtDomain() {
-		return loginAtDomain;
+		return loginAtDomain.getLoginAtDomain();
 	}
 
 	public String getEmail() {

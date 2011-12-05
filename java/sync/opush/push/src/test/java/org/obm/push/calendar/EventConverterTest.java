@@ -22,6 +22,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
@@ -140,7 +141,8 @@ public class EventConverterTest {
 		return decoder.decode(document.getDocumentElement()); 
 	}
 	
-	private BackendSession buildBackendSession(String loginAtDomain) {
+	private BackendSession buildBackendSession(String userId) {
+		LoginAtDomain loginAtDomain = new LoginAtDomain(userId);
 		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test", "email@domain"),
 				"Sync", new Device(1, "devType", "devId", new Properties()), new BigDecimal("12.5"));
 		return bs;

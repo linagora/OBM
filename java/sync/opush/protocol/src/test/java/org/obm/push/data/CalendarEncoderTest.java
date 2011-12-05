@@ -14,6 +14,7 @@ import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -42,7 +43,8 @@ public class CalendarEncoderTest {
 	}
 
 	private BackendSession getFakeBackendSession() {
-		BackendSession bs = new BackendSession(new Credentials("adrien@test.tlse.lngr", "test", "email@test.tlse.lngr"),
+		LoginAtDomain loginAtDomain = new LoginAtDomain("adrien@test.tlse.lngr");
+		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test", "email@test.tlse.lngr"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;
 	}

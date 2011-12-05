@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.SyncCollection;
 
 import bitronix.tm.TransactionManagerServices;
@@ -34,7 +35,8 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
-		this.credentials = new Credentials("login@domain", "password", "email@domain");
+		LoginAtDomain loginAtDomain = new LoginAtDomain("login@domain");
+		this.credentials = new Credentials(loginAtDomain, "password", "email@domain");
 	}
 	
 	@After

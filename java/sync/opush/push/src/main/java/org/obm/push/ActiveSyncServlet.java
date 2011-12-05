@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -22,7 +21,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.User;
+import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.FolderSyncHandler;
 import org.obm.push.handler.GetAttachmentHandler;
@@ -55,10 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -267,11 +263,11 @@ public class ActiveSyncServlet extends HttpServlet {
 	private Credentials login(String userId, String password, String deviceId, 
 			String deviceType, String userAgent) throws DaoException, AuthFault {
 		
-		String loginAtDomain = getLoginAtDomain(userId);
-		boolean initDevice = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent);
-		boolean syncAutho = deviceService.syncAuthorized(loginAtDomain, deviceId);
+		LoginAtDomain loginAtDomain = new LoginAtDomain(userId);
+		boolean initDevice = deviceService.initDevice(loginAtDomain.getLoginAtDomain(), deviceId, deviceType, userAgent);
+		boolean syncAutho = deviceService.syncAuthorized(loginAtDomain.getLoginAtDomain(), deviceId);
 		if (initDevice && syncAutho) {
-			AccessToken accessToken = backend.login(loginAtDomain, password);
+			AccessToken accessToken = backend.login(loginAtDomain.getLoginAtDomain(), password);
 			logger.debug("login/password ok & the device has been authorized");
 			return new Credentials(loginAtDomain, password, accessToken.getEmail());
 		} else {
@@ -340,43 +336,6 @@ public class ActiveSyncServlet extends HttpServlet {
 			logger.warn("{} : {}", h, request.getHeader(h));
 		}
 	}
-
-	/* package */ String getLoginAtDomain(String userID) {
-		Iterable<String> parts = splitOnSlashes(userID);
-		User user = buildUserFromLoginParts(parts);
-		if (user == null) {
-			parts = splitOnAtSign(userID);
-			user = buildUserFromLoginParts(parts);
-		}
-		if (user == null) {
-			throw new InvalidParameterException();
-		}
-		return user.getLoginAtDomain();
-	}
-
-	private Iterable<String> splitOnSlashes(String userID) {
-		Iterable<String> parts = Splitter.on("\\").split(userID);
-		return parts;
-	}
-
-	private Iterable<String> splitOnAtSign(String userID) {
-		Iterable<String> parts = Splitter.on("@").split(userID);
-		return ImmutableList.copyOf(parts).reverse();
-	}
-
-	private User buildUserFromLoginParts(Iterable<String> parts) {
-		int nbParts = Iterables.size(parts);
-		if (nbParts > 2) {
-			throw new InvalidParameterException();
-		} else if (nbParts == 2) {
-			Iterator<String> iterator = parts.iterator();
-			String domainName = iterator.next();
-			String userName = iterator.next();
-			return new User(userName, domainName);
-		}
-		return null;
-	}
-
 
 	/**
 	 * 
