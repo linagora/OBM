@@ -101,7 +101,7 @@ class EncoderHandler extends DefaultHandler {
 		try {
 			we.writeEmptyElement(e);
 		} catch (IOException e1) {
-			throw new SAXException(e);
+			throw new SAXException(e, e1);
 		}
 	}
 
