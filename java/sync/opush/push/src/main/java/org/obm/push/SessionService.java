@@ -38,7 +38,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.store.DeviceDao;
+import org.obm.push.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +49,11 @@ import com.google.inject.Singleton;
 public class SessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
-	private final DeviceDao deviceDao;
+	private final DeviceService deviceService;
 	
 	@Inject
-	private SessionService(DeviceDao deviceDao) {
-		this.deviceDao = deviceDao;
+	private SessionService(DeviceService deviceService) {
+		this.deviceService = deviceService;
 	}
 	
 	public BackendSession getSession(
@@ -69,7 +69,7 @@ public class SessionService {
 		String userAgent = r.getUserAgent();
 		String devId = r.getDeviceId();
 		
-		Device device = deviceDao.getDevice(credentials.getUser(), devId, userAgent);
+		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent);
 		
 		BackendSession bs = new BackendSession(credentials, 
 				r.getCommand(), device, getProtocolVersion(r));

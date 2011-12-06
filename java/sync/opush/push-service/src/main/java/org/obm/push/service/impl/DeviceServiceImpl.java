@@ -106,5 +106,10 @@ public class DeviceServiceImpl implements DeviceService {
 		}
 		return false;
 	}
+
+	@Override
+	public Device getDevice(User user, String deviceId, String userAgent) throws DaoException {
+		return deviceDao.getDevice(user, deviceId, userAgent);
+	}
 	
 }
