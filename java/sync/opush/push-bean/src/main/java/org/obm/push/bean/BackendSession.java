@@ -23,8 +23,8 @@ public class BackendSession {
 		return device.checkHint(key, defaultValue);
 	}
 
-	public LoginAtDomain getLoginAtDomain() {
-		return credentials.getLoginAtDomain();
+	public User getUser() {
+		return credentials.getUser();
 	}
 
 	public String getPassword() {

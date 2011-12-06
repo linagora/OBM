@@ -25,7 +25,7 @@ public class FolderBackend extends ObmSyncBackend {
 	}
 	
 	public String getColName(BackendSession bs){
-		return "obm:\\\\" + bs.getLoginAtDomain().getLoginAtDomain();
+		return "obm:\\\\" + bs.getUser().getLoginAtDomain();
 	}
 
 }

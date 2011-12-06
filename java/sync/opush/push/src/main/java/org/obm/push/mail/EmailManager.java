@@ -43,7 +43,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -99,7 +99,7 @@ public class EmailManager implements IEmailManager {
 	@Override
 	public String locateImap(BackendSession bs) throws LocatorClientException {
 		String locateImap = locatorService.
-				getServiceLocation("mail/imap_frontend", bs.getLoginAtDomain().getLoginAtDomain());
+				getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
 		logger.info("Using {} as imap host.", locateImap);
 		return locateImap;
 	}
@@ -117,11 +117,11 @@ public class EmailManager implements IEmailManager {
 	}
 
 	private String getLogin(BackendSession bs) {
-		LoginAtDomain loginAtDomain = bs.getLoginAtDomain();
+		User user = bs.getUser();
 		if (!loginWithDomain) {
-			return loginAtDomain.getLogin();
+			return user.getLogin();
 		}
-		return loginAtDomain.getLoginAtDomain();
+		return user.getLoginAtDomain();
 	}	
 
 	@Override

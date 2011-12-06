@@ -88,7 +88,7 @@ public class MailBackend extends ObmSyncBackend {
 			FolderType type) throws DaoException {
 		ItemChange ic = new ItemChange();
 		ic.setParentId("0");
-		ic.setDisplayName(bs.getLoginAtDomain().getLoginAtDomain() + " " + imapFolder);
+		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " " + imapFolder);
 		ic.setItemType(type);
 
 		String imapPath = buildPath(bs, imapFolder);
@@ -108,7 +108,7 @@ public class MailBackend extends ObmSyncBackend {
 	private String buildPath(BackendSession bs, String imapFolder) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("obm:\\\\");
-		sb.append(bs.getLoginAtDomain().getLoginAtDomain());
+		sb.append(bs.getUser().getLoginAtDomain());
 		sb.append("\\email\\");
 		sb.append(imapFolder);
 		return sb.toString();
@@ -428,7 +428,7 @@ public class MailBackend extends ObmSyncBackend {
 
 	private String getUserEmail(BackendSession bs) throws UnknownObmSyncServerException {
 		AbstractEventSyncClient cal = getCalendarClient();
-		AccessToken at = cal.login(bs.getLoginAtDomain().getLoginAtDomain(), bs.getPassword(), OBM_SYNC_ORIGIN);
+		AccessToken at = cal.login(bs.getUser().getLoginAtDomain(), bs.getPassword(), OBM_SYNC_ORIGIN);
 		try {
 			return cal.getUserEmail(at);
 		} catch (ServerFault e) {

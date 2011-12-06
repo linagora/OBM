@@ -10,7 +10,6 @@ import java.util.Set;
 import org.minig.imap.IMAPException;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
@@ -148,7 +147,7 @@ public class OBMBackend implements IBackend {
 		synchronized (registeredListeners) {
 			registeredListeners.add(ccl);
 		}
-		logger.info("[" + ccl.getSession().getLoginAtDomain().getLoginAtDomain()
+		logger.info("[" + ccl.getSession().getUser().getLoginAtDomain()
 				+ "] change listener registered on backend");
 		return ret;
 	}
@@ -166,7 +165,7 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public AccessToken login(LoginAtDomain loginAtDomain, String password) throws AuthFault {
+	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
 		return calendarBackend.login(loginAtDomain, password);
 	}
 

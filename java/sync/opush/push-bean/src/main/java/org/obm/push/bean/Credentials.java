@@ -1,46 +1,38 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
-
 import com.google.common.base.Objects;
 
 public class Credentials implements Serializable {
 
-	private final LoginAtDomain loginAtDomain;
+	private final User user;
 	private final String password;
-	private final String email;
 
-	public Credentials(LoginAtDomain loginAtDomain, String password, String email) {
+	public Credentials(User user, String password) {
 		super();
-		this.loginAtDomain = loginAtDomain;
+		this.user = user;
 		this.password = password;
-		this.email = email;
 	}
 
 	public String getPassword() {
 		return password;
 	}
 
-	public LoginAtDomain getLoginAtDomain() {
-		return loginAtDomain;
-	}
-
-	public String getEmail() {
-		return email;
+	public User getUser() {
+		return user;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(password, loginAtDomain, email);
+		return Objects.hashCode(user, password);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof Credentials) {
 			Credentials that = (Credentials) object;
-			return Objects.equal(this.password, that.password)
-				&& Objects.equal(this.loginAtDomain, that.loginAtDomain)
-				&& Objects.equal(this.email, that.email);
+			return Objects.equal(this.user, that.user)
+				&& Objects.equal(this.password, that.password);
 		}
 		return false;
 	}
@@ -48,9 +40,8 @@ public class Credentials implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
+			.add("user", user)
 			.add("password", password)
-			.add("loginAtDomain", loginAtDomain)
-			.add("email", email)
 			.toString();
 	}
 	

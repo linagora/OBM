@@ -28,7 +28,7 @@ public class SessionService {
 	public BackendSession getSession(
 			Credentials credentials, String devId, ActiveSyncRequest request) throws DaoException {
 
-		String sessionId = credentials.getLoginAtDomain() + "/" + devId;
+		String sessionId = credentials.getUser().getLoginAtDomain() + "/" + devId;
 		return createSession(credentials, request, sessionId);
 	}
 
@@ -38,7 +38,7 @@ public class SessionService {
 		String userAgent = r.getUserAgent();
 		String devId = r.getDeviceId();
 		
-		Device device = deviceDao.getDevice(credentials.getLoginAtDomain(), devId, userAgent);
+		Device device = deviceDao.getDevice(credentials.getUser(), devId, userAgent);
 		
 		BackendSession bs = new BackendSession(credentials, 
 				r.getCommand(), device, getProtocolVersion(r));

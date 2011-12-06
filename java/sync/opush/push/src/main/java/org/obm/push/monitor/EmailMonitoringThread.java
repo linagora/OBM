@@ -13,7 +13,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -95,14 +95,14 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 	}
 	
 	private IdleClient getIdleClient(BackendSession bs) throws LocatorClientException {
-		LoginAtDomain loginAtDomain = bs.getLoginAtDomain();
-		String login = loginAtDomain.getLoginAtDomain();
+		User user = bs.getUser();
+		String loginAtdomain = user.getLoginAtDomain();
 		boolean useDomain = emailManager.getLoginWithDomain();
 		if (!useDomain) {
-			login = loginAtDomain.getLogin();
+			loginAtdomain = user.getLogin();
 		}
-		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, useDomain);
-		IdleClient idleCli = new IdleClient(emailManager.locateImap(bs), 143, login, bs
+		logger.debug("Creating idleClient with login: {}, (useDomain {})", loginAtdomain, useDomain);
+		IdleClient idleCli = new IdleClient(emailManager.locateImap(bs), 143, loginAtdomain, bs
 				.getPassword());
 		return idleCli;
 	}

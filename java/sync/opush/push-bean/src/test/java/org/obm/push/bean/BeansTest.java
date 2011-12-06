@@ -45,9 +45,8 @@ public class BeansTest {
 					.add(SyncCollectionChange.class)
 					.add(SyncCollectionOptions.class)
 					.add(SyncState.class)
-					.add(User.class)
 					.add(MSEventUid.class)
-					.add(LoginAtDomain.class)
+					.add(User.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

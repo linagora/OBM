@@ -26,6 +26,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.User.Factory;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 
@@ -91,8 +92,8 @@ public class SerializableTest {
 
 	@Test
 	public void testCredentials() throws IOException {
-		LoginAtDomain loginAtDomain = new LoginAtDomain("login@titi");
-		Credentials obj = new Credentials(loginAtDomain, "tata", "email");
+		User user = Factory.create().createUser("login@titi", "email");
+		Credentials obj = new Credentials(user, "tata");
 		objectOutputStream.writeObject(obj);
 	}
 	

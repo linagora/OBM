@@ -7,7 +7,6 @@ import java.util.List;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.LoginAtDomain;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -43,11 +42,11 @@ public class ObmSyncBackend {
 	}
 
 	protected AccessToken login(ISyncClient client, BackendSession session) {
-		return client.login(session.getLoginAtDomain().getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
+		return client.login(session.getUser().getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
 	}
 
-	public AccessToken login(LoginAtDomain loginAtDomain, String password) throws AuthFault {
-		AccessToken token = calendarClient.login(loginAtDomain.getLoginAtDomain(), password, OBM_SYNC_ORIGIN);
+	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
+		AccessToken token = calendarClient.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
 			if (token == null || token.getSessionId() == null) {
 				throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
@@ -59,8 +58,8 @@ public class ObmSyncBackend {
 	}
 	
 	protected String getDefaultCalendarName(BackendSession bs) {
-		return "obm:\\\\" + bs.getLoginAtDomain().getLoginAtDomain() + "\\calendar\\"
-				+ bs.getLoginAtDomain().getLoginAtDomain();
+		return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\calendar\\"
+				+ bs.getUser().getLoginAtDomain();
 	}
 
 	public Integer getCollectionIdFor(Device device, String collection)

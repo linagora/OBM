@@ -1,12 +1,12 @@
 package org.obm.push.service;
 
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 
 public interface DeviceService {
 	
-	boolean initDevice(LoginAtDomain loginAtDomain, String deviceId,
+	boolean initDevice(User loginAtDomain, String deviceId,
 			String deviceType, String userAgent);
 
-	boolean syncAuthorized(LoginAtDomain loginAtDomain, String deviceId) throws DaoException;
+	boolean syncAuthorized(User loginAtDomain, String deviceId) throws DaoException;
 }

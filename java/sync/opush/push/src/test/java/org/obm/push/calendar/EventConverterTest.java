@@ -22,8 +22,9 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -61,7 +62,7 @@ public class EventConverterTest {
 		assertNotNull(event);
 		assertEquals("Windows Mobile 6.1 - HTC", event.getTitle());
 		
-		checkOrganizer(backendSession.getCredentials().getEmail(), organizer);
+		checkOrganizer(backendSession.getCredentials().getUser().getEmail(), organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).excludes(organizer);
@@ -119,7 +120,7 @@ public class EventConverterTest {
 		String email = "EMAIL@obm.lng.org";
 
 		Credentials credentials = new Credentials( 
-				new LoginAtDomain(loginAtDomain), "password", email);
+				Factory.create().createUser(loginAtDomain, email), "password");
 		BackendSession backendSession = buildBackendSession(credentials);
 		
 		IApplicationData data = getApplicationData("OBMFULL-2907.xml");
@@ -163,8 +164,8 @@ public class EventConverterTest {
 	}
 	
 	private BackendSession buildBackendSession(String userId) {
-		LoginAtDomain loginAtDomain = new LoginAtDomain(userId);
-		return buildBackendSession(new Credentials(loginAtDomain, "test", "email@domain"));
+		User user = Factory.create().createUser(userId, "email@domain");
+		return buildBackendSession(new Credentials(user, "test"));
 	}
 	
 	private BackendSession buildBackendSession(Credentials credentials) {

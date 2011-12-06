@@ -77,7 +77,7 @@ public class EventConverter {
 				hasOrganizer = true;
 				appendOrganizer(mse, at);
 			} 
-			if (!hasOrganizer && bs.getCredentials().getEmail().equalsIgnoreCase(at.getEmail())) {
+			if (!hasOrganizer && bs.getCredentials().getUser().getEmail().equalsIgnoreCase(at.getEmail())) {
 				appendOrganizer(mse, at);
 			}
 			mse.addAttendee(convertAttendee(at));
@@ -423,7 +423,7 @@ public class EventConverter {
 		if (oldEvent != null) {
 			e.setOwnerEmail(oldEvent.getOwnerEmail());
 		} else{
-			e.setOwnerEmail(bs.getCredentials().getEmail());
+			e.setOwnerEmail(bs.getCredentials().getUser().getEmail());
 		}
 	}
 
@@ -446,7 +446,7 @@ public class EventConverter {
 				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
 				e.getAttendees().add(attendee);
 			} else {
-				e.getAttendees().add( getOrganizer(bs.getCredentials().getEmail(), null) );
+				e.getAttendees().add( getOrganizer(bs.getCredentials().getUser().getEmail(), null) );
 			}	
 		}
 	}

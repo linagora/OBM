@@ -21,7 +21,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.FolderSyncHandler;
 import org.obm.push.handler.GetAttachmentHandler;
@@ -76,18 +76,20 @@ public class ActiveSyncServlet extends HttpServlet {
 	private IBackend backend;
 	private PushContinuation.Factory continuationFactory;
 	private DeviceService deviceService;
+	private final User.Factory userFactory;
 
 	
 	@Inject
 	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
-			IBackend backend, Factory continuationFactory,
-			DeviceService deviceService) {
+			IBackend backend, Factory continuationFactory, DeviceService deviceService, 
+			User.Factory userFactory) {
 		super();
 		this.sessionService = sessionService;
 		this.loggerService = loggerService;
 		this.backend = backend;
 		this.continuationFactory = continuationFactory;
 		this.deviceService = deviceService;
+		this.userFactory = userFactory;
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				return;
 			}
 
-			loggerService.initSession(creds.getLoginAtDomain(), c.getReqId(), asrequest.getCommand());
+			loggerService.initSession(creds.getUser(), c.getReqId(), asrequest.getCommand());
 
 			String policy = asrequest.getMsPolicyKey();
 			if (policy != null && policy.equals("0")
@@ -172,7 +174,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (bs == null) {
 			return;
 		}
-		loggerService.initSession(bs.getLoginAtDomain(), c.getReqId(), bs.getCommand());
+		loggerService.initSession(bs.getUser(), c.getReqId(), bs.getCommand());
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
@@ -263,13 +265,13 @@ public class ActiveSyncServlet extends HttpServlet {
 	private Credentials login(String userId, String password, String deviceId, 
 			String deviceType, String userAgent) throws DaoException, AuthFault {
 		
-		LoginAtDomain loginAtDomain = new LoginAtDomain(userId);
-		boolean initDevice = deviceService.initDevice(loginAtDomain, deviceId, deviceType, userAgent);
-		boolean syncAutho = deviceService.syncAuthorized(loginAtDomain, deviceId);
+		AccessToken accessToken = backend.login(userFactory.getLoginAtDomain(userId), password);
+		User user = userFactory.createUser(userId, accessToken.getEmail());
+		boolean initDevice = deviceService.initDevice(user, deviceId, deviceType, userAgent);
+		boolean syncAutho = deviceService.syncAuthorized(user, deviceId);
 		if (initDevice && syncAutho) {
-			AccessToken accessToken = backend.login(loginAtDomain, password);
 			logger.debug("login/password ok & the device has been authorized");
-			return new Credentials(loginAtDomain, password, accessToken.getEmail());
+			return new Credentials(user, password);
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}

@@ -2,7 +2,7 @@ package org.obm.push.service.impl;
 
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.DeviceService;
 import org.obm.push.store.DeviceDao;
@@ -29,7 +29,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 	
 	@Override
-	public boolean initDevice(LoginAtDomain loginAtDomain, String deviceId,
+	public boolean initDevice(User loginAtDomain, String deviceId,
 			String deviceType, String userAgent) {
 		boolean ret = true;
 		try {
@@ -50,7 +50,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 	
 	@Override
-	public boolean syncAuthorized(LoginAtDomain loginAtDomain, String deviceId) throws DaoException {
+	public boolean syncAuthorized(User loginAtDomain, String deviceId) throws DaoException {
 		if (userIsBlacklisted(loginAtDomain)) {
 			return false;
 		}
@@ -63,7 +63,7 @@ public class DeviceServiceImpl implements DeviceService {
 		return deviceDao.syncAuthorized(loginAtDomain, deviceId);
 	}
 
-	private boolean userIsBlacklisted(LoginAtDomain loginAtDomain) {
+	private boolean userIsBlacklisted(User loginAtDomain) {
 		String userList = opushSyncPermsConfigurationService.getBlackListUser();
 		String blacklist = Strings.nullToEmpty(userList);
 		Iterable<String> users = Splitter.on(',').trimResults()

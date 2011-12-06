@@ -42,7 +42,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 
 		ItemChange ic = new ItemChange();
-		String col = "obm:\\\\" + bs.getLoginAtDomain().getLoginAtDomain() + "\\contacts";
+		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\contacts";
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
@@ -54,7 +54,7 @@ public class ContactsBackend extends ObmSyncBackend {
 
 		ic.setServerId(serverId);
 		ic.setParentId("0");
-		ic.setDisplayName(bs.getLoginAtDomain().getLoginAtDomain() + " contacts");
+		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " contacts");
 		ic.setItemType(FolderType.DEFAULT_CONTACTS_FOLDER);
 		ret.add(ic);
 		return ret;

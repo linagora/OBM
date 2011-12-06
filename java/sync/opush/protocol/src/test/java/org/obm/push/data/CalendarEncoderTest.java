@@ -14,11 +14,12 @@ import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.LoginAtDomain;
+import org.obm.push.bean.User;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.protocol.data.CalendarEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.EventObmId;
@@ -43,8 +44,8 @@ public class CalendarEncoderTest {
 	}
 
 	private BackendSession getFakeBackendSession() {
-		LoginAtDomain loginAtDomain = new LoginAtDomain("adrien@test.tlse.lngr");
-		BackendSession bs = new BackendSession(new Credentials(loginAtDomain, "test", "email@test.tlse.lngr"),
+		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr");
+		BackendSession bs = new BackendSession(new Credentials(user, "test"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;
 	}
