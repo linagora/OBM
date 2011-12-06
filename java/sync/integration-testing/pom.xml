@@ -54,6 +54,22 @@
 			<artifactId>message-queue</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-module</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>client-opush</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>6.1.12</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>

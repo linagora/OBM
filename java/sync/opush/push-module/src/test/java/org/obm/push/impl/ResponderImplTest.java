@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;

@@ -37,6 +37,7 @@
 		<module>push-bean</module>
 		<module>push-service</module>
 		<module>protocol</module>
+		<module>push-module</module>
 	</modules>
 
 	<dependencyManagement>
