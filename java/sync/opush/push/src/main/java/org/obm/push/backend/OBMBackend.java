@@ -201,7 +201,7 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
+	public Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();

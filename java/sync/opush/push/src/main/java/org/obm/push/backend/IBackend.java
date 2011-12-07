@@ -64,7 +64,7 @@ public interface IBackend {
 
 	AccessToken login(String loginAtDomain, String password) throws AuthFault;
 
-	Set<SyncCollection> getChangesSyncCollections(CollectionChangeListener collectionChangeListener) 
+	Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 	
 }
