@@ -35,7 +35,8 @@ import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 
@@ -47,7 +48,7 @@ public class LocatorCacheTest {
 		String loginAtDomain = "test@test.obm.lng";
 		String returnValue = "127.0.0.1";
 
-		ObmConfigurationService configurationService = EasyMock.createStrictMock(ObmConfigurationService.class);
+		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
 		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
 		
 		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
@@ -71,7 +72,7 @@ public class LocatorCacheTest {
 		String loginAtDomain = "test@test.obm.lng";
 		String returnNullValue = null;
 
-		ObmConfigurationService configurationService = EasyMock.createStrictMock(ObmConfigurationService.class);
+		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
 		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
 		
 		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
@@ -95,7 +96,7 @@ public class LocatorCacheTest {
 		String loginAtDomain = null;
 		String returnValue = "return value";
 
-		ObmConfigurationService configurationService = EasyMock.createStrictMock(ObmConfigurationService.class);
+		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
 		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
 		
 		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
@@ -123,7 +124,7 @@ public class LocatorCacheTest {
 		String opushService = "opush";
 		String returnOpushValue = "localhost opush";
 
-		ObmConfigurationService configurationService = EasyMock.createStrictMock(ObmConfigurationService.class);
+		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
 		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
 		
 		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);

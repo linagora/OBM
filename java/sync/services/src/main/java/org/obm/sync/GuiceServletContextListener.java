@@ -42,6 +42,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
 import org.obm.locator.store.LocatorService;
@@ -105,6 +107,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(IDBCP.class).to(DBCP.class);
     			bind(LocatorService.class).to(LocatorCache.class);
     			bind(HelperService.class).to(HelperServiceImpl.class);
+    			bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
     			
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    

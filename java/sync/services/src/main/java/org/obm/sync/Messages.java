@@ -35,7 +35,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationService;
 
 import com.google.common.base.Charsets;
 
@@ -43,7 +43,7 @@ public class Messages {
 
 	private ResourceBundle bundle;
 
-	public Messages(ObmConfigurationService configurationservice, Locale locale) {
+	public Messages(ConfigurationService configurationservice, Locale locale) {
 		bundle = configurationservice.getResourceBundle(locale);
 	}
 	

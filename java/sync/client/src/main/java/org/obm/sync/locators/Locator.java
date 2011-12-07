@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.locators;
 
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 
@@ -42,10 +42,10 @@ import com.google.inject.Singleton;
 public class Locator {
 
 	private final LocatorService locatorService;
-	private final ObmConfigurationService configurationService;
+	private final ConfigurationService configurationService;
 
 	@Inject
-	private Locator(ObmConfigurationService configurationService, LocatorService locatorService) {
+	private Locator(ConfigurationService configurationService, LocatorService locatorService) {
 		this.configurationService = configurationService;
 		this.locatorService = locatorService;
 	}

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.services.constant;
 
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
@@ -41,7 +41,7 @@ import com.google.inject.Singleton;
  * Configuration service
  */
 @Singleton
-public class ConstantService extends ObmConfigurationService {
+public class ConstantService extends ConfigurationServiceImpl {
 
 	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
 	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/resources/template/";

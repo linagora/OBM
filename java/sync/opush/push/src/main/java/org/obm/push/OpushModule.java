@@ -1,6 +1,6 @@
 package org.obm.push;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -40,7 +40,7 @@ public class OpushModule extends AbstractModule {
 		bind(IEmailManager.class).to(EmailManager.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
-		bind(ObmConfigurationService.class).to(OpushConfigurationService.class);
+		bind(ConfigurationServiceImpl.class).to(OpushConfigurationService.class);
 		bind(IInvitationFilterManager.class).to(DummyInvitationFilterManager.class);	
 		bind(IBackend.class).to(OBMBackend.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);

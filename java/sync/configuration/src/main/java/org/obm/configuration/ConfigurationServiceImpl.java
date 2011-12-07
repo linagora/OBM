@@ -43,7 +43,7 @@ import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ObmConfigurationService extends AbstractConfigurationService {
+public class ConfigurationServiceImpl extends AbstractConfigurationService implements ConfigurationService {
 
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
@@ -53,7 +53,7 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 	
 	private final ImmutableMap<String, TimeUnit> timeUnits;
 	
-	public ObmConfigurationService() {
+	public ConfigurationServiceImpl() {
 		super("/etc/obm/obm_conf.ini");
 		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,
@@ -61,6 +61,7 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 								"hours", TimeUnit.HOURS);
 	}
 
+	@Override
 	public String getLocatorUrl() throws ConfigurationException {
 		String locatorHost = getStringValue("host");
 		if (locatorHost == null) {
@@ -70,6 +71,7 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/" + LOCATOR_APP_NAME + "/";
 	}
 
+	@Override
 	public String getObmUIBaseUrl() {
 		String protocol = getStringValue("external-protocol");
 		String hostname = getStringValue("external-url");
@@ -77,18 +79,22 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 		return protocol + "://" + hostname + path;
 	}
 
+	@Override
 	public InputStream getStoreConfiguration() throws StoreNotFoundException {
 		throw new StoreNotFoundException("Store not found for " + getClass() + " configuration.");
 	}
 	
+	@Override
 	public String getObmSyncUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
 	
+	@Override
 	public int getLocatorCacheTimeout() {
 		return getIntValue("locator-cache-timeout", 30);
 	}
 	
+	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
 		String key = getStringValue("locator-cache-timeunit");
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
@@ -104,6 +110,7 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 		return defaultUnit;
 	}
 	
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return ResourceBundle.getBundle("Messages", locale, new Control());
 	}

@@ -38,7 +38,7 @@ import java.util.List;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.io.IOUtils;
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.store.LocatorService;
 
 import com.google.inject.Inject;
@@ -50,7 +50,7 @@ public class LocatorClientImpl implements LocatorService {
 	private final String locatorUrl;
 
 	@Inject
-	private LocatorClientImpl(ObmConfigurationService obmConfigurationService) throws ConfigurationException {
+	private LocatorClientImpl(ConfigurationService obmConfigurationService) throws ConfigurationException {
 		locatorUrl = ensureTrailingSlash( obmConfigurationService.getLocatorUrl() );
 	}
 

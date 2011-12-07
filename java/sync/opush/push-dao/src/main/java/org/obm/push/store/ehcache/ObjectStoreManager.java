@@ -39,7 +39,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 
-import org.obm.configuration.ObmConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.inject.Inject;
@@ -51,7 +51,7 @@ public class ObjectStoreManager {
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
 	private final CacheManager singletonManager;
 
-	@Inject ObjectStoreManager(ObmConfigurationService configurationService) throws StoreNotFoundException {
+	@Inject ObjectStoreManager(ConfigurationService configurationService) throws StoreNotFoundException {
 		InputStream storeConfiguration = configurationService.getStoreConfiguration();
 		this.singletonManager = new CacheManager(storeConfiguration);
 	}
