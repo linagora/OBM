@@ -94,8 +94,8 @@ public class OPClient {
 		HttpClient ret = new HttpClient(mtManager);
 		HttpConnectionManagerParams mp = ret.getHttpConnectionManager()
 				.getParams();
-		mp.setDefaultMaxConnectionsPerHost(8);
-		mp.setMaxTotalConnections(16);
+		mp.setDefaultMaxConnectionsPerHost(100);
+		mp.setMaxTotalConnections(100);
 
 		return ret;
 	}
