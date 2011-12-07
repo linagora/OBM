@@ -43,7 +43,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
-import fr.aliacom.obm.utils.Helper;
+import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.LogUtils;
 
 /**
@@ -64,17 +64,17 @@ public class SessionManagement {
 	private final DomainService domainService;
 	private final ConstantService constantService;
 	private final SpecialAccounts specialAccounts;
-	private final Helper helper;
+	private final HelperService helperService;
 	
 	@Inject
 	private SessionManagement(AuthentificationServiceFactory authentificationServiceFactory, 
 			DomainService domainService, UserDao userDao, ConstantService constantService, 
-			SpecialAccounts specialAccounts, Helper helper) {
+			SpecialAccounts specialAccounts, HelperService helperService) {
 		
 		this.userManagementDAO = userDao;
 		this.constantService = constantService;
 		this.specialAccounts = specialAccounts;
-		this.helper = helper;
+		this.helperService = helperService;
 		this.conversationUidGenerator = new AtomicInteger();
 		this.sessions = configureSessionCache();
 		this.domainService = domainService;
@@ -207,7 +207,7 @@ public class SessionManagement {
 		token.setUser(userLogin);
 		token.setDomain(obmDomain.getName());
 		token.setSessionId(newSessionId());
-		token.setEmail(helper.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName()));
+		token.setEmail(helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName()));
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
 		token.setVersion(ObmSyncVersion.current());
 		//FIXME: probably broken

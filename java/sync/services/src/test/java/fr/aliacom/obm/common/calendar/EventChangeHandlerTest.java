@@ -46,7 +46,7 @@ import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
-import fr.aliacom.obm.utils.Helper;
+import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.Ical4jHelper;
 
 @RunWith(Suite.class)
@@ -389,7 +389,7 @@ public class EventChangeHandlerTest {
 			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(defaultObmUser, event)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(defaultObmUser, event)).andReturn(ICS_DATA_UPDATE);
 			
-			Helper helper = createMock(Helper.class);
+			HelperService helper = createMock(HelperService.class);
 			
 			replay(mailer, ical4jHelper, helper);
 			

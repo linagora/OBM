@@ -17,121 +17,32 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.sql.SQLException;
 
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class Helper {
+public class HelperDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(Helper.class);
-	private static final String HEX_DIGITS = "0123456789abcdef";
-	private static final String DATE_UTC_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
+	private static final Logger logger = LoggerFactory.getLogger(HelperDao.class);
 
-	private final SimpleDateFormat dateFormatUTC;
 	private final ObmHelper obmHelper;
 
 	@Inject
-	protected Helper(ObmHelper obmHelper) {
+	protected HelperDao(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
-		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
-		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 
-	public String getLoginFromEmail(String email) {
-		String username = "";
-		if (email != null) {
-			Iterable<String> it = Splitter.on('@').omitEmptyStrings()
-					.split(email);
-			username = Iterables.get(it, 0, "");
-		}
-		return username;
-	}
-
-	public String constructEmailFromList(String listofmail, String domain) {
-
-		String[] lemail = null;
-		if (listofmail != null) {
-			lemail = listofmail.split("\r\n");
-			if (lemail.length > 0) {
-
-				if (lemail[0].contains("@")) {
-					return lemail[0];
-				}
-				return lemail[0] + "@" + domain;
-			}
-		}
-		return "";
-	}
-
-	public String getMD5Diggest(String plaintext) {
-		try {
-			MessageDigest mg = MessageDigest.getInstance("MD5");
-			mg.update(plaintext.getBytes());
-			return toHexString(mg.digest());
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(), e);
-		}
-		return null;
-	}
-
-	private String toHexString(byte[] param) {
-		StringBuffer sb = new StringBuffer(param.length * 2);
-		for (int i = 0; i < param.length; i++) {
-			int b = param[i] & 0xFF;
-			sb.append(HEX_DIGITS.charAt(b >>> 4)).append(
-					HEX_DIGITS.charAt(b & 0xF));
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * Returns the given date in utc format.
-	 */
-	public String getUTCFormat(Date date) {
-		String utc = null;
-		if (date != null) {
-			utc = dateFormatUTC.format(date);
-		}
-		return utc;
-	}
-
-	/**
-	 * Returns true if the logged in user can writer on the given user_login's
-	 * calendar
-	 */
-	public boolean canWriteOnCalendar(AccessToken writer, String targetCalendar) {
-		// implicit right
-		String calendarLogin = getLoginFromEmail(targetCalendar);
-		if (checkImplicitRights(writer, calendarLogin)) {
-			return true;
-		}
-		// special account : root account
-		if (writer.isRootAccount()) {
-			return true;
-		}
-
+	public boolean canWriteOnCalendar(AccessToken accessToken, String login) {
 		boolean ret = false;
-
 		String q =
 		// direct rights
 		"select entityright_write "
@@ -170,21 +81,20 @@ public class Helper {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-			ps.setInt(1, writer.getObmId());
-			ps.setString(2, calendarLogin);
-			ps.setString(3, calendarLogin);
-			ps.setInt(4, writer.getObmId());
-			ps.setString(5, calendarLogin);
+			ps.setInt(1, accessToken.getObmId());
+			ps.setString(2, login);
+			ps.setString(3, login);
+			ps.setInt(4, accessToken.getObmId());
+			ps.setString(5, login);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ret = ret || rs.getBoolean(1);
 			}
-		} catch (Throwable t) {
+		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
 		return ret;
 	}
 
@@ -192,19 +102,8 @@ public class Helper {
 	 * Returns true if the logged in user can writer on the given user_login's
 	 * calendar
 	 */
-	public boolean canReadCalendar(AccessToken writer, String targetCalendar) {
-		String calendarLogin = getLoginFromEmail(targetCalendar);
-		// implicit right
-		if (checkImplicitRights(writer, calendarLogin)) {
-			return true;
-		}
-		// special account : root account
-		if (writer.isRootAccount()) {
-			return true;
-		}
-
+	public boolean canReadCalendar(AccessToken accessToken, String login) {
 		boolean ret = false;
-
 		String q =
 		// direct rights
 		"select entityright_read "
@@ -243,49 +142,21 @@ public class Helper {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-			ps.setInt(1, writer.getObmId());
-			ps.setString(2, calendarLogin);
-			ps.setString(3, calendarLogin);
-			ps.setInt(4, writer.getObmId());
-			ps.setString(5, calendarLogin);
+			ps.setInt(1, accessToken.getObmId());
+			ps.setString(2, login);
+			ps.setString(3, login);
+			ps.setInt(4, accessToken.getObmId());
+			ps.setString(5, login);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ret = ret || rs.getBoolean(1);
 			}
-		} catch (Throwable t) {
+		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
 		return ret;
 	}
 
-	private boolean checkImplicitRights(AccessToken writer,
-			String targetCalendar) {
-		return writer.getUser().equalsIgnoreCase(targetCalendar)
-				|| writer.getUserWithDomain().equalsIgnoreCase(targetCalendar);
-	}
-
-	/**
-	 * Reset status of event
-	 */
-	public void resetAttendeesStatus(Event event) {
-		if (event.getAttendees() != null) {
-			for (Attendee att : event.getAttendees()) {
-				att.setState(ParticipationState.NEEDSACTION);
-			}
-		}
-	}
-
-	public boolean attendeesContainsUser(List<Attendee> attendees,
-			AccessToken token) {
-		final String email = token.getEmail();
-		return Iterables.any(attendees, new Predicate<Attendee>() {
-			@Override
-			public boolean apply(Attendee attendee) {
-				return attendee.getEmail().equalsIgnoreCase(email);
-			}
-		});
-	}
 }

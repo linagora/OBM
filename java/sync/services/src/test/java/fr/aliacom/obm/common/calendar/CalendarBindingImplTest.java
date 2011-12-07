@@ -41,7 +41,7 @@ import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.utils.Helper;
+import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.Ical4jHelper;
 
 public class CalendarBindingImplTest {
@@ -93,8 +93,8 @@ public class CalendarBindingImplTest {
 		}
 	}
 	
-	private Helper mockRightsHelper(String calendar, AccessToken accessToken) {
-		Helper rightsHelper = createMock(Helper.class);
+	private HelperService mockRightsHelper(String calendar, AccessToken accessToken) {
+		HelperService rightsHelper = createMock(HelperService.class);
 		expect(rightsHelper.canWriteOnCalendar(eq(accessToken), eq(calendar))).andReturn(true).anyTimes();
 		expect(rightsHelper.canReadCalendar(eq(accessToken), eq(calendar))).andReturn(true).anyTimes();
 		return rightsHelper;
@@ -151,7 +151,7 @@ public class CalendarBindingImplTest {
 		};
 			
 		AccessToken accessToken = mockAccessToken(fixtures.userEmail, fixtures.domainName);
-		Helper rightsHelper = createMock(Helper.class);
+		HelperService rightsHelper = createMock(HelperService.class);
 		
 		rightsHelper.constructEmailFromList(eq(fixtures.userEmail), eq(fixtures.domainName));
 		EasyMock.expectLastCall().andReturn(fixtures.userEmail);
@@ -200,7 +200,7 @@ public class CalendarBindingImplTest {
 		};
 			
 		AccessToken accessToken = mockAccessToken(fixtures.userEmail, fixtures.domainName);
-		Helper rightsHelper = createMock(Helper.class);
+		HelperService rightsHelper = createMock(HelperService.class);
 		
 		rightsHelper.constructEmailFromList(eq(fixtures.userEmailWithoutDomain), eq(fixtures.domainName));
 		EasyMock.expectLastCall().andReturn(fixtures.userEmail);
@@ -234,7 +234,7 @@ public class CalendarBindingImplTest {
 		ObmUser user = mockObmUser(userEmail, domainName);
 		
 		AccessToken accessToken = mockAccessToken(userName, domainName);
-		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 		
 		final Event event = createMock(Event.class);
 		expect(event.getExtId()).andReturn(eventExtId).atLeastOnce();
@@ -288,7 +288,7 @@ public class CalendarBindingImplTest {
 		eventWithOwnerAttendee.setAttendees(Arrays.asList(fakeUserAttendee));
 		EasyMock.expectLastCall().once();
 		
-		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, calendar, domainName, obmUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, calendar, obmUser, eventExtId, eventWithOwnerAttendee);
@@ -368,7 +368,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.changeParticipationState(accessToken, obmUser, 
 				oldEventWithOtherAttendees.getExtId(), ParticipationState.DECLINED)).andReturn(true);		
 
-		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 
 		Object[] mocks = { accessToken, userService, rightsHelper, obmUser, calendarDao, eventChangeHandler };
 		EasyMock.replay(mocks);
@@ -403,7 +403,7 @@ public class CalendarBindingImplTest {
 		eventWithOwnerAttendee.setAttendees(Arrays.asList(fakeUserAttendee));
 		EasyMock.expectLastCall().once();
 		
-		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, calendar, domainName, obmUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, calendar, obmUser, eventExtId, eventWithOwnerAttendee);
@@ -452,7 +452,7 @@ public class CalendarBindingImplTest {
 		obmUser.setEmail(userEmail);
 		
 		AccessToken accessToken = mockAccessToken(calendar, domainName);
-		Helper helper = mockRightsHelper(calendar, accessToken);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
@@ -504,7 +504,7 @@ public class CalendarBindingImplTest {
 		obmUser.setEmail(userEmail);
 
 		AccessToken accessToken = mockAccessToken(calendar, domainName);
-		Helper helper = mockRightsHelper(calendar, accessToken);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
@@ -582,7 +582,7 @@ public class CalendarBindingImplTest {
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).atLeastOnce();
 
-		Helper rightsHelper = mockRightsHelper(calendar, accessToken);
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, eventExtId)).andReturn(oldEvent).once();
@@ -667,7 +667,7 @@ public class CalendarBindingImplTest {
 		eventFromIcs.setExtId(extId);
 		
 		AccessToken accessToken = mockAccessToken(calendar, domainName);
-		Helper helper = mockRightsHelper(calendar, accessToken);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
 		
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).once();
@@ -723,7 +723,7 @@ public class CalendarBindingImplTest {
 		obmUser.setEmail(userEmail);
 		
 		AccessToken accessToken = mockAccessToken(calendar, domainName);
-		Helper helper = mockRightsHelper(calendar, accessToken);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);

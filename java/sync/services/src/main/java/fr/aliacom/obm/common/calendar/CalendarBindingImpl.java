@@ -64,7 +64,7 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.utils.Helper;
+import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LogUtils;
 
@@ -82,13 +82,13 @@ public class CalendarBindingImpl implements ICalendar {
 	private final UserService userService;
 	private final EventChangeHandler eventChangeHandler;
 	
-	private final Helper helper;
+	private final HelperService helperService;
 	private final Ical4jHelper ical4jHelper;
 	
 
 	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
 		CalendarInfo myself = new CalendarInfo();
-		myself.setMail(helper.constructEmailFromList(user.getEmail(), user
+		myself.setMail(helperService.constructEmailFromList(user.getEmail(), user
 				.getDomain().getName()));
 		myself.setUid(user.getLogin());
 		myself.setFirstname(user.getFirstName());
@@ -102,14 +102,14 @@ public class CalendarBindingImpl implements ICalendar {
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserService userService,
 			CalendarDao calendarDao,
-			CategoryDao categoryDao, Helper helper, 
+			CategoryDao categoryDao, HelperService helperService, 
 			Ical4jHelper ical4jHelper) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
 		this.calendarDao = calendarDao;
 		this.categoryDao = categoryDao;
-		this.helper = helper;
+		this.helperService = helperService;
 		this.ical4jHelper = ical4jHelper;
 	}
 
@@ -212,7 +212,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain());
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain());
 			if (owner != null) {
-				if (helper.canWriteOnCalendar(token, calendar)) {
+				if (helperService.canWriteOnCalendar(token, calendar)) {
 					if (owner.getEmail().equals(calendarUser.getEmail())) {
 						cancelEvent(token, calendar, notification, eventId, ev);
 					} else {
@@ -277,7 +277,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return ev;
 			} else {
 
-				if (!helper.canWriteOnCalendar(token, calendar)) {
+				if (!helperService.canWriteOnCalendar(token, calendar)) {
 					logger.info(LogUtils.prefix(token) + "remove not allowed of " + ev.getTitle());
 					return ev;
 				}
@@ -322,7 +322,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 			
-			if (before.getOwner() != null && !helper.canWriteOnCalendar(token, before.getOwner())) {
+			if (before.getOwner() != null && !helperService.canWriteOnCalendar(token, before.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUser() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
@@ -368,7 +368,8 @@ public class CalendarBindingImpl implements ICalendar {
 
 			final Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
-
+			setAttendeeCanWriteOnCalendar(token, event);
+			
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 			}
@@ -390,7 +391,17 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
+	
+	private void setAttendeeCanWriteOnCalendar(AccessToken accessToken, Event event) {
+		for (Attendee attendee: event.getAttendees()) {
+			if (!StringUtils.isEmpty(attendee.getEmail()) && helperService.canWriteOnCalendar(accessToken,  attendee.getEmail())) {
+				attendee.setCanWriteOnCalendar(true);
+			} else {
+				attendee.setCanWriteOnCalendar(false);
+			}
+		}
+	}
+	
 	private boolean hasImportantChanges(Event before, Event after) {
 		boolean hasImportantChanges = before.getSequence() != after.getSequence();
 		return hasImportantChanges;
@@ -450,7 +461,7 @@ public class CalendarBindingImpl implements ICalendar {
 				throw new EventAlreadyExistException(message);
 			}
 
-			if (!helper.canWriteOnCalendar(token, calendar)) {
+			if (!helperService.canWriteOnCalendar(token, calendar)) {
 				String message = "[" + token.getUser() + "] Calendar : "
 						+ token.getUser() + " cannot create event on "
 						+ calendar + "calendar : no write right";
@@ -554,7 +565,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private void changePartipationState(AccessToken token, Event event){
 		for (Attendee att: event.getAttendees()) {
-			if (!StringUtils.isEmpty(att.getEmail()) && helper.canWriteOnCalendar(token,  att.getEmail())) {
+			if (!StringUtils.isEmpty(att.getEmail()) && helperService.canWriteOnCalendar(token,  att.getEmail())) {
 				att.setCanWriteOnCalendar(true);
 				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
 					att.setState(ParticipationState.ACCEPTED);
@@ -644,7 +655,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			logger.error(LogUtils.prefix(token) + "user " + token.getUser()
 					+ " tried to sync calendar " + calendar
 					+ " => permission denied");
@@ -674,7 +685,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault("Owner not found for event " + eventId);
 		}
 		
-		if (!helper.canReadCalendar(token, owner) && !helper.attendeesContainsUser(event.getAttendees(), token)) {
+		if (!helperService.canReadCalendar(token, owner) && !helperService.attendeesContainsUser(event.getAttendees(), token)) {
 			throw new ServerFault("user has no read rights on calendar " + calendar);
 		}
 		return event;
@@ -684,7 +695,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public KeyList getEventTwinKeys(AccessToken token, String calendar,
 			Event event) throws ServerFault {
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
 		}
@@ -706,7 +717,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public KeyList getRefusedKeys(AccessToken token, String calendar, Date since)
 			throws ServerFault {
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
 		}
@@ -761,7 +772,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public Event getEventFromExtId(AccessToken token, String calendar, EventExtId extId) 
 			throws ServerFault, EventNotFoundException {
 		
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
 		}
@@ -782,7 +793,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional
 	public List<Event> getListEventsFromIntervalDate(AccessToken token,
 			String calendar, Date start, Date end) throws ServerFault {
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar "
 					+ calendar);
 		}
@@ -806,7 +817,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public List<Event> getAllEvents(AccessToken token, String calendar,
 			EventType eventType) throws ServerFault {
 		try {
-			if (helper.canReadCalendar(token, calendar)) {
+			if (helperService.canReadCalendar(token, calendar)) {
 				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
 				return calendarDao.findAllEvents(token, calendarUser,
@@ -901,7 +912,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 		try {
 			String calendar = getCalendarOrDefault(token, specificCalendar);
-			if (helper.canReadCalendar(token, calendar)) {
+			if (helperService.canReadCalendar(token, calendar)) {
 				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
 				return calendarDao
@@ -934,7 +945,7 @@ public class CalendarBindingImpl implements ICalendar {
 			AccessToken token, String calendar, Date start, Date end)
 			throws ServerFault {
 		try {
-			if (helper.canReadCalendar(token, calendar)) {
+			if (helperService.canReadCalendar(token, calendar)) {
 				ObmUser calendarUser = userService.getUserFromCalendar(calendar,
 						token.getDomain());
 				return calendarDao
@@ -954,7 +965,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public Date getLastUpdate(AccessToken token, String calendar)
 			throws ServerFault {
 		try {
-			if (helper.canReadCalendar(token, calendar)) {
+			if (helperService.canReadCalendar(token, calendar)) {
 				return calendarDao.findLastUpdate(token, calendar);
 			}
 			throw new ServerFault("user has no read rights on calendar "
@@ -970,7 +981,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public boolean isWritableCalendar(AccessToken token, String calendar)
 			throws ServerFault {
 		try {
-			return helper.canWriteOnCalendar(token, calendar);
+			return helperService.canWriteOnCalendar(token, calendar);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -1011,7 +1022,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public boolean changeParticipationState(AccessToken token, String calendar,
 			EventExtId extId, ParticipationState participationState, int sequence, boolean notification) throws ServerFault {
 		String userEmail = userService.getUserFromAccessToken(token).getEmail();
-		if (helper.canWriteOnCalendar(token, calendar)) {
+		if (helperService.canWriteOnCalendar(token, calendar)) {
 			try {
 				boolean wasDone = changeParticipationStateInternal(token, calendar, extId, participationState, sequence,
 						notification);
@@ -1076,7 +1087,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, ServerFault {
 
-		if (!helper.canWriteOnCalendar(token, calendar)) {
+		if (!helperService.canWriteOnCalendar(token, calendar)) {
 			String message = "[" + token.getUser() + "] Calendar : "
 					+ token.getUser() + " cannot create event on "
 					+ calendar + "calendar : no write right";
@@ -1195,7 +1206,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	public void purge(final AccessToken token, final String calendar) throws ServerFault {
-		if (!helper.canReadCalendar(token, calendar)) {
+		if (!helperService.canReadCalendar(token, calendar)) {
 			throw new ServerFault("user has no read rights on calendar " + calendar);
 		}
 		try {

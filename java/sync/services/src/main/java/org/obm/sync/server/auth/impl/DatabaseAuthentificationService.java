@@ -31,7 +31,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.ldap.UnixCrypt;
-import fr.aliacom.obm.utils.Helper;
+import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.ObmHelper;
 
 /**
@@ -44,12 +44,12 @@ public class DatabaseAuthentificationService implements
 	private static final Logger logger = LoggerFactory
 			.getLogger(DatabaseAuthentificationService.class);
 	private final ObmHelper obmHelper;
-	private final Helper helper;
+	private final HelperService helperService;
 
 	@Inject
-	private DatabaseAuthentificationService(ObmHelper obmHelper, Helper helper) {
+	private DatabaseAuthentificationService(ObmHelper obmHelper, HelperService helperService) {
 		this.obmHelper = obmHelper;
-		this.helper = helper;
+		this.helperService = helperService;
 	}
 	
 	public boolean doAuth(String userLogin, ObmDomain obmDomain, String password) {
@@ -99,7 +99,7 @@ public class DatabaseAuthentificationService implements
 				if (passType.equals("crypt")) {
 					ret = UnixCrypt.matches(pass, password);
 				} else if (passType.equals("md5sum")) {
-					ret = pass.equals(helper.getMD5Diggest(password));
+					ret = pass.equals(helperService.getMD5Diggest(password));
 				} else {
 					ret = pass.equals(password);
 				}

@@ -37,7 +37,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.lang.StringUtils;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
@@ -87,7 +86,6 @@ import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.Helper;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
@@ -201,19 +199,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private final ContactDao contactDao;
 	private final ObmHelper obmHelper;
 
-	private final Helper helper;
 	private final Ical4jHelper ical4jHelper;
 
 	private final Factory solrHelperFactory;
 
 	@Inject
 	private CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
-			ObmHelper obmHelper, Helper helper, Ical4jHelper ical4jHelper) {
+			ObmHelper obmHelper, Ical4jHelper ical4jHelper) {
 		this.userDao = userDao;
 		this.solrHelperFactory = solrHelperFactory;
 		this.contactDao = contactDao;
 		this.obmHelper = obmHelper;
-		this.helper = helper;
 		this.ical4jHelper = ical4jHelper;
 	}
 	
@@ -1233,7 +1229,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private CalendarInfo makeCalendarInfo(ResultSet rs, String domainName) throws SQLException {
-		String email = helper.constructEmailFromList(rs.getString(4), domainName);
+		String email = constructEmailFromList(rs.getString(4), domainName);
 
 		CalendarInfo info = new CalendarInfo();
 		info.setUid(rs.getString(1));
@@ -1248,6 +1244,21 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return info;
 	}
 
+	public String constructEmailFromList(String listofmail, String domain) {
+		String[] lemail = null;
+		if (listofmail != null) {
+			lemail = listofmail.split("\r\n");
+			if (lemail.length > 0) {
+
+				if (lemail[0].contains("@")) {
+					return lemail[0];
+				}
+				return lemail[0] + "@" + domain;
+			}
+		}
+		return "";
+	}
+	
 	private void loadAttendeesAndAlerts(Connection con, AccessToken token, Map<EventObmId, Event> eventById,
 			AbstractSQLCollectionHelper<?> eventIds, String domainName) throws SQLException {
 		if (eventById.isEmpty()) {
@@ -1465,19 +1476,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(con, null, null);
 		}
 
-		Event event = findEventById(at, ev.getObmId());
-		setAttendeeCanWriteOnCalendar(at, event);
-		return event;
-	}
-	
-	private void setAttendeeCanWriteOnCalendar(AccessToken accessToken, Event event) {
-		for (Attendee attendee: event.getAttendees()) {
-			if (!StringUtils.isEmpty(attendee.getEmail()) && helper.canWriteOnCalendar(accessToken,  attendee.getEmail())) {
-				attendee.setCanWriteOnCalendar(true);
-			} else {
-				attendee.setCanWriteOnCalendar(false);
-			}
-		}
+		return findEventById(at, ev.getObmId());
 	}
 	
 	@Override

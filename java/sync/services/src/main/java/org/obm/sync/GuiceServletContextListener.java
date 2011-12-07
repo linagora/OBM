@@ -35,6 +35,8 @@ import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.freebusy.DatabaseFreeBusyProvider;
 import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
+import fr.aliacom.obm.utils.HelperService;
+import fr.aliacom.obm.utils.HelperServiceImpl;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -71,6 +73,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
     			bind(IDBCP.class).to(DBCP.class);
     			bind(LocatorService.class).to(LocatorCache.class);
+    			bind(HelperService.class).to(HelperServiceImpl.class);
     			
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    
