@@ -189,7 +189,6 @@ public abstract class AbstractClientImpl implements ISyncClient {
 
 		AccessToken token = new AccessToken(0, 0, origin);
 		token.setUser(loginAtDomain.split("@", 2)[0]);
-		token.setDomain(loginAtDomain.split("@", 2)[1]);
 		
 		Document doc = execute(token, "/login/doLogin", params);
 		Element root = doc.getDocumentElement();
@@ -202,6 +201,10 @@ public abstract class AbstractClientImpl implements ISyncClient {
 			version.setMinor(v.getAttribute("minor"));
 			version.setRelease(v.getAttribute("release"));
 		}
+		
+		Element domain = DOMUtils.getUniqueElement(root, "domain");
+		token.setDomain(DOMUtils.getElementText(domain));
+		token.setDomainUuid(domain.getAttribute("uuid"));
 		token.setSessionId(sid);
 		token.setVersion(version);
 		token.setEmail(email);

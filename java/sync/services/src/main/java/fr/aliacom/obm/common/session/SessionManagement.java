@@ -220,6 +220,7 @@ public class SessionManagement {
 		AccessToken token = new AccessToken(databaseUser.getUid(), obmDomain.getId(), origin);
 		token.setUser(userLogin);
 		token.setDomain(obmDomain.getName());
+		token.setDomainUuid(obmDomain.getUuid());
 		token.setSessionId(newSessionId());
 		token.setEmail(helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName()));
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
@@ -242,6 +243,7 @@ public class SessionManagement {
 			throw new AuthFault("Invalid access token");
 		}
 		at.setDomain(u.getDomain());
+		at.setDomainUuid(u.getDomainUuid());
 		at.setUser(u.getUser());
 		at.setDomainId(u.getDomainId());
 		at.setObmId(u.getObmId());

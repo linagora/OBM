@@ -42,6 +42,7 @@ public class AccessToken {
 	private String user;
 	private String sessionId;
 	private String domain;
+	private String domainUuid;
 	private int obmId;
 	private int domainId;
 	private String origin;
@@ -180,4 +181,13 @@ public class AccessToken {
 	public String getUserWithDomain() {
 		return user + "@" + domain;
 	}
+
+	public String getDomainUuid() {
+		return domainUuid;
+	}
+
+	public void setDomainUuid(String domainUuid) {
+		this.domainUuid = domainUuid;
+	}
+	
 }
