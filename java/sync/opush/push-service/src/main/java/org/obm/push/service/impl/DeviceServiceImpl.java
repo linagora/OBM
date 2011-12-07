@@ -51,11 +51,11 @@ public class DeviceServiceImpl implements DeviceService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final DeviceDao deviceDao;
-	private final SyncPermsConfigurationService opushSyncPermsConfigurationService;
+	private final SyncPermsConfigurationService syncPermsConfigurationService;
 	
 	@Inject
-	private DeviceServiceImpl(SyncPermsConfigurationService opushSyncPermsConfigurationService, DeviceDao deviceDao){
-		this.opushSyncPermsConfigurationService = opushSyncPermsConfigurationService;
+	private DeviceServiceImpl(SyncPermsConfigurationService syncPermsConfigurationService, DeviceDao deviceDao){
+		this.syncPermsConfigurationService = syncPermsConfigurationService;
 		this.deviceDao = deviceDao;
 	}
 	
@@ -86,7 +86,7 @@ public class DeviceServiceImpl implements DeviceService {
 			return false;
 		}
 		
-		final Boolean syncperm = opushSyncPermsConfigurationService.allowUnknownPdaToSync();
+		final Boolean syncperm = syncPermsConfigurationService.allowUnknownPdaToSync();
 		if(syncperm){
 			return true;
 		}
@@ -95,7 +95,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	private boolean userIsBlacklisted(User loginAtDomain) {
-		String userList = opushSyncPermsConfigurationService.getBlackListUser();
+		String userList = syncPermsConfigurationService.getBlackListUser();
 		String blacklist = Strings.nullToEmpty(userList);
 		Iterable<String> users = Splitter.on(',').trimResults()
 				.split(blacklist);
