@@ -78,5 +78,34 @@ public class UserServiceImpl implements UserService {
 				Splitter.on('@').omitEmptyStrings().split(calendar), null);
 		return username;
 	}
+	
+	@Override
+	public String getLoginFromEmail(String email) {
+		ObmUser obmUser = findUserFromEmail(email);
+		if (obmUser != null && obmUser.getLogin() != null) {
+			return obmUser.getLogin();
+		}
+		return null;
+	}
+
+	private ObmUser findUserFromEmail(String email) {
+		String domainName = findDomainNameFromEmail(email);
+		if (domainName != null) {
+			ObmDomain obmDomain = domainService.findDomainByName(domainName);
+			if (obmDomain != null) {
+				return userDao.findUser(email, obmDomain);
+			}	
+		}
+		return null;
+	}
+	
+	private String findDomainNameFromEmail(String email) {
+		String[] parts = email.split("@");
+		String domain = null;
+		if (parts.length > 1) {
+			domain = parts[1];
+		}
+		return domain;
+	}
 
 }

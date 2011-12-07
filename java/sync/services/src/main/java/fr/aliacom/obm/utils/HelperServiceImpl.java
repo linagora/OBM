@@ -33,6 +33,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
+import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
 public class HelperServiceImpl implements HelperService {
@@ -42,21 +43,13 @@ public class HelperServiceImpl implements HelperService {
 
 	private final HelperDao helperDao;
 	private final CalendarDaoJdbcImpl calendarDaoJdbcImpl;
+	private final UserService userService;
 	
 	@Inject
-	protected HelperServiceImpl(HelperDao helperDao, CalendarDaoJdbcImpl calendarDaoJdbcImpl) {
+	protected HelperServiceImpl(HelperDao helperDao, CalendarDaoJdbcImpl calendarDaoJdbcImpl, UserService userService) {
 		this.helperDao = helperDao;
 		this.calendarDaoJdbcImpl = calendarDaoJdbcImpl;
-	}
-
-	private String getLoginFromEmail(String email) {
-		String username = "";
-		if (email != null) {
-			Iterable<String> it = Splitter.on('@').omitEmptyStrings()
-					.split(email);
-			username = Iterables.get(it, 0, "");
-		}
-		return username;
+		this.userService = userService;
 	}
 
 	@Override
@@ -91,17 +84,12 @@ public class HelperServiceImpl implements HelperService {
 	 * calendar
 	 */
 	@Override
-	public boolean canWriteOnCalendar(AccessToken writer, String targetCalendar) {
-		// implicit right
-		String calendarLogin = getLoginFromEmail(targetCalendar);
-		if (checkImplicitRights(writer, calendarLogin)) {
+	public boolean canWriteOnCalendar(AccessToken accessToken, String loginOrEmail) {
+		String login = extractLogin(loginOrEmail);
+		if (checkImplicitRights(accessToken, login)) {
 			return true;
 		}
-		// special account : root account
-		if (writer.isRootAccount()) {
-			return true;
-		}
-		return helperDao.canWriteOnCalendar(writer, calendarLogin);
+		return helperDao.canWriteOnCalendar(accessToken, login);
 	}
 
 	/**
@@ -109,23 +97,49 @@ public class HelperServiceImpl implements HelperService {
 	 * calendar
 	 */
 	@Override
-	public boolean canReadCalendar(AccessToken writer, String targetCalendar) {
-		String calendarLogin = getLoginFromEmail(targetCalendar);
-		// implicit right
-		if (checkImplicitRights(writer, calendarLogin)) {
+	public boolean canReadCalendar(AccessToken accessToken, String loginOrEmail) {
+		String login = extractLogin(loginOrEmail);
+		if (checkImplicitRights(accessToken, login)) {
 			return true;
 		}
-		// special account : root account
-		if (writer.isRootAccount()) {
-			return true;
-		}
-		return helperDao.canReadCalendar(writer, calendarLogin);
+		return helperDao.canReadCalendar(accessToken, login);
 	}
 
-	private boolean checkImplicitRights(AccessToken writer,
-			String targetCalendar) {
-		return writer.getUser().equalsIgnoreCase(targetCalendar)
-				|| writer.getUserWithDomain().equalsIgnoreCase(targetCalendar);
+	private String extractLogin(String loginOrEmail) {
+		if (isEmail(loginOrEmail)) {
+			String login = userService.getLoginFromEmail(loginOrEmail);
+			if (login != null) {
+				return login;
+			} else {
+				return getEmailWithoutDomain(loginOrEmail);
+			}
+		} else {
+			return loginOrEmail;
+		}
+	}
+
+	private String getEmailWithoutDomain(String email) {
+		if (email != null) {
+			Iterable<String> it = Splitter.on('@').omitEmptyStrings().split(email);
+			return Iterables.get(it, 0, "");
+		}
+		return email;
+	}
+	
+	private boolean isEmail(String str) {
+		if (str.contains("@")) {
+			String[] parts = str.split("@");
+			return parts.length == 2;
+		} 
+		return false;
+	}
+	
+	private boolean checkImplicitRights(AccessToken accessToken, String loginOrEmailWithoutDomain) {
+		if (   accessToken.getUser().equalsIgnoreCase(loginOrEmailWithoutDomain) || 
+			   accessToken.getUserWithDomain().equalsIgnoreCase(loginOrEmailWithoutDomain)  ) {
+			return true;
+		}
+		return accessToken.isRootAccount();
 	}
 	
 	@Override

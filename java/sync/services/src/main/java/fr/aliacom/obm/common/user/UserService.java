@@ -11,5 +11,6 @@ public interface UserService {
 	ObmUser getUserFromLogin(String login, String domainName);
 	ObmUser getUserFromCalendar(String calendar, String domainName) throws FindException;
 	ObmUser getUserFromAttendee(Attendee organizer, String domainName);
+	String getLoginFromEmail(String email);
 	
 }
