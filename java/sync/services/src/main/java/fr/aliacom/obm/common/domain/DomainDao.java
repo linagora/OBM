@@ -61,7 +61,7 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_id FROM Domain WHERE domain_name=?";
+		String uq = "SELECT domain_id, domain_uuid FROM Domain WHERE domain_name=?";
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
@@ -69,7 +69,8 @@ public class DomainDao {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				ObmDomain ret = new ObmDomain();
-				ret.setId(rs.getInt(1));
+				ret.setId(rs.getInt("domain_id"));
+				ret.setUuid(rs.getString("domain_uuid"));
 				ret.setName(domainName);
 				return ret;
 			}
