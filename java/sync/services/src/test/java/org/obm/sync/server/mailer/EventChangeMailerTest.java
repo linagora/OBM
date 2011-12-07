@@ -115,6 +115,7 @@ public class EventChangeMailerTest {
 		protected AccessToken getStubAccessToken(){
 			AccessToken at = new AccessToken(1, 1, "unitTest");
 			at.setDomain("test.tlse.lng");
+			at.setDomainUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 			return at;
 		}
 		
@@ -377,6 +378,7 @@ public class EventChangeMailerTest {
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
 					"CREATED:20090608T142253Z",
 					"LAST-MODIFIED:20090608T142315Z",
 					"SEQUENCE:5"
@@ -624,6 +626,7 @@ public class EventChangeMailerTest {
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
 					"CREATED:20090608T142253Z",
 					"LAST-MODIFIED:20090608T142315Z",
 					"SEQUENCE:4"
@@ -721,6 +724,7 @@ public class EventChangeMailerTest {
 					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
 					"UID:f1514f44bf39311568d64072c1fec10f47fe",
 					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
 					"CREATED:20090608T142253Z",
 					"LAST-MODIFIED:20090608T142315Z",
 					"SEQUENCE:2"

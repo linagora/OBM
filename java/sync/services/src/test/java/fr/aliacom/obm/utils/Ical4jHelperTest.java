@@ -142,6 +142,7 @@ public class Ical4jHelperTest {
 		ObmUser obmUser = new ObmUser();
 		ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName("test.tlse.lng");
+		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		obmUser.setDomain(obmDomain);
 		return obmUser;
 	}
@@ -821,7 +822,7 @@ public class Ical4jHelperTest {
 	private ObmUser buildObmUser(final Attendee attendeeReply) {
 		final ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName(splitEmail(attendeeReply.getEmail()).get("domain"));
-		
+		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		final ObmUser obmUser = new ObmUser();
 		obmUser.setDomain(obmDomain);
 		obmUser.setEmail(splitEmail(attendeeReply.getEmail()).get("email"));
@@ -871,6 +872,48 @@ public class Ical4jHelperTest {
 		checkStringLengthLessThan(icsReply, 75);
 	}
 	
+	@Test
+	public void testXObmDomainInInvitation() {
+		Event event = buildEvent();
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		final ObmUser obmUser = buildObmUser(attendeeReply);
+
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		
+		checkContainXObmDomain(icsRequest, obmUser.getDomain().getName());
+		checkContainXObmDomain(icsCancel, obmUser.getDomain().getName());
+		checkContainXObmDomain(icsReply, obmUser.getDomain().getName());
+	}
+	
+	private void checkContainXObmDomain(String ics, String name) {
+		String field = "X-OBM-DOMAIN:"+name+"\r\n";
+		Assert.assertTrue(ics.contains(field));
+	}
+
+	@Test
+	public void testXObmDomainUUIDInInvitation() {
+		Event event = buildEvent();
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		final ObmUser obmUser = buildObmUser(attendeeReply);
+
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		
+		checkContainXObmDomainUUID(icsRequest, obmUser.getDomain().getUuid());
+		checkContainXObmDomainUUID(icsCancel, obmUser.getDomain().getUuid());
+		checkContainXObmDomainUUID(icsReply, obmUser.getDomain().getUuid());
+	}
+	
+	private void checkContainXObmDomainUUID(String ics, String uuid) {
+		String field = "X-OBM-DOMAIN-UUID:"+uuid+"\r\n";
+		Assert.assertTrue(ics.contains(field));
+	}
+
 	private void checkStringLengthLessThan(String ics, int length) {
 		Iterable<String> lines = Splitter.on("\r\n").split(ics);
 		for (String line: lines) {
