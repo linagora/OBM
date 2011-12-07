@@ -209,7 +209,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 					"http://www.obm.org/xsd/sync/contact.xsd", "contact");
 			Element root = doc.getDocumentElement();
 			appendContact(root, contact);
-			DOMUtils.serialise(doc, out);
+			DOMUtils.serialize(doc, out);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}

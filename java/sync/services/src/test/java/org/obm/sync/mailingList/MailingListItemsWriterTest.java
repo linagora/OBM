@@ -85,7 +85,7 @@ public class MailingListItemsWriterTest extends TestCase {
 			Document xml = writer.getMailingListsAsXML(getTestMailingList());
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			DOMUtils.serialise(xml, out);
+			DOMUtils.serialize(xml, out);
 			assertEquals(getTestMailingString(), out.toString());
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -138,7 +138,7 @@ public class MailingListItemsWriterTest extends TestCase {
 			Document xml = writer.getMailingListEmailsAsXML(emails);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			DOMUtils.serialise(xml, out);
+			DOMUtils.serialize(xml, out);
 			assertEquals(sb.toString(), out.toString());
 		} catch (TransformerException e1) {
 			fail(e1.getMessage());

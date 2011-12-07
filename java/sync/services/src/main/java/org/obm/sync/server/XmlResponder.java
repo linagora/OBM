@@ -140,11 +140,11 @@ public class XmlResponder {
 		String res = "";
 		try {
 			resp.setContentType("text/xml;charset=UTF-8");
-			DOMUtils.serialise(doc, resp.getOutputStream());
+			DOMUtils.serialize(doc, resp.getOutputStream());
 
 			DOMUtils.logDom(doc);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			DOMUtils.serialise(doc, out);
+			DOMUtils.serialize(doc, out);
 			res = out.toString();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

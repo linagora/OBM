@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.StringReader;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -297,12 +298,31 @@ public final class DOMUtils {
 		serialise(doc, out, false);
 	}
 
+	public static String serialise(Document doc)
+			throws TransformerException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		serialise(doc, byteArrayOutputStream, false);
+		return new String(byteArrayOutputStream.toByteArray());
+	}
+	
 	public static void logDom(Document doc) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		serialise(doc, out, true);
 		logger.info(out.toString());
 	}
 
+	public static Document parse(String xmlContent) throws SAXException, IOException {
+		lock();
+		Document ret = null;
+		try {
+			ret = builder.parse(new InputSource(new StringReader(xmlContent)));
+		} finally {
+			unlock();
+		}
+		return ret;
+		
+	}
+	
 	public static Document parse(InputStream is) throws SAXException,
 			IOException, FactoryConfigurationError {
 		lock();

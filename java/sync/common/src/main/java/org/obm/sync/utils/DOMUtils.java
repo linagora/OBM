@@ -291,7 +291,7 @@ public final class DOMUtils {
 		return el;
 	}
 
-	private static void serialise(Document doc, OutputStream out, boolean pretty)
+	private static void serialize(Document doc, OutputStream out, boolean pretty)
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();
 		if (pretty) {
@@ -304,14 +304,14 @@ public final class DOMUtils {
 		tf.transform(input, output);
 	}
 
-	public static void serialise(Document doc, OutputStream out)
+	public static void serialize(Document doc, OutputStream out)
 			throws TransformerException {
-		serialise(doc, out, false);
+		serialize(doc, out, false);
 	}
 
 	public static void logDom(Document doc) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		serialise(doc, out, true);
+		serialize(doc, out, true);
 		logger.info(out.toString());
 	}
 
