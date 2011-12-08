@@ -74,6 +74,7 @@ import com.google.common.collect.Lists;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.calendar.EventChangeHandler.AttendeeStateValue;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
@@ -119,8 +120,11 @@ public class EventChangeHandlerTest {
 	
 	private static AccessToken getMockAccessToken()
 	{
-		AccessToken token = new AccessToken(2, 1, "unitTest-origin");
-		token.setDomain("unitTest-domain");
+		ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setId(1);
+		obmDomain.setName("unitTest-domain");
+		AccessToken token = new AccessToken(2, "unitTest-origin");
+		token.setDomain(obmDomain);
 		token.setEmail("unitTest-email");
 		return token;
 	}

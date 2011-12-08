@@ -73,7 +73,7 @@ public class EventIndexer implements Runnable {
 			this.userDao = userDao;
 		}
 		
-		public EventIndexer createIndexer(CommonsHttpSolrServer srv, int domain, Event e) {
+		public EventIndexer createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, Event e) {
 			return new EventIndexer(srv, obmHelper, userDao, domain, e);
 		}
 
@@ -81,12 +81,12 @@ public class EventIndexer implements Runnable {
 
 	private CommonsHttpSolrServer srv;
 	private Event e;
-	private int domain;
+	private ObmDomain domain;
 	private final ObmHelper obmHelper;
 	private final UserDao userDao;
 
 	
-	private EventIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, UserDao userDao, int domain, Event e) {
+	private EventIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, UserDao userDao, ObmDomain domain, Event e) {
 		this.obmHelper = obmHelper;
 		this.userDao = userDao;
 		this.domain = domain;
@@ -134,10 +134,8 @@ public class EventIndexer implements Runnable {
 		f(sid, "duration", e.getDuration());
 
 		// owner: login ownerEmail: lAtDomain
-		ObmDomain od = new ObmDomain();
-		od.setId(domain);
 		ObmUser u = userDao.findUserByLogin(e.getOwner(),
-				od);
+				domain);
 
 		f(sid, "owner", u.getLastName(), u.getFirstName(), u.getLogin(),
 				u.getEmail());

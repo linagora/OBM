@@ -242,7 +242,7 @@ public class EventHandler extends SecureSyncHandler {
 		if (calendar.contains("@")) {
 			return calendar;
 		} else {
-			return calendar + "@" + accessToken.getDomain();
+			return calendar + "@" + accessToken.getDomain().getName();
 		}
 	}
 	

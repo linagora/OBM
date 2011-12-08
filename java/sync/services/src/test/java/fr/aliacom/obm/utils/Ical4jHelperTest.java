@@ -125,6 +125,30 @@ public class Ical4jHelperTest {
 		}
 	}
 	
+	private static class StringContainsIcsProperty extends TypeSafeMatcher<String> {
+
+		private final String propertyName;
+		private final String propertyValue;
+		
+
+		public StringContainsIcsProperty(String propertyName, String propertyValue) {
+			this.propertyName = propertyName;
+			this.propertyValue = propertyValue;
+			
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("check that given string contains the ics property named" + propertyName + " with the value "+propertyValue);
+		}
+
+		@Override
+		public boolean matchesSafely(String item) {
+			String field = propertyName+":"+propertyValue+"\r\n";
+			return item.contains(field);
+		}
+	}
+	
 	@BeforeClass
 	public static void setUpOnce() {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
@@ -248,7 +272,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		AccessToken token = new AccessToken(0, 0, null);
+		AccessToken token = new AccessToken(0, null);
 		token.setEmail("adrien@zz.com");
 		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isAllday());
@@ -883,14 +907,13 @@ public class Ical4jHelperTest {
 		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
 		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
 		
-		checkContainXObmDomain(icsRequest, obmUser.getDomain().getName());
-		checkContainXObmDomain(icsCancel, obmUser.getDomain().getName());
-		checkContainXObmDomain(icsReply, obmUser.getDomain().getName());
+		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN", obmUser.getDomain().getName());
+		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN", obmUser.getDomain().getName());
+		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN", obmUser.getDomain().getName());
 	}
 	
-	private void checkContainXObmDomain(String ics, String name) {
-		String field = "X-OBM-DOMAIN:"+name+"\r\n";
-		Assert.assertTrue(ics.contains(field));
+	private void checkContainIcsProperty(String ics, String propertyName, String propertyValue) {
+		Assert.assertThat(ics, new StringContainsIcsProperty(propertyName, propertyValue));
 	}
 
 	@Test
@@ -904,16 +927,11 @@ public class Ical4jHelperTest {
 		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
 		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
 		
-		checkContainXObmDomainUUID(icsRequest, obmUser.getDomain().getUuid());
-		checkContainXObmDomainUUID(icsCancel, obmUser.getDomain().getUuid());
-		checkContainXObmDomainUUID(icsReply, obmUser.getDomain().getUuid());
+		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
+		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
+		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
 	}
 	
-	private void checkContainXObmDomainUUID(String ics, String uuid) {
-		String field = "X-OBM-DOMAIN-UUID:"+uuid+"\r\n";
-		Assert.assertTrue(ics.contains(field));
-	}
-
 	private void checkStringLengthLessThan(String ics, int length) {
 		Iterable<String> lines = Splitter.on("\r\n").split(ics);
 		for (String line: lines) {

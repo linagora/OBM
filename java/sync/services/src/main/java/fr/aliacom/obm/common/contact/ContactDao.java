@@ -713,7 +713,7 @@ public class ContactDao {
 			ps.setString(idx++, c.getFirstname());
 			ps.setString(idx++, c.getLastname());
 			ps.setString(idx++, at.getOrigin());
-			ps.setInt(idx++, at.getDomainId());
+			ps.setInt(idx++, at.getDomain().getId());
 			ps.setInt(idx++, at.getObmId());
 
 			ps.setString(idx++, c.getCompany());
@@ -1360,7 +1360,7 @@ public class ContactDao {
 			int idx = 1;
 			ps.setInt(idx++, at.getObmId());
 			ps.setInt(idx++, at.getObmId());
-			ps.setInt(idx++, at.getDomainId());
+			ps.setInt(idx++, at.getDomain().getId());
 			ps.setInt(idx++, at.getObmId());
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -1646,4 +1646,5 @@ public class ContactDao {
 			obmHelper.cleanup(con, st, null);
 		}
 	}
+
 }

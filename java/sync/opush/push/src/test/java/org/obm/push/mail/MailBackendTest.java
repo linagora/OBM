@@ -56,14 +56,15 @@ import org.obm.sync.client.calendar.CalendarClient;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 
-public class MailBackendTest {
 
+public class MailBackendTest {
+	
 	@Test
 	public void testSendEmailWithBigMail()
 			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException {
 		final User user = Factory.create().createUser("test@test", "test@domain");
 		final String password = "pass";
-		final AccessToken at = new AccessToken(1, 1, "o-push");
+		final AccessToken at = new AccessToken(1, "o-push");
 		
 		EmailManager emailManager = EasyMock.createMock(EmailManager.class);
 		CalendarClient calendarClient = EasyMock.createMock(CalendarClient.class);

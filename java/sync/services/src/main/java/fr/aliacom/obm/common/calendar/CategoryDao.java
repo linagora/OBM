@@ -70,7 +70,7 @@ public class CategoryDao {
 			ps = con
 					.prepareStatement("SELECT eventcategory1_id, eventcategory1_label "
 							+ "FROM EventCategory1 WHERE eventcategory1_domain_id=?");
-			ps.setInt(1, at.getDomainId());
+			ps.setInt(1, at.getDomain().getId());
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Category c = new Category();

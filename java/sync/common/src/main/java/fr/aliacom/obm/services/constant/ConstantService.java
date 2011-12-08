@@ -61,7 +61,7 @@ public class ConstantService extends ObmConfigurationService {
 	}
 
 	public String getObmSyncMailer(AccessToken at) {
-		return OBM_SYNC_MAILER + "@" + at.getDomain();
+		return OBM_SYNC_MAILER + "@" + at.getDomain().getName();
 	}
 	
 }

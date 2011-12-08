@@ -56,6 +56,7 @@ import fr.aliacom.obm.services.constant.ConstantService;
 import fr.aliacom.obm.utils.ObmHelper;
 
 public class AddressBookBindingImplTest {
+	
 	private ObmHelper mockHelper() throws SQLException {
 		ObmHelper helper = EasyMock.createMock(ObmHelper.class);
 		expect(helper.getConnection()).andReturn(null).once();
@@ -73,7 +74,7 @@ public class AddressBookBindingImplTest {
 	public void testGetSyncGlobalAddressBookSync() throws ServerFault, SQLException {
 		Date timestamp = new Date();
 
-		AccessToken token = new AccessToken(1, 1, "");
+		AccessToken token = new AccessToken(1, "");
 
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");
@@ -178,7 +179,7 @@ public class AddressBookBindingImplTest {
 	public void testGetSyncNoGlobalAddressBookSync() throws ServerFault, SQLException {
 		Date timestamp = new Date();
 
-		AccessToken token = new AccessToken(1, 1, "");
+		AccessToken token = new AccessToken(1, "");
 
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");

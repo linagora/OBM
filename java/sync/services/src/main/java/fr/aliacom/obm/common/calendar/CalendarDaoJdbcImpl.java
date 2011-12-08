@@ -270,7 +270,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Integer ownerId = null;
 		logger.info("try to create with calendar owner:"
 				+ calendar);
-		ownerId = userDao.userIdFromEmail(con, calendar, editor.getDomainId());
+		ownerId = userDao.userIdFromEmail(con, calendar, editor.getDomain().getId());
 		if(ownerId == null){
 			throw new FindException("Error finding user["+calendar+"]");
 		}
@@ -466,7 +466,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setString(idx++, ev.getTitle());
 		ps.setString(idx++, ev.getLocation());
 		Integer cat = catIdFromString(ps.getConnection(), ev.getCategory(),
-				at.getDomainId());
+				at.getDomain().getId());
 		if (cat != null) {
 			ps.setInt(idx++, cat);
 		} else {
@@ -494,7 +494,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setNull(idx++, Types.DATE); // FIXME completed
 		ps.setNull(idx++, Types.VARCHAR); // FIXME url
 		ps.setString(idx++, ev.getDescription());
-		ps.setInt(idx++, at.getDomainId());
+		ps.setInt(idx++, at.getDomain().getId());
 		ps.setString(idx++, at.getOrigin());
 		ps.setObject(idx++, ev.getType().getJdbcObject(obmHelper.getType()));
 		ps.setInt(idx++, ev.getSequence());
@@ -1586,7 +1586,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setObject(4, ev.getOpacity().getJdbcObject(obmHelper.getType()));
 		ps.setString(5, ev.getTitle());
 		ps.setString(6, ev.getLocation());
-		Integer cat = catIdFromString(con, ev.getCategory(), at.getDomainId());
+		Integer cat = catIdFromString(con, ev.getCategory(), at.getDomain().getId());
 		if (cat != null) {
 			ps.setInt(7, cat);
 		} else {
@@ -1673,7 +1673,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);
 			for (Attendee at : toRemove) {
 				Integer id = userDao.userEntityIdFromEmail(con,
-						at.getEmail(), editor.getDomainId());
+						at.getEmail(), editor.getDomain().getId());
 				if (id == null) {
 					id = userDao
 							.contactEntityFromEmailQuery(con, at.getEmail());
@@ -1752,7 +1752,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			EventObmId databaseId = ev.getObmId();
 			for (Attendee at : ev.getAttendees()) {
 				Integer userId = userDao.userIdFromEmail(con,
-						at.getEmail(), token.getDomainId());
+						at.getEmail(), token.getDomain().getId());
 				if (userId != null) {
 					dev.setInt(1, databaseId.getObmId());
 					dev.setInt(2, userId);
@@ -1804,7 +1804,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		PreparedStatement ps = null;
 		try {
 			ps = con.prepareStatement(attQ);
-			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomainId());
+			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomain().getId());
 			
 			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);			
 			for (final Attendee at : listAttendee) {
@@ -1854,7 +1854,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Integer getUserEntityOrContactEntity(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
 		Integer userEntity  = userDao.userEntityIdFromEmail(con,
-				email, editor.getDomainId());
+				email, editor.getDomain().getId());
 		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
 			userEntity = null;
 			logger.info("user with email " + email
@@ -1881,7 +1881,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(q);
-			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, updater.getDomainId());
+			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, updater.getDomain().getId());
 			for (Attendee at : ev.getAttendees()) {
 				Integer userEntity = getUserEntityOrContactEntity(updater, con, userEntityCalendar, at.getEmail(), useObmUser);
 				if (userEntity == null) {
@@ -2380,7 +2380,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			EventObmId databaseId = ev.getObmId();
 			for (Attendee at : ev.getAttendees()) {
 				Integer userId = userDao.userIdFromEmail(con,
-						at.getEmail(), token.getDomainId());
+						at.getEmail(), token.getDomain().getId());
 				if (userId != null) {
 					dev.setInt(1, databaseId.getObmId());
 					dev.setInt(2, userId);

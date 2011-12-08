@@ -113,10 +113,7 @@ public class EventChangeMailerTest {
 		}
 
 		protected AccessToken getStubAccessToken(){
-			AccessToken at = new AccessToken(1, 1, "unitTest");
-			at.setDomain("test.tlse.lng");
-			at.setDomainUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-			return at;
+			return new AccessToken(1, "unitTest");
 		}
 		
 		protected MailService defineMailServiceExpectations(

@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 /**
  * Manages full-text indexing of events & contacts in a SOLR server
  */
@@ -113,7 +115,7 @@ public class SolrHelper {
 	private CommonsHttpSolrServer sEvent;
 	private final ExecutorService executor;
 	private final ContactIndexer.Factory contactIndexerFactory;
-	private final int domain;
+	private final ObmDomain domain;
 	private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
 
 	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, ExecutorService executor, 
@@ -121,17 +123,17 @@ public class SolrHelper {
 					throws MalformedURLException, LocatorClientException {
 		
 		this.eventIndexerFactory = eventIndexerFactory;
-		this.domain = at.getDomainId();
+		this.domain = at.getDomain();
 		this.executor = executor;
 		this.contactIndexerFactory = contactIndexerFactory;
 
 		sContact = new CommonsHttpSolrServer("http://"
 				+ locatorClient.getServiceLocation("solr/contact", at.getUser() + "@"
-						+ at.getDomain()) + ":8080/solr/contact", client);
+						+ at.getDomain().getName()) + ":8080/solr/contact", client);
 
 		sEvent = new CommonsHttpSolrServer("http://"
 				+ locatorClient.getServiceLocation("solr/event", at.getUser() + "@"
-						+ at.getDomain()) + ":8080/solr/event", client);
+						+ at.getDomain().getName()) + ":8080/solr/event", client);
 	}
 	
 	public CommonsHttpSolrServer getSolrContact(){

@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 @Singleton
 public class ObmSmtpProvider {
 
@@ -76,10 +78,10 @@ public class ObmSmtpProvider {
 		} 
     }
 	
-	private Session buildSession(String domain) throws LocatorClientException {
+	private Session buildSession(ObmDomain domain) throws LocatorClientException {
 		Properties properties = new Properties();
-		properties.put("mail.smtp.host", conf.getServerAddr(domain));	
-		properties.put("mail.smtp.port", conf.getServerPort(domain));
+		properties.put("mail.smtp.host", conf.getServerAddr(domain.getName()));	
+		properties.put("mail.smtp.port", conf.getServerPort(domain.getName()));
 		Session session = Session.getDefaultInstance(properties);
 		return session;
 	}

@@ -55,7 +55,7 @@ public class VersionValidatorTest{
 	}
 
 	private AccessToken createFakeAccessToken() {
-		return new AccessToken(10, 2, "unsused");
+		return new AccessToken(10, "unsused");
 	}
 	
 	@Test

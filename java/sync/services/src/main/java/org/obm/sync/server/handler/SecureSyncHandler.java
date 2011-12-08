@@ -64,7 +64,7 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 	}
 
 	private AccessToken getToken(ParametersSource params) {
-		AccessToken at = new AccessToken(0, 0, "unused");
+		AccessToken at = new AccessToken(0, "unused");
 		at.setSessionId(params.getParameter("sid"));
 		return at;
 	}

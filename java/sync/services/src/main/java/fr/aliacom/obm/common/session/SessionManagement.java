@@ -217,10 +217,9 @@ public class SessionManagement {
 					+ "=> user not found in database");
 			return null;
 		}
-		AccessToken token = new AccessToken(databaseUser.getUid(), obmDomain.getId(), origin);
+		AccessToken token = new AccessToken(databaseUser.getUid(), origin);
+		token.setDomain(obmDomain);
 		token.setUser(userLogin);
-		token.setDomain(obmDomain.getName());
-		token.setDomainUuid(obmDomain.getUuid());
 		token.setSessionId(newSessionId());
 		token.setEmail(helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName()));
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
@@ -243,9 +242,7 @@ public class SessionManagement {
 			throw new AuthFault("Invalid access token");
 		}
 		at.setDomain(u.getDomain());
-		at.setDomainUuid(u.getDomainUuid());
 		at.setUser(u.getUser());
-		at.setDomainId(u.getDomainId());
 		at.setObmId(u.getObmId());
 		at.setOrigin(u.getOrigin());
 		at.setEmail(u.getEmail());

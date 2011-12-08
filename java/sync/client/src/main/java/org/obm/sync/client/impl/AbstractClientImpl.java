@@ -63,6 +63,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public abstract class AbstractClientImpl implements ISyncClient {
 
 	private static final int MAX_CONNECTIONS = 8;
@@ -187,7 +189,7 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		params.put("password", password);
 		params.put("origin", origin);
 
-		AccessToken token = new AccessToken(0, 0, origin);
+		AccessToken token = new AccessToken(0, origin);
 		token.setUser(loginAtDomain.split("@", 2)[0]);
 		
 		Document doc = execute(token, "/login/doLogin", params);
@@ -202,9 +204,11 @@ public abstract class AbstractClientImpl implements ISyncClient {
 			version.setRelease(v.getAttribute("release"));
 		}
 		
+		ObmDomain obmDomain = new ObmDomain();
 		Element domain = DOMUtils.getUniqueElement(root, "domain");
-		token.setDomain(DOMUtils.getElementText(domain));
-		token.setDomainUuid(domain.getAttribute("uuid"));
+		obmDomain.setName(DOMUtils.getElementText(domain));
+		obmDomain.setUuid(domain.getAttribute("uuid"));
+		token.setDomain(obmDomain);
 		token.setSessionId(sid);
 		token.setVersion(version);
 		token.setEmail(email);

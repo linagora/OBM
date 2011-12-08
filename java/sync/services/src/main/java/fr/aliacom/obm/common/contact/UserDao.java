@@ -82,7 +82,7 @@ public class UserDao {
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
 				+ "WHERE userobm_archive != 1 and userobm_domain_id="
-				+ at.getDomainId() + " and userobm_hidden != 1 ";
+				+ at.getDomain().getId() + " and userobm_hidden != 1 ";
 		if (timestamp != null) {
 			q += " and (userobm_timecreate >= ? or userobm_timeupdate >= ? )";
 		}
@@ -156,7 +156,7 @@ public class UserDao {
 		}
 		q += " UNION ";
 		q += "SELECT userobm_id FROM UserObm where (userobm_archive=1 OR userobm_hidden=1) AND userobm_domain_id="
-				+ at.getDomainId();
+				+ at.getDomain().getId();
 		if (d != null) {
 			q += " AND userobm_timeupdate >= ? ";
 		}

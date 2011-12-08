@@ -62,8 +62,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public ObmUser getUserFromAccessToken(AccessToken token) {
-		ObmDomain obmDomain = domainService.findDomainByName(token.getDomain());
-		return userDao.findUserById(token.getObmId(), obmDomain);
+		return userDao.findUserById(token.getObmId(), token.getDomain());
 	}
 
 	@Override

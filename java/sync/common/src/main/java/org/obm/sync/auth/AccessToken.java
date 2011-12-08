@@ -37,14 +37,14 @@ import java.util.Map;
 
 import org.obm.sync.calendar.CalendarInfo;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class AccessToken {
 
 	private String user;
 	private String sessionId;
-	private String domain;
-	private String domainUuid;
 	private int obmId;
-	private int domainId;
+	private ObmDomain domain;
 	private String origin;
 	private String email;
 	private boolean rootAccount;
@@ -58,12 +58,19 @@ public class AccessToken {
 	private MavenVersion version;
 	private int conversationUid;
 
-	public AccessToken(int obmId, int domainId, String origin) {
+	public AccessToken(int obmId, String origin) {
 		this.obmId = obmId;
-		this.domainId = domainId;
 		this.origin = origin;
 		this.isoCodeToNameCache = new HashMap<String, String>();
 		this.serviceProps = new HashMap<String, String>();
+	}
+	
+	public ObmDomain getDomain() {
+		return domain;
+	}
+
+	public void setDomain(ObmDomain domain) {
+		this.domain = domain;
 	}
 
 	public String getUser() {
@@ -81,29 +88,13 @@ public class AccessToken {
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
 	}
-
-	public String getDomain() {
-		return domain;
-	}
-
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
-
+	
 	public int getObmId() {
 		return obmId;
 	}
 
-	public int getDomainId() {
-		return domainId;
-	}
-
 	public void setObmId(int obmId) {
 		this.obmId = obmId;
-	}
-
-	public void setDomainId(int domainId) {
-		this.domainId = domainId;
 	}
 
 	public String getOrigin() {
@@ -179,15 +170,6 @@ public class AccessToken {
 	}
 	
 	public String getUserWithDomain() {
-		return user + "@" + domain;
+		return user + "@" + domain.getName();
 	}
-
-	public String getDomainUuid() {
-		return domainUuid;
-	}
-
-	public void setDomainUuid(String domainUuid) {
-		this.domainUuid = domainUuid;
-	}
-	
 }
