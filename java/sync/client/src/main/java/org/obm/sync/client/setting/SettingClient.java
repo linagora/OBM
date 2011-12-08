@@ -35,8 +35,9 @@ import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.client.impl.AbstractClientImpl;
+import org.obm.sync.client.impl.AuthenticatedClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.login.LoginService;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
@@ -49,14 +50,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SettingClient extends AbstractClientImpl implements ISetting {
+public class SettingClient extends AuthenticatedClientImpl implements ISetting {
 
 	private final SettingItemsParser respParser;
 	private final Locator locator;
 
 	@Inject
-	private SettingClient(SyncClientException syncClientException, Locator locator) {
-		super(syncClientException);
+	private SettingClient(SyncClientException syncClientException, 
+			Locator locator, LoginService login) {
+		super(syncClientException, login);
 		this.locator = locator;
 		this.respParser = new SettingItemsParser();
 	}

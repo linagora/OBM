@@ -71,7 +71,8 @@ import org.obm.push.service.EventService;
 import org.obm.push.store.EmailDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
-import org.obm.sync.client.calendar.AbstractEventSyncClient;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,17 +97,20 @@ public class EmailManager implements IEmailManager {
 	private final boolean activateTLS;
 	private final EventService eventService;
 
+	private final LoginService login;
+
 	
 	@Inject
 	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EmailSync emailSync, LocatorService locatorService,
-			EventService eventService) {
+			EventService eventService, LoginService login) {
 		
 		this.emailSync = emailSync;
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
 		this.locatorService = locatorService;
 		this.eventService = eventService;
+		this.login = login;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 	}
@@ -154,7 +158,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public List<MSEmail> fetchMails(BackendSession bs, AbstractEventSyncClient calendarClient, Integer collectionId, 
+	public List<MSEmail> fetchMails(BackendSession bs, ICalendar calendarClient, Integer collectionId, 
 			String collectionName, Collection<Long> uids) throws IMAPException, LocatorClientException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
@@ -163,7 +167,8 @@ public class EmailManager implements IEmailManager {
 			login(store);
 			store.select(parseMailBoxName(store, collectionName));
 			
-			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient, eventService);
+			final MailMessageLoader mailLoader = 
+					new MailMessageLoader(store, calendarClient, eventService, login);
 			for (final Long uid: uids) {
 				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
 				if (email != null) {
@@ -274,7 +279,7 @@ public class EmailManager implements IEmailManager {
 	}
 
 	@Override
-	public List<InputStream> fetchMIMEMails(BackendSession bs, AbstractEventSyncClient calendarClient, String collectionName, 
+	public List<InputStream> fetchMIMEMails(BackendSession bs, ICalendar calendarClient, String collectionName, 
 			Set<Long> uids) throws IMAPException, LocatorClientException {
 		
 		List<InputStream> mails = new LinkedList<InputStream>();

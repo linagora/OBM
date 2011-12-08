@@ -72,7 +72,8 @@ import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.client.calendar.AbstractEventSyncClient;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,16 +87,19 @@ public class MailMessageLoader {
 	private static final Logger logger = LoggerFactory
 			.getLogger(MailMessageLoader.class);
 	
-	private final AbstractEventSyncClient calendarClient;
+	private final ICalendar calendarClient;
 	private final List<String> htmlMimeSubtypePriority;
 	private final StoreClient storeClient;
 	private final EventService eventService;
+	private final LoginService login;
 	
-	public MailMessageLoader(final StoreClient store, final AbstractEventSyncClient calendarClient, EventService eventService) {
+	public MailMessageLoader(final StoreClient store, final ICalendar calendarClient, 
+			EventService eventService, LoginService login) {
 		this.storeClient = store;
 		this.calendarClient = calendarClient;
 		this.eventService = eventService;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain");
+		this.login = login;
 	}
 
 	public MSEmail fetch(final Integer collectionId, final long messageId, final BackendSession bs) {
@@ -203,7 +207,7 @@ public class MailMessageLoader {
 	private MSEvent getInvitation(BackendSession bs, InputStream invitation) throws IOException {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
-			final AccessToken at = calendarClient.login(bs.getUser().getLoginAtDomain(),
+			final AccessToken at = login.login(bs.getUser().getLoginAtDomain(),
 					bs.getPassword(), ObmSyncBackend.OBM_SYNC_ORIGIN);
 			try {
 				final List<Event> obmEvents = calendarClient.parseICS(at, ics);
@@ -214,7 +218,7 @@ public class MailMessageLoader {
 			} catch (Throwable e) {
 				logger.error(e.getMessage() + ", ics was:\n" + ics, e);
 			} finally {
-				calendarClient.logout(at);
+				login.logout(at);
 			}
 		}
 		return null;

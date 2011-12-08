@@ -35,8 +35,9 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.client.impl.AbstractClientImpl;
+import org.obm.sync.client.impl.AuthenticatedClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.login.LoginService;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
@@ -50,15 +51,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class MailingListClient extends AbstractClientImpl implements IMailingList {
+public class MailingListClient extends AuthenticatedClientImpl implements IMailingList {
 
 	private final MailingListItemsParser mlParser;
 	private final MailingListItemsWriter mlWriter;
 	private final Locator locator;
 
 	@Inject
-	private MailingListClient(SyncClientException syncClientException, Locator locator) {
-		super(syncClientException);
+	private MailingListClient(SyncClientException syncClientException, 
+			Locator locator, LoginService login) {
+		super(syncClientException, login);
 		this.locator = locator;
 		this.mlParser = new MailingListItemsParser();
 		this.mlWriter = new MailingListItemsWriter();

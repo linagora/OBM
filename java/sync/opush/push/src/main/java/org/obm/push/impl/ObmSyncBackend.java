@@ -44,15 +44,15 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.ISyncClient;
-import org.obm.sync.client.book.BookClient;
-import org.obm.sync.client.calendar.AbstractEventSyncClient;
-import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.client.calendar.TodoClient;
+import org.obm.sync.client.CalendarType;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.services.IAddressBook;
+import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.inject.name.Named;
 
 public class ObmSyncBackend {
 
@@ -61,29 +61,38 @@ public class ObmSyncBackend {
 	protected String obmSyncHost;
 
 	private final CollectionDao collectionDao;
-	private final BookClient bookClient;
-	private final CalendarClient calendarClient;
-	private final TodoClient todoClient;
+	private final IAddressBook bookClient;
+	private final ICalendar calendarClient;
+	private final ICalendar todoClient;
+	private final LoginService login;
 
-	protected ObmSyncBackend(CollectionDao collectionDao, BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient) {
+	protected ObmSyncBackend(CollectionDao collectionDao, IAddressBook bookClient, 
+			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
+			@Named(CalendarType.TODO) ICalendar todoClient,
+			LoginService login) {
 		this.bookClient = bookClient;
 		this.calendarClient = calendarClient;
 		this.todoClient = todoClient;
 		this.collectionDao = collectionDao;
+		this.login = login;
 	}
 
-	protected AccessToken login(ISyncClient client, BackendSession session) {
-		return client.login(session.getUser().getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
+	protected AccessToken login(BackendSession session) {
+		return login.login(session.getUser().getLoginAtDomain(), session.getPassword(), OBM_SYNC_ORIGIN);
+	}
+
+	protected void logout(AccessToken at) {
+		login.logout(at);
 	}
 
 	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
-		AccessToken token = calendarClient.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
+		AccessToken token = login.login(loginAtDomain, password, OBM_SYNC_ORIGIN);
 		try {
 			if (token == null || token.getSessionId() == null) {
 				throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
 			}
 		} finally {
-			calendarClient.logout(token);
+			login.logout(token);
 		}
 		return token;
 	}
@@ -138,20 +147,23 @@ public class ObmSyncBackend {
 		return collectionDao.addCollectionMapping(device, col).toString();
 	}
 	
-	protected BookClient getBookClient() {
+	protected IAddressBook getBookClient() {
 		return bookClient;
 	}
 	
-	protected AbstractEventSyncClient getCalendarClient() {
+	protected ICalendar getCalendarClient() {
 		return getEventSyncClient(PIMDataType.CALENDAR);
 	}
 
-	protected AbstractEventSyncClient getEventSyncClient(PIMDataType type) {
+	protected ICalendar getEventSyncClient(PIMDataType type) {
 		if (PIMDataType.TASKS.equals(type)) {
 			return todoClient;
 		} else {
 			return calendarClient;
 		}
 	}
-	
+
+	public LoginService getSyncClient() {
+		return login;
+	}
 }

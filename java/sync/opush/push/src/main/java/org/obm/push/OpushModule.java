@@ -26,6 +26,7 @@ import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
+import org.obm.sync.ObmSyncHttpClientModule;
 
 import com.google.inject.AbstractModule;
 
@@ -37,6 +38,7 @@ public class OpushModule extends AbstractModule {
 		install(new TransactionalModule());
 		install(new DaoModule());
 		install(new OpushServletModule());
+		install(new ObmSyncHttpClientModule());
 		bind(IEmailManager.class).to(EmailManager.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);

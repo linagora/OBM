@@ -51,7 +51,8 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.services.ICalendar;
 
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
@@ -67,29 +68,30 @@ public class MailBackendTest {
 		final AccessToken at = new AccessToken(1, "o-push");
 		
 		EmailManager emailManager = EasyMock.createMock(EmailManager.class);
-		CalendarClient calendarClient = EasyMock.createMock(CalendarClient.class);
+		ICalendar calendarClient = EasyMock.createMock(ICalendar.class);
 		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
+		LoginService login = EasyMock.createMock(LoginService.class);
 		
 		EasyMock.expect(backendSession.getUser()).andReturn(user).once();
 		EasyMock.expect(backendSession.getPassword()).andReturn(password).once();
 
-		EasyMock.expect(calendarClient.login(user.getLoginAtDomain(), password, "o-push"))
+		EasyMock.expect(login.login(user.getLoginAtDomain(), password, "o-push"))
 				.andReturn(at).once();
 		EasyMock.expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
-		calendarClient.logout(at);
+		login.logout(at);
 		EasyMock.expectLastCall().once();
 		Set<Address> addrs = Sets.newHashSet();
 		emailManager.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class), EasyMock.anyBoolean());
 		EasyMock.expectLastCall().once();
 		
-		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null, new Mime4jUtils(), mockOpushConfigurationService());
+		MailBackend mailBackend = new MailBackend(emailManager, null, null, null, calendarClient, null, login, new Mime4jUtils(), mockOpushConfigurationService());
 
-		EasyMock.replay(emailManager, calendarClient, backendSession);
+		EasyMock.replay(emailManager, calendarClient, backendSession, login);
 
 		InputStream emailStream = loadEmail(getClass(), "bigEml.eml");
 		mailBackend.sendEmail(backendSession, ByteStreams.toByteArray(emailStream), true);
 		
-		EasyMock.verify(emailManager, calendarClient, backendSession);
+		EasyMock.verify(emailManager, calendarClient, backendSession, login);
 	}
 	
 }

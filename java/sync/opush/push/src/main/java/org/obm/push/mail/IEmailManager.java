@@ -49,14 +49,14 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.sync.client.calendar.AbstractEventSyncClient;
+import org.obm.sync.services.ICalendar;
 
 public interface IEmailManager {
 
 	MailChanges getSync(BackendSession bs, SyncState state, Integer devId, Integer collectionId, String collectionName)
 			throws IMAPException, DaoException, LocatorClientException;
 
-	List<MSEmail> fetchMails(BackendSession bs, AbstractEventSyncClient calendarClient, Integer collectionId, String collectionName, 
+	List<MSEmail> fetchMails(BackendSession bs, ICalendar calendarClient, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws IMAPException, LocatorClientException;
 
 	void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws IMAPException, LocatorClientException;
@@ -68,7 +68,7 @@ public interface IEmailManager {
 	Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
 			Long uid) throws IMAPException, DaoException, LocatorClientException;
 
-	List<InputStream> fetchMIMEMails(BackendSession bs, AbstractEventSyncClient calendarClient, String collectionName, 
+	List<InputStream> fetchMIMEMails(BackendSession bs, ICalendar calendarClient, String collectionName, 
 			Set<Long> uids) throws IMAPException, LocatorClientException;
 
 	void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws IMAPException, LocatorClientException;

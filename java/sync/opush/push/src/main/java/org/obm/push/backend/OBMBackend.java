@@ -42,7 +42,6 @@ import org.minig.imap.IMAPException;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -59,6 +58,7 @@ import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,23 +76,23 @@ public class OBMBackend implements IBackend {
 	private final MailBackend mailBackend;
 	private final CalendarMonitoringThread calendarPushMonitor;
 	private final ContactsMonitoringThread contactsPushMonitor;
+	private final LoginService loginService;
 	
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
-
-	private final CalendarBackend calendarBackend;
 	
 	@Inject
 	private OBMBackend(CollectionDao collectionDao, IEmailManager emailManager,
 			IContentsExporter contentsExporter, MailBackend mailBackend,
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
-			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, CalendarBackend calendarBackend) {
+			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory,
+			LoginService loginService) {
 		
 		this.collectionDao = collectionDao;
 		this.emailManager = emailManager;
 		this.contentsExporter = contentsExporter;
 		this.mailBackend = mailBackend;
-		this.calendarBackend = calendarBackend;
+		this.loginService = loginService;
 		
 		this.registeredListeners = Collections
 				.synchronizedSet(new HashSet<ICollectionChangeListener>());
@@ -197,7 +197,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
-		return calendarBackend.login(loginAtDomain, password);
+		return loginService.login(loginAtDomain, password, "o-push");
 	}
 
 	@Override
