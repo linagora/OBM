@@ -138,6 +138,8 @@ perl -MXML::SAX -e "XML::SAX->add_parser(q(XML::SAX::PurePerl))->save_parsers()"
 %config(noreplace) %{_sysconfdir}/logrotate.d/obm-satellite
 
 %changelog
+* Thu Dec 08 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-satellite-2.4.0.0-rc15
+- New upstream release.
 * Wed Nov 30 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-satellite-2.4.0.0-rc14
 - New upstream release.
 * Tue Aug 25 2009 Sylvain Garcia <sylvain.garcia[at]obm.org> - 2.3.0-1

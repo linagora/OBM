@@ -640,6 +640,8 @@ fi
 #empty package :(
 
 %changelog
+* Thu Dec 08 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-2.4.0.0-rc15
+- New upstream release.
 * Wed Nov 30 2011 Thomas Sarboni <tsarboni@linagora.com> - obm-2.4.0.0-rc14
 - New upstream release.
 * Tue Jul 21 2009 Sylvain Garcia <sylvain.garcia[at]obm.org> - 2.2.7-2
