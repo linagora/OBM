@@ -18,6 +18,7 @@ import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
 
 public class CalendarEncoder extends Encoder implements IDataEncoder {
@@ -217,8 +218,8 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 					"" + cal.get(Calendar.DAY_OF_MONTH));
 			break;
 		case MONTHLY_NDAY:
-			s(r, "Calendar:RecurrenceWeekOfMonth",
-					"" + cal.get(Calendar.WEEK_OF_MONTH));
+			int weekOfMonth = DateUtils.getWeekOfCurrentDayWithoutStartShift(cal);
+			s(r, "Calendar:RecurrenceWeekOfMonth", String.valueOf(weekOfMonth));
 			s(r, "Calendar:RecurrenceDayOfWeek", ""
 					+ RecurrenceDayOfWeek.dayOfWeekToInt(cal
 							.get(Calendar.DAY_OF_WEEK)));

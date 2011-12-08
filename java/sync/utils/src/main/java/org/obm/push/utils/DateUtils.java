@@ -31,4 +31,21 @@ public class DateUtils {
 		return calendar;
 	}
 	
+	public static int getWeekOfCurrentDayWithoutStartShift(Calendar cal) {
+		int eventStartDay = cal.get(Calendar.DAY_OF_MONTH);
+		int eventWeekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
+		int eventRealWeekOfMonth = getRealWeekOfDay(eventStartDay);
+		return adjustWeekOfMonth(eventWeekOfMonth, eventRealWeekOfMonth);
+	}
+
+	private static int adjustWeekOfMonth(int eventWeekOfMonth, int eventRealWeekOfMonth) {
+		if (eventWeekOfMonth > 1 && eventWeekOfMonth > eventRealWeekOfMonth) {
+			return eventWeekOfMonth - 1;
+		}
+		return eventWeekOfMonth;
+	}
+
+	private static int getRealWeekOfDay(int startDay) {
+		return (int) Math.ceil(startDay / 7d);
+	}
 }

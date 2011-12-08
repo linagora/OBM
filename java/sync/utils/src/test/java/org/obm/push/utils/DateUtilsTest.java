@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import junit.framework.Assert;
 
+import org.fest.assertions.Assertions;
 import org.junit.Test;
 
 public class DateUtilsTest {
@@ -29,4 +30,51 @@ public class DateUtilsTest {
 		Assert.assertEquals(0, twoHoursAMCalendar.get(Calendar.HOUR));
 	}
 	
+	@Test
+	public void testRealWeekWhenFirstDayNotInFirstWeek() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2011, 12, 7);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(1);
+	}
+
+	@Test
+	public void testRealWeekWhenSecondDayIsInThirdWeek() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2011, 12, 11);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
+	}
+
+	@Test
+	public void testRealWeekWhenFirstDayInFirstWeek() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2011, 12, 1);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(1);
+	}
+
+	@Test
+	public void testRealWeekWhenDayInSecondWeek() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2011, 12, 8);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
+	}
+	
+	@Test
+	public void testRealWeekWhenDayInLastWeek() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2011, 12, 30);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(5);
+	}
+	
+	@Test
+	public void testRealWeekWhenRegular() {
+		Calendar calendar = DateUtils.getCurrentGMTCalendar();
+		calendar.set(2012, 1, 18);
+		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
+		Assertions.assertThat(weekWithoutStartShift).isEqualTo(3);
+	}
 }
