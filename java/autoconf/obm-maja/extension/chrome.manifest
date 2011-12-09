@@ -1,5 +1,0 @@
-content	obmmaja	chrome/content/
-locale	obmmaja	fr-FR	chrome/locale/fr-FR/
-locale	obmmaja	en-US	chrome/locale/en-US/
-skin	obmmaja	classic/1.0	chrome/skin/
-overlay	chrome://messenger/content/messenger.xul	chrome://obmmaja/content/thunderbirdOverlay.xul
