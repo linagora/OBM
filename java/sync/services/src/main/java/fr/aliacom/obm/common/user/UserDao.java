@@ -102,7 +102,7 @@ public class UserDao {
 			String request = "SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
 					"INNER JOIN Domain ON domain_id = userobm_domain_id " +
-					"WHERE userobm_email like '%" + mail + "%'";
+					"WHERE UPPER(userobm_email) like UPPER('%" + mail + "%')";
 			
 			rs = st.executeQuery(request);
 			if (rs.next()) {
@@ -112,7 +112,7 @@ public class UserDao {
 				String domainNameToCompare = rs.getString(3);
 				String domainsAliasToCompare = rs.getString(4);
 				
-				if (strictCompareMail(mail, emailsToCompare)) {
+				if (compareMail(mail, emailsToCompare)) {
 					
 					if (strictCompareDomain(domain, domainNameToCompare, domainsAliasToCompare)) {
 						return id;	
@@ -145,12 +145,12 @@ public class UserDao {
 		return false;
 	}
 
-	private boolean strictCompareMail(String mail, String emailsToCompare) {
+	private boolean compareMail(String mail, String emailsToCompare) {
 		if (mail != null && emailsToCompare != null) {
 			Iterable<String> emails = Splitter.on("\r\n").split(emailsToCompare);			
 			for (String email: emails) {
 				email = getEmailWithoutDomain(email);
-				if (mail.equals(email)) {
+				if (mail.equalsIgnoreCase(email)) {
 					return true;
 				}
 			}	

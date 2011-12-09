@@ -76,7 +76,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ObmUser getUserFromAttendee(Attendee attendee, String domain) {
-		return getUserFromLogin(attendee.getEmail(), domain);
+		ObmDomain obmDomain = domainService.findDomainByName(domain);
+		if (obmDomain != null) {
+			return userDao.findUser(attendee.getEmail(), obmDomain);
+		}	
+		
+		return null;
 	}
 
 	@Override
@@ -125,7 +130,7 @@ public class UserServiceImpl implements UserService {
 			if (obmDomain != null) {
 				return userDao.findUser(email, obmDomain);
 			}	
-		}
+		} 
 		return null;
 	}
 	
