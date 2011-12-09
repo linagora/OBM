@@ -127,7 +127,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document document) {
-		responder.sendResponse("MeetingResponse", document);
+		responder.sendWBXMLResponse("MeetingResponse", document);
 	}
 
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 

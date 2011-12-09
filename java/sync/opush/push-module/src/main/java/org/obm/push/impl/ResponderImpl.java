@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,11 +42,13 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.push.protocol.data.IntEncoder;
+import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
@@ -90,7 +93,7 @@ public class ResponderImpl implements Responder {
 	}
 
 	@Override
-	public void sendResponse(String defaultNamespace, Document doc) {
+	public void sendWBXMLResponse(String defaultNamespace, Document doc) {
 		logger.debug("response: send response");
 		if (logger.isDebugEnabled()) {
 			DOMDumper.dumpXml(logger, doc);
@@ -98,22 +101,38 @@ public class ResponderImpl implements Responder {
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
-			Preconditions.checkNotNull(wbxml);
-			
-			resp.setContentType("application/vnd.ms-sync.wbxml");
-			resp.setContentLength(wbxml.length);
-			
-			ServletOutputStream out = resp.getOutputStream();
-			out.write(wbxml);
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			logger.warn(e.getMessage(), e);
+			writeData(wbxml, "application/vnd.ms-sync.wbxml");	
 		} catch (WBXmlException e) {
 			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.warn(e.getMessage(), e);
 		}
 	}
-	
+
+	@Override
+	public void sendXMLResponse(String defaultNamespace, Document doc) {
+		DOMDumper.dumpXml(logger, doc);
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			DOMUtils.serialise(doc, out);
+			byte[] ret = out.toByteArray();
+			writeData(ret, "text/xml");	
+		} catch (TransformerException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.warn(e.getMessage(), e);
+		}
+	}
+
+	private void writeData(byte[] data, String type) throws IOException {
+		resp.setContentType(type);
+		resp.setContentLength(data.length);
+		ServletOutputStream out = resp.getOutputStream();
+		out.write(data);
+		out.flush();
+		out.close();
+	}
+
 	@Override
 	public void sendResponseFile(String contentType, InputStream file) {
 		Preconditions.checkNotNull(contentType);

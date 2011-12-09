@@ -117,7 +117,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	
 	private void sendErrorResponse(Responder responder, ItemOperationsStatus status, Exception exception) {
 		logger.error(exception.getMessage(), exception);
-		responder.sendResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
+		responder.sendWBXMLResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
 	}
 	
 	private void sendResponse(Responder responder, Document document, ItemOperationsResponse response) {
@@ -126,7 +126,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			responder.sendMSSyncMultipartResponse(NAMESPACE, document, 
 					Arrays.asList(response.getAttachmentData()), response.isGzip());
 		} else {
-			responder.sendResponse(NAMESPACE, document);
+			responder.sendWBXMLResponse(NAMESPACE, document);
 		}
 	}
 	

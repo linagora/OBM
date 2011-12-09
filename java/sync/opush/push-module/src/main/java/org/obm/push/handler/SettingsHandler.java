@@ -66,7 +66,7 @@ public class SettingsHandler extends WbxmlRequestHandler {
 
 		try {
 			// send back the original document
-			responder.sendResponse("Settings", doc);
+			responder.sendWBXMLResponse("Settings", doc);
 		} catch (Exception e) {
 			logger.error("Error creating provision response");
 		}

@@ -99,7 +99,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	}
 
 	private void sendResponse(Responder responder, Document document) {
-		responder.sendResponse("Search", document);
+		responder.sendWBXMLResponse("Search", document);
 	}
 
 	private void sendError(Responder responder, SearchStatus error) {

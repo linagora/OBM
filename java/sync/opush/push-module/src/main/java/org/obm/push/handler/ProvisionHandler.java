@@ -92,7 +92,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 
 	private void sendResponse(Responder responder, Document ret) {
-		responder.sendResponse("Provision", ret);
+		responder.sendWBXMLResponse("Provision", ret);
 	}
 
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, BackendSession bs) {

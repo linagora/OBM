@@ -117,7 +117,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document document) {
-		responder.sendResponse("GetItemEstimate", document);
+		responder.sendWBXMLResponse("GetItemEstimate", document);
 	}
 
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 

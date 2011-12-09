@@ -37,8 +37,9 @@ import java.util.Collection;
 import org.w3c.dom.Document;
 
 public interface Responder {
-
-	void sendResponse(String defaultNamespace, Document doc);
+	void sendWBXMLResponse(String defaultNamespace, Document doc);
+	
+	void sendXMLResponse(String defaultNamespace, Document doc);
 
 	void sendResponseFile(String contentType, InputStream file);
 

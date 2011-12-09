@@ -117,7 +117,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	}
 	
 	private void sendResponse(Responder responder, Document doc) {
-		responder.sendResponse("Move", doc);
+		responder.sendWBXMLResponse("Move", doc);
 	}
 
 	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, BackendSession bs) {

@@ -43,6 +43,7 @@ public class ResponderImplTest {
 		byte[] data = null;
 		
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
+		servletResponse.setContentType("application/vnd.ms-sync.wbxml");
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		Document document = EasyMock.createMock(Document.class);
@@ -53,7 +54,7 @@ public class ResponderImplTest {
 		
 		
 		try {
-			responder.sendResponse(namespace, document);
+			responder.sendWBXMLResponse(namespace, document);
 		} catch (Throwable t) {
 			EasyMock.verify(servletResponse, intEncoder, wbxmlTools, document);
 			throw t;
@@ -80,7 +81,7 @@ public class ResponderImplTest {
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
 		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
 		
-		responder.sendResponse(namespace, document);
+		responder.sendWBXMLResponse(namespace, document);
 		
 		EasyMock.verify(servletResponse, intEncoder, wbxmlTools, document);
 	}
