@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.obm.configuration.ObmConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
-import org.obm.locator.store.LocatorCache;
 
 public class LocatorCacheTest {
 

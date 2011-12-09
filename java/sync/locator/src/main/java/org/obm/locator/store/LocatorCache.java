@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.ObmConfigurationService;
+import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
@@ -53,8 +54,8 @@ public class LocatorCache implements LocatorService {
 			return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
     	} catch (LocatorClientException e) {
 			logger.error(e.getMessage());
+			throw new LocatorCacheException("No host for { " + key.toString() + " }", e);
 		}
-		return null;
 	}
 	
 	@Override
@@ -64,6 +65,7 @@ public class LocatorCache implements LocatorService {
 		if (value == DEFAULT_VALUE) {
 			throw new LocatorClientException("No host for { " + key.toString() + " }");
 		}
+	
 		return value;
 	}
 	
