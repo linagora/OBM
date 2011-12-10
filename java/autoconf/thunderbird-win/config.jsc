@@ -1,2 +1,0 @@
-//https not supported !!
-pref("autoadmin.global_config_url", "http://autoconf.oc.dgfip/obm-autoconf/autoconfig.js");
