@@ -2,6 +2,44 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
+JAVA_HOME := /usr/lib/jvm/java-6-sun/
+export JAVA_HOME
+
+ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+MVN_BUILD_OPTIONS := $(MVN_BUILD_OPTIONS) -Dmaven.test.skip
+endif
+
+ifneq (,$(filter offline,$(DEB_BUILD_OPTIONS)))
+MVN_BUILD_OPTIONS := $(MVN_BUILD_OPTIONS) -o
+endif
+
+MVN_BIN := /usr/bin/mvn -Duser.home=$(HOME) $(MVN_BUILD_OPTIONS)
+
+ROOT_INSTALL_DIR = /usr/share/$(cdbs_curpkg)
+FAKEROOT_INSTALL_DIR = debian/$(cdbs_curpkg)$(ROOT_INSTALL_DIR)
+FAKEROOT_TOMCAT_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-tomcat/applis
+
+# Template for the Tomcat webapp file
+define WEBAPP_FILE
+<?xml version="1.0" encoding="UTF-8"?>
+	<Context docBase="@@ROOT_INSTALL_DIR@@" path="/@@cdbs_curpkg@@">
+</Context>
+endef
+export WEBAPP_FILE
+
+build:
+	$(MVN_BIN) install
+
+binary-install-tomcat-webapp/% ::
+	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar
+	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/slf4j-api-*.jar
+	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/logback*.jar
+	mkdir -p $(FAKEROOT_TOMCAT_CONFIG_DIR) 
+	echo "$$WEBAPP_FILE" | sed 's!@@ROOT_INSTALL_DIR@@!$(ROOT_INSTALL_DIR)!g' | sed 's!@@cdbs_curpkg@@!$(cdbs_curpkg)!g' > $(FAKEROOT_TOMCAT_CONFIG_DIR)/$(cdbs_curpkg).xml
+
+binary-install/obm-autoconf:: binary-install-tomcat-webapp/obm-autoconf
+
 install/obm-sync::
 	(/bin/bash $(CURDIR)/debian/obm-sync-build.sh $(CURDIR))
 

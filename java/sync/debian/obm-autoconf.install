@@ -1,0 +1,2 @@
+autoconf/target/autoconf-*/WEB-INF/web.xml      usr/share/obm-autoconf/WEB-INF
+autoconf/target/autoconf-*/WEB-INF/lib/*.jar    usr/share/obm-autoconf/WEB-INF/lib
