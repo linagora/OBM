@@ -64,6 +64,7 @@
 		<module>utils</module>
 		<module>dbcp</module>
 		<module>annotations</module>
+		<module>autoconf</module>
 		<module>common-test</module>
 		<module>integration-testing</module>
 	</modules>

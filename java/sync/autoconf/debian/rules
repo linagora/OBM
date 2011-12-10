@@ -1,0 +1,44 @@
+#!/usr/bin/make -f
+# Not buildable on etch
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+JAVA_HOME := /usr/lib/jvm/java-6-sun/
+
+ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+BUILD_OPTS := -Dmaven.test.skip
+endif
+
+MVN_BIN := /usr/bin/mvn -Duser.home=$(HOME) $(BUILD_OPTS) -o
+
+ROOT_INSTALL_DIR = /usr/share/$(cdbs_curpkg)
+FAKEROOT_INSTALL_DIR = $(DEB_DESTDIR)$(ROOT_INSTALL_DIR)
+FAKEROOT_TOMCAT_CONFIG_DIR := $(DEB_DESTDIR)/usr/share/obm-tomcat/applis
+DEB_BUILDDIR := $(DEB_SRCDIR)/target
+
+define WEBAPP_FILE
+<?xml version="1.0" encoding="UTF-8"?>
+	<Context docBase="@@ROOT_INSTALL_DIR@@" path="/@@cdbs_curpkg@@">
+</Context>
+endef
+
+export WEBAPP_FILE
+
+clean::
+	$(MVN_BIN) clean
+
+common-build-indep::
+	$(MVN_BIN) compile war:exploded
+
+install/obm-autoconf::
+	mkdir -p $(FAKEROOT_INSTALL_DIR)
+	# We don't know the exact name of the obm-autoconf dir, since it contains
+	# the version number
+	cp -a $(DEB_BUILDDIR)/$(cdbs_curpkg)*/WEB-INF $(FAKEROOT_INSTALL_DIR)
+	rmdir $(FAKEROOT_INSTALL_DIR)/WEB-INF/classes
+	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar
+	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/slf4j-api-*.jar
+	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/logback*.jar
+	mkdir -p $(FAKEROOT_TOMCAT_CONFIG_DIR) 
+	echo "$$WEBAPP_FILE" | sed 's!@@ROOT_INSTALL_DIR@@!$(ROOT_INSTALL_DIR)!g' | sed 's!@@cdbs_curpkg@@!$(cdbs_curpkg)!g' > $(FAKEROOT_TOMCAT_CONFIG_DIR)/$(cdbs_curpkg).xml
