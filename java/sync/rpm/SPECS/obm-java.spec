@@ -9,7 +9,6 @@ License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: obm-java-%{version}.tar.gz
 Source1: obm-sync.postinst
-Source2: jetty.xml.sample
 
 BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
@@ -62,19 +61,6 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-%package -n obm-jetty
-Summary: configuration for Jetty for Open Business Management
-Group:	Development/Tools
-Requires: jetty6
-
-%description -n obm-jetty
-It allows Jetty Server to start after its install and changes the port.
-
-OBM is a global groupware, messaging and CRM application. It is intended to
-be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
-simple contact database. OBM also features integration with PDAs, smartphones,
-Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
 %prep
 %setup -q -n obm-java-%{version}
 
@@ -98,9 +84,6 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/logback*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/jta-1.1.jar
 # postinst pour obm-sync
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
-# sample jetty
-mkdir -p $RPM_BUILD_ROOT%{_docdir}/obm-jetty
-install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty.xml.sample
 
 # install opush
 #mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/Microsoft-Server-ActiveSync
@@ -146,18 +129,6 @@ cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 #%{_datadir}/jetty/webapps/obm-locator
 /srv/jetty6/webapps/obm-locator
 %{_localstatedir}/log/obm-locator
-
-%files -n obm-jetty
-%defattr(-,root,root,-)
-%{_docdir}/obm-jetty/jetty.xml.sample
-
-%post -n obm-jetty
-/etc/init.d/jetty6 stop > /dev/null 2>&1 || :
-if [ -e /etc/jetty6/jetty.xml ]; then
-	cp /etc/jetty6/jetty.xml /etc/jetty6/jetty.xml.orig
-fi
-cp /usr/share/doc/obm-jetty/jetty.xml.sample /etc/jetty6/jetty.xml
-/etc/init.d/jetty6 start > /dev/null 2>&1 || :
 
 %post -n opush
 [ ! -f %{_sysconfdir}/opush/logback.xml ] && echo "<included/>" > %{_sysconfdir}/opush/logback.xml
