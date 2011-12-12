@@ -41,7 +41,7 @@ public class DateUtilsTest {
 	@Test
 	public void testRealWeekWhenSecondDayIsInThirdWeek() {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
-		calendar.set(2011, 12, 11);
+		calendar.set(2011, 11, 11);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
 		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
 	}
@@ -49,7 +49,7 @@ public class DateUtilsTest {
 	@Test
 	public void testRealWeekWhenFirstDayInFirstWeek() {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
-		calendar.set(2011, 12, 1);
+		calendar.set(2011, 11, 1);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
 		Assertions.assertThat(weekWithoutStartShift).isEqualTo(1);
 	}
@@ -57,7 +57,7 @@ public class DateUtilsTest {
 	@Test
 	public void testRealWeekWhenDayInSecondWeek() {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
-		calendar.set(2011, 12, 8);
+		calendar.set(2011, 11, 8);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
 		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
 	}
@@ -65,7 +65,7 @@ public class DateUtilsTest {
 	@Test
 	public void testRealWeekWhenDayInLastWeek() {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
-		calendar.set(2011, 12, 30);
+		calendar.set(2011, 11, 30);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
 		Assertions.assertThat(weekWithoutStartShift).isEqualTo(5);
 	}
@@ -73,7 +73,7 @@ public class DateUtilsTest {
 	@Test
 	public void testRealWeekWhenRegular() {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
-		calendar.set(2012, 1, 18);
+		calendar.set(2012, 0, 18);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
 		Assertions.assertThat(weekWithoutStartShift).isEqualTo(3);
 	}
