@@ -65,8 +65,6 @@ cp "${TEMPLATE}" "${NEWFILE}"
 ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
 ucfr opush "${CONFIG}"
 
-[ ! -f /etc/opush/logback.xml ] && echo "<included/>" > /etc/opush/logback.xml
-
 invoke-rc.d jetty status 3>1
 jetty_status=$?
 
