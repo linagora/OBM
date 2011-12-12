@@ -27,6 +27,9 @@ define WEBAPP_FILE
 endef
 export WEBAPP_FILE
 
+clean::
+	$(MVN_BIN) clean
+
 build:
 	$(MVN_BIN) install
 
