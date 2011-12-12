@@ -1,0 +1,2 @@
+services/target/services-*/WEB-INF/web.xml      usr/share/obm-sync/WEB-INF
+services/target/services-*/WEB-INF/lib/*.jar    usr/share/obm-sync/WEB-INF/lib

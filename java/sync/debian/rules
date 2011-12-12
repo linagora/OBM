@@ -40,8 +40,7 @@ binary-install-tomcat-webapp/% ::
 
 binary-install/obm-autoconf:: binary-install-tomcat-webapp/obm-autoconf
 
-install/obm-sync::
-	(/bin/bash $(CURDIR)/debian/obm-sync-build.sh $(CURDIR))
+binary-install/obm-sync:: binary-install-tomcat-webapp/obm-sync
 
 install/obm-locator::
 	(/bin/bash $(CURDIR)/debian/obm-locator-build.sh $(CURDIR))

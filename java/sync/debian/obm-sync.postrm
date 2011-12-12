@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-OBM_SYNC_FILE="/usr/share/obm-tomcat/applis/obm-sync.xml"
-
-if [ -f $OBM_SYNC_FILE ]; then
-rm $OBM_SYNC_FILE
-fi
-
-exit 0
