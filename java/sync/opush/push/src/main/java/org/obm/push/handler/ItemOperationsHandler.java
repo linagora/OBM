@@ -169,6 +169,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	private FetchItemResult fetchItem(String serverId, Integer collectionId, Integer type, BackendSession bs) {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
+		fetchResult.setServerId(serverId);
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);

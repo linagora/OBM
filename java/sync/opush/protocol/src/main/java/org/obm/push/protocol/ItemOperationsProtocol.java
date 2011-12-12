@@ -140,9 +140,9 @@ public class ItemOperationsProtocol {
 		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
 		DOMUtils.createElementAndText(fetchResp, "Status", fetchItemResult.getStatus().asXmlValue());
 		DOMUtils.createElementAndText(fetchResp, "AirSync:ServerId", fetchItemResult.getServerId());
-		DOMUtils.createElementAndText(fetchResp, "AirSync:CollectionId", fetchItemResult.getCollectionId());
 
-		if (fetchItemResult.getSyncCollection() != null) {
+		if (ItemOperationsStatus.SUCCESS == fetchItemResult.getStatus() &&
+				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
 			IDataEncoder encoder = encoderFactory.getEncoder(data);
