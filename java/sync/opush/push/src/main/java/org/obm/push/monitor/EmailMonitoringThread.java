@@ -1,6 +1,5 @@
 package org.obm.push.monitor;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -43,7 +42,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 		super(contentsExporter);
 		
 		remainConnected = false;
-		this.ccls = Collections.synchronizedSet(ccls);
+		this.ccls = ccls;
 		this.backend = cb;
 		this.emailManager = emailManager;
 		this.bs = bs;
