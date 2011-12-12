@@ -335,6 +335,10 @@ ALTER TABLE `opush_synced_item` ADD COLUMN `addition` BOOLEAN;
 UPDATE `opush_synced_item` SET `addition`='1';
 ALTER TABLE `opush_synced_item` MODIFY `addition` BOOLEAN NOT NULL;
 
+ALTER TABLE `Domain` ADD COLUMN `domain_uuid` CHAR(37);
+UPDATE Domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
+ALTER TABLE Domain MODIFY domain_uuid CHAR(37) NOT NULL;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------

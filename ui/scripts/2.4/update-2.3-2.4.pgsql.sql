@@ -392,20 +392,23 @@ DELETE FROM opush_invitation_mapping;
 ALTER TABLE opush_invitation_mapping DROP COLUMN event_uid;
 ALTER TABLE opush_invitation_mapping ADD COLUMN event_uid INTEGER NOT NULL REFERENCES event(event_id) ON DELETE CASCADE;
 
-CREATE OR REPLACE FUNCTION generate_uuid()
+CREATE OR REPLACE FUNCTION UUID()
   RETURNS uuid AS
 $BODY$
  SELECT CAST(md5(current_database()|| user ||current_timestamp ||random()) as uuid)
 $BODY$
   LANGUAGE 'sql' VOLATILE;
 
-UPDATE event SET event_ext_id=generate_uuid() WHERE event_ext_id IS NULL;
+UPDATE event SET event_ext_id=UUID() WHERE event_ext_id IS NULL;
 ALTER TABLE event ALTER event_ext_id SET NOT NULL;
 
 ALTER TABLE opush_synced_item ADD COLUMN addition BOOLEAN;
 UPDATE opush_synced_item SET addition='1';
 ALTER TABLE opush_synced_item ALTER addition SET NOT NULL;
 
+ALTER TABLE domain ADD COLUMN domain_uuid char(37);
+UPDATE domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
+ALTER TABLE domain ALTER domain_uuid SET NOT NULL;
 
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed

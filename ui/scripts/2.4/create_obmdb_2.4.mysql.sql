@@ -1238,6 +1238,7 @@ CREATE TABLE `Domain` (
   `domain_name` varchar(128) default NULL,
   `domain_alias` text,
   `domain_global` tinyint(1) default '0',
+  `domain_uuid` char(37)  NOT NULL,
   PRIMARY KEY  (`domain_id`),
   KEY `domain_userupdate_userobm_id_fkey` (`domain_userupdate`),
   KEY `domain_usercreate_userobm_id_fkey` (`domain_usercreate`),

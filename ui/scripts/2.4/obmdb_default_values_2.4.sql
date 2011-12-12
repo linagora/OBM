@@ -28,7 +28,7 @@ INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('scope-progress', '0')
 DELETE FROM UserObm;
 
 -- Global Domain
-INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global, domain_uuid) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE, UUID());
 INSERT INTO Entity (entity_mailing) VALUES (TRUE);
 INSERT INTO DomainEntity (domainentity_entity_id, domainentity_domain_id) SELECT MAX(entity_id), MAX(domain_id) FROM Domain, Entity;
 -- Global ADMIN

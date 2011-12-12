@@ -795,7 +795,8 @@ CREATE TABLE domain (
     domain_description character varying(255),
     domain_name character varying(128),
     domain_alias text,
-    domain_global boolean DEFAULT false
+    domain_global boolean DEFAULT false,
+    domain_uuid char(37)  NOT NULL
 );
 
 
@@ -11823,6 +11824,17 @@ ALTER TABLE ONLY field
 --
 ALTER TABLE ONLY field
     ADD CONSTRAINT field_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES Entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Generates a Universally unique identifier
+--
+CREATE OR REPLACE FUNCTION UUID()
+  RETURNS uuid AS
+$BODY$
+ SELECT CAST(md5(current_database()|| user ||current_timestamp ||random()) as uuid)
+$BODY$
+  LANGUAGE 'sql' VOLATILE;
+
 
 
 --
