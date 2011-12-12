@@ -36,34 +36,36 @@ public class OpushMonitoringThread {
 			Set<ICollectionChangeListener> ccls) {
 		
 		final LinkedList<PushNotification> pushNotifyList = new LinkedList<PushNotification>();
-		for (final ICollectionChangeListener ccl : ccls) {
+		synchronized (ccls) {
+			for (final ICollectionChangeListener ccl : ccls) {
 
-			final Collection<SyncCollection> monitoredCollections = ccl
-					.getMonitoredCollections();
-			
-			final BackendSession backendSession = ccl.getSession();
-			for (SyncCollection syncCollection : monitoredCollections) {
-			
-				try {
-					int count = contentsExporter.getItemEstimateSize(backendSession, syncCollection.getOptions().getFilterType(),
-							syncCollection.getCollectionId(), syncCollection.getSyncState(), syncCollection.getDataType());
-					
-					if (count > 0) {
-						addPushNotification(pushNotifyList, ccl);
+				final Collection<SyncCollection> monitoredCollections = ccl
+						.getMonitoredCollections();
+
+				final BackendSession backendSession = ccl.getSession();
+				for (SyncCollection syncCollection : monitoredCollections) {
+
+					try {
+						int count = contentsExporter.getItemEstimateSize(backendSession, syncCollection.getOptions().getFilterType(),
+								syncCollection.getCollectionId(), syncCollection.getSyncState(), syncCollection.getDataType());
+
+						if (count > 0) {
+							addPushNotification(pushNotifyList, ccl);
+						}
+					} catch (CollectionNotFoundException e) {
+						logger.error(e.getMessage(), e);
+					} catch (DaoException e) {
+						logger.error(e.getMessage(), e);
+					} catch (UnknownObmSyncServerException e) {
+						logger.error(e.getMessage(), e);
+					} catch (ProcessingEmailException e) {
+						logger.error(e.getMessage(), e);
 					}
-				} catch (CollectionNotFoundException e) {
-					logger.error(e.getMessage(), e);
-				} catch (DaoException e) {
-					logger.error(e.getMessage(), e);
-				} catch (UnknownObmSyncServerException e) {
-					logger.error(e.getMessage(), e);
-				} catch (ProcessingEmailException e) {
-					logger.error(e.getMessage(), e);
 				}
 			}
-		}
 
-		return pushNotifyList;
+			return pushNotifyList;
+		}
 	}
 
 	protected void addPushNotification(
