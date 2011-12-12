@@ -10,6 +10,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -29,8 +30,10 @@ import org.junit.Test;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -38,13 +41,19 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.auth.ServerFault;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.services.ICalendar;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
@@ -90,13 +99,20 @@ public class PingHandlerTest {
 					"<Ping><Status>1</Status><Folders/></Ping>");
 	}
 
-	private void mockForNoChangePing() throws DaoException,
-			CollectionNotFoundException {
-		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		mockDeviceDao(deviceDao, Arrays.asList(singleUserFixture.jaures));
+	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException, ServerFault {
+		List<OpushUser> opushUsers = Arrays.asList(singleUserFixture.jaures);
 
+		LoginService loginService = classToInstanceMap.get(LoginService.class);
+		mockLoginService(loginService, opushUsers);
+		
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		mockDeviceDao(deviceDao, opushUsers);
+
+		ICalendar iCalendar = classToInstanceMap.get(ICalendar.class);
+		mockCalendar(iCalendar, opushUsers);
+		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		mockCollectionDao(collectionDao);
+		mockCollectionDao(collectionDao, opushUsers);
 
 		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		mockMonitoredCollectionDao(monitoredCollectionDao);
@@ -105,6 +121,24 @@ public class PingHandlerTest {
 		mockHeartbeatDao(heartbeatDao);
 		
 		EasyMock.replay(Lists.newArrayList(classToInstanceMap).toArray());
+	}
+
+	private void mockCalendar(ICalendar iCalendar, List<OpushUser> opushUsers) throws ServerFault {
+		for (OpushUser user : opushUsers) {
+			Date dateFirstSync = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+			EventChanges eventChanges = new EventChanges();
+			eventChanges.setLastSync(new Date());
+			expect(iCalendar.getSync(user.accessToken, user.user.getLogin(), dateFirstSync)).andReturn(eventChanges).anyTimes();
+			expect(iCalendar.getUserEmail(user.accessToken)).andReturn(user.user.getEmail()).anyTimes();
+		}
+	}
+
+	private void mockLoginService(LoginService loginService, List<OpushUser> list) {
+		for (OpushUser user : list) {
+			expect(loginService.login(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
+			loginService.logout(user.accessToken);
+			expectLastCall().anyTimes();
+		}
 	}
 
 	@Test
@@ -143,7 +177,7 @@ public class PingHandlerTest {
 		
 		checkExecutionTime(2, 5, stopwatch);
 	}
-
+	
 	private Future<Document> queuePingCommand(final OPClient opClient,
 			ThreadPoolExecutor threadPoolExecutor) {
 		return threadPoolExecutor.submit(new Callable<Document>() {
@@ -172,8 +206,15 @@ public class PingHandlerTest {
 		}
 	}
 
-	private void mockCollectionDao(CollectionDao collectionDao) throws CollectionNotFoundException, DaoException {
-		expect(collectionDao.getCollectionPath(anyInt())).andReturn("\\calendar\\").anyTimes();
+	private void mockCollectionDao(CollectionDao collectionDao, Iterable<OpushUser> users) throws CollectionNotFoundException, DaoException {
+		ChangedCollections changed = new ChangedCollections(new Date(), ImmutableSet.<SyncCollection>of());
+		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
+		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
+
+		for (OpushUser opushUser: users) {
+			String collectionPath = opushUser.user.getLoginAtDomain() + "\\calendar\\" + opushUser.user.getLoginAtDomain();  
+			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPath).anyTimes();
+		}
 	}
 
 	private void mockMonitoredCollectionDao(MonitoredCollectionDao monitoredCollectionDao) {
