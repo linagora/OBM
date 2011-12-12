@@ -146,7 +146,6 @@ function run_query_domain_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_insert($domain) {
   global $obm, $cdg_sql, $cgp_use;
-
   $uid = sql_parse_id($obm['uid']);
   $label = $domain['label'];
   $desc = $domain['desc'];
@@ -163,7 +162,8 @@ function run_query_domain_insert($domain) {
     domain_label,
     domain_description,
     domain_name,
-    domain_alias)
+    domain_alias,
+    domain_uuid)
     VALUES (
       null,
       NOW(),
@@ -172,7 +172,8 @@ function run_query_domain_insert($domain) {
       '$label',
       '$desc',
       '$domain_name',
-      '$alias')";
+      '$alias',
+      UUID())";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
