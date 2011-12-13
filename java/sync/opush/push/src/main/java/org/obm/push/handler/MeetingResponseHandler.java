@@ -108,11 +108,12 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		return new MeetingHandlerResponse(meetingResponses);
 	}
 
-	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs, MeetingResponse item) throws DaoException,
+	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs,
+			MeetingResponse item) throws DaoException,
 			CollectionNotFoundException, ProcessingEmailException {
 		
 		MSEmail email = retrieveMailWithMeetingRequest(bs, item);
-	
+		
 		ItemChangeMeetingResponse meetingResponse = new ItemChangeMeetingResponse();
 		
 		if (email != null) {

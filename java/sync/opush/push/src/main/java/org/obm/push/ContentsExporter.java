@@ -113,7 +113,7 @@ public class ContentsExporter implements IContentsExporter {
 	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, PIMDataType getDataType, List<String> fetchServerIds) 
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnknownObmSyncServerException {
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException {
 		
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		switch (getDataType) {
