@@ -21,29 +21,34 @@ public class SyncState implements Serializable {
 	private PIMDataType dataType;
 	private int id;
 
-	public SyncState(PIMDataType dataType) {
-		this(dataType, null, null);
+	public SyncState(String path) {
+		this(path, null, null);
 	}
 	
-	public SyncState(PIMDataType dataType, Date lastSync) {
-		this(dataType, null, lastSync);
+	public SyncState(String path, Date lastSync) {
+		this(path, null, lastSync);
 	}
 	
-	public SyncState(PIMDataType dataType, String key) {
-		this(dataType, key, null);
+	public SyncState(String path, String key) {
+		this(path, key, null);
 	}
 	
-	public SyncState(String newSk, Date lastSync) {
-		this(null, newSk, lastSync);
-	}
-
-	public SyncState(PIMDataType dataType, String key, Date lastSync) {
+	public SyncState(String path, String key, Date lastSync) {
 		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-		this.lastSyncFiltred = false;
-		this.dataType = dataType;
+		lastSyncFiltred = false;
+		if (path.contains("\\calendar\\")) {
+			this.dataType = PIMDataType.CALENDAR;
+		} else if (path.endsWith("\\contacts")) {
+			this.dataType = PIMDataType.CONTACTS;
+		} else if (path.contains("\\tasks")) {
+			this.dataType = PIMDataType.TASKS;
+		} else if (path.contains("\\email")) {
+			this.dataType = PIMDataType.EMAIL;
+		} else {
+			this.dataType = PIMDataType.FOLDER;
+		}
 		this.key = key;
 	}
-
 
 	public Date getLastSync() {
 		return lastSync;

@@ -53,7 +53,7 @@ public class SerializableTest {
 	public void testSyncCollection() throws IOException {
 		SyncCollection syncCollection = new SyncCollection();
 		syncCollection.addChange(new SyncCollectionChange("serverId", "clientId", "modType", new MSContact(), PIMDataType.CALENDAR));
-		syncCollection.setSyncState(new SyncState(PIMDataType.CALENDAR, "key", new Date()));
+		syncCollection.setSyncState(new SyncState("path", "key", new Date()));
 		objectOutputStream.writeObject(syncCollection);
 	}
 	

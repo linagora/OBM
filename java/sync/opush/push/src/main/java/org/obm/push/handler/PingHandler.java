@@ -9,14 +9,12 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -72,13 +70,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, "unable to start monitoring, collection not found");
 		} catch (DaoException e) {
 			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
-		} catch (PIMDataTypeNotFoundException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
 		}
 	}
 
 	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
-			throws MissingRequestParameterException, DaoException, CollectionNotFoundException, PIMDataTypeNotFoundException {
+			throws MissingRequestParameterException, DaoException, CollectionNotFoundException {
 		
 		checkHeartbeatInterval(bs, pingRequest);
 		checkSyncCollections(bs, pingRequest);
@@ -103,7 +99,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 	
 	private void checkSyncCollections(BackendSession bs, PingRequest pingRequest)
-			throws MissingRequestParameterException, CollectionNotFoundException, DaoException, PIMDataTypeNotFoundException {
+			throws MissingRequestParameterException, CollectionNotFoundException, DaoException {
 		
 		Set<SyncCollection> syncCollections = pingRequest.getSyncCollections();
 		if (syncCollections == null || syncCollections.isEmpty()) {
@@ -118,13 +114,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 		loadSyncKeys(pingRequest.getSyncCollections());
 	}
 
-	private void loadSyncKeys(Set<SyncCollection> syncCollections) 
-			throws CollectionNotFoundException, DaoException, PIMDataTypeNotFoundException {
-		
+	private void loadSyncKeys(Set<SyncCollection> syncCollections) throws CollectionNotFoundException, DaoException {
 		for (SyncCollection collection: syncCollections) {
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
-			collection.setSyncState(new SyncState(PIMDataType.getPIMDataType(collectionPath)));
+			collection.setSyncState(new SyncState(collectionPath));
 		}
 	}
 

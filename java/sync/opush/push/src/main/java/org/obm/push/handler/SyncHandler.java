@@ -31,7 +31,6 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -142,8 +141,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (ProcessingEmailException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
-		} catch (PIMDataTypeNotFoundException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
@@ -151,23 +148,22 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		responder.sendResponse("AirSync", document);
 	}
 	
-	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync) throws CollectionNotFoundException, 
-		WaitIntervalOutOfRangeException, DaoException, PIMDataTypeNotFoundException {
+	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync)
+			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException {
 		
 		if (sync.getWaitInSecond() > 3540) {
 			throw new WaitIntervalOutOfRangeException();
 		}
 		
-		for (SyncCollection sc: sync.getCollections()) {
+		for (SyncCollection sc : sync.getCollections()) {
 			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
 			PIMDataType dataClass = PIMDataType.getPIMDataType(collectionPath);
-			if (dataClass == PIMDataType.EMAIL) {
+			if ("email".equalsIgnoreCase(dataClass.toString())) {
 				backend.startEmailMonitoring(bs, sc.getCollectionId());
 				break;
 			}
 		}
-		
 		continuation.setLastContinuationHandler(this);
 		monitoredCollectionService.put(bs.getCredentials(), bs.getDevice(), sync.getCollections());
 		CollectionChangeListener l = new CollectionChangeListener(bs,
@@ -289,15 +285,16 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return changed;
 	}
 
-	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
-		UnknownObmSyncServerException, ProcessingEmailException, PIMDataTypeNotFoundException {
+	private ModificationStatus processCollections(BackendSession bs, Sync sync) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
 		for (SyncCollection collection : sync.getCollections()) {
 
 			// Disables last push request
-			IContinuation cont = waitContinuationCache.get(collection.getCollectionId());
+			IContinuation cont = waitContinuationCache.get(collection
+					.getCollectionId());
 			if (cont != null) {
 				cont.error(SyncStatus.NEED_RETRY.asXmlValue());
 			}
@@ -310,9 +307,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				Map<String, String> processedClientIds = processModification(bs, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
-				String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
-				SyncState syncState = new SyncState(PIMDataType.getPIMDataType(collectionPath), collection.getSyncKey());
-				collection.setSyncState(syncState);
+				collection.setSyncState(
+						new SyncState(
+								collectionDao.getCollectionPath(collection.getCollectionId()), 
+																collection.getSyncKey()));
 			}
 			
 			modificationStatus.hasChanges |= haveFilteredItemToSync(bs, collection);
@@ -420,16 +418,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (InvalidServerId e) {
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);			
-		} catch (PIMDataTypeNotFoundException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
-			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId, PIMDataTypeNotFoundException {
+			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, 
+			CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
 
-		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
+		final List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
 			SyncCollectionResponse syncCollectionResponse = computeSyncState(bs, processedClientIds, c);
 			syncCollectionResponses.add(syncCollectionResponse);
@@ -441,7 +437,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(BackendSession bs,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnknownObmSyncServerException, ProcessingEmailException, PIMDataTypeNotFoundException {
+			UnknownObmSyncServerException, ProcessingEmailException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if ("0".equals(syncCollection.getSyncKey())) {
@@ -452,9 +448,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return syncCollectionResponse;
 	}
 
-	private void handleDataSync(BackendSession bs, Map<String, String> processedClientIds, SyncCollection syncCollection,
-			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId, PIMDataTypeNotFoundException {
+	private void handleDataSync(BackendSession bs,
+			Map<String, String> processedClientIds,
+			SyncCollection syncCollection,
+			SyncCollectionResponse syncCollectionResponse)
+			throws CollectionNotFoundException, DaoException,
+			UnknownObmSyncServerException, ProcessingEmailException,
+			InvalidServerId {
 		
 		SyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
 		if (st == null) {
@@ -477,8 +477,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	private void handleInitialSync(BackendSession bs, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
-			throws DaoException, InvalidServerId {
+	private void handleInitialSync(BackendSession bs,
+			SyncCollection syncCollection,
+			SyncCollectionResponse syncCollectionResponse) throws DaoException,
+			CollectionNotFoundException, InvalidServerId {
 		
 		backend.resetCollection(bs, syncCollection.getCollectionId());
 		syncCollectionResponse.setSyncStateValid(true);

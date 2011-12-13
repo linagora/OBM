@@ -15,7 +15,6 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -88,36 +87,28 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		responder.sendResponse("GetItemEstimate", document);
 	}
 
-	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
+	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException, 
 		UnknownObmSyncServerException, ProcessingEmailException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
+		
+			Integer collectionId = syncCollection.getCollectionId();
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			
-			try {
-				Integer collectionId = syncCollection.getCollectionId();
-				String collectionPath = collectionDao.getCollectionPath(collectionId);
-				syncCollection.setCollectionPath(collectionPath);
-				syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
-			
-				String syncKey = syncCollection.getSyncKey();
-				SyncState state = stMachine.getSyncState(syncKey);
-				if (state == null) {
-					throw new InvalidSyncKeyException(syncKey);
-				}
-				
-				int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);
-				int count = contentsExporter.getItemEstimateSize(bs, syncCollection.getOptions().getFilterType(), collectionId, state);
-			
-				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
+			syncCollection.setCollectionPath(collectionPath);
+			syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
 
-			} catch (PIMDataTypeNotFoundException e) {
-				logger.warn(e.getMessage());
-			} catch (CollectionNotFoundException e) {
-				logger.warn(e.getMessage());
+			String syncKey = syncCollection.getSyncKey();
+			SyncState state = stMachine.getSyncState(syncKey);
+			if (state == null) {
+				throw new InvalidSyncKeyException(syncKey);
 			}
 			
+			int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);
+			int count = contentsExporter.getItemEstimateSize(bs, syncCollection.getOptions().getFilterType(), collectionId, state);
+			estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
 		}
 		
 		return new GetItemEstimateResponse(estimates);

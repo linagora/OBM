@@ -17,7 +17,6 @@ import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -194,8 +193,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		} catch (DaoException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (ProcessingEmailException e) {
-			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
-		} catch (PIMDataTypeNotFoundException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;

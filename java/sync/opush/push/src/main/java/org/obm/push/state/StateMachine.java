@@ -11,11 +11,12 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -24,7 +25,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class StateMachine {
 
+	private static final Logger logger = LoggerFactory.getLogger(StateMachine.class);
+
 	private final CollectionDao collectionDao;
+
 	private final ItemTrackingDao itemTrackingDao;
 
 	@Inject
@@ -33,22 +37,20 @@ public class StateMachine {
 		this.itemTrackingDao = itemTrackingDao;
 	}
 
-	public SyncState getSyncState(String syncKey) throws CollectionNotFoundException, DaoException, PIMDataTypeNotFoundException {
+	public SyncState getSyncState(String syncKey) throws CollectionNotFoundException, DaoException {
 		return collectionDao.findStateForKey(syncKey);
 	}
 
-	public Date getLastSyncDate(String syncKey) throws CollectionNotFoundException, DaoException {
-		return collectionDao.findLastSyncDateFromKey(syncKey);
-	}
-	
 	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, 
-		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
+			Collection<ItemChange> changes, Collection<ItemChange> deletedItems) 
+			throws CollectionNotFoundException, DaoException, InvalidServerId {
 		
-		String newSk = UUID.randomUUID().toString();
-		SyncState newState = new SyncState(newSk, lastSync);
-		int syncStateId = collectionDao.updateState(bs.getDevice(), collectionId, newState);
+		final String newSk = UUID.randomUUID().toString();
+		final SyncState newState = new SyncState(collectionDao.getCollectionPath(collectionId), newSk, lastSync);
+		final int syncStateId = collectionDao.updateState(bs.getDevice(), collectionId, newState);
 		newState.setId(syncStateId);
-		
+		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
+				new Object[]{newState.getKey(), newState.getDataType().asXmlValue(), newState.getLastSync()});
 		if (changes != null && !changes.isEmpty()) {
 			itemTrackingDao.markAsSynced(newState, listNewItems(changes));
 		}
@@ -79,5 +81,4 @@ public class StateMachine {
 		}
 		return serverIds;
 	}
-	
 }
