@@ -199,7 +199,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
 		
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
+			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
 				throw new NoPermissionException("no permission to add a contact to address book users.");
 			} else {
 				if (!contactAlreadyExist(token, contact)) {
@@ -211,7 +211,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-
 	
 	private boolean contactAlreadyExist(AccessToken token, Contact contact) {
 		KeyList duplicates = getContactTwinKeys(token, contact);
@@ -227,7 +226,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		throws ServerFault, NoPermissionException, ContactNotFoundException {
 
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
+			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
 				throw new NoPermissionException("No permission to modify a contact in address book users.");
 			} else {
 				Contact previous = contactDao.findContact(token, contact.getUid());
@@ -252,7 +251,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public Contact removeContact(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		if (isUsersOBMAddressBook(addressBookId)) {
+		if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
 			throw new NoPermissionException("no permission to delete an user obm contact.");
 		} else {
 			try {
@@ -268,7 +267,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException {
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
+			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
 				return userDao.findUserObmContact(token, contactId);
 			} else {
 				return contactDao.findContact(token, contactId);
@@ -386,12 +385,4 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 	
-	private boolean isUsersOBMAddressBook(Integer addressBookId) {
-		if (addressBookId != null) {
-			return addressBookId.intValue() == contactConfiguration.getAddressBookUserId();
-		} else {
-			return false;
-		}
-	}
-
 }
