@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FolderType;
@@ -27,6 +26,7 @@ import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.calendar.TodoClient;
+import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 
@@ -36,14 +36,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class ContactsBackend extends ObmSyncBackend {
 
-	private final ContactConfiguration contactConfiguration;
-
 	@Inject
-	private ContactsBackend(ContactConfiguration contactConfiguration, CollectionDao collectionDao, BookClient bookClient, 
-			CalendarClient calendarClient, TodoClient todoClient) {
-		
+	private ContactsBackend(CollectionDao collectionDao, BookClient bookClient, CalendarClient calendarClient, TodoClient todoClient) {
 		super(collectionDao, bookClient, calendarClient, todoClient);
-		this.contactConfiguration = contactConfiguration;
 	}
 
 	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException {
@@ -51,7 +46,8 @@ public class ContactsBackend extends ObmSyncBackend {
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
 		try {
 			
-			FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
+			AddressBookChangesResponse addressBooks = listAddressBooksChanges(bs, lastSync);
+			FolderChanges folderChanges = addressBooks.getBooksChanges();
 			
 			for (Folder folder: folderChanges.getUpdated()) {
 				itemsChanged.add( createItemChange(bs, folder) );
@@ -69,11 +65,11 @@ public class ContactsBackend extends ObmSyncBackend {
 		return new HierarchyItemsChanges(itemsChanged, itemsDeleted);
 	}
 	
-	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
+	private AddressBookChangesResponse listAddressBooksChanges(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);
 		try {
-			return bc.listAddressBooksChanged(token, lastSync);
+			return bc.getAddressBookSync(token, lastSync);
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} finally {
@@ -96,16 +92,8 @@ public class ContactsBackend extends ObmSyncBackend {
 		itemChange.setServerId(serverId);
 		itemChange.setParentId("0");
 		itemChange.setDisplayName(folder.getName());
-		itemChange.setItemType(getItemType(folder));
+		itemChange.setItemType(FolderType.DEFAULT_CONTACTS_FOLDER);
 		return itemChange;
-	}
-
-	private FolderType getItemType(Folder folder) {
-		if (folder.getName().equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName())) {
-			return FolderType.DEFAULT_CONTACTS_FOLDER;
-		} else {
-			return FolderType.USER_CREATED_CONTACTS_FOLDER;
-		}
 	}
 	
 	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId) throws UnknownObmSyncServerException {
