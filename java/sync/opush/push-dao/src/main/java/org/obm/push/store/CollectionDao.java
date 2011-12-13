@@ -13,7 +13,8 @@ public interface CollectionDao {
 
 	Integer addCollectionMapping(Device device, String collection) throws DaoException;
 
-	Integer getCollectionMapping(Device device, String collectionId) throws DaoException;
+	int getCollectionMapping(Device device, String collectionId)
+			throws CollectionNotFoundException, DaoException;
 
 	String getCollectionPath(Integer collectionId)
 			throws CollectionNotFoundException, DaoException;

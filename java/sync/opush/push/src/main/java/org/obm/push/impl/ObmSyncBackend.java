@@ -62,12 +62,9 @@ public class ObmSyncBackend {
 				+ bs.getUser().getLoginAtDomain();
 	}
 
-	public Integer getCollectionIdFor(Device device, String collection) throws CollectionNotFoundException, DaoException {
-		Integer collectionId = collectionDao.getCollectionMapping(device, collection);
-		if (collectionId == null) {
-			throw new CollectionNotFoundException("Collection {" + collection + "} not found.");
-		}
-		return collectionId;
+	public Integer getCollectionIdFor(Device device, String collection)
+			throws CollectionNotFoundException, DaoException {
+		return collectionDao.getCollectionMapping(device, collection);
 	}
 
 	public String getCollectionPathFor(Integer collectionId) throws CollectionNotFoundException, DaoException {
