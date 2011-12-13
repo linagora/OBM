@@ -121,7 +121,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		if (isDefaultFolder(folder.getName())) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {
-			return FolderType.USER_CREATED_CONTACTS_FOLDER;
+			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		}
 	}
 	
