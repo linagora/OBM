@@ -142,7 +142,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			
 			List<ItemChange> addUpd = new LinkedList<ItemChange>();
 			for (Contact contact: contactChanges.getUpdated()) {
-				addUpd.add( convertContactToItemChange(collectionId, contact) );
+				addUpd.add( getContactChange(collectionId, contact) );
 			}
 			
 			List<ItemChange> deletions = new LinkedList<ItemChange>();
@@ -196,10 +196,10 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 	
-	private ItemChange convertContactToItemChange(Integer collectionId, Contact contact) {
+	private ItemChange getContactChange(Integer collectionId, Contact c) {
 		ItemChange ic = new ItemChange();
-		ic.setServerId( getServerIdFor(collectionId, String.valueOf(contact.getUid())) );
-		ic.setData( new ContactConverter().convert(contact) );
+		ic.setServerId( getServerIdFor(collectionId, String.valueOf(c.getUid())) );
+		ic.setData( new ContactConverter().convert(c) );
 		return ic;
 	}
 
@@ -253,42 +253,27 @@ public class ContactsBackend extends ObmSyncBackend {
 	}
 
 	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
-		for (String serverId: fetchServerIds) {
-			try {
-
-				Integer contactId = getItemIdFromServerId(serverId);
-				Integer collectionId = getCollectionIdFromServerId(serverId);
-				Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
-				
-				if (contactId != null && addressBookId != null) {
-					Contact contact = getContactFromId(bs, addressBookId, contactId);
-					ret.add( convertContactToItemChange(collectionId, contact) );
-				}
-				
-			} catch (UnknownObmSyncServerException e) {
-				logger.error(e.getMessage());
-			} catch (DaoException e) {
-				logger.error(e.getMessage());
-			} catch (ContactNotFoundException e) {
-				logger.warn(e.getMessage());
-			}
-		}
-		return ret;
-	}
-
-	private Contact getContactFromId(BackendSession bs, Integer addressBookId, Integer contactId) 
-			throws UnknownObmSyncServerException, ContactNotFoundException {
-		
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);
-		try {
-			return bc.getContactFromId(token, addressBookId, contactId);
-		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
-		} finally {
-			bc.logout(token);
+
+		List<ItemChange> ret = new LinkedList<ItemChange>();
+		for (String serverId: fetchServerIds) {
+			Integer id = getItemIdFor(serverId);
+			if (id != null) {
+				try {
+					Contact c = bc.getContactFromId(token, BookType.contacts, id.toString());
+					ItemChange ic = new ItemChange();
+					ic.setServerId(serverId);
+					MSContact cal = new ContactConverter().convert(c);
+					ic.setData(cal);
+					ret.add(ic);
+				} catch (ServerFault e) {
+					logger.error("Contact from id {} not found", id.toString());
+				}
+			}
 		}
+		bc.logout(token);
+		return ret;
 	}
 
 	public void createDefaultContactFolder(BackendSession bs) throws DaoException {

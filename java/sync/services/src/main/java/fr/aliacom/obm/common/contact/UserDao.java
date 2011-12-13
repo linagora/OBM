@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.slf4j.Logger;
@@ -192,35 +191,6 @@ public class UserDao {
 			}
 		}
 		return userDomain;
-	}
-
-	public Contact findUserObmContact(AccessToken token, Integer userId) throws SQLException, ContactNotFoundException {
-		String sql = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name "
-				+ "from UserObm "
-				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
-				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
-				+ "WHERE userobm_archive != 1 and userobm_domain_id="
-				+ token.getDomainId() + " and userobm_hidden != 1 and userobm_id = ?";
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(sql);
-			ps.setInt(1, userId);
-			rs = ps.executeQuery();
-		
-			if (rs.next()) {
-				return loadUser(rs);
-			}
-			throw new ContactNotFoundException("Contact user obm not found.", userId);
-		
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
 	}
 
 }

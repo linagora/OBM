@@ -104,7 +104,14 @@ public interface IAddressBook {
 	/**
 	 * Retrieve a contact by its uid
 	 */
-	Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) throws ServerFault, ContactNotFoundException;
+	Contact getContactFromId(AccessToken token, BookType book, String id)
+			throws ServerFault;
+
+	/**
+	 * Retrieve a contact by its uid
+	 */
+	Contact getContactInBook(AccessToken token, int addressBookId, String id)
+			throws ServerFault;
 
 	/**
 	 * Search contact similar to the given one.

@@ -317,15 +317,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) 
-			throws ServerFault, ContactNotFoundException {
+	public Contact getContactFromId(AccessToken token, BookType book, String id)
+			throws ServerFault {
+		if (book != BookType.contacts) {
+			return null;
+		}
+
 		try {
-			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
-				return userDao.findUserObmContact(token, contactId);
-			} else {
-				return contactDao.findContact(token, contactId);
-			}
-		} catch (SQLException e) {
+			int contactId = Integer.parseInt(id);
+			return contactDao.findContact(token, contactId);
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -408,6 +410,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return removeContact(token, BookType.contacts, uid);
 	}
 	
+	@Override
+	@Transactional
+	public Contact getContactInBook(AccessToken token, int addressBookId,
+			String id) throws ServerFault {
+		return getContactFromId(token, BookType.contacts, id);
+	}
+
 	@Override
 	@Transactional
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws ServerFault {

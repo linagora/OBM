@@ -6,8 +6,4 @@ public class ContactNotFoundException extends Exception {
 		super(message);
 	}
 	
-	public ContactNotFoundException(String message, Integer contactId) {
-		super(message + " : {" + contactId + "}");
-	}
-	
 }
