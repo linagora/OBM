@@ -2,36 +2,39 @@ package org.obm.push.protocol.bean;
 
 import java.util.Collection;
 
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 
 public class FolderSyncResponse {
 	
-	private final HierarchyItemsChanges hierarchyItemsChanges;
+	private final Collection<ItemChange> itemsAddedAndUpdated;
+	private final Collection<ItemChange> itemsDeleted;
+	
 	private final String newSyncKey;
 	
-	public FolderSyncResponse(HierarchyItemsChanges hierarchyItemsChanges, String newSyncKey) {
-		this.hierarchyItemsChanges = hierarchyItemsChanges;
+	public FolderSyncResponse(Collection<ItemChange> itemsAddedAndUpdates, Collection<ItemChange> itemsDeleted, 
+			String newSyncKey) {
+		this.itemsAddedAndUpdated = itemsAddedAndUpdates;
+		this.itemsDeleted = itemsDeleted;
 		this.newSyncKey = newSyncKey;
 	}
 	
 	public int getCount() {
 		int count = 0;
-		if (getItemsAddedAndUpdated() != null) {
-			count += getItemsAddedAndUpdated().size();
+		if (itemsAddedAndUpdated != null) {
+			count += itemsAddedAndUpdated.size();
 		}
-		if (getItemsDeleted() != null) {
-			count += getItemsDeleted().size();
+		if (itemsDeleted != null) {
+			count += itemsDeleted.size();
 		}
 		return count;
 	}
 
 	public Collection<ItemChange> getItemsAddedAndUpdated() {
-		return hierarchyItemsChanges.getItemsAddedOrUpdated();
+		return itemsAddedAndUpdated;
 	}
 	
 	public Collection<ItemChange> getItemsDeleted() {
-		return hierarchyItemsChanges.getItemsDeleted();
+		return itemsDeleted;
 	}
 	
 	public String getNewSyncKey() {
