@@ -67,7 +67,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	public void notifyCreatedEvent(Event event, AccessToken token) {
 		ObmUser user = userService.getUserFromAccessToken(token);
 		Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
-		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, event);
+		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, event, token);
 		Attendee owner = findOwner(event);
 		
 		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
@@ -85,7 +85,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		if (eventDeletionInvolveNotification(event)) {
 			ObmUser user = userService.getUserFromAccessToken(token);
 			Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, event, token);
 
 			Attendee owner = findOwner(event);
 
@@ -115,7 +115,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			
 			ObmUser user = userService.getUserFromAccessToken(token);
 			Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
-			String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser);
+			String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser, token);
 			
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
@@ -137,9 +137,9 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		ObmUser user = userService.getUserFromAccessToken(token);
 		Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
 		
-		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current);
-		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, current);
-		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current);
+		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current, token);
+		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, current, token);
+		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current, token);
 		
 		boolean notifyImportantChanges = previous.getSequence() != current.getSequence();
 		UserSettings settings = settingsService.getSettings(user);

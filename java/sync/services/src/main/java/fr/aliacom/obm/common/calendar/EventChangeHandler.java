@@ -53,7 +53,7 @@ public class EventChangeHandler {
 		this.jmsService = jmsService;
 		this.eventNotificationService = eventNotificationService;
 	}
-	
+
 	public void create(Event event, boolean notification, AccessToken token) throws NotificationException {
 		jmsService.writeIcsInvitationRequest(token, event);
 		if (notification) {

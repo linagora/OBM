@@ -344,8 +344,8 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event);
 			AccessToken token = getStubAccessToken();
+			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, token);
 			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
@@ -440,8 +440,8 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestRecurrentEvent();
-			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event);
 			AccessToken token = getStubAccessToken();
+			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, token);
 			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
@@ -804,7 +804,7 @@ public class EventChangeMailerTest {
 			}
 			after.setSequence(4);
 			AccessToken token = getStubAccessToken();
-			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, token);
 			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
@@ -906,7 +906,7 @@ public class EventChangeMailerTest {
 			}
 			after.setSequence(4);
 			AccessToken token = getStubAccessToken();
-			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, token);
 			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
@@ -1006,8 +1006,8 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
-			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event);
 			AccessToken token = getStubAccessToken();
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, token);
 			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
@@ -1106,8 +1106,8 @@ public class EventChangeMailerTest {
 		@Override
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestRecurrentEvent();
-			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event);
 			AccessToken token = getStubAccessToken();
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, token);
 			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		

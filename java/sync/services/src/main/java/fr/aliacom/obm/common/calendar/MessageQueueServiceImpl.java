@@ -37,21 +37,21 @@ public class MessageQueueServiceImpl implements MessageQueueService {
 	@Override
 	public void writeIcsInvitationRequest(AccessToken token, Event current) {
 		Ical4jUser buildIcal4jUser = getIcal4jUser(token);
-		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current);		
+		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current, token);		
 		writeIcs(ics);
 	}
 
 	@Override
 	public void writeIcsInvitationCancel(AccessToken token, Event event) {
 		Ical4jUser buildIcal4jUser = getIcal4jUser(token);
-		String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, event);
+		String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, event, token);
 		writeIcs(ics);
 	}
 	
 	@Override
 	public void writeIcsInvitationReply(AccessToken token, Event event) {
 		Ical4jUser buildIcal4jUser = getIcal4jUser(token);
-		String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser);
+		String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser, token);
 		writeIcs(ics);
 	}
 

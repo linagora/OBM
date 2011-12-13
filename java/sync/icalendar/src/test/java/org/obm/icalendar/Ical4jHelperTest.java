@@ -201,7 +201,8 @@ public class Ical4jHelperTest {
 		List<Event> l = new LinkedList<Event>();
 		l.add(event1);
 		l.add(event2);
-		String ics = getIcal4jHelper().parseEvents(getDefaultObmUser(), l);
+		AccessToken token = new AccessToken(0, "OBM");
+		String ics = getIcal4jHelper().parseEvents(getDefaultObmUser(), l, token);
 		assertNotNull(ics);
 		assertNotSame("", ics);
 	}
@@ -791,7 +792,8 @@ public class Ical4jHelperTest {
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
 		Ical4jHelper ical4jHelper = new Ical4jHelper();
-		final String ics = ical4jHelper.buildIcsInvitationReply(event, ical4jUser);
+		AccessToken token = new AccessToken(0, "OBM");
+		final String ics = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
 		
 		String icsAttendee = "ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;" +
 		"CN=OBM USER 3;ROLE=\r\n REQ-PARTICIPANT:mailto:obm3@obm.org";
@@ -866,13 +868,14 @@ public class Ical4jHelperTest {
 		superLongAttendee.setDisplayName("my attendee is more than 75 characters long");
 		superLongAttendee.setEmail("so-we-just-give-him-a-very-long-email-address@test.com");
 		event.addAttendee(superLongAttendee);
+		AccessToken token = new AccessToken(0, "OBM");
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event, token);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event, token);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
 		
 		checkStringLengthLessThan(icsRequest, 75);
 		checkStringLengthLessThan(icsCancel, 75);
@@ -885,10 +888,11 @@ public class Ical4jHelperTest {
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event, token);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event, token);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
 		
 		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN", ical4jUser.getObmDomain().getName());
 		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN", ical4jUser.getObmDomain().getName());
@@ -905,10 +909,11 @@ public class Ical4jHelperTest {
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event, token);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event, token);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
 		
 		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
 		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
@@ -921,6 +926,24 @@ public class Ical4jHelperTest {
 			Assert.assertThat(line, new StringLengthLessThan(length));
 		}
 	}
+    @Test
+    public void testInvitationIcsContainsEventOriginProperty() {
+        Event event = buildEvent();
+            
+        final Attendee attendeeReply = event.getAttendees().get(2);
+        final Ical4jUser obmUser = buildObmUser(attendeeReply);
+        AccessToken token = new AccessToken(0, "OBM");
+        
+        String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event, token);
+        String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event, token);
+        String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser, token);
+            
+        String XOBMORIGIN = "X-OBM-ORIGIN:OBM";
+        Assert.assertTrue(icsRequest.contains(XOBMORIGIN));
+        Assert.assertTrue(icsCancel.contains(XOBMORIGIN));
+        Assert.assertTrue(icsReply.contains(XOBMORIGIN));    
+    }    
+	
 	
 	@Test
 	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {

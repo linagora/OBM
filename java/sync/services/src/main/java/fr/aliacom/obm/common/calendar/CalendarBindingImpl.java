@@ -877,13 +877,13 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional(readOnly=true)
 	public String parseEvent(AccessToken token, Event event) throws ServerFault {
-		return ical4jHelper.parseEvent(event, createIcal4jUserFrom(token));
+		return ical4jHelper.parseEvent(event, createIcal4jUserFrom(token), token);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public String parseEvents(AccessToken token, List<Event> events) throws ServerFault {
-		return ical4jHelper.parseEvents(createIcal4jUserFrom(token), events);
+		return ical4jHelper.parseEvents(createIcal4jUserFrom(token), events, token);
 	}
 
 	@Override
