@@ -163,12 +163,12 @@ public class ContactDao {
 		return sql;
 	}
 	
-	public ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) throws SQLException {
+	public ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) {
 		String sql = getSelectForFindUpdatedContacts(at);
 		return findUpdatedContacts(sql, timestamp, at);
 	}
 	
-	private ContactUpdates findUpdatedContacts(String sql, Date timestamp, AccessToken at) throws SQLException {
+	private ContactUpdates findUpdatedContacts(String sql, Date timestamp, AccessToken at) {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -218,6 +218,8 @@ public class ContactDao {
 			upd.setArchived(archivedContactIds);
 			upd.setContacts(contacts);
 			
+		} catch (SQLException se) {
+			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
@@ -1077,12 +1079,12 @@ public class ContactDao {
 		return removeContact(at, c);
 	}
 
-	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
+	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) {
 		String sql = getSelectForFindRemovalCandidates(at);
 		return findRemovalCandidates(sql, d);
 	}
 	
-	private Set<Integer> findRemovalCandidates(String sql, Date d) throws SQLException {
+	private Set<Integer> findRemovalCandidates(String sql, Date d) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;
@@ -1099,6 +1101,8 @@ public class ContactDao {
 			while (rs.next()) {
 				l.add(rs.getInt(1));
 			}
+		} catch (SQLException e) {
+			logger.error("Could not find deleted contacts in OBM", e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
@@ -1640,12 +1644,12 @@ public class ContactDao {
 		}
 	}
 
-	public ContactUpdates findUpdatedContacts(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
+	public ContactUpdates findUpdatedContacts(Date lastSync, Integer addressBookId, AccessToken token) {
 		String sql = getSelectForFindUpdatedContacts(addressBookId, token);
 		return findUpdatedContacts(sql, lastSync, token);
 	}
 
-	public Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
+	public Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) {
 		String sql = getSelectForFindRemovalCandidates(addressBookId, token);
 		return findRemovalCandidates(sql, lastSync);
 	}

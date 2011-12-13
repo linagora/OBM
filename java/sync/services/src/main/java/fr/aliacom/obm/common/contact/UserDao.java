@@ -55,9 +55,8 @@ public class UserDao {
 
 	/**
 	 * Find updated user since timestamp
-	 * @throws SQLException 
 	 */
-	public ContactUpdates findUpdatedUsers(Date timestamp, AccessToken at) throws SQLException {
+	public ContactUpdates findUpdatedUsers(Date timestamp, AccessToken at) {
 		ContactUpdates cu = new ContactUpdates();
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
@@ -92,9 +91,13 @@ public class UserDao {
 			
 			cu.setContacts(contacts);
 			
+		} catch (SQLException se) {
+			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+		logger.info("returning " + cu.getContacts().size() + " updated user(s)");
+
 		return cu;
 	}
 
@@ -123,7 +126,7 @@ public class UserDao {
 		return m;
 	}
 
-	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
+	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) {
 		Set<Integer> ret = new HashSet<Integer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -152,6 +155,8 @@ public class UserDao {
 				ret.add(rs.getInt(1));
 			}
 
+		} catch (SQLException e) {
+			logger.error("Could not find users in OBM", e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
