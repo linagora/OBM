@@ -13,6 +13,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
@@ -169,5 +170,18 @@ public class ContactsBackend extends ObmSyncBackend {
 		bc.logout(token);
 		return ret;
 	}
-	
+
+	/**
+	 * obm:\\adrien@test.tlse.lng\contacts
+	 * 
+	 */
+	public FolderType getFolderType(String collectionPath)  throws FolderTypeNotFoundException {
+		if (collectionPath != null) {
+			if (collectionPath.contains("contacts")) {
+				return FolderType.DEFAULT_CONTACTS_FOLDER;
+			}	
+		}
+		throw new FolderTypeNotFoundException("The collection's path [ " + collectionPath + " ] is invalid");
+	}
+
 }

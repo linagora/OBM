@@ -36,6 +36,7 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.FolderTypeNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
@@ -588,6 +589,34 @@ public class MailBackend extends ObmSyncBackend {
 	
 	public Long getEmailUidFromServerId(String serverId){
 		return getItemIdFor(serverId).longValue();
+	}
+	
+	
+	/**
+	 *  obm:\\adrien@test.tlse.lng\email\INBOX
+	 *	obm:\\adrien@test.tlse.lng\email\Drafts
+	 *	obm:\\adrien@test.tlse.lng\email\Sent
+	 *	obm:\\adrien@test.tlse.lng\email\Trash
+	 * @param collectionPath
+	 * @return
+	 * @throws FolderTypeNotFoundException 
+	 */
+	public FolderType getFolderType(String collectionPath) throws FolderTypeNotFoundException {
+		if (collectionPath != null) {
+			if(collectionPath.contains(EmailConfiguration.IMAP_INBOX_NAME)){
+				return FolderType.DEFAULT_INBOX_FOLDER;
+			} 
+			if(collectionPath.contains(EmailConfiguration.IMAP_DRAFTS_NAME)){
+				return FolderType.DEFAULT_DRAFTS_FOLDERS;
+			}
+			if(collectionPath.contains(EmailConfiguration.IMAP_SENT_NAME)){
+				return FolderType.DEFAULT_SENT_EMAIL_FOLDER;
+			}
+			if(collectionPath.contains(EmailConfiguration.IMAP_TRASH_NAME)){
+				return FolderType.DEFAULT_DELETED_ITEMS_FOLDERS;
+			}
+		}
+		throw new FolderTypeNotFoundException("The collection's path["+collectionPath+"] is invalid");
 	}
 	
 }
