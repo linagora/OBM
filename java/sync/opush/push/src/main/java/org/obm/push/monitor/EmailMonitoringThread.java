@@ -43,7 +43,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 		super(contentsExporter);
 		
 		remainConnected = false;
-		this.ccls = ccls;
+		this.ccls = Collections.synchronizedSet(ccls);
 		this.backend = cb;
 		this.emailManager = emailManager;
 		this.bs = bs;
