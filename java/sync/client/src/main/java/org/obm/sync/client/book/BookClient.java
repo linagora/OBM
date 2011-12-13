@@ -117,9 +117,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 	
 	@Override
-	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) throws ServerFault {
+	public Contact modifyContact(AccessToken token, BookType book, Contact contact) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		params.put("addressBookId", String.valueOf(addressBookId));
+		params.put("book", book.toString());
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
 		Document doc = execute(token, "/book/modifyContact", params);
@@ -172,6 +172,17 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Document doc = execute(token, "/book/getAddressBookSync", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseAddressBookChanges(doc);
+	}
+	
+	@Override
+	public Contact modifyContactInBook(AccessToken token, int addressBookId, Contact contact) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		String ct = biw.getContactAsString(contact);
+		params.put("contact", ct);
+		Document doc = execute(token, "/book/modifyContactInBook", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
 	@Override

@@ -59,8 +59,14 @@ public interface IAddressBook {
 	/**
 	 * modify existing contact with data provided if possible.
 	 */
-	Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactNotFoundException;
+	Contact modifyContact(AccessToken token, BookType book,
+			Contact contact) throws ServerFault;
+
+	/**
+	 * modify existing contact with data provided if possible.
+	 */
+	Contact modifyContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws ServerFault;
 
 	/**
 	 * remove the contact with specified uid 

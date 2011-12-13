@@ -232,28 +232,41 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact)
-		throws ServerFault, NoPermissionException, ContactNotFoundException {
+	public Contact modifyContact(AccessToken token, BookType book, Contact contact)
+		throws ServerFault {
 
 		try {
-			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
-				throw new NoPermissionException("No permission to modify a contact in address book users.");
-			} else {
-				Contact previous = contactDao.findContact(token, contact.getUid());
-				if (!contactDao.hasRightsOn(token, contact.getUid())) {
-					throw new NoPermissionException("No permission to modify a contact in address book users.");
-				} else {
-					contactMerger.merge(previous, contact);
-					return contactDao.modifyContact(token, contact);
-				}
-			}
-		} catch (SQLException ex) {
-			throw new ServerFault(ex.getMessage());
-		} catch (FindException ex) {
-			throw new ServerFault(ex.getMessage());
-		} catch (EventNotFoundException ex) {
-			throw new ServerFault(ex.getMessage());
+			checkContactsAddressBook(token, book);
+			
+			Contact c = modifyContact(token, contact);
+
+			logger.info(LogUtils.prefix(token) + "contact[" + c.getFirstname()
+					+ " " + c.getLastname() + "] modified");
+			return c;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException, EventNotFoundException, ServerFault {
+		Contact modifiedContact;
+		try {
+			Contact previous = contactDao.findContact(token, c.getUid());
+			if (!contactDao.hasRightsOn(token, c.getUid())) {
+				logger.warn("contact " + c.getLastname() + " " + c.getFirstname()
+						+ "(" + c.getUid() + ") not modified. not allowed for "
+						+ token.getEmail());
+				modifiedContact = previous;
+			} else {
+				contactMerger.merge(previous, c);
+				modifiedContact = contactDao.modifyContact(token, c);
+			}
+		} catch (ContactNotFoundException e) {
+			logger.warn("previous version not found for c.uid: " + c.getUid() + " c.last: " + c.getLastname());
+			modifiedContact = c;
+		}
+		return modifiedContact;
 	}
 	
 	@Override
@@ -329,6 +342,18 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
+	@Override
+	@Transactional
+	public Contact modifyContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws ServerFault {
+		try  {
+			return modifyContact(token, contact);
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e);
+		}
+	}
+	
 	@Override
 	@Transactional
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws ServerFault {
