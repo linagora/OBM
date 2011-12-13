@@ -10,6 +10,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -184,6 +185,24 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		return out.toString();
 	}
 
+	public Document writeFolderChanges(FolderChangesResponse fc) {
+		Document doc = null;
+		try {
+			doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/folder-changes.xsd",
+					"folder-changes");
+			Element root = doc.getDocumentElement();
+			root.setAttribute("lastSync", DateHelper.asString(fc.getLastSync()));
+
+			createFolderChanges(fc.getFolderChanges(), root);
+
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+
+		return doc;
+	}
+
 	private void createFolderChanges(FolderChanges fc, Element root) {
 		Element removed = DOMUtils.createElement(root, "removed");
 		for (int eid : fc.getRemoved()) {
@@ -229,14 +248,6 @@ public class BookItemsWriter extends AbstractItemsWriter {
 			logger.error(ex.getMessage(), ex);
 		}
 
-		return doc;
-	}
-
-	public Document writeListAddressBooksChanged(FolderChanges folderChanges) {
-		Document doc = null;
-		doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/folder-changes.xsd", "folder-changes");
-		Element root = doc.getDocumentElement();
-		createFolderChanges(folderChanges, root);
 		return doc;
 	}
 

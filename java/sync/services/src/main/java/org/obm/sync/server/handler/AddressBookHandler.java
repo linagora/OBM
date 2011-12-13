@@ -33,7 +33,7 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChangesResponse;
-import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.IAddressBook;
@@ -88,6 +88,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			searchContact(token, params, responder);
 		} else if ("searchContactInGroup".equals(method)) {
 			searchContactInGroup(token, params, responder);
+		} else if ("getFolderSync".equals(method)) {
+			getFolderSync(token, params, responder);
 		} else if ("getAddressBookSync".equals(method)) {
 			getAddressBookSync(token, params, responder);
 		} else if ("createContactInBook".equals(method)) {
@@ -100,8 +102,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 			removeContactInBook(token, params, responder);
 		} else if ("unsubscribeBook".equals(method)) {
 			unsubscribeBook(token, params, responder);
-		} else if ("listAddressBooksChanged".equals(method)) {
-			listAddressBooksChanged(token, params, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
@@ -111,6 +111,12 @@ public class AddressBookHandler extends SecureSyncHandler {
 			XmlResponder responder) throws ServerFault {
 		boolean ret = binding.unsubscribeBook(token, getBookId(params));
 		responder.sendBoolean(ret);
+	}
+
+	private void getFolderSync(AccessToken at, ParametersSource params, XmlResponder responder) throws Exception {
+		Date lastSync = getLastSyncFromParams(params);
+		FolderChangesResponse fc = binding.getFolderSync(at, lastSync);
+		responder.sendFolderChanges(fc);
 	}
 
 	private void getContactTwinKeys(AccessToken at, ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
@@ -259,12 +265,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 		Date lastSync = getLastSyncFromParams(params);
 		AddressBookChangesResponse response = binding.getAddressBookSync(token, lastSync);
 		responder.sendAddressBookChanges(response);	
-	}
-	
-	private void listAddressBooksChanged(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault {
-		Date lastSync = getLastSyncFromParams(params);
-		FolderChanges folderChanges = binding.listAddressBooksChanged(token, lastSync);
-		responder.sendlistAddressBooksChanged(folderChanges);	
 	}
 	
 }
