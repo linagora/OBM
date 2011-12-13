@@ -1497,7 +1497,7 @@ public class ContactDao {
 		return new ArrayList<Contact>();
 	}
 
-	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) throws ServerFault {
+	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) {
 		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
 			+ " FROM AddressBook a "
 			+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
@@ -1532,9 +1532,11 @@ public class ContactDao {
 				}
 				folders.add(f);
 			}
+			rs.close();
+			rs = null;
 
-		} catch (SQLException se) {
-			throw new ServerFault(se.getMessage());
+		} catch (Throwable se) {
+			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
@@ -1544,7 +1546,7 @@ public class ContactDao {
 		return folders;
 	}
 
-	public Set<Integer> findRemovedFolders(Date d, AccessToken at) throws ServerFault {
+	public Set<Integer> findRemovedFolders(Date d, AccessToken at) {
 		Set<Integer> l = new HashSet<Integer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1572,7 +1574,7 @@ public class ContactDao {
 
 			logger.info("Returning " + l.size() + " folder(s) deleted");
 		} catch (SQLException e) {
-			throw new ServerFault(e.getMessage());
+			logger.error("Could not find deleted folder(s) in OBM", e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}

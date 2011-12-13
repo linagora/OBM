@@ -15,6 +15,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
@@ -219,9 +220,13 @@ public class BookItemsParser extends AbstractItemsParser {
 		return ret;
 	}
 
-	public FolderChanges parseFolderChangesResponse(Document doc) {
+	public FolderChangesResponse parseFolderChangesResponse(Document doc) {
+		FolderChangesResponse changes = new FolderChangesResponse();
 		Element root = doc.getDocumentElement();
-	    return parseFolderChanges(root);
+		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
+		changes.setLastSync(lastSync);
+		changes.setFolderChanges(parseFolderChanges(root));
+		return changes;
 	}
 
 	private FolderChanges parseFolderChanges(Element root) {

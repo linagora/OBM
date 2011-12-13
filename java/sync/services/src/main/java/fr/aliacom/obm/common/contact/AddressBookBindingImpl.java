@@ -38,6 +38,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
+import org.obm.sync.items.FolderChangesResponse;
 import org.obm.sync.services.IAddressBook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +171,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		try {
 			connection = obmHelper.getConnection();
 			response.setContactChanges(getContactsChanges(token, timestamp));
-			response.setBooksChanges(listAddressBooksChanged(token, timestamp));
+			response.setBooksChanges(getFolderChanges(token, timestamp));
 			response.setLastSync(obmHelper.selectNow(connection));
 		} catch (Throwable t) {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
@@ -391,6 +392,49 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
+	public FolderChangesResponse getFolderSync(AccessToken token, Date d)
+			throws ServerFault {
+
+		try {
+			logger.info(LogUtils.prefix(token) + "AddressBook : getFolderSync(" + d + ")");
+			FolderChangesResponse sync = getFolderSync(d, token);
+			return sync;
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e);
+		}
+	}
+
+	private FolderChangesResponse getFolderSync(Date timestamp, AccessToken token) throws Throwable {
+		Connection connection = obmHelper.getConnection();
+		try {
+			FolderChangesResponse response = new FolderChangesResponse();
+			response.setFolderChanges(getFolderChanges(token, timestamp));
+			response.setLastSync(obmHelper.selectNow(connection));
+			return response;
+		} catch (Throwable t) {
+			throw  new ServerFault(t);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
+		}
+	}
+
+	private FolderChanges getFolderChanges(AccessToken token, Date timestamp) {
+		FolderChanges changes = new FolderChanges();
+		
+		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
+		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+			updated.addAll(userDao.findUpdatedFolders(timestamp));
+		}
+		changes.setUpdated(updated);
+		
+		changes.setRemoved(contactDao.findRemovedFolders(timestamp, token));
+		return changes;
+	}
+
+	@Override
+	@Transactional
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit) throws ServerFault {
 
 		try {
@@ -453,18 +497,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
-	}
-	
-	@Override
-	@Transactional
-	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
-		List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
-		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
-				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
-			updated.addAll(userDao.findUpdatedFolders(timestamp));
-		}
-		return new FolderChanges(
-				updated, contactDao.findRemovedFolders(timestamp, token));
 	}
 	
 }
