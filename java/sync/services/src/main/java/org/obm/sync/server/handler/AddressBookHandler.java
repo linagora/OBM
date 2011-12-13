@@ -24,7 +24,6 @@ import java.util.List;
 import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
@@ -52,18 +51,14 @@ import fr.aliacom.obm.common.session.SessionManagement;
 @Singleton
 public class AddressBookHandler extends SecureSyncHandler {
 
-	private final IAddressBook binding;
-	private final BookItemsParser bip;
-	private final ContactConfiguration contactConfiguration;
+	private IAddressBook binding;
+	private BookItemsParser bip;
 
 	@Inject
-	private AddressBookHandler(SessionManagement sessionManagement, AddressBookBindingImpl addressBookBindingImpl, 
-			ContactConfiguration contactConfiguration) {
-		
+	private AddressBookHandler(SessionManagement sessionManagement, AddressBookBindingImpl addressBookBindingImpl) {
 		super(sessionManagement);
-		this.binding = addressBookBindingImpl;
-		this.contactConfiguration = contactConfiguration;
-		this.bip = new BookItemsParser();
+		binding = addressBookBindingImpl;
+		bip = new BookItemsParser();
 	}
 
 	@Override
@@ -80,8 +75,6 @@ public class AddressBookHandler extends SecureSyncHandler {
 		} else if ("listContactsChanged".equals(method)) {
 			listContactsChanged(token, params, responder);
 		} else if ("createContact".equals(method)) {
-			createContact(token, params, responder);
-		} else if ("createContactInBook".equals(method)) {
 			createContact(token, params, responder);
 		} else if ("modifyContact".equals(method)) {
 			modifyContact(token, params, responder);
@@ -125,8 +118,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private void getContactFromId(AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, ContactNotFoundException {
 		
-		Integer contactId = Integer.valueOf( p(params, "id") );
-		Integer addressBookId = getBookId(params);
+		Integer contactId = Integer.valueOf( p(params, "contactId") );
+		Integer addressBookId = Integer.valueOf( p(params, "addressBookId") );
 		Contact ret = binding.getContactFromId(at, addressBookId, contactId);
 		responder.sendContact(ret);
 	}
@@ -134,8 +127,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private void removeContact(AccessToken at, ParametersSource params, XmlResponder responder) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		Integer contactId = Integer.valueOf(p(params, "id"));
-		Integer addressBookId = getBookId(params);
+		Integer contactId = Integer.valueOf(p(params, "contactId"));
+		Integer addressBookId = Integer.valueOf(p(params, "addressBookId"));
 		Contact ret = binding.removeContact(at, addressBookId, contactId);
 		responder.sendContact(ret);
 	}
@@ -144,7 +137,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 			throws NoPermissionException, ServerFault, ContactNotFoundException {
 		
 		try {
-			Integer addressBookId = getBookId(params);
+			Integer addressBookId = Integer.valueOf( p(params, "addressBookId") );
 			Contact contact = getContactFromParams(params);
 			Contact ret = binding.modifyContact(at, addressBookId, contact);
 			responder.sendContact(ret);
@@ -161,7 +154,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
 		
 		try {
-			Integer addressBookId = getBookId(params);	
+			Integer addressBookId = Integer.valueOf(p(params, "addressBookId"));	
 			Contact contact = getContactFromParams(params);
 			Contact ret = binding.createContact(at, addressBookId, contact);
 			responder.sendContact(ret);
@@ -173,7 +166,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 			throw new ServerFault(e);
 		}
 	}
-	
+
 	private Contact getContactFromParams(ParametersSource params)
 			throws SAXException, IOException, FactoryConfigurationError {
 		return bip.parseContact(p(params, "contact"));
@@ -181,7 +174,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 
 	private void listContactsChanged(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
-		String addressBookId = p(params, "bookId");
+		String addressBookId = p(params, "addressBookId");
 		ContactChanges contactChanges = null;
 		if (addressBookId == null) {
 			contactChanges = binding.listContactsChanged(at, lastSync);
@@ -241,27 +234,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private Integer getBookId(ParametersSource params) {
-		String bookId = p(params, "bookId");
-		if (bookId == null) {
-			if (isUsersBookType(params)) {
-				return contactConfiguration.getAddressBookUserId();
-			} else {
-				return null;
-			}
-		}
-		return Integer.valueOf(bookId);
-	}
-
-	private Boolean isUsersBookType(ParametersSource params) {
-		BookType bookType = type(params);
-		if (bookType == null) {
-			return null;
-		}
-		if (bookType == BookType.users) {
-			return true;
-		} else {
-			return false;
-		}
+		return Integer.valueOf(p(params, "bookId"));
 	}
 	
 	private void getAddressBookSync(AccessToken token, ParametersSource params,
