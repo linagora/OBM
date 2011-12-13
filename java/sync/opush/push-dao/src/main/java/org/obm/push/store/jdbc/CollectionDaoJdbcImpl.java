@@ -13,9 +13,11 @@ import java.util.TimeZone;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.JDBCUtils;
@@ -115,6 +117,32 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return ret;
 	}
 
+	private String getCollectionPath(Integer collectionId, Connection con)
+			throws CollectionNotFoundException, DaoException {
+		String ret = null;
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping WHERE id=?");
+			ps.setInt(1, collectionId);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				ret = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(null, ps, rs);
+		}
+		if (ret == null) {
+			throw new CollectionNotFoundException();
+		}
+		return ret;
+	}
+	
 	@Override
 	public int updateState(Device device, Integer collectionId, SyncState state) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
@@ -140,7 +168,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public SyncState findStateForKey(String syncKey) throws DaoException {
+	public SyncState findStateForKey(String syncKey) throws DaoException, CollectionNotFoundException, PIMDataTypeNotFoundException {
 		SyncState ret = null;
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -149,14 +177,18 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(
-					"SELECT id, device_id, last_sync FROM opush_sync_state WHERE sync_key=?");
+					"SELECT id, device_id, last_sync, collection_id " +
+					"FROM opush_sync_state WHERE sync_key=?");
 			ps.setString(1, syncKey);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				Timestamp lastSync = rs.getTimestamp("last_sync");
-				ret = new SyncState(syncKey, lastSync);
+				String collectionPath = getCollectionPath(rs.getInt("collection_id"), con);
+				ret = new SyncState(PIMDataType.getPIMDataType(collectionPath));
 				ret.setId(rs.getInt("id"));
+				ret.setKey(syncKey);
+				ret.setLastSync(lastSync);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -253,6 +285,27 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setTimestamp(idx++, ts);
 			rs = ps.executeQuery();
 			return getContactChangedCollectionsFromResultSet(rs, lastSync);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+	}
+	
+	@Override
+	public Date findLastSyncDateFromKey(String syncKey) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("SELECT last_sync FROM opush_sync_state WHERE sync_key = ?");
+			ps.setString(1, syncKey);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return rs.getTimestamp("last_sync");
+			}
+			return null;
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
