@@ -53,6 +53,7 @@ public class ItemOperationsResponse {
 			private ItemChange itemChange;
 			private ItemOperationsStatus status;
 			private SyncCollection syncCollection;
+			private String collectionId;
 			private String serverId;
 			
 			public ItemChange getItemChange() {
@@ -77,6 +78,14 @@ public class ItemOperationsResponse {
 			
 			public void setSyncCollection(SyncCollection syncCollection) {
 				this.syncCollection = syncCollection;
+			}
+
+			public String getCollectionId() {
+				return collectionId;
+			}
+
+			public void setCollectionId(String collectionId) {
+				this.collectionId = collectionId;
 			}
 
 			public String getServerId() {
