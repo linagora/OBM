@@ -25,8 +25,6 @@ public interface IHierarchyExporter {
 
 	int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException;
 
-	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
-
-	void initHierarchyFolder(BackendSession bs) throws DaoException;
+	HierarchyItemsChanges getContactsChanged(BackendSession bs, Date lastSync) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException;
 
 }
