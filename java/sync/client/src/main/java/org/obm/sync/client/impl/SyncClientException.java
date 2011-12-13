@@ -3,10 +3,10 @@ package org.obm.sync.client.impl;
 import org.obm.sync.NotAllowedException;
 import javax.naming.NoPermissionException;
 
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
 

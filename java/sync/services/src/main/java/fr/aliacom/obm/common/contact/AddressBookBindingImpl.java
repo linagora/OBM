@@ -31,6 +31,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
@@ -38,8 +39,6 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
-import org.obm.sync.exception.ContactAlreadyExistException;
-import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -196,29 +195,56 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
-		
+	public Contact createContact(AccessToken token, BookType book, Contact contact)
+		throws ServerFault {
+
 		try {
-			if (addressBookId.intValue() == contactConfiguration.getAddressBookUserId()) {
-				throw new NoPermissionException("no permission to add a contact to address book users.");
-			} else {
-				if (!contactAlreadyExist(token, contact)) {
-					return contactDao.createContactInAddressBook(token, contact, addressBookId);
-				}
-				throw new ContactAlreadyExistException("Contact already exist", contact);	
-			}
-		} catch (SQLException e) {
+			checkContactsAddressBook(token, book);
+			
+			Contact c = contactDao.createContact(token, contact);
+			
+			logger.info(LogUtils.prefix(token) + "AddressBook : contact["
+					+ c.getFirstname() + " " + c.getLastname() + "] created");
+			return c;
+
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
 	
-	private boolean contactAlreadyExist(AccessToken token, Contact contact) {
-		List<String> duplicates = contactDao.findContactTwinKeys(token, contact);
-		if (duplicates != null && !duplicates.isEmpty()) {
-			return true;
+	@Override
+	@Transactional
+	public Contact createContactWithoutDuplicate(AccessToken token, BookType book, Contact contact)
+		throws ServerFault {
+
+		try {
+			checkContactsAddressBook(token, book);
+			
+			contact.setUid(null);
+
+			List<String> duplicates = contactDao.findContactTwinKeys(token, contact);
+			if (duplicates != null && !duplicates.isEmpty()) {
+				logger.info(LogUtils.prefix(token) + "AddressBook : "
+						+ duplicates.size()
+						+ " duplicate(s) found for contact ["
+						+ contact.getFirstname() + "," + contact.getLastname()
+						+ "]");
+				Integer contactId = Integer.parseInt(duplicates.get(0));
+				contactDao.markUpdated(contactId);
+				logger.info(LogUtils.prefix(token) + "Contact["+contactId+"] marked as updated");
+				return contactDao.findContact(token, contactId);
+			}
+
+			Contact c = contactDao.createContact(token,	contact);
+			logger.info(LogUtils.prefix(token) + "AddressBook : contact["
+					+ c.getFirstname() + " " + c.getLastname() + "] created");
+			return c;
+
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
 		}
-		return false;
 	}
 
 	private void checkContactsAddressBook(AccessToken token, BookType book) throws StoreException {
@@ -342,6 +368,23 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
+	@Override
+	@Transactional
+	public Contact createContactInBook(AccessToken token, int addressBookId,
+			Contact contact) throws ServerFault {
+		try {
+			Contact c = contactDao.createContactInAddressBook(token, contact, addressBookId);
+			
+			logger.info(LogUtils.prefix(token) + "AddressBook : contact["
+					+ c.getFirstname() + " " + c.getLastname() + "] created");
+			return c;
+
+		} catch (Throwable e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage());
+		}
+	}
+	
 	@Override
 	@Transactional
 	public Contact modifyContactInBook(AccessToken token, int addressBookId,

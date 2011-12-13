@@ -238,7 +238,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException, ServerFault {
+	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getEmail());
 		Connection con = null;
@@ -252,7 +252,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Event createEvent(Connection con, AccessToken editor, String calendar, Event ev,
-			Boolean useObmUser) throws SQLException, FindException, ServerFault {
+			Boolean useObmUser) throws SQLException, FindException {
 		Integer ownerId = null;
 		logger.info("try to create with calendar owner:"
 				+ calendar);
@@ -338,7 +338,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
 			List<Event> eventException, Connection con, EventObmId id, Boolean useObmUser)
-			throws SQLException, FindException, ServerFault {
+			throws SQLException, FindException {
 		List<Event> newEvExcepts = new LinkedList<Event>();
 		if (eventException != null) {
 			Event created = null;
@@ -1777,7 +1777,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private void insertAttendees(AccessToken editor, String calendar, Event ev, Connection con,
-			List<Attendee> attendees, boolean useObmUser) throws SQLException, ServerFault {
+			List<Attendee> attendees, boolean useObmUser) throws SQLException {
 		String attQ = "INSERT INTO EventLink (" + ATT_INSERT_FIELDS
 				+ ") VALUES (" + "?, " + // event_id
 				"?, " + // entity_id
@@ -1854,7 +1854,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
-			Boolean useObmUser) throws SQLException, ServerFault {
+			Boolean useObmUser) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
 				+ "where eventlink_event_id=? AND "
 				+ "eventlink_entity_id IN "

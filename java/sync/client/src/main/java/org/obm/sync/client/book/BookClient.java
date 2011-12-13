@@ -6,6 +6,7 @@ import java.util.List;
 import javax.naming.NoPermissionException;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
@@ -15,7 +16,6 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -45,11 +45,21 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) throws ServerFault {
+	public Contact createContact(AccessToken token, BookType book, Contact contact) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		params.put("addressBookId", String.valueOf(addressBookId));
+		params.put("book", book.toString());
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute(token, "/book/createContact", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseContact(doc.getDocumentElement());
+	}
+
+	@Override
+	public Contact createContactWithoutDuplicate(AccessToken token, BookType book, Contact contact) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		params.put("book", book.toString());
+		params.put("contact", biw.getContactAsString(contact));
+		Document doc = execute(token, "/book/createContactWithoutDuplicate", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
@@ -172,6 +182,16 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Document doc = execute(token, "/book/getAddressBookSync", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseAddressBookChanges(doc);
+	}
+	
+	@Override
+	public Contact createContactInBook(AccessToken token, int addressBookId, Contact contact) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		params.put("contact", biw.getContactAsString(contact));
+		Document doc = execute(token, "/book/createContactInBook", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseContact(doc.getDocumentElement());
 	}
 	
 	@Override

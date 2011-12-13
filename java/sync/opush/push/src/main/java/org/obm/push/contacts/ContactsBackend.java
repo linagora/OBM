@@ -21,6 +21,7 @@ import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
@@ -29,7 +30,6 @@ import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.calendar.TodoClient;
-import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 

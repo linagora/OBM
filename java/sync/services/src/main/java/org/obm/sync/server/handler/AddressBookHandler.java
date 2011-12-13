@@ -25,14 +25,13 @@ import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
-import org.obm.sync.exception.ContactAlreadyExistException;
-import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -76,6 +75,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			listContactsChanged(token, params, responder);
 		} else if ("createContact".equals(method)) {
 			createContact(token, params, responder);
+		} else if ("createContactWithoutDuplicate".equals(method)) {
+			createContactWithoutDuplicate(token, params, responder);
 		} else if ("modifyContact".equals(method)) {
 			modifyContact(token, params, responder);
 		} else if ("removeContact".equals(method)) {
@@ -90,6 +91,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			searchContactInGroup(token, params, responder);
 		} else if ("getAddressBookSync".equals(method)) {
 			getAddressBookSync(token, params, responder);
+		} else if ("createContactInBook".equals(method)) {
+			createContactInBook(token, params, responder);
 		} else if ("modifyContactInBook".equals(method)) {
 			modifyContactInBook(token, params, responder);
 		} else if ("unsubscribeBook".equals(method)) {
@@ -141,21 +144,16 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendContact(ret);
 	}
 
-	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) 
-			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
-		
-		try {
-			Integer addressBookId = Integer.valueOf(p(params, "addressBookId"));	
+	private void createContactWithoutDuplicate(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
+		Contact contact = getContactFromParams(params);
+		Contact ret = binding.createContactWithoutDuplicate(at,	type(params), contact);
+		responder.sendContact(ret);
+	}
+
+	private void createContact(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 			Contact contact = getContactFromParams(params);
-			Contact ret = binding.createContact(at, addressBookId, contact);
+			Contact ret = binding.createContact(at, type(params), contact);
 			responder.sendContact(ret);
-		} catch (SAXException e) {
-			throw new ServerFault(e);
-		} catch (IOException e) {
-			throw new ServerFault(e);
-		} catch (FactoryConfigurationError e) {
-			throw new ServerFault(e);
-		}
 	}
 
 	private Contact getContactFromParams(ParametersSource params)
@@ -231,6 +229,13 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private void modifyContactInBook(AccessToken token, ParametersSource params, XmlResponder responder) throws ServerFault, SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(params);
 		Contact ret = binding.modifyContactInBook(token, getBookId(params), contact);
+		responder.sendContact(ret);		
+	}
+
+	private void createContactInBook(AccessToken token,
+			ParametersSource params, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError, ServerFault {
+		Contact contact = getContactFromParams(params);
+		Contact ret = binding.createContactInBook(token, getBookId(params), contact);
 		responder.sendContact(ret);		
 	}
 

@@ -1,4 +1,4 @@
-package org.obm.sync.exception;
+package org.obm.sync.auth;
 
 public class ContactNotFoundException extends Exception {
 
