@@ -91,7 +91,8 @@ sub update {
                     domain_description,
                     domain_name,
                     domain_alias,
-                    domain_global
+                    domain_global,
+                    domain_uuid
                 ) SELECT    domain_id,
                             domain_timecreate,
                             domain_usercreate,
@@ -100,7 +101,8 @@ sub update {
                             domain_description,
                             domain_name,
                             domain_alias,
-                            domain_global
+                            domain_global,
+                            domain_uuid
                   FROM Domain
                   WHERE domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {

@@ -410,6 +410,9 @@ ALTER TABLE domain ADD COLUMN domain_uuid char(37);
 UPDATE domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
 ALTER TABLE domain ALTER domain_uuid SET NOT NULL;
 
+ALTER TABLE p_domain ADD COLUMN domain_uuid CHAR(37);
+UPDATE p_domain p SET domain_uuid=( select domain_uuid FROM domain d where d.domain_id=p.domain_id);
+ALTER TABLE p_domain ALTER domain_uuid SET NOT NULL;
 ------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 UPDATE ObmInfo SET obminfo_value='2.4.0' WHERE obminfo_name='db_version';

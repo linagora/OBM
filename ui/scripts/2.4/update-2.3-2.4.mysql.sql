@@ -339,6 +339,10 @@ ALTER TABLE `Domain` ADD COLUMN `domain_uuid` CHAR(37);
 UPDATE Domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
 ALTER TABLE Domain MODIFY domain_uuid CHAR(37) NOT NULL;
 
+ALTER TABLE P_Domain ADD COLUMN domain_uuid CHAR(37);
+UPDATE P_Domain p, Domain d SET p.domain_uuid=d.domain_uuid where p.domain_id=d.domain_id;
+ALTER TABLE P_Domain MODIFY domain_uuid CHAR(37) NOT NULL;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.3->2.4 is completed
 -- ----------------------------------------------------------------------------
