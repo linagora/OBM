@@ -119,10 +119,33 @@ public class PingHandlerTest {
 		checkExecutionTime(2, 5, stopwatch);
 	}
 
+	@Test
+	public void testPushNotificationOnBackendChange() throws Exception {
+		prepareMockHasChanges();
+
+		opushServer.start();
+		
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+		Document document = buildPingCommand(20);
+		Stopwatch stopwatch = new Stopwatch().start();
+		
+		Document response = opClient.postXml("Ping", document, "Ping");
+		
+		checkExecutionTime(10, 1, stopwatch);
+		checkHasChangeResponse(response);
+	}
+	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
 			ProcessingEmailException, UnknownObmSyncServerException {
 		mockForRegularNeeds();
 		mockForNoChangePing();
+		replay();
+	}
+
+	private void prepareMockHasChanges() throws DaoException, CollectionNotFoundException, 
+			UnknownObmSyncServerException, ProcessingEmailException {
+		mockForRegularNeeds();
+		mockForHasChangePing();
 		replay();
 	}
 	
@@ -157,6 +180,14 @@ public class PingHandlerTest {
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 					"<Ping><Status>1</Status><Folders/></Ping>");
 	}
+	
+	private void checkHasChangeResponse(Document response) throws TransformerException {
+		Assertions.assertThat(DOMUtils.serialise(response))
+			.isEqualTo(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><Ping>" +
+					"<Status>2</Status>" +
+					"<Folders><Folder>1432</Folder></Folders></Ping>");
+	}
 
 	private void mockForRegularNeeds() throws DaoException {
 		LoginService loginService = classToInstanceMap.get(LoginService.class);
@@ -181,6 +212,14 @@ public class PingHandlerTest {
 		mockCollectionDaoNoChange(collectionDao);
 	}
 
+	private void mockForHasChangePing() throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+
+		mockCollectionDaoHasChange(collectionDao);
+		mockExporterHasContentChanges(contentsExporter);
+	}
+
 	private void replay() {
 		EasyMock.replay(Lists.newArrayList(classToInstanceMap).toArray());
 	}
@@ -191,10 +230,49 @@ public class PingHandlerTest {
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 
+		int randomCollectionId = anyInt();
 		for (OpushUser opushUser: fakeTestUsers) {
 			String collectionPath = buildCalendarCollectionPath(opushUser);  
-			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPath).anyTimes();
+			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPath).anyTimes();
 		}
+	}
+	
+	private void mockCollectionDaoHasChange(CollectionDao collectionDao) 
+			throws DaoException, CollectionNotFoundException {
+		Date dateFirstSyncFromASSpecs = new Date(0);
+		Date dateWhenChangesAppear = new Date();
+		int collectionNoChangeIterationCount = 2;
+		int collectionIdWhereChangesAppear = anyInt();
+		
+		expectCollectionDaoUnchangeForXIteration(collectionDao, dateFirstSyncFromASSpecs, collectionNoChangeIterationCount);
+
+		int randomCollectionId = anyInt();
+		for (OpushUser user : fakeTestUsers) {
+			String collectionPathWhereChangesAppear = buildCalendarCollectionPath(user);  
+			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPathWhereChangesAppear).anyTimes();
+
+			ChangedCollections hasChangesCollections = buildSyncCollectionWithChanges(
+					dateWhenChangesAppear, collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
+			expect(collectionDao.getCalendarChangedCollections(dateFirstSyncFromASSpecs)).andReturn(hasChangesCollections).once();
+			expect(collectionDao.getCalendarChangedCollections(dateWhenChangesAppear)).andReturn(hasChangesCollections).anyTimes();
+		}
+	}
+	
+	private void expectCollectionDaoUnchangeForXIteration(CollectionDao collectionDao, Date activeSyncSpecFirstSyncDate, 
+			int noChangeIterationCount) throws DaoException {
+		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<SyncCollection>of());
+		expect(collectionDao.getContactChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).anyTimes();
+		expect(collectionDao.getCalendarChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).times(noChangeIterationCount);
+	}
+
+	private void mockExporterHasContentChanges(IContentsExporter contentsExporter)
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+		expect(contentsExporter.getItemEstimateSize(
+				anyObject(BackendSession.class), 
+				anyObject(FilterType.class),
+				anyInt(),
+				anyObject(SyncState.class)))
+			.andReturn(1).anyTimes();
 	}
 
 	private void mockContentsExporter(IContentsExporter contentsExporter) 
@@ -249,6 +327,13 @@ public class PingHandlerTest {
 	private void mockHeartbeatDao(HearbeatDao heartbeatDao) throws DaoException {
 		heartbeatDao.updateLastHearbeat(anyObject(Device.class), anyLong());
 		expectLastCall().anyTimes();
+	}
+	
+	private ChangedCollections buildSyncCollectionWithChanges(Date dateWhenChangesAppear, 
+			int collectionIdWhereChangesAppear, String collectionPathWhereChangesAppear) {
+		SyncCollection calendarCollection = new SyncCollection(collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
+		ChangedCollections calendarHasChangeCollections = new ChangedCollections(dateWhenChangesAppear , ImmutableSet.<SyncCollection>of(calendarCollection));
+		return calendarHasChangeCollections;
 	}
 	
 	private String buildCalendarCollectionPath(OpushUser opushUser) {
