@@ -236,16 +236,6 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseFolderChangesResponse(doc);
 	}
-	
-	@Override
-	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
-		params.put("addressBookId", String.valueOf(addressBookId));
-		Document doc = execute(token, "/book/listContactsChanged", params);
-		exceptionFactory.checkServerFaultException(doc);
-		return respParser.parseChanges(doc);
-	}
 
 	@Override
 	protected Locator getLocator() {

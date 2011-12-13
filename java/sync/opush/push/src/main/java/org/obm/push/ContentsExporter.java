@@ -49,6 +49,12 @@ public class ContentsExporter implements IContentsExporter {
 		this.invitationFilterManager = invitationFilterManager;
 	}
 
+	private DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) 
+			throws UnknownObmSyncServerException, DaoException {
+		
+		return contactsBackend.getContentChanges(bs, state, collectionId);
+	}
+
 	private DataDelta getTasksChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException  {
 		return this.calBackend.getContentChanges(bs, state, collectionId, filterType);
@@ -92,7 +98,7 @@ public class ContentsExporter implements IContentsExporter {
 			invitationFilterManager.filterEvent(bs, state, collectionId, delta);
 			break;
 		case CONTACTS:
-			delta = contactsBackend.getContactsChanges(bs, state, collectionId);
+			delta = getContactsChanges(bs, state, collectionId);
 			break;
 		case EMAIL:
 			DataDelta unfilteredChanges = mailBackend.getAndUpdateEmailChanges(bs, state, collectionId, filterType);
