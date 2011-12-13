@@ -117,75 +117,51 @@ public class ContactDao {
 		this.obmHelper = obmHelper;
 	}
 
-	private String getSelectForFindUpdatedContacts(AccessToken at) {
-		String sql = "SELECT "
-				+ CONTACT_SELECT_FIELDS
-				+ ", contact_archive, now() as last_sync FROM Contact"
-				+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id="
-				+ at.getObmId()
-				+ ") "
-				+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id "
-				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=s.addressbook_id "
-				+ "INNER JOIN AddressBook ON id=s.addressbook_id "
-				+ "LEFT JOIN EntityRight urights ON "
-				+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-				+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-				+ "AND grights.entityright_consumer_id IN ("
-				+ MY_GROUPS_QUERY
-				+ ") "
-				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
-				+ "WHERE "
-				+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
-		sql += " AND (contact_timecreate >= ? OR contact_timeupdate >= ? OR s.timestamp >= ?)";
-		return sql;
-	}
-	
-	private String getSelectForFindUpdatedContacts(Integer addressBookId, AccessToken at) {
-		String sql = getSelectForFindUpdatedContacts(at);
-		sql += " AND contact_addressbook_id = " + addressBookId;
-		return sql;
-	}
 
-	private String getSelectForFindRemovalCandidates(AccessToken at) {
-		String q = "SELECT "
-			+ "deletedcontact_contact_id "
-			+ "FROM DeletedContact "
-			+ "INNER JOIN SyncedAddressbook s ON ( s.addressbook_id=deletedcontact_addressbook_id AND s.user_id= "
-			+ at.getObmId() + ")";
-		q += " WHERE deletedcontact_timestamp >= ? ";
-		return q;
-	}
-	
-	private String getSelectForFindRemovalCandidates(Integer addressBookId, AccessToken at) {
-		String sql = getSelectForFindRemovalCandidates(at);
-		sql += " AND deletedcontact_addressbook_id = " + addressBookId;
-		return sql;
-	}
-	
 	public ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) {
-		String sql = getSelectForFindUpdatedContacts(at);
-		return findUpdatedContacts(sql, timestamp, at);
-	}
-	
-	private ContactUpdates findUpdatedContacts(String sql, Date timestamp, AccessToken at) {
+
+		String q = "SELECT "
+			+ CONTACT_SELECT_FIELDS
+			+ ", contact_archive, now() as last_sync FROM Contact"
+			+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id="
+			+ at.getObmId()
+			+ ") "
+			+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id "
+			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=s.addressbook_id "
+			+ "INNER JOIN AddressBook ON id=s.addressbook_id "
+			+ "LEFT JOIN EntityRight urights ON "
+			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
+			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
+			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
+			+ "AND grights.entityright_consumer_id IN ("
+			+ MY_GROUPS_QUERY
+			+ ") "
+			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
+			+ "WHERE "
+			+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
+
+		q += " AND (contact_timecreate >= ? OR contact_timeupdate >= ? OR s.timestamp >= ?)";
+
+		int idx = 1;
+
+		ContactUpdates upd = new ContactUpdates();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		
-		ContactUpdates upd = new ContactUpdates();
 		try {
-
 			List<Contact> contacts = new ArrayList<Contact>();
 			Set<Integer> archivedContactIds = new TreeSet<Integer>();
 
 			con = obmHelper.getConnection();
-			ps = con.prepareStatement(sql);
+			ps = con.prepareStatement(q);
 
-			int idx = 1;
+			// userentity_user_id
 			ps.setInt(idx++, at.getObmId());
+			// my groups
 			ps.setInt(idx++, at.getObmId());
+
 			ps.setInt(idx++, at.getObmId());
+
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
@@ -214,15 +190,19 @@ public class ContactDao {
 				loadBirthday(con, entityContact);
 				loadAnniversary(con, entityContact);
 			}
-			
+
 			upd.setArchived(archivedContactIds);
 			upd.setContacts(contacts);
-			
-		} catch (SQLException se) {
+
+			logger.info("returning " + upd.getContacts().size() + " contact(s) updated");
+			logger.info("returning " + upd.getArchived().size() + " contact(s) archived");
+
+		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+
 		return upd;
 	}
 
@@ -1080,32 +1060,39 @@ public class ContactDao {
 	}
 
 	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) {
-		String sql = getSelectForFindRemovalCandidates(at);
-		return findRemovalCandidates(sql, d);
-	}
-	
-	private Set<Integer> findRemovalCandidates(String sql, Date d) {
+		Set<Integer> l = new HashSet<Integer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;
 
-		Set<Integer> l = new HashSet<Integer>();
+		String q = "SELECT "
+			+ "deletedcontact_contact_id "
+			+ "FROM DeletedContact "
+			+ "INNER JOIN SyncedAddressbook s ON ( s.addressbook_id=deletedcontact_addressbook_id AND s.user_id= "
+			+ at.getObmId() + ")";
+		if (d != null) {
+			q += " WHERE deletedcontact_timestamp >= ? ";
+		}
+		int idx = 1;
 		try {
 			con = obmHelper.getConnection();
-			ps = con.prepareStatement(sql);
+			ps = con.prepareStatement(q);
 
-			int idx = 1;
-			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
+			if (d != null) {
+				ps.setTimestamp(idx++, new Timestamp(d.getTime()));
+			}
 			rs = ps.executeQuery();
-			
 			while (rs.next()) {
 				l.add(rs.getInt(1));
 			}
+
+			logger.info("Returning " + l.size() + " contact(s) deleted");
 		} catch (SQLException e) {
 			logger.error("Could not find deleted contacts in OBM", e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+
 		return l;
 	}
 
@@ -1643,15 +1630,17 @@ public class ContactDao {
 			obmHelper.cleanup(con, st, null);
 		}
 	}
-
-	public ContactUpdates findUpdatedContacts(Date lastSync, Integer addressBookId, AccessToken token) {
-		String sql = getSelectForFindUpdatedContacts(addressBookId, token);
-		return findUpdatedContacts(sql, lastSync, token);
-	}
-
-	public Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) {
-		String sql = getSelectForFindRemovalCandidates(addressBookId, token);
-		return findRemovalCandidates(sql, lastSync);
+	
+	public Date getLastSync() throws ServerFault {
+		Connection con = null;
+		try {
+			con = obmHelper.getConnection();
+			return obmHelper.selectNow(con);
+		} catch (SQLException e) {
+			throw new ServerFault(e.getMessage());
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
 	}
 	
 }
