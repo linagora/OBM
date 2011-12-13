@@ -13,8 +13,6 @@ public abstract class AbstractConfigurationService {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected AbstractConfigurationService() {}
-	
 	protected AbstractConfigurationService(String filename) {
 		props = new Properties();
 		FileInputStream in = null;

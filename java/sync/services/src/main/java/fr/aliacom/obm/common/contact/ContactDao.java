@@ -47,7 +47,6 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.obm.locator.LocatorClientException;
-import org.obm.configuration.ContactConfiguration;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
@@ -93,6 +92,9 @@ public class ContactDao {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ContactDao.class);
 
+	private static final String DEFAULT_ADDRESS_BOOK_NAME = "contacts";
+	private static final String COLLECTED_ADDRESS_BOOK_NAME = "collected_contacts";
+
 	private static final String ANNIVERSARY_FIELD = "contact_anniversary_id";
 	private static final String BIRTHDAY_FIELD = "contact_birthday_id";
 
@@ -107,11 +109,9 @@ public class ContactDao {
 	private final CalendarDao calendarDao;
 	private final Factory solrHelperFactory;
 	private final ObmHelper obmHelper;
-	private final ContactConfiguration contactConfiguration;
 
 	@Inject
-	private ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper) {
-		this.contactConfiguration = contactConfiguration;
+	private ContactDao(CalendarDao calendarDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper) {
 		this.calendarDao = calendarDao;
 		this.solrHelperFactory = solrHelperFactory;
 		this.obmHelper = obmHelper;
@@ -666,9 +666,9 @@ public class ContactDao {
 			ps = con.prepareStatement(
 			"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
 			if (c.isCollected()) {
-				ps.setString(1, contactConfiguration.getCollectedAddressBookName());
+				ps.setString(1, COLLECTED_ADDRESS_BOOK_NAME);
 			} else {
-				ps.setString(1, contactConfiguration.getDefaultAddressBookName());
+				ps.setString(1, DEFAULT_ADDRESS_BOOK_NAME);
 			}
 			ps.setInt(2, at.getObmId());
 
@@ -1516,7 +1516,7 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 			int userId = at.getObmId();
 			ps.setInt(idx++, userId);
-			ps.setString(idx++, contactConfiguration.getDefaultAddressBookName());
+			ps.setString(idx++, DEFAULT_ADDRESS_BOOK_NAME);
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
