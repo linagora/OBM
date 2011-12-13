@@ -15,7 +15,6 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -46,14 +45,12 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactAlreadyExistException {
-		
+	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("addressBookId", String.valueOf(addressBookId));
 		params.put("contact", biw.getContactAsString(contact));
 		Document doc = execute(token, "/book/createContact", params);
-		exceptionFactory.checkCreateContactException(doc);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
@@ -118,15 +115,13 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 	
 	@Override
-	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactNotFoundException {
-		
+	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("addressBookId", String.valueOf(addressBookId));
 		String ct = biw.getContactAsString(contact);
 		params.put("contact", ct);
 		Document doc = execute(token, "/book/modifyContact", params);
-		exceptionFactory.checkModifyContactException(doc);
+		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
 	}
 
