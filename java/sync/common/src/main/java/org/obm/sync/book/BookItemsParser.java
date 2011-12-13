@@ -225,6 +225,8 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 
 	private FolderChanges parseFolderChanges(Element root) {
+		FolderChanges folderChanges = new FolderChanges();
+		
 		Element removed = DOMUtils.getUniqueElement(root, "removed");
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
@@ -234,6 +236,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			Element e = (Element) rmed.item(i);
 			removedIds.add(Integer.parseInt(e.getAttribute("uid")));
 		}
+		folderChanges.setRemoved(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("folder");
 		List<Folder> updatedFolders = new ArrayList<Folder>(upd.getLength() + 1);
@@ -242,10 +245,8 @@ public class BookItemsParser extends AbstractItemsParser {
 			Folder f = parseFolder(e);
 			updatedFolders.add(f);
 		}
-		
-		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
-		
-		return new FolderChanges(updatedFolders, removedIds, lastSync);
+		folderChanges.setUpdated(updatedFolders);
+		return folderChanges;
 	}
 	
 	private Folder parseFolder(Element root) {

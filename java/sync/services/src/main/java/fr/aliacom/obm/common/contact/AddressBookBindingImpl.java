@@ -463,9 +463,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
 			updated.addAll(userDao.findUpdatedFolders(timestamp));
 		}
-		
-		Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
-		return new FolderChanges(updated, removed, contactDao.getLastSync());
+		return new FolderChanges(
+				updated, contactDao.findRemovedFolders(timestamp, token));
 	}
 	
 }
