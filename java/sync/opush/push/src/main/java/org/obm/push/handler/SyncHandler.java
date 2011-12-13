@@ -345,7 +345,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					deleteServerItem(bs, collection, processedClientIds, change);
 				}
 			} catch (ServerItemNotFoundException e) {
-				logger.warn("Item {} doesn't exist on server. " +
+				logger.warn("Item {} not exist on server. " +
 						"The client has sent a malformed or invalid item. Stop sending the item !", e.getServerId());
 			}
 		}
