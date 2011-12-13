@@ -6,35 +6,20 @@ import org.obm.push.bean.ItemChange;
 
 public class FolderSyncResponse {
 	
-	private final Collection<ItemChange> itemsAddedAndUpdated;
-	private final Collection<ItemChange> itemsDeleted;
-	
+	private final Collection<ItemChange> itemChanges;
 	private final String newSyncKey;
 	
-	public FolderSyncResponse(Collection<ItemChange> itemsAddedAndUpdates, Collection<ItemChange> itemsDeleted, 
-			String newSyncKey) {
-		this.itemsAddedAndUpdated = itemsAddedAndUpdates;
-		this.itemsDeleted = itemsDeleted;
+	public FolderSyncResponse(Collection<ItemChange> itemChanges, String newSyncKey) {
+		this.itemChanges = itemChanges;
 		this.newSyncKey = newSyncKey;
 	}
 	
 	public int getCount() {
-		int count = 0;
-		if (itemsAddedAndUpdated != null) {
-			count += itemsAddedAndUpdated.size();
-		}
-		if (itemsDeleted != null) {
-			count += itemsDeleted.size();
-		}
-		return count;
+		return itemChanges.size();
 	}
 
-	public Collection<ItemChange> getItemsAddedAndUpdated() {
-		return itemsAddedAndUpdated;
-	}
-	
-	public Collection<ItemChange> getItemsDeleted() {
-		return itemsDeleted;
+	public Collection<ItemChange> getItemChanges() {
+		return itemChanges;
 	}
 	
 	public String getNewSyncKey() {
