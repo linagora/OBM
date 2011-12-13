@@ -225,10 +225,10 @@ public class ContactsBackend extends ObmSyncBackend {
 			throw new ServerItemNotFoundException(e);
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
-			return null;
+			// return the same serverId
 		} catch (ContactAlreadyExistException e) {
 			logger.warn(e.getMessage());
-			return null;
+			// return the same serverId
 		}
 		
 		return getServerIdFor(collectionId, String.valueOf(contactId));
@@ -262,29 +262,28 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public String delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, DaoException {
+	public void delete(BackendSession bs, String serverId) 
+			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException {
+		
 		Integer contactId = getItemIdFromServerId(serverId);
 		Integer collectionId = getCollectionIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
-			Contact contact = removeContact(bs, addressBookId, contactId);
-			return getServerIdFor(collectionId, String.valueOf(contact.getUid()));
+			removeContact(bs, addressBookId, contactId);
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
-			return null;
 		} catch (ContactNotFoundException e) {
-			logger.warn(e.getMessage());
-			return null;
+			throw new ServerItemNotFoundException(e.getMessage());
 		}
 	}
 
-	private Contact removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
+	private void removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
 			throws UnknownObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
 		BookClient bc = getBookClient();
 		AccessToken token = login(bc, bs);
 		try {
-			return bc.removeContact(token, addressBookId, contactId);
+			bc.removeContact(token, addressBookId, contactId);
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} finally {
