@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.naming.NoPermissionException;
-
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
@@ -234,32 +232,23 @@ public class ContactsBackend extends ObmSyncBackend {
 		return getServerIdFor(collectionId, itemId);
 	}
 
-	public void delete(BackendSession bs, String serverId) 
-			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException {
-		
-		Integer contactId = getItemIdFromServerId(serverId);
-		Integer collectionId = getCollectionIdFromServerId(serverId);
-		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
-		try {
-			removeContact(bs, addressBookId, contactId);
-		} catch (NoPermissionException e) {
-			logger.warn(e.getMessage());
-		} catch (ContactNotFoundException e) {
-			throw new ServerItemNotFoundException(e.getMessage());
-		}
-	}
-
-	private void removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
-			throws UnknownObmSyncServerException, NoPermissionException, ContactNotFoundException {
-		
-		BookClient bc = getBookClient();
-		AccessToken token = login(bc, bs);
-		try {
-			bc.removeContact(token, addressBookId, contactId);
-		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
-		} finally {
-			bc.logout(token);
+	public void delete(BackendSession bs, String serverId) throws UnknownObmSyncServerException, ServerItemNotFoundException {
+		logger.info("delete serverId {}", serverId);
+		if (serverId != null) {
+			int idx = serverId.indexOf(":");
+			if (idx > 0) {
+				BookClient bc = getBookClient();
+				AccessToken token = login(bc, bs);
+				try {
+					bc.removeContact(token, BookType.contacts, serverId.substring(idx + 1) );
+				} catch (ServerFault e) {
+					throw new UnknownObmSyncServerException(e);
+				} catch (ContactNotFoundException e) {
+					throw new ServerItemNotFoundException(serverId);
+				} finally {
+					bc.logout(token);
+				}
+			}
 		}
 	}
 

@@ -99,21 +99,17 @@ public class ObmSyncBackend {
 	}
 
 	protected Integer getItemIdFromServerId(String serverId) {
-		if (serverId != null) {
-			String[] idx = serverId.split(":");
-			if (idx.length == 2) {
-				return Integer.parseInt(idx[1]);
-			}
+		String[] idx = serverId.split(":");
+		if (idx.length == 2) {
+			return Integer.parseInt(idx[1]);
 		}
 		return null;
 	}
 
 	protected Integer getCollectionIdFromServerId(String serverId) {
-		if (serverId != null) {
-			String[] idx = serverId.split(":");
-			if (idx.length == 2) {
-				return Integer.parseInt(idx[0]);
-			}
+		String[] idx = serverId.split(":");
+		if (idx.length == 2) {
+			return Integer.parseInt(idx[0]);
 		}
 		return null;
 	}

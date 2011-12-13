@@ -38,8 +38,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import javax.naming.NoPermissionException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -1072,10 +1070,12 @@ public class ContactDao {
 		}
 	}
 
-	public Contact removeContact(AccessToken at, int contactId) throws SQLException, ContactNotFoundException, NoPermissionException {
-		Contact c = findContact(at, contactId);
-		if (!hasRightsOn(at, contactId)) {
-			throw new NoPermissionException("Contact " + contactId + " removal not permitted for " + at.getEmail());
+	public Contact removeContact(AccessToken at, int uid) throws SQLException, ContactNotFoundException {
+		Contact c = findContact(at, uid);
+		if (!hasRightsOn(at, uid)) {
+			logger.info("contact " + uid + " removal not permitted for "
+					+ at.getEmail());
+			return c;
 		}
 		return removeContact(at, c);
 	}

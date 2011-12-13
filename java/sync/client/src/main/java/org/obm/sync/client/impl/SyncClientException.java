@@ -1,8 +1,6 @@
 package org.obm.sync.client.impl;
 
 import org.obm.sync.NotAllowedException;
-import javax.naming.NoPermissionException;
-
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -18,14 +16,6 @@ public class SyncClientException {
 		}
 	}
 
-	public void checkRemoveContactException(Document doc) throws ContactNotFoundException, ServerFault, NoPermissionException {
-		if (documentIsError(doc)) {
-			throwContactNotFoundException(doc);
-			throwNoPermissionException(doc);
-			checkServerFaultException(doc);
-		}
-	}
-	
 	public void checkContactNotFoundException(Document doc) throws ContactNotFoundException, ServerFault {
 		if (documentIsError(doc)) {
 			throwContactNotFoundException(doc);
@@ -87,14 +77,6 @@ public class SyncClientException {
 		}
 	}
 
-	private void throwNoPermissionException(Document doc) throws NoPermissionException {
-		String message = getErrorMessage(doc);
-		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-		if (NoPermissionException.class.getName().equals(type)) {
-			throw new NoPermissionException(message);
-		}
-	}
-	
 	private boolean documentIsError(Document doc) {
 		boolean isError = true;
 		if (doc != null && doc.getDocumentElement() != null) {

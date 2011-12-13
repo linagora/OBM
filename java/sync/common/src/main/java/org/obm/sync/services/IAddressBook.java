@@ -3,8 +3,6 @@ package org.obm.sync.services;
 import java.util.Date;
 import java.util.List;
 
-import javax.naming.NoPermissionException;
-
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ContactNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -86,8 +84,15 @@ public interface IAddressBook {
 	/**
 	 * remove the contact with specified uid 
 	 */
-	Contact removeContact(AccessToken token, Integer addressBookId, Integer contactId) throws ServerFault, ContactNotFoundException, NoPermissionException;
+	Contact removeContact(AccessToken token, BookType book, String uid)
+			throws ServerFault, ContactNotFoundException;
 
+	/**
+	 * remove the contact with specified uid 
+	 */
+	Contact removeContactInBook(AccessToken token, int addressBookId, String uid)
+			throws ServerFault, ContactNotFoundException;
+	
 	/**
 	 * Search contacts using a solr query
 	 */
