@@ -120,8 +120,8 @@ public class PingHandlerTest {
 	}
 
 	@Test
-	public void testPushNotificationOnBackendChange() throws Exception {
-		prepareMockHasChanges();
+	public void testPushNotificationOnBackendChangeShort() throws Exception {
+		prepareMockHasChanges(1);
 
 		opushServer.start();
 		
@@ -131,7 +131,23 @@ public class PingHandlerTest {
 		
 		Document response = opClient.postXml("Ping", document, "Ping");
 		
-		checkExecutionTime(10, 1, stopwatch);
+		checkExecutionTime(5, 1, stopwatch);
+		checkHasChangeResponse(response);
+	}
+	
+	@Test
+	public void testPushNotificationOnBackendChangeLong() throws Exception {
+		prepareMockHasChanges(2);
+
+		opushServer.start();
+		
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+		Document document = buildPingCommand(20);
+		Stopwatch stopwatch = new Stopwatch().start();
+		
+		Document response = opClient.postXml("Ping", document, "Ping");
+		
+		checkExecutionTime(5, 6, stopwatch);
 		checkHasChangeResponse(response);
 	}
 	
@@ -142,10 +158,10 @@ public class PingHandlerTest {
 		replay();
 	}
 
-	private void prepareMockHasChanges() throws DaoException, CollectionNotFoundException, 
+	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
 			UnknownObmSyncServerException, ProcessingEmailException {
 		mockForRegularNeeds();
-		mockForHasChangePing();
+		mockForHasChangePing(noChangeIterationCount);
 		replay();
 	}
 	
@@ -212,11 +228,12 @@ public class PingHandlerTest {
 		mockCollectionDaoNoChange(collectionDao);
 	}
 
-	private void mockForHasChangePing() throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+	private void mockForHasChangePing(int noChangeIterationCount) 
+			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 
-		mockCollectionDaoHasChange(collectionDao);
+		mockCollectionDaoHasChange(collectionDao, noChangeIterationCount);
 		mockExporterHasContentChanges(contentsExporter);
 	}
 
@@ -237,11 +254,11 @@ public class PingHandlerTest {
 		}
 	}
 	
-	private void mockCollectionDaoHasChange(CollectionDao collectionDao) 
+	private void mockCollectionDaoHasChange(CollectionDao collectionDao, int noChangeIterationCount) 
 			throws DaoException, CollectionNotFoundException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		Date dateWhenChangesAppear = new Date();
-		int collectionNoChangeIterationCount = 2;
+		int collectionNoChangeIterationCount = noChangeIterationCount;
 		int collectionIdWhereChangesAppear = anyInt();
 		
 		expectCollectionDaoUnchangeForXIteration(collectionDao, dateFirstSyncFromASSpecs, collectionNoChangeIterationCount);
