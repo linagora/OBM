@@ -31,25 +31,27 @@ import org.junit.Test;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXMLTools;
-import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.login.LoginService;
-import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.services.ICalendar;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -118,7 +120,7 @@ public class PingHandlerTest {
 	}
 
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ServerFault {
+			ProcessingEmailException, UnknownObmSyncServerException {
 		mockForRegularNeeds();
 		mockForNoChangePing();
 		replay();
@@ -170,9 +172,10 @@ public class PingHandlerTest {
 		mockHeartbeatDao(heartbeatDao);
 	}
 	
-	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException, ServerFault {
-		ICalendar iCalendar = classToInstanceMap.get(ICalendar.class);
-		mockCalendar(iCalendar);
+	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException,
+			ProcessingEmailException, UnknownObmSyncServerException {
+		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
+		mockContentsExporter(contentsExporterBackend);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		mockCollectionDaoNoChange(collectionDao);
@@ -194,14 +197,14 @@ public class PingHandlerTest {
 		}
 	}
 
-	private void mockCalendar(ICalendar iCalendar) throws ServerFault {
-		for (OpushUser user : fakeTestUsers) {
-			Date dateFirstSync = DateUtils.getEpochPlusOneSecondCalendar().getTime();
-			EventChanges eventChanges = new EventChanges();
-			eventChanges.setLastSync(new Date());
-			expect(iCalendar.getSync(user.accessToken, user.user.getLogin(), dateFirstSync)).andReturn(eventChanges).anyTimes();
-			expect(iCalendar.getUserEmail(user.accessToken)).andReturn(user.user.getEmail()).anyTimes();
-		}
+	private void mockContentsExporter(IContentsExporter contentsExporter) 
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
+		expect(contentsExporter.getItemEstimateSize(
+				anyObject(BackendSession.class), 
+				anyObject(FilterType.class),
+				anyInt(),
+				anyObject(SyncState.class)))
+			.andReturn(0).anyTimes();
 	}
 	
 	private void mockLoginService(LoginService loginService) {
