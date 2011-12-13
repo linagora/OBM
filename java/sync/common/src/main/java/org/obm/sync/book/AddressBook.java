@@ -41,19 +41,17 @@ public class AddressBook {
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(name, uid, readOnly);
+		return Objects.hashCode(uid);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof AddressBook) {
 			AddressBook that = (AddressBook) object;
-			return Objects.equal(this.name, that.name)
-				&& Objects.equal(this.uid, that.uid)
-				&& Objects.equal(this.readOnly, that.readOnly);
+			return Objects.equal(this.uid, that.uid);
 		}
 		return false;
 	}

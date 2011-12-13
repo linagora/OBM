@@ -10,14 +10,9 @@ public class DateUtils {
 		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	}
 	
-	public static Calendar getEpochCalendar() {
+	public static Calendar getEpochPlusOneSecondCalendar() {
 		Calendar calendar = getCurrentGMTCalendar();
 		calendar.setTimeInMillis(0);
-		return calendar;
-	}
-	
-	public static Calendar getEpochPlusOneSecondCalendar() {
-		Calendar calendar = getEpochCalendar();
 		//We don't use zero timestamp to avoid broken handling of MYSQL
 		calendar.set(Calendar.SECOND, 1);
 		return calendar;

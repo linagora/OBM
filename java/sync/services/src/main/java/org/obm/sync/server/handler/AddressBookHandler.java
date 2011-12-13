@@ -77,7 +77,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 			listBooks(token, responder);
 		} else if ("listAllBooks".equals(method)) {
 			listAllBooks(token, responder);
-		} else if ("listAllChanges".equals(method)) {
+		} else if ("listContactsChanged".equals(method)) {
 			listContactsChanged(token, params, responder);
 		} else if ("createContact".equals(method)) {
 			createContact(token, params, responder);

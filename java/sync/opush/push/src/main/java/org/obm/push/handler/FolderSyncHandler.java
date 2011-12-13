@@ -88,7 +88,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		if (isFirstSync(folderSyncRequest)) {
 
 			hierarchyExporter.initHierarchyFolder(bs);
-			return getFolderSyncResponse(bs, DateUtils.getEpochCalendar().getTime());
+			return getFolderSyncResponse(bs, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		} else {
 			
 			Date lastSyncDate = getLastSyncDate(folderSyncRequest);
