@@ -686,7 +686,8 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		
 		if (!helperService.canReadCalendar(token, owner) && !helperService.attendeesContainsUser(event.getAttendees(), token)) {
-			throw new ServerFault("user has no read rights on calendar " + calendar);
+			logger.info(LogUtils.prefix(token) + " event " + eventId + " not readable by this user");
+			throw new EventNotFoundException(eventId);
 		}
 		return event;
 	}
