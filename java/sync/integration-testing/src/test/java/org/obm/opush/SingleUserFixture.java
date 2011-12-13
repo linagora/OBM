@@ -22,7 +22,7 @@ public class SingleUserFixture {
 	@Inject
 	public SingleUserFixture(User.Factory userFactory) {
 		jaures = new OpushUser();
-		jaures.user = userFactory.createUser("jaures@sfio.fr", null);
+		jaures.user = userFactory.createUser("jaures@sfio.fr", null, null);
 		jaures.password = "jaures";
 		jaures.deviceType = "BellLabsWiredPhone";
 		jaures.deviceId = "blwp123";

@@ -41,12 +41,14 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class AccessToken {
 
-	private String user;
+	private String userLogin;
+	private String userDisplayName;
+	private String userEmail;
+	
 	private String sessionId;
 	private int obmId;
 	private ObmDomain domain;
 	private String origin;
-	private String email;
 	private boolean rootAccount;
 
 	private Map<String, String> isoCodeToNameCache;
@@ -73,12 +75,12 @@ public class AccessToken {
 		this.domain = domain;
 	}
 
-	public String getUser() {
-		return user;
+	public String getUserLogin() {
+		return userLogin;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
 	}
 
 	public String getSessionId() {
@@ -105,12 +107,12 @@ public class AccessToken {
 		this.origin = origin;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getUserEmail() {
+		return userEmail;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	public Map<String, String> getIsoCodeToNameCache() {
@@ -170,6 +172,15 @@ public class AccessToken {
 	}
 	
 	public String getUserWithDomain() {
-		return user + "@" + domain.getName();
+		return userLogin + "@" + domain.getName();
 	}
+
+	public String getUserDisplayName() {
+		return userDisplayName;
+	}
+	
+	public void setUserDisplayName(String displayName) {
+		this.userDisplayName = displayName;
+	}
+	
 }

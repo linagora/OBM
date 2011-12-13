@@ -123,7 +123,7 @@ public class SerializableTest {
 
 	@Test
 	public void testCredentials() throws IOException {
-		User user = Factory.create().createUser("login@titi", "email");
+		User user = Factory.create().createUser("login@titi", "email", "displayName");
 		Credentials obj = new Credentials(user, "tata");
 		objectOutputStream.writeObject(obj);
 	}

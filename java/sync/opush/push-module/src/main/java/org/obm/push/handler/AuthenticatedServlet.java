@@ -80,7 +80,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 	}
 	
 	private User createUser(String userId, AccessToken accessToken) {
-		return userFactory.createUser(userId, accessToken.getUser());
+		return userFactory.createUser(userId, accessToken.getUserEmail(), accessToken.getUserDisplayName());
 	}
 
 	protected String getLoginAtDomain(String userId) {

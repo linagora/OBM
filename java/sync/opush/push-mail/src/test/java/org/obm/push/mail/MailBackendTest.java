@@ -63,7 +63,7 @@ public class MailBackendTest {
 	@Test
 	public void testSendEmailWithBigMail()
 			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException {
-		final User user = Factory.create().createUser("test@test", "test@domain");
+		final User user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		final String password = "pass";
 		final AccessToken at = new AccessToken(1, "o-push");
 		

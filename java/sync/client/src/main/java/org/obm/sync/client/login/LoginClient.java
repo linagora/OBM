@@ -43,6 +43,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		Document doc = execute(token, "/login/doLogin", params);
 		Element root = doc.getDocumentElement();
 		String email = DOMUtils.getElementText(root, "email");
+		String displayname = DOMUtils.getElementText(root, "displayname");
 		String sid = DOMUtils.getElementText(root, "sid");
 		Element v = DOMUtils.getUniqueElement(root, "version");
 		MavenVersion version = new MavenVersion();
@@ -54,7 +55,8 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		token.setDomain( getDomain(root) );
 		token.setSessionId(sid);
 		token.setVersion(version);
-		token.setEmail(email);
+		token.setUserEmail(email);
+		token.setUserDisplayName(displayname);
 		return token;
 	}
 
@@ -95,7 +97,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		obmDomain.setName(loginAtDomain.split("@", 2)[1]);
 
 		AccessToken token = new AccessToken(0, origin);
-		token.setUser(loginAtDomain.split("@", 2)[0]);
+		token.setUserLogin(loginAtDomain.split("@", 2)[0]);
 		token.setDomain(obmDomain);
 		return token;
 	}

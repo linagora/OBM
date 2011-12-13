@@ -80,7 +80,7 @@ public class UserDao {
 				String k = rs.getString(1) + "/" + rs.getString(2);
 				String v = rs.getString(3);
 				map.put(k, v);
-				logger.info("found property for " + token.getUser() + "@"
+				logger.info("found property for " + token.getUserLogin() + "@"
 						+ token.getDomain().getName() + ": " + k + " => " + v);
 				return map;
 			}

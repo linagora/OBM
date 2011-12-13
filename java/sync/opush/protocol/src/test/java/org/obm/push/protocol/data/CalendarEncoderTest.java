@@ -76,7 +76,7 @@ public class CalendarEncoderTest {
 	}
 
 	private BackendSession getFakeBackendSession() {
-		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr");
+		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		BackendSession bs = new BackendSession(new Credentials(user, "test"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;

@@ -81,7 +81,7 @@ public abstract class AbstractMailer {
 	}
 
 	protected InternetAddress convertAccessTokenToAddresse(AccessToken at) throws AddressException {
-		return new InternetAddress(at.getEmail());
+		return new InternetAddress(at.getUserEmail());
 	}
 	
 	protected String applyTemplate(ImmutableMap<Object, Object> datamodel, Template template) 

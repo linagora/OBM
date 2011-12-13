@@ -128,11 +128,11 @@ public class SolrHelper {
 		this.contactIndexerFactory = contactIndexerFactory;
 
 		sContact = new CommonsHttpSolrServer("http://"
-				+ locatorClient.getServiceLocation("solr/contact", at.getUser() + "@"
+				+ locatorClient.getServiceLocation("solr/contact", at.getUserLogin() + "@"
 						+ at.getDomain().getName()) + ":8080/solr/contact", client);
 
 		sEvent = new CommonsHttpSolrServer("http://"
-				+ locatorClient.getServiceLocation("solr/event", at.getUser() + "@"
+				+ locatorClient.getServiceLocation("solr/event", at.getUserLogin() + "@"
 						+ at.getDomain().getName()) + ":8080/solr/event", client);
 	}
 	

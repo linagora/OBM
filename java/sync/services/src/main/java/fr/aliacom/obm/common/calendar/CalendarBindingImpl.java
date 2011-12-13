@@ -344,7 +344,7 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			if (before.getOwner() != null && !helperService.canWriteOnCalendar(token, before.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
-						+ token.getUser() + " cannot modify event["
+						+ token.getUserLogin() + " cannot modify event["
 						+ before.getTitle() + "] because not owner"
 						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
 				return before;
@@ -482,8 +482,8 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 
 			if (!helperService.canWriteOnCalendar(token, calendar)) {
-				String message = "[" + token.getUser() + "] Calendar : "
-						+ token.getUser() + " cannot create event on "
+				String message = "[" + token.getUserLogin() + "] Calendar : "
+						+ token.getUserLogin() + " cannot create event on "
 						+ calendar + "calendar : no write right";
 				logger.info(LogUtils.prefix(token) + message);
 				throw new ServerFault(message);
@@ -680,11 +680,11 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 		if (!helperService.canReadCalendar(token, calendar)) {
-			logger.error(LogUtils.prefix(token) + "user " + token.getUser()
+			logger.error(LogUtils.prefix(token) + "user " + token.getUserLogin()
 					+ " tried to sync calendar " + calendar
 					+ " => permission denied");
 			throw new ServerFault("Read permission denied for "
-					+ token.getUser() + " on " + calendar);
+					+ token.getUserLogin() + " on " + calendar);
 		}
 
 		try {
@@ -953,7 +953,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private String getDefaultCalendarFromToken(AccessToken token) {
-		return token.getUser();
+		return token.getUserLogin();
 	}
 
 	
@@ -1222,8 +1222,8 @@ public class CalendarBindingImpl implements ICalendar {
 		throws ImportICalendarException, ServerFault {
 
 		if (!helperService.canWriteOnCalendar(token, calendar)) {
-			String message = "[" + token.getUser() + "] Calendar : "
-					+ token.getUser() + " cannot create event on "
+			String message = "[" + token.getUserLogin() + "] Calendar : "
+					+ token.getUserLogin() + " cannot create event on "
 					+ calendar + "calendar : no write right";
 			logger.info(LogUtils.prefix(token) + message);
 			throw new ServerFault(message);

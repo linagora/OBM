@@ -56,12 +56,12 @@ public class User implements Serializable {
 		}
 		
 		public String getLoginAtDomain(String userId) {
-			return createUser(userId, null).getLoginAtDomain();
+			return createUser(userId, null, null).getLoginAtDomain();
 		}
 		
-		public User createUser(String userId, String email) {
+		public User createUser(String userId, String email, String displayName) {
 			String[] loginAndDomain = getLoginAndDomain(userId);
-			return new User(loginAndDomain[LOGIN], loginAndDomain[DOMAIN], email);
+			return new User(loginAndDomain[LOGIN], loginAndDomain[DOMAIN], email, displayName);
 		}
 		
 		private String[] getLoginAndDomain(String userId) {
@@ -113,12 +113,14 @@ public class User implements Serializable {
 	private final String domain;
 	
 	private final String email;
+	private final String displayName;
 
-	private User(String login, String domain, String email) {
+	private User(String login, String domain, String email, String displayName) {
 		super();
 		this.login = login;
 		this.domain = domain;
 		this.email = email;
+		this.displayName = displayName;
 	}
 	
 	public String getLoginAtDomain() {
@@ -137,9 +139,13 @@ public class User implements Serializable {
 		return email;
 	}
 
+	public String getDisplayName() {
+		return displayName;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(login, domain, email);
+		return Objects.hashCode(login, domain, email, displayName);
 	}
 	
 	@Override
@@ -148,7 +154,8 @@ public class User implements Serializable {
 			User that = (User) object;
 			return Objects.equal(this.login, that.login)
 				&& Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.email, that.email);
+				&& Objects.equal(this.email, that.email)
+				&& Objects.equal(this.displayName, that.displayName);
 		}
 		return false;
 	}
@@ -159,6 +166,7 @@ public class User implements Serializable {
 			.add("login", login)
 			.add("domain", domain)
 			.add("email", email)
+			.add("displayName", displayName)
 			.toString();
 	}
 	

@@ -489,7 +489,7 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, ParametersSource params, XmlResponder responder) 
 		throws ServerFault {
 		boolean ret = binding.isWritableCalendar(at, getCalendar(at, params));
-		logger.info("isWritable(" + at.getEmail() + ", "
+		logger.info("isWritable(" + at.getUserEmail() + ", "
 				+ getCalendar(at, params) + ") => " + ret);
 		return responder.sendBoolean(ret);
 	}

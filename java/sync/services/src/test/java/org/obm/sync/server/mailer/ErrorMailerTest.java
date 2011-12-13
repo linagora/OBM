@@ -75,7 +75,7 @@ public class ErrorMailerTest {
 	protected static AccessToken getMockAccessToken(){
 		AccessToken at = new AccessToken(1, "unitTest");
 		at.setDomain(ToolBox.getDefaultObmDomain());
-		at.setEmail("adrien@test.tlse.lng");
+		at.setUserEmail("adrien@test.tlse.lng");
 		return at;
 	}
 	

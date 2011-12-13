@@ -420,7 +420,7 @@ public class ContactDao {
 		e.setPrivacy(1);
 		e.setPriority(1);
 		Attendee at = new Attendee();
-		at.setEmail(token.getEmail());
+		at.setEmail(token.getUserEmail());
 		at.setRequired(ParticipationRole.CHAIR);
 		at.setState(ParticipationState.ACCEPTED);
 		e.addAttendee(at);
@@ -1075,7 +1075,7 @@ public class ContactDao {
 	public Contact removeContact(AccessToken at, int contactId) throws SQLException, ContactNotFoundException, NoPermissionException {
 		Contact c = findContact(at, contactId);
 		if (!hasRightsOn(at, contactId)) {
-			throw new NoPermissionException("Contact " + contactId + " removal not permitted for " + at.getEmail());
+			throw new NoPermissionException("Contact " + contactId + " removal not permitted for " + at.getUserEmail());
 		}
 		return removeContact(at, c);
 	}
@@ -1315,7 +1315,7 @@ public class ContactDao {
 			obmHelper.cleanup(con, ps, rs);
 		}
 
-		logger.info("[" + at.getUser() + "] searchSimilar for '"
+		logger.info("[" + at.getUserLogin() + "] searchSimilar for '"
 				+ c.getLastname() + "' returned " + found.size()
 				+ " contact(s)");
 

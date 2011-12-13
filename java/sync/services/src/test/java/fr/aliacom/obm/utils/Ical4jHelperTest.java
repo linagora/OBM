@@ -273,7 +273,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
 		AccessToken token = new AccessToken(0, null);
-		token.setEmail("adrien@zz.com");
+		token.setUserEmail("adrien@zz.com");
 		Event event = getIcal4jHelper().getEvent(getDefaultObmUser(), vEvent);
 		assertTrue(event.isAllday());
 

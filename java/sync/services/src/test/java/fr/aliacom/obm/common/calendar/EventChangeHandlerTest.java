@@ -125,7 +125,7 @@ public class EventChangeHandlerTest {
 		obmDomain.setName("unitTest-domain");
 		AccessToken token = new AccessToken(2, "unitTest-origin");
 		token.setDomain(obmDomain);
-		token.setEmail("unitTest-email");
+		token.setUserEmail("unitTest-email");
 		return token;
 	}
 	

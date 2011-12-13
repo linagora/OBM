@@ -125,7 +125,7 @@ public class XmlResponder {
 			v.setAttribute("major", version.getMajor());
 			v.setAttribute("minor", version.getMinor());
 			v.setAttribute("release", version.getRelease());
-			DOMUtils.createElementAndText(root, "email", at.getEmail());
+			DOMUtils.createElementAndText(root, "email", at.getUserEmail());
 			
 			Element domain = DOMUtils.createElementAndText(root, "domain", at.getDomain().getName());
 			domain.setAttribute("uuid", at.getDomain().getUuid());

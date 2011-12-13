@@ -41,7 +41,7 @@ public class UserTest {
 	@Test
 	public void testGetLoginAtDomainWithArrobase() {
 		String text = "login@domain";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		String result = loginAtDomain.getLoginAtDomain();
 		Assertions.assertThat(result).isEqualTo(text);
 	}
@@ -49,21 +49,21 @@ public class UserTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetLoginAtDomainWithTwoArrobases() {
 		String text = "login@domain@error";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		loginAtDomain.getLoginAtDomain();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetLoginAtDomainWithNoDomain() {
 		String text = "login";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		loginAtDomain.getLoginAtDomain();
 	}
 	
 	@Test
 	public void testGetLoginAtDomainWithSlashes() {
 		String text = "domain\\login";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		String result = loginAtDomain.getLoginAtDomain();
 		Assertions.assertThat(result).isEqualTo("login@domain");
 	}
@@ -71,14 +71,14 @@ public class UserTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetLoginAtDomainWithSlashesAndArrobase() {
 		String text = "domain\\login@domain2";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		loginAtDomain.getLoginAtDomain();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetLoginAtDomainWithArrobaseAndSlashes() {
 		String text = "doma@in\\login";
-		User loginAtDomain = Factory.create().createUser(text, "email@domain");
+		User loginAtDomain = Factory.create().createUser(text, "email@domain", "displayName");
 		loginAtDomain.getLoginAtDomain();
 	}
 }

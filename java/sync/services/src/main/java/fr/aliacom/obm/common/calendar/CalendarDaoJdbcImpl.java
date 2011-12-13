@@ -262,7 +262,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	@Override
 	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException, ServerFault {
 		logger.info("create with token " + editor.getSessionId() + " from "
-				+ editor.getOrigin() + " for " + editor.getEmail());
+				+ editor.getOrigin() + " for " + editor.getUserEmail());
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
@@ -898,7 +898,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				fetchIds.append("AND e.event_date <= ? ");
 			}
 			fetchIds.append(") )");
-			logger.info(token.getUser() + " will use the sync range [ "
+			logger.info(token.getUserLogin() + " will use the sync range [ "
 					+ syncRange.getAfter() + " - " + syncRange.getBefore() + " ]");
 		}
 

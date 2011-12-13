@@ -134,7 +134,7 @@ public class CalendarBindingImplTest {
 	private AccessToken mockAccessToken(String userName, ObmDomain domain) {
 		AccessToken accessToken = createMock(AccessToken.class);
 		expect(accessToken.getDomain()).andReturn(domain).atLeastOnce();
-		expect(accessToken.getUser()).andReturn(userName).anyTimes();
+		expect(accessToken.getUserLogin()).andReturn(userName).anyTimes();
 		expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
 		expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
 		return accessToken;

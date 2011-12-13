@@ -33,10 +33,6 @@ package org.obm.push.bean;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.protocol.AutodiscoverResponse;
-import org.obm.push.bean.protocol.AutodiscoverResponseError;
-import org.obm.push.bean.protocol.AutodiscoverResponseServer;
-import org.obm.push.bean.protocol.AutodiscoverResponseUser;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -83,10 +79,6 @@ public class BeansTest {
 					.add(SyncState.class)
 					.add(MSEventUid.class)
 					.add(User.class)
-					.add(AutodiscoverResponse.class)
-					.add(AutodiscoverResponseUser.class)
-					.add(AutodiscoverResponseServer.class)
-					.add(AutodiscoverResponseError.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

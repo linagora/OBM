@@ -149,7 +149,7 @@ public class HelperServiceImpl implements HelperService {
 	}
 	
 	private boolean checkImplicitRights(AccessToken accessToken, String loginOrEmailWithoutDomain) {
-		if (   accessToken.getUser().equalsIgnoreCase(loginOrEmailWithoutDomain) || 
+		if (   accessToken.getUserLogin().equalsIgnoreCase(loginOrEmailWithoutDomain) || 
 			   accessToken.getUserWithDomain().equalsIgnoreCase(loginOrEmailWithoutDomain)  ) {
 			return true;
 		}
@@ -159,7 +159,7 @@ public class HelperServiceImpl implements HelperService {
 	@Override
 	public boolean attendeesContainsUser(List<Attendee> attendees,
 			AccessToken token) {
-		final String email = token.getEmail();
+		final String email = token.getUserEmail();
 		return Iterables.any(attendees, new Predicate<Attendee>() {
 			@Override
 			public boolean apply(Attendee attendee) {
