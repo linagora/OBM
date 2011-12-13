@@ -218,6 +218,7 @@ class Vcalendar_Reader_OBM {
     if($data['event_priority']) $vevent->set('priority', $this->parsePriority($data['event_priority']));
     $vevent->set('organizer', $data['event_owner']);
     $vevent->set('x-obm-domain', $data['owner_domain']);
+    $vevent->set('x-obm-domain-uuid', $data['owner_domain_uuid']);
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
     $vevent->set('x-obm-color', $data['event_color']);

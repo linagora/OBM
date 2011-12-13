@@ -75,6 +75,7 @@ function run_query_calendar_detail($calendar_id) {
     o.userobm_lastname AS owner_lastname,
     o.userobm_firstname AS owner_firstname,
     d.domain_name AS owner_domain,
+    d.domain_uuid AS owner_domain_uuid,
     event_opacity,
     event_title,
     event_description,
