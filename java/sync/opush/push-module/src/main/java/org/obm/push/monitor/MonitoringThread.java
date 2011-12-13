@@ -43,7 +43,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.impl.PushNotification;
 import org.obm.push.store.CollectionDao;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public abstract class MonitoringThread extends OpushMonitoringThread implements Runnable {
@@ -80,26 +79,22 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 						continue;
 					}
 						
-					List<PushNotification> toNotify = ImmutableList.<PushNotification>of();
-					
 					synchronized (ccls) {
 						if (ccls.isEmpty()) {
 							continue;
 						}
+						
 						ChangedCollections changedCollections = getChangedCollections(lastSync);
 						
-			            if (logger.isInfoEnabled() && changedCollections.hasChanges()) {
+						if (changedCollections.hasChanges()) {
 							logger.info("changes detected : {}", changedCollections.toString());
 						}
-						toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+						
+						List<PushNotification> toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+						notifyListeners(toNotify);
+						
+						lastSync = changedCollections.getLastSync();
 					}
-					
-					for (PushNotification listener: toNotify) {
-						listener.emit();
-					}
-					ChangedCollections changedCollections = getChangedCollections(lastSync);
-					toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
-					lastSync = changedCollections.getLastSync();
 
 				} catch (ChangedCollectionsException e1) {
 					logger.error(e1.getMessage(), e1);
@@ -112,6 +107,12 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		}	
+	}
+
+	private void notifyListeners(List<PushNotification> toNotify) {
+		for (PushNotification listener: toNotify) {
+			listener.emit();
+		}
 	}
 
 	private Set<ICollectionChangeListener> selectListenersToNotify(ChangedCollections changedCollections,
