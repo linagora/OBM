@@ -37,7 +37,7 @@ public class StateMachine {
 		return collectionDao.findStateForKey(syncKey);
 	}
 
-	public Date getLastSyncDate(String syncKey) throws DaoException {
+	public Date getLastSyncDate(String syncKey) throws CollectionNotFoundException, DaoException {
 		return collectionDao.findLastSyncDateFromKey(syncKey);
 	}
 	
