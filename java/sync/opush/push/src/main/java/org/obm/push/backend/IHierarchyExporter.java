@@ -23,4 +23,6 @@ public interface IHierarchyExporter {
 
 	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException;
 
+	void initHierarchyFolder(BackendSession bs) throws DaoException;
+
 }
