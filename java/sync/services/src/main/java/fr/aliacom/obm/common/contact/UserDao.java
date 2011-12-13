@@ -28,13 +28,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
+import org.obm.sync.book.Folder;
+import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -45,11 +47,12 @@ public class UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private final ObmHelper obmHelper;
-	private final ContactConfiguration contactConfiguration;
+	
+	private static final int FOLDER_UID = -1;
+	private static final String FOLDER_NAME = "users";
 	
 	@Inject
-	private UserDao(ContactConfiguration contactConfiguration, ObmHelper obmHelper) {
-		this.contactConfiguration = contactConfiguration;
+	private UserDao(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
 	}
 
@@ -103,7 +106,7 @@ public class UserDao {
 
 	private Contact loadUser(ResultSet rs) throws SQLException {
 		Contact c = new Contact();
-		c.setFolderId(contactConfiguration.getAddressBookUserId());
+		c.setFolderId(FOLDER_UID);
 		
 		c.setUid(rs.getInt("userobm_id"));
 		c.setFirstname(rs.getString("userobm_firstname"));
@@ -196,6 +199,21 @@ public class UserDao {
 			}
 		}
 		return userDomain;
+	}
+
+	public List<Folder> findUpdatedFolders(Date timestamp) {
+		if(isFirstSync(timestamp)){
+			Folder f = new Folder();
+			f.setUid(FOLDER_UID);
+			f.setName(FOLDER_NAME);
+			return ImmutableList.of(f);
+		}
+		
+		return ImmutableList.of();
+	}
+	
+	private boolean isFirstSync(Date timestamp) {
+		return timestamp == null || DateHelper.asDate("0").equals(timestamp);
 	}
 
 }

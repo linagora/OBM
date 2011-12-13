@@ -32,7 +32,7 @@ import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.items.AddressBookChangesResponse;
-import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
@@ -70,8 +70,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			listBooks(token, responder);
 		} else if ("listAllBooks".equals(method)) {
 			listAllBooks(token, responder);
-		} else if ("listContactsChanged".equals(method)) {
-			listContactsChanged(token, params, responder);
+		} else if ("getSync".equals(method)) {
+			getSync(token, params, responder);
 		} else if ("createContact".equals(method)) {
 			createContact(token, params, responder);
 		} else if ("createContactWithoutDuplicate".equals(method)) {
@@ -163,10 +163,10 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return bip.parseContact(p(params, "contact"));
 	}
 
-	private void listContactsChanged(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
+	private void getSync(AccessToken at, ParametersSource params, XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromParams(params);
-		ContactChanges contactChanges = binding.listContactsChanged(at, lastSync);
-		responder.sendContactChanges(contactChanges);
+		ContactChangesResponse cc = binding.getSync(at, type(params), lastSync);
+		responder.sendContactChanges(cc);
 	}
 
 	private Date getLastSyncFromParams(ParametersSource params) {

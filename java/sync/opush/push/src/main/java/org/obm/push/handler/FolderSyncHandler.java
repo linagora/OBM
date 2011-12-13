@@ -124,10 +124,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		UnknownObmSyncServerException, InvalidServerId {
 
 		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.getContactsChanged(bs, lastSync);
-		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), 
-				hierarchyItemsChanges.getItemsAddedOrUpdated(),
-				hierarchyItemsChanges.getItemsDeleted());
-		
+		String newSyncKey = stMachine.allocateNewSyncKey(bs, getCollectionId(bs), hierarchyItemsChanges.getLastSync(), hierarchyItemsChanges.getItemsAddedOrUpdated());
 		return new FolderSyncResponse(
 				hierarchyItemsChanges.getItemsAddedOrUpdated(), hierarchyItemsChanges.getItemsDeleted(), newSyncKey);
 	}

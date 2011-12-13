@@ -35,22 +35,6 @@ public class Folder {
 	public void setOwnerDisplayName(String ownerDisplayName) {
 		this.ownerDisplayName = ownerDisplayName;
 	}
-	
-	@Override
-	public int hashCode(){
-		return Objects.hashCode(uid, name, ownerDisplayName);
-	}
-	
-	@Override
-	public boolean equals(Object object){
-		if (object instanceof Folder) {
-			Folder that = (Folder) object;
-			return Objects.equal(this.uid, that.uid)
-				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName);
-		}
-		return false;
-	}
 
 	@Override
 	public String toString() {

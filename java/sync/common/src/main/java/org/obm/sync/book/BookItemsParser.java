@@ -13,6 +13,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
@@ -159,12 +160,18 @@ public class BookItemsParser extends AbstractItemsParser {
 	/**
 	 * Parse the contact changes document returned by the getSync call
 	 */
-	public ContactChanges parseChanges(Document doc) {
+	public ContactChangesResponse parseChanges(Document doc) {
+		ContactChangesResponse changes = new ContactChangesResponse();
 		Element root = doc.getDocumentElement();
-		return  parseContactChanges(root);
+		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
+		changes.setLastSync(lastSync);
+		changes.setChanges(parseContactChanges(root));
+		return changes;
 	}
 
 	private ContactChanges parseContactChanges(Element root) {
+		ContactChanges contactChanges = new ContactChanges();
+		
 		Element removed = DOMUtils.getUniqueElement(root, "removed");
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
@@ -174,6 +181,7 @@ public class BookItemsParser extends AbstractItemsParser {
 			Element e = (Element) rmed.item(i);
 			removedIds.add(Integer.parseInt(e.getAttribute("uid")));
 		}
+		contactChanges.setRemoved(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("contact");
 		List<Contact> updatedEvents = new ArrayList<Contact>(
@@ -183,10 +191,8 @@ public class BookItemsParser extends AbstractItemsParser {
 			Contact ev = parseContact(e);
 			updatedEvents.add(ev);
 		}
-		
-		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
-
-		return new ContactChanges(updatedEvents, removedIds, lastSync);
+		contactChanges.setUpdated(updatedEvents);
+		return contactChanges;
 	}
 	
 	public List<AddressBook> parseListAddressBook(Document doc) {

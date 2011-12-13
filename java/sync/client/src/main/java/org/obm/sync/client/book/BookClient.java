@@ -15,7 +15,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.items.AddressBookChangesResponse;
-import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.ContactChangesResponse;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
@@ -83,10 +83,16 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
+	public ContactChangesResponse getSync(AccessToken token, BookType book, Date lastSync) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
-		Document doc = execute(token, "/book/listContactsChanged", params);
+		params.put("book", book.toString());
+		if (lastSync != null) {
+			params.put("lastSync", DateHelper.asString(lastSync));
+		} else {
+			params.put("lastSync", "0");
+		}
+
+		Document doc = execute(token, "/book/getSync", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseChanges(doc);
 	}
