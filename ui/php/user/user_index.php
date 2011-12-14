@@ -75,8 +75,6 @@ update_last_visit('user', $params['user_id'], $action);
 
 page_close();
 
-$customFields = new OBM_Form_Field('user');
-
 // get Profile list (name and id)
 $params['profiles'] = get_all_profiles(false);
 

@@ -374,8 +374,9 @@ function html_user_search_form($user) {
   }
 
   // User defined data
+  $customFields = new OBM_Form_Field('user');
   $block_userdata .= of_userdata_dis_search('user', $user);
-  $block_userfields = $GLOBALS['customFields']->buildSearchForm($user);
+  $block_userfields = $customFields->buildSearchForm($user);
 
   if ($popup) {
     $ext_action = $user['ext_action'];
@@ -626,8 +627,9 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
 
   // User defined data
+  $customFields = new OBM_Form_Field('user');
   $url_userdata = of_userdata_get_url_search_params('user', $user);
-  $url_userfields = $GLOBALS['customFields']->buildSearchUrl($user);
+  $url_userfields = $customFields->buildSearchUrl($user);
   if ($popup) {
     $ext_action = $user['ext_action'];
     $ext_url = $user['ext_url'];
@@ -868,7 +870,8 @@ function html_user_consult($obm_q) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_entity_consult('user', $id);
-  $block_userfields = $GLOBALS['customFields']->buildConsultDetail($id);
+  $customFields = new OBM_Form_Field('user');
+  $block_userfields = $customFields->buildConsultDetail($id);
 
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
@@ -1740,10 +1743,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if ($field != '') {
     $class[$field] = 'error';
   }
+  $customFields = new OBM_Form_Field('user');
   if ($id) {
-    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, $id, $user);
+    $block_userfields = $customFields->buildEntityForm($class, $id, $user);
   } else {
-    $block_userfields = $GLOBALS['customFields']->buildEntityForm($class, null, $user);
+    $block_userfields = $customFields->buildEntityForm($class, null, $user);
   }
 
   // Default exp is hidden

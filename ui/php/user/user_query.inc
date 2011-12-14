@@ -275,7 +275,8 @@ function run_query_user_search($user) {
   }
 
   // User custom fields
-  $custom = $GLOBALS['customFields']->buildQuery($user);
+  $customFields = new OBM_Form_Field('user');
+  $custom = $customFields->buildQuery($user);
   if ($custom != '') {
     $where .= $custom['where'];
     $join_custom = $custom['join'];
@@ -754,8 +755,9 @@ function run_query_user_insert($user) {
     run_query_user_addressbook_insert($id, $domain_id);
     of_index_update('user', $id);
     $user['entity_id'] = $id;
-    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
-    $GLOBALS['customFields']->insert($id, $user);
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);
+    $customFields = new OBM_Form_Field('user');
+    $customFields->insert($id, $user);
     $entity_id = of_entity_insert('calendar', $id);    
     $entity_id = of_entity_insert('mailbox', $id);    
     run_query_user_set_default_rights($id, $profile, 'mailbox');
@@ -1209,7 +1211,8 @@ function run_query_user_update($u_id, $user) {
   }
 
   if ($retour) {
-    $GLOBALS['customFields']->insert($u_id, $user);
+    $customFields = new OBM_Form_Field('user');
+    $customFields->insert($u_id, $user);
     $ret = of_index_update('user', $u_id);
     $ret = of_userdata_query_update('user', $u_id, $user);
   }
@@ -1231,7 +1234,8 @@ function run_query_user_delete($p_id) {
   global $cdg_sql, $obm, $c_use_connectors;
 
   $multidomain = sql_multidomain('userobm');
-  $GLOBALS['customFields']->delete($p_id);
+  $customFields = new OBM_Form_Field('user');
+  $customFields->delete($p_id);
   of_entity_delete($GLOBALS['module'], $p_id);
   of_entity_delete('mailbox', $p_id);
   of_entity_delete('calendar', $p_id);
