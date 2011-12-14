@@ -33,7 +33,8 @@ package org.obm.dbcp;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.transaction.TransactionManager;
 
@@ -82,26 +83,15 @@ public class DBConnectionPool {
 
 		GenericObjectPool pool = new GenericObjectPool();
 		pool.setTestOnBorrow(true);
+		List<String> initConnectionSqls = Arrays.asList(cf.setGMTTimezoneQuery());
 		PoolableConnectionFactory factory = new PoolableConnectionFactory(
-				connectionFactory, pool, null, VALIDATION_QUERY, false, true);
+				connectionFactory, pool, null, VALIDATION_QUERY, initConnectionSqls, false, true);
 		pool.setFactory(factory);
 		return new PoolingDataSource(pool);
 	}
 
 	/* package */ Connection getConnection() throws SQLException {
-		Connection connection = poolingDataSource.getConnection();
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			statement.execute(cf.setGMTTimezoneQuery());
-		} catch (SQLException e) {
-			connection.close();
-		} finally {
-			if (statement != null) {
-				statement.close();	
-			}
-		}
-		return connection;
+		return poolingDataSource.getConnection();
 	}
 
 	/* package */ TransactionManager getTransactionManager() {
