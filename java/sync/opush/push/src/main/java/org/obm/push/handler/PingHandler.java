@@ -67,11 +67,12 @@ public class PingHandler extends WbxmlRequestHandler implements
 			doTheJob(continuation, bs, pingRequest);
 
 		} catch (MissingRequestParameterException e) {
-			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS, "Don't know what to monitor");
+			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS);
 		} catch (CollectionNotFoundException e) {
-			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, "unable to start monitoring, collection not found");
+			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
 		} catch (DaoException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		}
 	}
 
@@ -158,15 +159,19 @@ public class PingHandler extends WbxmlRequestHandler implements
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);
 		} catch (FolderSyncRequiredException e) {
-			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED, "unable to start monitoring, collection not found");
+			sendError(responder, PingStatus.FOLDER_SYNC_REQUIRED);
 		} catch (DaoException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		} catch (CollectionNotFoundException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		} catch (UnknownObmSyncServerException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		} catch (ProcessingEmailException e) {
-			sendError(responder, PingStatus.SERVER_ERROR, e.getMessage());
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		} 
 	}
 
@@ -195,8 +200,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		sendResponse(responder, document);
 	}
 
-	private void sendError(Responder responder, PingStatus serverError, String errorMessage) {
-		logger.error(errorMessage);
+	private void sendError(Responder responder, PingStatus serverError) {
 		sendError(responder, serverError.asXmlValue(), null);
 	}
 	
