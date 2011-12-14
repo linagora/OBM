@@ -109,6 +109,9 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 				
 				long uid = getUid(payload);
 				Date internalDate = getInternalDate(payload);
+				if (internalDate == null) {
+					logger.error("Failed to get internaldate in fetch response: {}", payload);
+				}
 				Set<Flag> flags = getFlags(payload);
 				buildSet.add(new FastFetch(uid, internalDate, flags));
 			}
@@ -132,7 +135,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		int fidx = payload.indexOf("INTERNALDATE \"") + "INTERNALDATE \"".length();
 		
 		if (fidx == -1 + "INTERNALDATE \"".length()) {
-			return new Date(0);
+			return null;
 		}
 		int endDate = payload.indexOf("\"", fidx);
 		String internalDate = "";
@@ -168,7 +171,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		} catch (ParseException e) {
 			logger.error("Can't parse internal date["+date+"]");
 		}
-		return new Date(0);
+		return null;
 	}
 	
 	private Set<Flag> parseFlags(String flags) {
