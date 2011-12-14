@@ -43,6 +43,8 @@ import javax.transaction.UserTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 public class JDBCUtils {
 
 	private final static Logger logger = LoggerFactory
@@ -123,6 +125,8 @@ public class JDBCUtils {
 	}
 
 	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
+		Preconditions.checkNotNull(rs);
+		Preconditions.checkNotNull(fieldName);
 		return new Date(rs.getTimestamp(fieldName).getTime());
 	}
 	
