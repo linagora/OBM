@@ -31,7 +31,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>net.fortuna.ical4j</groupId>
+			<groupId>org.mnode.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
 		</dependency>
 		<dependency>

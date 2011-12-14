@@ -50,6 +50,7 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
+import org.fest.assertions.Assertions;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -848,10 +849,22 @@ public class Ical4jHelperTest {
 	
 	@Test
 	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {
-		InputStream stream = getStreamICS("OBMFULL-2891.ics");
+		String icsFilename = "OBMFULL-2891.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+		Assertions.assertThat(events).isNotNull().isNotEmpty();
+	}
+
+	private List<Event> testIcsParsing(String icsFilename) throws IOException,
+			ParserException {
+		InputStream stream = getStreamICS(icsFilename);
 		String ics = IOUtils.toString(stream);
-		getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
-		assertTrue(true);
+		return getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
 	}
 	
+	@Test
+	public void executeJIRA2940() throws IOException, ParserException {
+		String icsFilename = "OBMFULL-2940.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+		Assertions.assertThat(events).isNotNull();
+	}
 }

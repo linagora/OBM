@@ -23,7 +23,6 @@
 		<commons-io.version>2.0.1</commons-io.version>
 		<jms.version>1.1</jms.version>
 		<netty.version>3.2.4.Final</netty.version>		
-		<ical4j.version>1.0-rc3</ical4j.version>
 		<jta.version>1.1</jta.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<slf4j.version>1.6.2</slf4j.version>
@@ -297,9 +296,9 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>net.fortuna.ical4j</groupId>
+				<groupId>org.mnode.ical4j</groupId>
 				<artifactId>ical4j</artifactId>
-				<version>${ical4j.version}</version>
+				<version>1.0.2</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
