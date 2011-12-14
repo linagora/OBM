@@ -116,52 +116,6 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}
 
 	@Override
-	public void update(Integer devId, Integer collectionId, Email email) throws DaoException {
-		Connection con = null;
-		PreparedStatement ps = null;
-		
-		try {
-			con = dbcp.getConnection();
-			
-			ps = con.prepareStatement("UPDATE opush_sync_mail SET is_read = ?, timestamp = ? WHERE collection_id = ? AND device_id = ? AND mail_uid = ?");
-			int index = 1;
-			ps.setBoolean(index++, email.isRead());
-			ps.setTimestamp(index++, new Timestamp(email.getDate().getTime()));
-			ps.setInt(index++, collectionId);
-			ps.setInt(index++, devId);
-			ps.setLong(index++, email.getUid());
-			
-			ps.execute();
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}	
-	}
-	
-	@Override
-	public void insert(Integer devId, Integer collectionId, Date lastSync, Email email) throws DaoException {
-		Connection con = null;
-		PreparedStatement ps = null;
-		
-		try {
-			con = dbcp.getConnection();
-			
-			ps = con.prepareStatement("INSERT INTO opush_sync_mail (collection_id, device_id, mail_uid, timestamp) VALUES (?, ?, ?, ?)");
-			ps.setInt(1, collectionId);
-			ps.setInt(2, devId);
-			ps.setLong(3, email.getUid());
-			ps.setTimestamp(4, new Timestamp(lastSync.getTime()));
-			
-			ps.execute();
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}
-	}
-	
-	@Override
 	public void deleteSyncEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
 		deleteSyncEmails(devId, collectionId, Calendar.getInstance().getTime(), mailUids);
 	}

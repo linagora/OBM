@@ -54,10 +54,6 @@ public interface EmailDao {
 
 	Set<Email> alreadySyncedEmails(int collectionId, int device, Collection<Email> emails) throws DaoException;
 	
-	void update(Integer devId, Integer collectionId, Email email) throws DaoException;
-
-	void insert(Integer devId, Integer collectionId, Date lastSync, Email email) throws DaoException;
-
 	Set<Email> listDeletedEmails(Integer devId, Integer collectionId) throws DaoException;
 
 	void createSyncEntries(Integer devId, Integer collectionId,
