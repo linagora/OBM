@@ -19,6 +19,7 @@ public class DBConnectionPool {
 	private final TransactionManager transactionManager;
 	private final PoolingDataSource poolingDataSource;
 	private final IJDBCDriver cf;
+	private static final String VALIDATION_QUERY = "SELECT 666";
 
 	/* package */ DBConnectionPool(TransactionManager transactionManager, IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password) {
@@ -49,8 +50,9 @@ public class DBConnectionPool {
 			throws IllegalStateException {
 
 		GenericObjectPool pool = new GenericObjectPool();
+		pool.setTestOnBorrow(true);
 		PoolableConnectionFactory factory = new PoolableConnectionFactory(
-				connectionFactory, pool, null, null, false, true);
+				connectionFactory, pool, null, VALIDATION_QUERY, false, true);
 		pool.setFactory(factory);
 		return new PoolingDataSource(pool);
 	}
