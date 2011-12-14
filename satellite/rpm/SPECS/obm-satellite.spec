@@ -38,7 +38,7 @@ License:        AGPLv3
 
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
-Requires:	    perl(:MODULE_COMPAT_5.8.8)
+Requires:	    perl(:MODULE_COMPAT_%{perl_module_compat})
 Requires:       perl-LDAP
 Requires:       perl-Net-CIDR
 Requires:       perl-Net-Server

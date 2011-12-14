@@ -38,6 +38,9 @@ def build_argument_parser(args):
     parser.add_argument('-r', '--release', help='release of OBM',
             default='', dest='obm_release')
 
+    parser.add_argument('--perl-version', help='perl flavor (only for RPMs)',
+            default='5.8', dest='perl_version', choices=['5.8', '5.10'])
+
     package_types = ['deb', 'rpm']
     parser.add_argument('-p', '--package-type', metavar='PACKAGETYPE',
             help="package type, may be one of: %s" % ", ".join(package_types),
@@ -101,8 +104,13 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
             package_type=args.package_type, date=date, sha1=scm_manager.sha1,
             mode=mode, version=version, release=release)
 
+    perl_section_name = "perl_%s" % args.perl_version
+    perl_module_compat = config.get(perl_section_name, 'perl_module_compat')
+    perl_vendorlib = config.get(perl_section_name, 'perl_vendorlib')
+
     packagers = [ob.Packager(p, args.package_type, packages_dir,
-        changelog_updater, version, release) for p in packages]
+        changelog_updater, version, release, perl_module_compat,
+        perl_vendorlib) for p in packages]
     return packagers
 
 def assert_package_option_is_correct(usage, package_names, available_packages):

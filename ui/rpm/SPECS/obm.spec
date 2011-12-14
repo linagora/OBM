@@ -216,7 +216,7 @@ License:        GPL+ or Artistic
 
 BuildARch:      noarch
 BuildRequires:	perl(ExtUtils::MakeMaker)
-Requires:	perl(:MODULE_COMPAT_5.8.8)
+Requires:	perl(:MODULE_COMPAT_%{perl_module_compat})
 Requires:	perl-Class-Singleton
 Requires:       perl-Digest-SHA
 

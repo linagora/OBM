@@ -23,12 +23,14 @@ class Packager(object):
     """
 
     def __init__(self, package, package_type, build_dir, changelog_updater,
-            version, release):
+            version, release, perl_module_compat=None, perl_vendorlib=None):
         self.package = package
         self.package_type = package_type
         self.changelog_updater = changelog_updater
         self.version = version
         self.release = release
+        self.perl_module_compat = perl_module_compat
+        self.perl_vendorlib = perl_vendorlib
         self.build_dir = build_dir
         self._target_dir = os.path.join(self.build_dir, package.name)
 
@@ -152,8 +154,12 @@ class Packager(object):
                 (topdir, target_dir, target_dir, self.version, self.release)
             if redefine_platform_params:
                 # Override the Perl module destination directory
+                if self.perl_vendorlib is None or self.perl_module_compat is None:
+                    raise ValueError("Need perl_vendorlib and perl_module_compat!")
+                command += "--define 'perl_module_compat " \
+                    "%s' " % self.perl_module_compat
                 command += "--define 'perl_vendorlib " \
-                    "/usr/lib/perl5/vendor_perl/5.8.8' "
+                    "%s' " % self.perl_vendorlib
             command += "rpm/SPECS/*.spec"
         else:
             raise PackagingError("Unknown packaging type: %s" % \
