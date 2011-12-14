@@ -43,7 +43,11 @@ public class MailTestsUtils {
 	
 	public static Message loadMimeMessage(Class<?> testClass, String name) throws MimeException, IOException {
 		InputStream eml = loadEmail(testClass, name);
-		Message message = mime4jUtils.parseMessage(eml);
+		return loadMimeMessage(eml);
+	}
+	
+	public static Message loadMimeMessage(InputStream stream) throws MimeException, IOException {
+		Message message = mime4jUtils.parseMessage(stream);
 		return message;
 	}
 	
