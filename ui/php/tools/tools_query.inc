@@ -382,17 +382,18 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
       }
     }   
   }
-
-  foreach($metadata['links'] as $linkName => $link) {
-    $rules['links'][$linkName] = $rules['update'];
-    if (is_array($link['rules'])) {
-      foreach($link['rules'] as $field => $value) {
-        if (is_array($value)) {
-          $rules['links'][$linkName] [] ="Link.$field IN ('".implode("','", $value)."')";
-        } else {
-          $rules['links'][$linkName] [] ="Link.$field = '$value'";
-        }
-      }   
+  if (is_array($metadata['links'])) {
+    foreach($metadata['links'] as $linkName => $link) {
+      $rules['links'][$linkName] = $rules['update'];
+      if (is_array($link['rules'])) {
+        foreach($link['rules'] as $field => $value) {
+          if (is_array($value)) {
+            $rules['links'][$linkName] [] ="Link.$field IN ('".implode("','", $value)."')";
+          } else {
+            $rules['links'][$linkName] [] ="Link.$field = '$value'";
+          }
+        }   
+      }
     }
   }
 
