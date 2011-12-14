@@ -38,7 +38,6 @@ import org.columba.ristretto.message.Address;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -54,7 +53,6 @@ public class EmailManagerTest {
 	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException {
 		
 		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
-		LocatorService locatorService = EasyMock.createMock(LocatorService.class);
 		SmtpSender smtpSender = EasyMock.createMock(SmtpSender.class);
 		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
 		
@@ -69,7 +67,9 @@ public class EmailManagerTest {
 		
 		EasyMock.replay(emailConfiguration, smtpSender, backendSession);
 		
-		EmailManager emailManager = new EmailManager(null, emailConfiguration, smtpSender, null, locatorService, null, null);
+		EmailManager emailManager = 
+				new EmailManager(null, emailConfiguration, smtpSender, 
+						null, null, null, null);
 
 		emailManager.sendEmail(backendSession,
 				new Address("test@test.fr"),

@@ -55,10 +55,8 @@ import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.User;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -91,63 +89,35 @@ public class EmailManager implements IEmailManager {
 	
 	private final EmailDao emailDao;
 	private final SmtpSender smtpProvider;
-	private final LocatorService locatorService;
 	private final EmailSync emailSync;
-	private final boolean loginWithDomain;
-	private final boolean activateTLS;
 	private final EventService eventService;
-
 	private final LoginService login;
+	private final boolean activateTLS;
+	private final boolean loginWithDomain;
 
+	private final ImapClientProvider imapClientProvider;
 	
 	@Inject
 	/*package*/ EmailManager(EmailDao emailDao, EmailConfiguration emailConfiguration, 
-			SmtpSender smtpSender, EmailSync emailSync, LocatorService locatorService,
-			EventService eventService, LoginService login) {
+			SmtpSender smtpSender, EmailSync emailSync,
+			EventService eventService, LoginService login,
+			ImapClientProvider imapClientProvider) {
 		
 		this.emailSync = emailSync;
 		this.smtpProvider = smtpSender;
 		this.emailDao = emailDao;
-		this.locatorService = locatorService;
 		this.eventService = eventService;
 		this.login = login;
-		this.loginWithDomain = emailConfiguration.loginWithDomain();
+		this.imapClientProvider = imapClientProvider;
 		this.activateTLS = emailConfiguration.activateTls();
+		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
-
-	@Override
-	public String locateImap(BackendSession bs) throws LocatorClientException {
-		String locateImap = locatorService.
-				getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
-		logger.info("Using {} as imap host.", locateImap);
-		return locateImap;
-	}
-
-	private StoreClient getImapClient(BackendSession bs) throws LocatorClientException {
-		final String imapHost = locateImap(bs);
-		final String login = getLogin(bs);
-		StoreClient storeClient = new StoreClient(imapHost, 143, login, bs.getPassword()); 
-		
-		logger.debug("Creating storeClient with login {} : " +
-				"loginWithDomain = {} | activateTLS = {}", 
-				new Object[]{login, loginWithDomain, activateTLS});
-		
-		return storeClient; 
-	}
-
-	private String getLogin(BackendSession bs) {
-		User user = bs.getUser();
-		if (!loginWithDomain) {
-			return user.getLogin();
-		}
-		return user.getLoginAtDomain();
-	}	
 
 	@Override
 	public MailChanges getSync(BackendSession bs, SyncState syncState, Integer deviceId, Integer collectionId, String collectionName) 
 			throws IMAPException, DaoException, LocatorClientException {
 		
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			store.select( parseMailBoxName(store, collectionName) );
@@ -162,7 +132,7 @@ public class EmailManager implements IEmailManager {
 			String collectionName, Collection<Long> uids) throws IMAPException, LocatorClientException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
-		final StoreClient store = getImapClient(bs);
+		final StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			store.select(parseMailBoxName(store, collectionName));
@@ -187,7 +157,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws IMAPException, LocatorClientException {
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionName);
@@ -205,7 +175,7 @@ public class EmailManager implements IEmailManager {
 	@Override
 	public String parseMailBoxName(BackendSession bs, String collectionName) throws IMAPException, LocatorClientException {
 		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			return parseMailBoxName(store, collectionName);
@@ -234,7 +204,7 @@ public class EmailManager implements IEmailManager {
 	public void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) 
 			throws IMAPException, DaoException, LocatorClientException {
 		
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionPath);
@@ -253,7 +223,7 @@ public class EmailManager implements IEmailManager {
 	public Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
 			Long uid) throws IMAPException, DaoException, LocatorClientException {
 		
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		Collection<Long> newUid = null;
 		try {
 			login(store);
@@ -283,7 +253,7 @@ public class EmailManager implements IEmailManager {
 			Set<Long> uids) throws IMAPException, LocatorClientException {
 		
 		List<InputStream> mails = new LinkedList<InputStream>();
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			store.select(parseMailBoxName(store, collectionName));
@@ -304,7 +274,7 @@ public class EmailManager implements IEmailManager {
 
 	@Override
 	public void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws IMAPException, LocatorClientException {
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionName);
@@ -369,7 +339,7 @@ public class EmailManager implements IEmailManager {
 	
 	@Override
 	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws IMAPException, LocatorClientException {
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionName);
@@ -385,7 +355,7 @@ public class EmailManager implements IEmailManager {
 			throws IMAPException, DaoException, LocatorClientException {
 		
 		long time = System.currentTimeMillis();
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String mailBoxName = parseMailBoxName(store, collectionPath);
@@ -410,7 +380,7 @@ public class EmailManager implements IEmailManager {
 			throws StoreEmailException, LocatorClientException {
 		
 		logger.info("Store mail in folder[Inbox]");
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			return storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, isRead, mailContent, false);
@@ -431,7 +401,7 @@ public class EmailManager implements IEmailManager {
 	 * @throws StoreEmailException
 	 */
 	private Long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException, LocatorClientException {
-		StoreClient store = getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String sentFolderName = null;

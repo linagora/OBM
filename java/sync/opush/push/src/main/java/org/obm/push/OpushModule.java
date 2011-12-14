@@ -12,6 +12,8 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.OBMBackend;
 import org.obm.push.mail.EmailManager;
 import org.obm.push.mail.IEmailManager;
+import org.obm.push.mail.ImapClientProvider;
+import org.obm.push.mail.ImapClientProviderImpl;
 import org.obm.push.service.DeviceService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
@@ -55,5 +57,6 @@ public class OpushModule extends AbstractModule {
 		bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(EventService.class).to(EventServiceImpl.class);
+		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
 	}
 }

@@ -43,12 +43,12 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.impl.PushNotification;
 import org.obm.push.mail.IEmailManager;
+import org.obm.push.mail.ImapClientProvider;
 
 public class EmailMonitoringThread extends OpushMonitoringThread implements IIdleCallback {
 	
@@ -64,16 +64,19 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 	private Boolean remainConnected;  
 
 	private IdleClient store;
+	private final ImapClientProvider imapClientProvider;
 
 	public EmailMonitoringThread(ObmSyncBackend cb,
 			Set<ICollectionChangeListener> ccls, BackendSession bs,
 			Integer collectionId, IEmailManager emailManager, 
-			IContentsExporter contentsExporter) throws CollectionNotFoundException, DaoException {
+			IContentsExporter contentsExporter,
+			ImapClientProvider imapClientProvider) throws CollectionNotFoundException, DaoException {
 		
 		super(contentsExporter);
 		
-		remainConnected = false;
 		this.ccls = ccls;
+		this.imapClientProvider = imapClientProvider;
+		this.remainConnected = false;
 		this.backend = cb;
 		this.emailManager = emailManager;
 		this.bs = bs;
@@ -82,7 +85,7 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 
 	public synchronized void startIdle() throws IMAPException, LocatorClientException {
 		if (store == null) {
-			store = getIdleClient(bs);
+			store = imapClientProvider.getImapIdleClient(bs);
 			store.login(emailManager.getActivateTLS());
 			store.select(emailManager.parseMailBoxName(bs,
 					collectionName));
@@ -122,19 +125,6 @@ public class EmailMonitoringThread extends OpushMonitoringThread implements IIdl
 
 		this.stopIdle();
 		pushNotifyList.add(new PushNotification(ccl));
-	}
-	
-	private IdleClient getIdleClient(BackendSession bs) throws LocatorClientException {
-		User user = bs.getUser();
-		String loginAtdomain = user.getLoginAtDomain();
-		boolean useDomain = emailManager.getLoginWithDomain();
-		if (!useDomain) {
-			loginAtdomain = user.getLogin();
-		}
-		logger.debug("Creating idleClient with login: {}, (useDomain {})", loginAtdomain, useDomain);
-		IdleClient idleCli = new IdleClient(emailManager.locateImap(bs), 143, loginAtdomain, bs
-				.getPassword());
-		return idleCli;
 	}
 
 	@Override
