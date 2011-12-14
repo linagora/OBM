@@ -8,6 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use IO::Socket qw(AF_INET);
+
 eval {
     require Config::IniFiles;
 } or die 'Config::IniFiles perl module needed !'."\n";
@@ -127,6 +129,7 @@ sub _configureSSL {
     $self->{'server'}->{'socketConf'}->{'LocalPort'} = HTTP_PORT;
     $self->{'server'}->{'socketConf'}->{'Timeout'} = SOCKET_TIMEOUT;
     $self->{'server'}->{'socketConf'}->{'Listen'} = 1;
+    $self->{'server'}->{'socketConf'}->{'Domain'} = AF_INET;
     $self->{'server'}->{'socketConf'}->{'ReuseAddr'} = 'TRUE';
     $self->{'server'}->{'socketConf'}->{'SSL_key_file'} = SSL_OBM_CERT;
     $self->{'server'}->{'socketConf'}->{'SSL_cert_file'} = SSL_OBM_CERT;
