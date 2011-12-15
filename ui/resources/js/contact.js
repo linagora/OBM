@@ -160,9 +160,10 @@ Obm.Contact.AddressBook = new Class ({
       //this.addressBookRequest.addEvent('success', function() {
       //  showOkMessage(obm.vars.labels.deleteOk);
       //});      
+      this.dataRequest.addEvent('complete', function() {
+        window.location.href =  obm.vars.consts.obmUrl + '/contact/contact_index.php';
+      });
       this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
-      this.hideContact();
-      window.location.href =  obm.vars.consts.obmUrl + '/contact/contact_index.php';
     }
   },
 
