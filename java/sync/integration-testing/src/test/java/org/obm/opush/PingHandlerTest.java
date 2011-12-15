@@ -6,14 +6,18 @@ import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
+import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
+import static org.obm.opush.IntegrationTestUtils.buildOpushClient;
+import static org.obm.opush.IntegrationTestUtils.expectUsersHaveNoChange;
+import static org.obm.opush.IntegrationTestUtils.replayMocks;
+import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.TransformerException;
 
-import org.easymock.EasyMock;
 import org.fest.assertions.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +37,6 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.PIMDataType;
@@ -45,21 +47,16 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.DeviceDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.push.wbxml.WBXMLTools;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 public class PingHandlerTest {
@@ -100,8 +97,8 @@ public class PingHandlerTest {
 		prepareMockNoChange();
 
 		opushServer.start();
-		
-		final OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
 
 		ThreadPoolExecutor threadPoolExecutor = 
 				new ThreadPoolExecutor(20, 20, 1,TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
@@ -126,8 +123,8 @@ public class PingHandlerTest {
 		prepareMockHasChanges(1);
 
 		opushServer.start();
-		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
@@ -142,8 +139,8 @@ public class PingHandlerTest {
 		prepareMockHasChanges(2);
 
 		opushServer.start();
-		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
@@ -154,17 +151,19 @@ public class PingHandlerTest {
 	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ProcessingEmailException, UnknownObmSyncServerException, AuthFault {
-		mockForRegularNeeds();
+			ProcessingEmailException, UnknownObmSyncServerException {
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockForPingNeeds();
 		mockForNoChangePing();
-		replay();
+		replayMocks(classToInstanceMap);
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException, AuthFault {
-		mockForRegularNeeds();
+			UnknownObmSyncServerException, ProcessingEmailException {
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockForPingNeeds();
 		mockForHasChangePing(noChangeIterationCount);
-		replay();
+		replayMocks(classToInstanceMap);
 	}
 	
 	public void testHeartbeatInterval(int heartbeatInterval, int delta, int expected) throws Exception {
@@ -172,7 +171,7 @@ public class PingHandlerTest {
 		
 		opushServer.start();
 		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures);
+		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(heartbeatInterval);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
@@ -207,16 +206,9 @@ public class PingHandlerTest {
 					"<Folders><Folder>1432</Folder></Folders></Ping>");
 	}
 
-	private void mockForRegularNeeds() throws DaoException, AuthFault {
-		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		mockLoginService(loginService);
-		
-		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		mockDeviceDao(deviceDao);
-
+	private void mockForPingNeeds() throws DaoException {
 		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		mockMonitoredCollectionDao(monitoredCollectionDao);
-
 		HearbeatDao heartbeatDao = classToInstanceMap.get(HearbeatDao.class);
 		mockHeartbeatDao(heartbeatDao);
 	}
@@ -227,7 +219,7 @@ public class PingHandlerTest {
 		mockContentsExporter(contentsExporterBackend);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		mockCollectionDaoNoChange(collectionDao);
+		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
 	}
 
 	private void mockForHasChangePing(int noChangeIterationCount) 
@@ -239,23 +231,6 @@ public class PingHandlerTest {
 		mockExporterHasContentChanges(contentsExporter);
 	}
 
-	private void replay() {
-		EasyMock.replay(Lists.newArrayList(classToInstanceMap).toArray());
-	}
-	
-	private void mockCollectionDaoNoChange(CollectionDao collectionDao) throws CollectionNotFoundException, DaoException {
-		Date lastSync = new Date();
-		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
-		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
-		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
-
-		int randomCollectionId = anyInt();
-		for (OpushUser opushUser: fakeTestUsers) {
-			String collectionPath = buildCalendarCollectionPath(opushUser);  
-			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPath).anyTimes();
-		}
-	}
-	
 	private void mockCollectionDaoHasChange(CollectionDao collectionDao, int noChangeIterationCount) 
 			throws DaoException, CollectionNotFoundException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
@@ -305,14 +280,6 @@ public class PingHandlerTest {
 			.andReturn(0).anyTimes();
 	}
 	
-	private void mockLoginService(LoginService loginService) throws AuthFault {
-		for (OpushUser user : fakeTestUsers) {
-			expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
-			loginService.logout(user.accessToken);
-			expectLastCall().anyTimes();
-		}
-	}
-
 	private Future<Document> queuePingCommand(final OPClient opClient,
 			ThreadPoolExecutor threadPoolExecutor) {
 		return threadPoolExecutor.submit(new Callable<Document>() {
@@ -322,26 +289,6 @@ public class PingHandlerTest {
 				return opClient.postXml("Ping", document, "Ping");
 			}
 		});
-	}
-
-	private void mockDeviceDao(DeviceDao deviceDao) throws DaoException {
-		int i = 0;
-		for (OpushUser opushUser: fakeTestUsers) {
-			expect(deviceDao.getDevice(opushUser.user, 
-					opushUser.deviceId, 
-					opushUser.userAgent))
-					.andReturn(
-							new Device(i++, opushUser.deviceType, opushUser.deviceId, new Properties()))
-							.anyTimes();
-		}
-	}
-
-	private void mockMonitoredCollectionDao(MonitoredCollectionDao monitoredCollectionDao) {
-		monitoredCollectionDao.put(
-				anyObject(Credentials.class), 
-				anyObject(Device.class), 
-				anyObject(Set.class));
-		expectLastCall().anyTimes();
 	}
 
 	private void mockHeartbeatDao(HearbeatDao heartbeatDao) throws DaoException {
@@ -354,10 +301,6 @@ public class PingHandlerTest {
 		SyncCollection calendarCollection = new SyncCollection(collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
 		ChangedCollections calendarHasChangeCollections = new ChangedCollections(dateWhenChangesAppear , ImmutableSet.<SyncCollection>of(calendarCollection));
 		return calendarHasChangeCollections;
-	}
-	
-	private String buildCalendarCollectionPath(OpushUser opushUser) {
-		return opushUser.user.getLoginAtDomain() + "\\calendar\\" + opushUser.user.getLoginAtDomain();
 	}
 
 	private Document buildPingCommand(int heartbeatInterval)
@@ -372,20 +315,6 @@ public class PingHandlerTest {
 				+ "</Folder>"
 				+ "</Folders>"
 				+ "</Ping>");
-	}
-
-	private OPClient buildOpushClient(OpushUser user) {
-		String url = buildServiceUrl();
-		return new OPClient(
-				user.user.getLoginAtDomain(), 
-				user.password, 
-				user.deviceId, 
-				user.deviceType, 
-				user.userAgent, url, new WBXMLTools());
-	}
-
-	private String buildServiceUrl() {
-		return "http://localhost:" + port + "/";
 	}
 
 }
