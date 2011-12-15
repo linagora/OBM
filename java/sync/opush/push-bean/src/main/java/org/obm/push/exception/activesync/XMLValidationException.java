@@ -38,6 +38,10 @@ public class XMLValidationException extends ActiveSyncException {
 		super();
 	}
 
+	public XMLValidationException(String message) {
+		super(message);
+	}
+	
 	public XMLValidationException(Exception e) {
 		super(e);
 	}

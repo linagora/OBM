@@ -88,7 +88,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	public void process(IContinuation continuation, BackendSession bs,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			SearchRequest searchRequest = protocol.getRequest(doc.getDocumentElement());
+			SearchRequest searchRequest = protocol.getRequest(doc);
 			SearchResponse response = search(bs, searchRequest);
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);

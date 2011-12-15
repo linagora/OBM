@@ -45,7 +45,11 @@ import com.google.common.base.Strings;
 
 public class SearchProtocol {
 
-	public SearchRequest getRequest(Element documentElement) throws XMLValidationException {
+	public SearchRequest getRequest(Document document) throws XMLValidationException {
+		if (document == null) {
+			throw new XMLValidationException("Null Request not supported by Search Command");
+		}
+		Element documentElement = document.getDocumentElement();
 		SearchRequest ret = new SearchRequest();
 		StoreName st = StoreName.getValue(DOMUtils.getElementText(documentElement, "Name"));
 		if (st == null) {
