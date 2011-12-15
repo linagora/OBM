@@ -56,6 +56,7 @@ public class ContactConverter {
 		msc.setFirstName(c.getFirstname());
 		msc.setLastName(c.getLastname());
 		msc.setMiddleName(c.getMiddlename());
+		msc.setFileAs(c.getDisplayName());
 		msc.setSuffix(c.getSuffix());
 		msc.setNickName(c.getAka());
 		msc.setTitle(c.getTitle());
