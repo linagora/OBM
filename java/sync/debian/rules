@@ -42,6 +42,9 @@ binary-install/obm-autoconf:: binary-install-tomcat-webapp/obm-autoconf
 
 binary-install/obm-sync:: binary-install-tomcat-webapp/obm-sync
 
+install/obm-locator::
+	(/bin/bash $(CURDIR)/debian/obm-locator-build.sh $(CURDIR))
+
 binary-install/opush::
 	mkdir -p debian/$(cdbs_curpkg)/etc/$(cdbs_curpkg)
 	echo '<included/>' > debian/$(cdbs_curpkg)/etc/$(cdbs_curpkg)/logback.xml

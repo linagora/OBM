@@ -1,3 +1,0 @@
-obm-locator/target/obm-locator/WEB-INF/*.xml        var/lib/jetty/webapps/obm-locator/WEB-INF
-obm-locator/target/obm-locator/WEB-INF/lib/*.jar    var/lib/jetty/webapps/obm-locator/WEB-INF/lib
-obm-locator/target/obm-locator/WEB-INF/classes/*    var/lib/jetty/webapps/obm-locator/WEB-INF/classes
