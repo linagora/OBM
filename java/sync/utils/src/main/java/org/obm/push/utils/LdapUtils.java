@@ -39,14 +39,20 @@ import java.util.Map;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.SizeLimitExceededException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LdapUtils {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private DirContext ctx;
 	private String baseDn;
 
@@ -76,29 +82,35 @@ public class LdapUtils {
 		NamingEnumeration<SearchResult> results = ctx.search(baseDn, filter.replace("%q",
 				query).replace("**", "*"), constraints);
 		List<Map<String, List<String>>> matched = new LinkedList<Map<String, List<String>>>();
-		while (results.hasMore()) {
-			SearchResult si = results.next();
-			Attributes attrs = si.getAttributes();
-			if (attrs == null) {
-				continue;
-			}
-			NamingEnumeration<? extends Attribute> ae = attrs.getAll();
-			Map<String, List<String>> ret = new HashMap<String, List<String>>();
-			while (ae.hasMoreElements()) {
-				Attribute attr = ae.next();
-				String id = attr.getID();
-				List<String> vals = null;
-				if (!ret.containsKey(id)) {
-					vals = new LinkedList<String>();
-					ret.put(id, vals);
-				} else {
-					vals = ret.get(id);
+		try {
+			while (results.hasMore()) {
+				SearchResult si = results.next();
+				Attributes attrs = si.getAttributes();
+				if (attrs == null) {
+					continue;
 				}
-				for (int i = 0; i < attr.size(); i++) {
-					vals.add((String) attr.get(i));
+				NamingEnumeration<? extends Attribute> ae = attrs.getAll();
+				Map<String, List<String>> ret = new HashMap<String, List<String>>();
+				while (ae.hasMoreElements()) {
+					Attribute attr = ae.next();
+					String id = attr.getID();
+					List<String> vals = null;
+					if (!ret.containsKey(id)) {
+						vals = new LinkedList<String>();
+						ret.put(id, vals);
+					} else {
+						vals = ret.get(id);
+					}
+					for (int i = 0; i < attr.size(); i++) {
+						vals.add((String) attr.get(i));
+					}
 				}
+				matched.add(ret);
 			}
-			matched.add(ret);
+		} catch (SizeLimitExceededException e) {
+			logger.error("Too much entries returned by the query, " +
+					"results truncated by server, " +
+					"check openldap sizelimit parameter", e);
 		}
 		return matched;
 	}
