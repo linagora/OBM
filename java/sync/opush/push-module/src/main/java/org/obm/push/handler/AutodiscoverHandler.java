@@ -31,22 +31,109 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.util.List;
+import java.util.Locale;
+
+import org.obm.push.OpushConfigurationService;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.protocol.AutodiscoverResponse;
+import org.obm.push.bean.protocol.AutodiscoverResponseError;
+import org.obm.push.bean.protocol.AutodiscoverResponseServer;
+import org.obm.push.bean.protocol.AutodiscoverResponseUser;
+import org.obm.push.bean.protocol.AutodiscoverStatus;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.Responder;
+import org.obm.push.protocol.AutodiscoverProtocol;
+import org.obm.push.protocol.bean.AutodiscoverProtocolException;
+import org.obm.push.protocol.bean.AutodiscoverRequest;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class AutodiscoverHandler extends XmlRequestHandler {
+	
+	private final AutodiscoverProtocol protocol;
+	private final OpushConfigurationService configurationService;
 
-	@Inject
-	private AutodiscoverHandler() { }
+	@Inject AutodiscoverHandler(AutodiscoverProtocol autodiscoverProtocol, 
+			OpushConfigurationService configurationService) {
+		
+		this.protocol = autodiscoverProtocol;
+		this.configurationService = configurationService; 
+	}
 
 	@Override
 	protected void process(BackendSession bs, Document doc, Responder responder) {
-		// TODO Auto-generated method stub
+		AutodiscoverRequest autodiscoverRequest = null;
+		try {
+			autodiscoverRequest = protocol.getRequest(doc);
+			AutodiscoverResponse autodiscoverResponse = doTheJob(bs, autodiscoverRequest);
+			Document ret = protocol.encodeResponse(autodiscoverResponse);
+			sendResponse(responder, ret);
+		} catch (NoDocumentException e) {
+			logger.error(e.getMessage(), e);
+		} catch (AutodiscoverProtocolException e) {
+			sendErrorResponse(e, responder, AutodiscoverStatus.SUCCESS, autodiscoverRequest);
+		}
+	}
+
+	private AutodiscoverResponse doTheJob(BackendSession bs, AutodiscoverRequest autodiscoverRequest) {
+		String culture = formatCultureParameter( Locale.getDefault() );
+
+		AutodiscoverResponseUser user = buildUserField(bs, autodiscoverRequest);
+		List<AutodiscoverResponseServer> actionsServer = buildActionsServer(); 
+
+		return new AutodiscoverResponse(culture, user, null, actionsServer, null, null);
+	}
+
+	/**
+	 * Specifies the client culture, which is used to localize error messages.
+	 *
+	 * @param locale
+	 * @return locale formated
+	 */
+	private String formatCultureParameter(Locale locale) {
+		return  locale.getLanguage().toLowerCase() + ":" + 
+				locale.getCountry().toLowerCase() ;
+	}
+
+	private AutodiscoverResponseUser buildUserField(BackendSession bs, AutodiscoverRequest autodiscoverRequest) {
+		String email = autodiscoverRequest.getEmailAddress();
+		String displayName = bs.getUser().getDisplayName();
+		return new AutodiscoverResponseUser(email, displayName);
+	}
+	
+	private List<AutodiscoverResponseServer> buildActionsServer() {
+		String url = configurationService.getActiveSyncServletUrl();
+		return Lists.newArrayList( 
+				new AutodiscoverResponseServer("MobileSync", url, url, null), 
+				new AutodiscoverResponseServer("CertEnroll", url, null, "CertEnrollTemplate")
+				);
+	}
+	
+	private void sendResponse(Responder responder, Document document) {
+		responder.sendXMLResponse("Autodiscover", document);
+	}
+
+	private void sendErrorResponse(Exception e, Responder responder, AutodiscoverStatus errorStatus, 
+			AutodiscoverRequest autodiscoverRequest) {
+		
+		logger.error(e.getMessage(), e);
+		
+		AutodiscoverResponseError autodiscoverError = new AutodiscoverResponseError(
+				errorStatus, e.getMessage(), e.getMessage(), null);
+		
+		if (autodiscoverRequest != null) {
+			Document document = protocol.encodeErrorResponse(
+					autodiscoverError, 
+					autodiscoverRequest.getEmailAddress(), 
+					formatCultureParameter(Locale.getDefault()));
+			
+			responder.sendXMLResponse("Autodiscover", document);
+		}
 	}
 
 }

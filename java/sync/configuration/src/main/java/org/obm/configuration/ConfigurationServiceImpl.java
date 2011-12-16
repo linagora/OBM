@@ -49,6 +49,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
+	private final static String ASCMD = "Microsoft-Server-ActiveSync";
+	
+	private final static String EXTERNAL_URL_KEY = "external-url";
+	
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
@@ -78,7 +82,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	@Override
 	public String getObmUIBaseUrl() {
 		String protocol = getStringValue("external-protocol");
-		String hostname = getStringValue("external-url");
+		String hostname = getExternalUrl();
 		String path = getStringValue("obm-prefix");
 		return protocol + "://" + hostname + path;
 	}
@@ -124,5 +128,12 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 		return DEFAULT_ENCODING;
 	}
 
+	public String getActiveSyncServletUrl() {
+		return "https://" + getExternalUrl() + "/" + ASCMD;
+	}
+
+	private String getExternalUrl() {
+		return getStringValue(EXTERNAL_URL_KEY);
+	}
 	
 }

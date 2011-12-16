@@ -25,6 +25,8 @@ public interface ConfigurationService {
 	TimeUnit getLocatorCacheTimeUnit();
 
 	ResourceBundle getResourceBundle(Locale locale);
+	
+	String getActiveSyncServletUrl();
 
 	Charset getDefaultEncoding();
 	
