@@ -110,18 +110,19 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			sendResponse(responder, document);
 			
 		} catch (NoDocumentException e) {
-			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
+			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		} catch (DaoException e) {
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
+			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		} catch (CollectionNotFoundException e) {
-			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST, e);
+			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		} catch (ProcessingEmailException e) {
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR, e);
+			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		}
 	}
 	
-	private void sendErrorResponse(Responder responder, MeetingResponseStatus status, Exception exception) {
-		logger.error(exception.getMessage(), exception);
+	private void sendErrorResponse(Responder responder, MeetingResponseStatus status) {
 		sendResponse(responder, meetingProtocol.encodeErrorResponse(status));
 	}
 	
@@ -158,8 +159,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 					meetingResponse.setCalId(calId);
 				}
 			} catch (ServerItemNotFoundException e) {
+				logger.error(e.getMessage(), e);
 				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
 			} catch (UnknownObmSyncServerException e) {
+				logger.error(e.getMessage(), e);
 				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
 			}
 		} else {
