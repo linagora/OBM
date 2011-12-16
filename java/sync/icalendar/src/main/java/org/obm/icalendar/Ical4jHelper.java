@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -128,7 +130,10 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -265,46 +270,57 @@ public class Ical4jHelper {
 	private Map<EventExtId, Event> getEvents(ComponentList cl,
 			String typeCalendar, Ical4jUser ical4jUser) {
 		Map<EventExtId, Event> mapEvents = new HashMap<EventExtId, Event>();
+		Multimap<EventExtId, Event> mapExceptionEvents = HashMultimap.create();
+
 		for (Object obj: cl) {
 			Component comp = (Component) obj;
 			if (comp != null) {
 
 				if (Component.VEVENT.equals(typeCalendar)) {
 					VEvent vEvent = (VEvent) comp;
-					if (vEvent.getRecurrenceId() == null) {
-						Event event = convertVEventToEvent(ical4jUser, vEvent);
+					Event event = convertVEventToEvent(ical4jUser, vEvent);
+					if(event.getRecurrenceId() == null) {
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = convertVEventToEvent(ical4jUser, vEvent);
-						Event event = mapEvents.get(eexcep.getExtId());
-
-						if (event != null) {
-							eexcep.setExtId(null);
-							event.getRecurrence().addEventException(eexcep);
-							// event.getRecurrence().addException(
-							// getRecurrenceId(vEvent));
-						} else {
-							mapEvents.put(eexcep.getExtId(), eexcep);
-						}
+						mapExceptionEvents.put(event.getExtId(), event);
 					}
+
 				} else if (Component.VTODO.equals(typeCalendar)) {
 					VToDo vTodo = (VToDo) comp;
-					if (vTodo.getRecurrenceId() == null) {
-						Event event = convertVTodoToEvent(ical4jUser, vTodo);
+					Event event = convertVTodoToEvent(ical4jUser, vTodo);
+					if(event.getRecurrenceId() == null) {
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = convertVTodoToEvent(ical4jUser, vTodo);
-						Event event = mapEvents.get(eexcep.getExtId());
-
-						if (event != null) {
-							eexcep.setExtId(null);
-							event.getRecurrence().addEventException(eexcep);
-						}
+						mapExceptionEvents.put(event.getExtId(), event);
 					}
 				}
 			}
 		}
+
+		addEventExceptionToDefinedParentEvent(mapEvents, mapExceptionEvents);
+
 		return mapEvents;
+	}
+
+	private void addEventExceptionToDefinedParentEvent(
+			Map<EventExtId, Event> mapEvents,
+			Multimap<EventExtId, Event> mapExceptionEvents) {
+
+		Collection<Entry<EventExtId, Collection<Event>>> mapExceptionEventsEntries = mapExceptionEvents.asMap().entrySet();
+
+		for (Entry<EventExtId, Collection<Event>> entry : mapExceptionEventsEntries) {
+			Event parentEvent = mapEvents.get(entry.getKey());
+			Collection<Event> eventsException = entry.getValue();
+			if (parentEvent != null) {
+				EventRecurrence parentEventRecurrence = parentEvent
+						.getRecurrence();
+				parentEventRecurrence.getEventExceptions().addAll(eventsException);
+			} else {
+				logger.warn(
+						"Drop following events exception while parsing ICS file because parent was not defined: {}",
+						eventsException);
+			}
+		}
 	}
 
 	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent) {

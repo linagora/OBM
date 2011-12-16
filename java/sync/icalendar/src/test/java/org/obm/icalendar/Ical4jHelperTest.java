@@ -953,4 +953,38 @@ public class Ical4jHelperTest {
 		Attendee userc = event.getAttendees().get(1);
 		Assertions.assertThat(userc.getState()).isNotNull().isEqualTo(ParticipationState.NEEDSACTION);
 	}
+
+	@Test
+	public void testImportICSWithRecurrenceIdAfterParentEventDefinition() throws IOException, ParserException, ParseException {
+		String icsFilename = "OBMFULL-2963sorted.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+
+		Assertions.assertThat(events).hasSize(2);
+
+		Event firstParentEvent = events.get(0);
+		Event secondParentEvent = events.get(1);
+		Assertions.assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		Assertions.assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+	}
+
+	@Test
+	public void testImportICSWithRecurrenceIdBeforeParentEventDefinition() throws IOException, ParserException {
+		String icsFilename = "OBMFULL-2963unsorted.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+
+		Assertions.assertThat(events).hasSize(2);
+
+		Event firstParentEvent = events.get(0);
+		Event secondParentEvent = events.get(1);
+		Assertions.assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		Assertions.assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+	}
+
+	@Test
+	public void testImportICSWithOnlyRecurrenceId() throws IOException, ParserException {
+		String icsFilename = "OBMFULL-2963onlyRecurrenceId.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+
+		Assertions.assertThat(events).isEmpty();
+	}
 }
