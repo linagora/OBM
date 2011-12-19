@@ -437,8 +437,10 @@ public class CalendarBindingImplTest {
 		
 		Event beforeEvent = new Event();
 		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setTitle("firstTitle");
 		beforeEvent.setInternalEvent(true);
 		beforeEvent.setExtId(extId);
+		beforeEvent.addAttendee(attendee);
 		beforeEvent.setSequence(0);
 		
 		Event event = new Event();
@@ -472,6 +474,11 @@ public class CalendarBindingImplTest {
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
 		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0).getState());
+		Assert.assertEquals(1, beforeEvent.getAttendees().size());
+		Assert.assertEquals(true, beforeEvent.getAttendees().iterator().next().isCanWriteOnCalendar());
+		
+		Assert.assertEquals(1, event.getAttendees().size());
+		Assert.assertEquals(true, event.getAttendees().iterator().next().isCanWriteOnCalendar());
 	}
 	
 	@Test
