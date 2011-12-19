@@ -36,16 +36,16 @@ import java.util.Locale;
 
 import org.obm.push.OpushConfigurationService;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.protocol.AutodiscoverResponse;
-import org.obm.push.bean.protocol.AutodiscoverResponseError;
-import org.obm.push.bean.protocol.AutodiscoverResponseServer;
-import org.obm.push.bean.protocol.AutodiscoverResponseUser;
-import org.obm.push.bean.protocol.AutodiscoverStatus;
+import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
+import org.obm.push.bean.autodiscover.AutodiscoverRequest;
+import org.obm.push.bean.autodiscover.AutodiscoverResponse;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.autodiscover.AutodiscoverStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.AutodiscoverProtocol;
-import org.obm.push.protocol.bean.AutodiscoverProtocolException;
-import org.obm.push.protocol.bean.AutodiscoverRequest;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Lists;

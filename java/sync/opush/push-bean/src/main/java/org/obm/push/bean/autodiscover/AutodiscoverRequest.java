@@ -29,7 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean.autodiscover;
+
+import com.google.common.base.Objects;
 
 public class AutodiscoverRequest {
 
@@ -57,6 +59,29 @@ public class AutodiscoverRequest {
 	 */
 	public String getAcceptableResponseSchema() {
 		return acceptableResponseSchema;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(emailAddress, acceptableResponseSchema);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof AutodiscoverRequest) {
+			AutodiscoverRequest that = (AutodiscoverRequest) object;
+			return Objects.equal(this.emailAddress, that.emailAddress)
+				&& Objects.equal(this.acceptableResponseSchema, that.acceptableResponseSchema);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("emailAddress", emailAddress)
+			.add("acceptableResponseSchema", acceptableResponseSchema)
+			.toString();
 	}
 	
 }

@@ -1,5 +1,4 @@
-package org.obm.push.bean.protocol;
-
+package org.obm.push.bean.autodiscover;
 
 import com.google.common.base.Objects;
 

@@ -33,13 +33,13 @@ package org.obm.push.protocol;
 
 import java.util.List;
 
-import org.obm.push.bean.protocol.AutodiscoverResponse;
-import org.obm.push.bean.protocol.AutodiscoverResponseError;
-import org.obm.push.bean.protocol.AutodiscoverResponseServer;
-import org.obm.push.bean.protocol.AutodiscoverResponseUser;
+import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
+import org.obm.push.bean.autodiscover.AutodiscoverRequest;
+import org.obm.push.bean.autodiscover.AutodiscoverResponse;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
+import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.protocol.bean.AutodiscoverProtocolException;
-import org.obm.push.protocol.bean.AutodiscoverRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

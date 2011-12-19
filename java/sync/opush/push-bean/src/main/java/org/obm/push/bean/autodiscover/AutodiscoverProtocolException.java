@@ -1,4 +1,4 @@
-package org.obm.push.protocol.bean;
+package org.obm.push.bean.autodiscover;
 
 public class AutodiscoverProtocolException extends Exception {
 

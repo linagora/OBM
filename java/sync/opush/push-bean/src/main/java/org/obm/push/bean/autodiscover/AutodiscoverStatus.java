@@ -1,4 +1,4 @@
-package org.obm.push.bean.protocol;
+package org.obm.push.bean.autodiscover;
 
 public enum AutodiscoverStatus {
 
