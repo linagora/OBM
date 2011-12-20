@@ -50,10 +50,12 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.handler.ErrorMail;
 import org.obm.sync.server.template.ITemplateLoader;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -71,10 +73,14 @@ public class ErrorMailer extends AbstractMailer {
 	@Inject
 	protected ErrorMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
-		lastNotificationDateByUser = 
-			new MapMaker()
-				.expireAfterWrite(INTERVAL_BETWEEN_NOTIFICATION, TimeUnit.HOURS)
-				.makeMap();
+		Cache<String, Date> cache = CacheBuilder.newBuilder().expireAfterWrite(INTERVAL_BETWEEN_NOTIFICATION, TimeUnit.HOURS)
+				.build(new CacheLoader<String, Date>() {
+					@Override
+					public Date load(String key) throws Exception {
+			        	return null;
+					}
+				});
+		lastNotificationDateByUser = cache.asMap(); 
 	}
 	
 	public void notifyConnectorVersionError(AccessToken at, String version, Locale locale, TimeZone timezone) throws NotificationException {

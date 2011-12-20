@@ -31,34 +31,35 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.domain;
 
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class DomainCache implements DomainService {
 
-	private final ConcurrentMap<String, ObmDomain> domainCache;
+	private final Cache<String, ObmDomain> domainCache;
 	
 	@Inject
 	private DomainCache(DomainDao domainDao) {
 		this.domainCache = configureObmDomainCache(domainDao);
 	}
 
-	private ConcurrentMap<String, ObmDomain> configureObmDomainCache(final DomainDao domainDao) {
-		return new MapMaker().
-		expireAfterWrite(1, TimeUnit.MINUTES).
-		concurrencyLevel(1).
-		makeComputingMap(new Function<String, ObmDomain>() {
-			@Override
-			public ObmDomain apply(String domainName) {
-				return domainDao.findDomainByName(domainName);
-			}
-		});
+	private Cache<String,ObmDomain> configureObmDomainCache(final DomainDao domainDao) {
+		return CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+				.concurrencyLevel(1)
+				.build(new CacheLoader<String, ObmDomain>() {
+
+					@Override
+					public ObmDomain load(String domainName) throws Exception {
+						return domainDao.findDomainByName(domainName);
+					}
+				});
 	}
 	
 	@Override
@@ -66,6 +67,8 @@ public class DomainCache implements DomainService {
 		try {
 			return domainCache.get(domainName);
 		} catch (NullPointerException e) {
+			return null;
+		} catch (ExecutionException e) {
 			return null;
 		}
 	}

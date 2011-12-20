@@ -30,21 +30,23 @@
 package org.obm.locator.store;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.obm.locator.LocatorCacheException;
 import org.obm.configuration.ConfigurationService;
+import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 
 
 @Singleton
@@ -53,7 +55,7 @@ public class LocatorCache implements LocatorService {
 	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
 	private static final String DEFAULT_VALUE = new String();
 	
-	private final Map<Key, String> store;
+	private final Cache<Key, String> store;
 	private final LocatorClientImpl locatorClientImpl;
 
 	@Inject
@@ -63,19 +65,19 @@ public class LocatorCache implements LocatorService {
 							   obmConfigurationService.getLocatorCacheTimeUnit()); 
 	}
 
-	private Map<Key, String> createStore(int duration, TimeUnit unit) {
-		return new MapMaker()
-	    .expireAfterWrite(duration, unit)
-	    .makeComputingMap(new Function<Key, String>() {
-	        @Override
-	        public String apply(Key key) {
-	            String value = getServiceLocation(key);
-	        	if (value != null) {
-	        		return value;
-	        	}
-	        	return DEFAULT_VALUE;
-	        }
-	    });
+	private Cache<Key, String> createStore(int duration, TimeUnit unit) {
+		return CacheBuilder.newBuilder().expireAfterWrite(duration, unit)
+				.build(new CacheLoader<Key, String>() {
+
+					@Override
+					public String load(Key key) throws Exception {
+						 String value = getServiceLocation(key);
+						 if (value != null) {
+							 return value;
+						 }
+						 return DEFAULT_VALUE;
+					}
+				});
 	}
 
 	private String getServiceLocation(Key key) {
@@ -90,12 +92,15 @@ public class LocatorCache implements LocatorService {
 	@Override
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 		Key key = new Key(serviceSlashProperty, loginAtDomain);
-		String value = store.get(key);
-		if (value == DEFAULT_VALUE) {
+		try {
+			String value = store.get(key);
+			if (value == DEFAULT_VALUE) {
+				throw new LocatorClientException("No host for { " + key.toString() + " }");
+			}
+			return value;
+		} catch (ExecutionException e) {
 			throw new LocatorClientException("No host for { " + key.toString() + " }");
 		}
-	
-		return value;
 	}
 	
 	private class Key implements Serializable {

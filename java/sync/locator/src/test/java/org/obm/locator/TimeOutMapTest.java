@@ -33,80 +33,98 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapEvictionListener;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 public class TimeOutMapTest {
 
 	private final static String APPLY_VALUE = "DEFAULT-VALUE";
-	private Map<String, String> cache;
 
-	@Before
-	public void init() {
-		cache = new MapMaker()
-	    .expireAfterAccess(2, TimeUnit.SECONDS)
-	    .makeComputingMap(new Function<String, String>() {
-	        @Override
-	        public String apply(String input) {
-	            return APPLY_VALUE;
-	        }
-	    });
-	}
-	
-	@After
-	public void flush() {
-		cache.clear();
-	}
-	
 	@Test
 	public void basicOperation() {
+		Cache<String, String> localCache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS)
+				.build(new CacheLoader<String, String>() {
+
+					@Override
+					public String load(String key) throws Exception {
+						return APPLY_VALUE;
+					}
+				});
+		Map<String, String> mapCache = localCache.asMap();
 		String value = "ONE-VALUE";
 		String key = "ONE-KEY";
-		cache.put(key, value);
+		mapCache.put(key, value);
+		Assert.assertEquals(value, mapCache.get(key));
+	}
+	
+	@Test
+	public void returnApplyValue() throws ExecutionException {
+		Cache<String, String> localCache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS)
+				.build(new CacheLoader<String, String>() {
+
+					@Override
+					public String load(String key) throws Exception {
+						return APPLY_VALUE;
+					}
+				});
+		Assert.assertEquals(APPLY_VALUE, localCache.get("KEY-NOT-EXIST") );
+	}
+	
+	@Test
+	public void returnApplyValueExpireAfterAccess() throws InterruptedException, ExecutionException {
+		Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.SECONDS)
+				.build(new CacheLoader<String, String>() {
+
+					@Override
+					public String load(String key) throws Exception {
+						return APPLY_VALUE;
+					}
+				});
+		Map<String, String> mapCache = cache.asMap();
+		String value = "ONE-VALUE";
+		String key = "ONE-KEY";
+		mapCache.put(key, value);
 		Assert.assertEquals(value, cache.get(key) );
-	}
-	
-	@Test
-	public void returnApplyValue() {
-		Assert.assertEquals(APPLY_VALUE, cache.get("KEY-NOT-EXIST") );
-	}
-	
-	@Test
-	public void returnApplyValueExpireAfterAccess() throws InterruptedException {
-		String value = "ONE-VALUE";
-		String key = "ONE-KEY";
-		cache.put(key, value);
-		
 		Thread.sleep(5000);
 		Assert.assertEquals(APPLY_VALUE, cache.get(key) );
 	}
 	
 	@Test
 	public void testTimeOutMap() throws Exception {
-		ConcurrentMap<String, Object> t = new MapMaker().
-			expireAfterWrite(5, TimeUnit.SECONDS).
-			evictionListener(new MapEvictionListener<String, Object>() {
-				@Override
-				public void onEviction(String key, Object value) {
-				}
-			}).makeMap();
-		t.put("a", new Object());
-		assertNotNull(t.get("a"));
+		Cache<String, Object> cache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS)
+				.removalListener(new RemovalListener<String, Object>() {
+
+					@Override
+					public void onRemoval(
+							RemovalNotification<String, Object> notification) {
+						
+					}
+				})
+				.build(new CacheLoader<String, Object>() {
+
+					@Override
+					public Object load(String key) throws Exception {
+						return APPLY_VALUE;
+					}
+				});
+		Map<String, Object> mapCache = cache.asMap();
+		mapCache.put("a", new Object());
+		assertNotNull(mapCache.get("a"));
 		for (int i = 0; i < 4; i++) {
 			Thread.sleep(1000);
-			assertNotNull(t.get("a"));
+			assertNotNull(mapCache.get("a"));
 		}
 		Thread.sleep(1000);
-		assertNull(t.get("a"));
+		assertNull(mapCache.get("a"));
 	}
 
 }

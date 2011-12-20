@@ -44,8 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.MapEvictionListener;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -96,15 +99,24 @@ public class SessionManagement {
 	}
 
 	private ConcurrentMap<String, AccessToken> configureSessionCache() {
-		return new MapMaker().
-			expireAfterAccess(20, TimeUnit.MINUTES).
-			concurrencyLevel(16).
-			evictionListener(new MapEvictionListener<String, AccessToken>() {
-				@Override
-				public void onEviction(String sessionId, AccessToken token) {
-					logSessionRemoval(token);
-				}
-			}).	makeMap();
+		Cache<String, AccessToken> cache =  CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES)
+				.concurrencyLevel(16)
+				.removalListener(new RemovalListener<String, AccessToken>() {
+
+					@Override
+					public void onRemoval(
+							RemovalNotification<String, AccessToken> notification) {
+						logSessionRemoval(notification.getValue());
+						
+					}
+				})
+				.build(new CacheLoader<String, AccessToken>() {
+					@Override
+					public AccessToken load(String accessToken) throws Exception {
+						return null;
+					}
+				});
+		return cache.asMap();
 	}
 
 	private String newSessionId() {

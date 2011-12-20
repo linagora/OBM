@@ -41,14 +41,13 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
 
 public class TestQueueManager {
 
@@ -74,7 +73,7 @@ public class TestQueueManager {
 	@After
 	public void cleanUp() throws Exception {
 		shutdownQueueManager();
-		Files.deleteRecursively(new File("data"));
+		FileUtils.deleteDirectory(new File("data"));
 	}
 
 	private void shutdownQueueManager() {
