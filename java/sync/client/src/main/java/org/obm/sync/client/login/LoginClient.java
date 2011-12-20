@@ -25,6 +25,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		this.locator = locator;
 	}
 	
+	@Override
 	public AccessToken login(String loginAtDomain, String password, String origin) {
 		Multimap<String, String> params = ArrayListMultimap.create();
 		params.put("login", loginAtDomain);
@@ -44,12 +45,27 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 			version.setMinor(v.getAttribute("minor"));
 			version.setRelease(v.getAttribute("release"));
 		}
+		token.setDomain( getDomain(root) );
 		token.setSessionId(sid);
 		token.setVersion(version);
 		token.setEmail(email);
 		return token;
 	}
 
+	@Override
+	public void logout(AccessToken at) {
+		Multimap<String, String> params = initParams(at);
+		executeVoid(at, "/login/doLogout", params);
+	}
+
+	private ObmDomain getDomain(Element root) {
+		ObmDomain obmDomain = new ObmDomain();
+		Element domain = DOMUtils.getUniqueElement(root, "domain");
+		obmDomain.setName(DOMUtils.getElementText(domain));
+		obmDomain.setUuid(domain.getAttribute("uuid"));
+		return obmDomain;
+	}
+	
 	private AccessToken newAccessToken(String loginAtDomain, String origin) {
 		ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName(loginAtDomain.split("@", 2)[1]);
@@ -58,11 +74,6 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		token.setUser(loginAtDomain.split("@", 2)[0]);
 		token.setDomain(obmDomain);
 		return token;
-	}
-
-	public void logout(AccessToken at) {
-		Multimap<String, String> params = initParams(at);
-		executeVoid(at, "/login/doLogout", params);
 	}
 
 	@Override

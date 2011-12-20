@@ -49,23 +49,18 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.obm.locator.LocatorClientException;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.MavenVersion;
-import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.exception.ObmSyncClientException;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public abstract class AbstractClientImpl implements ISyncClient {
+public abstract class AbstractClientImpl {
 
 	static {
 		XTrustProvider.install();
@@ -183,55 +178,17 @@ public abstract class AbstractClientImpl implements ISyncClient {
 		}
 	}
 
-	public AccessToken login(String loginAtDomain, String password, String origin) {
-		Multimap<String, String> params = ArrayListMultimap.create();
-		params.put("login", loginAtDomain);
-		params.put("password", password);
-		params.put("origin", origin);
-
-		AccessToken token = new AccessToken(0, origin);
-		token.setUser(loginAtDomain.split("@", 2)[0]);
-		
-		Document doc = execute(token, "/login/doLogin", params);
-		Element root = doc.getDocumentElement();
-		String email = DOMUtils.getElementText(root, "email");
-		String sid = DOMUtils.getElementText(root, "sid");
-		Element v = DOMUtils.getUniqueElement(root, "version");
-		MavenVersion version = new MavenVersion();
-		if (v != null) {
-			version.setMajor(v.getAttribute("major"));
-			version.setMinor(v.getAttribute("minor"));
-			version.setRelease(v.getAttribute("release"));
-		}
-		
-		ObmDomain obmDomain = new ObmDomain();
-		Element domain = DOMUtils.getUniqueElement(root, "domain");
-		obmDomain.setName(DOMUtils.getElementText(domain));
-		obmDomain.setUuid(domain.getAttribute("uuid"));
-		token.setDomain(obmDomain);
-		token.setSessionId(sid);
-		token.setVersion(version);
-		token.setEmail(email);
-		return token;
-	}
-
-	public void logout(AccessToken at) {
-		Multimap<String, String> params = initParams(at);
-		executeVoid(at, "/login/doLogout", params);
-	}
-	
 	private String getBackendUrl(String loginAtDomain) throws LocatorClientException {
 		Locator locator = getLocator();
 		return locator.backendUrl(loginAtDomain);
 	}
 
-	private PostMethod getPostMethod(AccessToken at, String action)
-			throws LocatorClientException {
-				String backendUrl = getBackendUrl(at.getUserWithDomain());
-				PostMethod pm = new PostMethod(backendUrl + action );
-				pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-				return pm;
-			}
+	private PostMethod getPostMethod(AccessToken at, String action) throws LocatorClientException {
+		String backendUrl = getBackendUrl(at.getUserWithDomain());
+		PostMethod pm = new PostMethod(backendUrl + action);
+		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+		return pm;
+	}
 
 	private void releaseConnection(PostMethod pm) {
 		if (pm != null) {
