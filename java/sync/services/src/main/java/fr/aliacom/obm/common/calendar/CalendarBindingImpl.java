@@ -368,7 +368,6 @@ public class CalendarBindingImpl implements ICalendar {
 
 			final Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
-			setAttendeeCanWriteOnCalendar(token, event);
 			setAttendeeCanWriteOnCalendar(token, after);
 			
 			if (after != null) {
