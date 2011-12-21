@@ -209,7 +209,7 @@ form {
   position: absolute;
   width: 16.5em;
   left: 8px;
-  margin-top: 2em;
+  margin-top: 2.8em;
   clear: left;
 }
 
@@ -217,7 +217,7 @@ form {
   z-index:100;
   min-width: 800px;
   margin: 0 0px 0px 17.5em;
-  padding: 2em 1em 0em;
+  padding: 2.8em 1em 0em;
 /*IE workaround*/
   height: auto!important;
   height: 1px;
@@ -228,6 +228,36 @@ form {
   padding: 0 0 5px; 
   margin: 0;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Support OBM ! */
+/* ------------------------------------------------------------------------- */
+
+.spreadLove {
+  border-left: 1px solid rgba(255, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+  border-bottom-left-radius: 10px;
+  font-weight: normal;
+  margin: 0;
+  min-width: 400px;
+  padding: 5px;
+  text-align: center;
+  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  box-shadow: 0px 0px 10px #DDD;
+  position: absolute;
+  top: 2.8em;
+  right: 0px;
+  font-size: 1em;
+}
+
+.spreadLove a {  color: #368397; }
+.spreadLove .supportUs { padding-top: 3px; }
+
+
 /* ------------------------------------------------------------------------- */
 /* Banner */
 /* ------------------------------------------------------------------------- */
@@ -235,8 +265,8 @@ form {
 #banner {
   width: 100%;
   min-width: 1002px;
-  height: 2.3em;
-  line-height: 2.3em;
+  height: 2.8em;
+  line-height: 2.8em;
   background-color: #e1e1e1;
   background-image: url('../images/banner_border.png');
   background-repeat: repeat-x;
@@ -287,7 +317,7 @@ form {
   padding: 0;
   font-weight: bold;
   list-style-type: none;
-  margin-left: 95px;
+  margin-left: 105px;
 }
 
 #section li {

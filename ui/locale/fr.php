@@ -105,5 +105,9 @@ return array(
   "backup of users and mailshares of domain %domain_name% completed with %count% errors" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec %count% erreurs",
   "backup of users and mailshares of delegation %delegation% completed with %count% errors" => "Sauvegarde des utilisateurs et des boites partagées de la delegation %delegation% terminée avec %count% erreurs",
   "backup of users and mailshares of domain %domain_name% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées du domaine %domain_name% terminée avec succès",
-  "backup of users and mailshares of delegation %delegation% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées de la delegation %delegation% terminée avec succès"
+  "backup of users and mailshares of delegation %delegation% completed successfully" => "Sauvegarde des utilisateurs et des boites partagées de la delegation %delegation% terminée avec succès",
+  "You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>" 
+    => "Vous utilisez la version libre et gratuite d'<a href=\"http://www.obm.org/\">OBM</a> développée et supportée par <a href=\"http://www.linagora.com/\">Linagora</a>",
+  "Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>"
+    => "Contribuez à la R&amp;D du produit en souscrivant à une <a href=\"http://pro.obm.org/\">offre entreprise</a>"
 );
