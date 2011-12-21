@@ -453,6 +453,7 @@ function run_query_calendar_insert_decision($calendar, $userId) {
   $event_id = $calendar['calendar_id'];
   $state = $calendar['decision_event'];
   $owner_notification = $calendar['owner_notification'];
+  $event =  run_query_calendar_detail($event_id);
 
   $concernedPeople = get_concerned_people_for_event($event_id);
 
@@ -462,7 +463,11 @@ function run_query_calendar_insert_decision($calendar, $userId) {
     $obm_q->query($query);
   }
   else{
-    run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, $owner_notification);
+  	if ($event->f('event_repeatkind') != 'none') {
+      run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, true, $owner_notification);
+  	} else {
+  	  run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state,false, $owner_notification);
+  	}
   }
 }
 
@@ -480,46 +485,51 @@ function get_concerned_people_for_event($eventId){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update a user decision for its participation to an event
-// Parameters: 
+// Update a user decision for its participation to an event using internal id
+// Parameters:
 //   - $event_id : event Id
 //   - $user_id  : User id
 //   - $state    : New state to set (ACCEPTED, NEEDS-ACTION or DECLINED)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id, $state, $owner_notification = true, $force = false) {
-  global $cdg_sql;
-  global $obm, $err, $l_of_right_err_auth;
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id, $state, $isRecurrent = false, $owner_notification = true, $force = false) {
+	global $cdg_sql;
+	global $obm, $err, $l_of_right_err_auth;
 
-  $oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
+	$oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
 
-  if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
-    if ($entity == 'user') {
-      $ok = OBM_Acl::canWrite($obm['uid'], 'calendar', $entity_id);
-    } elseif ($entity == 'resource') {
-      $ok = OBM_Acl::canWrite($obm['uid'], 'resource', $entity_id);
-    } elseif ($entity == 'contact') {
-      $ok = true;
-    }
+	if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
+		if ($entity == 'user') {
+			$ok = OBM_Acl::canWrite($obm['uid'], 'calendar', $entity_id);
+		} elseif ($entity == 'resource') {
+			$ok = OBM_Acl::canWrite($obm['uid'], 'resource', $entity_id);
+		} elseif ($entity == 'contact') {
+			$ok = true;
+		}
 
-    if (!$ok) {
-      $err['msg'] = $l_of_right_err_auth;  
-      return false;
-    } 
-  }
+		if (!$ok) {
+			$err['msg'] = $l_of_right_err_auth;
+			return false;
+		}
+	}
 
-  $id = sql_parse_id($event_id, true);
-  $retour = run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $oldEvent->uid, $state);
+	$id = sql_parse_id($event_id, true);
+	
+	if ($isRecurrent == true) {
+		$retour = run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $oldEvent->uid, $state);
+	} else {
+		$retour = run_query_calendar_update_entity_event($entity, $entity_id, $event_id, $state);
+	}
 
-  if ($retour) {
-    //$retour = run_query_calendar_touch_event($event_id);
+	if ($retour) {
+		//$retour = run_query_calendar_touch_event($event_id);
 
-    if ($owner_notification == 'true') {
-    	OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
-    }
-    
-  }
+		if ($owner_notification == 'true') {
+			OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
+		}
 
-  return $retour;    
+	}
+
+	return $retour;
 }
 
 /**
@@ -6140,7 +6150,7 @@ function run_query_calendar_reset($id,$params) {
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $event[] = $obm_q->f('eventlink_event_id');
-      run_query_calendar_update_occurrence_state($obm_q->f('eventlink_event_id'), 'user', $id, 'DECLINED');
+      run_query_calendar_update_occurrence_state($obm_q->f('eventlink_event_id'), 'user', $id, 'DECLINED', true);
     }
   }
 
