@@ -65,7 +65,9 @@ public interface CalendarDao {
 
 	Event findEventById(AccessToken token, EventObmId eventId) throws EventNotFoundException, ServerFault;
 
-	Event findEventByExtId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId);
+	Event findEventOrSetOfEventByExtId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId);
+	
+	Event findOccurrenceByExtIdAndRecurrenceId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId, Date recurrenceId);
 
 	List<String> findEventTwinKeys(String calendar, Event event, ObmDomain domain);
 
@@ -114,7 +116,7 @@ public interface CalendarDao {
 			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
-	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, ParticipationState participationState) throws SQLException ;
+	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, Date recurrenceId, ParticipationState participationState) throws SQLException ;
 
 	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;

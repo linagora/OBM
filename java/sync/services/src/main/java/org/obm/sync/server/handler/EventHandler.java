@@ -32,10 +32,12 @@
 package org.obm.sync.server.handler;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
+
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.NotAllowedException;
@@ -493,12 +495,24 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String changeParticipationState(AccessToken at,
-			ParametersSource params, XmlResponder responder) throws ServerFault {
-		boolean success = binding.changeParticipationState(at, getCalendar(at, params),
-				getExtId(params, "extId"),
-				ParticipationState.getValueOf(params.getParameter("state")),
-				i(params, "sequence", 0),
-				getNotificationOption(params));
+			ParametersSource params, XmlResponder responder) throws ServerFault, ParseException, EventNotFoundException {
+		
+		boolean recursive = getRecursive(params);
+		boolean success = false;
+		
+		if (recursive) {
+			success = binding.changeParticipationState(at, getCalendar(at, params),
+					getExtId(params, "extId"), 
+					ParticipationState.getValueOf(params.getParameter("state")),
+					i(params, "sequence", 0),
+					getNotificationOption(params));
+		} else {
+			success = binding.changeParticipationState(at, getCalendar(at, params),
+					getExtId(params, "extId"), getRecurrenceId(params, "recurrenceId"),
+					ParticipationState.getValueOf(params.getParameter("state")),
+					i(params, "sequence", 0),
+					getNotificationOption(params));
+		}
 		return responder.sendBoolean(success);
 	}
 	
@@ -522,6 +536,22 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private EventObmId getObmId(ParametersSource params, String tagName) {
 		return new EventObmId(params.getParameter(tagName));
+	}
+	
+	private Timestamp getRecurrenceId(ParametersSource params, String tagName) {
+		String recurrenceIdParam = params.getParameter(tagName);
+		if (recurrenceIdParam != null) {
+			return Timestamp.valueOf(params.getParameter(tagName));
+		}	
+		return null;
+	}
+	
+	private Boolean getRecursive(ParametersSource params) {
+		String recursiveParam = params.getParameter("recursive");
+		if(recursiveParam != null) {
+			return Boolean.valueOf(recursiveParam);
+		}
+		return true;
 	}
 
 }

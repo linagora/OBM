@@ -285,7 +285,7 @@ public class CalendarBindingImpl implements ICalendar {
 			EventExtId extId, int sequence, boolean notification) throws ServerFault {
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			final Event ev = calendarDao.findEventByExtId(token, calendarUser, extId);
+			final Event ev = calendarDao.findEventOrSetOfEventByExtId(token, calendarUser, extId);
 
 			if (ev == null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] not removed, it doesn't exist");
@@ -307,7 +307,7 @@ public class CalendarBindingImpl implements ICalendar {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
 					changeParticipationStateInternal(token, calendar, ev.getExtId(), ParticipationState.DECLINED, sequence, notification);
-					return calendarDao.findEventByExtId(token, calendarUser, extId);
+					return calendarDao.findEventOrSetOfEventByExtId(token, calendarUser, extId);
 				}
 			}
 		} catch (Throwable e) {
@@ -362,7 +362,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
 		if (event.getObmId() == null && event.getExtId() != null && event.getExtId().getExtId() != null) {
-			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
+			final Event currentEvent = calendarDao.findEventOrSetOfEventByExtId(token, calendarUser, event.getExtId());
 			if (currentEvent != null) {
 				event.setUid(currentEvent.getObmId());
 			}
@@ -794,7 +794,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			Event event = calendarDao.findEventByExtId(token, calendarUser, extId);
+			Event event = calendarDao.findEventOrSetOfEventByExtId(token, calendarUser, extId);
 			if (event == null) {
 				throw new EventNotFoundException("Event from extId " + extId + " not found.");
 			} 
@@ -1056,21 +1056,82 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault("The user " + userEmail + " has no write rights on calendar " + calendar);
 		}
 	}
+	
 
 	private boolean changeParticipationStateInternal(AccessToken token,
-			String calendar, EventExtId extId,
+            String calendar, EventExtId extId,
+            ParticipationState participationState, int sequence, boolean notification)
+            throws FindException, SQLException {
+    
+	    ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain());
+	    Event currentEvent = calendarDao.findEventOrSetOfEventByExtId(token, calendarOwner, extId);
+	    boolean changed = false;
+	    if (currentEvent != null) {
+	             changed = applyParticipationChange(token, extId, null, participationState,
+	                            sequence, calendarOwner, currentEvent);
+	    }
+	    
+	    Event newEvent = calendarDao.findEventOrSetOfEventByExtId(token, calendarOwner, extId);
+	    if (newEvent != null) {
+	            eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState, notification);
+	    } else {
+	            logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
+	    }
+	    return changed;
+	}
+	
+	@Override
+	@Transactional
+	public boolean changeParticipationState(AccessToken token, String calendar,
+			EventExtId extId, Date recurrenceId, ParticipationState participationState, int sequence, boolean notification) throws ServerFault, EventNotFoundException {
+		String userEmail = userService.getUserFromAccessToken(token).getEmail();
+		if (helperService.canWriteOnCalendar(token, calendar)) {
+			try {
+				boolean wasDone = changeParticipationStateForRecursiveEvent(token, calendar, extId, recurrenceId, participationState, sequence,
+						notification);
+				if (!wasDone) {
+					logger.warn("Change of participation state failed to " + participationState + " (got sequence number " +
+						sequence + ", probably stale) on calendar " + calendar + " on event "+ extId + " by user " + userEmail);
+				}
+				return wasDone;
+			} catch (FindException e) {
+				throw new ServerFault("no user found with calendar " + calendar);
+			} catch (SQLException e) {
+				throw new ServerFault(e);
+			}
+		}
+		else {
+			throw new ServerFault("The user " + userEmail + " has no write rights on calendar " + calendar);
+		}
+	}
+	
+	private boolean changeParticipationStateForRecursiveEvent(AccessToken token,
+			String calendar, EventExtId extId, Date recurrenceId,
 			ParticipationState participationState, int sequence, boolean notification)
-			throws FindException, SQLException {
+			throws FindException, SQLException, EventNotFoundException, ServerFault {
 		
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-		Event currentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
+		Event currentEvent = calendarDao.findOccurrenceByExtIdAndRecurrenceId(token, calendarOwner, extId, recurrenceId);
 		boolean changed = false;
 		if (currentEvent != null) {
-			 changed = applyParticipationChange(token, extId, participationState, 
+			 changed = applyParticipationChange(token, extId, recurrenceId, participationState, 
 					sequence, calendarOwner, currentEvent);
+		} else {
+			Event parentEvent = calendarDao.findEventOrSetOfEventByExtId(token, calendarOwner, extId);
+			if(parentEvent != null) {
+				Event eventException = parentEvent.clone();
+				eventException.setRecurrenceId(recurrenceId);
+				eventException.setRecurrence(null);
+				eventException.setDate(recurrenceId);
+				
+				parentEvent.getRecurrence().addEventException(eventException);
+				parentEvent = calendarDao.modifyEventForcingSequence(token, calendar, parentEvent, true, parentEvent.getSequence(), true);
+				changed = applyParticipationChange(token, extId, recurrenceId, participationState, 
+						sequence, calendarOwner, eventException);
+			}
 		}
 		
-		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
+		Event newEvent = calendarDao.findOccurrenceByExtIdAndRecurrenceId(token, calendarOwner, extId, recurrenceId);
 		if (newEvent != null) {
 			eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState, notification, token);
 		} else {
@@ -1080,11 +1141,11 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private boolean applyParticipationChange(AccessToken token, EventExtId extId,
-			ParticipationState participationState, int sequence,
+			Date recurrenceId, ParticipationState participationState, int sequence,
 			ObmUser calendarOwner, Event currentEvent) throws SQLException {
 		
 		if (currentEvent.getSequence() == sequence) {
-			boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, participationState);
+			boolean changed = calendarDao.changeParticipationState(token, calendarOwner, extId, recurrenceId, participationState);
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] change participation state for user " + 
 					calendarOwner.getEmail() + " new state : " + participationState);
@@ -1171,7 +1232,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
 		final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 		if (event.getExtId() != null && event.getExtId().getExtId() != null) {
-			final Event eventExist = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
+			final Event eventExist = calendarDao.findEventOrSetOfEventByExtId(token, calendarUser, event.getExtId());
 			if (eventExist != null) {
 				return true;
 			}

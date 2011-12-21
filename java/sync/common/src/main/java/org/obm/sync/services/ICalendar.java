@@ -283,6 +283,14 @@ public interface ICalendar {
 			boolean notification) throws ServerFault;
 
 	/**
+	 * change participation State of specific exception or set of events.
+	 * @throws EventNotFoundException 
+	 */
+	boolean changeParticipationState(AccessToken token, String calendar,
+			EventExtId extId, Date recurrenceId, ParticipationState participationState, int sequence,
+			boolean notification) throws ServerFault, EventNotFoundException;
+	
+	/**
 	 * Import ics file in calendar's user Adding a new attendee (owner) if
 	 * calendar owner not exist in data's ics
 	 * 

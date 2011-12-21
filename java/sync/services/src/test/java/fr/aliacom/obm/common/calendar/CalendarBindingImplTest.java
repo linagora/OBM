@@ -278,7 +278,7 @@ public class CalendarBindingImplTest {
 		EasyMock.expectLastCall().andReturn(user).atLeastOnce();
 
 		final CalendarDao calendarDao = createMock(CalendarDao.class);
-		calendarDao.findEventByExtId(eq(accessToken), eq(user), eq(eventExtId));
+		calendarDao.findEventOrSetOfEventByExtId(eq(accessToken), eq(user), eq(eventExtId));
 		EasyMock.expectLastCall().andReturn(null).once();
 
 		Object[] mocks = {event, accessToken, userService, calendarDao, rightsHelper, user};
@@ -392,10 +392,10 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.removeEventById(accessToken, oldEventNoOtherAttendeesUid, 
 				oldEventNoOtherAttendees.getType(), oldEventNoOtherAttendees.getSequence()+1)).
 				andReturn(oldEventNoOtherAttendees);
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, oldEventWithOtherAttendeesExtId)).
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, oldEventWithOtherAttendeesExtId)).
 			andReturn(oldEventWithOtherAttendees).atLeastOnce();
 		expect(calendarDao.changeParticipationState(accessToken, obmUser, 
-				oldEventWithOtherAttendees.getExtId(), ParticipationState.DECLINED)).andReturn(true);		
+				oldEventWithOtherAttendees.getExtId(), oldEventWithOtherAttendees.getRecurrenceId(), ParticipationState.DECLINED)).andReturn(true);		
 
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 
@@ -489,7 +489,7 @@ public class CalendarBindingImplTest {
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
 		
 		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser).atLeastOnce();
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(beforeEvent).atLeastOnce();
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(beforeEvent).atLeastOnce();
 		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(true).atLeastOnce();
 		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1, true)).andReturn(event).atLeastOnce();
 		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
@@ -547,7 +547,7 @@ public class CalendarBindingImplTest {
 
 		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser)
 				.atLeastOnce();
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
 				beforeEvent).atLeastOnce();
 		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false)
 				.atLeastOnce();
@@ -621,7 +621,7 @@ public class CalendarBindingImplTest {
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, eventExtId)).andReturn(oldEvent).once();
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, eventExtId)).andReturn(oldEvent).once();
 		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, newEvent, updateAttendees, sequence, true)).andReturn(newEvent).once();
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
@@ -663,7 +663,7 @@ public class CalendarBindingImplTest {
 	
 	private CalendarDao mockImportICalendarCalendarDao(AccessToken accessToken, String calendar, ObmUser obmUser, EventExtId eventExtId, Event eventWithOwnerAttendee) throws FindException, SQLException, ServerFault{
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.findEventByExtId(eq(accessToken), eq(obmUser), eq(eventExtId))).andReturn(null).once();
+		expect(calendarDao.findEventOrSetOfEventByExtId(eq(accessToken), eq(obmUser), eq(eventExtId))).andReturn(null).once();
 		expect(calendarDao.createEvent(accessToken, calendar, eventWithOwnerAttendee, false)).andReturn(eventWithOwnerAttendee).once();
 		return calendarDao;
 	}
@@ -711,7 +711,7 @@ public class CalendarBindingImplTest {
 		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, ics, eventFromIcs);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, extId)).andReturn(eventFromDao).once();
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, extId)).andReturn(eventFromDao).once();
 
 		Object[] mocks = new Object[] {calendarDao, userService, ical4jHelper, accessToken, helper};
 		
@@ -765,7 +765,7 @@ public class CalendarBindingImplTest {
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
 		
 		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser).atLeastOnce();
-		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(null).once();
+		expect(calendarDao.findEventOrSetOfEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(null).once();
 		expect(calendarDao.createEvent(accessToken, calendar, event, false)).andReturn(eventCreated).once();
 		expect(calendarDao.removeEvent(accessToken, eventCreated, eventCreated.getType(), eventCreated.getSequence())).andReturn(eventCreated).once();
 		eventChangeHandler.updateParticipationState(eventCreated, obmUser, calOwner.getState(), notification, accessToken);

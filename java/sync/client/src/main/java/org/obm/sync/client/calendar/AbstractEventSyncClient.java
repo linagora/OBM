@@ -449,6 +449,22 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId.serializeToString());
+		params.put("state", participationState.toString()); 
+		params.put("sequence", String.valueOf(sequence));
+		params.put("notification", String.valueOf(notification));
+		Document doc = execute(token, type + "/changeParticipationState", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
+	}	
+	
+	@Override
+	public boolean changeParticipationState(AccessToken token, String calendar,
+			EventExtId extId, Date recurrenceId, ParticipationState participationState, 
+			int sequence, boolean notification) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		params.put("calendar", calendar);
+		params.put("extId", extId.serializeToString());
+		params.put("recurrenceId", recurrenceId.toString());
 		params.put("state", participationState.toString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
