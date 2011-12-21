@@ -947,11 +947,11 @@ function display_page(&$display) {
        </span>
       </div>         
      <div id=\"portlets\">          
-      $display[last]
       $display[todo]
       $display[features] 
       $display[link] 
       $display[detailInfo] 
+      $display[last]
      </div>
     </div>
     <!-- left panel end -->
