@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 
 public class IntegrationTestUtils {
 
-
 	public static void expectUsersHaveNoChange(CollectionDao collectionDao, Collection<OpushUser> users) throws DaoException, CollectionNotFoundException {
 		Date lastSync = new Date();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());

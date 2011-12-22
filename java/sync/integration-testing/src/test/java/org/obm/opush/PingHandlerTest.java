@@ -51,6 +51,7 @@ import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -151,7 +152,7 @@ public class PingHandlerTest {
 	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ProcessingEmailException, UnknownObmSyncServerException {
+			ProcessingEmailException, UnknownObmSyncServerException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForNoChangePing();
@@ -159,7 +160,7 @@ public class PingHandlerTest {
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException {
+			UnknownObmSyncServerException, ProcessingEmailException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForHasChangePing(noChangeIterationCount);
