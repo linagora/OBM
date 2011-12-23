@@ -796,7 +796,7 @@ CREATE TABLE domain (
     domain_name character varying(128),
     domain_alias text,
     domain_global boolean DEFAULT false,
-    domain_uuid char(37)  NOT NULL
+    domain_uuid char(36)  NOT NULL
 );
 
 

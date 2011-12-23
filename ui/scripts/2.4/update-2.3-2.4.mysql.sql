@@ -335,13 +335,13 @@ ALTER TABLE `opush_synced_item` ADD COLUMN `addition` BOOLEAN;
 UPDATE `opush_synced_item` SET `addition`='1';
 ALTER TABLE `opush_synced_item` MODIFY `addition` BOOLEAN NOT NULL;
 
-ALTER TABLE `Domain` ADD COLUMN `domain_uuid` CHAR(37);
+ALTER TABLE `Domain` ADD COLUMN `domain_uuid` CHAR(36);
 UPDATE Domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
-ALTER TABLE Domain MODIFY domain_uuid CHAR(37) NOT NULL;
+ALTER TABLE Domain MODIFY domain_uuid CHAR(36) NOT NULL;
 
-ALTER TABLE P_Domain ADD COLUMN domain_uuid CHAR(37);
+ALTER TABLE P_Domain ADD COLUMN domain_uuid CHAR(36);
 UPDATE P_Domain p, Domain d SET p.domain_uuid=d.domain_uuid where p.domain_id=d.domain_id;
-ALTER TABLE P_Domain MODIFY domain_uuid CHAR(37) NOT NULL;
+ALTER TABLE P_Domain MODIFY domain_uuid CHAR(36) NOT NULL;
 
 UPDATE opush_sync_mail SET timestamp='1970-01-01 01:00:01' WHERE timestamp='0000-00-00 00:00:00';
 
