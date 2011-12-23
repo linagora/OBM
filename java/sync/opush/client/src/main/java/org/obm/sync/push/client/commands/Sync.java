@@ -88,8 +88,7 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 			Collection col = new Collection();
 			col.setSyncKey(DOMUtils.getElementText(e, "SyncKey"));
 			col.setCollectionId(DOMUtils.getElementText(e, "CollectionId"));
-			col.setStatus(Integer.valueOf(
-					DOMUtils.getElementText(e, "Status"), 0));
+			col.setStatus(Integer.valueOf(DOMUtils.getElementText(e, "Status")));
 			NodeList ap = e.getElementsByTagName("Add");
 			for (int j = 0; j < ap.getLength(); j++) {
 				Element appData = (Element) ap.item(j);
