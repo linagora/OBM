@@ -1918,7 +1918,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
-  run_query_calendar_update_event_data($calendar); 
+  run_query_calendar_update_event_data($calendar, $oldEvent); 
 
   $updatedEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   
@@ -2008,7 +2008,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 // Parameters: 
 //   - $calendar : Calendar params
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_event_data($calendar) {
+function run_query_calendar_update_event_data($calendar, $oldEvent) {
   global $cdg_sql, $obm, $c_none;
   $title = sql_parse_text($calendar['title']);
   
@@ -2113,8 +2113,19 @@ function run_query_calendar_update_event_data($calendar) {
 
   $event_id = $calendar['calendar_id'];
 
-  if ($repeat_kind == 'none') {
-    run_query_delete_event_exceptions($event_id);
+  if ($datebegin != $oldEvent->date_begin
+  	|| $repeat_kind != $oldEvent->repeat_kind 
+  	|| $frequency != $oldEvent->repeatfrequency 
+  	|| $repeat_days != $oldEvent->repeat_days
+  	|| $repeat_end != $oldEvent->repeat_end) {
+    
+  	$deletedEventExceptionsId = run_query_delete_event_exceptions($event_id);
+  	if(!empty($deletedEventExceptionsId)) {
+	  	foreach($deletedEventExceptionsId as $deletedEventId) {
+	  		$deletedEvent = OBM_EventFactory::getInstance()->getById($deletedEventId);
+			OBM_EventFactory::getInstance()->delete($deletedEvent);
+	  	}
+  	}
     return;
   }
 
