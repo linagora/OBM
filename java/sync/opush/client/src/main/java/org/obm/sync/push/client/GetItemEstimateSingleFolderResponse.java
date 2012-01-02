@@ -1,7 +1,9 @@
 package org.obm.sync.push.client;
 
+import com.google.common.base.Objects;
 
-public class GetItemEstimateSingleFolderResponse implements IEasReponse {
+
+public final class GetItemEstimateSingleFolderResponse implements IEasReponse {
 
 	private final int collectionId;
 	private final int estimate;
@@ -29,4 +31,22 @@ public class GetItemEstimateSingleFolderResponse implements IEasReponse {
 	public int getStatus() {
 		return status;
 	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(collectionId, estimate, status);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof GetItemEstimateSingleFolderResponse) {
+			GetItemEstimateSingleFolderResponse that = (GetItemEstimateSingleFolderResponse) object;
+			return Objects.equal(this.collectionId, that.collectionId)
+				&& Objects.equal(this.estimate, that.estimate)
+				&& Objects.equal(this.status, that.status);
+		}
+		return false;
+	}
+	
+	
 }

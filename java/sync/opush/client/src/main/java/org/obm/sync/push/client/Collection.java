@@ -33,12 +33,13 @@ package org.obm.sync.push.client;
 
 import java.util.LinkedList;
 import java.util.List;
+import com.google.common.base.Objects;
 
 /**
  * <Collection> <SyncKey>f0e0ec53-40a6-432a-bfee-b8c1d391478c</SyncKey>
  * <CollectionId>179</CollectionId> <Status>1</Status> </Collection>
  */
-public class Collection {
+public final class Collection {
 
 	private String syncKey;
 	private String collectionId;
@@ -86,4 +87,21 @@ public class Collection {
 		deletes.add(data);
 	}
 
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(syncKey, collectionId, status, adds, deletes);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Collection) {
+			Collection that = (Collection) object;
+			return Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.collectionId, that.collectionId)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.adds, that.adds)
+				&& Objects.equal(this.deletes, that.deletes);
+		}
+		return false;
+	}
 }

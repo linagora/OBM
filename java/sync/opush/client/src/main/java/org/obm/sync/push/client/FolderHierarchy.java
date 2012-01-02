@@ -35,8 +35,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import com.google.common.base.Objects;
 
-public class FolderHierarchy implements Map<FolderType, Folder> {
+public final class FolderHierarchy implements Map<FolderType, Folder> {
 
 	private Map<FolderType, Folder> folders;
 
@@ -103,6 +104,20 @@ public class FolderHierarchy implements Map<FolderType, Folder> {
 	@Override
 	public Collection<Folder> values() {
 		return folders.values();
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(folders);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof FolderHierarchy) {
+			FolderHierarchy that = (FolderHierarchy) object;
+			return Objects.equal(this.folders, that.folders);
+		}
+		return false;
 	}
 
 }

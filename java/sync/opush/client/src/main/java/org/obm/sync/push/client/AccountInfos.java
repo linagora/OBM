@@ -32,8 +32,9 @@
 package org.obm.sync.push.client;
 
 import org.apache.commons.codec.binary.Base64;
+import com.google.common.base.Objects;
 
-public class AccountInfos {
+public final class AccountInfos {
 	private String login;
 	private String password;
 	private String userId;
@@ -94,6 +95,26 @@ public class AccountInfos {
 		sb.append(encoded);
 		String ret = sb.toString();
 		return ret;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(login, password, userId, devId, devType, url, userAgent);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof AccountInfos) {
+			AccountInfos that = (AccountInfos) object;
+			return Objects.equal(this.login, that.login)
+				&& Objects.equal(this.password, that.password)
+				&& Objects.equal(this.userId, that.userId)
+				&& Objects.equal(this.devId, that.devId)
+				&& Objects.equal(this.devType, that.devType)
+				&& Objects.equal(this.url, that.url)
+				&& Objects.equal(this.userAgent, that.userAgent);
+		}
+		return false;
 	}
 
 }
