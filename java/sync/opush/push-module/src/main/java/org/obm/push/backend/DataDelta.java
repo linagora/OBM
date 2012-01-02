@@ -44,7 +44,7 @@ public class DataDelta {
 	private final List<ItemChange> deletions;
 	private final Date syncDate;
 	
-	public DataDelta(Collection<ItemChange> changes, List<ItemChange> deletions, Date syncDate) {
+	public DataDelta(Collection<ItemChange> changes, Collection<ItemChange> deletions, Date syncDate) {
 		this.syncDate = syncDate;
 		this.changes = new ArrayList<ItemChange>(changes);
 		this.deletions = new ArrayList<ItemChange>(deletions);
