@@ -44,6 +44,7 @@ public class Collection {
 	private String collectionId;
 	private SyncStatus status;
 	private List<Add> adds = new LinkedList<Add>();
+	private List<Delete> deletes = new LinkedList<Delete>();
 
 	public String getSyncKey() {
 		return syncKey;
@@ -75,6 +76,14 @@ public class Collection {
 
 	public void addAdd(Add applicationData) {
 		adds.add(applicationData);
+	}
+
+	public List<Delete> getDeletes() {
+		return deletes;
+	}
+	
+	public void addDelete(Delete data) {
+		deletes.add(data);
 	}
 
 }
