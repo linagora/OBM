@@ -459,7 +459,7 @@ chkconfig --add httpd
 %files	-n %{name}-core
 %{_bindir}/%{name}-core
 %defattr(-,root,root,-)
-%doc doc/* LICENSE README 
+%doc doc/* LEGAL_NOTICE THIRD_PARTY README 
 %attr(-,apache,apache) %dir %{_datadir}/%{name}
 %attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}
 %attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}/backup
