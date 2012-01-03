@@ -1069,7 +1069,9 @@ CREATE TABLE eventtemplate (
     eventtemplate_organizer integer DEFAULT 0,
     eventtemplate_group_ids text default NULL,
     eventtemplate_force_insertion boolean DEFAULT false,
-    eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity
+    eventtemplate_opacity vopacity DEFAULT 'OPAQUE'::vopacity,
+    eventtemplate_show_user_calendar boolean DEFAULT false,
+    eventtemplate_show_resource_calendar boolean DEFAULT false
 );
 
 
