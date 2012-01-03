@@ -938,7 +938,7 @@ function display_page(&$display) {
 $display["supportOBMBanner"] = "<h2 class=\"spreadLove\"><div>"
   .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>")
   ."</div><div class=\"supportUs\">"
-  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro/obm.org/\">enterprise offer</a>")
+  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>")
   ."</div></h2>";
 
   echo $display['head'] . $display['header'] . "
