@@ -4019,7 +4019,8 @@ function dis_calendar_quick_form($calendar_entity) {
           $calendar_inputs
           <fieldset class='buttons'> 
             <input class='closeSticky' type='submit' value='$GLOBALS[l_validate]' />
-            <input type='button' id='calendarQuickFormEdit' onclick='obm.calendarQuickForm.goTo();' />
+            <input type='button' id='calendarQuickFormAdvanced' onclick='obm.calendarQuickForm.goTo();' />
+            <input type='button' id='calendarQuickFormEdit' onclick=\"obm.calendarQuickForm.submit('detailupdate');\" />
             <input type='button' id='calendarQuickFormDetail' onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value='$GLOBALS[l_details]' />
             <input type='button' class='closeSticky' id='calendarQuickFormDelete' 
               onclick=\"obm.calendarQuickForm.submit('quick_delete');\" value='$GLOBALS[l_c_delete]' />

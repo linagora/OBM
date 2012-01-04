@@ -391,7 +391,8 @@ if ($action == 'search') {
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
-			$display['detailInfo'] = display_record_info($eve_q);
+      
+	  $display['detailInfo'] = display_record_info($eve_q);
       $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);

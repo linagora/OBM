@@ -1073,7 +1073,61 @@ Obm.CalendarManager = new Class({
   // **************************************************************************
 
   /**
-   * Update the event on OBM server 
+   * Update the recurring event or the occurrency on OBM server 
+   */
+  sendDetailUpdate: function(evt) {
+	    var eventData = this.prepareEventForUpdate(evt);
+	    action_cmd = 'check_update';
+	    
+	    new Request.JSON({
+	      url: obm.vars.consts.calendarUrl,
+	      secure : false,
+	      onFailure: function (response) {
+	        Obm.Error.parseStatus(this);
+	      },
+	      onSuccess : function(response) {
+	        if(response.occUpdate) {
+	          obm.calendarManager.popupManager.add('calendarOccurencyUpdate');
+	        }
+	        obm.calendarManager.popupManager.addEvent('update_all', function () {
+	            eventData.all = 1;
+	        });
+	        obm.calendarManager.popupManager.addEvent('complete', function () {
+	            obm.calendarManager.DetailUpdateRequest(eventData);
+	        }.bind(this));	       
+	      obm.calendarManager.popupManager.show(eventData);
+	      }.bind(this)
+	    }).post($merge({ajax : 1, action : action_cmd}, eventData));
+	  },
+
+  DetailUpdateRequest: function(eventData) {
+	  new Request.JSON({
+	      url: obm.vars.consts.calendarUrl,
+	      secure : false,
+	      onComplete : this.goToDetailUpdateURI.bind(this)
+	  }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
+  },
+	  
+  goToDetailUpdateURI: function(response) {
+	    try {
+	        var resp = eval(response);
+	      } catch (e) {
+	        resp = new Object();
+	        resp.error = 1;
+	        resp.message = obm.vars.labels.fatalServerErr;
+	      }
+	      if (response.error == 0) {
+	        obm.calendarManager.eventIndexing(response.eventId);
+	      } else {
+	        showErrorMessage(response.message);
+	        obm.calendarManager.cancel(obm.calendarManager.oldEvent.elementId);
+	      }
+	      obm.calendarManager.lock = false;
+	      obm.calendarQuickForm.goTo('detailupdate&calendar_id=' + response.eventId);
+  },
+ 
+  /**
+   * Update the event on OBM server after a drag'n'drop
    */
   sendUpdateEvent: function(evt, forceUpdate) {
     var eventData = this.prepareEventForUpdate(evt);
@@ -2050,6 +2104,7 @@ Obm.CalendarQuickForm = new Class({
     this.attendees = $('calendarQuickFormAttendees');
     this.deleteButton = $('calendarQuickFormDelete');
     this.detailButton = $('calendarQuickFormDetail');
+    this.advancedButton = $('calendarQuickFormAdvanced');
     this.editButton = $('calendarQuickFormEdit');
     this.entityView = $('calendarViewEntity');
     this.entityKind = $('calendarKindEntity');
@@ -2145,6 +2200,7 @@ Obm.CalendarQuickForm = new Class({
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
+      this.advancedButton.setStyle('display','none');
       this.title.setStyle('display', 'none');
       $('extEventTitle').setStyle('display', 'none');
       if(this.entityList) this.entityList.setStyle('display','none');
@@ -2221,14 +2277,15 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.element_id = '';
     this.eventData.formAction = 'quick_insert';
     this.gotoURI = 'action=new';
-    this.editButton.value = obm.vars.labels.edit_full;
+    this.advancedButton.value = obm.vars.labels.edit_full;
 
     this.form.setStyle('display','block');
     this.data.setStyle('display','none');
     this.title.setStyle('display','none');
     $('extEventTitle').setStyle('display', 'none');
     this.deleteButton.setStyle('display','none');
-    this.editButton.setStyle('display','');
+    this.editButton.setStyle('display','none');
+    this.advancedButton.setStyle('display','');
     this.detailButton.setStyle('display','none');
     if (this.entityList) {
       this.entityList.setStyle('display','');
@@ -2282,6 +2339,9 @@ Obm.CalendarQuickForm = new Class({
         obm.calendarManager.sendCreateEvent(this.eventData);
       } else if (action == 'quick_delete') {
         obm.calendarManager.sendDeleteEvent(this.eventData); 
+      } else if (action == 'detailupdate') {
+    	var evt = obm.calendarManager.events.get(this.eventData.element_id);
+    	obm.calendarManager.sendDetailUpdate(evt);
       } else {
         var evt = obm.calendarManager.events.get(this.eventData.element_id);
         if (evt.event.title != this.eventData.title)  {
