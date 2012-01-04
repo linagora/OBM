@@ -35,7 +35,6 @@ import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -119,7 +118,7 @@ public class AddressBookBindingImplTest {
 		updatedContactFolder2.setUid(2);
 		updatedContactFolder2.setName("updatedContactFolder2");
 
-		List<Folder> updatedContactFolders = new ArrayList<Folder>();
+		Set<Folder> updatedContactFolders = new HashSet<Folder>();
 		updatedContactFolders.add(updatedContactFolder1);
 		updatedContactFolders.add(updatedContactFolder2);
 
@@ -135,7 +134,16 @@ public class AddressBookBindingImplTest {
 		allUpdatedFolders.addAll(updatedContactFolders);
 		allUpdatedFolders.addAll(updatedUserFolders);
 
-		Set<Integer> removedContactFolders = ImmutableSet.of(10, 11);
+		Set<Folder> removedContactFolders =  new HashSet<Folder>();
+		Folder removedContactFolder1 = new Folder();
+		removedContactFolder1.setUid(10);
+		removedContactFolder1.setName("removedContactFolder1");
+		Folder removedContactFolder2 = new Folder();
+		removedContactFolder2.setUid(11);
+		removedContactFolder2.setName("removedContactFolder2");
+		
+		removedContactFolders.add(removedContactFolder1);
+		removedContactFolders.add(removedContactFolder2);
 
 		ObmHelper helper = mockHelper();
 
@@ -219,13 +227,22 @@ public class AddressBookBindingImplTest {
 		updatedContactFolder2.setUid(2);
 		updatedContactFolder2.setName("updatedContactFolder2");
 
-		List<Folder> updatedContactFolders = new ArrayList<Folder>();
+		Set<Folder> updatedContactFolders = new HashSet<Folder>();
 		updatedContactFolders.add(updatedContactFolder1);
 		updatedContactFolders.add(updatedContactFolder2);
 
 		Set<Folder> allUpdatedFolders = new HashSet<Folder>(updatedContactFolders);
 
-		Set<Integer> removedContactFolders = ImmutableSet.of(10, 11);
+		Set<Folder> removedContactFolders =  new HashSet<Folder>();
+		Folder removedContactFolder1 = new Folder();
+		removedContactFolder1.setUid(10);
+		removedContactFolder1.setName("removedContactFolder1");
+		Folder removedContactFolder2 = new Folder();
+		removedContactFolder2.setUid(11);
+		removedContactFolder2.setName("removedContactFolder2");
+		
+		removedContactFolders.add(removedContactFolder1);
+		removedContactFolders.add(removedContactFolder2);
 
 		ObmHelper helper = mockHelper();
 

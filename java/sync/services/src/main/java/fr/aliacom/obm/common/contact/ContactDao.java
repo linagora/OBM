@@ -1509,7 +1509,7 @@ public class ContactDao {
 		return new ArrayList<Contact>();
 	}
 
-	public List<Folder> findUpdatedFolders(Date timestamp, AccessToken at) throws SQLException {
+	public Set<Folder> findUpdatedFolders(Date timestamp, AccessToken at) throws SQLException {
 		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
 			+ " FROM AddressBook a "
 			+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
@@ -1519,7 +1519,7 @@ public class ContactDao {
 
 		int idx = 1;
 
-		List<Folder> folders = new ArrayList<Folder>();
+		Set<Folder> folders = new HashSet<Folder>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1534,14 +1534,7 @@ public class ContactDao {
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				Folder f = new Folder();
-				f.setUid(rs.getInt(1));
-				f.setName(rs.getString(2));
-				if (rs.getInt(3) != userId) {
-					String ownerFirstName = rs.getString(4);
-					String ownerLastName = rs.getString(5);
-					f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
-				}
+				Folder f = buildFolder(at, rs);
 				folders.add(f);
 			}
 
@@ -1554,38 +1547,84 @@ public class ContactDao {
 		return folders;
 	}
 
-	public Set<Integer> findRemovedFolders(Date d, AccessToken at) throws SQLException {
-		Set<Integer> l = new HashSet<Integer>();
+	public Set<Folder> findRemovedFolders(Date date, AccessToken at) throws SQLException {
+		Set<Folder> folders = new HashSet<Folder>();
+		folders.addAll(listDeletedAddressbook(date, at));
+		folders.addAll(listDeletedSyncedAddressbook(date, at));
+		return folders;
+	}
+
+	private Set<Folder> listDeletedAddressbook(Date date, AccessToken at) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;
-
-		String q = 
-			"SELECT addressbook_id FROM DeletedAddressbook WHERE user_id=?  AND timestamp >= ? "
-			+ " UNION "
-			+ "SELECT addressbook_id FROM DeletedSyncedAddressbook WHERE user_id=? AND timestamp >= ?";
-
+		
+		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname" +
+				   " FROM AddressBook" +
+				   " INNER JOIN DeletedAddressbook ON (addressbook_id = id)" +
+				   " INNER JOIN UserObm ON (owner = userobm_id)" +
+				   " WHERE user_id = ? AND timestamp >= ?";
+		
+		Set<Folder> folders = new HashSet<Folder>();
+		
 		try {
 			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
-
-			int idx = 1;
-			ps.setInt(idx++, at.getObmId());
-			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
-			ps.setInt(idx++, at.getObmId());
-			ps.setTimestamp(idx++, new Timestamp(d.getTime()));
-
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, at.getObmId());
+			ps.setTimestamp(2, new Timestamp(date.getTime()));
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				l.add(rs.getInt(1));
+				Folder f = buildFolder(at, rs);
+				folders.add(f);
 			}
-
-			logger.info("Returning " + l.size() + " folder(s) deleted");
+		
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+		return folders;
+	}
 
-		return l;
+
+	private Set<Folder> listDeletedSyncedAddressbook(Date date, AccessToken at) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection con = null;
+		
+		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname" +
+				   " FROM AddressBook" +
+				   " INNER JOIN DeletedSyncedAddressbook ON (addressbook_id = id)" +
+				   " INNER JOIN UserObm ON (owner = userobm_id)" +
+				   " WHERE user_id = ? AND timestamp >= ?";
+		
+		Set<Folder> folders = new HashSet<Folder>();
+		
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, at.getObmId());
+			ps.setTimestamp(2, new Timestamp(date.getTime()));
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				Folder f = buildFolder(at, rs);
+				folders.add(f);
+			}
+		
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+		return folders;
+	}
+	
+	private Folder buildFolder(AccessToken at, ResultSet rs) throws SQLException {
+		Folder f = new Folder();
+		f.setUid(rs.getInt(1));
+		f.setName(rs.getString(2));
+		if (rs.getInt(3) != at.getObmId()) {
+			String ownerFirstName = rs.getString(4);
+			String ownerLastName = rs.getString(5);
+			f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
+		}
+		return f;
 	}
 
 	public int markUpdated(int databaseId) throws SQLException {

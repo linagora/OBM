@@ -98,14 +98,16 @@ public class ContactsBackend extends ObmSyncBackend {
 			itemsChanged.add( createItemChange(bs, folderChangesSorted.next()) );
 		}
 		
-		for (Integer collectionId: folderChanges.getRemoved()) {
-			String toString = collectionIdToString(collectionId);
-			itemsDeleted.add( new ItemChange(toString) );
+		for (Folder folder: folderChanges.getRemoved()) {
+			ItemChange item = createItemDelete(bs, folder);
+			if (item != null) {
+				itemsDeleted.add( item );
+			}
 		}
 		
 		return new HierarchyItemsChanges(itemsChanged, itemsDeleted, folderChanges.getLastSync());
 	}
-	
+
 	private Iterator<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
 		TreeSet<Folder> treeSet = new TreeSet<Folder>( new ComparatorUsingFolderName(defaultAddressBookName) );
 		treeSet.addAll(folderChanges.getUpdated());
@@ -137,6 +139,15 @@ public class ContactsBackend extends ObmSyncBackend {
 		return new ItemChange(serverId, parentId, folder.getName(), itemType, isNew);
 	}
 
+	private ItemChange createItemDelete(BackendSession bs, Folder folder) throws DaoException {
+		String collectionPath = getCollectionPath(bs, folder.getName());
+		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+		if (serverId != null) {
+			return new ItemChange(serverId);
+		}
+		return null;
+	}
+	
 	private String getCollectionPath(BackendSession bs, String folderName)  {
 		if (isDefaultFolder(folderName)) {
 			return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\\\" + folderName;

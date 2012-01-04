@@ -339,13 +339,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Transactional
 	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
 		try {
-			List<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
+			Set<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
 			if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
 					GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
 				updated.addAll(createAddressBookForUsers(timestamp));
 			}
 			
-			Set<Integer> removed = contactDao.findRemovedFolders(timestamp, token);
+			Set<Folder> removed = contactDao.findRemovedFolders(timestamp, token);
 			return new FolderChanges(updated, removed, getLastSync());	
 		} catch (SQLException ex) {
 			throw new ServerFault(ex.getMessage());
