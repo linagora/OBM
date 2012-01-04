@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -374,7 +373,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Transactional
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
 		try {
-			Set<Integer> removal = new HashSet<Integer>();
+			Set<Integer> removal = null;
 			ContactUpdates contactUpdates = null;
 			
 			if (addressBookId == contactConfiguration.getAddressBookUserId()) {
@@ -385,13 +384,16 @@ public class AddressBookBindingImpl implements IAddressBook {
 				removal = contactDao.findRemovalCandidates(lastSync, addressBookId, token);
 			}
 			
-			return new ContactChanges(contactUpdates.getContacts(), removal, getLastSync());
-	
+			return new ContactChanges(
+					contactUpdates.getContacts(), 
+					Sets.union(contactUpdates.getArchived(), removal), 
+					getLastSync());
+			
 		} catch (SQLException ex) {
 			throw new ServerFault(ex);
 		}
 	}
-	
+		
 	private Date getLastSync() throws ServerFault {
 		Connection connection = null;
 		try {
