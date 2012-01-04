@@ -5,7 +5,7 @@ Summary: the Tomcat web application server for Open Business Management
 Vendor: obm.org
 URL: http://www.obm.org
 Group: Applications/File
-License: GPLv2
+License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: %{name}-%{version}.tar.gz
 Source1: obm-tomcat.init

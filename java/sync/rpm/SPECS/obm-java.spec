@@ -5,7 +5,7 @@ Summary: synchronization application for Open Business Management
 Vendor: obm.org
 URL: http://www.obm.org
 Group: Applications/File
-License: GPLv2
+License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: obm-java-%{version}.tar.gz
 Source1: obm-sync.postinst

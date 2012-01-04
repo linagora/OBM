@@ -3,7 +3,7 @@ Version:        %{obm_version}
 Release:        %{obm_release}%{?dist}
 Summary:        Generate SSL for OBM 
 Group:          Development/Tools
-License:        GPLv2
+License:        AGPLv3
 Vendor:		www.obm.org
 BuildArch:      noarch
 # Source obm-ssl-ca

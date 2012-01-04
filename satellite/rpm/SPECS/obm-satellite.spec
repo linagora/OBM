@@ -4,7 +4,7 @@ Release:        %{obm_release}%{?dist}
 Summary:        integration of OBM with Cyrus and Postfix
 
 Group:          Development/Languages
-License:        GPLv2
+License:        AGPLv3
 URL:            http://www.obm.org
 Source0:        %{name}-%{version}.tar.gz
 Source1:        obm-satellite.sh
@@ -34,7 +34,7 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 %package        -n perl-ObmSatellite
 Summary:        library for the integration of OBM with Cyrus and Postfix
 Group:          Development/Libraries
-License:        GPL2
+License:        AGPLv3
 
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
