@@ -96,6 +96,12 @@ documentDefaultPath="/"
 ;auth-ldap-binddn = uid=uid=ldapadmin,ou=sysusers,dc=local
 ;auth-ldap-bindpw = "mdp3PaAL"
 
+
+; If set to true, will display 'login@domain' instead of 'login' when downloading
+; the PDF with the user information after creating a new user (can be useful when using
+; LemonLDAP-ng)
+;show-domain-in-login-pdf=false
+
 [automate]
 ; Automate specific parameters
 ;
