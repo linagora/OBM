@@ -225,7 +225,7 @@ class CalendarMailer extends OBM_Mailer {
       $ics_file = $event->getIcs($this->userId, $method, $include_attachments);
       $this->parts[] = array(
         'content' => fopen($ics_file, 'r'), 
-        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST',
+        'content_type' => 'text/calendar; charset=UTF-8; method='.strtoupper($method),
         'encoding' => $this->icsEncoding
       );
       $this->attachments[] = array(
