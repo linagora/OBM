@@ -6857,7 +6857,8 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   }
   
   // 'ACCEPTED' enables filtering of events upon user participation state. Fix M#3005
-  $reader = new Vcalendar_Reader_OBM($calendar_user, NULL, $start, $end, array("ACCEPTED")); 
+  // 'NEEDS-ACTION' events should popup too. Fix OBMFULL-3022
+  $reader = new Vcalendar_Reader_OBM($calendar_user, NULL, $start, $end, array("ACCEPTED", "NEEDS-ACTION")); 
   $document = $reader->getDocument('PUBLISH', $private);
   $writer = new Vcalendar_Writer_ICS();  
   $writer->writeDocument($document);
