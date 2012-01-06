@@ -856,15 +856,14 @@ Obm.CalendarManager = new Class({
   },
 
 
-	/**
+  /**
    * Reload Calendar
    */
-	
-	reloadCalendar: function() {
-		if(obm.vars.consts.calendarRange == "month") this.current = obm.vars.consts.currentMonth;
+  reloadCalendar: function() {
+    if(obm.vars.consts.calendarRange == "month") this.current = obm.vars.consts.currentMonth;
     this.refresh();
   },
-	
+
 
   /*
    * Back to my view
