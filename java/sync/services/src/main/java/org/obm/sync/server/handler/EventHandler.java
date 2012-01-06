@@ -38,6 +38,7 @@ import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.NotAllowedException;
@@ -538,11 +539,11 @@ public class EventHandler extends SecureSyncHandler {
 		return new EventObmId(params.getParameter(tagName));
 	}
 	
-	private Timestamp getRecurrenceId(ParametersSource params, String tagName) {
+	private DateTime getRecurrenceId(ParametersSource params, String tagName) throws ParseException {
 		String recurrenceIdParam = params.getParameter(tagName);
 		if (recurrenceIdParam != null) {
-			return Timestamp.valueOf(params.getParameter(tagName));
-		}	
+				return new DateTime(recurrenceIdParam);
+		}
 		return null;
 	}
 	

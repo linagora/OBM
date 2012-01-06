@@ -464,8 +464,10 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId.serializeToString());
-		params.put("recurrenceId", recurrenceId.toString());
-		params.put("state", participationState.toString());
+		if (recurrenceId != null) {
+			params.put("recurrenceId", recurrenceId.toString());
+		}
+		params.put("state", participationState.toString()); 
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/changeParticipationState", params);

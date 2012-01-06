@@ -40,6 +40,7 @@ import org.obm.sync.calendar.EventObmId;
 public class ParticipationChanges {
 	private EventObmId eventId;
 	private EventExtId eventExtId;
+	private String recurrenceId;
 	private List<Attendee> attendees;
 	
 	public ParticipationChanges() {
@@ -60,6 +61,14 @@ public class ParticipationChanges {
 
 	public void setEventExtId(EventExtId eventExtId) {
 		this.eventExtId = eventExtId;
+	}
+
+	public String getRecurrenceId() {
+		return recurrenceId;
+	}
+
+	public void setRecurrenceId(String recurrenceId) {
+		this.recurrenceId = recurrenceId;
 	}
 
 	public List<Attendee> getAttendees() {

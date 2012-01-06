@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.transactional.Transactional;
@@ -643,6 +644,10 @@ public class CalendarBindingImpl implements ICalendar {
 				ParticipationChanges participationChanges = new ParticipationChanges(); 
 				participationChanges.setAttendees(event.getAttendees());
 				participationChanges.setEventExtId(event.getExtId());
+				if(event.getRecurrenceId() != null) {
+					String recurrenceId = new DateTime(event.getRecurrenceId()).toString();
+					participationChanges.setRecurrenceId(recurrenceId);
+				}
 				participationChanges.setEventId(event.getObmId());
 				return participationChanges;
 			}
@@ -1130,12 +1135,16 @@ public class CalendarBindingImpl implements ICalendar {
 						sequence, calendarOwner, eventException);
 			}
 		}
-		
+
 		Event newEvent = calendarDao.findOccurrenceByExtIdAndRecurrenceId(token, calendarOwner, extId, recurrenceId);
 		if (newEvent != null) {
 			eventChangeHandler.updateParticipationState(newEvent, calendarOwner, participationState, notification, token);
 		} else {
-			logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
+			if (recurrenceId != null) {
+				logger.error("event with extId : "+ extId + " and recurrenceId : "+ recurrenceId + " is no longer in database, ignoring notification");
+			} else {
+				logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
+			}
 		}
 		return changed;
 	}
