@@ -53,12 +53,16 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 	private Folder[] folders;
 
 	public Sync(Folder... folders) {
-		super(NS.AirSync, "Sync", "SyncRequest.xml");
+		this("SyncRequest.xml");
 		this.folders = folders;
 	}
 
 	public Sync(Document doc) {
 		super(NS.AirSync, "Sync", doc);
+	}
+
+	public Sync(String template) {
+		super(NS.AirSync, "Sync", template);
 	}
 
 	@Override

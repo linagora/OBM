@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetItemEstimate xmlns="ItemEstimate:" xmlns:AirSync="AirSync:">
+	<Response>
+		<Status>STATUS</Status>
+		<Collection>
+			<CollectionId>COLLECTIONID</CollectionId>
+			<Estimate>ESTIMATE</Estimate>
+		</Collection>
+	</Response>
+<GetItemEstimate>

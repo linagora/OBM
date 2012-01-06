@@ -48,7 +48,9 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.FolderSync;
+import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.Options;
 import org.obm.sync.push.client.commands.Sync;
 import org.slf4j.Logger;
@@ -112,10 +114,18 @@ public class OPClient {
 		return run(new Sync(folders));
 	}
 
+	public SyncResponse syncEmail(String key, String collectionId) throws Exception {
+		return run(new EmailSyncCommand(key, collectionId));
+	}
+	
 	public SyncResponse sync(Document doc) throws Exception {
 		return run(new Sync(doc));
 	}
 
+	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, String collectionId) throws Exception {
+		return run(new GetItemEstimateEmailFolderCommand(key, collectionId));
+	}
+	
 	public Document postXml(String namespace, Document doc, String cmd)
 			throws Exception {
 		return postXml(namespace, doc, cmd, null, false);
