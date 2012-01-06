@@ -836,8 +836,8 @@ function dis_calendar_navbar($current_view) {
     </span>
     <span id='navBarLabel' class='label'>$label</span>
     <span class='lnk'>
-      <a href='javascript: void(0);' 
-        onclick='obm.calendarManager.refresh()'>$GLOBALS[l_refresh]</a>
+      <a href='javascript: void(0);'
+        onclick='obm.calendarManager.reloadCalendar()'>$GLOBALS[l_refresh]</a> 
     </span>
     </div>";
   } else {

@@ -855,6 +855,17 @@ Obm.CalendarManager = new Class({
     this.refresh();
   },
 
+
+	/**
+   * Reload Calendar
+   */
+	
+	reloadCalendar: function() {
+		if(obm.vars.consts.calendarRange == "month") this.current = obm.vars.consts.currentMonth;
+    this.refresh();
+  },
+	
+
   /*
    * Back to my view
    * Remove selected entities
@@ -919,13 +930,13 @@ Obm.CalendarManager = new Class({
       data.date = new Obm.DateTime(min).format('c');
       data.ndays = Math.ceil((max - min)/86400000)+1;
       data.cal_range = 'custom';
-      obm.vars.consts.nbDisplayedDays = data.ndays;
+      obm.vars.consts.nbDisplayedDays = data.date;
     } else {
-      if (this.current) data.date = this.current.format('c');
+      if (this.current)	data.date = this.current.format('c');
       data.cal_range = obm.vars.consts.calendarRange;
       data.ndays = obm.vars.consts.nbDisplayedDays;
     }
-         
+	
     new Request.HTML({
       url: obm.vars.consts.calendarUrl,
       secure : false,
