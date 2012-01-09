@@ -201,8 +201,8 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
-		return loginService.login(loginAtDomain, password, "o-push");
+	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
+		return loginService.authenticate(loginAtDomain, password, "o-push");
 	}
 
 	@Override

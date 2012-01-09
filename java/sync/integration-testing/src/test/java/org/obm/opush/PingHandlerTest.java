@@ -51,6 +51,7 @@ import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
@@ -153,14 +154,14 @@ public class PingHandlerTest {
 	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ProcessingEmailException, UnknownObmSyncServerException {
+			ProcessingEmailException, UnknownObmSyncServerException, AuthFault {
 		mockForRegularNeeds();
 		mockForNoChangePing();
 		replay();
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException {
+			UnknownObmSyncServerException, ProcessingEmailException, AuthFault {
 		mockForRegularNeeds();
 		mockForHasChangePing(noChangeIterationCount);
 		replay();
@@ -206,7 +207,7 @@ public class PingHandlerTest {
 					"<Folders><Folder>1432</Folder></Folders></Ping>");
 	}
 
-	private void mockForRegularNeeds() throws DaoException {
+	private void mockForRegularNeeds() throws DaoException, AuthFault {
 		LoginService loginService = classToInstanceMap.get(LoginService.class);
 		mockLoginService(loginService);
 		
@@ -304,9 +305,9 @@ public class PingHandlerTest {
 			.andReturn(0).anyTimes();
 	}
 	
-	private void mockLoginService(LoginService loginService) {
+	private void mockLoginService(LoginService loginService) throws AuthFault {
 		for (OpushUser user : fakeTestUsers) {
-			expect(loginService.login(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
+			expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
 			loginService.logout(user.accessToken);
 			expectLastCall().anyTimes();
 		}

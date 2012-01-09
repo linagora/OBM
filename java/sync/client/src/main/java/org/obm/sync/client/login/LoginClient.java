@@ -1,6 +1,7 @@
 package org.obm.sync.client.login;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -50,6 +51,19 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		token.setSessionId(sid);
 		token.setVersion(version);
 		token.setEmail(email);
+		return token;
+	}
+
+	@Override
+	public AccessToken authenticate(String loginAtDomain, String password, String origin) throws AuthFault {
+		AccessToken token = login(loginAtDomain, password, origin);
+		try {
+			if (token == null || token.getSessionId() == null) {
+				throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
+			}
+		} finally {
+			logout(token);
+		}
 		return token;
 	}
 

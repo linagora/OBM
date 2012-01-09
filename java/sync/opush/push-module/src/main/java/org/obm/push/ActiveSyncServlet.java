@@ -245,7 +245,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private Credentials login(String userId, String password, String deviceId, 
 			String deviceType, String userAgent) throws DaoException, AuthFault {
 		
-		AccessToken accessToken = backend.login(userFactory.getLoginAtDomain(userId), password);
+		AccessToken accessToken = backend.authenticate(userFactory.getLoginAtDomain(userId), password);
 		User user = userFactory.createUser(userId, accessToken.getEmail());
 		boolean initDevice = deviceService.initDevice(user, deviceId, deviceType, userAgent);
 		boolean syncAutho = deviceService.syncAuthorized(user, deviceId);

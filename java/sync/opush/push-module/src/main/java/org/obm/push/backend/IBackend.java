@@ -62,7 +62,7 @@ public interface IBackend {
 
 	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
 
-	AccessToken login(String loginAtDomain, String password) throws AuthFault;
+	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
 
 	Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
