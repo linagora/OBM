@@ -32,17 +32,14 @@
 
 package org.obm.dbcp.jdbc;
 
+import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+
 
 
 public class MySqlJDBCDriver implements IJDBCDriver {
-
-	@Override
-	public String getSupportedDbType() {
-		return "mysql";
-	}
-
-	@Override
-	public String getJDBCUrl(String host, String dbName) {
+	
+	private String getJDBCUrl(String host, String dbName) {
 		String jdbcUrl = "jdbc:mysql://" + host + "/" + dbName + "?"
 				+ getMySQLOptions();
 		return jdbcUrl;
@@ -69,8 +66,23 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 	}
 
 	@Override
-	public String setGMTTimezoneQuery() {
-		return "set time_zone='+00:00'";
+	public String getDataSourceClassName() {
+		return "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
+	}
+
+	@Override
+	public String getUniqueName() {
+		return "mySqlBtm";
+	}
+
+	@Override
+	public Map<String, String> getDriverProperties(String login, String password, String dbName, String dbHost) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		builder.put("user", login);
+		builder.put("password", password);
+		builder.put("databaseName", dbName);
+		builder.put("url", getJDBCUrl(dbHost, dbName));
+		return builder.build();
 	}
 
 }
