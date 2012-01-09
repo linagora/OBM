@@ -39,7 +39,6 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -65,7 +64,6 @@ public interface IContentsExporter {
 	MSAttachementData getEmailAttachement(BackendSession bs,
 			String attachmentName) throws AttachementNotFoundException, CollectionNotFoundException, DaoException, ProcessingEmailException;
 
-	boolean getFilterChanges(BackendSession bs, SyncCollection collection) throws DaoException;
 
 	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state, PIMDataType dataType) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException;

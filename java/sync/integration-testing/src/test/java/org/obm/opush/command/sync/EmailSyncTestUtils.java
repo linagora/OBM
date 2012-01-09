@@ -23,7 +23,6 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -155,11 +154,6 @@ public class EmailSyncTestUtils {
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
 
-		expect(contentsExporter.getFilterChanges(
-				anyObject(BackendSession.class),
-				anyObject(SyncCollection.class)))
-				.andReturn(false).once();
-		
 		expect(contentsExporter.getChanged(
 				anyObject(BackendSession.class), 
 				anyObject(SyncState.class),

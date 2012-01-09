@@ -84,7 +84,7 @@ public class MailBackendTest {
 		emailManager.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class), EasyMock.anyBoolean());
 		EasyMock.expectLastCall().once();
 				
-		MailBackend mailBackend = new MailBackendImpl(emailManager, null, calendarClient, login, new Mime4jUtils(), mockOpushConfigurationService(), null);
+		MailBackend mailBackend = new MailBackendImpl(emailManager, calendarClient, login, new Mime4jUtils(), mockOpushConfigurationService(), null);
 
 		EasyMock.replay(emailManager, calendarClient, backendSession, login);
 

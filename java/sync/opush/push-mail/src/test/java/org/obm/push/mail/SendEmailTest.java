@@ -1,7 +1,8 @@
 package org.obm.push.mail;
 
-import static org.obm.push.mail.MailTestsUtils.loadMimeMessage;
 import static org.obm.push.mail.MailTestsUtils.addr;
+import static org.obm.push.mail.MailTestsUtils.loadMimeMessage;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 

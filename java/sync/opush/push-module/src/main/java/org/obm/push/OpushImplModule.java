@@ -46,7 +46,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(ConfigurationService.class).to(OpushConfigurationService.class);
-		bind(IInvitationFilterManager.class).to(DummyInvitationFilterManager.class);	
 		bind(IBackend.class).to(OBMBackend.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);

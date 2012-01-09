@@ -114,7 +114,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private static class ModificationStatus {
 		public Map<String, String> processedClientIds = new HashMap<String, String>();
-		public boolean hasChanges = false;
 	}
 	
 	private static Map<Integer, IContinuation> waitContinuationCache;
@@ -148,10 +147,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncRequest syncRequest = syncProtocol.getRequest(doc, bs);
 			
 			ModificationStatus modificationStatus = processCollections(bs, syncRequest.getSync());
-			if (!modificationStatus.hasChanges && syncRequest.getSync().getWaitInSecond() > 0) {
+			if (syncRequest.getSync().getWaitInSecond() > 0) {
 				registerWaitingSync(continuation, bs, syncRequest.getSync());
 			} else {
-				
 				SyncResponse syncResponse = doTheJob(bs, syncRequest.getSync().getCollections(), 
 						 modificationStatus.processedClientIds, continuation);
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
@@ -349,16 +347,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				SyncState syncState = new SyncState(collection.getSyncKey());
 				collection.setSyncState(syncState);
 			}
-			
-			modificationStatus.hasChanges |= haveFilteredItemToSync(bs, collection);
 		}
 		return modificationStatus;
 	}
 
-	private boolean haveFilteredItemToSync(BackendSession bs,
-			SyncCollection collection) throws DaoException {
-		return contentsExporter.getFilterChanges(bs, collection);
-	}
 	
 	/**
 	 * Handles modifications requested by mobile device
