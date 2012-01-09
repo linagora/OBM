@@ -943,23 +943,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
-				ParticipationState state = ParticipationState.getValueOf(evrs
-						.getString(2));
 				Integer eventId = evrs.getInt(1);
-				if (state == ParticipationState.DECLINED) {
-					declined.add(new DeletedEvent(
-							new EventObmId(eventId), 
-							new EventExtId(evrs.getString(3))));
-				} else {
-					fetchedData = true;
-					int recurentParentId = evrs.getInt(4);
-					if(recurentParentId > 0){
-						fetched.append(",");
-						fetched.append(recurentParentId);
-					}
+				fetchedData = true;
+				int recurentParentId = evrs.getInt(4);
+				if(recurentParentId > 0){
 					fetched.append(",");
-					fetched.append(eventId);
+					fetched.append(recurentParentId);
 				}
+				fetched.append(",");
+				fetched.append(eventId);
 			}
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
@@ -986,7 +978,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 					+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
 					+ "WHERE e.event_id IN " + fetched.toString();
-
+			
 			try {
 				con = obmHelper.getConnection();
 				evps = con.prepareStatement(ev);
