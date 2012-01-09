@@ -3,6 +3,7 @@ package org.obm.sync.client.login;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
+import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
@@ -68,8 +69,13 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	@Override
 	public void logout(AccessToken at) {
-		Multimap<String, String> params = initParams(at);
-		executeVoid(at, "/login/doLogout", params);
+		try {
+			Multimap<String, String> params = ArrayListMultimap.create();
+			setToken(params, at);
+			executeVoid(at, "/login/doLogout", params);
+		} catch (SIDNotFoundException e) {
+			logger.warn(e.getMessage(), e);
+		}
 	}
 
 	private ObmDomain getDomain(Element root) {
