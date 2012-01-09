@@ -52,7 +52,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
-import org.obm.push.store.CollectionDao;
+import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
@@ -77,12 +77,12 @@ public class ContactsBackend extends ObmSyncBackend {
 	private final ContactConfiguration contactConfiguration;
 	
 	@Inject
-	private ContactsBackend(CollectionDao collectionDao, IAddressBook bookClient, 
+	private ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			@Named(CalendarType.TODO) ICalendar todoClient,
 			LoginService login, ContactConfiguration contactConfiguration) {
 		
-		super(collectionDao, bookClient, calendarClient, todoClient, login);
+		super(mappingService, bookClient, calendarClient, todoClient, login);
 		this.contactConfiguration = contactConfiguration;
 	}
 
@@ -131,7 +131,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		String collectionPath = getCollectionPath(bs, folder.getName());
 		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
 		if (serverId == null) {
-			serverId = createCollectionMapping(bs.getDevice(), collectionPath);
+			serverId = mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
 			isNew = true;
 		}
 		String parentId = getParentId(bs, folder);
@@ -159,8 +159,8 @@ public class ContactsBackend extends ObmSyncBackend {
 	
 	private String getServerIdFromCollectionPath(BackendSession bs, String collectionPath) throws DaoException {
 		try {
-			Integer collectionId = getCollectionIdFor(bs.getDevice(), collectionPath);
-			return collectionIdToString(collectionId);
+			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), collectionPath);
+			return mappingService.collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			return null;
 		}	
@@ -203,7 +203,7 @@ public class ContactsBackend extends ObmSyncBackend {
 
 		List<ItemChange> deletions = new LinkedList<ItemChange>();
 		for (Integer remove : contactChanges.getRemoved()) {
-			ItemChange change = getItemChange(collectionId, String.valueOf(remove));
+			ItemChange change = mappingService.getItemChange(collectionId, String.valueOf(remove));
 			deletions.add(change);
 		}
 
@@ -217,7 +217,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		for (AddressBook addressBook: addressBooks) {
 			String colllectionPath = getCollectionPath(bs, addressBook.getName());
 			try {
-				Integer addressBookCollectionId = getCollectionIdFor(bs.getDevice(), colllectionPath);
+				Integer addressBookCollectionId = mappingService.getCollectionIdFor(bs.getDevice(), colllectionPath);
 				if (addressBookCollectionId.intValue() == collectionId.intValue()) {
 					return addressBook.getUid();
 				}
@@ -254,7 +254,7 @@ public class ContactsBackend extends ObmSyncBackend {
 	
 	private ItemChange convertContactToItemChange(Integer collectionId, Contact contact) {
 		ItemChange ic = new ItemChange();
-		ic.setServerId( getServerIdFor(collectionId, String.valueOf(contact.getUid())) );
+		ic.setServerId( mappingService.getServerIdFor(collectionId, String.valueOf(contact.getUid())) );
 		ic.setData( new ContactConverter().convert(contact) );
 		return ic;
 	}
@@ -262,7 +262,7 @@ public class ContactsBackend extends ObmSyncBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, MSContact data)
 			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException, CollectionNotFoundException {
 		
-		Integer contactId = getItemIdFromServerId(serverId);
+		Integer contactId = mappingService.getItemIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
 
@@ -285,7 +285,7 @@ public class ContactsBackend extends ObmSyncBackend {
 			return null;
 		}
 		
-		return getServerIdFor(collectionId, String.valueOf(contactId));
+		return mappingService.getServerIdFor(collectionId, String.valueOf(contactId));
 	}
 
 	private Contact modifyContact(BackendSession bs, Integer addressBookId, Contact contact) 
@@ -319,12 +319,12 @@ public class ContactsBackend extends ObmSyncBackend {
 	public String delete(BackendSession bs, String serverId) 
 			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
 		
-		Integer contactId = getItemIdFromServerId(serverId);
-		Integer collectionId = getCollectionIdFromServerId(serverId);
+		Integer contactId = mappingService.getItemIdFromServerId(serverId);
+		Integer collectionId = mappingService.getCollectionIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
 			Contact contact = removeContact(bs, addressBookId, contactId);
-			return getServerIdFor(collectionId, String.valueOf(contact.getUid()));
+			return mappingService.getServerIdFor(collectionId, String.valueOf(contact.getUid()));
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
 			return null;
@@ -355,8 +355,8 @@ public class ContactsBackend extends ObmSyncBackend {
 		for (String serverId: fetchServerIds) {
 			try {
 
-				Integer contactId = getItemIdFromServerId(serverId);
-				Integer collectionId = getCollectionIdFromServerId(serverId);
+				Integer contactId = mappingService.getItemIdFromServerId(serverId);
+				Integer collectionId = mappingService.getCollectionIdFromServerId(serverId);
 				Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 				
 				Contact contact = getContactFromId(bs, addressBookId, contactId);
@@ -387,7 +387,7 @@ public class ContactsBackend extends ObmSyncBackend {
 		String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
 		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
 		if (serverId == null) {
-			createCollectionMapping(bs.getDevice(), collectionPath);
+			mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
 		}
 	}
 	

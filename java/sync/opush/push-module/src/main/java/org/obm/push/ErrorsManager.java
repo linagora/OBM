@@ -52,7 +52,7 @@ import org.apache.james.mime4j.message.BodyPart;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.QuotaExceededException;
-import org.obm.push.mail.IEmailManager;
+import org.obm.push.mail.MailboxService;
 import org.obm.push.utils.Mime4jUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,13 +66,13 @@ public class ErrorsManager implements IErrorsManager {
 	private final static String errorNameSender = "X-OBM-OPUSH";
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final IEmailManager manager;
+	private final MailboxService manager;
 	private final Messages messages;
 
 	private final Mime4jUtils mime4jUtils;
 	
 	@Inject
-	private ErrorsManager(IEmailManager manager, Messages messages, Mime4jUtils mime4jUtils) {
+	private ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils) {
 		this.manager = manager;
 		this.mime4jUtils = mime4jUtils;
 		this.messages = messages;

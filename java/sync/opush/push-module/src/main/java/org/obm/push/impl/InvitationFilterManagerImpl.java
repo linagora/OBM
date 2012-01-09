@@ -50,6 +50,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.sync.calendar.EventObmId;
 import org.slf4j.Logger;
@@ -68,13 +69,16 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	private final CalendarBackend calendarBackend;
 	private final MailBackend mailBackend;
 	private final FiltrageInvitationDao filtrageInvitationDao;
+	private final MappingService mappingService;
 
 	@Inject
 	private InvitationFilterManagerImpl(CalendarBackend calendarBackend, 
-			MailBackend mailMabBackend,	FiltrageInvitationDao filtrageInvitationDao) {
+			MailBackend mailMabBackend,	FiltrageInvitationDao filtrageInvitationDao,
+			MappingService mappingService) {
 		this.calendarBackend = calendarBackend;
 		this.mailBackend = mailMabBackend;
-		this.filtrageInvitationDao = filtrageInvitationDao; 
+		this.filtrageInvitationDao = filtrageInvitationDao;
+		this.mappingService = mappingService; 
 	}
 
 	@Override
@@ -250,7 +254,7 @@ public class InvitationFilterManagerImpl implements IInvitationFilterManager {
 	
 	private List<ItemChange> listEmailsToDelete(Integer emailCollectionId, SyncState state) throws DaoException {
 		List<Long> emailUidToDeleted = filtrageInvitationDao.getEmailToDeleted(emailCollectionId, state.getKey());
-		return mailBackend.buildItemsToDeleteFromUids(emailCollectionId, emailUidToDeleted);
+		return mappingService.buildItemsToDeleteFromUids(emailCollectionId, emailUidToDeleted);
 	}
 	
 	private void createOrUpdateInvitation(final Integer emailCollectionId, final Integer eventCollectionId, 

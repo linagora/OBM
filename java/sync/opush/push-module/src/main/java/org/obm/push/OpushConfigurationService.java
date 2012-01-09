@@ -32,21 +32,19 @@
 package org.obm.push;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 import javax.servlet.ServletContext;
 
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.store.StoreNotFoundException;
 
-import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class OpushConfigurationService extends ConfigurationServiceImpl {
+public class OpushConfigurationService extends ConfigurationServiceImpl implements ConfigurationService {
 	
-	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 	private final ServletContext servletContext;
 	
 	@Inject
@@ -64,7 +62,4 @@ public class OpushConfigurationService extends ConfigurationServiceImpl {
 		return storeConfigurations;
 	}
 	
-	public Charset getDefaultEncoding() {
-		return DEFAULT_ENCODING;
-	}
 }

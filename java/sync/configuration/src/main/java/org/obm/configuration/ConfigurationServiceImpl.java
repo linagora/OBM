@@ -32,6 +32,7 @@
 package org.obm.configuration;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
@@ -41,9 +42,12 @@ import javax.naming.ConfigurationException;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
 public class ConfigurationServiceImpl extends AbstractConfigurationService implements ConfigurationService {
+
+	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
 	private final static String LOCATOR_PORT = "8082";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
@@ -115,4 +119,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 		return ResourceBundle.getBundle("Messages", locale, new Control());
 	}
 
+	@Override
+	public Charset getDefaultEncoding() {
+		return DEFAULT_ENCODING;
+	}
+
+	
 }

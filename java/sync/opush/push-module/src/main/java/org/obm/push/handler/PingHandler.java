@@ -155,7 +155,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	private void startEmailMonitoringThreadIfNeeded(BackendSession bs,
-			PingRequest pingRequest) throws CollectionNotFoundException {
+			PingRequest pingRequest) throws CollectionNotFoundException, DaoException {
 		for (SyncCollection syncCollection: pingRequest.getSyncCollections()) {
 			if ("email".equalsIgnoreCase(syncCollection.getDataClass())) {
 				backend.startEmailMonitoring(bs, syncCollection.getCollectionId());

@@ -40,25 +40,32 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;
-import org.obm.push.impl.PushNotification;
+import org.obm.push.service.PushNotification;
+import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.store.CollectionDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-public abstract class MonitoringThread extends OpushMonitoringThread implements Runnable {
+public abstract class MonitoringThread implements Runnable {
 	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	protected final CollectionDao collectionDao;
 	private final Set<ICollectionChangeListener> ccls;
 	private final long freqMillisec;
+	private final PushPublishAndSubscribe pushPublishAndSubscribe;
 	private boolean stopped;
 	
 	protected abstract ChangedCollections getChangedCollections(Date lastSync) throws ChangedCollectionsException, DaoException;
 	
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
-			CollectionDao collectionDao, IContentsExporter contentsExporter) {
-		super(contentsExporter);
-
+			CollectionDao collectionDao, IContentsExporter contentsExporter,
+			PushPublishAndSubscribe.Factory pubSubFactory) {
+		super();
+		
+		this.pushPublishAndSubscribe = pubSubFactory.create(contentsExporter);
 		this.freqMillisec = freqMillisec;
 		this.stopped = false;
 		this.ccls = ccls;
@@ -90,7 +97,7 @@ public abstract class MonitoringThread extends OpushMonitoringThread implements 
 							logger.info("changes detected : {}", changedCollections.toString());
 						}
 						
-						List<PushNotification> toNotify = listPushNotification(selectListenersToNotify(changedCollections, ccls));
+						List<PushNotification> toNotify = pushPublishAndSubscribe.listPushNotification(selectListenersToNotify(changedCollections, ccls));
 						notifyListeners(toNotify);
 						
 						lastSync = changedCollections.getLastSync();

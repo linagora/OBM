@@ -32,10 +32,10 @@ public class IntegrationUserAccessUtils {
 	}
 
 	public static void expectUserLoginFromOpush(LoginService loginService, OpushUser user) throws AuthFault {
-		expect(loginService.login(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
+		expect(loginService.login(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
 		loginService.logout(user.accessToken);
 		expectLastCall().anyTimes();
-		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password, "o-push")).andReturn(user.accessToken).anyTimes();
+		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
 	}
 
 

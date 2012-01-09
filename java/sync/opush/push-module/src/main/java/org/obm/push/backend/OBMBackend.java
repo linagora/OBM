@@ -33,13 +33,9 @@ package org.obm.push.backend;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.minig.imap.IMAPException;
-import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
@@ -47,12 +43,8 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ListenerRegistration;
-import org.obm.push.mail.IEmailManager;
-import org.obm.push.mail.ImapClientProvider;
-import org.obm.push.mail.MailBackend;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
-import org.obm.push.monitor.EmailMonitoringThread;
 import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
 import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
 import org.obm.push.protocol.provisioning.Policy;
@@ -72,38 +64,28 @@ public class OBMBackend implements IBackend {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final CollectionDao collectionDao;
-	private final IEmailManager	emailManager;
 	private final IContentsExporter contentsExporter;
-	private final MailBackend mailBackend;
 	private final CalendarMonitoringThread calendarPushMonitor;
 	private final ContactsMonitoringThread contactsPushMonitor;
 	private final LoginService loginService;
-	
 	private final Set<ICollectionChangeListener> registeredListeners;
-	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
-
-	private final ImapClientProvider imapClientProvider;
+	private final MailMonitoringBackend emailBackend;
 	
 	@Inject
-	private OBMBackend(CollectionDao collectionDao, IEmailManager emailManager,
-			IContentsExporter contentsExporter, MailBackend mailBackend,
+	private OBMBackend(CollectionDao collectionDao,
+			IContentsExporter contentsExporter,
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
 			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, 
 			LoginService loginService,
-			ImapClientProvider imapClientProvider) {
+			MailMonitoringBackend emailBackend) {
 		
 		this.collectionDao = collectionDao;
-		this.emailManager = emailManager;
 		this.contentsExporter = contentsExporter;
-		this.mailBackend = mailBackend;
 		this.loginService = loginService;
-		this.imapClientProvider = imapClientProvider;
+		this.emailBackend = emailBackend;
 		
 		this.registeredListeners = Collections
 				.synchronizedSet(new HashSet<ICollectionChangeListener>());
-		
-		this.emailPushMonitors = Collections
-				.synchronizedMap(new HashMap<Integer, EmailMonitoringThread>());
 		
 		this.calendarPushMonitor = calendarMonitoringThreadFactory
 				.createClient(5000, this.registeredListeners);
@@ -128,40 +110,10 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException {
-		EmailMonitoringThread emt = null;
-		synchronized (emailPushMonitors) {
-			emt = emailPushMonitors.get(collectionId);
-		}
-		try {
-			if (emt != null) {
-				emt.stopIdle();
-			} else {
-				emt = new EmailMonitoringThread(mailBackend, registeredListeners,
-					bs, collectionId, emailManager, contentsExporter, imapClientProvider);
-			}
-		
-			emt.startIdle();
-			
-			synchronized (emailPushMonitors) {
-				emailPushMonitors.put(collectionId, emt);
-			}
-		} catch (DaoException e) {
-			stopIdle(emt, collectionId, e);
-		} catch (IMAPException e) {
-			stopIdle(emt, collectionId, e);
-		} catch (LocatorClientException e) {
-			stopIdle(emt, collectionId, e);
-		}
+	public void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException, DaoException {
+		emailBackend.startMonitoringCollection(bs, collectionId, registeredListeners);
 	}
 
-	private void stopIdle(EmailMonitoringThread emt, Integer collectionId, Exception exception) {
-		logger.error("Error while starting idle on collection [ " + collectionId + " ]", exception);
-		if (emt != null) {
-			emt.stopIdle();	
-		}
-	}
-	
 	@Override
 	public String getWasteBasket() {
 		return "Trash";
@@ -202,7 +154,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
-		return loginService.authenticate(loginAtDomain, password, "o-push");
+		return loginService.authenticate(loginAtDomain, password);
 	}
 
 	@Override

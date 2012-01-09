@@ -35,7 +35,10 @@
 		<module>technical-log</module>
 		<module>push-dao</module>
 		<module>push-bean</module>
+		<module>push-interfaces</module>
+		<module>push-mail</module>
 		<module>push-service</module>
+		<module>push-servlet</module>
 		<module>protocol</module>
 		<module>push-module</module>
 	</modules>

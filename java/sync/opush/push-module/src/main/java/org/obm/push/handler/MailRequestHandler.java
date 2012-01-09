@@ -34,7 +34,6 @@ package org.obm.push.handler;
 import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.minig.imap.IMAPException;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
@@ -47,6 +46,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.MailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -69,7 +69,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, 
-			CollectionNotFoundException, UnknownObmSyncServerException, DaoException, IMAPException;
+			CollectionNotFoundException, UnknownObmSyncServerException, DaoException, MailException;
 	
 	@Override
 	public void process(IContinuation continuation, BackendSession bs, ActiveSyncRequest request, Responder responder) {
@@ -96,7 +96,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
 		} catch (DaoException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
-		} catch (IMAPException e) {
+		} catch (MailException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
 		} catch (QuotaExceededException e) {
 			notifyUserQuotaExceeded(bs, e);

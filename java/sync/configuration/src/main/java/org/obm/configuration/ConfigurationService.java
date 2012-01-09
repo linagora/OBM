@@ -1,6 +1,7 @@
 package org.obm.configuration;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
@@ -25,4 +26,6 @@ public interface ConfigurationService {
 
 	ResourceBundle getResourceBundle(Locale locale);
 
+	Charset getDefaultEncoding();
+	
 }

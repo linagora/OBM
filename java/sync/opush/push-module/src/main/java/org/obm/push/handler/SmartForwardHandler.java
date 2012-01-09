@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import org.minig.imap.IMAPException;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
@@ -41,6 +40,7 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.MailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 
@@ -59,7 +59,7 @@ public class SmartForwardHandler extends MailRequestHandler {
 
 	@Override
 	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException, 
-	SendEmailException, SmtpInvalidRcptException, UnknownObmSyncServerException, DaoException, IMAPException {
+	SendEmailException, SmtpInvalidRcptException, UnknownObmSyncServerException, DaoException, MailException {
 
 		contentsImporter.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
 				mailRequest.getCollectionId(), mailRequest.getServerId());

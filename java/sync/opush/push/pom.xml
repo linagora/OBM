@@ -23,7 +23,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-module</artifactId>
+			<artifactId>push-servlet</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>

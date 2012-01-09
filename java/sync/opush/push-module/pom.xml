@@ -37,10 +37,6 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
 		</dependency>
@@ -128,11 +124,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
 		</dependency>
@@ -154,6 +145,11 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-interfaces</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>

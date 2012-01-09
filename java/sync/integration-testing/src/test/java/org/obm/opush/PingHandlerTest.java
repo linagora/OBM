@@ -280,7 +280,7 @@ public class PingHandlerTest {
 				anyObject(PIMDataType.class)))
 			.andReturn(0).anyTimes();
 	}
-	
+
 	private Future<Document> queuePingCommand(final OPClient opClient,
 			ThreadPoolExecutor threadPoolExecutor) {
 		return threadPoolExecutor.submit(new Callable<Document>() {

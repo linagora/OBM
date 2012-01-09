@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.locator;
 
-public class LocatorClientException extends Exception {
+public class LocatorClientException extends RuntimeException {
 
 	public LocatorClientException(String message) {
 		super(message);

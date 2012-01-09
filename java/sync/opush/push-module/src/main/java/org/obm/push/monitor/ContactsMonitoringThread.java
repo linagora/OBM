@@ -38,6 +38,7 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;
+import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.store.CollectionDao;
 
 import com.google.inject.Inject;
@@ -49,25 +50,28 @@ public class ContactsMonitoringThread extends MonitoringThread {
 	public static class Factory {
 		private final CollectionDao collectionDao;
 		private final IContentsExporter contentsExporter;
+		private final PushPublishAndSubscribe.Factory pubSubFactory;
 
 		@Inject
-		private Factory(CollectionDao collectionDao, IContentsExporter contentsExporter) {
+		private Factory(CollectionDao collectionDao, IContentsExporter contentsExporter,
+				PushPublishAndSubscribe.Factory pubSubFactory) {
 			this.collectionDao = collectionDao;
 			this.contentsExporter = contentsExporter;
+			this.pubSubFactory = pubSubFactory;
 		}
 
 		public ContactsMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
 			return new ContactsMonitoringThread(freqMs, ccls,
-					this.collectionDao, this.contentsExporter);
+					this.collectionDao, this.contentsExporter, pubSubFactory);
 		}
 	}
 	
 	private ContactsMonitoringThread(long freqMs,
 			Set<ICollectionChangeListener> ccls,
-			CollectionDao collectionDao, IContentsExporter contentsExporter) {
-		super(freqMs, ccls, collectionDao, contentsExporter);
+			CollectionDao collectionDao, IContentsExporter contentsExporter, PushPublishAndSubscribe.Factory pubSubFactory) {
+		super(freqMs, ccls, collectionDao, contentsExporter, pubSubFactory);
 	}
 
 	@Override
