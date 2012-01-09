@@ -48,3 +48,6 @@ install/obm-locator::
 
 install/opush::
 	(/bin/bash $(CURDIR)/debian/opush-build.sh $(CURDIR))
+
+install/obm-tomcat-common-libs::
+	(/bin/bash $(CURDIR)/debian/obm-webapp-common-libs-build.sh $(CURDIR) "tomcat")

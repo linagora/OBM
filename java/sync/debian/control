@@ -9,7 +9,7 @@ Homepage: http://www.obm.org
 
 Package: obm-sync
 Architecture: all
-Pre-Depends: obm-conf, obm-tomcat
+Pre-Depends: obm-conf, obm-tomcat, obm-tomcat-common-libs
 Depends: obm-munin-node
 Description: synchronization application for Open Business Management
  This package contains a J2E web application used to synchronize OBM data with
@@ -71,3 +71,15 @@ Description: Icedove/Thunderbird autoconfiguration service for Open Business Man
  be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
  simple contact database. OBM also features integration with PDAs, smartphones,
  Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+Package: obm-tomcat-common-libs
+Architecture: all
+Pre-Depends: obm-tomcat
+Description: Tomcat common libs for Open Business Management
+ This package contains the library used by obm webapps deployed in tomcat.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
