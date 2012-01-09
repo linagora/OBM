@@ -22,7 +22,7 @@ Description: synchronization application for Open Business Management
 
 Package: opush
 Architecture: all
-Depends: obm-conf, sun-java6-jdk, obm-jetty
+Depends: obm-conf, sun-java6-jdk, obm-jetty, obm-jetty-common-libs
 Provides: obm-opush
 Replaces: obm-opush ( << 2.3.3-1 )
 Conflicts: obm-opush ( << 2.3.3-1 )
@@ -49,7 +49,7 @@ Description: Transitional package for opush
 
 Package: obm-locator
 Architecture: all
-Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty
+Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty, obm-jetty-common-libs
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
@@ -76,6 +76,17 @@ Package: obm-tomcat-common-libs
 Architecture: all
 Pre-Depends: obm-tomcat
 Description: Tomcat common libs for Open Business Management
+ This package contains the library used by obm webapps deployed in tomcat.
+ .
+ OBM is a global groupware, messaging and CRM application. It is intended to
+ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+ simple contact database. OBM also features integration with PDAs, smartphones,
+ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+Package: obm-jetty-common-libs
+Architecture: all
+Pre-Depends: obm-jetty
+Description: Jetty common libs for Open Business Management
  This package contains the library used by obm webapps deployed in tomcat.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to

@@ -51,3 +51,6 @@ install/opush::
 
 install/obm-tomcat-common-libs::
 	(/bin/bash $(CURDIR)/debian/obm-webapp-common-libs-build.sh $(CURDIR) "tomcat")
+
+install/obm-jetty-common-libs::
+	(/bin/bash $(CURDIR)/debian/obm-webapp-common-libs-build.sh $(CURDIR) "jetty")
