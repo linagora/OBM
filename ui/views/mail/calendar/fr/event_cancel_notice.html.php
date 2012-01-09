@@ -53,7 +53,10 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;"><?php echo $location; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"><?php echo $auteur; ?></td>
+        <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
     </tr>
     <tr>
         <td colspan="2">

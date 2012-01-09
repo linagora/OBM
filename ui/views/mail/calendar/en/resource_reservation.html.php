@@ -55,7 +55,10 @@ A new resource reservation was scheduled
         <td style="text-align:right;">Location</td><td><?php echo $location; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;">Author</td><td><?php echo $auteur; ?></td>
+        <td style="text-align:right;">Organizer</td><td><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;">Created by</td><td><?php echo $creator; ?></td>
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">

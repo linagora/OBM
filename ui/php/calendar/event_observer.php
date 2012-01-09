@@ -74,6 +74,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $contact;
   private $sequence;
   private $ics_files = array();
+  private $creator;
 
 
   /**
@@ -464,14 +465,15 @@ class OBM_EventFactory extends OBM_ASubject {
    * @return OBM_Event
    */
   public function getById($id) {
-    $query = 'SELECT Event.*, userobm_id, userobm_lastname, userobm_firstname FROM Event INNER JOIN UserObm ON userobm_id = event_owner WHERE event_id = '.$id.'';
+    $query = 'SELECT Event.*, owner.userobm_id AS owner_id, owner.userobm_lastname AS owner_last_name, owner.userobm_firstname AS owner_firstname, creator.userobm_id AS creator_id, creator.userobm_lastname AS creator_lastname, creator.userobm_firstname AS creator_firstname FROM Event INNER JOIN UserObm owner ON owner.userobm_id = event_owner INNER JOIN UserObm creator ON creator.userobm_id = event_usercreate WHERE event_id = '.$id.'';
     $this->db->query($query);
     $this->db->next_record();
     $event = new OBM_Event($id);
     $event->title = $this->db->f('event_title');
     $event->uid = $this->db->f('event_ext_id');
     $event->sequence = $this->db->f('event_sequence');
-    $event->owner = new OBM_EventAttendee($this->db->f('userobm_id'), null, $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname')) ;
+    $event->owner = new OBM_EventAttendee($this->db->f('owner_id'), null, $this->db->f('owner_firstname').' '.$this->db->f('owner_lastname')) ;
+    $event->creator = new OBM_EventAttendee($this->db->f('creator_id'), null, $this->db->f('creator_firstname').' '.$this->db->f('creator_lastname')) ;
     $event->opacity = $this->db->f('event_opacity');
     $event->location = $this->db->f('event_location');
     $event->category1 = $this->db->f('event_category1_id');

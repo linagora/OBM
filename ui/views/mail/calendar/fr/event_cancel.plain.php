@@ -38,13 +38,14 @@ RENDEZ-VOUS ANNULÉ !
 
 Le rendez-vous suivant à été annulé
 
-du     : <?php echo $start; ?>
+du              : <?php echo $start; ?>
 
-au     : <?php echo $end; ?>
+au              : <?php echo $end; ?>
 
-sujet  : <?php echo $title; ?>
+sujet           : <?php echo $title; ?>
 
-lieu   : <?php echo $location; ?>
+lieu            : <?php echo $location; ?>
 
-auteur : <?php echo $auteur; ?>
+organisateur    : <?php echo $organizer; ?>
 
+créé par        : <?php echo $creator; ?>

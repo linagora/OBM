@@ -38,14 +38,16 @@ NEW APPOINTMENT
 
 You are invited to participate to this appointment
 
-from     : <?php echo $start; ?>
+from        : <?php echo $start; ?>
 
-to       : <?php echo $end; ?>
+to          : <?php echo $end; ?>
 
-subject  : <?php echo $title; ?>
+subject     : <?php echo $title; ?>
 
-location : <?php echo $location; ?>
+location    : <?php echo $location; ?>
 
-author   : <?php echo $auteur; ?>
+organizer   : <?php echo $organizer; ?>
 
-attendee(s)   : <?php echo $attendees; ?>
+created by  : <?php echo $creator; ?>
+
+attendee(s) : <?php echo $attendees; ?>

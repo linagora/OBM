@@ -38,15 +38,17 @@ NEW RESOURCE RESERVATION !
 
 A new resource reservation was scheduled
 
-from     : <?php echo $start; ?>
+from         : <?php echo $start; ?>
 
-to       : <?php echo $end; ?>
+to           : <?php echo $end; ?>
 
-subject  : <?php echo $title; ?>
+subject      : <?php echo $title; ?>
 
-location : <?php echo $location; ?>
+location     : <?php echo $location; ?>
 
-author   : <?php echo $auteur; ?>
+organizer    : <?php echo $organizer; ?>
+
+created by   : <?php echo $creator; ?>
 
 
 :: To accept or refuse this reservation :

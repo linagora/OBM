@@ -38,17 +38,19 @@ NEW APPOINTMENT
 
 You are invited to participate to this appointment
 
-from     : <?php echo $start; ?>
+from        : <?php echo $start; ?>
 
-to       : <?php echo $end; ?>
+to          : <?php echo $end; ?>
 
-subject  : <?php echo $title; ?>
+subject     : <?php echo $title; ?>
 
-location : <?php echo $location; ?>
+location    : <?php echo $location; ?>
 
-author   : <?php echo $auteur; ?>
+organizer   : <?php echo $organizer; ?>
 
-attendee(s)   : <?php echo $attendees; ?>
+created by  : <?php echo $creator; ?>
+
+attendee(s) : <?php echo $attendees; ?>
 
 :: To accept this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED

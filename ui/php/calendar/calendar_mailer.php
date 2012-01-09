@@ -52,7 +52,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('New event from %organizer%: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     $this->attachIcs($event, "request");
   }
@@ -61,7 +61,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('New event from %organizer%: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
 
@@ -69,7 +69,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('Event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     $this->attachIcs($event, "cancel");
   }
@@ -78,7 +78,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('Event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
   
@@ -86,7 +86,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('Event from %organizer% updated: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     $this->attachIcs($event, "request");
@@ -96,7 +96,7 @@ class CalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
-    $this->subject = __('Event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+    $this->subject = __('Event from %organizer% updated: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
@@ -259,7 +259,8 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'end'      => $event->date_end->getOutputDateTime(),
       $prefix.'title'    => $event->title,
       $prefix.'location' => $event->location,
-      $prefix.'auteur'   => $event->owner->label,
+      $prefix.'organizer'=> $event->owner->label,
+      $prefix.'creator'  => $event->creator->label,
       $prefix.'target'   => $target->label,
       $prefix.'targetState' => __($target->state),
       $prefix.'attendees' => $list_attendees
