@@ -81,12 +81,22 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
-        </dependency>
+        	</dependency>
 		<dependency>
 		    <groupId>com.google.guiceberry</groupId>
 		    <artifactId>guiceberry</artifactId>
 		    <version>3.1.0</version>
 		    <scope>test</scope>
 		</dependency>
+		<dependency>
+                       <groupId>org.codehaus.btm</groupId>
+                       <artifactId>btm</artifactId>
+                       <scope>test</scope>
+                </dependency>
+                <dependency>
+			<groupId>javax.transaction</groupId>
+                       	<artifactId>jta</artifactId>
+                       	<scope>test</scope>
+               </dependency>
 	</dependencies>
 </project>

@@ -38,6 +38,7 @@
 		<jsoup.version>1.6.1</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.7.1</apache-mime4j.version>
+		<btm.version>2.1.0</btm.version>
 	</properties>
 
 	<repositories>
@@ -72,6 +73,7 @@
 		<module>autoconf</module>
 		<module>common-test</module>
 		<module>integration-testing</module>
+		<module>webapp-common-dependencies</module>
 	</modules>
 
 	<build>
@@ -303,11 +305,13 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>${postgresql.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql-connector-java.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jsoup</groupId>
@@ -330,7 +334,13 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>javax.transaction</groupId>
 				<artifactId>jta</artifactId>
 				<version>${jta.version}</version>
+				<scope>provided</scope>
 			</dependency>
+			<dependency>
+                        	<groupId>org.codehaus.btm</groupId>
+                        	<artifactId>btm</artifactId>
+                        	<version>${btm.version}</version>
+	                </dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
@@ -363,12 +373,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${easymock.version}</version>
 				<scope>test</scope>
 			</dependency>
-            <dependency>
-                <groupId>org.easytesting</groupId>
-                <artifactId>fest-assert</artifactId>
-                <version>${fest.version}</version>
-                <scope>test</scope>
-            </dependency>
+            		<dependency>
+                		<groupId>org.easytesting</groupId>
+                		<artifactId>fest-assert</artifactId>
+                		<version>${fest.version}</version>
+                		<scope>test</scope>
+            		</dependency>
 			<dependency>
 				<groupId>org.hornetq</groupId>
 				<artifactId>hornetq-core</artifactId>
