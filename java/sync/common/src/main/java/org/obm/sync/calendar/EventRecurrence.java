@@ -137,7 +137,7 @@ public class EventRecurrence {
 		eventRecurrence.setKind(this.kind);
 		return eventRecurrence;
 	}
-
+	
 	public boolean hasImportantChanges(EventRecurrence recurrence) {
 		if (recurrence == null) {
 			return true;

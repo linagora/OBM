@@ -317,6 +317,44 @@ public class Event implements Indexed<Integer> {
 		return event;
 	}
 
+	public Event cloneAndKeepException(Date recurrenceId) {
+		Event event = new Event();
+		event.setAlert(alert);
+		event.setAllday(allday);
+		event.addAttendees(new LinkedList<Attendee>(attendees));
+		event.setCategory(category);
+		event.setCompletion(completion);
+		event.setDate(recurrenceId);
+		event.setDescription(description);
+		event.setDomain(domain);
+		event.setDuration(duration);
+		event.setEntityId(entityId);
+		event.setExtId(extId);
+		event.setLocation(location);
+		event.setOpacity(opacity);
+		event.setOwner(owner);
+		event.setOwnerDisplayName(ownerDisplayName);
+		event.setOwnerEmail(ownerEmail);
+		event.setPercent(percent);
+		event.setPriority(priority);
+		event.setPrivacy(privacy);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.lookup("none"));
+		event.setRecurrence(recurrence);
+		event.setTimeUpdate(timeUpdate);
+		event.setTimezoneName(timezoneName);
+		event.setTitle(title);
+		event.setType(type);
+		event.setUid(uid);
+		event.setRecurrenceId(recurrenceId);
+		event.setInternalEvent(internalEvent);
+		event.setSequence(sequence);
+		
+		event.setTimeCreate(timeCreate);
+		event.setTimeUpdate(timeUpdate);
+		return event;
+	}
+	
 	public String getTimezoneName() {
 		return timezoneName;
 	}
