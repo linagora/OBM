@@ -203,7 +203,30 @@ class OBM_AddressBook implements OBM_ISearchable {
                                                           $db->f('entityright_read'), $db->f('entityright_write'),$db->f('entityright_admin'));
       }
     }  
+    return new OBM_AddressBookArray($addressBooks);
+  }
 
+  public static function searchOwnAddressBooks($user_id) {
+    $db = new DB_OBM;
+    $addressBooks = array();
+    $db->xquery("SELECT
+	    AddressBook.id,
+        AddressBook.owner,
+        AddressBook.name,
+        AddressBook.is_default,
+        AddressBook.syncable,
+        1,1,1,1,
+        SyncedAddressbook.user_id as synced
+        FROM AddressBook
+        JOIN SyncedAddressbook ON AddressBook.id = SyncedAddressbook.addressbook_id
+        WHERE AddressBook.owner=$user_id");
+    while($db->next_record()) {
+        $addressBooks[$db->f('id')] = new OBM_AddressBook($db->f('id'), 
+        $db->f('name'), $db->f('is_default'), $db->f('owner'), 
+        $db->f('syncable'), $db->f('synced'), $db->f('entityright_access'),
+        $db->f('entityright_read'), $db->f('entityright_write'),
+        $db->f('entityright_admin'));
+    }
     return new OBM_AddressBookArray($addressBooks);
   }
 

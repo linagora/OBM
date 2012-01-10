@@ -106,9 +106,9 @@ $this->login = $login;
     //privateContacts
     if (isset($data['privateContact'])) {
       $privateContact = $sxml->addChild('privateContact');
-      foreach ($data['privateContact'] as $addBookName => $addBook) {
-        $xmlAddressBook = $privateContact->addChild('addressBook',base64_encode($addBook));
-        $xmlAddressBook->addAttribute('name', $addBookName);
+      foreach ($data['privateContact'] as $addBook) {
+        $xmlAddressBook = $privateContact->addChild('addressBook',base64_encode($addBook->toVcard()));
+        $xmlAddressBook->addAttribute('name', $addBook->name);
       }
     }
 

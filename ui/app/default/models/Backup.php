@@ -321,26 +321,13 @@ class Backup {
   }
 
   /**
-   * Perform the export of user contacts to the vcard format
+   * Perform the export of user contacts
    */
   private function user_contacts_export($user_id) {
-    $vcards = array();
-
     include_once('php/contact/addressbook.php');
 
-    $remember_uid = $GLOBALS['obm']['uid'];
-    $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
-
-    $addressbooks = OBM_AddressBook::search();
-    foreach ($addressbooks as $addressbook) {
-      if ($addressbook->name!='public_contacts') { // I'd better filter this addressbook on search
-        $vcards[$addressbook->name] = $addressbook->toVcard();
-      }
-    }
-
-    $GLOBALS['obm']['uid'] = $remember_uid;
-
-    return $vcards;
+    $addressbooks = OBM_AddressBook::searchOwnAddressBooks($user_id);
+    return $addressbooks;
   }
 
   /**
@@ -353,7 +340,7 @@ class Backup {
     $remember_uid = $GLOBALS['obm']['uid'];
     $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
 
-    $addressbooks = OBM_AddressBook::search();
+    $addressbooks = OBM_AddressBook::searchOwnAddressBooks($user_id);
     $addressBookByName = array();
     foreach ($addressbooks as $addressbook) {
       if ($addressbook->name!='public_contacts') { // I'd better filter this addressbook on search
@@ -372,7 +359,7 @@ class Backup {
       } else {
         $addressbook = OBM_AddressBook::create(array('name' => $addBookName));
       }
-      if($fd && $addressbook->write) {
+      if($fd) {
         $ids = run_query_vcard_insert(array('vcard_fd' => $fd), $addressbook);
       }
     }
