@@ -39,17 +39,13 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
 
 import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
 
 import bitronix.tm.TransactionManagerServices;
-
-import fr.aliasource.obm.utils.ObmHelper;
 
 
 public class DataSourceEnv {
@@ -86,7 +82,7 @@ public class DataSourceEnv {
 
 		Transaction ut = tm.getTransaction();
 		Class.forName(props.getProperty("driver"));
-		IDBCP dbcp = new DBCP(tm);
+		IDBCP dbcp = new DBCP();
 /*
 		DataSource ds = new javax.sql.DataSource(
 				props.getProperty("url"), props.getProperty("login"), props
