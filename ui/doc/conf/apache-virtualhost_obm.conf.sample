@@ -48,11 +48,11 @@ NameVirtualHost *:443
 #obm#</Location>
 
 
-#obm#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync/ActiveSyncServlet/
-#obm#ProxyPassReverse /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync/ActiveSyncServlet/
+#obm#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/opush/ActiveSyncServlet/
+#obm#ProxyPassReverse /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/opush/ActiveSyncServlet/
 
-#obm#ProxyPassMatch (?i:/autodiscover) http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync/Autodiscover/
-#obm#ProxyPassReverse /autodiscover http://_OPUSH_SERVER_:8082/Microsoft-Server-ActiveSync/Autodiscover/
+#obm#ProxyPassMatch (?i:/autodiscover) http://_OPUSH_SERVER_:8082/opush/Autodiscover/
+#obm#ProxyPassReverse /autodiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 
 
 #obm#ProxyRequests On

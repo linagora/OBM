@@ -27,7 +27,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # copie du web-inf
-WEBAPP="${PROJECT_NAME}/target/Microsoft-Server-ActiveSync"
+WEBAPP="${PROJECT_NAME}/target/opush"
 cp -r ${WEBAPP} ${INSTALL_DIR}
 
 # Copie des fichiers de template de configuration

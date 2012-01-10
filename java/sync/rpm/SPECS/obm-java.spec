@@ -86,8 +86,8 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/jta-1.1.jar
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
 
 # install opush
-#mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/Microsoft-Server-ActiveSync
-mkdir -p $RPM_BUILD_ROOT/srv/jetty6/webapps/Microsoft-Server-ActiveSync
+#mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
+mkdir -p $RPM_BUILD_ROOT/srv/jetty6/webapps/opush
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/opush
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/opush
 cp opush/config-sample/sync_perms.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
@@ -96,8 +96,8 @@ cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
 # copie du web-inf
 cd opush
 WEB_INF=`find push/target -name WEB-INF `
-#cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/Microsoft-Server-ActiveSync
-cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/Microsoft-Server-ActiveSync
+#cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
+cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/opush
 cd -
 
 # install obm-locator
@@ -117,8 +117,8 @@ cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 
 %files -n opush
 %defattr(-,root,root,-)
-#%{_datadir}/jetty/webapps/Microsoft-Server-ActiveSync
-/srv/jetty6/webapps/Microsoft-Server-ActiveSync
+#%{_datadir}/jetty/webapps/opush
+/srv/jetty6/webapps/opush
 %{_localstatedir}/log/opush
 %config(noreplace) %{_sysconfdir}/opush/sync_perms.ini
 %config(noreplace) %{_sysconfdir}/opush/ldap_conf.ini

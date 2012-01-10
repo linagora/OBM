@@ -65,6 +65,7 @@ EOF
 elif [ -f "/etc/apache2/sites-available/obm.conf" ] ; then
    # if the obm.conf file is already in place we just ensure there is a / at then end of the Opush Proxy
    perl -i -pe's@/Microsoft-Server-ActiveSync$@/Microsoft-Server-ActiveSync/@g' /etc/apache2/sites-available/obm.conf
+   perl -i -pe's@/Microsoft-Server-ActiveSync/$@/opush/ActiveSyncServlet/@g' /etc/apache2/sites-available/obm.conf
 fi
 
 if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.2.0-0; then

@@ -29,7 +29,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>Microsoft-Server-ActiveSync</finalName>
+		<finalName>opush</finalName>
 		<plugins>		
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
