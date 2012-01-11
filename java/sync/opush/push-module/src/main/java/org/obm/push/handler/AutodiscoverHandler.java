@@ -34,7 +34,7 @@ package org.obm.push.handler;
 import java.util.List;
 import java.util.Locale;
 
-import org.obm.push.OpushConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
@@ -56,10 +56,10 @@ import com.google.inject.Singleton;
 public class AutodiscoverHandler extends XmlRequestHandler {
 	
 	private final AutodiscoverProtocol protocol;
-	private final OpushConfigurationService configurationService;
+	private final ConfigurationService configurationService;
 
 	@Inject AutodiscoverHandler(AutodiscoverProtocol autodiscoverProtocol, 
-			OpushConfigurationService configurationService) {
+			ConfigurationService configurationService) {
 		
 		this.protocol = autodiscoverProtocol;
 		this.configurationService = configurationService; 

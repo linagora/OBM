@@ -22,12 +22,14 @@ public class SingleUserFixture {
 	@Inject
 	public SingleUserFixture(User.Factory userFactory) {
 		jaures = new OpushUser();
-		jaures.user = userFactory.createUser("jaures@sfio.fr", null, null);
+		jaures.user = userFactory.createUser("jaures@sfio.fr", "jaures@sfio.fr", "Jean Jaures");
 		jaures.password = "jaures";
 		jaures.deviceType = "BellLabsWiredPhone";
 		jaures.deviceId = "blwp123";
 		jaures.userAgent = "BellLabsWiredPhoneAgent";
 		jaures.accessToken = new AccessToken(1, "o-push");
+		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());
+		jaures.accessToken.setUserEmail(jaures.user.getEmail());
 	}
 	
 }
