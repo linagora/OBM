@@ -50,7 +50,6 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.MSTask;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -75,7 +74,6 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.services.IAddressBook;
 import org.obm.sync.services.ICalendar;
 
 import com.google.common.collect.ImmutableList;
@@ -88,22 +86,26 @@ import com.google.inject.name.Named;
 public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private final EventConverter eventConverter;
-	private final TodoConverter todoConverter;
 	private final EventService eventService;
+	private final ICalendar calendarClient;
 
 	@Inject
 	private CalendarBackend(MappingService mappingService, 
-			IAddressBook bookClient, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
-			@Named(CalendarType.TODO) ICalendar todoClient,
-			EventConverter eventConverter, TodoConverter todoConverter, EventService eventService,
+			EventConverter eventConverter, 
+			EventService eventService,
 			LoginService login) {
-		super(mappingService, bookClient, calendarClient, todoClient, login);
+		super(mappingService, login);
+		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
-		this.todoConverter = todoConverter;
 		this.eventService = eventService;
 	}
 
+	private String getDefaultCalendarName(BackendSession bs) {
+		return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\calendar\\"
+				+ bs.getUser().getLoginAtDomain();
+	}
+	
 	@Override
 	public PIMDataType getPIMDataType() {
 		return PIMDataType.CALENDAR;
@@ -121,10 +123,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private List<ItemChange> getCalendarList(BackendSession bs) throws DaoException, UnknownObmSyncServerException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		ICalendar cc = getCalendarClient();
 		AccessToken token = login(bs);
 		try {
-			CalendarInfo[] cals = cc.listCalendars(token);
+			CalendarInfo[] cals = calendarClient.listCalendars(token);
 			String domain = bs.getUser().getDomain();
 			for (CalendarInfo ci : cals) {
 				ItemChange ic = new ItemChange();
@@ -206,7 +207,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			CollectionNotFoundException, UnknownObmSyncServerException,
 			ProcessingEmailException {
 		
-		ICalendar cc = getEventSyncClient(getPIMDataType());
 		AccessToken token = login(bs);
 		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
@@ -221,15 +221,15 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			
 			EventChanges changes = null;
 			if (state.isLastSyncFiltred()) {
-				changes = cc.getSyncEventDate(token, calendar, state.getLastSync());
+				changes = calendarClient.getSyncEventDate(token, calendar, state.getLastSync());
 			} else {
-				changes = cc.getSync(token, calendar, state.getLastSync());
+				changes = calendarClient.getSync(token, calendar, state.getLastSync());
 			}
 			
 			logger.info("Event changes [ {} ]", changes.getUpdated().length);
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 			
-			final String userEmail = cc.getUserEmail(token);
+			final String userEmail = calendarClient.getUserEmail(token);
 			addOrRemoveEventFilter(addUpd, deletions, changes, userEmail, collectionId, bs);
 			syncDate = changes.getLastSync();
 			
@@ -313,7 +313,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, IApplicationData data) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
 
-		ICalendar cc = getEventSyncClient(data.getType());
 		AccessToken token = login(bs);
 		
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
@@ -326,7 +325,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Event oldEvent = null;
 			if (serverId != null) {
 				eventId = convertServerIdToEventObmId(serverId);
-				oldEvent = cc.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventId);	
+				oldEvent = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventId);	
 			}
 
 			boolean isInternal = EventConverter.isInternalEvent(oldEvent, true);
@@ -335,15 +334,15 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			if (eventId != null) {
 				event.setUid(eventId);
 				setSequence(oldEvent, event);
-				updateCalendarEntity(cc, token, collectionPath, oldEvent, event);
+				updateCalendarEntity(calendarClient, token, collectionPath, oldEvent, event);
 			} else {
-				eventId = createCalendarEntity(bs, cc, token, collectionPath, event, data);
+				eventId = createCalendarEntity(bs, calendarClient, token, collectionPath, event, data);
 			}
 				
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} catch (EventAlreadyExistException e) {
-			eventId = getEventIdFromExtId(token, collectionPath, cc, event);
+			eventId = getEventIdFromExtId(token, collectionPath, calendarClient, event);
 		} catch (EventNotFoundException e) {
 			throw new ServerItemNotFoundException(serverId);
 		} finally {
@@ -409,14 +408,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private Event convertMSObjectToObmObject(BackendSession bs,
 			IApplicationData data, Event oldEvent, boolean isInternal) {
-		switch (data.getType()) {
-		case CALENDAR:
-			return eventConverter.convert(bs, oldEvent, (MSEvent) data, isInternal);
-		case TASKS:
-			return todoConverter.convert(bs, oldEvent, (MSTask) data, isInternal);
-		default:
-			throw new InvalidParameterException("Can't convert type " + data.getType());
-		}
+		return eventConverter.convert(bs, oldEvent, (MSEvent) data, isInternal);
 	}
 	
 	private EventObmId getEventIdFromExtId(AccessToken token, String collectionPath, ICalendar cc, Event event)
@@ -438,14 +430,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		if (serverId != null) {
 
-			ICalendar bc = getEventSyncClient(PIMDataType.CALENDAR);
 			AccessToken token = login(bs);
 			try {
 				logger.info("Delete event serverId {}", serverId);
 				//FIXME: not transactional
 				String calendarName = parseCalendarName(collectionPath);
-				Event evr = getEventFromServerId(bc, token, calendarName, serverId);
-				bc.removeEventById(token, calendarName, evr.getObmId(), evr.getSequence(), true);
+				Event evr = getEventFromServerId(token, calendarName, serverId);
+				calendarClient.removeEventById(token, calendarName, evr.getObmId(), evr.getSequence(), true);
 			} catch (ServerFault e) {
 				throw new UnknownObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
@@ -462,14 +453,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			throws UnknownObmSyncServerException, CollectionNotFoundException, DaoException, ServerItemNotFoundException {
 		
 		MSEvent event = invitation.getInvitation();
-		ICalendar calCli = getEventSyncClient(event.getType());
 		AccessToken at = login(bs);
 		try {
 			logger.info("handleMeetingResponse = {}", event.getObmId());
-			Event obmEvent = createOrModifyInvitationEvent(bs, event, calCli, at);
+			Event obmEvent = createOrModifyInvitationEvent(bs, event, at);
 			event.setObmId(obmEvent.getObmId());
 			event.setObmSequence(obmEvent.getSequence());
-			return updateUserStatus(bs, event, status, calCli, at);
+			return updateUserStatus(bs, event, status, calendarClient, at);
 		} catch (UnknownObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
@@ -479,11 +469,11 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event, ICalendar calCli, AccessToken at) 
+	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event, AccessToken at) 
 			throws UnknownObmSyncServerException, EventNotFoundException {
 		
 		try {
-			Event obmEvent = getEventFromExtId(bs, event, calCli, at);
+			Event obmEvent = getEventFromExtId(bs, event, at);
 			
 			boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
 			Event newEvent = convertMSObjectToObmObject(bs, event, null, isInternal);
@@ -492,12 +482,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				
 				EventObmId id = null;
 				try {
-					id = calCli.createEvent(at, bs.getUser().getLoginAtDomain(), newEvent, isInternal);
+					id = calendarClient.createEvent(at, bs.getUser().getLoginAtDomain(), newEvent, isInternal);
 				} catch (EventAlreadyExistException e) {
 					throw new UnknownObmSyncServerException("it's not possible because getEventFromExtId == null");
 				}
 				logger.info("createOrModifyInvitationEvent : create new event {}", event.getObmId());
-				return calCli.getEventFromId(at, bs.getUser().getLoginAtDomain(), id);
+				return calendarClient.getEventFromId(at, bs.getUser().getLoginAtDomain(), id);
 				
 			} else {
 			
@@ -505,7 +495,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				newEvent.setSequence(obmEvent.getSequence());
 				if(!obmEvent.isInternalEvent()){
 					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
-					obmEvent = calCli.modifyEvent(at, bs.getUser().getLoginAtDomain(), newEvent, true, false);
+					obmEvent = calendarClient.modifyEvent(at, bs.getUser().getLoginAtDomain(), newEvent, true, false);
 				}
 				return obmEvent;
 			}	
@@ -515,10 +505,10 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}		
 	}
 
-	private Event getEventFromExtId(BackendSession bs, MSEvent event, ICalendar calCli, AccessToken at) 
+	private Event getEventFromExtId(BackendSession bs, MSEvent event, AccessToken at) 
 			throws ServerFault {
 		try {
-			return calCli.getEventFromExtId(at, bs.getUser().getLoginAtDomain(), event.getExtId());
+			return calendarClient.getEventFromExtId(at, bs.getUser().getLoginAtDomain(), event.getExtId());
 		} catch (EventNotFoundException e) {
 			logger.info(e.getMessage());
 		}
@@ -545,11 +535,10 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			ProcessingEmailException, UnknownObmSyncServerException {
 	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		ICalendar calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(bs);
 		for (String serverId : fetchIds) {
 			try {
-				Event event = getEventFromServerId(calCli, token, bs.getUser().getLoginAtDomain(), serverId);
+				Event event = getEventFromServerId(token, bs.getUser().getLoginAtDomain(), serverId);
 				if (event != null) {
 					ItemChange ic = createItemChangeToAddFromEvent(bs, event, serverId);
 					ret.add(ic);
@@ -566,11 +555,10 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	
 	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) throws DaoException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		ICalendar calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(bs);
 		for (EventObmId itemId : uids) {
 			try {
-				Event e = calCli.getEventFromId(token, bs.getUser().getLoginAtDomain(), itemId);
+				Event e = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), itemId);
 				if (e != null) {
 					String serverId = getServerIdFor(collectionId, e.getObmId());
 					ret.add(createItemChangeToAddFromEvent(bs, e, serverId));
@@ -586,23 +574,15 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private IApplicationData convertObmObjectToMSObject(BackendSession bs, Event event) throws DaoException {
-		switch (event.getType()) {
-		case VEVENT:
-			return eventService.convertEventToMSEvent(bs, event);
-		case VTODO:
-			return todoConverter.convert(event);
-		default:
-			throw new InvalidParameterException("can't convert type " + event.getType());
-		}
+		return eventService.convertEventToMSEvent(bs, event);
 	}
 	
 	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
 		final List<ItemChange> ret = Lists.newArrayListWithCapacity(uids.size());
-		final ICalendar calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		final AccessToken token = login(bs);
 		for (final EventObmId eventUid : uids) {
 			try {
-				Event event = calCli.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventUid);
+				Event event = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventUid);
 				if (event != null) {
 					ret.add(getItemChange(collectionId, event.getObmId()));
 				}
@@ -624,10 +604,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	public Event getEventFromServerId(BackendSession bs, String serverId) {
 		
-		final ICalendar calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		final AccessToken token = login(bs);
 		try {
-			return getEventFromServerId(calCli, token, bs.getUser().getLoginAtDomain(), serverId);
+			return getEventFromServerId(token, bs.getUser().getLoginAtDomain(), serverId);
 		} catch (EventNotFoundException e) {
 			logger.error(e.getMessage(), e);
 		} catch (ServerFault e) {
@@ -639,12 +618,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 
-	private Event getEventFromServerId(ICalendar calCli, AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
+	private Event getEventFromServerId(AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
 		Integer itemId = mappingService.getItemIdFromServerId(serverId);
 		if (itemId == null) {
 			return null;
 		}
-		return calCli.getEventFromId(token, calendar, new EventObmId(itemId));
+		return calendarClient.getEventFromId(token, calendar, new EventObmId(itemId));
 	}
 
 	
