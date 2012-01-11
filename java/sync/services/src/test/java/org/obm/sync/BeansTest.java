@@ -38,6 +38,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.RecurrenceId;
 
 import com.google.common.collect.ImmutableList;
 
@@ -56,6 +57,7 @@ public class BeansTest {
 				ImmutableList.<Class<?>>builder()
 					.add(EventObmId.class)
 					.add(EventExtId.class)
+					.add(RecurrenceId.class)
 					.add(Event.class)
 					.add(EventRecurrence.class)
 					.build();

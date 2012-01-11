@@ -56,6 +56,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
@@ -459,13 +460,13 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, Date recurrenceId, ParticipationState participationState, 
+			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState, 
 			int sequence, boolean notification) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId.serializeToString());
 		if (recurrenceId != null) {
-			params.put("recurrenceId", recurrenceId.toString());
+			params.put("recurrenceId", recurrenceId.serializeToString());
 		}
 		params.put("state", participationState.toString()); 
 		params.put("sequence", String.valueOf(sequence));

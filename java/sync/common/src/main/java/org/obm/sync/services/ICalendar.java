@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.services;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
@@ -283,12 +285,13 @@ public interface ICalendar {
 			boolean notification) throws ServerFault;
 
 	/**
-	 * change participation State of specific exception or set of events.
-	 * @throws EventNotFoundException 
+	 * This method is used to change the participation state of a specific occurrence
+	 * using the recurrenceId.
+	 * @throws ParseException if recurrenceId is not in the right format.
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, Date recurrenceId, ParticipationState participationState, int sequence,
-			boolean notification) throws ServerFault, EventNotFoundException;
+			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState, int sequence,
+			boolean notification) throws ServerFault, EventNotFoundException, ParseException;
 	
 	/**
 	 * Import ics file in calendar's user Adding a new attendee (owner) if

@@ -33,6 +33,7 @@ package fr.aliacom.obm.common.calendar;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
@@ -65,9 +67,9 @@ public interface CalendarDao {
 
 	Event findEventById(AccessToken token, EventObmId eventId) throws EventNotFoundException, ServerFault;
 
-	Event findEventOrSetOfEventByExtId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId);
+	Event findEventByExtId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId);
 	
-	Event findOccurrenceByExtIdAndRecurrenceId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId, Date recurrenceId);
+	Event findEventByExtIdAndRecurrenceId(AccessToken token, ObmUser calendarUser, EventExtId eventExtId, RecurrenceId recurrenceId) throws ParseException;
 
 	List<String> findEventTwinKeys(String calendar, Event event, ObmDomain domain);
 
@@ -116,8 +118,12 @@ public interface CalendarDao {
 			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
-	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, Date recurrenceId, ParticipationState participationState) throws SQLException ;
+	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState) throws SQLException, ParseException ;
 
 	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;
+
+	boolean changeParticipationState(AccessToken token, ObmUser calendar,
+			EventExtId extId, ParticipationState participationState)
+			throws SQLException;
 }

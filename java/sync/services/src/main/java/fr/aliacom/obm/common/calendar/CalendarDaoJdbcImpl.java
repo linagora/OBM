@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -51,6 +52,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
+import net.fortuna.ical4j.model.DateTime;
+
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
@@ -63,7 +66,6 @@ import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
-import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -77,6 +79,7 @@ import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
@@ -500,44 +503,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setInt(idx++, ev.getSequence());
 		return idx;
 	}
-	
-	private List<DeletedEvent> findDeletedEvents(ObmUser calendarUser, Date d,
-			EventType et, List<DeletedEvent> declined) {
-
-		List<DeletedEvent> result = new LinkedList<DeletedEvent>();
-		result.addAll(declined);
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		String q = "SELECT deletedevent_event_id, deletedevent_event_ext_id FROM DeletedEvent "
-				+ "WHERE deletedevent_user_id=? AND deletedevent_type=? ";
-		if (d != null) {
-			q += "AND deletedevent_timestamp >= ?";
-		}
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
-			ps.setInt(1, calendarUser.getUid());
-			ps.setObject(2, et.getJdbcObject(obmHelper.getType()));
-			if (d != null) {
-				ps.setTimestamp(3, new Timestamp(d.getTime()));
-			}
-
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				result.add(new DeletedEvent(
-						new EventObmId(rs.getInt(1)),
-						new EventExtId(rs.getString(2))));
-			}
-		} catch (SQLException se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
-
-		return result;
-	}
 
 	@Override
 	public Event findEventById(AccessToken token, EventObmId uid) throws EventNotFoundException, ServerFault {
@@ -913,9 +878,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id, ex.eventexception_parent_id");
-		
-		
-		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
+
 
 		StringBuilder fetched = new StringBuilder();
 		fetched.append("(0");
@@ -1041,8 +1004,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(conComp, null, null);
 		}
 		ret.setUpdated(changedEvent.toArray(new Event[0]));
-		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
-				declined));
 		
 		return ret;
 	}
@@ -1985,7 +1946,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event findEventOrSetOfEventByExtId(AccessToken token, ObmUser calendar,
+	public Event findEventByExtId(AccessToken token, ObmUser calendar,
 			EventExtId extId) {
 		String ev = "SELECT "
 				+ EVENT_SELECT_FIELDS
@@ -2032,9 +1993,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return null;
 	}
 
-	public Event findOccurrenceByExtIdAndRecurrenceId(AccessToken token, ObmUser calendar, EventExtId extId, Date recurrenceId) {
+	public Event findEventByExtIdAndRecurrenceId(AccessToken token, ObmUser calendar, EventExtId extId, RecurrenceId recurrenceId) throws ParseException {
 		
-		String evRecurrenceId = (recurrenceId != null) ? "AND eexp.eventexception_date=?" : "";
 		String ev = "SELECT "
 				+ EVENT_SELECT_FIELDS
 				+ ", eventexception_date as recurrence_id "
@@ -2048,7 +2008,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserObm u ON u.userobm_id=userentity_user_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "WHERE e.event_ext_id=? " 
-				+ evRecurrenceId
+				+ "AND eexp.eventexception_date=?"
 				+ "AND u.userobm_login=?";
 		
 		PreparedStatement evps = null;
@@ -2059,12 +2019,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(ev);
 			evps.setString(1, extId.getExtId());
-			if (recurrenceId != null) {
-				evps.setTimestamp(2, new Timestamp(recurrenceId.getTime()));
-				evps.setString(3, calendar.getLogin());
-			} else {
-				evps.setString(2, calendar.getLogin());
-			}
+			
+			Date recId = new DateTime(recurrenceId.getRecurrenceId());
+			evps.setTimestamp(2, new Timestamp(recId.getTime()));
+			evps.setString(3, calendar.getLogin());
+
 			evrs = evps.executeQuery();
 			if (evrs.next()) {
 				Calendar cal = getGMTCalendar();
@@ -2077,6 +2036,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
+		} catch (ParseException e) {
+			logger.error(e.getMessage(), e);
+			throw e; 
 		} finally {
 			obmHelper.cleanup(con, evps, evrs);
 		}	
@@ -2411,7 +2373,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Event removeEventByExtId(Connection con, ObmUser calendar,
 			AccessToken token, EventExtId extId) {
-		Event ev = findEventOrSetOfEventByExtId(token, calendar, extId);
+		Event ev = findEventByExtId(token, calendar, extId);
 		if (ev == null) {
 			return null;
 		}
@@ -2452,7 +2414,55 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public boolean changeParticipationState(AccessToken token, ObmUser calendar,
-			EventExtId extId, Date recurrenceId, ParticipationState participationState) throws SQLException {
+			EventExtId extId, ParticipationState participationState) throws SQLException {
+
+		Connection con = null;
+		try {
+			con = obmHelper.getConnection();
+			return changeParticipationState(con, token, extId, calendar, participationState);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
+	
+	private boolean changeParticipationState(Connection con, AccessToken token, EventExtId extId, ObmUser calendarOwner,
+			ParticipationState participationState) throws SQLException {
+		
+		PreparedStatement ps = null;
+				
+		String q = "UPDATE EventLink " 
+			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
+			+ "WHERE eventlink_event_id IN "
+			+ "( SELECT event_id FROM Event WHERE event_ext_id = ? ) AND "
+			+ "eventlink_entity_id IN "
+			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id = ? )";
+		
+		Integer loggedUserId = token.getObmId();
+
+		try {
+			ps = con.prepareStatement(q);		
+
+			int idx = 1;
+			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
+			ps.setInt(idx++, loggedUserId);
+			ps.setString(idx++, extId.getExtId());
+			ps.setInt(idx++, calendarOwner.getUid());
+			ps.execute();
+			if (ps.getUpdateCount() > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean changeParticipationState(AccessToken token, ObmUser calendar,
+			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState) throws SQLException, ParseException {
 
 		Connection con = null;
 		try {
@@ -2463,20 +2473,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 	
-	private boolean changeParticipationState(Connection con, AccessToken token, EventExtId extId, Date recurrenceId, ObmUser calendarOwner,
-			ParticipationState participationState) throws SQLException {
+	private boolean changeParticipationState(Connection con, AccessToken token, EventExtId extId, RecurrenceId recurrenceId, ObmUser calendarOwner,
+			ParticipationState participationState) throws SQLException, ParseException {
 		
 		PreparedStatement ps = null;
-		String q_setOrOccurrence = (recurrenceId != null) ? 
-				  "SELECT event_id FROM Event e LEFT JOIN eventexception eexp ON e.event_id = eventexception_child_id "
-				  + "WHERE event_ext_id = ? "
-				  + "AND eexp.eventexception_date = ?" 
-				: "SELECT event_id FROM Event WHERE event_ext_id = ?";
 				
 		String q = "UPDATE EventLink " 
 			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
 			+ "WHERE eventlink_event_id IN "
-			+ "( "+ q_setOrOccurrence + " ) AND "
+			+ "( SELECT event_id FROM Event e LEFT JOIN eventexception eexp ON e.event_id = eventexception_child_id "
+			+ "WHERE event_ext_id = ? "
+			+ "AND eexp.eventexception_date = ? AND "
 			+ "eventlink_entity_id IN "
 			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id = ? )";
 		
@@ -2490,7 +2497,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, extId.getExtId());
 			if(recurrenceId != null) {
-				ps.setTimestamp(idx++, new Timestamp(recurrenceId.getTime()));
+				Date recId = new DateTime(recurrenceId.getRecurrenceId());
+				ps.setTimestamp(idx++, new Timestamp(recId.getTime()));
 			}
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
@@ -2498,6 +2506,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				return true;
 			}
 		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} catch (ParseException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} finally {

@@ -93,7 +93,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		participation.setAttribute("id", changes.getEventId().serializeToString());
 		participation.setAttribute("extId", changes.getEventExtId().serializeToString());
 		if (changes.getRecurrenceId() != null) {
-			participation.setAttribute("recurrenceId", changes.getRecurrenceId().toString());
+			participation.setAttribute("recurrenceId", changes.getRecurrenceId().serializeToString());
 		}
 		Element attendees = DOMUtils.createElement(participation, "attendees");
 		for (Attendee a: changes.getAttendees()) {

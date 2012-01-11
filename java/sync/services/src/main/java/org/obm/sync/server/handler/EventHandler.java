@@ -38,8 +38,6 @@ import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import net.fortuna.ical4j.model.DateTime;
-
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
@@ -59,6 +57,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.ParametersSource;
@@ -509,7 +508,7 @@ public class EventHandler extends SecureSyncHandler {
 					getNotificationOption(params));
 		} else {
 			success = binding.changeParticipationState(at, getCalendar(at, params),
-					getExtId(params, "extId"), getRecurrenceId(params, "recurrenceId"),
+					getExtId(params, "extId"), getRecurrenceId(params),
 					ParticipationState.getValueOf(params.getParameter("state")),
 					i(params, "sequence", 0),
 					getNotificationOption(params));
@@ -539,10 +538,10 @@ public class EventHandler extends SecureSyncHandler {
 		return new EventObmId(params.getParameter(tagName));
 	}
 	
-	private DateTime getRecurrenceId(ParametersSource params, String tagName) throws ParseException {
-		String recurrenceIdParam = params.getParameter(tagName);
+	private RecurrenceId getRecurrenceId(ParametersSource params) {
+		String recurrenceIdParam = params.getParameter("recurrenceId");
 		if (recurrenceIdParam != null) {
-				return new DateTime(recurrenceIdParam);
+				return new RecurrenceId(recurrenceIdParam);
 		}
 		return null;
 	}

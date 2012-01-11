@@ -36,11 +36,12 @@ import java.util.List;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.RecurrenceId;
 
 public class ParticipationChanges {
 	private EventObmId eventId;
 	private EventExtId eventExtId;
-	private String recurrenceId;
+	private RecurrenceId recurrenceId;
 	private List<Attendee> attendees;
 	
 	public ParticipationChanges() {
@@ -63,11 +64,11 @@ public class ParticipationChanges {
 		this.eventExtId = eventExtId;
 	}
 
-	public String getRecurrenceId() {
+	public RecurrenceId getRecurrenceId() {
 		return recurrenceId;
 	}
 
-	public void setRecurrenceId(String recurrenceId) {
+	public void setRecurrenceId(RecurrenceId recurrenceId) {
 		this.recurrenceId = recurrenceId;
 	}
 
