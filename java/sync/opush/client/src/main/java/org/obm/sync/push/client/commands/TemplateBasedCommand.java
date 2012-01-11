@@ -79,7 +79,7 @@ public abstract class TemplateBasedCommand<T> implements IEasCommand<T> {
 		if (fromTemplate) {
 			customizeTemplate(ai, opc);
 		}
-		Document response = opc.postXml(namespace, tpl, cmd);
+		Document response = opc.postXml(namespace, tpl, cmd, null, false);
 		T ret = null;
 		if (response != null) {
 			ret = parseResponse(response.getDocumentElement());
@@ -89,7 +89,7 @@ public abstract class TemplateBasedCommand<T> implements IEasCommand<T> {
 
 	protected abstract void customizeTemplate(AccountInfos ai, OPClient opc);
 
-	protected abstract T parseResponse(Element responseRootElem);
+	protected abstract T parseResponse(Element responseRootElem) throws Exception;
 
 	private InputStream loadDataFile(String name) {
 		return TemplateBasedCommand.class.getClassLoader().getResourceAsStream(

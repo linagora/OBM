@@ -7,9 +7,9 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
-import static org.obm.opush.IntegrationTestUtils.buildOpushClient;
 import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
-import static org.obm.opush.IntegrationTestUtils.expectUsersHaveNoChange;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -51,7 +51,6 @@ import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
@@ -100,7 +99,7 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 
 		ThreadPoolExecutor threadPoolExecutor = 
 				new ThreadPoolExecutor(20, 20, 1,TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
@@ -126,11 +125,11 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
-		Document response = opClient.postXml("Ping", document, "Ping");
+		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(5, 1, stopwatch);
 		checkHasChangeResponse(response);
@@ -142,11 +141,11 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
-		Document response = opClient.postXml("Ping", document, "Ping");
+		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(5, 6, stopwatch);
 		checkHasChangeResponse(response);
@@ -173,11 +172,11 @@ public class PingHandlerTest {
 		
 		opushServer.start();
 		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		Document document = buildPingCommand(heartbeatInterval);
 		Stopwatch stopwatch = new Stopwatch().start();
 		
-		Document response = opClient.postXml("Ping", document, "Ping");
+		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(delta, expected, stopwatch);
 		checkNoChangeResponse(response);
@@ -221,7 +220,7 @@ public class PingHandlerTest {
 		mockContentsExporter(contentsExporterBackend);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 	}
 
 	private void mockForHasChangePing(int noChangeIterationCount) 
@@ -288,7 +287,7 @@ public class PingHandlerTest {
 			@Override
 			public Document call() throws Exception {
 				Document document = buildPingCommand(5);
-				return opClient.postXml("Ping", document, "Ping");
+				return opClient.postXml("Ping", document, "Ping", null, false);
 			}
 		});
 	}

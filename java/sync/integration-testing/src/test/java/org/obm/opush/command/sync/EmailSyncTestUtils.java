@@ -4,7 +4,7 @@ import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.obm.opush.IntegrationTestUtils.expectUsersHaveNoChange;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -90,7 +90,7 @@ public class EmailSyncTestUtils {
 		mockContentsExporter(contentsExporterBackend, delta);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, syncEmailCollectionId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);

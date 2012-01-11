@@ -5,8 +5,8 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationPushTestUtils.mockAddressBook;
-import static org.obm.opush.IntegrationTestUtils.buildOpushClient;
-import static org.obm.opush.IntegrationTestUtils.expectUsersHaveNoChange;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -70,7 +70,7 @@ public class FolderSyncHandlerTest {
 		mockAddressBook(singleUserFixture, classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 		mockCollectionDao(collectionDao, initialSyncKey, serverId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
@@ -80,7 +80,7 @@ public class FolderSyncHandlerTest {
 		
 		opushServer.start();
 		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		
 		Assertions.assertThat(folderSyncResponse.getStatus()).isEqualTo(1);
@@ -96,7 +96,7 @@ public class FolderSyncHandlerTest {
 		mockAddressBook(singleUserFixture, classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 		mockCollectionDao(collectionDao, syncKey, serverId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
@@ -106,7 +106,7 @@ public class FolderSyncHandlerTest {
 		
 		opushServer.start();
 		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(syncKey);
 		
 		Assertions.assertThat(folderSyncResponse.getStatus()).isEqualTo(1);

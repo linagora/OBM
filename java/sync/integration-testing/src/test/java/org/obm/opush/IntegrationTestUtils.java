@@ -3,26 +3,62 @@ package org.obm.opush;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.WBXMLOPClient;
+import org.obm.sync.push.client.XMLOPClient;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class IntegrationTestUtils {
 
-	public static void expectUsersHaveNoChange(CollectionDao collectionDao, Collection<OpushUser> users) throws DaoException, CollectionNotFoundException {
+	public static void expectUserLoginFromOpush(LoginService loginService, Collection<OpushUser> users) throws AuthFault {
+		for (OpushUser user : users) {
+			expectUserLoginFromOpush(loginService, user);
+		}
+	}
+	
+	public static void expectUserLoginFromOpush(LoginService loginService, OpushUser user) throws AuthFault {
+		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
+		loginService.logout(user.accessToken);
+		expectLastCall().anyTimes();
+	}
+
+
+	public static void expectUserDeviceAccess(DeviceDao deviceDao, Collection<OpushUser> users) throws DaoException {
+		for (OpushUser user : users) {
+			expectUserDeviceAccess(deviceDao, user);
+		}
+	}
+	
+	public static void expectUserDeviceAccess(DeviceDao deviceDao, OpushUser user) throws DaoException {
+		expect(deviceDao.getDevice(user.user, 
+				user.deviceId, 
+				user.userAgent))
+				.andReturn(
+						new Device(user.hashCode(), user.deviceType, user.deviceId, new Properties()))
+						.anyTimes();
+	}
+	
+	public static void expectUserCollectionsNeverChange(CollectionDao collectionDao, Collection<OpushUser> users) throws DaoException, CollectionNotFoundException {
 		Date lastSync = new Date();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
@@ -30,7 +66,7 @@ public class IntegrationTestUtils {
 
 		int randomCollectionId = anyInt();
 		for (OpushUser opushUser: users) {
-			String collectionPath = buildCalendarCollectionPath(opushUser);  
+			String collectionPath = IntegrationTestUtils.buildCalendarCollectionPath(opushUser);  
 			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPath).anyTimes();
 		}
 	}
@@ -40,13 +76,21 @@ public class IntegrationTestUtils {
 	}
 	
 	public static OPClient buildOpushClient(OpushUser user, int port) {
-		String url = buildServiceUrl(port);
-		return new OPClient(
+		return new XMLOPClient(user.user.getLoginAtDomain(), 
+				user.password, 
+				user.deviceId, 
+				user.deviceType, 
+				user.userAgent, port
+			);
+	}
+	
+	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port) {
+		return new WBXMLOPClient(
 				user.user.getLoginAtDomain(), 
 				user.password, 
 				user.deviceId, 
 				user.deviceType, 
-				user.userAgent, url, new WBXMLTools());
+				user.userAgent, port, new WBXMLTools());
 	}
 
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {
@@ -59,9 +103,5 @@ public class IntegrationTestUtils {
 	
 	private static String buildCollectionPath(OpushUser opushUser, String dataType) {
 		return opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + opushUser.user.getLoginAtDomain();
-	}
-	
-	private static String buildServiceUrl(int port) {
-		return "http://localhost:" + port + "/ActiveSyncServlet/";
 	}
 }

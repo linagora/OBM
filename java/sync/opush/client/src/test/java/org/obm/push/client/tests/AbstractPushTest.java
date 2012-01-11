@@ -40,6 +40,7 @@ import org.junit.Ignore;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProtocolVersion;
+import org.obm.sync.push.client.WBXMLOPClient;
 import org.w3c.dom.Document;
 
 @Ignore("It's necessary to do again all tests")
@@ -71,11 +72,9 @@ public class AbstractPushTest extends TestCase {
 		String devId = p(p, "devId");
 		String devType = p(p, "devType");
 		String userAgent = p(p, "userAgent");
-		String url = p(p, "url");
 
 		wbxmlTools = new WBXMLTools();
-		
-		opc = new OPClient(login, password, devId, devType, userAgent, url, wbxmlTools);
+		opc = new WBXMLOPClient(login, password, devId, devType, userAgent, 9142, wbxmlTools);
 	}
 
 	@Override
@@ -109,7 +108,7 @@ public class AbstractPushTest extends TestCase {
 	public Document postXml(String namespace, Document doc, String cmd)
 			throws Exception {
 		opc.setProtocolVersion(ProtocolVersion.V121);
-		return opc.postXml(namespace, doc, cmd);
+		return opc.postXml(namespace, doc, cmd, null, false);
 	}
 
 	public Document postMultipartXml(String namespace, Document doc, String cmd)
@@ -121,13 +120,13 @@ public class AbstractPushTest extends TestCase {
 	public Document postXml25(String namespace, Document doc, String cmd)
 			throws Exception {
 		opc.setProtocolVersion(ProtocolVersion.V25);
-		return opc.postXml(namespace, doc, cmd);
+		return opc.postXml(namespace, doc, cmd, null, false);
 	}
 
 	public Document postXml120(String namespace, Document doc, String cmd)
 			throws Exception {
 		opc.setProtocolVersion(ProtocolVersion.V120);
-		return opc.postXml(namespace, doc, cmd);
+		return opc.postXml(namespace, doc, cmd, null, false);
 	}
 
 	public byte[] postGetAttachment(String attachmentName) throws Exception {
