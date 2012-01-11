@@ -50,7 +50,6 @@ import org.obm.locator.LocatorClientException;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.exception.ObmSyncClientException;
-import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -125,17 +124,13 @@ public abstract class AbstractClientImpl {
 		}
 	}
 
-	protected void setToken(Multimap<String, String> parameters, AccessToken token) throws SIDNotFoundException {
+	protected void setToken(Multimap<String, String> parameters, AccessToken token) {
 		if (token != null) {
-			if (token.getSessionId() != null) {
-				parameters.put("sid", token.getSessionId());
-			} else {
-				throw new SIDNotFoundException(token);
-			}
+			parameters.put("sid", token.getSessionId());
 		}
 	}
 
-	protected Multimap<String, String> initParams(AccessToken at) throws SIDNotFoundException {
+	protected Multimap<String, String> initParams(AccessToken at) {
 		Multimap<String, String> m = ArrayListMultimap.create();
 		setToken(m, at);
 		return m;
@@ -160,9 +155,7 @@ public abstract class AbstractClientImpl {
 
 	private void setPostMethodParameters(PostMethod pm, Multimap<String, String> parameters) {
 		for (Entry<String, String> entry: parameters.entries()) {
-			if (entry.getKey() != null && entry.getValue() != null) {
-				pm.setParameter(entry.getKey(), entry.getValue());
-			}
+			pm.setParameter(entry.getKey(), entry.getValue());
 		}
 	}
 
