@@ -31,8 +31,6 @@ build:
 	$(MVN_BIN) install
 
 binary-install-tomcat-webapp/% ::
-	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
-	rm $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar
 	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/slf4j-api-*.jar
 	rm -f $(FAKEROOT_INSTALL_DIR)/WEB-INF/lib/logback*.jar
 	mkdir -p $(FAKEROOT_TOMCAT_CONFIG_DIR) 
