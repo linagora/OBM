@@ -36,8 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.PushNotification;

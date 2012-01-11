@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.push.backend.MailMonitoringBackend;
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
+import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.DaoException;

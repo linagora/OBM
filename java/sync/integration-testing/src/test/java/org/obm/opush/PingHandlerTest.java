@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.backend.IContentsExporter;
+import org.obm.push.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
@@ -263,9 +263,9 @@ public class PingHandlerTest {
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
 		expect(contentsExporter.getItemEstimateSize(
 				anyObject(BackendSession.class), 
-				anyObject(FilterType.class),
-				anyInt(),
 				anyObject(SyncState.class),
+				anyInt(),
+				anyObject(FilterType.class),
 				anyObject(PIMDataType.class)))
 			.andReturn(1).times(2);
 	}
@@ -274,9 +274,9 @@ public class PingHandlerTest {
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
 		expect(contentsExporter.getItemEstimateSize(
 				anyObject(BackendSession.class), 
-				anyObject(FilterType.class),
-				anyInt(),
 				anyObject(SyncState.class),
+				anyInt(),
+				anyObject(FilterType.class),
 				anyObject(PIMDataType.class)))
 			.andReturn(0).anyTimes();
 	}

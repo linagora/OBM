@@ -36,8 +36,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
@@ -101,8 +101,11 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 				for (SyncCollection syncCollection : monitoredCollections) {
 
 					try {
-						int count = contentsExporter.getItemEstimateSize(backendSession, syncCollection.getOptions().getFilterType(),
-								syncCollection.getCollectionId(), syncCollection.getSyncState(), syncCollection.getDataType());
+						int count = contentsExporter.getItemEstimateSize(
+								backendSession, syncCollection.getSyncState(), 
+								syncCollection.getCollectionId(),
+								syncCollection.getOptions().getFilterType(),
+								syncCollection.getDataType());
 
 						if (count > 0) {
 							addPushNotification(pushNotifyList, ccl);

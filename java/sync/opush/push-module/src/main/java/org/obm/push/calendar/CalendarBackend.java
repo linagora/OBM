@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import org.obm.push.EventConverter;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
@@ -55,6 +56,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
@@ -83,7 +85,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class CalendarBackend extends ObmSyncBackend {
+public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private final EventConverter eventConverter;
 	private final TodoConverter todoConverter;
@@ -102,6 +104,11 @@ public class CalendarBackend extends ObmSyncBackend {
 		this.eventService = eventService;
 	}
 
+	@Override
+	public PIMDataType getPIMDataType() {
+		return PIMDataType.CALENDAR;
+	}
+	
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) 
 			throws DaoException, UnknownObmSyncServerException {
 
@@ -184,10 +191,22 @@ public class CalendarBackend extends ObmSyncBackend {
 		return ret;
 	}
 
-	public DataDelta getContentChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, 
-			PIMDataType dataType) throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+	@Override
+	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException {
+		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
+		return dataDelta.getItemEstimateSize();
+	}
+	
+	@Override
+	public DataDelta getChanged(BackendSession bs, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnknownObmSyncServerException,
+			ProcessingEmailException {
 		
-		ICalendar cc = getEventSyncClient(dataType);
+		ICalendar cc = getEventSyncClient(getPIMDataType());
 		AccessToken token = login(bs);
 		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
@@ -520,11 +539,15 @@ public class CalendarBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) throws DaoException {
+	@Override
+	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+			throws CollectionNotFoundException, DaoException,
+			ProcessingEmailException, UnknownObmSyncServerException {
+	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		ICalendar calCli = getEventSyncClient(PIMDataType.CALENDAR);
 		AccessToken token = login(bs);
-		for (String serverId : fetchServerIds) {
+		for (String serverId : fetchIds) {
 			try {
 				Event event = getEventFromServerId(calCli, token, bs.getUser().getLoginAtDomain(), serverId);
 				if (event != null) {

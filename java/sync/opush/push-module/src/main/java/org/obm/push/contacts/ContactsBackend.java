@@ -41,15 +41,19 @@ import javax.naming.NoPermissionException;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.impl.MappingService;
@@ -72,7 +76,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ContactsBackend extends ObmSyncBackend {
+public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 	private final ContactConfiguration contactConfiguration;
 	
@@ -86,6 +90,11 @@ public class ContactsBackend extends ObmSyncBackend {
 		this.contactConfiguration = contactConfiguration;
 	}
 
+	@Override
+	public PIMDataType getPIMDataType() {
+		return PIMDataType.CONTACTS;
+	}
+	
 	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
@@ -190,7 +199,24 @@ public class ContactsBackend extends ObmSyncBackend {
 		return false;
 	}
 	
-	public DataDelta getContactsChanges(BackendSession bs, SyncState state, Integer collectionId) 
+	@Override
+	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException {
+		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
+		return dataDelta.getItemEstimateSize();
+	}
+	
+	@Override
+	public DataDelta getChanged(BackendSession bs, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnknownObmSyncServerException,
+			ProcessingEmailException {
+		return getChanged(bs, state, collectionId);
+	}
+	
+	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId) 
 			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs,collectionId);
@@ -348,11 +374,12 @@ public class ContactsBackend extends ObmSyncBackend {
 		}
 	}
 
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchServerIds) 
-			throws CollectionNotFoundException, UnknownObmSyncServerException, DaoException {
+	@Override
+	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		for (String serverId: fetchServerIds) {
+		for (String serverId: fetchIds) {
 			try {
 
 				Integer contactId = mappingService.getItemIdFromServerId(serverId);
@@ -390,5 +417,6 @@ public class ContactsBackend extends ObmSyncBackend {
 			mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
 		}
 	}
+	
 	
 }

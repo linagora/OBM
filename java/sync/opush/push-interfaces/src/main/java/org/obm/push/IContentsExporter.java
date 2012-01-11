@@ -29,63 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
-import org.obm.push.backend.IContinuation;
+import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.MSAttachementData;
-import org.obm.push.exception.activesync.AttachementNotFoundException;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.impl.Responder;
-import org.obm.push.mail.MailBackend;
-import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+public interface IContentsExporter {
 
-@Singleton
-public class GetAttachmentHandler implements IRequestHandler {
+	DataDelta getChanged(BackendSession bs, SyncState state,
+			Integer collectionId, FilterType filterType, PIMDataType dataType)
+			throws DaoException, CollectionNotFoundException,
+			UnknownObmSyncServerException, ProcessingEmailException;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	private final MailBackend mailBackend;
+	List<ItemChange> fetch(BackendSession bs, List<String> fetchServerIds,
+			PIMDataType dataType) throws CollectionNotFoundException,
+			DaoException, ProcessingEmailException,
+			UnknownObmSyncServerException;
 
-	@Inject
-	protected GetAttachmentHandler(MailBackend mailBackend) {
-		this.mailBackend = mailBackend;
-	}
+	int getItemEstimateSize(BackendSession bs, SyncState state,
+			Integer collectionId, FilterType filterType, PIMDataType dataType)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException;
 
-	@Override
-	public void process(IContinuation continuation, BackendSession bs,
-			ActiveSyncRequest request, Responder responder) {
-
-		String AttachmentName = request.getParameter("AttachmentName");
-
-		try {
-			MSAttachementData attachment = getAttachment(bs, AttachmentName);
-			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
-		} catch (AttachementNotFoundException e) {
-			sendErrorResponse(responder, e);
-		} catch (CollectionNotFoundException e) {
-			sendErrorResponse(responder, e);
-		} catch (ProcessingEmailException e) {
-			sendErrorResponse(responder, e);
-		}
-	}
-
-	private void sendErrorResponse(Responder responder, Exception exception) {
-		logger.error(exception.getMessage(), exception);
-		responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
-
-	private MSAttachementData getAttachment(BackendSession bs, String AttachmentName) 
-			throws AttachementNotFoundException, CollectionNotFoundException, ProcessingEmailException {
-		return mailBackend.getAttachment(bs, AttachmentName);
-	}
-	
 }

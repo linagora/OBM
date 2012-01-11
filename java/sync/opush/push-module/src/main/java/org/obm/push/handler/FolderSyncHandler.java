@@ -33,8 +33,8 @@ package org.obm.push.handler;
 
 import java.util.Date;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
@@ -57,8 +57,8 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.utils.DateUtils;
+import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.inject.Inject;

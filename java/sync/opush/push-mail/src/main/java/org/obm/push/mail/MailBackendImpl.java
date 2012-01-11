@@ -59,6 +59,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
@@ -116,6 +117,11 @@ public class MailBackendImpl implements MailBackend {
 		this.mappingService = mappingService;
 	}
 
+	@Override
+	public PIMDataType getPIMDataType() {
+		return PIMDataType.EMAIL;
+	}
+	
 	@Override
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
@@ -179,6 +185,15 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
+	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException {
+		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
+		return dataDelta.getItemEstimateSize();
+	}
+	
+	@Override
 	public DataDelta getMailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
@@ -191,10 +206,12 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public DataDelta getAndUpdateEmailChanges(BackendSession bs, SyncState state, Integer collectionId, FilterType filter) 
-			throws ProcessingEmailException, CollectionNotFoundException {
+	public DataDelta getChanged(BackendSession bs, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnknownObmSyncServerException,
+			ProcessingEmailException {
 		
-		MailChanges mailChanges = getSync(bs, state, collectionId, filter);
+		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
 		try {
 			emailManager.updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
 					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
@@ -240,7 +257,10 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public List<ItemChange> fetchItems(BackendSession bs, List<String> fetchIds) throws ProcessingEmailException {
+	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+			throws CollectionNotFoundException, DaoException,
+			ProcessingEmailException, UnknownObmSyncServerException {
+	
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(fetchIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {

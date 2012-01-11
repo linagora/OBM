@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
@@ -16,20 +17,13 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
-public interface MailBackend {
+public interface MailBackend extends PIMBackend {
 
 	List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException;
 
 	DataDelta getMailChanges(BackendSession bs, SyncState state,
 			Integer collectionId, FilterType filterType)
 			throws ProcessingEmailException, CollectionNotFoundException;
-
-	DataDelta getAndUpdateEmailChanges(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filter)
-			throws ProcessingEmailException, CollectionNotFoundException;
-
-	List<ItemChange> fetchItems(BackendSession bs, List<String> fetchIds)
-			throws ProcessingEmailException;
 
 	List<ItemChange> fetchItems(BackendSession bs, Integer collectionId,
 			Collection<Long> uids) throws CollectionNotFoundException,

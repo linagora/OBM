@@ -34,8 +34,8 @@ package org.obm.push.handler;
 import java.util.Arrays;
 import java.util.List;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
@@ -57,6 +57,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -83,16 +84,19 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 
 	private static final String NAMESPACE = "ItemOperations";
 	private final ItemOperationsProtocol protocol;
-
+	private final MailBackend mailBackend;
+	
 	@Inject
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol protocol,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools,
+			MailBackend mailBackend) {
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		this.protocol = protocol;
+		this.mailBackend = mailBackend;
 	}
 	
 	@Override
@@ -108,8 +112,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (UnsupportedStoreException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
-		} catch (DaoException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
@@ -131,7 +133,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
-		UnsupportedStoreException, DaoException, ProcessingEmailException {
+		UnsupportedStoreException, ProcessingEmailException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
@@ -148,7 +150,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 
 	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, 
-		DaoException, ProcessingEmailException {
+		ProcessingEmailException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
@@ -158,8 +160,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, DaoException, 
-		ProcessingEmailException {
+	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, ProcessingEmailException {
 		
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
@@ -178,8 +179,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return mailboxFetchResponse;
 	}
 
-	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, 
-		ProcessingEmailException {
+	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, ProcessingEmailException {
 
 		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(bs, reference);
 		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.getStatus())) {
@@ -188,12 +188,12 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchAttachmentResult;
 	}
 
-	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, DaoException, 
+	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, 
 		ProcessingEmailException {
 
 		FetchAttachmentResult fetchResult = new FetchAttachmentResult();
 		try {
-			MSAttachementData data = contentsExporter.getEmailAttachement(bs, reference);
+			MSAttachementData data = mailBackend.getAttachment(bs, reference);
 			fetchResult.setContentType(data.getContentType());
 			try {
 				fetchResult.setAttch(FileUtils.streamBytes(data.getFile(), true));
@@ -216,7 +216,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
 			
-			List<ItemChange> itemChanges = contentsExporter.fetch(bs, dataType, ImmutableList.of(serverId));
+			List<ItemChange> itemChanges = contentsExporter.fetch(bs, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 			} else {

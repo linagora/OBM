@@ -1,7 +1,7 @@
 package org.obm.opush;
 
 import org.obm.opush.env.AbstractOverrideModule;
-import org.obm.push.backend.IContentsExporter;
+import org.obm.push.IContentsExporter;
 
 public class ModuleUtils {
 

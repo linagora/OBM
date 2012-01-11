@@ -14,8 +14,8 @@ import java.util.Set;
 
 import org.fest.assertions.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -155,8 +155,8 @@ public class EmailSyncTestUtils {
 		expect(contentsExporter.getChanged(
 				anyObject(BackendSession.class), 
 				anyObject(SyncState.class),
-				anyObject(FilterType.class),
 				anyInt(),
+				anyObject(FilterType.class),
 				anyObject(PIMDataType.class)))
 			.andReturn(delta).once();
 	}

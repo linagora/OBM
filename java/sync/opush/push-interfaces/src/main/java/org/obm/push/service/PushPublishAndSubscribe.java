@@ -3,8 +3,8 @@ package org.obm.push.service;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 
 public interface PushPublishAndSubscribe {
 
