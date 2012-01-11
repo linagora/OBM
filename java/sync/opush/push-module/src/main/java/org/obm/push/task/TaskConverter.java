@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.calendar;
+package org.obm.push.task;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -58,7 +58,7 @@ import com.google.common.base.Objects;
 /**
  * Convert events between OBM-Sync object model & Microsoft object model
  */
-public class TodoConverter {
+public class TaskConverter {
 
 	private static final int TASK_IMPORTANCE_NORMAL = 1;
 
