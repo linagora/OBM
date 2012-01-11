@@ -6101,8 +6101,10 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
     LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
+    LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
     WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id $filter)
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
+      AND ee.eventexception_parent_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1
     UNION
     SELECT event_id FROM Event
@@ -6110,8 +6112,10 @@ function run_query_calendar_reset($id,$params) {
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     LEFT JOIN Contact birthday ON birthday.contact_birthday_id = event_id
     LEFT JOIN Contact anniversary ON anniversary.contact_anniversary_id = event_id
+    LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
     WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") $filter
       AND birthday.contact_birthday_id IS NULL AND anniversary.contact_anniversary_id IS NULL
+      AND ee.eventexception_parent_id IS NULL
     GROUP BY event_id HAVING COUNT(*) = 1 AND MAX(userentity_user_id) = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset(1)');
   $obm_q->query($query);
