@@ -10,6 +10,9 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.OBMBackend;
+import org.obm.push.backend.PIMBackend;
+import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.service.DeviceService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
@@ -28,9 +31,11 @@ import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
+import org.obm.push.task.TaskBackend;
 import org.obm.sync.ObmSyncHttpClientModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 
@@ -59,5 +64,11 @@ public class OpushImplModule extends AbstractModule {
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance("o-push");
+		
+		Multibinder<PIMBackend> pimBackends = 
+				Multibinder.newSetBinder(binder(), PIMBackend.class);
+		pimBackends.addBinding().to(TaskBackend.class);
+		pimBackends.addBinding().to(CalendarBackend.class);
+		pimBackends.addBinding().to(ContactsBackend.class);
 	}
 }
