@@ -137,8 +137,17 @@ class Vcalendar_Writer_OBM {
     return $eventData;    
   }
 
-  function getEventByExtId($id) {
-    $query = "SELECT event_id as id, event_owner FROM Event WHERE event_ext_id = '$id'";
+  function getEventByExtId($id, $recurrence_id=null) {
+    $query = null;
+    if ($recurrence_id == null) {
+      $query = "SELECT event_id as id, event_owner FROM Event WHERE event_ext_id = '$id'";
+    }
+    else {
+      $query = "SELECT event_id as id, event_owner
+        FROM Event
+        JOIN EventException ee ON ee.eventexception_child_id = event_id
+        WHERE event_ext_id = '$id' AND event_date = '$recurrence_id'";
+    }
     $this->db->query($query);
     if($this->db->nf() == 0) {
       return null;
@@ -262,6 +271,7 @@ class Vcalendar_Writer_OBM {
       $event['all_day'] = $vevent->isAllDay();
       $event['color'] = $vevent->get('x-obm-color');
       $event['properties'] = $vevent->get('x-obm-properties');
+      $event['recurrence_id'] = $vevent->get('recurrence-id');
       return array('event' => $event, 'entities' => $entities, 'states' => $states);
     }
     else {
@@ -279,14 +289,42 @@ class Vcalendar_Writer_OBM {
 
   function insertEvent(&$vevent) {
     $data = $this->parseEventData($vevent);
+    $in_error = false;
     if (!is_null($data)){
       if(!$this->haveAccess($data['event']['owner'])) {
         $data['event']['owner'] = $GLOBALS['obm']['uid'];
       }
-      $id = run_query_calendar_add_event($data['event'], $data['entities']);
-      $this->updateStates($data['states'], $id);
-      $this->updateAlerts($vevent->get('x-obm-alert'), $id);
+      if ($vevent->get('recurrence-id') == null) {
+        $id = run_query_calendar_add_event($data['event'], $data['entities']);
+      }
+      else {
+        $parent_event_id = run_query_get_recurring_event_id_from_ext_id($data['event']['ext_id'], $GLOBALS['obm']['uid']);
+        if ($parent_event_id != null) {
+          $parent_event_data = run_query_calendar_detail($parent_event_id);
+          $dao_params = array(
+            'calendar_id'       => $parent_event_id,
+            'title'             => $data['event']['title'],
+            'old_date_begin'    => $data['event']['date_begin'],
+            'date_begin'        => $data['event']['date_begin'],
+            'duration'          => $data['event']['event_duration'],
+            'all_day'           => $data['event']['all_day'],
+            'send_mail'         => false,
+          );
+          $id = run_query_calendar_event_exception_insert($dao_params, $parent_event_data);
+        }
+        else {
+          $in_error = true;
+          $this->event_error ++;
+        }
+      }
+      if (!$in_error) {
+        $this->updateStates($data['states'], $id);
+        $this->updateAlerts($vevent->get('x-obm-alert'), $id);
+      }
     } else {
+      $in_error = true;
+    }
+    if ($in_error) {
       $this->event_error ++;
     }
     return $id;
@@ -325,6 +363,7 @@ class Vcalendar_Writer_OBM {
       $data['event']['owner'] = $GLOBALS['obm']['uid'];
     }    
     $data['event']['calendar_id'] = $id;
+    $data['event']['organizer'] = $GLOBALS['obm']['uid'];
     run_query_calendar_event_update($data['event'], $data['entities'], $id, true);
     $this->updateStates($data['states'], $id);
     $alert = $vevent->get('x-obm-alert');
@@ -334,7 +373,7 @@ class Vcalendar_Writer_OBM {
   function & getOBMEvent(&$vevent) {
     $eventData = NULL;
     if(($id = $this->getOBMId($vevent->get('uid')))) {
-      $eventData = $this->getEventByExtId($id);
+      $eventData = $this->getEventByExtId($id, $vevent->get('recurrence-id'));
     }
     if(is_null($eventData)) {
       $eventData = $this->getEventByData($vevent);

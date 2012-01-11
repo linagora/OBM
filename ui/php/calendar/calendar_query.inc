@@ -7217,4 +7217,25 @@ function run_query_writable_calendars($obm_user_id, $selected_calendars) {
   }
   return $writable_calendars;
 }
+
+function run_query_get_recurring_event_id_from_ext_id($ext_id, $obm_user_id) {
+  global $cdg_sql;
+  $query = "SELECT e.event_id AS event_id
+        FROM Event e
+        LEFT JOIN EventException ee
+        ON e.event_id = ee.eventexception_child_id
+        WHERE e.event_ext_id = '".addslashes($ext_id)."'
+        AND e.event_owner = $obm_user_id
+        AND ee.eventexception_parent_id IS NULL";
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
+  $obm_q->query($query);
+
+  $event_id = null;
+  if ($obm_q->next_record()) {
+    $event_id = $obm_q->f('event_id');
+  }
+  return $event_id;
+}
+
 ?>

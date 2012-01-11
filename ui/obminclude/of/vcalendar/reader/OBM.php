@@ -86,7 +86,7 @@ class Vcalendar_Reader_OBM {
 
     while($repeatEvent->next_record()) {
       $ids[] = $repeatEvent->f('event_id');
-      $this->eventSets[] = $repeatEvent->Record;
+      array_unshift($this->eventSets, $repeatEvent->Record);
     }
     return $ids;
   }
