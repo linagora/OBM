@@ -78,13 +78,21 @@ public class User implements Serializable {
 		}
 		
 		private Iterable<String> splitOnSlashes(String userId) {
-			Iterable<String> parts = Splitter.on("\\").split(userId);
+			Iterable<String> parts = Splitter.on("\\").omitEmptyStrings().split(userId);
 			return parts;
 		}
 
 		private Iterable<String> splitOnAtSign(String userId) {
-			Iterable<String> parts = Splitter.on("@").split(userId);
+			Iterable<String> parts = Splitter.on("@").split(trimBeginSlash(userId));
 			return ImmutableList.copyOf(parts).reverse();
+		}
+
+		private CharSequence trimBeginSlash(String userId) {
+			if (userId.startsWith("\\")) {
+				return userId.substring(1);
+			} else {
+				return userId;
+			}
 		}
 
 		private String[] buildUserFromLoginParts(Iterable<String> parts) {

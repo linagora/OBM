@@ -67,6 +67,13 @@ public class UserTest {
 		String result = loginAtDomain.getLoginAtDomain();
 		Assertions.assertThat(result).isEqualTo("login@domain");
 	}
+
+	@Test
+	public void testFactoryCreateWithDomainAfter() {
+		String userId = "\\email@domain";
+		User user = Factory.create().createUser(userId, "email@domain", "displayName");
+		Assertions.assertThat(user).isNotNull();
+	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetLoginAtDomainWithSlashesAndArrobase() {
