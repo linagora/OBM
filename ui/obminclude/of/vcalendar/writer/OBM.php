@@ -146,7 +146,7 @@ class Vcalendar_Writer_OBM {
       $query = "SELECT event_id as id, event_owner
         FROM Event
         JOIN EventException ee ON ee.eventexception_child_id = event_id
-        WHERE event_ext_id = '$id' AND event_date = '$recurrence_id'";
+        WHERE event_ext_id = '$id' AND ee.eventexception_date = '$recurrence_id'";
     }
     $this->db->query($query);
     if($this->db->nf() == 0) {
