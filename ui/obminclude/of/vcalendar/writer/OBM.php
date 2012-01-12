@@ -304,7 +304,7 @@ class Vcalendar_Writer_OBM {
           $dao_params = array(
             'calendar_id'       => $parent_event_id,
             'title'             => $data['event']['title'],
-            'old_date_begin'    => $data['event']['date_begin'],
+            'old_date_begin'    => new Of_Date($data['event']['recurrence_id'], 'GMT'),
             'date_begin'        => $data['event']['date_begin'],
             'duration'          => $data['event']['event_duration'],
             'all_day'           => $data['event']['all_day'],
