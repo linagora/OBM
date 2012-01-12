@@ -34,9 +34,9 @@ package org.obm.push.monitor;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.store.CollectionDao;
@@ -49,14 +49,14 @@ public class ContactsMonitoringThread extends MonitoringThread {
 	@Singleton
 	public static class Factory {
 		private final CollectionDao collectionDao;
-		private final IContentsExporter contentsExporter;
 		private final PushPublishAndSubscribe.Factory pubSubFactory;
+		private final ContactsBackend contactsBackend;
 
 		@Inject
-		private Factory(CollectionDao collectionDao, IContentsExporter contentsExporter,
+		private Factory(CollectionDao collectionDao, ContactsBackend contactsBackend,
 				PushPublishAndSubscribe.Factory pubSubFactory) {
 			this.collectionDao = collectionDao;
-			this.contentsExporter = contentsExporter;
+			this.contactsBackend = contactsBackend;
 			this.pubSubFactory = pubSubFactory;
 		}
 
@@ -64,14 +64,14 @@ public class ContactsMonitoringThread extends MonitoringThread {
 				Set<ICollectionChangeListener> ccls) {
 			
 			return new ContactsMonitoringThread(freqMs, ccls,
-					this.collectionDao, this.contentsExporter, pubSubFactory);
+					this.collectionDao, this.contactsBackend, pubSubFactory);
 		}
 	}
 	
 	private ContactsMonitoringThread(long freqMs,
 			Set<ICollectionChangeListener> ccls,
-			CollectionDao collectionDao, IContentsExporter contentsExporter, PushPublishAndSubscribe.Factory pubSubFactory) {
-		super(freqMs, ccls, collectionDao, contentsExporter, pubSubFactory);
+			CollectionDao collectionDao, ContactsBackend contactsBackend, PushPublishAndSubscribe.Factory pubSubFactory) {
+		super(freqMs, ccls, collectionDao, contactsBackend, pubSubFactory);
 	}
 
 	@Override

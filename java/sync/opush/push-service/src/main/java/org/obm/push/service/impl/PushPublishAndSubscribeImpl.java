@@ -36,9 +36,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.MonitoringService;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
@@ -64,17 +64,17 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 		}
 		
 		@Override
-		public PushPublishAndSubscribe create(IContentsExporter contentsExporter) {
-			return new PushPublishAndSubscribeImpl(contentsExporter);
+		public PushPublishAndSubscribe create(PIMBackend backend) {
+			return new PushPublishAndSubscribeImpl(backend);
 		}
 	}
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final IContentsExporter contentsExporter;
+	private final PIMBackend backend;
 	private MonitoringService monitoringService;
 
-	private PushPublishAndSubscribeImpl(IContentsExporter contentsExporter) {
-		this.contentsExporter = contentsExporter;
+	private PushPublishAndSubscribeImpl(PIMBackend backend) {
+		this.backend = backend;
 	}
 
 	
@@ -101,11 +101,11 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 				for (SyncCollection syncCollection : monitoredCollections) {
 
 					try {
-						int count = contentsExporter.getItemEstimateSize(
-								backendSession, syncCollection.getSyncState(), 
-								syncCollection.getCollectionId(),
+						int count = backend.getItemEstimateSize(
+								backendSession, 
 								syncCollection.getOptions().getFilterType(),
-								syncCollection.getDataType());
+								syncCollection.getCollectionId(),
+								syncCollection.getSyncState());
 
 						if (count > 0) {
 							addPushNotification(pushNotifyList, ccl);

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PushMonitoringManager;
@@ -30,15 +29,15 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	private final ImapClientProvider imapClientProvider;
 	private final MailboxService emailManager;
 	private final MappingService mappingService;
-	private final IContentsExporter contentsExporter;
 	private final Factory pubSubFactory;
+	private final MailBackend mailBackend;
 	
 	
 	@Inject
 	private ImapMonitoringImpl(ImapClientProvider imapClientProvider,
 			MappingService mappingService, MailboxService emailManager,
-			IContentsExporter contentsExporter, PushPublishAndSubscribe.Factory pubSubFactory) {
-		this.contentsExporter = contentsExporter;
+			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory) {
+		this.mailBackend = mailBackend;
 		this.pubSubFactory = pubSubFactory;
 		this.emailPushMonitors = Collections
 				.synchronizedMap(new HashMap<Integer, EmailMonitoringThread>());
@@ -55,7 +54,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 
 		public Manager(Set<ICollectionChangeListener> registeredListeners) {
 			this.registeredListeners = registeredListeners;
-			pushPublishAndSubscribe = pubSubFactory.create(contentsExporter);
+			pushPublishAndSubscribe = pubSubFactory.create(mailBackend);
 		}
 		
 		@Override
