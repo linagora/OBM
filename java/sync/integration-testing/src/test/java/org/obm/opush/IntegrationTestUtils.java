@@ -62,6 +62,6 @@ public class IntegrationTestUtils {
 	}
 	
 	private static String buildServiceUrl(int port) {
-		return "http://localhost:" + port + "/";
+		return "http://localhost:" + port + "/ActiveSyncServlet/";
 	}
 }

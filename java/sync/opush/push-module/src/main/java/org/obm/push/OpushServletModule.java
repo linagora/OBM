@@ -42,7 +42,8 @@ public class OpushServletModule extends ServletModule{
 	    protected void configureServlets() {
 	        super.configureServlets();
 
-	        serve("/*").with(ActiveSyncServlet.class);
+	        serve("/ActiveSyncServlet/*").with(ActiveSyncServlet.class);
+	        serve("/Autodiscover/*").with(AutodiscoverServlet.class);
 
 	        
 	        bind(ContinuationFilter.class).in(Singleton.class);

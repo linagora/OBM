@@ -7,8 +7,8 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
-import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.buildOpushClient;
+import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.expectUsersHaveNoChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
@@ -51,6 +51,7 @@ import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
@@ -317,5 +318,4 @@ public class PingHandlerTest {
 				+ "</Folders>"
 				+ "</Ping>");
 	}
-
 }

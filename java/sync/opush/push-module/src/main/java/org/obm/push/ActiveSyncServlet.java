@@ -33,16 +33,12 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidParameterException;
 import java.util.Enumeration;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
@@ -54,6 +50,7 @@ import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;
 import org.obm.push.handler.IRequestHandler;
+import org.obm.push.handler.AuthenticatedServlet;
 import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.Responder;
@@ -62,10 +59,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -75,33 +69,25 @@ import com.google.inject.Singleton;
  * handlers.
  */
 @Singleton
-public class ActiveSyncServlet extends HttpServlet {
+public class ActiveSyncServlet extends AuthenticatedServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncServlet.class);
-	
 	private Handlers handlers;
 	private SessionService sessionService;
-	private LoggerService loggerService; 
-	private IBackend backend;
 	private PushContinuation.Factory continuationFactory;
 	private DeviceService deviceService;
 	
-	private final User.Factory userFactory;
 	private final ResponderImpl.Factory responderFactory;
 
-	
 	@Inject
 	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
-			IBackend backend, Factory continuationFactory,
-			DeviceService deviceService, User.Factory userFactory,
-			ResponderImpl.Factory responderFactory, Handlers handlers) {
-		super();
+			IBackend backend, Factory continuationFactory, DeviceService deviceService, 
+			User.Factory userFactory, ResponderImpl.Factory responderFactory, Handlers handlers) {
+	
+		super(backend, loggerService, userFactory);
+		
 		this.sessionService = sessionService;
-		this.loggerService = loggerService;
-		this.backend = backend;
 		this.continuationFactory = continuationFactory;
 		this.deviceService = deviceService;
-		this.userFactory = userFactory;
 		this.responderFactory = responderFactory;
 		this.handlers = handlers;
 	}
@@ -138,42 +124,34 @@ public class ActiveSyncServlet extends HttpServlet {
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 			/*Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
 			logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());*/
-			Credentials creds = performAuthentification(asrequest, response);
-			if (creds == null) {
-				return;
-			}
+			Credentials creds = performAuthentication(asrequest);
 
-			loggerService.initSession(creds.getUser(), c.getReqId(), asrequest.getCommand());
+			getLoggerService().initSession(creds.getUser(), c.getReqId(), asrequest.getCommand());
 
 			String policy = asrequest.getMsPolicyKey();
-			if (policy != null && policy.equals("0")
-					&& !asrequest.getCommand().equals("Provision")) {
-
-				logger.debug("forcing device (ua: {}) provisioning",
-						asrequest.getUserAgent());
+			if (policy != null && policy.equals("0") && !asrequest.getCommand().equals("Provision")) {
+				logger.debug("forcing device (ua: {}) provisioning", asrequest.getUserAgent());
 				response.setStatus(449);
 				return;
 			} else {
 				logger.debug("policy used = {}", policy);
 			}
 
-			try {
-				processActiveSyncMethod(c, 
-						creds, 
-						asrequest.getDeviceId(), 
-						asrequest,
-						response);
-			} catch (DaoException e) {
-				logger.error(e.getMessage(), e);
-			}
+			processActiveSyncMethod(c, creds, asrequest.getDeviceId(), asrequest, response);
+			
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
+		} catch (AuthFault e) {
+			logger.error(e.getMessage(), e);
+			returnHttpUnauthorized(request, response);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
 		} finally {
-			loggerService.closeSession();
+			getLoggerService().closeSession();
 		}
 	}
 
@@ -188,7 +166,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		if (bs == null) {
 			return;
 		}
-		loggerService.initSession(bs.getUser(), c.getReqId(), bs.getCommand());
+		getLoggerService().initSession(bs.getUser(), c.getReqId(), bs.getCommand());
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
@@ -200,75 +178,22 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 	
-	/**
-	 * Checks authentification headers. Returns non null value if login/password
-	 * is valid & the device has been authorized.
-	 */
-	private Credentials performAuthentification(ActiveSyncRequest request,
-			HttpServletResponse response) {
-
-		/*Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
-		logger.debug(asXmlRequestMarker, request.getHttpServletRequest().toString());*/
-		String authHeader = request.getHeader("Authorization");
-		if (authHeader != null) {
-			StringTokenizer st = new StringTokenizer(authHeader);
-			if (st.hasMoreTokens()) {
-				String basic = st.nextToken();
-				if (basic.equalsIgnoreCase("Basic")) {
-					String credentials = st.nextToken();
-					String userPass = new String(
-							Base64.decodeBase64(credentials));
-					int p = userPass.indexOf(":");
-					if (p != -1) {
-						String userId = userPass.substring(0, p);
-						String password = userPass.substring(p + 1);
-						String deviceId = request.getDeviceId();
-						String deviceType = request.getDeviceType();
-						String userAgent = request.getUserAgent();
-						try {
-							return login(userId, password, deviceId, deviceType, userAgent);
-						} catch (DaoException e) {
-							logger.error("Database exception while authenticating user", e);
-						} catch (InvalidParameterException e) {
-							//will be logged later
-						} catch (AuthFault e) {
-							logger.error(e.getMessage(), e);
-						}
-					}
-				}
-			}
-		}
-		returnHttpUnauthorized(request.getHttpServletRequest(), response);
-		return null;
-	}
-
-	private Credentials login(String userId, String password, String deviceId, 
-			String deviceType, String userAgent) throws DaoException, AuthFault {
+	private Credentials performAuthentication(ActiveSyncRequest request) throws AuthFault, DaoException {
+		Credentials credentials = authentication(request.getHttpServletRequest());
 		
-		AccessToken accessToken = backend.authenticate(userFactory.getLoginAtDomain(userId), password);
-		User user = userFactory.createUser(userId, accessToken.getEmail());
-		boolean initDevice = deviceService.initDevice(user, deviceId, deviceType, userAgent);
-		boolean syncAutho = deviceService.syncAuthorized(user, deviceId);
+		String deviceId = request.getDeviceId();
+		String deviceType = request.getDeviceType();
+		String userAgent = request.getUserAgent();
+		
+		boolean initDevice = deviceService.initDevice(credentials.getUser(), deviceId, deviceType, userAgent);
+		boolean syncAutho = deviceService.syncAuthorized(credentials.getUser(), deviceId);
 		if (initDevice && syncAutho) {
+		
 			logger.debug("login/password ok & the device has been authorized");
-			return new Credentials(user, password);
+			return credentials;
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}
-	}
-
-	private void returnHttpUnauthorized(HttpServletRequest httpServletRequest,
-			HttpServletResponse response) {
-
-		logger.warn("invalid auth, sending http 401 ( uri = {}{}{} )", 
-				new Object[] { 
-					httpServletRequest.getMethod(), 
-					httpServletRequest.getRequestURI(), 
-					httpServletRequest.getQueryString()});
-		
-		String s = "Basic realm=\"OBMPushService\"";
-		response.setHeader("WWW-Authenticate", s);
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,
@@ -356,5 +281,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	private IRequestHandler getHandler(BackendSession p) {
 		return handlers.getHandler(p.getCommand());
 	}
+
 
 }
