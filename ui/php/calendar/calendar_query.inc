@@ -1964,7 +1964,11 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
   
   if (hasEventChanged($oldEvent, $updatedEvent)) {
-    run_query_calendar_reset_event_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $oldEvent->uid);
+  	if($oldEvent->repeat_kind == 'none' || $params['all'] == 1) {
+  		run_query_calendar_reset_occurrence_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $calendar['calendar_id']);
+  	} else {
+    	run_query_calendar_reset_event_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $oldEvent->uid);
+    }
 	run_query_increment_sequence($oldEvent->uid);
   }
   
@@ -2190,11 +2194,9 @@ function run_query_calendar_quick_event_update($calendar) {
 
 	// reload once again to have the correct sequence number
 	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-  // Send mail
-// Send mail session var
+  // Send mail session var
   $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
   // Notify Observers
-  $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
 }
 
@@ -2414,6 +2416,33 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
   }
 }
 
+function run_query_calendar_reset_occurrence_links($users, $contacts, $resources, $id) {
+	global $obm;
+
+	if (is_array($users)) {
+		$users = array_unique($users);
+		foreach ($users as $user_id) {
+			if ($user_id != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
+				run_query_calendar_update_entity_event('user', $user_id, $id, 'NEEDS-ACTION');
+			}
+		}
+	}
+	if (is_array($contacts)) {
+		$contacts = array_unique($contacts);
+		foreach ($contacts as $contact_id) {
+			run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $id, 'NEEDS-ACTION');
+		}
+	}
+	if (is_array($resources)) {
+		$resources = array_unique($resources);
+		foreach ($resources as $res_id) {
+			if (!OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
+				run_query_calendar_update_entity_event('resource', $res_id, $id, 'NEEDS-ACTION');
+			}
+		}
+	}
+}
+
 /**
  * Create an exception for an event 
  * 
@@ -2525,7 +2554,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
       foreach ($data['entity'] as $entity_id => $entity_data) {
         # Ensure that both the new exception, the recurring event and the old
         # exceptions have the same participation state and organizer.
-        run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $entity_data['state']);
         run_query_calendar_insert_entity_event($entity, $entity_id, $exception_id, $entity_data['state'], $entity_data['is_organizer']);
       }
     }
@@ -2671,16 +2699,14 @@ function run_query_delete_one_event_exception($event_id, $eventexception_date, $
  * @access public
  * @return void
  */
-function run_query_quick_attendee_update($params, $eve_q) {
+function run_query_quick_attendee_update($params, $event_id) {
   global $obm, $cgp_host;
 
-  $event_id = $eve_q->f('event_id');
-  $oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
   $entities = get_calendar_event_entity($event_id);
   $users = isset($entities['user']) ? $entities['user']['ids'] : array();
   $contacts = isset($entities['contact']) ? $entities['contact']['ids'] : array();
   $resources = isset($entities['resources']) ? $entities['resources']['ids'] : array();
-  run_query_calendar_reset_event_links($users, $contacts, $resources, $oldEvent->uid);
+  run_query_calendar_reset_occurrence_links($users, $contacts, $resources, $event_id);
 }
 
 

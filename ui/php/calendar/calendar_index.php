@@ -507,7 +507,6 @@ if ($action == 'search') {
     if(!$conflicts || can_force_resource_conflict($conflicts)) {
       $id = $params['calendar_id'];
       $eve_q = run_query_calendar_detail($id);
-      run_query_quick_attendee_update($params,$eve_q);
       if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
         run_query_calendar_quick_event_update($params);
       } else {
@@ -516,6 +515,7 @@ if ($action == 'search') {
 	  $id = $params['calendar_id'];
         }
       }
+      run_query_quick_attendee_update($params, $id);
       json_build_html_event($params, $current_view, $id);
       $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
       $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
