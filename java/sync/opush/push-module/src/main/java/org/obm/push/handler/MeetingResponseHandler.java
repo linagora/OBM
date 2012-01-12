@@ -44,6 +44,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -74,18 +75,21 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	private final MeetingProtocol meetingProtocol;
 	private final MailBackend mailBackend;
+	private final CalendarBackend calendarBackend;
 	
 	@Inject
 	protected MeetingResponseHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,	StateMachine stMachine, 
 			MeetingProtocol meetingProtocol, CollectionDao collectionDao,
-			MailBackend mailBackend, WBXMLTools wbxmlTools) {
+			MailBackend mailBackend, WBXMLTools wbxmlTools,
+			CalendarBackend calendarBackend) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools);
 		this.meetingProtocol = meetingProtocol;
 		this.mailBackend = mailBackend;
+		this.calendarBackend = calendarBackend;
 	}
 
 	// <?xml version="1.0" encoding="UTF-8"?>
@@ -152,8 +156,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
 			try {
 				AttendeeStatus userResponse = item.getUserResponse();
-				String calId = contentsImporter.importCalendarUserStatus(bs, item.getCollectionId(), email, 
-						userResponse);
+				String calId = calendarBackend.handleMeetingResponse(bs, email,	userResponse);
 				contentsImporter.importMessageDeletion(bs, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
 				if (!AttendeeStatus.DECLINE.equals(userResponse)) {
 					meetingResponse.setCalId(calId);

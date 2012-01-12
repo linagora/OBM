@@ -46,6 +46,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
@@ -53,6 +54,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
@@ -279,19 +281,24 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return ic;
 	}
 
-	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, MSContact data)
-			throws UnknownObmSyncServerException, DaoException, ServerItemNotFoundException, CollectionNotFoundException {
-		
+	@Override
+	public String createOrUpdate(BackendSession bs, Integer collectionId,
+			String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException,
+			ServerItemNotFoundException {
+
+		MSContact contact = (MSContact) data;
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
 
 			if (serverId != null) {
-				Contact convertedContact = new ContactConverter().contact(data);
+				Contact convertedContact = new ContactConverter().contact(contact);
 				convertedContact.setUid(contactId);
 				modifyContact(bs, addressBookId, convertedContact);
 			} else {
-				Contact createdContact = createContact(bs, addressBookId, new ContactConverter().contact(data));
+				Contact createdContact = createContact(bs, addressBookId, new ContactConverter().contact(contact));
 				contactId = createdContact.getUid();
 			}
 
@@ -334,21 +341,19 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	public String delete(BackendSession bs, String serverId) 
-			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
+	@Override
+	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
+			throws CollectionNotFoundException, DaoException,
+			UnknownObmSyncServerException, ServerItemNotFoundException {
 		
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
-		Integer collectionId = mappingService.getCollectionIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
 		try {
-			Contact contact = removeContact(bs, addressBookId, contactId);
-			return mappingService.getServerIdFor(collectionId, String.valueOf(contact.getUid()));
+			removeContact(bs, addressBookId, contactId);
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
-			return null;
 		} catch (ContactNotFoundException e) {
 			logger.warn(e.getMessage());
-			return null;
 		}
 	}
 
@@ -406,6 +411,22 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		if (serverId == null) {
 			mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
 		}
+	}
+
+
+	@Override
+	public String move(BackendSession bs, String srcFolder, String dstFolder,
+			String messageId) throws CollectionNotFoundException,
+			ProcessingEmailException {
+		return null;
+	}
+
+	@Override
+	public void emptyFolderContent(BackendSession bs, String collectionPath,
+			boolean deleteSubFolder) throws NotAllowedException {
+		throw new NotAllowedException(
+				"emptyFolderContent is only supported for emails, collection was "
+						+ collectionPath);
 	}
 	
 	

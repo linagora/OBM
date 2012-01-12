@@ -39,13 +39,16 @@ import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 
 public class TaskBackend implements PIMBackend {
 
@@ -75,6 +78,34 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public PIMDataType getPIMDataType() {
 		return PIMDataType.TASKS;
+	}
+
+	@Override
+	public String createOrUpdate(BackendSession bs, Integer collectionId,
+			String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnknownObmSyncServerException,
+			ServerItemNotFoundException {
+		return null;
+	}
+
+	@Override
+	public String move(BackendSession bs, String srcFolder, String dstFolder,
+			String messageId) throws CollectionNotFoundException,
+			ProcessingEmailException {
+		return null;
+	}
+
+	@Override
+	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
+			throws CollectionNotFoundException, DaoException,
+			UnknownObmSyncServerException, ServerItemNotFoundException {
+		
+	}
+
+	@Override
+	public void emptyFolderContent(BackendSession bs, String collectionPath,
+			boolean deleteSubFolder) throws NotAllowedException {
 	}
 	
 }

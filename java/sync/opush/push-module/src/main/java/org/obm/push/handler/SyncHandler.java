@@ -406,7 +406,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
 			UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 
-		String serverId = contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), change.getServerId(), collection
+		String serverId = change.getServerId();
+		contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), serverId, collection
 				.getOptions().isDeletesAsMoves());
 		if (serverId != null) {
 			processedClientIds.put(serverId, null);

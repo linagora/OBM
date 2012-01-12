@@ -35,16 +35,31 @@ import java.util.List;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ServerItemNotFoundException;
 
 public interface PIMBackend {
 
+	String createOrUpdate(BackendSession bs, Integer collectionId,
+			String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, ProcessingEmailException, 
+			DaoException, UnknownObmSyncServerException, ServerItemNotFoundException;
+	
+	String move(BackendSession bs, String srcFolder, String dstFolder,
+			String messageId) throws CollectionNotFoundException,
+			ProcessingEmailException;
+	
+	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
+			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException;
+	
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
@@ -54,6 +69,8 @@ public interface PIMBackend {
 	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException;
 
+	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException;
+	
 	PIMDataType getPIMDataType();
 	
 }

@@ -29,40 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push;
 
-import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.UnknownObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.MailException;
-import org.obm.push.protocol.MailProtocol;
-import org.obm.push.protocol.bean.MailRequest;
+import java.util.Map;
+import java.util.Set;
 
+import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.PIMDataType;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SmartForwardHandler extends MailRequestHandler {
+public class Backends {
+
+	private final Map<PIMDataType, PIMBackend> backends;
 
 	@Inject
-	protected SmartForwardHandler(MailBackend mailBackend, 
-			IErrorsManager errorManager, MailProtocol mailProtocol) {
-		
-		super(mailBackend, errorManager, mailProtocol);
+	private Backends(Set<PIMBackend> backends) {
+		this.backends = buildBackendsMap(backends);
 	}
 
-	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException, 
-	SendEmailException, SmtpInvalidRcptException, UnknownObmSyncServerException, DaoException, MailException {
+	private Map<PIMDataType, PIMBackend> buildBackendsMap(Set<PIMBackend> backends) {
+		Map<PIMDataType, PIMBackend> map = Maps.newHashMap();
+		for (PIMBackend backend: backends) {
+			map.put(backend.getPIMDataType(), backend);
+		}
+		return map;
+	}
 
-		mailBackend.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
-				mailRequest.getCollectionId(), mailRequest.getServerId());
+	public PIMBackend getBackend(PIMDataType dataType) {
+		PIMBackend backend = backends.get(dataType);
+		Preconditions.checkNotNull(backend, "Datatype %s not handled", dataType);
+		return backend;
 	}
 	
 }

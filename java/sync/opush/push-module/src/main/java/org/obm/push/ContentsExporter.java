@@ -33,8 +33,6 @@ package org.obm.push;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
@@ -48,46 +46,30 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class ContentsExporter implements IContentsExporter {
 
-	private final Map<PIMDataType, PIMBackend> backends;
+	private final Backends backends;
 
 	@Inject
-	private ContentsExporter(Set<PIMBackend> backends) {
-		this.backends = buildBackendsMap(backends);
+	private ContentsExporter(Backends backends) {
+		this.backends = backends;
 	}
 
-	private Map<PIMDataType, PIMBackend> buildBackendsMap(Set<PIMBackend> backends) {
-		Map<PIMDataType, PIMBackend> map = Maps.newHashMap();
-		for (PIMBackend backend: backends) {
-			map.put(backend.getPIMDataType(), backend);
-		}
-		return map;
-	}
-	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
-		PIMBackend backend = getBackend(dataType);
+		PIMBackend backend = backends.getBackend(dataType);
 		return backend.getChanged(bs, state, filterType, collectionId);
 	}
 
-	private PIMBackend getBackend(PIMDataType dataType) {
-		PIMBackend backend = backends.get(dataType);
-		Preconditions.checkNotNull(backend, "Datatype %s not handled", dataType);
-		return backend;
-	}
-	
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> fetchServerIds, PIMDataType dataType) 
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnknownObmSyncServerException {
-		PIMBackend backend = getBackend(dataType);
+		PIMBackend backend = backends.getBackend(dataType);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		changes.addAll(backend.fetch(bs, fetchServerIds));
 		return changes;
@@ -96,7 +78,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
-		PIMBackend backend = getBackend(dataType);
+		PIMBackend backend = backends.getBackend(dataType);
 		return backend.getItemEstimateSize(bs, filterType, collectionId, state);
 	}
 	

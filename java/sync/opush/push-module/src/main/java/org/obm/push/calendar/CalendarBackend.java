@@ -55,12 +55,12 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
-import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -310,8 +310,11 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return mappingService.getServerIdFor(collectionId, uid.serializeToString());
 	}
 
-	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
+	@Override
+	public String createOrUpdate(BackendSession bs, Integer collectionId,
+			String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, ProcessingEmailException, 
+			DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
 
 		AccessToken token = login(bs);
 		
@@ -424,7 +427,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return null;
 	}
 
-	public void delete(BackendSession bs, Integer collectionId, String serverId) 
+	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
 		
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
@@ -441,7 +444,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				throw new UnknownObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
 				throw new ServerItemNotFoundException(serverId);
-			} catch (NotAllowedException e) {
+			} catch (org.obm.sync.NotAllowedException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
 				logout(token);
@@ -633,6 +636,21 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			return event.getExtId();
 		}
 		return null;
+	}
+
+	@Override
+	public String move(BackendSession bs, String srcFolder, String dstFolder,
+			String messageId) throws CollectionNotFoundException,
+			ProcessingEmailException {
+		return null;
+	}
+
+	@Override
+	public void emptyFolderContent(BackendSession bs, String collectionPath,
+			boolean deleteSubFolder) throws NotAllowedException {
+		throw new NotAllowedException(
+				"emptyFolderContent is only supported for emails, collection was "
+						+ collectionPath);
 	}
 
 }

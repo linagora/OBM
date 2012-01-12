@@ -261,6 +261,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (ProcessingEmailException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
+		} catch (PIMDataTypeNotFoundException e) {
+			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return emptyFolderContentsResult;
 	}

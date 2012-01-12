@@ -32,23 +32,17 @@
 package org.obm.push;
 
 import org.obm.push.backend.IContentsImporter;
-import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSContact;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
-import org.obm.push.mail.MailBackend;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -56,112 +50,42 @@ import com.google.inject.Singleton;
 @Singleton
 public class ContentsImporter implements IContentsImporter {
 
-	private final MailBackend mailBackend;
-	private final CalendarBackend calBackend;
-	private final ContactsBackend contactBackend;
+	private final Backends backends;
 
 	@Inject
-	private ContentsImporter(MailBackend mailBackend,
-			CalendarBackend calBackend, ContactsBackend contactBackend) {
-
-		this.mailBackend = mailBackend;
-		this.calBackend = calBackend;
-		this.contactBackend = contactBackend;
+	private ContentsImporter(Backends backends) {
+		this.backends = backends;
 	}
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 		
-		String resultServerId = null;
-		switch (data.getType()) {
-		case CONTACTS:
-			resultServerId = contactBackend.createOrUpdate(bs, collectionId, serverId, (MSContact) data);
-			break;
-		case EMAIL:
-			resultServerId = mailBackend.createOrUpdate(bs, collectionId, serverId,
-					clientId, (MSEmail) data);
-			break;
-		case TASKS:
-		case CALENDAR:
-			resultServerId = calBackend.createOrUpdate(bs, collectionId, serverId, data);
-			break;
-		}
-		return resultServerId;
+		PIMBackend backend = backends.getBackend(data.getType());
+		return backend.createOrUpdate(bs, collectionId, serverId, clientId, data);
 	}
 
 	@Override
-	public String importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 					throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
-		
-		String serverIdDeleted = serverId;
-		switch (type) {
-		case CALENDAR:
-			calBackend.delete(bs, collectionId, serverId);
-			break;
-		case CONTACTS:
-			serverIdDeleted = contactBackend.delete(bs, serverId);
-			break;
-		case EMAIL:
-			mailBackend.delete(bs, serverId,moveToTrash);
-			break;
-		case TASKS:
-			calBackend.delete(bs, collectionId, serverId);
-			break;
-		}
-		return serverIdDeleted;
+
+		PIMBackend backend = backends.getBackend(type);
+		backend.delete(bs, collectionId, serverId, moveToTrash);
 	}
 
 	public String importMoveItem(BackendSession bs, PIMDataType type,
 			String srcFolder, String dstFolder, String messageId) throws CollectionNotFoundException, DaoException, ProcessingEmailException {
-		switch (type) {
-		case EMAIL:
-			return mailBackend.move(bs, srcFolder, dstFolder, messageId);
-		case CALENDAR:
-		case CONTACTS:
-		case TASKS:
-			break;
-		}
-		return null;
-	}
-
-	@Override
-	public void sendEmail(BackendSession bs, byte[] mailContent,
-			Boolean saveInSent)  throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
-		mailBackend.sendEmail(bs, mailContent, saveInSent);
-	}
-
-	@Override
-	public void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)  
-					throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
-					DaoException, UnknownObmSyncServerException {
-		mailBackend.replyEmail(bs, mailContent, saveInSent, collectionId, serverId);
-	}
-
-	@Override
-	public String importCalendarUserStatus(BackendSession bs,  Integer invitationCollexctionId, MSEmail invitation,
-			AttendeeStatus userResponse) throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ServerItemNotFoundException {
-		return calBackend.handleMeetingResponse(bs, invitation, userResponse);
-	}
-
-	@Override
-	public void forwardEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, String collectionId, String serverId)  
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, DaoException {
-		mailBackend.forwardEmail(bs, mailContent, saveInSent, collectionId, serverId);
+		PIMBackend backend = backends.getBackend(type);
+		return backend.move(bs, srcFolder, dstFolder, messageId);
 	}
 
 	@Override
 	public void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
-			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException {
-		
-		if (collectionPath != null && collectionPath.contains("email\\")) {
-			mailBackend.purgeFolder(bs, collectionPath, deleteSubFolder);
-		} else {
-			throw new NotAllowedException(
-					"emptyFolderContent is only supported for emails, collection was "
-							+ collectionPath);
-		}
+			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, PIMDataTypeNotFoundException {
+
+		PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+		PIMBackend backend = backends.getBackend(dataType);
+		backend.emptyFolderContent(bs, collectionPath, deleteSubFolder);
 	}
 
 }

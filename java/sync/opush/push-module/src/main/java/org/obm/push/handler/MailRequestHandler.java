@@ -34,7 +34,6 @@ package org.obm.push.handler;
 import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
@@ -46,6 +45,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
@@ -57,12 +57,13 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	protected final IContentsImporter contentsImporter;
+	protected final MailBackend mailBackend;
 	private final IErrorsManager errorManager;
 	private final MailProtocol mailProtocol;
+
 	
-	protected MailRequestHandler(IContentsImporter contentsImporter, IErrorsManager errorManager, MailProtocol mailProtocol) {
-		this.contentsImporter = contentsImporter;
+	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol) {
+		this.mailBackend = mailBackend;
 		this.errorManager = errorManager;
 		this.mailProtocol = mailProtocol;
 	}
