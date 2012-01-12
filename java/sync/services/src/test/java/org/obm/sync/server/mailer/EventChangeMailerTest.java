@@ -480,7 +480,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
 			Assert.assertNull(parts.applicationIcs);
@@ -566,7 +566,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
@@ -663,7 +663,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_par_Raphael");
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
@@ -762,7 +762,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Ev=C3=A9nement_annul=C3=A9_par_Raphael");
+					"Subject: =?UTF-8?Q?Annulation_d'un_=C3=A9v=C3=A9nement_de_Raphael");
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
