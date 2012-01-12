@@ -35,7 +35,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +56,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -72,8 +76,10 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
+import org.obm.push.store.EmailDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
@@ -84,6 +90,7 @@ import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -98,20 +105,26 @@ public class MailBackendImpl implements MailBackend {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final MailboxService emailManager;
+	private final MailboxService mailboxService;
 	private final Mime4jUtils mime4jUtils;
 	private final ConfigurationService configurationService;
 	private final ICalendar calendarClient;
 	private final LoginService login;
 	private final MappingService mappingService;
+	private final EmailDao emailDao;
+
+	private final EmailSync emailSync;
 
 	@Inject
-	/* package */ MailBackendImpl(MailboxService emailManager, 
+	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
+			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			MappingService mappingService)  {
 		
-		this.emailManager = emailManager;
+		this.mailboxService = mailboxService;
+		this.emailDao = emailDao;
+		this.emailSync = emailSync;
 		this.mime4jUtils = mime4jUtils;
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
@@ -173,10 +186,8 @@ public class MailBackendImpl implements MailBackend {
 		
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			Integer devDbId = bs.getDevice().getDatabaseId();
-
 			state.updatingLastSync(filterType);
-			return emailManager.getSync(bs, state, devDbId, collectionId, collectionPath);
+			return emailSync.getSync(bs, mailboxService, state, collectionPath, collectionId);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MailException e) {
@@ -204,7 +215,7 @@ public class MailBackendImpl implements MailBackend {
 		
 		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
 		try {
-			emailManager.updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
+			updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
 					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
 			return getDataDelta(bs, collectionId, mailChanges);
 		} catch (DaoException e) {
@@ -212,6 +223,18 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
+	private void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailUids,
+			Collection<Email> newAndUpdatedEmails) throws DaoException {
+		
+		if (removedEmailUids != null && !removedEmailUids.isEmpty()) {
+			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedEmailUids);
+		}
+		
+		if (newAndUpdatedEmails != null && !newAndUpdatedEmails.isEmpty()) {
+			markEmailsAsSynced(devId, collectionId, lastSync, newAndUpdatedEmails);
+		}
+	}
+	
 	private DataDelta getDataDelta(BackendSession bs, Integer collectionId, MailChanges mailChanges) 
 			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
@@ -228,7 +251,7 @@ public class MailBackendImpl implements MailBackend {
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
 			List<MSEmail> msMails = 
-					emailManager.fetchMails(bs, calendarClient, collectionId, collection, emailsUids);
+					mailboxService.fetchMails(bs, calendarClient, collectionId, collection, emailsUids);
 			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -286,7 +309,7 @@ public class MailBackendImpl implements MailBackend {
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<MSEmail> emails = emailManager.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
+			final List<MSEmail> emails = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
 			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(mappingService.getServerIdFor(collectionId, String.valueOf(email.getUid())));
@@ -322,9 +345,11 @@ public class MailBackendImpl implements MailBackend {
 				if (trash) {
 					String wasteBasketPath = getWasteBasketPath(bs);
 					Integer wasteBasketId = mappingService.getCollectionIdFor(bs.getDevice(), wasteBasketPath);
-					emailManager.moveItem(bs, devDbId, collectionName, collectionId, wasteBasketPath, wasteBasketId, uid);
+					mailboxService.moveItem(bs, devDbId, collectionName, collectionId, wasteBasketPath, wasteBasketId, uid);
+					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
+					addMessageInCache(bs, devDbId, wasteBasketId, uid);
 				} else {
-					emailManager.delete(bs, devDbId, collectionName, collectionId, uid);
+					mailboxService.delete(bs, devDbId, collectionName, collectionId, uid);
 				}
 			}	
 		} catch (MailException e) {
@@ -356,7 +381,7 @@ public class MailBackendImpl implements MailBackend {
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
 			if (serverId != null) {
 				Long mailUid = getEmailUidFromServerId(serverId);
-				emailManager.updateReadFlag(bs, collectionPath, mailUid, email.isRead());
+				mailboxService.updateReadFlag(bs, collectionPath, mailUid, email.isRead());
 			}
 			return serverId;
 		} catch (MailException e) {
@@ -378,7 +403,9 @@ public class MailBackendImpl implements MailBackend {
 			final Integer srcFolderId = mappingService.getCollectionIdFor(bs.getDevice(), srcFolder);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(bs.getDevice(), dstFolder);
 			final Integer devDbId = bs.getDevice().getDatabaseId();
-			Long newUidMail = emailManager.moveItem(bs, devDbId, srcFolder, srcFolderId, dstFolder, dstFolderId, currentMailUid);
+			Long newUidMail = mailboxService.moveItem(bs, devDbId, srcFolder, srcFolderId, dstFolder, dstFolderId, currentMailUid);
+			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
+			addMessageInCache(bs, devDbId, dstFolderId, currentMailUid);
 			return dstFolderId + ":" + newUidMail;	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
@@ -423,14 +450,14 @@ public class MailBackendImpl implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = emailManager.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
 				Message message = mime4jUtils.parseMessage(mailContent);
 				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message);
 				send(bs, replyEmail, saveInSent);
-				emailManager.setAnsweredFlag(bs, collectionPath, uid);
+				mailboxService.setAnsweredFlag(bs, collectionPath, uid);
 			} else {
 				sendEmail(bs, mailContent, saveInSent);
 			}
@@ -460,7 +487,7 @@ public class MailBackendImpl implements MailBackend {
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 
-			List<MSEmail> mail = emailManager.fetchMails(bs, calendarClient, collectionIdInt, collectionName, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(bs, calendarClient, collectionIdInt, collectionName, uids);
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
@@ -469,7 +496,7 @@ public class MailBackendImpl implements MailBackend {
 						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message);
 				send(bs, forwardEmail, saveInSent);
 				try{
-					emailManager.setAnsweredFlag(bs, collectionName, uid);
+					mailboxService.setAnsweredFlag(bs, collectionName, uid);
 				} catch (Throwable e) {
 					logger.info("Can't set Answered Flag to mail["+uid+"]");
 				}
@@ -515,7 +542,7 @@ public class MailBackendImpl implements MailBackend {
 
 			Address from = getAddress(sendEmail.getFrom());
 			if (!sendEmail.isInvitation() && isScheduleMeeting) {
-				emailManager.sendEmail(bs, from, sendEmail.getTo(),
+				mailboxService.sendEmail(bs, from, sendEmail.getTo(),
 						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
@@ -545,7 +572,7 @@ public class MailBackendImpl implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = emailManager.fetchMails(bs, calendarClient, collectionId, collectionName, uids);
+			List<MSEmail> emails = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
@@ -583,7 +610,7 @@ public class MailBackendImpl implements MailBackend {
 
 				String collectionName = mappingService.getCollectionPathFor(Integer
 						.parseInt(collectionId));
-				InputStream is = emailManager.findAttachment(bs,
+				InputStream is = mailboxService.findAttachment(bs,
 						collectionName, Long.parseLong(messageId),
 						mimePartAddress);
 
@@ -632,7 +659,8 @@ public class MailBackendImpl implements MailBackend {
 			}
 			final Integer devDbId = bs.getDevice().getDatabaseId();
 			int collectionId = mappingService.getCollectionIdFor(bs.getDevice(), collectionPath);
-			emailManager.purgeFolder(bs, devDbId, collectionPath, collectionId);
+			Collection<Long> uids = mailboxService.purgeFolder(bs, devDbId, collectionPath, collectionId);
+			deleteEmails(devDbId, collectionId, uids);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
 			}	
@@ -648,6 +676,69 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public Long getEmailUidFromServerId(String serverId){
 		return mappingService.getItemIdFromServerId(serverId).longValue();
+	}
+
+	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids) throws DaoException {
+		Collection<Email> emails = mailboxService.fetchEmails(bs, ImmutableList.of(mailUids));
+		try {
+			markEmailsAsSynced(devId, collectionId, emails);
+		} catch (DaoException e) {
+			throw new DaoException("Error while adding messages in db", e);
+		}
+	}
+
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
+		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
+	}
+
+	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
+		Set<Email> allEmailsToMark = Sets.newHashSet(emails);
+		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
+		Set<Email> modifiedEmails = findModifiedEmails(allEmailsToMark, alreadySyncedEmails);
+		Set<Email> emailsNeverTrackedBefore = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
+		logger.info("mark {} updated mail(s) as synced", modifiedEmails.size());
+		emailDao.updateSyncEntriesStatus(devId, collectionId, modifiedEmails);
+		logger.info("mark {} new mail(s) as synced", emailsNeverTrackedBefore.size());
+		emailDao.createSyncEntries(devId, collectionId, emailsNeverTrackedBefore, lastSync);
+	}
+
+	private Set<Email> findModifiedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
+		Map<Long, Email> indexedEmailsToMark = getEmailsAsUidTreeMap(allEmailsToMark);
+		HashSet<Email> modifiedEmails = Sets.newHashSet();
+		for (Email email: alreadySyncedEmails) {
+			Email modifiedEmail = indexedEmailsToMark.get(email.getUid());
+			if (modifiedEmail != null && !modifiedEmail.equals(email)) {
+				modifiedEmails.add(modifiedEmail);
+			}
+		}
+		return modifiedEmails;
+	}
+
+	private Set<Email> filterOutAlreadySyncedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
+		return org.obm.push.utils.collection.Sets.difference(allEmailsToMark, alreadySyncedEmails, new Comparator<Email>() {
+			@Override
+			public int compare(Email o1, Email o2) {
+				return Long.valueOf(o1.getUid() - o2.getUid()).intValue();
+			}
+		});
+	}
+
+	private Map<Long, Email> getEmailsAsUidTreeMap(Set<Email> emails) {
+		return Maps.uniqueIndex(emails, new Function<Email, Long>() {
+			@Override
+			public Long apply(Email email) {
+				return email.getIndex();
+			}
+		});
+	}
+	
+
+	private void deleteEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
+		try {
+			emailDao.deleteSyncEmails(devId, collectionId, mailUids);
+		} catch (DaoException e) {
+			throw new DaoException("Error while deleting messages in db", e);
+		}
 	}
 
 }

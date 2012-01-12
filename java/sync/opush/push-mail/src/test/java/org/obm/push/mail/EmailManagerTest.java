@@ -68,8 +68,7 @@ public class EmailManagerTest {
 		EasyMock.replay(emailConfiguration, smtpSender, backendSession);
 		
 		ImapMailboxService emailManager = 
-				new ImapMailboxService(null, emailConfiguration, smtpSender, 
-						null, null, null, null);
+				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null);
 
 		emailManager.sendEmail(backendSession,
 				new Address("test@test.fr"),

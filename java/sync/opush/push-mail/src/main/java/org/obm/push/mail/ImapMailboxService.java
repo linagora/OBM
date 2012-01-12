@@ -36,12 +36,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.minig.imap.FastFetch;
@@ -58,7 +55,6 @@ import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -66,8 +62,6 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.service.EventService;
-import org.obm.push.store.EmailDao;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
@@ -76,9 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -87,46 +78,25 @@ public class ImapMailboxService implements MailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
 	
-	private final EmailDao emailDao;
 	private final SmtpSender smtpProvider;
-	private final EmailSync emailSync;
 	private final EventService eventService;
 	private final LoginService login;
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
-
 	private final ImapClientProvider imapClientProvider;
 	
 	@Inject
-	/* package */ ImapMailboxService(EmailDao emailDao, EmailConfiguration emailConfiguration, 
-			SmtpSender smtpSender, EmailSync emailSync,
+	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
+			SmtpSender smtpSender,
 			EventService eventService, LoginService login,
 			ImapClientProvider imapClientProvider) {
 		
-		this.emailSync = emailSync;
 		this.smtpProvider = smtpSender;
-		this.emailDao = emailDao;
 		this.eventService = eventService;
 		this.login = login;
 		this.imapClientProvider = imapClientProvider;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
-	}
-
-	@Override
-	public MailChanges getSync(BackendSession bs, SyncState syncState, Integer deviceId, Integer collectionId, String collectionName) 
-			throws DaoException, MailException {
-		
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			store.select( parseMailBoxName(store, collectionName) );
-			return emailSync.getSync(store, deviceId, syncState, collectionId);
-		} catch (IMAPException e) {
-			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
 	}
 
 	@Override
@@ -247,8 +217,6 @@ public class ImapMailboxService implements MailboxService {
 			logger.info("delete conv id = ", uid);
 			store.uidStore(uids, fl, true);
 			store.expunge();
-			deleteEmails(devId, srcFolderId, Arrays.asList(uid));
-			addMessageInCache(store, devId, dstFolderId, uid);
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
@@ -369,7 +337,7 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) 
+	public Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) 
 			throws DaoException, MailException {
 		
 		long time = System.currentTimeMillis();
@@ -384,10 +352,10 @@ public class ImapMailboxService implements MailboxService {
 			fl.add(Flag.DELETED);
 			store.uidStore(uids, fl, true);
 			store.expunge();
-			deleteEmails(devId, collectionId, uids);
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
 					new Object[]{collectionPath, time, uids.size()});
+			return uids;
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
@@ -468,74 +436,6 @@ public class ImapMailboxService implements MailboxService {
 		return ret;
 	}
 
-	private void deleteEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
-		try {
-			emailDao.deleteSyncEmails(devId, collectionId, mailUids);
-		} catch (DaoException e) {
-			throw new DaoException("Error while deleting messages in db", e);
-		}
-	}
-
-	private void addMessageInCache(StoreClient store, Integer devId, Integer collectionId, Long mailUids) throws DaoException {
-		Collection<FastFetch> fetch = store.uidFetchFast(ImmutableSet.of(mailUids));
-		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
-					@Override
-					public Email apply(FastFetch input) {
-						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
-					}
-				});
-		try {
-			markEmailsAsSynced(devId, collectionId, emails);
-		} catch (DaoException e) {
-			throw new DaoException("Error while adding messages in db", e);
-		}
-	}
-
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
-		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
-	}
-
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
-		Set<Email> allEmailsToMark = Sets.newHashSet(emails);
-		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
-		Set<Email> modifiedEmails = findModifiedEmails(allEmailsToMark, alreadySyncedEmails);
-		Set<Email> emailsNeverTrackedBefore = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
-		logger.info("mark {} updated mail(s) as synced", modifiedEmails.size());
-		emailDao.updateSyncEntriesStatus(devId, collectionId, modifiedEmails);
-		logger.info("mark {} new mail(s) as synced", emailsNeverTrackedBefore.size());
-		emailDao.createSyncEntries(devId, collectionId, emailsNeverTrackedBefore, lastSync);
-	}
-
-	private Set<Email> findModifiedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
-		Map<Long, Email> indexedEmailsToMark = getEmailsAsUidTreeMap(allEmailsToMark);
-		HashSet<Email> modifiedEmails = Sets.newHashSet();
-		for (Email email: alreadySyncedEmails) {
-			Email modifiedEmail = indexedEmailsToMark.get(email.getUid());
-			if (modifiedEmail != null && !modifiedEmail.equals(email)) {
-				modifiedEmails.add(modifiedEmail);
-			}
-		}
-		return modifiedEmails;
-	}
-
-	private Set<Email> filterOutAlreadySyncedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
-		return org.obm.push.utils.collection.Sets.difference(allEmailsToMark, alreadySyncedEmails, new Comparator<Email>() {
-			@Override
-			public int compare(Email o1, Email o2) {
-				return Long.valueOf(o1.getUid() - o2.getUid()).intValue();
-			}
-		});
-	}
-	
-	private Map<Long, Email> getEmailsAsUidTreeMap(Set<Email> emails) {
-		return Maps.uniqueIndex(emails, new Function<Email, Long>() {
-			@Override
-			public Long apply(Email email) {
-				return email.getIndex();
-			}
-		});
-	}
-	
 	@Override
 	public boolean getLoginWithDomain() {
 		return loginWithDomain;
@@ -547,15 +447,31 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailUids,
-			Collection<Email> newAndUpdatedEmails) throws DaoException {
-		
-		if (removedEmailUids != null && !removedEmailUids.isEmpty()) {
-			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedEmailUids);
-		}
-		
-		if (newAndUpdatedEmails != null && !newAndUpdatedEmails.isEmpty()) {
-			markEmailsAsSynced(devId, collectionId, lastSync, newAndUpdatedEmails);
+	public Collection<Email> fetchEmails(BackendSession bs, Collection<Long> uids) {
+		StoreClient store = imapClientProvider.getImapClient(bs);
+		Collection<FastFetch> fetch = store.uidFetchFast(uids);
+		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
+					@Override
+					public Email apply(FastFetch input) {
+						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
+					}
+				});
+		return emails;
+	}
+	
+	@Override
+	public Set<Email> fetchEmails(BackendSession bs, String collectionName, Date windows) throws MailException {
+		StoreClient store = imapClientProvider.getImapClient(bs);
+		try {
+			login(store);
+			store.select( parseMailBoxName(store, collectionName) );
+			Collection<Long> uids = store.uidSearch(new SearchQuery(null, windows));
+			Collection<FastFetch> mails = store.uidFetchFast(uids);
+			return EmailFactory.listEmailFromFastFetch(mails);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
 		}
 	}
 

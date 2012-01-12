@@ -31,12 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.minig.imap.StoreClient;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 
 public interface IEmailSync {
 
-	MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException;
+	MailChanges getSync(BackendSession bs, MailboxService mailboxService,
+			SyncState state, String collectionName, Integer collectionId)
+			throws DaoException, MailException;
 
 }

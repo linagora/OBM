@@ -31,14 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 
-import org.minig.imap.FastFetch;
-import org.minig.imap.SearchQuery;
-import org.minig.imap.StoreClient;
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -69,9 +66,9 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public MailChanges getSync(StoreClient imapStore, Integer devId, SyncState state, Integer collectionId) throws DaoException {
-		Set<Email> emailsFromIMAP = getImapEmails(imapStore, state.getLastSync());
-		Set<Email> alreadySyncedEmails = emailDao.listSyncedEmails(devId, collectionId, state);
+	public MailChanges getSync(BackendSession bs, MailboxService mailboxService, SyncState state, String collectionName, Integer collectionId) throws DaoException, MailException {
+		Set<Email> emailsFromIMAP = mailboxService.fetchEmails(bs, collectionName, state.getLastSync());
+		Set<Email> alreadySyncedEmails = emailDao.listSyncedEmails(bs.getDevice().getDatabaseId(), collectionId, state);
 		Set<Email> newAndUpdatedEmails = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
 		Set<Email> deletedEmails = findDeletedEmails(emailsFromIMAP, alreadySyncedEmails);
 		MailChanges mailChanges = new MailChanges(deletedEmails, newAndUpdatedEmails);
@@ -91,12 +88,6 @@ public class EmailSync implements IEmailSync {
 		logger.info("{} email(s) from imap", emailsFromIMAP.size());
 		logger.info("{} new or updated emails", mailChanges.getNewAndUpdatedEmails().size());
 		logger.info("{} already synced emails", alreadySyncedEmails.size());
-	}
-
-	private Set<Email> getImapEmails(StoreClient imapStore, Date windows) {
-		Collection<Long> uids = imapStore.uidSearch(new SearchQuery(null, windows));
-		Collection<FastFetch> mails = imapStore.uidFetchFast(uids);
-		return EmailFactory.listEmailFromFastFetch(mails);
 	}
 
 }
