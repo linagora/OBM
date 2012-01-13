@@ -330,7 +330,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_ROUGE?=");
+					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
 			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
@@ -417,7 +417,7 @@ public class EventChangeMailerTest {
 			checkStringContains(parts.rawMessage, 
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_ROUGE?=");
+					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
 		}
