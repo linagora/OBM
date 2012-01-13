@@ -43,5 +43,7 @@ public interface EmailConfiguration {
 	boolean loginWithDomain();
 
 	int getMessageMaxSize();
+	
+	int imapPort();
 
 }

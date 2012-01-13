@@ -17,12 +17,15 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	
 	private final LocatorService locatorService;
 	private final boolean loginWithDomain;
+	private final int imapPort;
+
 	
 	@Inject
 	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, 
 			LocatorService locatorService) {
 		this.locatorService = locatorService;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
+		this.imapPort = emailConfiguration.imapPort();
 	}
 
 	
@@ -38,7 +41,7 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	public StoreClient getImapClient(BackendSession bs) throws LocatorClientException {
 		final String imapHost = locateImap(bs);
 		final String login = getLogin(bs);
-		StoreClient storeClient = new StoreClient(imapHost, 143, login, bs.getPassword()); 
+		StoreClient storeClient = new StoreClient(imapHost, imapPort, login, bs.getPassword()); 
 		
 		logger.debug("Creating storeClient with login {} : " +
 				"loginWithDomain = {}", 

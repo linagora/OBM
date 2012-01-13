@@ -39,6 +39,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class EmailConfigurationImpl extends AbstractConfigurationService implements EmailConfiguration {
 	
+	private static final int IMAP_PORT = 143;
 	private static final int MESSAGE_DEFAULT_MAX_SIZE = 10485760;
 	
 	private static final String BACKEND_CONF_FILE = "/etc/opush/mail_conf.ini";
@@ -69,5 +70,10 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	@Override
 	public int getMessageMaxSize() {
 		return getIntValue(BACKEND_MESSAGE_MAX_SIZE, MESSAGE_DEFAULT_MAX_SIZE);
+	}
+	
+	@Override
+	public int imapPort() {
+		return IMAP_PORT;
 	}
 }
