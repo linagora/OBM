@@ -91,7 +91,7 @@ public class EmailSyncTestUtils {
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUsersHaveNoChange(collectionDao, fakeTestUsers);
-		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, syncEmailCollectionId, fakeTestUsers);
+		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, syncEmailCollectionId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		mockItemTrackingDao(itemTrackingDao);
@@ -140,15 +140,13 @@ public class EmailSyncTestUtils {
 		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
 	}
 
-	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, String syncEmailSyncKey, int syncEmailCollectionId, List<OpushUser> fakeTestUsers) throws CollectionNotFoundException, DaoException {
+	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, String syncEmailSyncKey, int syncEmailCollectionId) throws DaoException {
 		expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
 				.andReturn(syncEmailCollectionId).anyTimes();
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
 				.andReturn((int)(Math.random()*10000)).anyTimes();
-		for (OpushUser user : fakeTestUsers) {
-			SyncState state = new SyncState(syncEmailSyncKey);
-			expect(collectionDao.findStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
-		}
+		SyncState state = new SyncState(syncEmailSyncKey);
+		expect(collectionDao.findStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
 	}
 
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 

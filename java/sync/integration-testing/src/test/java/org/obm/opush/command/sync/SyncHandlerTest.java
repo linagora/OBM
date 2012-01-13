@@ -1,8 +1,6 @@
 package org.obm.opush.command.sync;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
+import static org.obm.opush.IntegrationPushTestUtils.mockAddressBook;
 import static org.obm.opush.IntegrationTestUtils.buildOpushClient;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasAddItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasDeleteItems;
@@ -14,7 +12,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.fest.assertions.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,17 +27,13 @@ import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.items.FolderChanges;
 import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderHierarchy;
 import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
-import org.obm.sync.services.IAddressBook;
 
 import com.google.inject.Inject;
 
@@ -67,35 +60,12 @@ public class SyncHandlerTest {
 	}
 
 	@Test
-	public void testInitialFolderSync() throws Exception {
-		String initialSyncKey = "0";
-		int syncEmailCollectionId = 4;
-		DataDelta delta = new DataDeltaBuilder().build();
-		mockAddressBook();
-		mockEmailSyncClasses(initialSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
-		opushServer.start();
-		
-		OPClient opClient = buildOpushClient(singleUserFixture.jaures, port);
-		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		
-		checkRegularFoldersAreSynchronized(folderSyncResponse);
-	}
-
-	private void mockAddressBook() throws ServerFault {
-		IAddressBook iAddressBook = classToInstanceMap.get(IAddressBook.class);
-		expect(
-				iAddressBook.listAddressBooksChanged(
-						eq(singleUserFixture.jaures.accessToken), anyObject(Date.class)))
-				.andReturn(new FolderChanges());
-	}
-
-	@Test
 	public void testSyncDefaultMailFolderUnchange() throws Exception {
 		String initialSyncKey = "0";
 		String syncEmailSyncKey = "1";
 		int syncEmailCollectionId = 4;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
-		mockAddressBook();
+		mockAddressBook(singleUserFixture, classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -121,7 +91,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook();
+		mockAddressBook(singleUserFixture, classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -150,7 +120,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook();
+		mockAddressBook(singleUserFixture, classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -177,7 +147,7 @@ public class SyncHandlerTest {
 						.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook();
+		mockAddressBook(singleUserFixture, classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -205,7 +175,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook();
+		mockAddressBook(singleUserFixture, classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -217,20 +187,6 @@ public class SyncHandlerTest {
 		checkSyncDefaultMailFolderHasItems(inbox, syncEmailResponse, 
 				Arrays.asList(new Add(syncEmailCollectionId + ":123")),
 				Arrays.asList(new Delete(syncEmailCollectionId + ":122")));
-	}
-
-	
-	
-	private void checkRegularFoldersAreSynchronized(FolderSyncResponse folderSyncResponse) {
-		FolderHierarchy folderHierarchy = folderSyncResponse.getFolders();
-		Assertions.assertThat(folderHierarchy).isNotNull();
-		Assertions.assertThat(folderHierarchy.keySet())
-			.containsOnly(FolderType.DEFAULT_INBOX_FOLDER,
-					FolderType.DEFAULT_CALENDAR_FOLDER,
-					FolderType.DEFAULT_TASKS_FOLDER,
-					FolderType.DEFAULT_DRAFTS_FOLDERS,
-					FolderType.DEFAULT_SENT_EMAIL_FOLDER,
-					FolderType.DEFAULT_DELETED_ITEMS_FOLDERS);
 	}
 
 }

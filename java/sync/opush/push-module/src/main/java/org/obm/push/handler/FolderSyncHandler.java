@@ -42,6 +42,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
@@ -121,11 +122,19 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		
 		if (isFirstSync(folderSyncRequest)) {
 
-			return getFolderSyncResponse(bs, DateUtils.getEpochCalendar().getTime());
+			FolderSyncResponse folderSyncResponse = getFolderSyncResponse(bs, DateUtils.getEpochCalendar().getTime());
+			initializeItems(folderSyncResponse);
+			return folderSyncResponse;
 		} else {
 			
 			Date lastSyncDate = getLastSyncDate(folderSyncRequest);
 			return getFolderSyncContactsResponse(bs, lastSyncDate);
+		}
+	}
+
+	private void initializeItems(FolderSyncResponse folderSyncResponse) {
+		for (ItemChange itemChange: folderSyncResponse.getItemsAddedAndUpdated()) {
+			itemChange.setIsNew(true);
 		}
 	}
 

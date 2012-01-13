@@ -37,6 +37,7 @@ import java.util.Map;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Folder;
+import org.obm.sync.push.client.FolderStatus;
 import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
@@ -65,18 +66,19 @@ public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 	@Override
 	protected FolderSyncResponse parseResponse(Element root) {
 		String key = DOMUtils.getElementText(root, "SyncKey");
-		int count = Integer.parseInt(DOMUtils.getElementText(root, "Count"));
+		int status = Integer.valueOf(DOMUtils.getElementText(root, "Status"));
+		int count = Integer.valueOf(DOMUtils.getElementText(root, "Count"));
 		Map<FolderType, Folder> ret = new HashMap<FolderType, Folder>(count + 1);
 
 		// TODO process deletions
-		getFolders(ret, root, "Add");
-		getFolders(ret, root, "Update");
+		getFolders(ret, root, FolderStatus.ADD);
+		getFolders(ret, root, FolderStatus.UPDATE);
 		
-		return new FolderSyncResponse(key, ret);
+		return new FolderSyncResponse(key, ret, status, count);
 	}
 
-	private void getFolders(Map<FolderType, Folder> ret, Element root, String nodeName) {
-		NodeList nl = root.getElementsByTagName(nodeName);
+	private void getFolders(Map<FolderType, Folder> ret, Element root, FolderStatus statusNodeName) {
+		NodeList nl = root.getElementsByTagName(statusNodeName.getValue());
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element e = (Element) nl.item(i);
 			Folder f = new Folder();
@@ -84,6 +86,7 @@ public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 			f.setParentId(DOMUtils.getElementText(e, "ParentId"));
 			f.setName(DOMUtils.getElementText(e, "DisplayName"));
 			f.setType(FolderType.getValue(Integer.parseInt(DOMUtils.getElementText(e, "Type"))));
+			f.setStatus(statusNodeName);
 			ret.put(f.getType(), f);
 		}
 	}

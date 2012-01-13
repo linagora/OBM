@@ -36,10 +36,14 @@ import com.google.common.base.Objects;
 
 public final class FolderSyncResponse implements IEasReponse {
 
-	private FolderHierarchy fl;
-	private String key;
+	private final FolderHierarchy fl;
+	private final String key;
+	private final int status;
+	private final int count;
 
-	public FolderSyncResponse(String key, Map<FolderType, Folder> fl) {
+	public FolderSyncResponse(String key, Map<FolderType, Folder> fl, int status, int count) {
+		this.status = status;
+		this.count = count;
 		this.fl = new FolderHierarchy(fl);
 		this.key = key;
 	}
@@ -53,9 +57,17 @@ public final class FolderSyncResponse implements IEasReponse {
 		return fl;
 	}
 
+	public int getStatus() {
+		return status;
+	}
+	
+	public int getCount() {
+		return count;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(fl, key);
+		return Objects.hashCode(fl, key, status, count);
 	}
 	
 	@Override
@@ -63,7 +75,9 @@ public final class FolderSyncResponse implements IEasReponse {
 		if (object instanceof FolderSyncResponse) {
 			FolderSyncResponse that = (FolderSyncResponse) object;
 			return Objects.equal(this.fl, that.fl)
-				&& Objects.equal(this.key, that.key);
+				&& Objects.equal(this.key, that.key)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.count, that.count);
 		}
 		return false;
 	}
