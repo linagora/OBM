@@ -1704,39 +1704,94 @@ class OBM_Contact implements OBM_ISearchable {
     return $obm_q->f('country_iso3166');
   }
 
+  /**
+  * get this contact external ICS calendar, in Vpdi
+  *
+  * @return mixed Vpdi_icalendar on success, false on failure
+  */
   public function getCalendar() {
-    global $cremote_calendar_ics_ttl;
-    if (is_array($this->website)) {
-      foreach($this->website as $website) {
-        if ($website['label'][0] == 'CALURI') {
-          $url = $website['url'];
-          $file = "/tmp/".str_replace("/", "_", $url);
-          $now = new Of_Date();
-          if (file_exists($file) && ($now->getTimestamp() - filectime($file)) < $cremote_calendar_ics_ttl) {
-            // get ics from stored file
-            $f = fopen($file, 'r');
-            $d = stream_get_contents($f);
-            fclose($f);
-          } else {
-            // get ics from url
-            $handle = @fopen($url, "r");
-            if ($handle) {
-              $d = stream_get_contents($handle);
-              fclose($handle);
-
-              // store ics file in filesystem
-              $f = fopen($file, 'w');
-              fwrite($f, $d);
-              fclose($f);
-            } else {
-              return false;
-            }
-          }
-          return Vpdi::decodeOne($d);
-        }
+    $url = $this->getCalendarUrl();
+    if ( !$url ) {
+      return false;
+    }
+    $vpdi = $this->getCalendarFromCache($url);
+    if ( !$vpdi ) {
+      $vpdi = $this->getCalendarFromUrl($url);
+      if ( $vpdi ) {
+        $this->storeCalendarToCache($url,$vpdi);
       }
     }
-    return false;
+    return $vpdi;
+  }
+
+
+  /**
+  * fetch a remote ICS and parses it using VPDI
+  *
+  * @param string $url remote Ical URL
+  * @return Vpdi_Icalendar Vpdi parsed ICS
+  */
+  private function getCalendarFromUrl($url) {
+    $handle = @fopen($url, "r");
+    $ics = false;
+    if ($handle) {
+      $ics = stream_get_contents($handle);
+      fclose($handle);
+    }
+    return Vpdi::decodeOne($ics);
+  }
+
+  /**
+  * fetch a serialized Vpdi calendar on a local file returns it unserialized
+  *
+  * @param string $url remote Ical URL
+  * @return Vpdi_Icalendar Vpdi parsed ICS
+  */
+  private function getCalendarFromCache($url) {
+    global $cremote_calendar_ics_ttl;
+    $vpdi = false;
+    $file = $this->getCalendarCacheFilename($url);
+    $now = new Of_Date();
+    if ( file_exists($file) && ($now->getTimestamp() - filectime($file)) < $cremote_calendar_ics_ttl ) {
+      try {
+        $vpdi = unserialize( file_get_contents($file) );
+      } catch (Exception $e) {
+        $vpdi = false;
+      }
+    }
+    return $vpdi;
+  }
+
+  /**
+  * serialize & write a vpdi calendar to the filesystem
+  *
+  * @param string $url remote Ical URL
+  * @param Vpdi_Icalendar $vpdi Vpdi parsed ICS
+  * @return boolean whether the operation succeeded
+  */
+  private function storeCalendarToCache($url, $vpdi) {
+    $file = $this->getCalendarCacheFilename($url);
+    $data = serialize($vpdi);
+    $f = fopen($file, 'w');
+    if ( !$f ) {
+      return false;
+    }
+    $writeResult = fwrite($f, $data);
+    if ( !$writeResult ) {
+      return false;
+    }
+    fclose($f);
+    return true;
+  }
+
+  /**
+  * get a filename from an URL
+  *
+  * @param string $url the ics remote url
+  * @return string a correct filename
+  */
+  private function getCalendarCacheFilename($url) {
+    return "/tmp/".str_replace("/", "_", $url);
   }
 
   public function hasACalendarUrl(){
@@ -1748,6 +1803,22 @@ class OBM_Contact implements OBM_ISearchable {
       }
     }
     return false;
+  }
+
+  /**
+  *returns the contact ics url (if any)
+  *
+  * @return mixed the contact's calendar URL, or null
+  */
+  public function getCalendarUrl(){
+    if (is_array($this->website)) {
+      foreach($this->website as $website) {
+        if ($website['label'][0] == 'CALURI' && $website['url']) {
+          return $website['url'];
+        }
+      }
+    }
+    return null;
   }
 
 
