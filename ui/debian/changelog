@@ -1,3 +1,32 @@
+obm (2.4.0.0) stable; urgency=low
+
+  * Sub-task
+  * [OBMFULL-2362] - Answers on a smartphone using opush are not received by attendee or is empty
+  * [OBMFULL-2751] - Put a license header in each source file
+  * [OBMFULL-2754] - License header into every obm-sync source files
+  * [OBMFULL-2759] - Check licenses in RPM and Debian packages
+  * Bug
+  * [OBMFULL-2531] - Push mode does not work with Iphone
+  * [OBMFULL-2541] - Invitations are not received on Nokia E72
+  * [OBMFULL-2735] - Synchronization error and “Erreur serveur due à ” on Linagora prod
+  * [OBMFULL-2760] - Clean RPM and Debian control files
+  * [OBMFULL-2789] - really interrupt master-slave DRBD synchronization on icasso upgrade
+  * [OBMFULL-2831] - Create changelog update script
+  * [OBMFULL-2877] - Problem during upgrade from 2.3.20 with “aptitude safe-upgrade”
+  * [OBMFULL-2950] - Fix LemonLDAP support
+  * [OBMFULL-2957] - The query that calculate whether the yellow ”!” should be displayed could return PHP warnings
+  * [OBMFULL-2964] - Can't delete a contact
+  * [OBMFULL-2967] - Wrong email received by attendee after modification of an event by user having R/W rights
+  * [OBMFULL-2992] - Lower down the “last visits” portlet in the left pane
+  * [OBMFULL-3004] - eventtemplate_show_user_calendar and eventtemplate_show_resource_calendar missing with install postgres from scratch
+  * Task
+  * [OBMFULL-2732] - Update OBM Licence in all source code and packaging
+  * [OBMFULL-2793] - Implement automatic OBM signature in thunderbird connector
+  * [OBMFULL-2794] - Add a visual indication in obm-ui (agenda) header to identify a genuine OBM
+  * [OBMFULL-2795] - Verify autoconf compatiblity with windows 7
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Fri, 13 Jan 2012 11:11:22 +0000
+
 obm (2.4.0.0~rc16) stable; urgency=low
 
   * New upstream release.
