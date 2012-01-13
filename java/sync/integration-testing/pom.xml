@@ -58,7 +58,12 @@
 			<artifactId>message-queue</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
-			<dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-servlet</artifactId>
 			<version>${obm.version}</version>
