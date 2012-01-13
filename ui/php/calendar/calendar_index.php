@@ -625,7 +625,7 @@ if ($action == 'search') {
   } else {
     $json[] = 'occUpdate:true';
   }
-  if (($entities['user']['ids'] == array($obm['uid']) || run_query_calendar_no_mail($entities['user']['ids'])) && !$resourceNotification) {
+  if ( (($entities['user']['ids'] == array($obm['uid']) || run_query_calendar_no_mail($entities['user']['ids'])) && count($entities['contact']['ids']) == 0)  && !$resourceNotification) {
     $json[] = 'mail:false';
   } else {
     $json[] = 'mail:true';
