@@ -29,24 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push.protocol.bean;
 
-import org.obm.push.bean.BackendSession;
-import org.obm.push.impl.Responder;
-import org.w3c.dom.Document;
+public class AutodiscoverRequest {
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-@Singleton
-public class AutodiscoverHandler extends XmlRequestHandler {
-
-	@Inject
-	private AutodiscoverHandler() { }
-
-	@Override
-	protected void process(BackendSession bs, Document doc, Responder responder) {
-		// TODO Auto-generated method stub
+	private final String emailAddress;
+	private final String acceptableResponseSchema;
+	
+	public AutodiscoverRequest(String emailAddress, String acceptableResponseSchema) {
+		this.emailAddress = emailAddress;
+		this.acceptableResponseSchema = acceptableResponseSchema;
 	}
-
+	
+	/**
+	 * Is used to identify the user's mailbox in the network
+	 *
+	 * @return the SMTP e-mail address of the user
+	 */
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+	
+	/**
+	 * Example : "http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006".
+	 *
+	 * @return schema in which the server MUST send the response
+	 */
+	public String getAcceptableResponseSchema() {
+		return acceptableResponseSchema;
+	}
+	
 }

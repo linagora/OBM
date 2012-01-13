@@ -51,7 +51,7 @@ public class MeetingProtocol {
 
 	public MeetingHandlerRequest getRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
-			throw new NoDocumentException();
+			throw new NoDocumentException("Document of MeetingResponse request is null.");
 		}
 		NodeList requests = doc.getDocumentElement().getElementsByTagName("Request");
 		List<MeetingResponse> items = parseNodeListAsMeetingResponses(requests);

@@ -52,7 +52,7 @@ public class MoveItemsProtocol {
 	
 	public MoveItemsRequest getRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
-			throw new NoDocumentException();
+			throw new NoDocumentException("Document of MoveItems request is null.");
 		}
 		
 		NodeList moves = doc.getDocumentElement().getElementsByTagName("Move");

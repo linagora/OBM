@@ -50,7 +50,7 @@ public class FolderSyncProtocol {
 	
 	public FolderSyncRequest getRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
-			throw new NoDocumentException();
+			throw new NoDocumentException("Document of FolderSync request is null.");
 		}
 		String syncKey = DOMUtils.getElementText(doc.getDocumentElement(), "SyncKey");
 		return new FolderSyncRequest(syncKey);

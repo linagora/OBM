@@ -29,24 +29,28 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push.protocol;
 
-import org.obm.push.bean.BackendSession;
-import org.obm.push.impl.Responder;
+import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.protocol.bean.AutodiscoverRequest;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+public class AutodiscoverProtocol {
 
-@Singleton
-public class AutodiscoverHandler extends XmlRequestHandler {
-
-	@Inject
-	private AutodiscoverHandler() { }
-
-	@Override
-	protected void process(BackendSession bs, Document doc, Responder responder) {
-		// TODO Auto-generated method stub
+	public AutodiscoverRequest getRequest(Document document) throws NoDocumentException {
+		if (document == null) {
+			throw new NoDocumentException("Document of Autodiscover request is null.");
+		}
+		
+		Element root = document.getDocumentElement();
+		
+		Element emailAddressElement = DOMUtils.getUniqueElement(root, "EMailAddress");
+		Element acceptableResponseSchElement = DOMUtils.getUniqueElement(root, "AcceptableResponseSchema");
+		
+		return new AutodiscoverRequest( emailAddressElement.getTextContent(),
+										acceptableResponseSchElement.getTextContent());
 	}
 
 }
