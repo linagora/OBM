@@ -55,10 +55,10 @@ public class SmtpSender {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SmtpSender.class);
 
-	private SmtpLocator locator;
+	private SmtpProvider locator;
 
 	@Inject
-	private SmtpSender(SmtpLocator locator) {
+	private SmtpSender(SmtpProvider locator) {
 		this.locator = locator;
 	}
 

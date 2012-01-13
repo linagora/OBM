@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.configuration.SyncPermsConfigurationService;
 
 public final class ConfigurationModule extends AbstractOverrideModule {
@@ -21,7 +22,7 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 	@Override
 	protected void configureImpl() {
 		bindWithMock(ConfigurationService.class);
-		bindWithMock(EmailConfiguration.class);
+		bindWithMock(EmailConfigurationImpl.class);
 		bindWithMock(SyncPermsConfigurationService.class);
 		defineBehavior();
 	}
@@ -35,7 +36,7 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 		expect(syncPerms.getBlackListUser()).andReturn(configuration.syncPerms.blacklist).anyTimes();
 		expect(syncPerms.allowUnknownPdaToSync()).andReturn(configuration.syncPerms.allowUnkwownDevice).anyTimes();
 		
-		EmailConfiguration emailConfiguration = getMock(EmailConfiguration.class);
+		EmailConfiguration emailConfiguration = getMock(EmailConfigurationImpl.class);
 		expect(emailConfiguration.activateTls()).andReturn(configuration.mail.activateTls).anyTimes();
 		expect(emailConfiguration.loginWithDomain()).andReturn(configuration.mail.loginWithDomain).anyTimes();
 	}

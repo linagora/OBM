@@ -4,6 +4,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.mail.smtp.SmtpProvider;
+import org.obm.push.mail.smtp.SmtpProviderImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -17,6 +19,7 @@ public class OpushMailModule extends AbstractModule {
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
+		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(MailBackendImpl.class);

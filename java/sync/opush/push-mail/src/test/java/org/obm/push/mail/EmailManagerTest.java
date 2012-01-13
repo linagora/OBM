@@ -37,6 +37,7 @@ import java.util.Set;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SendEmailException;
@@ -52,7 +53,7 @@ public class EmailManagerTest {
 	@Test
 	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException {
 		
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
 		SmtpSender smtpSender = EasyMock.createMock(SmtpSender.class);
 		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
 		

@@ -43,16 +43,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SmtpLocator {
+public class SmtpProviderImpl implements SmtpProvider {
 
-	private static final Logger logger = LoggerFactory.getLogger(SmtpLocator.class);
+	private static final Logger logger = LoggerFactory.getLogger(SmtpProviderImpl.class);
 	private final LocatorService locatorService;
 
 	@Inject
-	private SmtpLocator(LocatorService locatorService) {
+	private SmtpProviderImpl(LocatorService locatorService) {
 		this.locatorService = locatorService;
 	}
 	
+	@Override
 	public SMTPProtocol getSmtpClient(BackendSession bs) throws SmtpLocatorException {
 		try {
 			String smtpHost = locatorService.getServiceLocation("mail/smtp_out", bs.getUser().getLoginAtDomain());
