@@ -35,7 +35,7 @@ import com.google.common.io.CharStreams;
 
 public class ReplyEmail extends SendEmail {
 
-	private final static String EMAIL_LINEBREAKER = "\r\n";
+	protected final static String EMAIL_LINEBREAKER = "\r\n";
 
 	private final Mime4jUtils mime4jUtils;
 	private final ConfigurationService configuration;
@@ -262,7 +262,10 @@ public class ReplyEmail extends SendEmail {
 			final String docAsText = DOMUtils.serializeHtmlDocument(replyHtmlDoc);
 
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
-			return basicBodyFactory.textBody(docAsText, htmlPart.getMimeCharset());
+			return basicBodyFactory.textBody( 
+					cleanLineBreaks( new StringReader(docAsText) ), 
+					htmlPart.getMimeCharset());
+			
 		} catch (TransformerException e) {
 			logger.error(e.getMessage(),e);
 			throw new NotQuotableEmailException("Html part isn't quotable", e);

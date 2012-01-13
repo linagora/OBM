@@ -245,4 +245,45 @@ public class ReplyEmailTest {
 		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
 		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
 	}
+	
+	@Test
+	public void testTerminationSequenceEndLineInHTMLReplyEmail() throws IOException, MimeException, NotQuotableEmailException {
+		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		Message reply = loadMimeMessage(getClass(), "jira-2362.eml");
+		
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
+		
+		Message message = replyEmail.getMimeMessage();
+		String messageAsString = mime4jUtils.toString(message.getBody());
+
+		String badReplyFormatMessage = buildReplyEmailWithEndLineCharacter("\n");
+		String goodReplyFormatMessage = buildReplyEmailWithEndLineCharacter(ReplyEmail.EMAIL_LINEBREAKER);
+		
+		Assertions.assertThat(message.isMultipart()).isTrue();
+		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
+		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		
+		Assertions.assertThat(messageAsString).doesNotContain(badReplyFormatMessage);
+		Assertions.assertThat(messageAsString).contains(goodReplyFormatMessage );
+	}
+	
+	private String buildReplyEmailWithEndLineCharacter(String endCharacter) {
+		StringBuilder str = new StringBuilder();
+		str.append("<HTML>").append(endCharacter);
+		str.append("<BODY>Test<BR>").append(endCharacter);
+		str.append("<BR>Envoy&eacute; depuis mon HTC<BR>").append(endCharacter);
+		str.append("<BR>").append(endCharacter);
+		str.append("<DIV id=\"htc_header\" style=\"\">----- Reply message -----<BR>De : \"Jean Jaures\" &lt;jaures@obm.matthieu.lng&gt;<BR>Pour&nbsp;: \"L&eacute;on Blum\" &lt;blum@obm.matthieu.lng&gt;<BR>Objet : mail de test<BR>Date : lun., nov. 7, 2011 09:32<BR>").append(endCharacter);
+		str.append("<BR>").append(endCharacter);
+		str.append("</DIV>").append(endCharacter);
+		str.append("<BR>").append(endCharacter);
+		str.append("<BR>").append(endCharacter);
+		str.append(endCharacter);
+		str.append("<BLOCKQUOTE style=\"border-left:1px solid black; padding-left:1px;\">origin<BR>").append(endCharacter);
+		str.append("</BLOCKQUOTE>").append(endCharacter);
+		str.append("</BODY>").append(endCharacter);
+		str.append("</HTML>").append(endCharacter);
+		return str.toString();
+	}
+	
 }
