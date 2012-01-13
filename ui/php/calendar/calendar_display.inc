@@ -6232,11 +6232,14 @@ function dis_calendar_free_interval($current_view, $calendar) {
     <table>
       <tbody class='readable' $visiblityU>
         <tr>
+        <td>&nbsp;</td>
+        </tr>  
+        <tr>
           <td>$GLOBALS[l_users]/$GLOBALS[l_contacts]</td>
         </tr>
         <tr>
           <td class='autocompleteField'>
-          <select id='freeBusySearchSource' class='autocompleteSource' name='' style='float: right;'>
+          <select id='freeBusySearchSource' class='autocompleteSource' name='' style='display:inline-block;'>
             <option value='$GLOBALS[path]/user/user_index.php?from=calendar'>$GLOBALS[l_users]</option>
             <optgroup label=\"$GLOBALS[l_addressbook]\">
               $addressbook_options
@@ -6249,8 +6252,10 @@ function dis_calendar_free_interval($current_view, $calendar) {
           <td>$GLOBALS[l_others_attendees]</td>
         </tr>
         <tr>
-          <td><input style='width:14em;' type='text' name='external_contact' value='' id='external_contact' />
-            <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addAttendee(\"data-others_attendees-\"+$(\"external_contact\").value);'/></td>
+          <td>
+            <input style='width:14em;display:inline;' type='text' name='external_contact' value='' id='external_contact'/>
+            <input type='submit' value='$GLOBALS[l_add]' onclick='obm.calendarFreeBusy.addAttendee(\"data-others_attendees-\"+$(\"external_contact\").value);'/>
+          </td>
         </tr>            
       </tbody>
       <tbody class='readable' $visiblityR>
@@ -6292,42 +6297,39 @@ function dis_calendar_free_interval($current_view, $calendar) {
       </div>
     <div class='readable' id='scrollRight'>»</div>
     </div>
+      <div class='freeBusyButtons readable' style='text-align:center;'>
+        <input type='button' id='pickPrev' value='$GLOBALS[l_freebusy_autopick_prev]' onclick='obm.calendarFreeBusy.autoPickPrev();' />
+        <input type='button' id='pickNext' value='$GLOBALS[l_freebusy_autopick_next]' onclick='obm.calendarFreeBusy.autoPickNext();' />
+      </div>
 
-    <div class='freeBusyButtons readable'>
-      <input type='button' id='pickPrev' value='$GLOBALS[l_freebusy_autopick_prev]' onclick='obm.calendarFreeBusy.autoPickPrev();' />
-      <input type='button' id='pickNext' value='$GLOBALS[l_freebusy_autopick_next]' onclick='obm.calendarFreeBusy.autoPickNext();' />
-    </div>
-
-    <div id='meetingInfo' class='detail'>
-      <table class='infos'>
-        <tr>
-          <th>$GLOBALS[l_datebegin]</th>
-          <td id='meeting_start'></td>
-        </tr>
-        <tr>
-          <th>$GLOBALS[l_dateend]</th>
-          <td id='meeting_end'></td>
-        </tr>
-      </table>
-    </div>
-
-    <div class='buttons'>
-      <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
-        <input class='close readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
-        <input class='close closeSticky' style='display:none;' id='formClose' type='button' value='$GLOBALS[l_close]' />
-        <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
-        <input type='hidden' name='duration' id='duration' value='' />
-        <input type='hidden' name='time_begin' id='time_begin' value='' />
-        <input type='hidden' name='min_begin' id='min_begin' value='' />
-        <input type='hidden' name='new_meeting' value='1'>
-        <input type='hidden' id='fb_title' name='tf_title' value=''>
-        <input type='hidden' id='fb_owner' name='owner' value=''>
-        <input type='hidden' name='template_id' value='$_POST[template_id]'>
-        $form_entities
-        <input type='hidden' id='freebusy_action' name='action' value='new'>
-      </form>
-    </div>
-
+      <div id='meetingInfo'>
+        <table class='details'>
+          <tr>
+            <th>$GLOBALS[l_datebegin]</th>
+            <td id='meeting_start'></td>
+          </tr>
+          <tr>
+            <th>$GLOBALS[l_dateend]</th>
+            <td id='meeting_end'></td>
+          </tr>
+        </table>
+      </div>
+      <div class='buttons'>
+        <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
+          <input class='close readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
+          <input class='close closeSticky' id='formClose' type='button' value='$GLOBALS[l_cancel]' style='margin-left:-2em;'/>
+          <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
+          <input type='hidden' name='duration' id='duration' value='' />
+          <input type='hidden' name='time_begin' id='time_begin' value='' />
+          <input type='hidden' name='min_begin' id='min_begin' value='' />
+          <input type='hidden' name='new_meeting' value='1'>
+          <input type='hidden' id='fb_title' name='tf_title' value=''>
+          <input type='hidden' id='fb_owner' name='owner' value=''>
+          <input type='hidden' name='template_id' value='$_POST[template_id]'>
+          $form_entities
+          <input type='hidden' id='freebusy_action' name='action' value='new'>
+        </form>
+      </div>
   </div>
   <div id='dummy' style='display:none;'/>
   <script type='text/javascript'>
