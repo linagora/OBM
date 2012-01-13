@@ -54,7 +54,7 @@ return array(
   'Recurrent event from %organizer% updated: %title%' => 'Mise à jour d\'un événement récurrent de %organizer% : %title%',
   'Resource %resource% reservation: %title%' => 'Réservation de la ressource %resource% : %title%',
   'Resource %resource% reservation updated: %title%' => 'Mise à jour d\'une réservation de la ressource %resource% : %title%',
-  'Resource %resource% reservation cancelled: %title%' => 'Annulation d\'une réseravation de la ressource %resource% : %title%',
+  'Resource %resource% reservation cancelled: %title%' => 'Annulation d\'une réservation de la ressource %resource% : %title%',
   'New resource reservation: %title%' => 'Nouvelle réservation de ressource : %title%',
   'Exploitation report : %name%' => 'Rapport d\'exploitation : %name%',
   '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
