@@ -1141,9 +1141,10 @@ public class CalendarBindingImpl implements ICalendar {
 				EventRecurrence recurrence = new EventRecurrence();
 				recurrence.setKind(RecurrenceKind.lookup("none"));
 				eventException.setRecurrence(recurrence);
-				eventException.setDate(new DateTime(recurrenceId.getRecurrenceId()));
-				eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));
-				
+				if (recurrenceId != null) {
+					eventException.setDate(new DateTime(recurrenceId.getRecurrenceId()));
+					eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));					
+				}	
 				parentEvent.getRecurrence().addEventException(eventException);
 				parentEvent = calendarDao.modifyEventForcingSequence(token, owner, parentEvent, true, parentEvent.getSequence(), true);
 				changed = applyParticipationChange(token, extId, recurrenceId, participationState, 
