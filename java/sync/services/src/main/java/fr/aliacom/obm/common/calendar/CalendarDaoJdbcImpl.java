@@ -2481,9 +2481,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String q = "UPDATE EventLink " 
 			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
 			+ "WHERE eventlink_event_id IN "
-			+ "( SELECT event_id FROM Event e LEFT JOIN eventexception eexp ON e.event_id = eventexception_child_id "
+			+ "("
+			+ "SELECT event_id "
+			+ "FROM Event e "
+			+ "LEFT JOIN eventexception eexp ON e.event_id = eventexception_child_id "
 			+ "WHERE event_ext_id = ? "
-			+ "AND eexp.eventexception_date = ? AND "
+			+ "AND eexp.eventexception_date = ?"
+			+ ") AND "
 			+ "eventlink_entity_id IN "
 			+ "( SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id = ? )";
 		
@@ -2496,10 +2500,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, extId.getExtId());
-			if(recurrenceId != null) {
-				Date recId = new DateTime(recurrenceId.getRecurrenceId());
-				ps.setTimestamp(idx++, new Timestamp(recId.getTime()));
-			}
+			Date recId = new DateTime(recurrenceId.getRecurrenceId());
+			ps.setTimestamp(idx++, new Timestamp(recId.getTime()));
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
 			if (ps.getUpdateCount() > 0) {

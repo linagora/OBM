@@ -1131,8 +1131,13 @@ public class CalendarBindingImpl implements ICalendar {
 
 		boolean changed = false;
 		if (currentEvent != null) {
-			 changed = applyParticipationChange(token, extId, recurrenceId, participationState, 
+			if (recurrenceId != null) {
+				changed = applyParticipationChange(token, extId, recurrenceId, participationState, 
 					sequence, calendarOwner, currentEvent);
+			} else {
+				changed = applyParticipationChange(token, extId, participationState, 
+						sequence, calendarOwner, currentEvent);
+			}
 		} else {
 			Event parentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 			if(parentEvent != null) {
