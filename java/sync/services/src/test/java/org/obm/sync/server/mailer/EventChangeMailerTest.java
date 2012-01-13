@@ -179,6 +179,9 @@ public class EventChangeMailerTest {
 			event.setOwner("raphael");
 			event.setOwnerDisplayName("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
+			event.setCreator("emmanuel");
+			event.setCreatorDisplayName("Emmanuel SURLEAU");
+			event.setCreatorEmail("esurleau@linagora.com");
 			event.setDate(date(2010, 10, 8, 11, 00));
 			event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 			event.setDuration(2700);
@@ -342,10 +345,12 @@ public class EventChangeMailerTest {
 		protected String[] getExpectedPlainStrings() {
 			return new String[] {
 				"NOUVEAU RENDEZ-VOUS",
-				"du     : 8 nov. 2010 11:00", 
-				"au     : 8 nov. 2010 11:45",
-				"sujet  : Sprint planning OBM", 
-				"lieu   : ","auteur : Raphael ROUGERON"
+				"du              : 8 nov. 2010 11:00:00", 
+				"au              : 8 nov. 2010 11:45",
+				"sujet           : Sprint planning OBM", 
+				"lieu            : ",
+				"organisateur    : Raphael ROUGERON",
+				"créé par        : Emmanuel SURLEAU"
 			};
 		}
 		
@@ -357,7 +362,8 @@ public class EventChangeMailerTest {
 				"Au 8 nov. 2010 11:45", 
 				"Sujet Sprint planning OBM", 
 				"Lieu", 
-				"Organisateur Raphael ROUGERON"
+				"Organisateur Raphael ROUGERON",
+				"Créé par Emmanuel SURLEAU"
 			};
 		}
 		
@@ -426,10 +432,12 @@ public class EventChangeMailerTest {
 		protected String[] getExpectedPlainStrings() {
 			return new String[] {
 				"NOUVEAU RENDEZ-VOUS",
-				"du     : 8 nov. 2010 11:00", 
-				"au     : 8 nov. 2010 11:45",
-				"sujet  : Sprint planning OBM", 
-				"lieu   : ","auteur : Raphael ROUGERON",
+				"du              : 8 nov. 2010 11:00", 
+				"au              : 8 nov. 2010 11:45",
+				"sujet           : Sprint planning OBM", 
+				"lieu            : ",
+				"organisateur    : Raphael ROUGERON",
+				"créé par        : Emmanuel SURLEAU",
 				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous."
 			};
 		}
@@ -443,6 +451,7 @@ public class EventChangeMailerTest {
 				"Sujet Sprint planning OBM", 
 				"Lieu", 
 				"Organisateur Raphael ROUGERON",
+				"Créé par Emmanuel SURLEAU",
 			    "Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous."
 			};
 		}
@@ -523,6 +532,7 @@ public class EventChangeMailerTest {
 					"Sujet Sprint planning OBM", 
 					"Lieu", 
 					"Organisateur Raphael ROUGERON",
+					"Créé par Emmanuel SURLEAU",
 					"Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications."
 			};
 		}
@@ -605,7 +615,8 @@ public class EventChangeMailerTest {
 					"Au 8 nov. 2010 13:00",
 					"Sujet Sprint planning OBM", 
 					"Lieu", 
-					"Organisateur Raphael ROUGERON"
+					"Organisateur Raphael ROUGERON",
+					"Créé par Emmanuel SURLEAU"
 			};
 		}
 		
@@ -704,7 +715,8 @@ public class EventChangeMailerTest {
 					"Au 8 nov. 2010 11:45", 
 					"Sujet Sprint planning OBM", 
 					"Lieu", 
-					"Organisateur Raphael ROUGERON"
+					"Organisateur Raphael ROUGERON",
+					"Créé par Emmanuel SURLEAU"
 			};
 		}
 		
@@ -732,11 +744,11 @@ public class EventChangeMailerTest {
 		protected String[] getExpectedPlainStrings() {
 			return new String[] {
 					"RENDEZ-VOUS ANNULÉ",
-					"du     : 8 nov. 2010 11:00", 
-					"au     : 8 nov. 2010 11:45",
-					"sujet  : Sprint planning OBM", 
-					"lieu   : ",
-					"auteur : Raphael ROUGERON"
+					"du              : 8 nov. 2010 11:00", 
+					"au              : 8 nov. 2010 11:45",
+					"sujet           : Sprint planning OBM", 
+					"lieu            : ",
+					"organisateur    : Raphael ROUGERON"
 				};
 		}
 		

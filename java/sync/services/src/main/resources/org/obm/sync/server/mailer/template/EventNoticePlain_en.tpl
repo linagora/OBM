@@ -13,7 +13,7 @@ subject  : ${subject}
 
 location : ${location}
 
-author   : ${author}
+organizer : ${organizer}
 
 ::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this appointment.
 

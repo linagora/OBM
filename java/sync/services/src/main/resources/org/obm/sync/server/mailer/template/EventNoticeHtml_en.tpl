@@ -20,7 +20,10 @@
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${location}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Author</td><td style="font-weight:bold;">${author}</td>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;">${organizer}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;">${creator}</td>
     </tr>
 	<tr>
     	<td colspan="2">

@@ -68,7 +68,8 @@ public class TemplateTest {
 			put("end", date(2001, 8, 11, 19, 12)).
 			put("subject", "test event").
 			put("location", "Lyon").
-			put("author", "Matthieu Baechler").
+			put("organizer", "Matthieu Baechler").
+			put("creator", "Emmanuel Surleau").
 			put("host", "obm.matthieu.lng").
 			put("calendarId", 12).build();
 		return datamodel;
@@ -95,11 +96,12 @@ public class TemplateTest {
 		Template template = retrieveEventInvitationTemplate(new Locale("fr"));
 		ImmutableMap<Object, Object> datamodel = buildDatamodel();
 		String message = applyTemplate(template, datamodel);
-		Assert.assertThat(message, StringContains.containsString("sujet  : test event"));
-		Assert.assertThat(message, StringContains.containsString("lieu   : Lyon"));
-		Assert.assertThat(message, StringContains.containsString("auteur : Matthieu Baechler"));
-		Assert.assertThat(message, StringContains.containsString("du     : 11 sept. 2001 09:12"));
-		Assert.assertThat(message, StringContains.containsString("au     : 11 sept. 2001 19:12"));
+		Assert.assertThat(message, StringContains.containsString("sujet           : test event"));
+		Assert.assertThat(message, StringContains.containsString("lieu            : Lyon"));
+		Assert.assertThat(message, StringContains.containsString("organisateur    : Matthieu Baechler"));
+		Assert.assertThat(message, StringContains.containsString("créé par        : Emmanuel Surleau"));
+		Assert.assertThat(message, StringContains.containsString("du              : 11 sept. 2001 09:12"));
+		Assert.assertThat(message, StringContains.containsString("au              : 11 sept. 2001 19:12"));
 	}
 
 	@Test
@@ -108,11 +110,12 @@ public class TemplateTest {
 		Template template = retrieveEventInvitationTemplate(new Locale("en"));
 		ImmutableMap<Object, Object> datamodel = buildDatamodel();
 		String message = applyTemplate(template, datamodel);
-		Assert.assertThat(message, StringContains.containsString("subject  : test event"));
-		Assert.assertThat(message, StringContains.containsString("location : Lyon"));
-		Assert.assertThat(message, StringContains.containsString("author   : Matthieu Baechler"));
-		Assert.assertThat(message, StringContains.containsString("from     : Sep 11, 2001 9:12 AM"));
-		Assert.assertThat(message, StringContains.containsString("to       : Sep 11, 2001 7:12 PM"));
+		Assert.assertThat(message, StringContains.containsString("subject      : test event"));
+		Assert.assertThat(message, StringContains.containsString("location     : Lyon"));
+		Assert.assertThat(message, StringContains.containsString("organizer    : Matthieu Baechler"));
+		Assert.assertThat(message, StringContains.containsString("creator      : Emmanuel Surleau"));
+		Assert.assertThat(message, StringContains.containsString("from         : Sep 11, 2001 9:12 AM"));
+		Assert.assertThat(message, StringContains.containsString("to           : Sep 11, 2001 7:12 PM"));
 	}
 	
 	@Test

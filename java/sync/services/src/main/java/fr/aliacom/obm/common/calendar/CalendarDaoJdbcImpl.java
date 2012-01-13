@@ -168,7 +168,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "event_sequence, "
 			+ "o.userobm_login as owner, domain_name, o.userobm_firstname as ownerFirstName, "
 			+ "o.userobm_lastname as ownerLastName,  o.userobm_commonname as ownerCommonName, " 
-			+ "o.userobm_email ";
+			+ "o.userobm_email,"
+			+ "c.userobm_login as creator, "
+			+ "c.userobm_firstname as creatorFirstName, "
+			+ "c.userobm_lastname as creatorLastName,"
+			+ "c.userobm_commonname as creatorCommonName, "
+		    + "c.userobm_email as creatorEmail";
 
 	private static final String EVENT_INSERT_FIELDS = "event_owner, "
 			+ "event_ext_id, "
@@ -441,6 +446,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setOwner(evrs.getString("owner"));
 		e.setOwnerEmail( getUserObmEmail(evrs, evrs.getString("domain_name")) );
 		e.setOwnerDisplayName(getOwnerDisplayName(evrs));
+		e.setCreator(evrs.getString("creator"));
+		e.setCreatorEmail(getCreatorObmEmail(evrs, evrs.getString("domain_name")));
+		e.setCreatorDisplayName(getCreatorDisplayName(evrs));
 		if (evrs.getTimestamp("recurrence_id") != null) {
 			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
 			e.setRecurrenceId(cal.getTime());
@@ -452,6 +460,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String first = evrs.getString("ownerFirstName");
 		String last = evrs.getString("ownerLastName");
 		String common = evrs.getString("ownerCommonName");
+		return getDisplayName(first, last, common);
+	}
+
+	private String getCreatorDisplayName(ResultSet evrs) throws SQLException {
+		String first = evrs.getString("creatorFirstName");
+		String last = evrs.getString("creatorLastName");
+		String common = evrs.getString("creatorCommonName");
 		return getDisplayName(first, last, common);
 	}
 
@@ -515,6 +530,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN Domain ON event_domain_id=domain_id "
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "WHERE event_id=? ";
 
 		PreparedStatement evps = null;
@@ -667,6 +683,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private String getUserObmEmail(ResultSet rs, String domainName)
 			throws SQLException {
 		String[] alias = rs.getString("userobm_email").split("\r\n");
+		if (!alias[0].contains("@")) {
+			return alias[0] + "@" + domainName;
+		}
+		return alias[0];
+	}
+
+	private String getCreatorObmEmail(ResultSet rs, String domainName)
+			throws SQLException {
+		String[] alias = rs.getString("creatorEmail").split("\r\n");
 		if (!alias[0].contains("@")) {
 			return alias[0] + "@" + domainName;
 		}
@@ -937,6 +962,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					+ " FROM Event e "
 					+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
 					+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+					+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 					+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 					+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 					+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
@@ -1342,6 +1368,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN Domain ON event_domain_id=domain_id "
 				+ "INNER JOIN EventEntity ON evententity_event_id=event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "INNER JOIN EventException ON e.event_id = eventexception_child_id "
 				+ "WHERE eventexception_parent_id IN (" + eventIds.asPlaceHolders() + ") "
 				+ "OR eventexception_child_id IN (" + eventIds.asPlaceHolders() + ") ";
@@ -1960,6 +1987,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserEntity ON userentity_entity_id=eventlink_entity_id "
 				+ "INNER JOIN UserObm u ON u.userobm_id=userentity_user_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "WHERE e.event_ext_id=? " 
 				+ "AND u.userobm_login=?";
 
@@ -2056,6 +2084,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
@@ -2118,6 +2147,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
 				+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
+				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "

@@ -3,15 +3,17 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS ANNULÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant à été annulé
+Le rendez-vous suivant a été annulé
 
-du     : ${start}
+du              : ${start}
 
-au     : ${end}
+au              : ${end}
 
-sujet  : ${subject}
+sujet           : ${subject}
 
-lieu   : ${location}
+lieu            : ${location}
 
-auteur : ${author}
+organisateur    : ${organizer}
+
+créé par        : ${creator}
 

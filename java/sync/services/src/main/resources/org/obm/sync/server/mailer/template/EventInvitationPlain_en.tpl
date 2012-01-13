@@ -5,16 +5,17 @@ NEW APPOINTMENT
 
 You are invited to participate to this appointment
 
-from     : ${start}
+from        : ${start}
 
-to       : ${end}
+to          : ${end}
 
-subject  : ${subject}
+subject     : ${subject}
 
-location : ${location}
+location    : ${location}
 
-author   : ${author}
+organizer   : ${organizer}
 
+created by  : ${creator}
 
 :: To accept this appointment : 
 ${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED

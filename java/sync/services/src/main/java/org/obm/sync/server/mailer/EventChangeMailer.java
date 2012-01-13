@@ -423,7 +423,8 @@ public class EventChangeMailer extends AbstractMailer {
 			.put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
 			.put("location", Strings.nullToEmpty(event.getLocation()))
-			.put("author", Strings.nullToEmpty(event.getOwnerDisplayName()));
+			.put("organizer", Strings.nullToEmpty(event.getOwnerDisplayName()))
+			.put("creator", Strings.nullToEmpty(event.getCreatorDisplayName()));
 		return datamodel;
 	}
 	

@@ -53,6 +53,9 @@ public class Event implements Indexed<Integer> {
 	private String owner;
 	private String ownerDisplayName;
 	private String ownerEmail;
+	private String creator;
+	private String creatorDisplayName;
+	private String creatorEmail;
 	private String location;
 	private Date date;
 	private int duration;
@@ -297,6 +300,9 @@ public class Event implements Indexed<Integer> {
 		event.setOwner(owner);
 		event.setOwnerDisplayName(ownerDisplayName);
 		event.setOwnerEmail(ownerEmail);
+		event.setCreator(creator);
+		event.setCreatorDisplayName(creatorDisplayName);
+		event.setCreatorEmail(creatorEmail);
 		event.setPercent(percent);
 		event.setPriority(priority);
 		event.setPrivacy(privacy);
@@ -386,6 +392,30 @@ public class Event implements Indexed<Integer> {
 
 	public void setOwnerDisplayName(String ownerDisplayName) {
 		this.ownerDisplayName = ownerDisplayName;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+
+	public String getCreatorDisplayName() {
+		return creatorDisplayName;
+	}
+
+	public void setCreatorDisplayName(String creatorDisplayName) {
+		this.creatorDisplayName = creatorDisplayName;
+	}
+
+	public String getCreatorEmail() {
+		return creatorEmail;
+	}
+
+	public void setCreatorEmail(String creatorEmail) {
+		this.creatorEmail = creatorEmail;
 	}
 
 	public boolean modifiedSince(Date reference) {
@@ -485,12 +515,11 @@ public class Event implements Indexed<Integer> {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(title, domain, description,
-				uid, extId, privacy, owner, ownerDisplayName, ownerEmail,
-				location, date, duration, alert, category, priority, allday,
-				attendees, recurrence, type, completion, percent, opacity,
-				entityId, timeUpdate, timeCreate, timezoneName, recurrenceId,
-				internalEvent, sequence);
+		return Objects.hashCode(title, domain, description, uid, extId, privacy, owner,
+				ownerDisplayName, ownerEmail, creator, creatorDisplayName, creatorEmail, location,
+				date, duration, alert, category, priority, allday, attendees, recurrence, type,
+				completion, percent, opacity, entityId, timeUpdate, timeCreate, timezoneName,
+				recurrenceId, internalEvent, sequence);
 	}
 	
 	@Override
@@ -506,6 +535,9 @@ public class Event implements Indexed<Integer> {
 				&& Objects.equal(this.owner, that.owner)
 				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName)
 				&& Objects.equal(this.ownerEmail, that.ownerEmail)
+				&& Objects.equal(this.creator, that.creator)
+				&& Objects.equal(this.creatorDisplayName, that.creatorDisplayName)
+				&& Objects.equal(this.creatorEmail, that.creatorEmail)
 				&& Objects.equal(this.location, that.location)
 				&& Objects.equal(this.date, that.date)
 				&& Objects.equal(this.duration, that.duration)

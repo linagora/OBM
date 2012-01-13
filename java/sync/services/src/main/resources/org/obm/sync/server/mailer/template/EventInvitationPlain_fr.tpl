@@ -5,15 +5,17 @@ NOUVEAU RENDEZ-VOUS !
 
 Vous êtes invité à participer à ce rendez-vous
 
-du     : ${start}
+du              : ${start}
 
-au     : ${end}
+au              : ${end}
 
-sujet  : ${subject}
+sujet           : ${subject}
 
-lieu   : ${location}
+lieu            : ${location}
 
-auteur : ${author}
+organisateur    : ${organizer}
+
+créé par        : ${creator}
 
 
 :: Pour accepter : 
