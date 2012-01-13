@@ -71,7 +71,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -83,19 +83,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(AddressBookBindingImpl.class);
-	public static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
-	public static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
 
 	private final ContactDao contactDao;
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
 	private final ContactMerger contactMerger;
-	private final ConstantService configuration;
+	private final ObmSyncConfigurationService configuration;
 	private final ContactConfiguration contactConfiguration;
 
 	@Inject
 	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
-			ConstantService configuration, ContactConfiguration contactConfiguration) {
+			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
@@ -179,8 +177,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
 
 		ContactUpdates userUpdates = new ContactUpdates();
-		if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
-				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+		if (configuration.syncUsersAsAddressBook()) {
 			userUpdates = userDao.findUpdatedUsers(timestamp, token);
 		} else {
 			userUpdates = new ContactUpdates();
@@ -342,8 +339,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
 		try {
 			Set<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
-			if (configuration.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
-					GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)) {
+			if (configuration.syncUsersAsAddressBook()) {
 				updated.addAll(createAddressBookForUsers(timestamp));
 			}
 			

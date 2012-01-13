@@ -38,7 +38,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.ldap.LDAPAuthService;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Fetches the ldap or database authentification service.
@@ -46,15 +46,15 @@ import fr.aliacom.obm.services.constant.ConstantService;
 @Singleton
 public class AuthentificationServiceFactory {
 
-	private final ConstantService constantService;
+	private final ObmSyncConfigurationService configuration;
 	private final LDAPAuthService ldapAuthService;
 	private final DatabaseAuthentificationService databaseAuthentificationService;
 
 	@Inject
-	private AuthentificationServiceFactory(ConstantService constantService, 
+	private AuthentificationServiceFactory(ObmSyncConfigurationService configuration, 
 			DatabaseAuthentificationService databaseAuthentificationService,
 			Provider<LDAPAuthService> ldapAuthServiceProvider) {
-		this.constantService = constantService;
+		this.configuration = configuration;
 		this.databaseAuthentificationService = databaseAuthentificationService;
 		if (isLDAPBasedLogin()) {
 			this.ldapAuthService = ldapAuthServiceProvider.get();
@@ -64,7 +64,7 @@ public class AuthentificationServiceFactory {
 	}
 	
 	private boolean isLDAPBasedLogin() {
-		return constantService.getStringValue("auth-ldap-server") != null;
+		return configuration.getLdapServer() != null;
 	}
 
 	public IAuthentificationService get() {

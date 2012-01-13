@@ -37,6 +37,7 @@ import java.io.InputStream;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 
@@ -45,7 +46,7 @@ public class MailProtocolTest {
 	
 	@Test
 	public void testWithBigMessageMaxSize() throws IOException, QuotaExceededException {
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
 		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
 		
 		EasyMock.expect(request.getParameter("CollectionId")).andReturn("1").once();
@@ -64,7 +65,7 @@ public class MailProtocolTest {
 	
 	@Test(expected=QuotaExceededException.class)
 	public void testWithSmallMessageMaxSize() throws IOException, QuotaExceededException {
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
 		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
 		
 		EasyMock.expect(request.getParameter("CollectionId")).andReturn("1").once();

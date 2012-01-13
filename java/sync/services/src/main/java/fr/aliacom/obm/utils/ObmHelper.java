@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Helper functions datasource management
@@ -60,9 +60,9 @@ public class ObmHelper {
 	private final IDBCP dbcp;
 
 	@Inject
-	private ObmHelper(ConstantService constantService, IDBCP dbcp) {
+	private ObmHelper(ObmSyncConfigurationService configuration, IDBCP dbcp) {
 		this.dbcp = dbcp;
-		type = ObmDbType.valueOf(constantService.getStringValue("dbtype").trim());
+		type = configuration.getDbType();
 	}
 
 	/**

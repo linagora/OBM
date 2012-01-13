@@ -48,7 +48,7 @@ import org.obm.sync.server.template.ITemplateLoader;
 import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.MailService;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -59,7 +59,7 @@ public abstract class AbstractMailer {
 	protected MailService mailService;
 	protected ITemplateLoader templateLoader;
 		
-	private ConstantService constantService;
+	private ObmSyncConfigurationService constantService;
 	
 	public static class NotificationException extends RuntimeException {
 		private static final long serialVersionUID = -7984056189522385977L;
@@ -69,7 +69,7 @@ public abstract class AbstractMailer {
 		}
 	}
 	
-	protected AbstractMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
+	protected AbstractMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
 		this.mailService = mailService;
 		this.constantService = constantService;
 		this.templateLoader = templateLoader;

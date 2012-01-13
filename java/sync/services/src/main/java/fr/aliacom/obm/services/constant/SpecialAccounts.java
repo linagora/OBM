@@ -52,15 +52,15 @@ public class SpecialAccounts {
 	private Map<String, String> appliAccounts;
 
 	@Inject
-	private SpecialAccounts(ConstantService configuration) {
+	private SpecialAccounts(ObmSyncConfigurationService configuration) {
 		try {
 			rootAccounts = new HashMap<String, String>();
 			anyUserAccounts = new ArrayList<String>();
 			appliAccounts = new HashMap<String, String>();
 
-			String roots = configuration.getStringValue("rootAccounts");
-			String applis = configuration.getStringValue("appliAccounts");
-			String anyUsers = configuration.getStringValue("anyUserAccounts");
+			String roots = configuration.getRootAccounts();
+			String applis = configuration.getAppliAccounts();
+			String anyUsers = configuration.getAnyUserAccounts();
 
 			if (roots != null && !roots.equals("")) {
 				for (String account : roots.split(",")) {

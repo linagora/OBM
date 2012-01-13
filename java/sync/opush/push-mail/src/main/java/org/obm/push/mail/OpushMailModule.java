@@ -1,5 +1,7 @@
 package org.obm.push.mail;
 
+import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
 
@@ -14,6 +16,7 @@ public class OpushMailModule extends AbstractModule {
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
+		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(MailBackendImpl.class);

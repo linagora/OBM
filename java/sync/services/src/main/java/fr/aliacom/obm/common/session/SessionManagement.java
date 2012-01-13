@@ -43,7 +43,6 @@ import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -58,7 +57,7 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.LogUtils;
@@ -79,17 +78,17 @@ public class SessionManagement {
 	private final AuthentificationServiceFactory authentificationServiceFactory;
 	private final UserDao userManagementDAO;
 	private final DomainService domainService;
-	private final ConstantService constantService;
+	private final ObmSyncConfigurationService configuration;
 	private final SpecialAccounts specialAccounts;
 	private final HelperService helperService;
 	
 	@Inject
 	private SessionManagement(AuthentificationServiceFactory authentificationServiceFactory, 
-			DomainService domainService, UserDao userDao, ConstantService constantService, 
+			DomainService domainService, UserDao userDao, ObmSyncConfigurationService constantService, 
 			SpecialAccounts specialAccounts, HelperService helperService) {
 		
 		this.userManagementDAO = userDao;
-		this.constantService = constantService;
+		this.configuration = constantService;
 		this.specialAccounts = specialAccounts;
 		this.helperService = helperService;
 		this.conversationUidGenerator = new AtomicInteger();
@@ -141,8 +140,8 @@ public class SessionManagement {
 	private boolean doAuthLemonLdap(String remoteIP) {
 		String ip = remoteIP.trim();
 		logger.debug("lemon login with ip " + remoteIP);
-		String lemonIPs = constantService.getStringValue("lemonLdapIps");
-		for (String lemonIp: Splitter.on(',').trimResults().split(lemonIPs)) {
+		Iterable<String> lemonIPs = configuration.getLemonLdapIps();
+		for (String lemonIp: lemonIPs) {
 			if (lemonIp.equals(ip)) {
 				logger.info("login from lemonLDAP ok from ip " + remoteIP);
 				return true;

@@ -33,7 +33,9 @@ package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.base.ObmDbType;
 
+import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -41,14 +43,16 @@ import com.google.inject.Singleton;
  * Configuration service
  */
 @Singleton
-public class ConstantService extends ConfigurationServiceImpl {
+public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 
 	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
 	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/resources/template/";
 	private static final String OBM_SYNC_MAILER = "x-obm-sync";
-
+	private static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
+	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
+	
 	@Inject
-	private ConstantService() {
+	private ObmSyncConfigurationService() {
 		super();
 	}
 
@@ -62,6 +66,60 @@ public class ConstantService extends ConfigurationServiceImpl {
 
 	public String getObmSyncMailer(AccessToken at) {
 		return OBM_SYNC_MAILER + "@" + at.getDomain().getName();
+	}
+	
+	public String getLdapServer() {
+		return getStringValue("auth-ldap-server");
+	}
+
+	public String getLdapBaseDn() {
+		return getStringValue("auth-ldap-basedn").replace("\"", "");
+	}
+
+	public String getLdapFilter() {
+		return getStringValue("auth-ldap-filter").replace("\"", "");
+	}
+
+	public String getLdapBindDn() {
+		String bindDn = getStringValue("auth-ldap-binddn");
+		if (bindDn != null) {
+			return bindDn.replace("\"", "");
+		}
+		return null;
+	}
+
+	public String getLdapBindPassword() {
+		String bindPassword = getStringValue("auth-ldap-bindpw");
+		if (bindPassword != null) {
+			return bindPassword.replace("\"", "");
+		}
+		return null;
+	}
+
+	public ObmDbType getDbType() {
+		return ObmDbType.valueOf(getStringValue("dbtype").trim());
+	}
+
+	public Iterable<String> getLemonLdapIps() {
+		String lemonIPs = getStringValue("lemonLdapIps");
+		return Splitter.on(',').trimResults().split(lemonIPs);
+	}
+
+	public String getRootAccounts() {
+		return getStringValue("rootAccounts");
+	}
+
+	public String getAppliAccounts() {
+		return getStringValue("appliAccounts");
+	}
+
+	public String getAnyUserAccounts() {
+		return getStringValue("anyUserAccounts");
+	}
+
+	public boolean syncUsersAsAddressBook() {
+		return getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE);
 	}
 	
 }

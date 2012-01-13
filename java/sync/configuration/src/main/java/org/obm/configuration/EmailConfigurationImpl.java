@@ -31,61 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class AbstractConfigurationService {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class EmailConfigurationImpl extends AbstractConfigurationService implements EmailConfiguration {
 	
-	protected Properties props;
+	private static final int MESSAGE_DEFAULT_MAX_SIZE = 10485760;
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final String BACKEND_CONF_FILE = "/etc/opush/mail_conf.ini";
+	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
+	private static final String BACKEND_IMAP_ACTIVATE_TLS = "imap.activateTLS";
+	private static final String BACKEND_MESSAGE_MAX_SIZE = "message.maxSize";
 	
-	protected AbstractConfigurationService() {}
+	@Inject
+	private EmailConfigurationImpl() {
+		super(BACKEND_CONF_FILE);
+	}	
 	
-	protected AbstractConfigurationService(String filename) {
-		props = new Properties();
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(filename);
-			props.load(in);
-		} catch (IOException e) {
-			logger.error(filename + " not found", e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					logger.error("error closing ini file inputstream", e);
-				}
-			}
-		}
+	private boolean isOptionEnabled(String option) {
+		String entryContent = getStringValue(option);
+		return !"false".equals(entryContent);
 	}
 	
-	protected String getStringValue(String prop) {
-		return props.getProperty(prop);
-	}
-
-	protected boolean getBooleanValue(String prop) {
-		return Boolean.valueOf(getStringValue(prop)).booleanValue();
-	}
-
-	protected boolean getBooleanValue(String prop, boolean defaultValue) {
-		String valueString = getStringValue(prop);
-		boolean value = valueString != null ? Boolean.valueOf(valueString).booleanValue()
-				: defaultValue;
-		return value;
-	}
-
-	protected int getIntValue(String prop, int defaultValue) {
-		try {
-			return Integer.parseInt(getStringValue(prop));
-		} catch (NumberFormatException nfe) {
-			return defaultValue;
-		}
+	@Override
+	public boolean activateTls() {
+		return isOptionEnabled(BACKEND_IMAP_ACTIVATE_TLS);
 	}
 	
+	@Override
+	public boolean loginWithDomain() {
+		return isOptionEnabled(BACKEND_IMAP_LOGIN_WITH_DOMAIN);
+	}
+	
+	@Override
+	public int getMessageMaxSize() {
+		return getIntValue(BACKEND_MESSAGE_MAX_SIZE, MESSAGE_DEFAULT_MAX_SIZE);
+	}
 }

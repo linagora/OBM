@@ -60,7 +60,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.MailService;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -71,7 +71,7 @@ public class ErrorMailer extends AbstractMailer {
 	private ConcurrentMap<String, Date> lastNotificationDateByUser;
 	
 	@Inject
-	protected ErrorMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
+	protected ErrorMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
 		Cache<String, Date> cache = CacheBuilder.newBuilder().expireAfterWrite(INTERVAL_BETWEEN_NOTIFICATION, TimeUnit.HOURS)
 				.build(new CacheLoader<String, Date>() {

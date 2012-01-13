@@ -58,7 +58,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventMail;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.SimpleDate;
 import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
@@ -69,7 +69,7 @@ public class EventChangeMailer extends AbstractMailer {
 	private final String baseUrl;
 	
 	@Inject
-	/* package */ EventChangeMailer(MailService mailService, ConstantService constantService, ITemplateLoader templateLoader) {
+	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();
 	}

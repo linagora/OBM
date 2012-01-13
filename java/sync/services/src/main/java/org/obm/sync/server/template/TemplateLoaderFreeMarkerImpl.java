@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -53,10 +53,10 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 	private static final Logger logger = LoggerFactory
 			.getLogger(CalendarBindingImpl.class);
 
-	private ConstantService constantService;
+	private ObmSyncConfigurationService constantService;
 
 	@Inject
-	public TemplateLoaderFreeMarkerImpl(ConstantService constantService) {
+	public TemplateLoaderFreeMarkerImpl(ObmSyncConfigurationService constantService) {
 		this.constantService = constantService;
 	}
 

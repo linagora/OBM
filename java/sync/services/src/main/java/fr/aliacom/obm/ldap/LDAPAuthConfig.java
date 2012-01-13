@@ -33,7 +33,7 @@ package fr.aliacom.obm.ldap;
 
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Contient la liste des ldaps sur lesquels on peut essayer de s'authentifier
@@ -43,19 +43,12 @@ class LDAPAuthConfig {
 	private LDAPDirectory dir;
 
 	@Inject
-	private LDAPAuthConfig(ConstantService cs) {
-		String uri = cs.getStringValue("auth-ldap-server");
-		String baseDN = cs.getStringValue("auth-ldap-basedn").replace("\"", "");
-		String userFilter = cs.getStringValue("auth-ldap-filter").replace("\"",
-				"");
-		String bindDn = cs.getStringValue("auth-ldap-binddn");
-		if (bindDn != null) {
-			bindDn = bindDn.replace("\"", "");
-		}
-		String bindPw = cs.getStringValue("auth-ldap-bindpw");
-		if (bindPw != null) {
-			bindPw = bindPw.replace("\"", "");
-		}
+	private LDAPAuthConfig(ObmSyncConfigurationService obmSyncConfiguration) {
+		String uri = obmSyncConfiguration.getLdapServer();
+		String baseDN = obmSyncConfiguration.getLdapBaseDn();
+		String userFilter = obmSyncConfiguration.getLdapFilter();
+		String bindDn = obmSyncConfiguration.getLdapBindDn();
+		String bindPw = obmSyncConfiguration.getLdapBindPassword();
 		dir = new LDAPDirectory(uri, userFilter, bindDn, bindPw, baseDN, null,
 				null);
 	}

@@ -75,7 +75,7 @@ import com.google.common.collect.ImmutableList;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.Ical4jHelper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -190,7 +190,7 @@ public class EventChangeMailerTest {
 		}
 
 		private MimeMessage test() throws MessagingException {
-			ConstantService constantService = EasyMock.createMock(ConstantService.class);
+			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
 			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
 					ResourceBundle.getBundle("Messages", Locale.FRENCH));

@@ -62,7 +62,7 @@ import com.google.common.collect.ImmutableList;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -136,7 +136,7 @@ public class ErrorMailerTest {
 
 
 		protected void test() throws UnsupportedEncodingException, IOException, MessagingException {
-			ConstantService constantService = EasyMock.createMock(ConstantService.class);
+			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
 			EasyMock.expect(constantService.getObmSyncMailer(at)).andReturn("x-obm-sync@test.tlse.lng").once();
 			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
 					ResourceBundle.getBundle("Messages", Locale.FRENCH));
@@ -224,7 +224,7 @@ public class ErrorMailerTest {
 		@Test
 		public void testExpireAfterWrite() throws MessagingException {
 			AccessToken at = getMockAccessToken();
-			ConstantService constantService = EasyMock.createMock(ConstantService.class);
+			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
 			EasyMock.expect(constantService.getObmSyncMailer(at)).andReturn("x-obm-sync@test.tlse.lng").once();
 			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
 					ResourceBundle.getBundle("Messages", Locale.FRENCH));

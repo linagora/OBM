@@ -53,7 +53,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import fr.aliacom.obm.services.constant.ConstantService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
 
 public class AddressBookBindingImplTest {
@@ -165,9 +165,8 @@ public class AddressBookBindingImplTest {
 		UserDao userDao = EasyMock.createMock(UserDao.class);
 		expect(userDao.findUpdatedUsers(timestamp, token)).andReturn(userUpdates).once();
 
-		ConstantService configuration = EasyMock.createMock(ConstantService.class);
-		expect(configuration.getBooleanValue(AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC,
-						AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)).andReturn(true).atLeastOnce();
+		ObmSyncConfigurationService configuration = EasyMock.createMock(ObmSyncConfigurationService.class);
+		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
 
 		ContactConfiguration contactConfiguration = EasyMock.createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(defautUsersIdFolder);
@@ -260,11 +259,9 @@ public class AddressBookBindingImplTest {
 		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
-		ConstantService configuration = EasyMock.createMock(ConstantService.class);
+		ObmSyncConfigurationService configuration = EasyMock.createMock(ObmSyncConfigurationService.class);
 		expect(
-				configuration.getBooleanValue(AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC,
-						AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE)).andReturn(
-				false).atLeastOnce();
+				configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
 
 		Object[] mocks = { helper, contactDao, configuration };
 		EasyMock.replay(mocks);
