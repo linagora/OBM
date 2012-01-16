@@ -33,27 +33,22 @@ package org.obm.push.tnefconverter.test;
 
 import java.io.InputStream;
 
+import org.fest.assertions.Assertions;
+import org.junit.Test;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 
-import junit.framework.TestCase;
+public class TNEFUtilsTest {
 
-public class TNEFUtilsTest  extends TestCase{
-
+	@Test
 	public void testIsScheduleMeetingRequest() throws TNEFConverterException{
 		InputStream in = loadDataFile("recurmontly.eml");
-		Boolean ret = TNEFUtils.isScheduleMeetingRequest(in);
-		assertTrue(ret);
-	}
-
-	public void testContainsTNEFAttchment() throws TNEFConverterException {
-		InputStream in = loadDataFile("recurmontly.eml");
-		Boolean ret = TNEFUtils.containsTNEFAttchment(in);
-		assertTrue(ret);
+		Assertions.assertThat(TNEFUtils.isScheduleMeetingRequest(in)).isTrue();
 	}
 	
 	protected InputStream loadDataFile(String name) {
 		return getClass().getClassLoader().getResourceAsStream(
 				"data/eml/" + name);
 	}
+	
 }

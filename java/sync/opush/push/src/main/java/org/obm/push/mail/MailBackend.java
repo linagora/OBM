@@ -496,10 +496,10 @@ public class MailBackend extends ObmSyncBackend {
 
 	private void send(BackendSession bs, SendEmail sendEmail, Boolean saveInSent) throws ProcessingEmailException {
 		try {
-			Boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
+			boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
 
 			Address from = getAddress(sendEmail.getFrom());
-			if(!sendEmail.isInvitation() && isScheduleMeeting){
+			if (!sendEmail.isInvitation() && isScheduleMeeting) {
 				emailManager.sendEmail(bs, from, sendEmail.getTo(),
 						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
 			} else {
