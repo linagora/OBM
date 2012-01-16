@@ -1,4 +1,4 @@
-{package_name} ({version}~{release}) stable; urgency=low
+{package_name} ({debian_version}) stable; urgency=low
 
   * New upstream release.
 
