@@ -1,6 +1,6 @@
 package org.obm.opush.command.sync;
 
-import static org.obm.opush.IntegrationPushTestUtils.mockAddressBook;
+import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasAddItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasDeleteItems;
@@ -65,7 +65,7 @@ public class SyncHandlerTest {
 		String syncEmailSyncKey = "1";
 		int syncEmailCollectionId = 4;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -91,7 +91,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -120,7 +120,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -147,7 +147,7 @@ public class SyncHandlerTest {
 						.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -175,7 +175,7 @@ public class SyncHandlerTest {
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 

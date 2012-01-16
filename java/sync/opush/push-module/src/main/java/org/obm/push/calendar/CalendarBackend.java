@@ -32,7 +32,6 @@
 package org.obm.push.calendar;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -169,27 +168,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " calendar");
 		ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
 		return ImmutableList.of(ic);
-	}
-
-	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws DaoException {
-		List<ItemChange> ret = new ArrayList<ItemChange>(1);
-		ItemChange ic = new ItemChange();
-		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\tasks\\"
-				+ bs.getUser().getLoginAtDomain();
-		String serverId;
-		try {
-			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), col);
-			serverId = mappingService.collectionIdToString(collectionId);
-		} catch (CollectionNotFoundException e) {
-			serverId = mappingService.createCollectionMapping(bs.getDevice(), col);
-			ic.setIsNew(true);
-		}
-		ic.setServerId(serverId);
-		ic.setParentId("0");
-		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " tasks");
-		ic.setItemType(FolderType.DEFAULT_TASKS_FOLDER);
-		ret.add(ic);
-		return ret;
 	}
 
 	@Override

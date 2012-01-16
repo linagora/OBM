@@ -52,12 +52,16 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements CollectionDao {
+
+	private static final String SYNC_STATE_FIELDS = 
+			Joiner.on(',').join("id", "last_sync", "sync_key");
 	
 	@Inject
 	protected CollectionDaoJdbcImpl(IDBCP dbcp) {
@@ -172,7 +176,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	@Override
 	public SyncState findStateForKey(String syncKey) throws DaoException {
-		SyncState ret = null;
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -180,23 +183,55 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(
-					"SELECT id, device_id, last_sync FROM opush_sync_state WHERE sync_key=?");
+					"SELECT " + SYNC_STATE_FIELDS 
+					+ " FROM opush_sync_state WHERE sync_key=?");
 			ps.setString(1, syncKey);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				Timestamp lastSync = rs.getTimestamp("last_sync");
-				ret = new SyncState(syncKey, lastSync);
-				ret.setId(rs.getInt("id"));
+				return buildSyncState(rs);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
-		return ret;
+		return null;
 	}
 	
+	@Override
+	public SyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement(
+					"SELECT " + SYNC_STATE_FIELDS + " FROM opush_sync_state " +
+					"WHERE device_id=? AND collection_id=? ORDER BY last_sync DESC LIMIT 1");
+			ps.setInt(1, device.getDatabaseId());
+			ps.setInt(2, collectionId);
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return buildSyncState(rs);
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+		return null;
+	}
+	
+	private SyncState buildSyncState(ResultSet rs) throws SQLException {
+		Timestamp lastSync = rs.getTimestamp("last_sync");
+		String syncKey = rs.getString("sync_key");
+		SyncState syncState = new SyncState(syncKey, lastSync);
+		syncState.setId(rs.getInt("id"));
+		return syncState;
+	}
+
 	public Integer getCollectionMapping(Device device, String collection) throws DaoException {
 		Integer devDbId = device.getDatabaseId();
 		Integer ret = null;

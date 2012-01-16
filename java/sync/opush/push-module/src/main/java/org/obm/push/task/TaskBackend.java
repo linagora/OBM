@@ -50,6 +50,8 @@ import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
 
+import com.google.common.collect.ImmutableList;
+
 public class TaskBackend implements PIMBackend {
 
 	@Override
@@ -106,6 +108,10 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public void emptyFolderContent(BackendSession bs, String collectionPath,
 			boolean deleteSubFolder) throws NotAllowedException {
+	}
+
+	public List<ItemChange> getHierarchyChanges() {
+		return ImmutableList.<ItemChange>of();
 	}
 	
 }

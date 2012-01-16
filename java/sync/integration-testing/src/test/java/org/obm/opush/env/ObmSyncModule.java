@@ -1,5 +1,11 @@
 package org.obm.opush.env;
 
+import static org.easymock.EasyMock.expect;
+
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.task.TaskBackend;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.IAddressBook;
@@ -28,5 +34,14 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 		bindWithMock(LoginService.class);
 		bindWithMock(IMailingList.class);
 		bindWithMock(ISetting.class);
+		bindWithMock(CalendarBackend.class);
+		bindWithMock(ContactsBackend.class);
+		bindWithMock(TaskBackend.class);
+		CalendarBackend calendarBackend = getMock(CalendarBackend.class);
+		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR);
+		ContactsBackend contactBackend = getMock(ContactsBackend.class);
+		expect(contactBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS);
+		TaskBackend taskBackend = getMock(TaskBackend.class);
+		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS);
 	}
 }

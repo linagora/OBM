@@ -62,4 +62,6 @@ public interface CollectionDao {
 
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
 
+	SyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
+
 }

@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
@@ -66,6 +67,10 @@ public class StateMachine {
 		this.itemTrackingDao = itemTrackingDao;
 	}
 
+	public SyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
+		return collectionDao.lastKnownState(device, collectionId);
+	}
+	
 	public SyncState getSyncState(String syncKey) throws DaoException {
 		return collectionDao.findStateForKey(syncKey);
 	}

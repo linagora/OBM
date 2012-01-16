@@ -46,6 +46,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.task.TaskBackend;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -57,20 +58,22 @@ public class HierarchyExporter implements IHierarchyExporter {
 	private final MailBackend mailExporter;
 	private final CalendarBackend calendarExporter;
 	private final ContactsBackend contactsBackend;
+	private final TaskBackend taskBackend;
 
 	@Inject
 	private HierarchyExporter(FolderBackend folderExporter,
 			MailBackend mailExporter, CalendarBackend calendarExporter,
-			ContactsBackend contactsBackend) {
+			ContactsBackend contactsBackend, TaskBackend taskBackend) {
 		
 		this.folderExporter = folderExporter;
 		this.mailExporter = mailExporter;
 		this.calendarExporter = calendarExporter;
 		this.contactsBackend = contactsBackend;
+		this.taskBackend = taskBackend;
 	}
 
-	private List<ItemChange> getTasksChanges(BackendSession bs) throws DaoException {
-		return calendarExporter.getHierarchyTaskChanges(bs);
+	private List<ItemChange> getTasksChanges() {
+		return taskBackend.getHierarchyChanges();
 	}
 
 	private List<ItemChange> getCalendarChanges(BackendSession bs) throws DaoException, UnknownObmSyncServerException {
@@ -91,7 +94,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 		HierarchyItemsChanges itemsContactChanged = listContactFoldersChanged(bs, lastSync);
 		allItemsChanged.addAll(itemsContactChanged.getItemsAddedOrUpdated());
 		
-		allItemsChanged.addAll(getTasksChanges(bs));
+		allItemsChanged.addAll(getTasksChanges());
 
 		return new HierarchyItemsChanges(
 				allItemsChanged, itemsContactChanged.getItemsDeleted(), itemsContactChanged.getLastSync());

@@ -100,24 +100,26 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 				final BackendSession backendSession = ccl.getSession();
 				for (SyncCollection syncCollection : monitoredCollections) {
 
-					try {
-						int count = backend.getItemEstimateSize(
-								backendSession, 
-								syncCollection.getOptions().getFilterType(),
-								syncCollection.getCollectionId(),
-								syncCollection.getSyncState());
+					if (syncCollection.getDataType().equals(backend.getPIMDataType())) {
+						try {
+							int count = backend.getItemEstimateSize(
+									backendSession, 
+									syncCollection.getOptions().getFilterType(),
+									syncCollection.getCollectionId(),
+									syncCollection.getSyncState());
 
-						if (count > 0) {
-							addPushNotification(pushNotifyList, ccl);
+							if (count > 0) {
+								addPushNotification(pushNotifyList, ccl);
+							}
+						} catch (CollectionNotFoundException e) {
+							logger.error(e.getMessage(), e);
+						} catch (DaoException e) {
+							logger.error(e.getMessage(), e);
+						} catch (UnknownObmSyncServerException e) {
+							logger.error(e.getMessage(), e);
+						} catch (ProcessingEmailException e) {
+							logger.error(e.getMessage(), e);
 						}
-					} catch (CollectionNotFoundException e) {
-						logger.error(e.getMessage(), e);
-					} catch (DaoException e) {
-						logger.error(e.getMessage(), e);
-					} catch (UnknownObmSyncServerException e) {
-						logger.error(e.getMessage(), e);
-					} catch (ProcessingEmailException e) {
-						logger.error(e.getMessage(), e);
 					}
 				}
 			}

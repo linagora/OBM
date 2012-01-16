@@ -4,7 +4,7 @@ import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.obm.opush.IntegrationPushTestUtils.mockAddressBook;
+import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
@@ -67,7 +67,7 @@ public class FolderSyncHandlerTest {
 		int serverId = 4;
 				
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
@@ -93,7 +93,7 @@ public class FolderSyncHandlerTest {
 		int serverId = 4;
 		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		mockAddressBook(singleUserFixture, classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
@@ -118,15 +118,11 @@ public class FolderSyncHandlerTest {
 		FolderHierarchy folderHierarchy = folderSyncResponse.getFolders();
 		Assertions.assertThat(folderHierarchy).isNotNull();
 		Assertions.assertThat(folderHierarchy.keySet())
-			.containsOnly(FolderType.DEFAULT_INBOX_FOLDER,
-					FolderType.DEFAULT_CALENDAR_FOLDER,
-					FolderType.DEFAULT_TASKS_FOLDER,
+			.contains(FolderType.DEFAULT_INBOX_FOLDER,
 					FolderType.DEFAULT_DRAFTS_FOLDERS,
 					FolderType.DEFAULT_SENT_EMAIL_FOLDER,
 					FolderType.DEFAULT_DELETED_ITEMS_FOLDERS);
 		checkStatus(folderHierarchy, FolderType.DEFAULT_INBOX_FOLDER, folderStatus);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_CALENDAR_FOLDER, folderStatus);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_TASKS_FOLDER, folderStatus);
 		checkStatus(folderHierarchy, FolderType.DEFAULT_DRAFTS_FOLDERS, folderStatus);
 		checkStatus(folderHierarchy, FolderType.DEFAULT_SENT_EMAIL_FOLDER, folderStatus);
 		checkStatus(folderHierarchy, FolderType.DEFAULT_DELETED_ITEMS_FOLDERS, folderStatus);

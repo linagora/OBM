@@ -34,14 +34,13 @@ import org.junit.Test;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -163,7 +162,7 @@ public class PingHandlerTest {
 			UnknownObmSyncServerException, ProcessingEmailException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
-		mockForHasChangePing(noChangeIterationCount);
+		mockForCalendarHasChangePing(noChangeIterationCount);
 		replayMocks(classToInstanceMap);
 	}
 	
@@ -216,20 +215,20 @@ public class PingHandlerTest {
 	
 	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException,
 			ProcessingEmailException, UnknownObmSyncServerException {
-		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
-		mockContentsExporter(contentsExporterBackend);
+		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
+		mockCalendarBackendHasNoChange(calendarBackend);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 	}
 
-	private void mockForHasChangePing(int noChangeIterationCount) 
+	private void mockForCalendarHasChangePing(int noChangeIterationCount) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
-		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
+		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 
 		mockCollectionDaoHasChange(collectionDao, noChangeIterationCount);
-		mockExporterHasContentChanges(contentsExporter);
+		mockCalendarBackendHasContentChanges(calendarBackend);
 	}
 
 	private void mockCollectionDaoHasChange(CollectionDao collectionDao, int noChangeIterationCount) 
@@ -259,25 +258,23 @@ public class PingHandlerTest {
 		expect(collectionDao.getCalendarChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).times(noChangeIterationCount);
 	}
 
-	private void mockExporterHasContentChanges(IContentsExporter contentsExporter)
+	private void mockCalendarBackendHasContentChanges(CalendarBackend calendarBackend)
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
-		expect(contentsExporter.getItemEstimateSize(
+		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
-				anyObject(SyncState.class),
-				anyInt(),
 				anyObject(FilterType.class),
-				anyObject(PIMDataType.class)))
+				anyInt(),
+				anyObject(SyncState.class)))
 			.andReturn(1).times(2);
 	}
 
-	private void mockContentsExporter(IContentsExporter contentsExporter) 
+	private void mockCalendarBackendHasNoChange(CalendarBackend calendarBackend) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
-		expect(contentsExporter.getItemEstimateSize(
+		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
-				anyObject(SyncState.class),
-				anyInt(),
 				anyObject(FilterType.class),
-				anyObject(PIMDataType.class)))
+				anyInt(),
+				anyObject(SyncState.class)))
 			.andReturn(0).anyTimes();
 	}
 
