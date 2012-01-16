@@ -79,6 +79,7 @@ import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.SyncRange;
@@ -518,6 +519,45 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setInt(idx++, ev.getSequence());
 		return idx;
 	}
+	
+    private List<DeletedEvent> findDeletedEvents(ObmUser calendarUser, Date d,
+                    EventType et, List<DeletedEvent> declined) {
+
+            List<DeletedEvent> result = new LinkedList<DeletedEvent>();
+            result.addAll(declined);
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            String q = "SELECT deletedevent_event_id, deletedevent_event_ext_id FROM DeletedEvent "
+                               + "WHERE deletedevent_user_id=? AND deletedevent_type=? ";
+            if (d != null) {
+                    q += "AND deletedevent_timestamp >= ?";
+            }
+            try {
+                    con = obmHelper.getConnection();
+                    ps = con.prepareStatement(q);
+                    ps.setInt(1, calendarUser.getUid());
+                    ps.setObject(2, et.getJdbcObject(obmHelper.getType()));
+                    if (d != null) {
+                            ps.setTimestamp(3, new Timestamp(d.getTime()));
+                    }
+
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                            result.add(new DeletedEvent(
+                                            new EventObmId(rs.getInt(1)),
+                                            new EventExtId(rs.getString(2))));
+                    }
+            } catch (SQLException se) {
+                    logger.error(se.getMessage(), se);
+            } finally {
+                    obmHelper.cleanup(con, ps, rs);
+            }
+
+            return result;
+    }
+	
 
 	@Override
 	public Event findEventById(AccessToken token, EventObmId uid) throws EventNotFoundException, ServerFault {
@@ -904,6 +944,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id, ex.eventexception_parent_id");
 
+		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
 
 		StringBuilder fetched = new StringBuilder();
 		fetched.append("(0");
@@ -1030,6 +1071,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(conComp, null, null);
 		}
 		ret.setUpdated(changedEvent.toArray(new Event[0]));
+		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
+				declined));
 		
 		return ret;
 	}
