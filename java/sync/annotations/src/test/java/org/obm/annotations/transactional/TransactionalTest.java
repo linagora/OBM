@@ -37,6 +37,7 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
@@ -157,6 +158,7 @@ public class TransactionalTest {
 			@Override
 			protected void configure() {
 				bind(TransactionManager.class).toProvider(provider);
+				bind(ITransactionAttributeBinder.class).to(TransactionAttributeBinder.class);
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), 
 						Matchers.annotatedWith(Transactional.class), 
@@ -179,351 +181,346 @@ public class TransactionalTest {
 	
 	@Test
 	public void testOneTransaction() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_COMMITTED)).anyTimes();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		mockCommit(transactionManager, transaction);
+		
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_COMMITTED)).anyTimes();
+		EasyMock.replay(transactionManager);
+		
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.successfullMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
+	}
+	
+	private void mockBegin(TransactionManager transactionManager, Transaction transaction) throws NotSupportedException, SystemException{
+		transactionManager.begin();
+		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getTransaction()).andReturn(transaction).once();
+	}
+	
+	private void mockCommit(TransactionManager transactionManager, Transaction transaction) throws SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+		EasyMock.expect(transactionManager.getTransaction()).andReturn(transaction).once();
+		transactionManager.commit();
+		EasyMock.expectLastCall().once();
+	}
+	
+	private void mockRollback(TransactionManager transactionManager, Transaction transaction) throws SystemException, SecurityException, IllegalStateException {
+		EasyMock.expect(transactionManager.getTransaction()).andReturn(transaction).once();
+		transactionManager.rollback();
+		EasyMock.expectLastCall().once();
 	}
 
 	@Test
 	public void testSub() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(5);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(5);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.subMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void testRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.throwingRuntimeExceptionMethod();	
 		} catch (RuntimeException e) {
 			return;
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 		Assert.fail("RuntimeExceptionExpected");
 	}
 
 	@Test
 	public void testSubRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION)).once();
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.subThrowingRuntimeExceptionMethod();
 		} catch (RuntimeException e) {
 			return;
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 		Assert.fail("RuntimeExceptionExpected");
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void testRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.throwingRuntimeExceptionButNoRollbackMethod();	
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void testSubRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.subRuntimeExceptionButNoRollbackMethod();	
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 	}
 	
 	@Test
 	public void parentAndChildWithTransactionalTag() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.parentAndChildWithTransactionalTag();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void parentWithTransactionalTagAndChildWithout() throws SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.replay(transaction);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.parentWithTransactionalTagAndChildWithout();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void childWithTransactionalTagAndParentWithout() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.childWithTransactionalTagAndParentWithout();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void testOneNestedTransaction() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.simpleNested();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void requiredWithNestedChild() throws SystemException, NotSupportedException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException{
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.requiredWithSuccessfulNestedSubMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test
 	public void simpleNestedRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.nestedThrowingRuntimeException();	
 		} catch (RuntimeException e) {
 			return;
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 		Assert.fail("RuntimeExceptionExpected");
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void nestedNoRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		try {
 			testClass.nestedThrowingRuntimeExceptionButNoRollbackMethod();	
 		} finally {
-			EasyMock.verify(transaction);
+			EasyMock.verify(transactionManager);
 		}
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void requiredWithNestedChildThrowingRuntimeException() throws SystemException, NotSupportedException, SecurityException, IllegalStateException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockRollback(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.requiredWithNestedSubThrowingRuntimeExceptionMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void requiredThrowingRuntimeExceptionAfterNestedChild() throws SystemException, NotSupportedException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
-		transaction.commit();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(3);
+		mockCommit(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
+		mockRollback(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.requiredThrowingRuntimeExceptionAfterNestedSubMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void requiredWithNestedSubThrowingRuntimeExceptionButNoRollback() throws SystemException, NotSupportedException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.rollback();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockRollback(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
 		
-		transaction.commit();
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
+		mockCommit(transactionManager, transaction);
+		EasyMock.replay(transactionManager);
 		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.requiredWithNestedSubThrowingRuntimeExceptionButNoRollbackMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void requiredThrowingRuntimeExceptionButNoRollbackAfterNestedSub() throws SystemException, NotSupportedException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManager transaction = EasyMock.createStrictMock(TransactionManager.class);
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		Transaction transaction = EasyMock.createMock(Transaction.class);
+		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_NO_TRANSACTION));
+		mockBegin(transactionManager, transaction);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
-		transaction.begin();
-		EasyMock.expectLastCall().once();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE));
+		mockBegin(transactionManager, transaction);
 
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(1);
-		transaction.commit();
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(1);
+		mockCommit(transactionManager, transaction);
+		
+		EasyMock.expect(transactionManager.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
+		
 		EasyMock.expectLastCall().once();
+		EasyMock.replay(transactionManager);
 		
-		EasyMock.expect(transaction.getStatus()).andReturn(Integer.valueOf(Status.STATUS_ACTIVE)).times(2);
-		
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(transaction);
-		
-		TestClass testClass = createTestClass(getProvider(transaction));
+		TestClass testClass = createTestClass(getProvider(transactionManager));
 		testClass.requiredThrowingRuntimeExceptionButNoRollbackAfterNestedSubMethod();
-		EasyMock.verify(transaction);
+		EasyMock.verify(transactionManager);
 	}
 	
 }

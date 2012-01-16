@@ -37,6 +37,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.annotations.transactional.TransactionException;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.dbcp.impl.ObmConfIni;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 import org.obm.dbcp.jdbc.MySqlJDBCDriver;
@@ -53,6 +56,8 @@ public class DBCP implements IDBCP{
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	private final ITransactionAttributeBinder transactionAttributeBinder;
+	
 	private DBConnectionPool ds;
 
 	private String lastInsertIdQuery;
@@ -64,7 +69,8 @@ public class DBCP implements IDBCP{
 	private String dbName;
 
 	@Inject
-	public DBCP() {
+	public DBCP(final ITransactionAttributeBinder transactionAttributeBinder) {
+		this.transactionAttributeBinder = transactionAttributeBinder;
 		logger.info("Starting OBM connection pool...");
 		readObmConfIni();
 		createDataSource();
@@ -125,7 +131,22 @@ public class DBCP implements IDBCP{
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		return ds.getConnection();
+		Connection connection = ds.getConnection();
+		try {
+			boolean isReadOnlyTransaction = isReadOnlyTransaction();
+			if(connection.isReadOnly() != isReadOnlyTransaction){
+				connection.setReadOnly(isReadOnlyTransaction);
+			}
+		} catch (TransactionException e) {
+			logger.warn("Error while getting the current transaction, a read-only connection is returned");
+			connection.setReadOnly(true);
+		}
+		return connection;
+	}
+
+	private boolean isReadOnlyTransaction() throws TransactionException {
+			Transactional transactional = transactionAttributeBinder.getCurrentTransactional();
+			return transactional.readOnly();
 	}
 	
 }

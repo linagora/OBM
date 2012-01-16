@@ -86,6 +86,7 @@ public class ObmHelper {
 		if (con != null) {
 			try {
 				con.close();
+				con.setReadOnly(false);
 			} catch (SQLException e) {
 				logger.debug("error closing Connection", e);
 			}

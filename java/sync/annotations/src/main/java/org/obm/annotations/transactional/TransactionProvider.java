@@ -46,9 +46,9 @@ public class TransactionProvider implements Provider<TransactionManager> {
 	private TransactionManager transactionManager;
 
 	@Inject
-	public TransactionProvider() throws SystemException {
+	public TransactionProvider(TransactionConfiguration configuration) throws SystemException {
 		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.setTransactionTimeout(3600);
+		transactionManager.setTransactionTimeout(configuration.getTimeOutInSecond());
 	}
 	
 	@Override

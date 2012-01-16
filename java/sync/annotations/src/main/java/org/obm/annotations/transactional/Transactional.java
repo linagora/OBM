@@ -43,5 +43,7 @@ public @interface Transactional {
     Class<? extends Exception>[] noRollbackOn() default {};
     
     Propagation propagation() default Propagation.REQUIRED;
-
+    
+    boolean readOnly() default false;
+    
 }

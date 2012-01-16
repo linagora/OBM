@@ -33,6 +33,8 @@ package org.obm.annotations.transactional;
 
 import java.lang.reflect.Method;
 
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
@@ -53,7 +55,11 @@ public class TransactionalInterceptor implements MethodInterceptor {
 	
 	@Inject
 	private Provider<TransactionManager> transactionManagerProvider;
-
+	
+	@Inject
+	private ITransactionAttributeBinder transactionAttributeBinder;
+	
+	
 	public TransactionalInterceptor() {
 		super();
 	}
@@ -78,7 +84,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		boolean haveCreatedNewTransaction = false;
 		
 		try {
-			haveCreatedNewTransaction = attachTransactionIfNeeded(ut, transactional.propagation());
+			haveCreatedNewTransaction = attachTransactionIfNeeded(ut, transactional);
 			Object obj = methodInvocation.proceed();
 			detachTransactionIfNeeded(ut, haveCreatedNewTransaction);
 			return obj;
@@ -91,16 +97,16 @@ public class TransactionalInterceptor implements MethodInterceptor {
 	}
 
 	private boolean attachTransactionIfNeeded(	TransactionManager ut, 
-			Propagation propagation) throws NotSupportedException,
-			SystemException {
+			Transactional transactional) throws NotSupportedException,
+			SystemException, TransactionException {
 		
 		boolean transactionAlreadyAttached = isTransactionAssociated(ut);
 		
-		if (transactionAlreadyAttached && propagation == Propagation.REQUIRED) {
+		if (transactionAlreadyAttached && transactional.propagation() == Propagation.REQUIRED) {
 			logger.debug("reuse current transaction, thread {}", Thread.currentThread().getId());
 			return false;
 		} else {
-			ut.begin();
+			doBegin(ut, transactional);
 			logger.debug("transaction was started, thread {}", Thread.currentThread().getId());
 			return true;
 		}
@@ -112,10 +118,10 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		if (isTransactionAssociated(ut) && haveCreatedNewTransaction) {
 			logger.debug("transaction status {}, thread {}", ut.getStatus(), Thread.currentThread().getId());
 			if (canCommitTransaction(ut)) {
-				ut.commit();
+				doCommit(ut);
 				logger.debug("transaction was commited, thread {}", Thread.currentThread().getId());
 			} else {
-				ut.rollback();
+				doRollBack(ut);
 				logger.debug("transaction was rollback, thread {}", Thread.currentThread().getId());
 				throw new RollbackException();
 			}
@@ -124,6 +130,21 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		}
 	}
 
+	private void doBegin(TransactionManager ut, Transactional transactional) throws TransactionException, NotSupportedException, SystemException{
+		ut.begin();
+		transactionAttributeBinder.bindTransactional(transactional);
+	}
+	
+	private void doCommit(TransactionManager ut) throws SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException, SystemException, TransactionException{
+		transactionAttributeBinder.invalidateTransactional();
+		ut.commit();
+	}
+	
+	private void doRollBack(TransactionManager ut) throws IllegalStateException, SecurityException, SystemException, TransactionException{
+		transactionAttributeBinder.invalidateTransactional();
+		ut.rollback();
+	}
+	
 	private void rollbackTransaction(Transactional transactional, TransactionManager ut,
 			boolean haveCreatedNewTransaction, Throwable e) {
 		logger.error(e.getMessage(), e);		
@@ -131,12 +152,12 @@ public class TransactionalInterceptor implements MethodInterceptor {
 			if (isTransactionAssociated(ut) && haveCreatedNewTransaction) {
 				if (needRollback(transactional, e)) {
 					logger.error("transaction was rollback", e);
-					ut.rollback();
+					doRollBack(ut);
 					return;
 				} else {
 					if (canCommitTransaction(ut)) {
 						logger.info("transaction was commited, thread {}", Thread.currentThread().getId());
-						ut.commit();
+						doCommit(ut);
 						return;
 					}
 				}
