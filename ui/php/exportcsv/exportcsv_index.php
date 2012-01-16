@@ -72,7 +72,7 @@ if (($action == 'index') || ($action == '')) {
   $emodule = $params['module'];
   if ($emodule != '') {
   	//we verify that the module name doesn't contain a path to a local file .
-  	if(preg_match('/^[A-Za-z_]+$/',$emodule)){
+  	if(preg_match('/^[A-Za-z0-9_]+$/',$emodule)){
   		require_once("$obminclude/lang/".$_SESSION['set_lang']."/${emodule}.inc");
         require_once("$path/$emodule/${emodule}_display.inc");
         require_once("$path/$emodule/${emodule}_query.inc");
