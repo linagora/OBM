@@ -75,7 +75,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		if (!uids.isEmpty()) {
 			sb.append("UID FETCH ");
 			sb.append(MessageSet.asString(uids));
-			sb.append(" FAST");
+			sb.append(" (FLAGS INTERNALDATE RFC822.SIZE)");
 		} else {
 			sb.append("NOOP");
 		}
@@ -100,7 +100,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 			for (int i = 0; it.hasNext() && i < uids.size(); ) {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
-				if (!payload.contains(" FETCH")) {
+				if (!payload.contains(" FETCH (")) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("not a fetch: "+payload);
 					}
