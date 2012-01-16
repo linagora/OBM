@@ -4,7 +4,6 @@ import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.EmailDao;
-import org.obm.push.store.FiltrageInvitationDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -22,7 +21,6 @@ public final class DaoModule extends AbstractOverrideModule {
 		bindWithMock(CollectionDao.class);
 		bindWithMock(DeviceDao.class);
 		bindWithMock(EmailDao.class);
-		bindWithMock(FiltrageInvitationDao.class);
 		bindWithMock(HearbeatDao.class);
 		bindWithMock(MonitoredCollectionDao.class);
 		bindWithMock(SyncedCollectionDao.class);

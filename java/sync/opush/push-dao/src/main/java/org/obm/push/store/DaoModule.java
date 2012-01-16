@@ -40,7 +40,6 @@ import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
 import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
-import org.obm.push.store.jdbc.FiltrageInvitationDaoJdbcImpl;
 import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
 
 import com.google.inject.AbstractModule;
@@ -54,7 +53,6 @@ public class DaoModule extends AbstractModule{
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
-		bind(FiltrageInvitationDao.class).to(FiltrageInvitationDaoJdbcImpl.class);
 		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
 		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
