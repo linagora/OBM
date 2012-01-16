@@ -2607,7 +2607,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   if($run_observers) {
   	// Send mail session var
   	$GLOBALS['send_notification_mail'] = $calendar['send_mail'];
-  	// Notify Observers
+  	// Notify Observers and ensure that email content points to the old event
+  	// begin and end date.
+  	$oldEvent->set("date_begin",$olddatebegin);
+  	$oldEvent->date_end = clone $oldEvent->date_begin;
+  	$oldEvent->date_end->addSecond($event_duration);
   	OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
   }
   
