@@ -371,11 +371,11 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		for (String serverId: fetchIds) {
+		for (String serverId: itemIds) {
 			try {
 
 				Integer contactId = mappingService.getItemIdFromServerId(serverId);

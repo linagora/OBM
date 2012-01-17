@@ -51,7 +51,7 @@ public interface IContentsExporter {
 			throws DaoException, CollectionNotFoundException,
 			UnknownObmSyncServerException, ProcessingEmailException;
 
-	List<ItemChange> fetch(BackendSession bs, List<String> fetchServerIds,
+	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
 			PIMDataType dataType) throws CollectionNotFoundException,
 			DaoException, ProcessingEmailException,
 			UnknownObmSyncServerException;

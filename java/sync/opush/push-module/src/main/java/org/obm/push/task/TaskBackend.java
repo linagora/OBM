@@ -55,7 +55,7 @@ import com.google.common.collect.ImmutableList;
 public class TaskBackend implements PIMBackend {
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
 			ProcessingEmailException, UnknownObmSyncServerException {
 		throw new CollectionNotFoundException();

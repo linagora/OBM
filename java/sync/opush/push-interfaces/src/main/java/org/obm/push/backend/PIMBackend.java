@@ -63,7 +63,7 @@ public interface PIMBackend {
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
 			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
 
-	List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+	List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnknownObmSyncServerException;
 
 	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 

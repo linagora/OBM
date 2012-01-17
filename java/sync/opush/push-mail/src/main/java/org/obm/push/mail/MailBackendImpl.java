@@ -271,12 +271,12 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
 			ProcessingEmailException, UnknownObmSyncServerException {
 	
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
-		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(fetchIds);
+		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
 			Integer collectionId = entry.getKey();
 			Collection<Long> uids = entry.getValue();

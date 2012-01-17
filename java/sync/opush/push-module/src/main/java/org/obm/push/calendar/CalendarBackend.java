@@ -511,13 +511,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> fetchIds)
+	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
 			ProcessingEmailException, UnknownObmSyncServerException {
 	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(bs);
-		for (String serverId : fetchIds) {
+		for (String serverId : itemIds) {
 			try {
 				Event event = getEventFromServerId(token, bs.getUser().getLoginAtDomain(), serverId);
 				if (event != null) {
