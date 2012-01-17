@@ -100,18 +100,6 @@ public class BasicStoreTests extends LoggedTestCase {
 		sc.noop();
 	}
 
-	public void testList() {
-		ListResult lr = sc.listAll();
-		assertNotNull(lr);
-		assertTrue(lr.size() > 0);
-	}
-
-	public void testLsub() {
-		ListResult lr = sc.listSubscribed();
-		assertNotNull(lr);
-		assertTrue(lr.size() > 0);
-	}
-
 	public void testAppend() {
 		FlagsList fl = new FlagsList();
 		fl.add(Flag.SEEN);

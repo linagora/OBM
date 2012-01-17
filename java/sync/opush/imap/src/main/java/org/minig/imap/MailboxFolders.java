@@ -30,12 +30,49 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.minig.imap.command;
+package org.minig.imap;
 
-public class ListCommand extends AbstractListCommand {
+import java.util.Iterator;
+import java.util.List;
+import com.google.common.base.Objects;
 
-	public ListCommand() {
-		super(false);
+public class MailboxFolders implements Iterable<MailboxFolder> {
+
+	private final List<MailboxFolder> folders;
+	
+	public MailboxFolders(List<MailboxFolder> folders) {
+		super();
+		this.folders = folders;
 	}
 
+	@Override
+	public Iterator<MailboxFolder> iterator() {
+		return folders.iterator();
+	}
+	
+	public int size() {
+		return folders.size();
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(folders);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MailboxFolders) {
+			MailboxFolders that = (MailboxFolders) object;
+			return Objects.equal(this.folders, that.folders);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("folders", folders)
+			.toString();
+	}
+	
 }

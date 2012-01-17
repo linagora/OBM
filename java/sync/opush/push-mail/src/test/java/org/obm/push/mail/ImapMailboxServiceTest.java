@@ -41,6 +41,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.minig.imap.MailboxFolder;
+import org.minig.imap.MailboxFolders;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
@@ -56,11 +58,13 @@ public class ImapMailboxServiceTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
-	@Inject MailboxService mailboxService;
+	@Inject ImapMailboxService mailboxService;
 	
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
+	private BackendSession bs;
+
 
 	@Before
 	public void setUp() {
@@ -68,6 +72,9 @@ public class ImapMailboxServiceTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
+	    bs = new BackendSession(
+				new Credentials(User.Factory.create()
+						.createUser(mailbox, mailbox, null), password, null), null, null, null);
 	}
 	
 	@After
@@ -79,11 +86,106 @@ public class ImapMailboxServiceTest {
 	public void testFetchFast() throws MailException, InterruptedException {
 		Date before = new Date();
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		BackendSession bs = new BackendSession(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+	
+	@Test
+	public void testDefaultListFolders() throws Exception {
+		MailboxFolders emails = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(emails).isNotNull().containsOnly(inbox());
+	}
+	
+	@Test
+	public void testListTwoFolders() throws Exception {
+		MailboxFolder newFolder = folder("NEW");
+		mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				newFolder);
+	}
+
+	@Test
+	public void testListInboxSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.NEW");
+		mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				newFolder);
+	}
+	
+	@Test
+	public void testListInboxDeepSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4");
+		mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("INBOX.LEVEL1"),
+				folder("INBOX.LEVEL1.LEVEL2"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4"));
+	}
+
+	@Test
+	public void testListToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP");
+		mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("TOP"));
+	}
+	
+	@Test
+	public void testListNestedToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP.LEVEL1");
+		mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("TOP"),
+				folder("TOP.LEVEL1"));
+	}
+	
+	@Test
+	public void testCreateCaseInsensitiveInbox() throws Exception {
+		MailboxFolder newFolder = folder("inBox");
+		boolean result = mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(result).isFalse();
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox());
+	}
+	
+	@Test
+	public void testCreateSpecialNameMailbox() throws Exception {
+		MailboxFolder newFolder = folder("to&to");
+		boolean result = mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(result).isTrue();
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(), newFolder);
+	}
+	
+	@Test
+	public void testCreateUtf8Mailbox() throws Exception {
+		MailboxFolder newFolder = folder("éàêôï");
+		boolean result = mailboxService.createFolder(bs, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(bs);
+		Assertions.assertThat(result).isTrue();
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(), newFolder);
+	}
+	
+	private MailboxFolder folder(String name) {
+		return new MailboxFolder(name);
+	}
+	
+	private MailboxFolder inbox() {
+		return folder("INBOX");
 	}
 }

@@ -29,29 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.minig.imap;
 
-import java.util.ArrayList;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-public class ListResult extends ArrayList<ListInfo> {
+import com.google.common.collect.ImmutableList;
 
-	private static final long serialVersionUID = -1402141425321463033L;
+public class BeansTest {
+
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
 	
-	private char imapSeparator;
-	
-	public ListResult(int size) {
-		super(size);
-	}
-
-	public char getImapSeparator() {
-		return imapSeparator;
-	}
-
-	public void setImapSeparator(char imapSeparator) {
-		this.imapSeparator = imapSeparator;
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
 	
-	
+	@Test
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(Address.class)
+					.add(MailboxFolder.class)
+					.add(MailboxFolders.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
+	}
 	
 }

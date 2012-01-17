@@ -42,12 +42,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
+import javax.mail.Folder;
+import javax.mail.MessagingException;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
-import org.minig.imap.ListInfo;
-import org.minig.imap.ListResult;
+import org.minig.imap.MailboxFolder;
+import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
@@ -72,11 +74,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.sun.mail.imap.IMAPStore;
 
 @Singleton
-public class ImapMailboxService implements MailboxService {
+public class ImapMailboxService implements MailboxService, PrivateMailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
 	
@@ -110,7 +114,7 @@ public class ImapMailboxService implements MailboxService {
 		final StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			store.select(parseMailBoxName(store, collectionName));
+			store.select(parseMailBoxName(bs, collectionName));
 			
 			final MailMessageLoader mailLoader = 
 					new MailMessageLoader(store, calendarClient, eventService, ical4jHelper, ical4jUserFactory);
@@ -128,16 +132,53 @@ public class ImapMailboxService implements MailboxService {
 		return mails;
 	}
 
-	private ListResult listAllFolder(StoreClient store) {
-		return store.listAll();
+	@Override
+	public MailboxFolders listAllFolders(BackendSession bs) throws MailException {
+		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		try {
+			Folder[] folders = store.getDefaultFolder().list("*");
+			
+			List<MailboxFolder> mailboxFolders = Lists.newArrayList();
+			for (Folder folder: folders) {
+				mailboxFolders.add(
+						new MailboxFolder(folder.getFullName(), folder.getSeparator()));
+			}
+			return new MailboxFolders(mailboxFolders);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
+	}
+	
+	@Override
+	public boolean createFolder(BackendSession bs, MailboxFolder folder) throws MailException {
+		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		try {
+			Folder newFolder = store.getFolder(folder.getName());
+			return newFolder.create(Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
 	}
 
+	private void closeQuietly(IMAPStore store) throws MailException {
+		try {
+			store.close();
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		}
+	}
+
+	
 	@Override
 	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, collectionName);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.SEEN);
@@ -154,32 +195,21 @@ public class ImapMailboxService implements MailboxService {
 	@Override
 	public String parseMailBoxName(BackendSession bs, String collectionName) throws MailException {
 		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			return parseMailBoxName(store, collectionName);
-		} catch (IMAPException e) {
-			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
-	}
-
-	private String parseMailBoxName(StoreClient store, String collectionName) throws IMAPException {
 		if (collectionName.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
 		
 		int slash = collectionName.lastIndexOf("email\\");
 		final String boxName = collectionName.substring(slash + "email\\".length());
-		final ListResult lr = listAllFolder(store);
-		for (final ListInfo i: lr) {
+		final MailboxFolders lr = listAllFolders(bs);
+		for (final MailboxFolder i: lr) {
 			if (i.getName().toLowerCase().contains(boxName.toLowerCase())) {
 				return i.getName();
 			}
 		}
-		throw new IMAPException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
+		throw new MailException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
 	}
+
 	 
 	@Override
 	public void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) 
@@ -188,7 +218,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionPath);
+			String mailBoxName = parseMailBoxName(bs, collectionPath);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
@@ -210,8 +240,8 @@ public class ImapMailboxService implements MailboxService {
 		Collection<Long> newUid = null;
 		try {
 			login(store);
-			String srcMailBox = parseMailBoxName(store, srcFolder);
-			String dstMailBox = parseMailBoxName(store, dstFolder);
+			String srcMailBox = parseMailBoxName(bs, srcFolder);
+			String dstMailBox = parseMailBoxName(bs, dstFolder);
 			store.select(srcMailBox);
 			List<Long> uids = Arrays.asList(uid);
 			newUid = store.uidCopy(uids, dstMailBox);
@@ -239,7 +269,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			store.select(parseMailBoxName(store, collectionName));
+			store.select(parseMailBoxName(bs, collectionName));
 			for (Long uid : uids) {
 				mails.add(store.uidFetchMessage(uid));
 			}
@@ -262,7 +292,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, collectionName);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.ANSWERED);
@@ -304,6 +334,8 @@ public class ImapMailboxService implements MailboxService {
 			throw new ProcessingEmailException(e);
 		} catch (SMTPException e) {
 			throw new ProcessingEmailException(e);
+		} catch (MailException e) {
+			throw new ProcessingEmailException(e);
 		} finally {
 			closeStream(streamMail);
 		}
@@ -325,7 +357,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, collectionName);
 			store.select(mailBoxName);
 			return store.uidFetchPart(mailUid, mimePartAddress);
 		} catch (IMAPException e) {
@@ -343,7 +375,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionPath);
+			String mailBoxName = parseMailBoxName(bs, collectionPath);
 			store.select(mailBoxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
 			Collection<Long> uids = store.uidSearch(new SearchQuery());
@@ -387,20 +419,20 @@ public class ImapMailboxService implements MailboxService {
 	 * @return the imap uid of the mail
 	 * @throws StoreEmailException
 	 */
-	private Long storeInSent(BackendSession bs, InputStream mail) throws StoreEmailException {
+	private Long storeInSent(BackendSession bs, InputStream mail) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			String sentFolderName = null;
-			ListResult lr = listAllFolder(store);
-			for (ListInfo i: lr) {
+			MailboxFolders lr = listAllFolders(bs);
+			for (MailboxFolder i: lr) {
 				if (i.getName().toLowerCase().endsWith("sent")) {
 					sentFolderName = i.getName();
 				}
 			}
 			return storeMail(store, sentFolderName,true, mail, true);
 		} catch (IMAPException e) {
-			throw new StoreEmailException("Error during store mail in Sent folder", e);
+			throw new MailException("Error during store mail in Sent folder", e);
 		} finally {
 			store.logout();
 		}
@@ -471,7 +503,7 @@ public class ImapMailboxService implements MailboxService {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			store.select( parseMailBoxName(store, collectionName) );
+			store.select( parseMailBoxName(bs, collectionName) );
 			Collection<Long> uids = store.uidSearch(new SearchQuery(null, windows));
 			Collection<FastFetch> mails = store.uidFetchFast(uids);
 			return EmailFactory.listEmailFromFastFetch(mails);

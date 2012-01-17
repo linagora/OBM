@@ -1,5 +1,11 @@
 package org.obm.push.mail;
 
+import java.util.Properties;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+
 import org.minig.imap.IdleClient;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
@@ -10,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.sun.mail.imap.IMAPStore;
 
 public class ImapClientProviderImpl implements ImapClientProvider {
 
@@ -68,6 +75,22 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		String login = getLogin(bs);
 		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, loginWithDomain);
 		return new IdleClient(locateImap(bs), 143, login, bs.getPassword());
+	}
+
+
+	@Override
+	public IMAPStore getJavaxMailImapClient(BackendSession bs) throws MailException {
+		try {
+			Properties properties = new Properties();
+			Session session = Session.getDefaultInstance(properties);
+			Store imapStore = session.getStore("imap");
+			final String imapHost = locateImap(bs);
+			final String login = getLogin(bs);
+			imapStore.connect(imapHost, imapPort, login, bs.getPassword());
+			return (IMAPStore) imapStore;
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		}
 	}
 	
 }

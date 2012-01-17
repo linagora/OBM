@@ -52,7 +52,6 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPHeaders;
 import org.minig.imap.InternalDate;
-import org.minig.imap.ListResult;
 import org.minig.imap.NameSpaceInfo;
 import org.minig.imap.QuotaInfo;
 import org.minig.imap.SearchQuery;
@@ -62,9 +61,7 @@ import org.minig.imap.command.CreateCommand;
 import org.minig.imap.command.DeleteCommand;
 import org.minig.imap.command.ExpungeCommand;
 import org.minig.imap.command.ICommand;
-import org.minig.imap.command.ListCommand;
 import org.minig.imap.command.LoginCommand;
-import org.minig.imap.command.LsubCommand;
 import org.minig.imap.command.NamespaceCommand;
 import org.minig.imap.command.NoopCommand;
 import org.minig.imap.command.QuotaRootCommand;
@@ -232,14 +229,6 @@ public class ClientSupport {
 
 	public boolean select(String mailbox) {
 		return run(new SelectCommand(mailbox));
-	}
-
-	public ListResult listSubscribed() {
-		return run(new LsubCommand());
-	}
-
-	public ListResult listAll() {
-		return run(new ListCommand());
 	}
 
 	public Set<String> capabilities() {

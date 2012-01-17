@@ -60,16 +60,6 @@ public class CustomerStoreTests extends LoggedTestCase {
 		sc.noop();
 	}
 
-	public void testList() {
-		ListResult lr = sc.listAll();
-		assertNotNull(lr);
-	}
-
-	public void testLsub() {
-		ListResult lr = sc.listSubscribed();
-		assertNotNull(lr);
-	}
-
 	public void testUidSearch() {
 		SearchQuery sq = new SearchQuery();
 		sc.select("INBOX");
