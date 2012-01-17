@@ -47,6 +47,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
@@ -276,11 +277,11 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Event event, String serverId) throws DaoException {
-		ItemChange ic = new ItemChange();
-		ic.setServerId(serverId);
-		
-		IApplicationData ev = convertObmObjectToMSObject(bs, event);
-		ic.setData(ev);
+		IApplicationData ev = eventService.convertEventToMSEvent(bs, event);
+		ItemChange ic = new ItemChangeBuilder()
+			.withServerId(serverId)
+			.withApplicationData(ev)
+			.build();
 		return ic;
 	}
 
@@ -554,10 +555,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return ret;
 	}
 
-	private IApplicationData convertObmObjectToMSObject(BackendSession bs, Event event) throws DaoException {
-		return eventService.convertEventToMSEvent(bs, event);
-	}
-	
 	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
 		final List<ItemChange> ret = Lists.newArrayListWithCapacity(uids.size());
 		final AccessToken token = login(bs);
