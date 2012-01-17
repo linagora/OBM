@@ -1322,7 +1322,7 @@ public class ContactDao {
 		return found;
 	}
 
-	public List<AddressBook> findAddressBooks(Connection con, AccessToken at) {
+	public List<AddressBook> findAddressBooks(AccessToken at) throws SQLException {
 		List<AddressBook> ret = new LinkedList<AddressBook>();
 		String q = "SELECT AddressBook.id as uid, "
 			+ " AddressBook.name as name"
@@ -1350,10 +1350,11 @@ public class ContactDao {
 			+ "  WHERE of_usergroup_user_id = ? AND entityright_read = 1 "
 			+ ") AS Rights ON AddressBook.id = Rights.addressbookentity_addressbook_id";
 
+		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-
 		try {
+			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 			int idx = 1;
 			ps.setInt(idx++, at.getObmId());
@@ -1364,12 +1365,10 @@ public class ContactDao {
 			while (rs.next()) {
 				ret.add(new AddressBook(rs.getString(2), rs.getInt(1), false));
 			}
-		} catch (SQLException se) {
-			logger.error(se.getMessage(), se);
+			return ret;
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
-		return ret;
 	}
 
 	private List<Contact> searchContact(AccessToken at, List<AddressBook> addrBooks, Connection con, String querys, int limit) 
@@ -1474,33 +1473,27 @@ public class ContactDao {
 		return ret;
 	}
 
-	/**
-	 * Search contacts. Query will match against lastname, firstname & email
-	 * prefixes.
-	 */
-	public List<Contact> searchContact(AccessToken at, String querys, int limit) {
+	public List<Contact> searchContactsInAddressBookList(AccessToken at, List<AddressBook> addrBooks, String querys, int limit) 
+			throws MalformedURLException, LocatorClientException, SQLException {
+		
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			List<AddressBook> addrBooks = findAddressBooks(con, at);
 			return searchContact(at, addrBooks, con, querys, limit);
-		} catch (Throwable e1) {
-			logger.error(e1.getMessage(), e1);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
-		return new ArrayList<Contact>();
 	}
 
 	/**
 	 * Search contacts. Query will match against lastname, firstname & email
 	 * prefixes.
 	 */
-	public List<Contact> searchContact(AccessToken at, AddressBook book, String querys, int limit) {
+	public List<Contact> searchContact(AccessToken at, AddressBook book, String query, int limit) {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return searchContact(at, Arrays.asList(book), con, querys, limit);
+			return searchContact(at, Arrays.asList(book), con, query, limit);
 		} catch (Throwable e1) {
 			logger.error(e1.getMessage(), e1);
 		} finally {

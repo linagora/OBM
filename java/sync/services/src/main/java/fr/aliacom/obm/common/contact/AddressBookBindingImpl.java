@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import javax.naming.NoPermissionException;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
@@ -119,19 +121,14 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional
 	public List<AddressBook> listAllBooks(AccessToken token) throws ServerFault {
-		Connection con = null;
 		try {
-			con = obmHelper.getConnection();
-			List<AddressBook> addressBooks = contactDao.findAddressBooks(con, token);
+			List<AddressBook> addressBooks = contactDao.findAddressBooks(token);
 			addressBooks.add(
 					new AddressBook(contactConfiguration.getAddressBookUsersName(), 
 							contactConfiguration.getAddressBookUserId(), true));
 			return addressBooks;
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault("error finding addressbooks ");
-		} finally {
-			obmHelper.cleanup(con, null, null);
+		} catch (SQLException e) {
+			throw new ServerFault(e.getMessage(), e);
 		}
 	}
 	
@@ -300,14 +297,19 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public List<Contact> searchContact(AccessToken token, String query, int limit) 
-		throws ServerFault {
-
+	public List<Contact> searchContact(AccessToken token, String query, int limit) throws ServerFault {
 		try {
-			return contactDao.searchContact(token, query, limit);
-		} catch (Throwable e) {
+			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
+			return contactDao.searchContactsInAddressBookList(token, addrBooks, query, limit);
+		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
+			throw new ServerFault(e.getMessage(), e);
+		} catch (MalformedURLException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage(), e);
+		} catch (LocatorClientException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage(), e);
 		}
 	}
 
