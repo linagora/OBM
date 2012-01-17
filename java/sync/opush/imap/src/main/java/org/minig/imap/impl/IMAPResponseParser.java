@@ -53,7 +53,10 @@ public class IMAPResponseParser {
 		String response = msg.getMessageLine();
 		IMAPResponse r = new IMAPResponse();
 		int idx = response.indexOf(' ');
-		if (idx < 0) {
+		if (idx == -1 && response.length() == 1) {
+			idx = 1;
+		}
+		if (idx < 0)  {
 			logger.warn("response without space (forcing bad status): "+response);
 			r.setStatus("BAD");
 			r.setPayload(response);
@@ -66,11 +69,14 @@ public class IMAPResponseParser {
 		if (statusIdx < 0) {
 			statusIdx = response.length();
 		}
-		String status = response.substring(idx + 1, statusIdx);
-		if (logger.isDebugEnabled()) {
-			logger.debug("TAG: " + tag + " STATUS: " + status);
+		if (idx + 1 < statusIdx) {
+			String status = response.substring(idx + 1, statusIdx);
+			if (logger.isDebugEnabled()) {
+				logger.debug("TAG: " + tag + " STATUS: " + status);
+			}
+			r.setStatus(status);
 		}
-		r.setStatus(status);
+		
 
 		boolean clientDataExpected = false;
 		if ("+".equals(tag) || !"*".equals(tag)) {
