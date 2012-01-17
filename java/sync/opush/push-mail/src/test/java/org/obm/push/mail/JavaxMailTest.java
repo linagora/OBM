@@ -33,34 +33,42 @@ package org.obm.push.mail;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Properties;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
 
 import org.fest.assertions.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.obm.configuration.EmailConfiguration;
+import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
-import org.obm.push.bean.User;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-public class ImapMailboxServiceTest {
+public class JavaxMailTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
-	@Inject MailboxService mailboxService;
+	@Inject LocatorService locatorService;
+	@Inject EmailConfiguration emailConfig;
 	
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
+	private String emailHost;
 
 	@Before
 	public void setUp() {
@@ -68,22 +76,51 @@ public class ImapMailboxServiceTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
+	    emailHost = locatorService.getServiceLocation("mail/imap_frontend", mailbox);
 	}
 	
 	@After
 	public void tearDown() {
 		greenMail.stop();
 	}
-	
+
 	@Test
-	public void testFetchFast() throws MailException, InterruptedException {
-		Date before = new Date();
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		BackendSession bs = new BackendSession(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+	public void testReceiveMailUsingJavaMail() throws InterruptedException, NoSuchProviderException, MessagingException {
+		sendOneEmail();
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+
+		Collection<Message> emails = getUserMails(emailHost, emailConfig.imapPort());
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+
+	private Collection<Message> getUserMails(String host, int port)
+			throws MessagingException {
+		Store userStore = getConnectedUserImapStore(host, port);
+		Folder userInboxFolder = getUserInboxFolder(userStore);
+		return openFolderAndGetMessages(userInboxFolder);
+	}
+
+	private Store getConnectedUserImapStore(String host, int port)
+			throws NoSuchProviderException, MessagingException {
+		Session session = Session.getDefaultInstance(new Properties());
+		Store imapStore = session.getStore("imap");
+		imapStore.connect(host, port, mailbox, password);
+		return imapStore;
+	}
+
+	private Folder getUserInboxFolder(Store userStore) throws MessagingException {
+		Folder userRootFolder = userStore.getDefaultFolder();
+		Folder userInboxFolder = userRootFolder.getFolder(IMAP_INBOX_NAME);
+		return userInboxFolder;
+	}
+	
+	private Collection<Message> openFolderAndGetMessages(Folder userInboxFolder)
+			throws MessagingException {
+		userInboxFolder.open(Folder.READ_ONLY);
+		return Arrays.asList(userInboxFolder.getMessages());
+	}
+
+	private void sendOneEmail() {
+		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 	}
 }
