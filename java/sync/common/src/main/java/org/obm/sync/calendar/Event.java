@@ -41,6 +41,7 @@ import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class Event implements Indexed<Integer> {
 
@@ -484,6 +485,31 @@ public class Event implements Indexed<Integer> {
 			hasImportantChanges = true;
 		}
 		return hasImportantChanges;
+	}
+	
+	public boolean hasImportantChangesExceptedEventException(Event event) {
+		ComparatorUsingEventHasImportantChanges comparator = new ComparatorUsingEventHasImportantChanges();
+		boolean hasImportantChanges = false;
+		if (comparator.equals(this, event)) {
+			if (this.recurrence != null) {
+				hasImportantChanges =  this.recurrence.hasImportantChangesExceptedEventException(event.getRecurrence());
+			}
+		} else {
+			hasImportantChanges = true;
+		}
+		return hasImportantChanges;
+	}
+	
+	public List<Event> getExceptionsWithImportantChanges(Event event) {
+		if (event.getRecurrence() == null) {
+			return Lists.newArrayList();
+		}
+		else if (recurrence == null) {
+			return event.getRecurrence().getEventExceptions();
+		}
+		else {
+			return this.recurrence.getExceptionsWithImportantChanges(event.getRecurrence());
+		}
 	}
 	
 	public boolean hasChangesOnEventAttributesExceptedEventException(Event event) {

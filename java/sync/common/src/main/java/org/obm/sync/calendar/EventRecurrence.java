@@ -139,19 +139,39 @@ public class EventRecurrence {
 	}
 	
 	public boolean hasImportantChanges(EventRecurrence recurrence) {
+		boolean hasImportantChangesExceptedEventException = hasImportantChangesExceptedEventException(recurrence);
+		if(hasImportantChangesExceptedEventException) {
+			return true;
+		}
+		
+		if (recurrence != null && !(this.eventExceptions.size() == recurrence.eventExceptions.size())) {
+			return true;
+		}
+		
+		Collection<Event> difference = getExceptionsWithImportantChanges(recurrence);
+		return !difference.isEmpty();
+	}
+
+	public List<Event> getExceptionsWithImportantChanges(EventRecurrence recurrence) {
+		Set<Event> difference = Sets.difference(this.getEventExceptions(),
+				recurrence.getEventExceptions(),
+				new ComparatorUsingEventHasImportantChanges());
+		List<Event> exceptionsWithImportantChanges = Lists.newArrayList(difference);
+		return exceptionsWithImportantChanges;
+	}
+	
+	public boolean hasImportantChangesExceptedEventException(EventRecurrence recurrence) {
 		if (recurrence == null) {
 			return true;
 		}
 		if ( !(Objects.equal(this.end, recurrence.end)
 				&& Objects.equal(this.kind, recurrence.kind)
 				&& Objects.equal(this.frequence, recurrence.frequence)
-				&& (this.eventExceptions.size() == recurrence.eventExceptions.size())
 				&& (this.exceptions.size() == recurrence.exceptions.size())) ) {
 			return true;
 		}
-		Set<Event> difference = Sets.difference(this.getEventExceptions(), recurrence.getEventExceptions(), 
-				new ComparatorUsingEventHasImportantChanges());
-		return !difference.isEmpty();
+		
+		return false;
 	}
 	
 	public List<Event> getEventExceptionWithChangesExceptedOnException(EventRecurrence recurrence) {

@@ -387,10 +387,19 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			boolean hasImportantChanges = hasImportantChanges(before, event);
-			if (hasImportantChanges) {
-                changePartipationState(token, event);
-            }
 
+			if (before.hasImportantChangesExceptedEventException(event)) {
+                changePartipationState(token, event);
+                if(event.isRecurrent()) {
+	                EventRecurrence eventRecurrence = event.getRecurrence();
+	                List<Event> eventsExceptions = eventRecurrence.getEventExceptions();
+	                changePartipationStateOfException(token, eventsExceptions);
+                }
+            }
+			
+			List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
+			changePartipationStateOfException(token, exceptionWithChanges);
+			
 			final Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
 			setAttendeeCanWriteOnCalendar(token, after);
@@ -403,7 +412,6 @@ public class CalendarBindingImpl implements ICalendar {
             if(before.hasChangesOnEventAttributesExceptedEventException(after)) {
             	eventChangeHandler.update(user, before, after, notification, hasImportantChanges, token);
             } else if(after != null){
-            	List<Event> exceptionWithChanges = after.getEventExceptionWithModifiedAttributes(before);
 				for(Event exception : exceptionWithChanges) {
 					Event previousException = before.getEventInstanceWithRecurrenceId(exception.getRecurrenceId());
 					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges, token);
@@ -414,6 +422,13 @@ public class CalendarBindingImpl implements ICalendar {
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	private void changePartipationStateOfException(AccessToken token,
+			List<Event> exceptionWithChanges) {
+		for(Event exception : exceptionWithChanges) {
+			changePartipationState(token, exception);
 		}
 	}
 

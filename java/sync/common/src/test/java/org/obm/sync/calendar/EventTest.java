@@ -428,6 +428,31 @@ public class EventTest {
 	}
 	
 	@Test
+	public void testHasImportantChangesExceptedEventExceptionWithoutChanges() {
+		Event ev1 = createOneEvent(3);
+		Event ev2 = ev1.clone();
+		
+		EventRecurrence recurrence = createRecurrence(ev1);
+		ev2.setRecurrence(recurrence);
+		
+		boolean change = ev1.hasImportantChangesExceptedEventException(ev2);
+		
+		Assert.assertFalse(change);
+	}
+	
+	@Test
+	public void testHasImportantChangesExceptedEventExceptionWithChanges() {
+		Event ev1 = createOneEvent(3);
+		Event ev2 = ev1.clone();
+		
+		ev2.setLocation("a new location");
+		
+		boolean change = ev1.hasImportantChangesExceptedEventException(ev2);
+		
+		Assert.assertTrue(change);
+	}
+	
+	@Test
 	public void getEventInstanceWithRecurrenceIdWithoutExistedException(){
 		Event ev1 = createOneEvent(3);
 		Calendar cal = Calendar.getInstance();

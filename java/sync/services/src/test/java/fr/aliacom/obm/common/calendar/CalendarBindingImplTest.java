@@ -497,6 +497,7 @@ public class CalendarBindingImplTest {
 		event.setInternalEvent(true);
 		event.setExtId(extId);
 		event.addAttendee(attendee);
+		event.setLocation("aLocation");
 		event.setSequence(1);
 		
 		ObmUser obmUser = new ObmUser();
@@ -770,6 +771,7 @@ public class CalendarBindingImplTest {
 		event.setInternalEvent(true);
 		event.setExtId(extId);
 		event.addAttendee(attendee);
+		event.setLocation("aLocation");
 		event.setSequence(1);
 
 		ObmUser obmUser = new ObmUser();
@@ -806,6 +808,84 @@ public class CalendarBindingImplTest {
 				.getState());
 	}
 
+	
+	@Test
+	public void testCreateAnEventExceptionAndUpdateItsStatusButNotTheParent() throws FindException, SQLException, EventNotFoundException, ServerFault {
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String calendar = "cal1";
+		String userEmail = "user@domain1";
+		String attendeeEmail = "attendee@domain1";
+		EventExtId extId = new EventExtId("extId");
+		boolean updateAttendee = true;
+		boolean notification = false;
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.lookup("daily"));
+
+		Attendee attendee = getFakeAttendee(userEmail);
+		attendee.setState(ParticipationState.ACCEPTED);
+		Attendee attendee2 = getFakeAttendee(attendeeEmail);
+		attendee2.setState(ParticipationState.ACCEPTED);
+		
+		Event beforeEvent = new Event();
+		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setInternalEvent(true);
+		beforeEvent.setExtId(extId);
+		beforeEvent.addAttendee(attendee);
+		beforeEvent.addAttendee(attendee2);
+		beforeEvent.setRecurrence(recurrence);
+		beforeEvent.setSequence(0);
+		
+		Event eventException = beforeEvent.clone();
+		EventRecurrence recurrence2 = new EventRecurrence();
+		recurrence2.setKind(RecurrenceKind.lookup("none"));
+		eventException.setRecurrence(recurrence2);
+		eventException.setRecurrenceId(new Date());
+		beforeEvent.getRecurrence().addEventException(eventException);
+		
+		Event event = beforeEvent.clone();
+		event.setSequence(1);
+		event.getRecurrence().getEventExceptions().get(0).setLocation("aLocation");
+		
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+
+		AccessToken accessToken = mockAccessToken(calendar, fixtures.domain);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+
+		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser)
+				.atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
+				beforeEvent).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(true)
+				.atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee2.getEmail())).andReturn(false)
+		.atLeastOnce();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
+						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+		
+		eventChangeHandler.update(obmUser, beforeEvent.getRecurrence().getEventExceptionWithRecurrenceId(eventException.getRecurrenceId()), 
+				event.getRecurrence().getEventExceptionWithRecurrenceId(eventException.getRecurrenceId()), notification, true, accessToken);
+		EasyMock.expectLastCall().atLeastOnce();
+		
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, helper, null, null);
+		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
+				notification);
+
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0)
+				.getState());		
+		Assert.assertEquals(ParticipationState.NEEDSACTION, newEvent.getRecurrence().getEventExceptions().get(0).getAttendees().get(1)
+				.getState());
+	}
+	
 	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException, EventNotFoundException {
 		ColdWarFixtures fixtures = new ColdWarFixtures();
 		String calendar = "cal1";
