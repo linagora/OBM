@@ -32,7 +32,6 @@
 package org.obm.push.calendar;
 
 import java.security.InvalidParameterException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,7 +76,6 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -406,6 +404,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return null;
 	}
 
+	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException {
 		
@@ -535,82 +534,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return ret;
 	}
 	
-	public List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) throws DaoException {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
-		AccessToken token = login(bs);
-		for (EventObmId itemId : uids) {
-			try {
-				Event e = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), itemId);
-				if (e != null) {
-					String serverId = getServerIdFor(collectionId, e.getObmId());
-					ret.add(createItemChangeToAddFromEvent(bs, e, serverId));
-				}
-			} catch (ServerFault e) {
-				logger.error(e.getMessage(), e);
-			} catch (EventNotFoundException e) {
-				logger.error("fetchItems : event from extId {} not found", itemId);
-			}
-		}
-		logout(token);
-		return ret;
-	}
-
-	public List<ItemChange> fetchDeletedItems(BackendSession bs, Integer collectionId, Collection<EventObmId> uids) {
-		final List<ItemChange> ret = Lists.newArrayListWithCapacity(uids.size());
-		final AccessToken token = login(bs);
-		for (final EventObmId eventUid : uids) {
-			try {
-				Event event = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventUid);
-				if (event != null) {
-					ret.add(getItemChange(collectionId, event.getObmId()));
-				}
-			} catch (ServerFault e) {
-				logger.error(e.getMessage(), e);
-			} catch (EventNotFoundException e) {
-				logger.error("fetchDeletedItems : event from extId {} not found", eventUid);
-			}
-		}
-		logout(token);
-		return ret;
-	}
-	
-	
-	public Integer getCollectionId(BackendSession bs) throws CollectionNotFoundException, DaoException {
-		String calPath = getDefaultCalendarName(bs);
-		return mappingService.getCollectionIdFor(bs.getDevice(), calPath);
-	}
-
-	public Event getEventFromServerId(BackendSession bs, String serverId) {
-		
-		final AccessToken token = login(bs);
-		try {
-			return getEventFromServerId(token, bs.getUser().getLoginAtDomain(), serverId);
-		} catch (EventNotFoundException e) {
-			logger.error(e.getMessage(), e);
-		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			logout(token);
-		}
-		return null;
-	}
-
-
 	private Event getEventFromServerId(AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
 		Integer itemId = mappingService.getItemIdFromServerId(serverId);
 		if (itemId == null) {
 			return null;
 		}
 		return calendarClient.getEventFromId(token, calendar, new EventObmId(itemId));
-	}
-
-	
-	public EventExtId getEventExtIdFromServerId(BackendSession bs, String serverId) {
-		Event event = getEventFromServerId(bs, serverId);
-		if (event != null) {
-			return event.getExtId();
-		}
-		return null;
 	}
 
 	@Override
