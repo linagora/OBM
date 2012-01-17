@@ -238,6 +238,16 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
+	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		params.put("query", query);
+		params.put("limit", String.valueOf(limit));
+		Document doc = execute(token, "/book/searchContactsInSynchronizedAddressBooks", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseListContact(doc.getDocumentElement());
+	}
+	
+	@Override
 	protected Locator getLocator() {
 		return Locator;
 	}

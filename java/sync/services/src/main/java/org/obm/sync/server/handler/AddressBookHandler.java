@@ -115,6 +115,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			unsubscribeBook(token, params, responder);
 		} else if ("listAddressBooksChanged".equals(method)) {
 			listAddressBooksChanged(token, params, responder);
+		} else if ("searchContactsInSynchronizedAddressBooks".equals(method)) {
+			searchContactsInSynchronizedAddressBooks(token, params, responder);
 		} else {
 			responder.sendError("Cannot handle method '" + method + "'");
 		}
@@ -289,6 +291,15 @@ public class AddressBookHandler extends SecureSyncHandler {
 		Date lastSync = getLastSyncFromParams(params);
 		FolderChanges folderChanges = binding.listAddressBooksChanged(token, lastSync);
 		responder.sendlistAddressBooksChanged(folderChanges);	
+	}
+	
+	private void searchContactsInSynchronizedAddressBooks(AccessToken token, ParametersSource params, 
+			XmlResponder responder) throws ServerFault {
+		
+		String query = p(params, "query");
+		int limit = Integer.parseInt(p(params, "limit"));
+		List<Contact> ret = binding.searchContactsInSynchronizedAddressBooks(token, query, limit);
+		responder.sendListContact(ret);
 	}
 	
 }

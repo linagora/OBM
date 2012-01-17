@@ -132,5 +132,7 @@ public interface IAddressBook {
 	FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault;
 
 	ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
+
+	List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault;
 	
 }

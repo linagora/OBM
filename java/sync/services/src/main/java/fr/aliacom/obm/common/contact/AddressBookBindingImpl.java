@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -300,7 +301,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public List<Contact> searchContact(AccessToken token, String query, int limit) throws ServerFault {
 		try {
 			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
-			return contactDao.searchContactsInAddressBookList(token, addrBooks, query, limit);
+			return contactDao.searchContactsInAddressBooksList(token, addrBooks, query, limit);
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
@@ -396,6 +397,24 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 		
+	@Override
+	@Transactional
+	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault {
+		try {
+			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);
+			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit);
+		} catch (SQLException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage(), e);
+		} catch (MalformedURLException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage(), e);
+		} catch (LocatorClientException e) {
+			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			throw new ServerFault(e.getMessage(), e);
+		}
+	}
+	
 	private Date getLastSync() throws ServerFault {
 		Connection connection = null;
 		try {

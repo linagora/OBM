@@ -41,6 +41,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,8 +63,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.obm.locator.LocatorClientException;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
@@ -1371,7 +1372,7 @@ public class ContactDao {
 		}
 	}
 
-	private List<Contact> searchContact(AccessToken at, List<AddressBook> addrBooks, Connection con, String querys, int limit) 
+	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit) 
 			throws MalformedURLException, SQLException, LocatorClientException {
 		
 		List<Contact> ret = new LinkedList<Contact>();
@@ -1395,15 +1396,15 @@ public class ContactDao {
 					idx++;
 				}
 				sb.append(")");
-				if (querys != null && !"".equals(querys)) {
+				if (query != null && !"".equals(query)) {
 					sb.append(" +(displayname:(");
-					sb.append(querys.toLowerCase());
+					sb.append(query.toLowerCase());
 					sb.append("*) OR firstname:(");
-					sb.append(querys.toLowerCase());
+					sb.append(query.toLowerCase());
 					sb.append("*) OR lastname:(");
-					sb.append(querys.toLowerCase());
+					sb.append(query.toLowerCase());
 					sb.append("*) OR email:(");
-					sb.append(querys.toLowerCase());
+					sb.append(query.toLowerCase());
 					sb.append("*))");
 				}
 				SolrQuery params = new SolrQuery();
@@ -1473,13 +1474,13 @@ public class ContactDao {
 		return ret;
 	}
 
-	public List<Contact> searchContactsInAddressBookList(AccessToken at, List<AddressBook> addrBooks, String querys, int limit) 
+	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit) 
 			throws MalformedURLException, LocatorClientException, SQLException {
 		
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return searchContact(at, addrBooks, con, querys, limit);
+			return searchContact(at, addrBooks, con, query, limit);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1679,6 +1680,35 @@ public class ContactDao {
 	public Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
 		String sql = getSelectForFindRemovalCandidates(addressBookId, token);
 		return findRemovalCandidates(sql, lastSync);
+	}
+
+	public Collection<AddressBook> listSynchronizedAddressBooks(AccessToken token) throws SQLException {
+		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
+				+ " FROM AddressBook a"
+				+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?)"
+				+ " INNER JOIN UserObm ON (owner=userobm_id)"
+				+ " WHERE (a.syncable OR a.name=?)";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(q);
+			int idx = 1;
+			ps.setInt(idx++, token.getObmId());
+			ps.setString(idx++, contactConfiguration.getDefaultAddressBookName());
+			rs = ps.executeQuery();
+
+			Set<AddressBook> listAddressBooks = new HashSet<AddressBook>();
+			while (rs.next()) {
+				listAddressBooks.add(new AddressBook(rs.getString(2), rs.getInt(1), false));
+			}
+			return listAddressBooks;
+			
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
 	}
 	
 }

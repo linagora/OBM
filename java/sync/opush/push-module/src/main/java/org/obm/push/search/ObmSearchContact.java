@@ -75,7 +75,7 @@ public class ObmSearchContact implements ISearchSource {
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		ContactConverter cc = new ContactConverter();
 		try {
-			List<Contact> contacts = bc.searchContact(token, query, limit);
+			List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit);
 			for (Contact contact: contacts) {
 				ret.add(cc.convertToSearchResult(contact));
 			}
