@@ -72,7 +72,7 @@ public interface MailboxService {
 
 	Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 
-	Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws StoreEmailException;
+	boolean storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws StoreEmailException;
 
 	boolean getLoginWithDomain();
 

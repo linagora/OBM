@@ -41,9 +41,7 @@ import org.minig.imap.FlagsList;
 import org.minig.imap.impl.IMAPResponse;
 import org.obm.push.utils.FileUtils;
 
-import com.google.common.collect.Iterables;
-
-public class AppendCommand extends Command<Long> {
+public class AppendCommand extends Command<Boolean> {
 
 	private InputStream in;
 	private String mailbox;
@@ -81,18 +79,8 @@ public class AppendCommand extends Command<Long> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		boolean isOk = isOk(rs);
-		if (isOk) {
-			String s = Iterables.getLast(rs).getPayload();
-			int idx = s.lastIndexOf("]");
-			int space = s.lastIndexOf(' ', idx - 1);
-			data = Long.parseLong(s.substring(space + 1, idx));
-		} else {
-			data = -1l;
-			for (IMAPResponse resp : rs) {
-				imaplogger.warn("S: '" + resp.getPayload() + "'");
-			}
-		}
+		IMAPResponse r = rs.get(rs.size() - 1);
+		data = r.isOk();
 	}
 
 }

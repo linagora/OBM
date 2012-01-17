@@ -32,7 +32,6 @@
 
 package org.minig.imap;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -103,35 +102,10 @@ public class BasicStoreTests extends LoggedTestCase {
 	public void testAppend() {
 		FlagsList fl = new FlagsList();
 		fl.add(Flag.SEEN);
-		long uid = sc.append("INBOX", getRfc822Message(), fl);
-		assertTrue(uid > 0);
-		long secondUid = sc.append("INBOX", getUtf8Rfc822Message(), fl);
-		assertTrue("Added uids : " + uid + " " + secondUid, secondUid == uid + 1);
-	}
-
-	public void testUidFetchMessage() {
-		FlagsList fl = new FlagsList();
-		fl.add(Flag.SEEN);
-		long uid = sc.append("INBOX", getUtf8Rfc822Message(), fl);
-		sc.select("INBOX");
-		InputStream in = sc.uidFetchMessage(uid);
-		assertNotNull(in);
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			FileUtils.transfer(in, out, true);
-		} catch (IOException e) {
-			fail(e.getMessage());
-		}
-
-		for (int i = 0; i < COUNT; i++) {
-			sc.uidFetchMessage(uid);
-			out = new ByteArrayOutputStream();
-			try {
-				FileUtils.transfer(in, out, true);
-			} catch (IOException e) {
-				fail("error");
-			}
-		}
+		boolean firstEmailAppendOK = sc.append("INBOX", getRfc822Message(), fl);
+		boolean secondEmailAppendOK = sc.append("INBOX", getUtf8Rfc822Message(), fl);
+		assertTrue(firstEmailAppendOK);
+		assertTrue("Added status : " + firstEmailAppendOK + " " + secondEmailAppendOK, secondEmailAppendOK);
 	}
 
 	public void testNested() {
@@ -256,30 +230,6 @@ public class BasicStoreTests extends LoggedTestCase {
 			assertNotNull(mts);
 		} catch (Throwable t) {
 			fail(t.getMessage());
-		}
-	}
-
-	public void testUidFetchBodyStructure() {
-		FlagsList fl = new FlagsList();
-		fl.add(Flag.SEEN);
-		Collection<Long> uid = Arrays.asList(
-				sc.append("INBOX", getUtf8Rfc822Message(), fl),
-				sc.append("INBOX", getRfc822Message(), fl));
-		sc.select("INBOX");
-		sc.uidFetchBodyStructure(uid);
-
-		for (int i = 0; i < COUNT; i++) {
-			sc.uidFetchBodyStructure(uid);
-		}
-
-		sc.select("INBOX");
-		Collection<Long> allUids = sc.uidSearch(new SearchQuery());
-		for (long l : allUids) {
-			try {
-				sc.uidFetchBodyStructure(Arrays.asList(l));
-			} catch (Throwable t) {
-				fail(t.getMessage());
-			}
 		}
 	}
 

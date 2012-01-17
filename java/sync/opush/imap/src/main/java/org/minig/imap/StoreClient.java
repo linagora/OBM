@@ -145,7 +145,7 @@ public class StoreClient {
 		return cs.noop();
 	}
 
-	public long append(String mailbox, InputStream in, FlagsList fl) {
+	public boolean append(String mailbox, InputStream in, FlagsList fl) {
 		return cs.append(mailbox, in, fl);
 	}
 

@@ -350,11 +350,11 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			
 			if (saveInSent) {
 				streamMail.reset();
-				final Long uid = storeInSent(bs, streamMail);
-				if (uid != null) {
-					logger.info("This mail {} is stored in 'sent' folder.", uid);
+				boolean isMailStoredInSent = storeInSent(bs, streamMail);
+				if (isMailStoredInSent) {
+					logger.info("The mail is stored in the 'sent' folder.");
 				} else {
-					logger.error("The mail can't to be store in 'sent' folder.");
+					logger.error("The mail can't be stored in the 'sent' folder.");
 				}
 			} else {
 				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
@@ -427,7 +427,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Long storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) 
+	public boolean storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) 
 			throws StoreEmailException {
 		
 		logger.info("Store mail in folder[Inbox]");
@@ -450,8 +450,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	 * @param mail the mail that will be stored
 	 * @return the imap uid of the mail
 	 * @throws StoreEmailException
+	 * @throws MailException 
 	 */
-	private Long storeInSent(BackendSession bs, InputStream mail) throws MailException {
+	private boolean storeInSent(BackendSession bs, InputStream mail) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
@@ -476,11 +477,11 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	 *            if true the message will be stored with SEEN Flag
 	 * @param reset
 	 *            if true mailContent will be reseted
-	 * @return the imap uid of the mail
+	 * @return storeMail response status
 	 */
-	private Long storeMail(StoreClient store, String folderName,
+	private boolean storeMail(StoreClient store, String folderName,
 			boolean isRead, InputStream mailContent, boolean reset) {
-		Long ret = null;
+		boolean ret = false;
 		if (folderName != null) {
 			if (reset && mailContent.markSupported()) {
 				mailContent.mark(0);
