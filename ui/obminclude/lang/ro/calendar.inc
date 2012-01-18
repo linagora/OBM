@@ -178,6 +178,7 @@ $l_select_contacts = "Alegeți cel puțin un contact sau un grup";
 $l_select_repeat_day = "Selectați ziua sau zilele de repetare";
 $l_select_pdf_day = "Selectați o zi";
 $l_confirm_delete_all = "Această opțiune va șterge toate vizualizările acestui eveniment pentru toți utilizatorii, doriți să continuați?";
+$l_confirm_delete_single = "This operation will remove this event for all users, are you sure you want to continue?";
 $l_confirm_delete = "Această opțiune va șterge acest eveniment pentru toți utilizatorii, doriți să continuați?";
 $l_conflict_events = "Intervalul sau intervalurile orare alese sunt ocupate pentru";
 $l_fill_title = "Completați câmpul [ $l_title ]";

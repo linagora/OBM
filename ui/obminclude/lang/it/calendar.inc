@@ -135,6 +135,7 @@ $l_post_fatal_error = "Error: Your request failed because the submitted data was
 $l_confirm_reset = "Questa opzione eliminerà completamente il tuo calendario e annullerà la tua partecipazione a tutte le riunioni dove sei stato invitato. Sei sicuro di proseguire? ";
 $l_begin = "Inizio";
 $l_confirm_delete_all = "Questa opzione eliminerà tutte le occorrenze di questo appuntamento per tutti gli utenti, vuoi proseguire?";
+$l_confirm_delete_single = "This operation will remove this event for all users, are you sure you want to continue?";
 $l_view_month_desc = "Guarda gli appuntamenti su un mese";
 $l_toggle_public_write = "Questa opzione permetterà a tutti di modificare sia l'appuntamento che la partecipazione di questa persona all'appuntamento. Vuoi continuare?";
 $l_view_delete = "Elimina tema";

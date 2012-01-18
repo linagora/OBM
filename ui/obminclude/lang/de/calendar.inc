@@ -131,6 +131,7 @@ $l_post_fatal_error = "Error: Your request failed because the submitted data was
 $l_confirm_reset = "Dieser Vorgang wird Ihren Kalender klar und wird Ihrer Teilnahme an den Sitzungen löschen. Wollen Sie wirklich weitergehen ?";
 $l_begin = "Anfang";
 $l_confirm_delete_all = "Dieser Vorgang wird alle Vorkommen dieser Veranstaltung für alle Benutzer löschen, wollen Sie weitergehen ?";
+$l_confirm_delete_single = "This operation will remove this event for all users, are you sure you want to continue?";
 $l_user_right = "Rechte verwalten";
 $l_view_month_desc = "Sehen die Veranstaltungen auf einen Monat";
 $l_toggle_public_write = "Dies führt dazu, dass jeder Sie diesen Termin und die Beteiligung der Person an einem Termin ändern können. Wollen Sie weiterhin?";
