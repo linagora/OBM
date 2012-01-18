@@ -163,7 +163,7 @@ $l_owner_notification = "Notify event owner";
 $l_notification =  "Notify";
 $l_attach_documents = "Attach";
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
-$l_confirm_delete = "This operation will remove the occurence of this event for all users, are you sure you want to continue?";
+$l_confirm_delete = "This operation will remove the occurrence of this event for all users, are you sure you want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";
 $l_update_warning = "Warning: some conflicts have been detected";
@@ -251,7 +251,7 @@ $l_view_day_desc = 'Day view ';
 $l_view_month_desc = "Month view";
 $l_expand_all = "Expand All";
 $l_edit_full = "Advanced";
-$l_confirm_delete_all = "This operation will remove all occurences of this event for all users, are you sure you want to continue?";
+$l_confirm_delete_all = "This operation will remove all occurrences of this event for all users, are you sure you want to continue?";
 $l_confirm_delete_single = "This operation will remove this event for all users, are you sure you want to continue?";
 $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
@@ -374,7 +374,7 @@ This message was sent on %s at %s by %s %s from OBM
 $l_delete_exception_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
-OCCURENCE(S) RESTORED!
+OCCURRENCE(S) RESTORED!
 ------------------------------------------------------------------
 
 One or more occurrences of the appointment %s, initially cancelled 
@@ -389,7 +389,7 @@ This message was sent on %s at %s by %s %s from OBM
 $l_add_exception_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------
-OCCURENCE(S) CANCELLED!
+OCCURRENCE(S) CANCELLED!
 ------------------------------------------------------------------
 
 One or more occurrences of the appointment %s, initially scheduled
