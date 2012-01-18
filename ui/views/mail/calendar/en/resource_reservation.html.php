@@ -43,9 +43,6 @@ A new resource reservation was scheduled
 </td>
     </tr>
     <tr>
-        <td style="text-align:right; width:20%">Resource Name</td><td><?php echo $resourceLabel; ?></td>
-    </tr>
-    <tr>
         <td style="text-align:right; width:20%">Subject</td><td><?php echo $title; ?></td>
     </tr>
     <tr>
