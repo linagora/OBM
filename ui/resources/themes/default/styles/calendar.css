@@ -766,7 +766,7 @@ li.eventOwner19Legend {
 /* OBM 2.2 FreeBusy */
 
 .freeBusyContent {
-  padding-bottom:2em;
+  padding: 0;
 }
 
 .freeBusyContent h2 {
@@ -778,6 +778,7 @@ li.eventOwner19Legend {
   margin-left: 16em;
   padding: 5px 0px 5px 0px;
 }
+
 .freeBusyCalendar {
   margin-right: 2em;
   position: relative;
@@ -835,10 +836,7 @@ li.eventOwner19Legend {
   font-weight: bold;
   padding-left: 1em;
 }
-#meetingInfo{
-  width:15.5em;
-  margin:0 auto;
-}
+
 .freeBusyCalendarHour {
   padding-left: 1px;
 }
@@ -848,7 +846,7 @@ li.eventOwner19Legend {
 }
 
 .freeBusyEntities {
-  width: 22em;
+  width: 15em;
   position: absolute;
   padding: 5px 0px 0px 5px;
 }
@@ -856,7 +854,7 @@ li.eventOwner19Legend {
 .freeBusyEntities table {
   border-spacing:0;
   border-collapse:collapse;
-  width: 22em;
+  width: 15em;
 }
 
 .freeBusyEntities tr {
@@ -923,6 +921,7 @@ li.eventOwner19Legend {
 
 .freeBusyButtons {
   margin-top: 1em;
+  margin-left:16em;
 }
 
 input[type="submit"][disabled] {
