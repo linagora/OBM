@@ -34,7 +34,6 @@ package org.minig.imap.command;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,6 +42,10 @@ import java.util.Locale;
 
 import org.minig.imap.SearchQuery;
 import org.minig.imap.impl.IMAPResponse;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class UIDSearchCommand extends Command<Collection<Long>> {
 
@@ -89,10 +92,11 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 
 			if (uidString != null) {
 				// 9 => '* SEARCH '.length
-				String[] splitted = uidString.substring(9).split(" ");
-				final List<Long> result = new ArrayList<Long>(splitted.length);
-				for (int i = 0; i < splitted.length; i++) {
-					result.add(Long.parseLong(splitted[i]));
+				String uidList = uidString.substring(9);
+				Iterable<String> uids = Splitter.on(' ').omitEmptyStrings().split(uidList);
+				final List<Long> result = Lists.newArrayListWithExpectedSize(Iterables.size(uids));
+				for (String uid : uids) {
+					result.add(Long.valueOf(uid));
 				}
 				data = result;
 			}
