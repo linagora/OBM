@@ -66,7 +66,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public Map<String, String> getSettings(AccessToken token)
 			throws ServerFault {
 		try {
@@ -110,7 +110,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public ForwardingSettings getEmailForwarding(AccessToken token)
 			throws ServerFault {
 		try {
@@ -123,7 +123,7 @@ public class SettingBindingImpl implements ISetting {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public VacationSettings getVacationSettings(AccessToken token)
 			throws ServerFault {
 		try {

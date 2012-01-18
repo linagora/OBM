@@ -33,12 +33,14 @@ package fr.aliacom.obm.freebusy;
 
 import java.util.List;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.domain.DomainDao;
@@ -49,6 +51,7 @@ import fr.aliacom.obm.common.user.UserDao;
 /**
  * Retrieves freebusy data from the local database.
  */
+@Singleton
 public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	private Ical4jHelper ical4jHelper;
 	private DomainDao domainDao;
@@ -65,6 +68,7 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException {
 		String ics = null;
 

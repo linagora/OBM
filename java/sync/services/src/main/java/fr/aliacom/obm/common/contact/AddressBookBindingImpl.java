@@ -103,7 +103,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public boolean isReadOnly(AccessToken token, BookType book) {
 		if (book == BookType.contacts) {
 			return false;
@@ -112,13 +112,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public BookType[] listBooks(AccessToken token) {
 		return new BookType[] { BookType.contacts, BookType.users };
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<AddressBook> listAllBooks(AccessToken token) throws ServerFault {
 		try {
 			List<AddressBook> addressBooks = contactDao.findAddressBooks(token);
@@ -132,7 +132,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
 		logger.info(LogUtils.prefix(token) + "AddressBook : listContactsChanged");
 		try {
@@ -143,7 +143,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date timestamp)
 			throws ServerFault {
 		try {
@@ -272,7 +272,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException {
 		try {
@@ -287,14 +287,14 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public KeyList getContactTwinKeys(AccessToken token, Contact contact) {
 		List<String> keys = contactDao.findContactTwinKeys(token, contact);
 		return new KeyList(keys);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<Contact> searchContact(AccessToken token, String query, int limit) throws ServerFault {
 		try {
 			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
@@ -312,7 +312,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit) throws ServerFault {
 
 		try {
@@ -335,7 +335,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public FolderChanges listAddressBooksChanged(AccessToken token, Date timestamp) throws ServerFault {
 		try {
 			Set<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
@@ -369,7 +369,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
 		try {
 			Set<Integer> removal = null;
@@ -394,7 +394,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 		
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault {
 		try {
 			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);

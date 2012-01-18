@@ -61,7 +61,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<MailingList> listAllMailingList(AccessToken token)
 			throws ServerFault {
 		try {
@@ -121,7 +121,7 @@ public class MailingListBindingImpl implements IMailingList {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=true)
 	public MailingList getMailingListFromId(AccessToken token, Integer id)
 			throws ServerFault {
 		try {

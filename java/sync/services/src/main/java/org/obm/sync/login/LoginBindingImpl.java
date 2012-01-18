@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.login;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
@@ -45,10 +46,11 @@ public class LoginBindingImpl {
 	private final SessionManagement sessionManagement;
 
 	@Inject
-	private LoginBindingImpl(SessionManagement sessionManagement) {
+	protected LoginBindingImpl(SessionManagement sessionManagement) {
 		this.sessionManagement = sessionManagement;
 	}
 	
+	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain) throws ObmSyncVersionNotFoundException {
@@ -56,6 +58,7 @@ public class LoginBindingImpl {
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
 	}
 
+	@Transactional(readOnly=true)
 	public void logout(String sessionId) {
 		sessionManagement.logout(sessionId);
 	}
