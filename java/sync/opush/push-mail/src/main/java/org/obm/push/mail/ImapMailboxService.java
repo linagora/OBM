@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -276,17 +277,12 @@ public class ImapMailboxService implements MailboxService {
 	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			Boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
 		
-		SmtpInvalidRcptException invalidRctp = null;
 		InputStream streamMail = null;
 		try {
 			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
 			streamMail.mark(streamMail.available());
 			
-			try {
-				smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
-			} catch (SmtpInvalidRcptException e1) {
-				invalidRctp = e1;
-			}
+			smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
 			
 			if (saveInSent) {
 				streamMail.reset();
@@ -296,19 +292,20 @@ public class ImapMailboxService implements MailboxService {
 				} else {
 					logger.error("The mail can't to be store in 'sent' folder.");
 				}
+			} else {
+				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
 			}
 			
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
+		} catch (SMTPException e) {
+			throw new ProcessingEmailException(e);
 		} finally {
 			closeStream(streamMail);
 		}
 		
-		if (invalidRctp != null) {
-			throw invalidRctp;
-		}
 	}	
 	
 	private void closeStream(InputStream mimeMail) {

@@ -34,6 +34,7 @@ package org.obm.push.mail;
 import java.io.InputStream;
 import java.util.Set;
 
+import org.columba.ristretto.smtp.SMTPException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
@@ -51,7 +52,7 @@ import com.google.common.collect.Sets;
 public class EmailManagerTest {
 
 	@Test
-	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException {
+	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException, SMTPException {
 		
 		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
 		SmtpSender smtpSender = EasyMock.createMock(SmtpSender.class);

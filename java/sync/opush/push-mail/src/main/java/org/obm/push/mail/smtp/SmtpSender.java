@@ -31,10 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.smtp;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
@@ -42,8 +41,7 @@ import org.columba.ristretto.smtp.SMTPProtocol;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.SmtpServiceNotAvailableException;
+import org.obm.push.exception.SmtpLocatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,49 +60,62 @@ public class SmtpSender {
 		this.locator = locator;
 	}
 
-	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo,
-			Set<Address> setCc, Set<Address> setCci, InputStream mimeMail)
-			throws SendEmailException, SmtpInvalidRcptException {
-		org.columba.ristretto.message.Address[] recipients = getAllRistrettoRecipients(setTo, setCc, setCci);
-		org.columba.ristretto.message.Address ristrettoFrom = getCleanedAddress(from);
-		smtpSendMail(bs, ristrettoFrom, recipients, mimeMail);
+	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, 
+			InputStream mimeMail) throws SendEmailException, SMTPException {
+		
+		smtpSendMail(bs, 
+				getCleanedAddress(from), 
+				getAllRistrettoRecipients(setTo, setCc, setCci), 
+				mimeMail);
 	}
-
+	
 	private void smtpSendMail(BackendSession bs, org.columba.ristretto.message.Address from, 
-			org.columba.ristretto.message.Address[] rcpts,
-			InputStream data) throws SendEmailException,
-			SmtpInvalidRcptException {
-		Map<String, Throwable> undeliveredRcpt = new HashMap<String, Throwable>();
-
+			org.columba.ristretto.message.Address[] rcpts, InputStream data) throws SendEmailException, SMTPException {
+		
 		SMTPProtocol smtp = null;
 		try {
 			smtp = locator.getSmtpClient(bs);
 			smtp.openPort();
 			smtp.ehlo(InetAddress.getLocalHost());
-			smtp.mail(from);
-			for (org.columba.ristretto.message.Address rcpt : rcpts) {
-				try {
-					smtp.rcpt(rcpt);
-				} catch (Throwable e) {
-					undeliveredRcpt.put(rcpt.getMailAddress(), e);
-				}
-			}
+			setSmtpFrom(smtp, from);
+			setSmtpRcpts(smtp, rcpts);
 			smtp.data(data);
-		} catch (SMTPException se) {
-			throw new SendEmailException(se.getCode(), se);
-		} catch (Throwable e) {
-			throw new SmtpServiceNotAvailableException(e);
+		} catch (SmtpLocatorException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		} finally {
+			quit(smtp);
+		}
+	}
+
+	private void setSmtpFrom(SMTPProtocol smtp, org.columba.ristretto.message.Address from) throws SendEmailException, IOException {
+		try {
+			smtp.mail(from);
+		} catch (SMTPException e) {
+			throw new SendEmailException("Bad sender address syntax {from:" + from.getMailAddress() + "}", e);
+		}
+	}
+	
+	private void setSmtpRcpts(SMTPProtocol smtp, org.columba.ristretto.message.Address[] rcpts) {
+		for (org.columba.ristretto.message.Address rcpt : rcpts) {
 			try {
-				if (smtp != null) {
-					smtp.quit();
-				}
-			} catch (Throwable e) {
-				logger.error("Error while closing the smtp connection");
+				smtp.rcpt(rcpt);
+			} catch (SMTPException e) {
+				logger.error("Bad sender address syntax {from:" + rcpt.getMailAddress() + "}", e);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
-		if (!undeliveredRcpt.isEmpty()) {
-			throw new SmtpInvalidRcptException(undeliveredRcpt);
+	}
+
+	private void quit(SMTPProtocol smtp) throws SMTPException {
+		try {
+			if (smtp != null) {
+				smtp.quit();
+			}
+		} catch (IOException e) {
+			logger.error("Error while closing the smtp connection");
 		}
 	}
 

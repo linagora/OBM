@@ -32,6 +32,7 @@
 package org.obm.push.exception;
 
 
+
 public class SendEmailException extends Exception {
 
 	int smtpErrorCode = -1;
@@ -46,6 +47,10 @@ public class SendEmailException extends Exception {
 		this.smtpErrorCode = smtpErrorCode;
 	}
 
+	public SendEmailException(String message, Throwable e) {
+		super(message, e);
+	}
+	
 	public int getSmtpErrorCode() {
 		return smtpErrorCode;
 	}
