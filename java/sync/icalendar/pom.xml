@@ -18,6 +18,15 @@
 	<url>http://www.obm.org/</url>
 
 	<dependencies>
+ 		<dependency>
+                        <groupId>com.google.inject</groupId>
+                        <artifactId>guice</artifactId>
+                </dependency>
+	 	<dependency>
+                        <groupId>com.linagora.obm</groupId>
+                        <artifactId>utils</artifactId>
+                        <version>${obm.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
@@ -64,6 +73,12 @@
 		  	<groupId>org.slf4j</groupId>
 		  	<artifactId>jcl-over-slf4j</artifactId>
 		  	<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

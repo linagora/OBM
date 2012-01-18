@@ -29,52 +29,66 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.domain;
+package org.obm.icalendar;
 
+import org.obm.push.utils.UserEmailParserUtils;
 import com.google.common.base.Objects;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class ObmDomain {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	private int id;
-	private String name;
-	private String uuid;
+public class Ical4jUser {
 
-	public String getName() {
-		return name;
+	@Singleton
+	public static class Factory {
+
+		private final UserEmailParserUtils userEmailParserUtils;
+
+		@Inject
+		private Factory(UserEmailParserUtils userEmailParserUtils) {
+			this.userEmailParserUtils = userEmailParserUtils;
+		}
+		
+		public static Factory create() {
+			return new Factory(new UserEmailParserUtils());
+		}
+		
+		public Ical4jUser createIcal4jUser(String email, ObmDomain obmDomain) {
+			String login = userEmailParserUtils.getLogin(email);
+			String domain = userEmailParserUtils.getDomain(email);
+			return new Ical4jUser(login + "@" + domain, obmDomain);
+		}
+		
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	
+	private final String email;
+	private final ObmDomain obmDomain;
+	
+	private Ical4jUser(String email, ObmDomain obmDomain) {
+		this.email = email;
+		this.obmDomain = obmDomain;
 	}
-
-	public int getId() {
-		return id;
+	
+	public ObmDomain getObmDomain() {
+		return obmDomain;
 	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	
+	public String getEmail() {
+		return email;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(id, name, uuid);
+		return Objects.hashCode(email, obmDomain);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof ObmDomain) {
-			ObmDomain that = (ObmDomain) object;
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.uuid, that.uuid);
+		if (object instanceof Ical4jUser) {
+			Ical4jUser that = (Ical4jUser) object;
+			return Objects.equal(this.email, that.email)
+				&& Objects.equal(this.obmDomain, that.obmDomain);
 		}
 		return false;
 	}
@@ -82,9 +96,8 @@ public class ObmDomain {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("name", name)
-			.add("uuid", uuid)
+			.add("email", email)
+			.add("obmDomain", obmDomain)
 			.toString();
 	}
 	

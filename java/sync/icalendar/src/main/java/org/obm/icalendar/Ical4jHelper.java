@@ -132,7 +132,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
 public class Ical4jHelper {
@@ -144,9 +143,9 @@ public class Ical4jHelper {
 
 	private static Logger logger = LoggerFactory.getLogger(Ical4jHelper.class);
 	
-	public String buildIcsInvitationRequest(ObmUser user, Event event) {
+	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = buildIcsInvitationVEvent(user, event);
+		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
@@ -159,9 +158,9 @@ public class Ical4jHelper {
 		return foldingWriterToString(calendar);
 	}
 	
-	public String buildIcsInvitationRequestForEventException(ObmUser user, Event event, EventExtId parentExtId) {
+	public String buildIcsInvitationRequestForEventException(Ical4jUser iCal4jUser, Event event, EventExtId parentExtId) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = buildIcsInvitationVEvent(user, event);
+		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
@@ -188,17 +187,17 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	public String buildIcsInvitationReply(final Event event, final ObmUser obmUserReply) {
+	public String buildIcsInvitationReply(final Event event, final Ical4jUser iCal4jUser) {
 		Method method = Method.REPLY;
-		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), obmUserReply);
-		final Calendar calendar = buildVEvent(obmUserReply, event, replyAttendee,method);		
+		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), iCal4jUser);
+		final Calendar calendar = buildVEvent(iCal4jUser, event, replyAttendee,method);		
 		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
 	
-	public String buildIcsInvitationCancel(ObmUser user, Event event) {
+	public String buildIcsInvitationCancel(Ical4jUser iCal4jUser, Event event) {
 		Method method = Method.CANCEL;
-		Calendar calendar = buildVEvent(user, event, null, method);
+		Calendar calendar = buildVEvent(iCal4jUser, event, null, method);
 		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
@@ -232,12 +231,11 @@ public class Ical4jHelper {
 		return buildIcsInvitationVEventDefaultValue(event);
 	}
 	
-	
-	private VEvent buildIcsInvitationVEvent(ObmUser user, Event event) {
+	private VEvent buildIcsInvitationVEvent(Ical4jUser iCal4jUser, Event event) {
 		VEvent vEvent = buildIcsInvitationVEventDefaultValue(event);
 		PropertyList prop = vEvent.getProperties();
 		appendUidToICS(prop, event, null);
-		appendXObmDomainProperties(user.getDomain(), prop);
+		appendXObmDomainProperties(iCal4jUser, prop);
 		return vEvent;
 	}
 	
@@ -257,7 +255,7 @@ public class Ical4jHelper {
 		return freeBusy;
 	}
 
-	public List<Event> parseICSEvent(String ics,	ObmUser user) 
+	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser) 
 		throws IOException, ParserException {
 		
 		List<Event> ret = new LinkedList<Event>();
@@ -267,12 +265,12 @@ public class Ical4jHelper {
 		if (calendar != null) {
 			ComponentList comps = getComponents(calendar, Component.VEVENT);
 			Map<EventExtId, Event> mapEvents = 
-				getEvents(comps, Component.VEVENT, user);
+				getEvents(comps, Component.VEVENT, ical4jUser);
 			ret.addAll(mapEvents.values());
 
 			comps = getComponents(calendar, Component.VTODO);
 			Map<EventExtId, Event> mapTodo = 
-				getEvents(comps, Component.VTODO, user);
+				getEvents(comps, Component.VTODO, ical4jUser);
 			ret.addAll(mapTodo.values());
 		}
 
@@ -280,7 +278,7 @@ public class Ical4jHelper {
 	}
 
 	private Map<EventExtId, Event> getEvents(ComponentList cl,
-			String typeCalendar, ObmUser user) {
+			String typeCalendar, Ical4jUser ical4jUser) {
 		Map<EventExtId, Event> mapEvents = new HashMap<EventExtId, Event>();
 		for (Object obj: cl) {
 			Component comp = (Component) obj;
@@ -289,10 +287,10 @@ public class Ical4jHelper {
 				if (Component.VEVENT.equals(typeCalendar)) {
 					VEvent vEvent = (VEvent) comp;
 					if (vEvent.getRecurrenceId() == null) {
-						Event event = getEvent(user, vEvent);
+						Event event = getEvent(ical4jUser, vEvent);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(user, vEvent);
+						Event eexcep = getEvent(ical4jUser, vEvent);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -305,10 +303,10 @@ public class Ical4jHelper {
 				} else if (Component.VTODO.equals(typeCalendar)) {
 					VToDo vTodo = (VToDo) comp;
 					if (vTodo.getRecurrenceId() == null) {
-						Event event = getEvent(user, vTodo);
+						Event event = getEvent(ical4jUser, vTodo);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(user, vTodo);
+						Event eexcep = getEvent(ical4jUser, vTodo);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -322,7 +320,7 @@ public class Ical4jHelper {
 		return mapEvents;
 	}
 
-	public Event getEvent(ObmUser user, VEvent vEvent) {
+	public Event getEvent(Ical4jUser ical4jUser, VEvent vEvent) {
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
 		appendSummary(event, vEvent.getSummary());
@@ -342,14 +340,14 @@ public class Ical4jHelper {
 		appendRecurence(event, vEvent);
 		appendAlert(event, vEvent.getAlarms());
 		appendOpacity(event, vEvent.getTransparency(), event.isAllday());
-		appendIsInternal(user.getDomain(), event, vEvent.getProperty(X_OBM_DOMAIN_UUID));
+		appendIsInternal(ical4jUser, event, vEvent.getProperty(X_OBM_DOMAIN_UUID));
 		
 		appendCreated(event, vEvent.getCreated());
 		appendLastModified(event, vEvent.getLastModified());
 		return event;
 	}
 
-	public Event getEvent(ObmUser user, VToDo vTodo) {
+	public Event getEvent(Ical4jUser ical4jUser, VToDo vTodo) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
 		appendSummary(event, vTodo.getSummary());
@@ -368,12 +366,12 @@ public class Ical4jHelper {
 		appendAttendees(event, vTodo);
 		appendRecurence(event, vTodo);
 		appendAlert(event, vTodo.getAlarms());
-		appendPercent(event, vTodo.getPercentComplete(), user.getEmail());
-		appendStatus(event, vTodo.getStatus(), user.getEmail());
+		appendPercent(event, vTodo.getPercentComplete(), ical4jUser.getEmail());
+		appendStatus(event, vTodo.getStatus(), ical4jUser.getEmail());
 		appendOpacity(event,
 				(Transp) vTodo.getProperties().getProperty(Property.TRANSP),
 				event.isAllday());
-		appendIsInternal(user.getDomain(), event, vTodo.getProperty(X_OBM_DOMAIN_UUID));
+		appendIsInternal(ical4jUser, event, vTodo.getProperty(X_OBM_DOMAIN_UUID));
 		
 		appendCreated(event, vTodo.getCreated());
 		appendLastModified(event, vTodo.getLastModified());
@@ -393,10 +391,10 @@ public class Ical4jHelper {
 		}
 	}
 	
-	private void appendIsInternal(ObmDomain domain, Event event, Property obmDomain) {
+	private void appendIsInternal(Ical4jUser ical4jUser, Event event, Property obmDomain) {
 		boolean eventIsInternal = false;
 		if(obmDomain != null){
-			eventIsInternal = domain.getUuid().equals(obmDomain.getValue());
+			eventIsInternal = ical4jUser.getObmDomain().getUuid().equals(obmDomain.getValue());
 		}
 		event.setInternalEvent(eventIsInternal);
 		
@@ -560,44 +558,44 @@ public class Ical4jHelper {
 
 	}
 
-	public String parseEvents(ObmUser user, List<Event> listEvent) {
+	public String parseEvents(Ical4jUser iCal4jUser, List<Event> listEvent) {
 
 		Calendar calendar = initCalendar();
 
 		for (Event event : listEvent) {
-			VEvent vEvent = getVEvent(user, event, null, null);
+			VEvent vEvent = getVEvent(iCal4jUser, event, null, null);
 			calendar.getComponents().add(vEvent);
 		}
 		return calendar.toString();
 	}
 
-	public String parseEvent(Event event, ObmUser user) {
+	public String parseEvent(Event event, Ical4jUser iCal4jUser) {
 		if (EventType.VEVENT.equals(event.getType())) {
-			Calendar c = buildVEvent(user, event, null, null);
+			Calendar c = buildVEvent(iCal4jUser, event, null, null);
 			return c.toString();
 		} else if (EventType.VTODO.equals(event.getType())) {
-			Calendar c = buildVTodo(event, user);
+			Calendar c = buildVTodo(event, iCal4jUser);
 			return c.toString();
 		}
 		return null;
 	}
 
-	private Calendar buildVTodo(Event event, ObmUser user) {
+	private Calendar buildVTodo(Event event, Ical4jUser iCal4jUser) {
 		Calendar calendar = initCalendar();
-		VToDo vTodo = getVToDo(event, user);
+		VToDo vTodo = getVToDo(event, iCal4jUser);
 		calendar.getComponents().add(vTodo);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VToDo todoExt = getVTodo(ee, event.getExtId(), user, event);
+				VToDo todoExt = getVTodo(ee, event.getExtId(), iCal4jUser, event);
 				calendar.getComponents().add(todoExt);
 			}
 		}
 		return calendar;
 	}
 
-	private Calendar buildVEvent(ObmUser user, Event event, Attendee replyAttendee, Method method) {
+	private Calendar buildVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = getVEvent(user, event, replyAttendee, method);
+		VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method);
 		calendar.getComponents().add(vEvent);
 		if (event.getRecurrence() != null) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
@@ -607,14 +605,10 @@ public class Ical4jHelper {
 		}
 		return calendar;
 	}
-
 	
-	
-	
-	
-	private Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final ObmUser obmUser) {
+	private Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final Ical4jUser iCal4jUser) {
 		for (final Attendee attendee: attendees) {
-			if (attendee.getEmail().equalsIgnoreCase(obmUser.getEmail())) {
+			if (attendee.getEmail().equalsIgnoreCase(iCal4jUser.getEmail())) {
 				return attendee;
 			}
 		}
@@ -624,14 +618,12 @@ public class Ical4jHelper {
 	private void appendDurationToIcs(PropertyList prop, Event event) {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
-
 	
-	
-	public VEvent getVEvent(ObmUser user, Event event, Attendee replyAttendee, Method method) {
-		return getVEvent(user, event, null, null, replyAttendee, method);
+	public VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method) {
+		return getVEvent(iCal4jUser, event, null, null, replyAttendee, method);
 	}
 
-	public VEvent getVEvent(ObmUser user, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method) {
+	public VEvent getVEvent(Ical4jUser iCal4jUser, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -665,8 +657,8 @@ public class Ical4jHelper {
 		}
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
-		if(user != null){
-			appendXObmDomainProperties(user.getDomain(), prop);
+		if(iCal4jUser != null){
+			appendXObmDomainProperties(iCal4jUser, prop);
 		}
 		return vEvent;
 	}
@@ -679,12 +671,11 @@ public class Ical4jHelper {
 		}
 	}
 
-	public VToDo getVToDo(Event event, ObmUser user) {
-		return getVTodo(event, null, user, null);
+	public VToDo getVToDo(Event event, Ical4jUser iCal4jUser) {
+		return getVTodo(event, null, iCal4jUser, null);
 	}
 
-	private VToDo getVTodo(Event event, EventExtId parentExtID,
-			ObmUser user, Event pere) {
+	private VToDo getVTodo(Event event, EventExtId parentExtID, Ical4jUser iCal4jUser, Event pere) {
 		VToDo vTodo = new VToDo();
 		PropertyList prop = vTodo.getProperties();
 
@@ -710,8 +701,8 @@ public class Ical4jHelper {
 		appendExDateToICS(prop, event);
 		appendVAlarmToICS(vTodo.getAlarms(), event);
 		appendRecurenceIdToICS(prop, event);
-		appendPercentCompleteToICS(prop, event, user);
-		appendStatusToICS(prop, event, user);
+		appendPercentCompleteToICS(prop, event, iCal4jUser);
+		appendStatusToICS(prop, event, iCal4jUser);
 		appendXMozLastAck(prop);
 
 		return vTodo;
@@ -729,7 +720,8 @@ public class Ical4jHelper {
 		prop.add(p);
 	}
 	
-	private void appendXObmDomainProperties(ObmDomain obmDomain, PropertyList prop) {
+	private void appendXObmDomainProperties(Ical4jUser iCal4jUser, PropertyList prop) {
+		ObmDomain obmDomain = iCal4jUser.getObmDomain();
 		XProperty domainProp = new XProperty(X_OBM_DOMAIN, obmDomain.getName());
 		XProperty uuidDomainProp = new XProperty(X_OBM_DOMAIN_UUID, obmDomain.getUuid());
 		
@@ -737,10 +729,9 @@ public class Ical4jHelper {
 		prop.add(uuidDomainProp);
 	}
 
-	private void appendStatusToICS(PropertyList prop, Event event,
-			ObmUser user) {
+	private void appendStatusToICS(PropertyList prop, Event event, Ical4jUser iCal4jUser) {
 		for (Attendee att : event.getAttendees()) {
-			if (att.getEmail().equals(user.getEmail())) {
+			if (att.getEmail().equals(iCal4jUser.getEmail())) {
 				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
 					prop.add(Status.VTODO_NEEDS_ACTION);
 				} else if (ParticipationState.INPROGRESS.equals(att.getState())) {
@@ -757,10 +748,9 @@ public class Ical4jHelper {
 		}
 	}
 
-	private void appendPercentCompleteToICS(PropertyList prop,
-			Event event, ObmUser user) {
+	private void appendPercentCompleteToICS(PropertyList prop, Event event, Ical4jUser iCal4jUser) {
 		for (Attendee att : event.getAttendees()) {
-			if (att.getEmail().equals(user.getEmail())) {
+			if (att.getEmail().equals(iCal4jUser.getEmail())) {
 				prop.add(new PercentComplete(att.getPercent()));
 			}
 		}

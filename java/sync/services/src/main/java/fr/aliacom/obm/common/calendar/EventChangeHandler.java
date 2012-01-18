@@ -43,7 +43,9 @@ import java.util.TimeZone;
 import javax.jms.JMSException;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -78,22 +80,24 @@ public class EventChangeHandler {
 	private final UserService userService;
 	private final Producer producer;
 	private final Ical4jHelper ical4jHelper;
+	private final ICalendarFactory calendarFactory;
 
 	@Inject
 	/* package */ EventChangeHandler(EventChangeMailer eventChangeMailer, SettingsService settingsService, 
-			UserService userService, Producer producer, Ical4jHelper ical4jHelper) {
+			UserService userService, Producer producer, Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
 		
 		this.eventChangeMailer = eventChangeMailer;
 		this.settingsService = settingsService;
 		this.userService = userService;
 		this.producer = producer;
 		this.ical4jHelper = ical4jHelper;
+		this.calendarFactory = calendarFactory;
 	}
 	
 	public void create(final ObmUser user, final Event event, boolean notification, AccessToken token) throws NotificationException {
 		Attendee owner = findOwner(event);
 		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
-		String ics = ical4jHelper.buildIcsInvitationRequest(user, event);
+		String ics = ical4jHelper.buildIcsInvitationRequest(createIcal4jUserFrom(user), event);
 		writeIcs(ics);
 		if (notification && eventCreationInvolveNotification(event)) {
 			notifyCreate(user, attendees, event, ics, token);
@@ -149,9 +153,10 @@ public class EventChangeHandler {
 	public void update(ObmUser user, Event previous, Event current, boolean notification, boolean hasImportantChanges, AccessToken token)
 			throws NotificationException {
 		
-		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
-		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(user, current);
-		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(user, current);
+		Ical4jUser buildIcal4jUser = createIcal4jUserFrom(user);
+		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current);
+		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, current);
+		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current);
 		
 		writeIcs(updateUserIcs);
 		
@@ -238,7 +243,7 @@ public class EventChangeHandler {
 	}
 
 	public void delete(final ObmUser user, final Event event, boolean notification, AccessToken token) throws NotificationException {
-		String removeUserIcs = ical4jHelper.buildIcsInvitationCancel(user, event);
+		String removeUserIcs = ical4jHelper.buildIcsInvitationCancel(createIcal4jUserFrom(user), event);
 		writeIcs(removeUserIcs);
 		
  		if (notification && eventDeletionInvolveNotification(event)) {
@@ -374,7 +379,7 @@ public class EventChangeHandler {
 	public void updateParticipationState(final Event event, final ObmUser calendarOwner, 
 			final ParticipationState state, boolean notification, AccessToken token) {
 		
-		String ics = ical4jHelper.buildIcsInvitationReply(event, calendarOwner);
+		String ics = ical4jHelper.buildIcsInvitationReply(event, createIcal4jUserFrom(calendarOwner));
 		writeIcs(ics);
 		
 		if (notification) {
@@ -430,6 +435,10 @@ public class EventChangeHandler {
 		default:
 			return false;
 		}
+	}
+	
+	private Ical4jUser createIcal4jUserFrom(ObmUser user) {
+		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
 }

@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
+import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -71,7 +72,8 @@ public abstract class AbstractEventChangeHandlerTest {
 		Producer producer = getDefaultProducer();
 		EasyMock.replay(userService, defaultSettingsService);
 		Ical4jHelper ical4jHelper = EasyMock.createMock(Ical4jHelper.class);
-		return new EventChangeHandler(mailer, defaultSettingsService, userService, producer, ical4jHelper);
+		ICalendarFactory calendarFactory = EasyMock.createMock(ICalendarFactory.class);
+		return new EventChangeHandler(mailer, defaultSettingsService, userService, producer, ical4jHelper, calendarFactory);
 	}
 	
 	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event, ObmUser obmUser) throws NotificationException;

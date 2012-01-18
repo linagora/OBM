@@ -53,7 +53,9 @@ import org.easymock.EasyMock;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -194,7 +196,7 @@ public class CalendarBindingImplTest {
 		// Wrap the returned list into array list because we need a mutable list
 		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
 		
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 		
@@ -243,7 +245,7 @@ public class CalendarBindingImplTest {
 		// Wrap the returned list into array list because we need a mutable list
 		EasyMock.expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
 		
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 		
@@ -284,7 +286,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = {event, accessToken, userService, calendarDao, rightsHelper, user};
 		EasyMock.replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
 
 		try {
 			calendarService.createEvent(accessToken, calendar, event, true);
@@ -317,15 +319,21 @@ public class CalendarBindingImplTest {
 		eventWithOwnerAttendee.setAttendees(Arrays.asList(fakeUserAttendee));
 		EasyMock.expectLastCall().once();
 		
+		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
+		Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(userEmail, fixtures.domain);
+		expect(calendarFactory.createIcal4jUserFromObmUser(obmUser)).andReturn(ical4jUser).anyTimes();		
+		
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, icsData, eventWithOwnerAttendee);
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, calendar, fixtures.domainName, obmUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, calendar, obmUser, eventExtId, eventWithOwnerAttendee);
 		
-		Object[] mocks = {accessToken, userService, rightsHelper, eventWithOwnerAttendee, ical4jHelper, obmUser, calendarDao};
+		Object[] mocks = {accessToken, userService, rightsHelper, eventWithOwnerAttendee, ical4jHelper, obmUser, calendarDao,
+				calendarFactory};
 		EasyMock.replay(mocks);
 		
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, ical4jHelper);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao,
+				null, rightsHelper, ical4jHelper, calendarFactory);
 		
 		try {
 			calendarService.importICalendar(accessToken, calendar, icsData);
@@ -402,7 +410,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = { accessToken, userService, rightsHelper, obmUser, calendarDao, eventChangeHandler };
 		EasyMock.replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, rightsHelper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, rightsHelper, null, null);
 
 		calendarService.purge(accessToken, calendar);
 
@@ -433,14 +441,21 @@ public class CalendarBindingImplTest {
 		EasyMock.expectLastCall().once();
 		
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, icsData, eventWithOwnerAttendee);
+		
+		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
+		Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(userEmail, fixtures.domain);
+		expect(calendarFactory.createIcal4jUserFromObmUser(obmUser)).andReturn(ical4jUser).anyTimes();
+
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, calendar, fixtures.domainName, obmUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, calendar, obmUser, eventExtId, eventWithOwnerAttendee);
 		
-		Object[] mocks = {accessToken, userService, rightsHelper, eventWithOwnerAttendee, ical4jHelper, obmUser, calendarDao};
+		Object[] mocks = {accessToken, userService, rightsHelper, eventWithOwnerAttendee, ical4jHelper, 
+				obmUser, calendarDao, calendarFactory};
 		EasyMock.replay(mocks);
 		
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, ical4jHelper);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null,
+				rightsHelper, ical4jHelper, calendarFactory);
 		
 		try {
 			calendarService.importICalendar(accessToken, calendar, icsData);
@@ -497,7 +512,7 @@ public class CalendarBindingImplTest {
 		
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null, null);
 		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 		
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -560,7 +575,7 @@ public class CalendarBindingImplTest {
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, helper, null);
+				userService, calendarDao, null, helper, null, null);
 		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
 				notification);
 
@@ -629,7 +644,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = {accessToken, calendarDao, userService, rightsHelper, eventChangeHandler};
 		EasyMock.replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, rightsHelper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, rightsHelper, null, null);
 
 		calendarService.modifyEvent(accessToken, calendar, newEvent, updateAttendees, notification);
 
@@ -646,9 +661,9 @@ public class CalendarBindingImplTest {
 		return att;
 	}
 	
-	private Ical4jHelper mockIcal4jHelper(ObmUser obmUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
+	private Ical4jHelper mockIcal4jHelper(Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
 		Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-		expect(ical4jHelper.parseICSEvent(icsData, obmUser)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
+		expect(ical4jHelper.parseICSEvent(icsData, ical4jUser)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
 		return ical4jHelper;
 	}
 	
@@ -708,16 +723,21 @@ public class CalendarBindingImplTest {
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser).once();
 		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).once();
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(obmUser, ics, eventFromIcs);
+		
+		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
+		Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(email, fixtures.domain);
+		expect(calendarFactory.createIcal4jUserFromObmUser(obmUser)).andReturn(ical4jUser).anyTimes();
+		
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, ics, eventFromIcs);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, extId)).andReturn(eventFromDao).once();
 
-		Object[] mocks = new Object[] {calendarDao, userService, ical4jHelper, accessToken, helper};
+		Object[] mocks = new Object[] {calendarDao, userService, ical4jHelper, accessToken, helper, calendarFactory};
 		
 		EasyMock.replay(mocks);
 		
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, helper, ical4jHelper);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, helper, ical4jHelper, calendarFactory);
 		List<Event> events = calendarService.parseICS(accessToken, ics);
 		
 		EasyMock.verify(mocks);
@@ -773,10 +793,11 @@ public class CalendarBindingImplTest {
 		
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helper, null, null);
 		calendarService.createEvent(accessToken, calendar, event, notification);
 		
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
 	}
+	
 }

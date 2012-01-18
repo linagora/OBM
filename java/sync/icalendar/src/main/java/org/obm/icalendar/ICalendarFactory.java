@@ -29,64 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm;
+package org.obm.icalendar;
 
-import java.util.Locale;
-import java.util.TimeZone;
+import org.obm.icalendar.Ical4jUser.Factory;
 
-import org.easymock.EasyMock;
-import org.obm.icalendar.Ical4jUser;
-
-import com.linagora.obm.sync.Producer;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserSettings;
 
-public class ToolBox {
+@Singleton
+public class ICalendarFactory {
+	
+	private final Factory ical4jFactory;
 
-	public static ObmDomain getDefaultObmDomain() {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName("test.tlse.lng");
-		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		return obmDomain;
+	@Inject
+	private ICalendarFactory(Ical4jUser.Factory ical4jFactory) {
+		this.ical4jFactory = ical4jFactory;
 	}
 	
-	public static ObmUser getDefaultObmUser(){
-		ObmDomain obmDomain = getDefaultObmDomain();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setFirstName("Obm");
-		obmUser.setLastName("User");
-		obmUser.setLogin("user");
-		obmUser.setEmail("user@test");
-		obmUser.setDomain(obmDomain);
-		return obmUser;
+	public Ical4jUser createIcal4jUserFromObmUser(ObmUser obmUser) {
+		return ical4jFactory.createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
 	}
 	
-	public static Ical4jUser getIcal4jUser() {
-		ObmUser obmUser = getDefaultObmUser();
-		return Ical4jUser.Factory.create().createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
-	}
-	
-	public static UserSettings getDefaultSettings() {
-		UserSettings settings = EasyMock.createMock(UserSettings.class);
-		EasyMock.expect(settings.locale()).andReturn(Locale.FRENCH).anyTimes();
-		EasyMock.expect(settings.timezone()).andReturn(TimeZone.getTimeZone("Europe/Paris")).anyTimes();
-		return settings;
-	}
-	
-	public static SettingsService getDefaultSettingsService() {
-		UserSettings defaultSettings = getDefaultSettings();
-		SettingsService service = EasyMock.createMock(SettingsService.class);
-		service.getSettings(EasyMock.anyObject(ObmUser.class));
-		EasyMock.expectLastCall().andReturn(defaultSettings).anyTimes();
-		EasyMock.replay(defaultSettings);
-		return service;
-	}
-	
-	public static Producer getDefaultProducer() {
-		return EasyMock.createMock(Producer.class);
+	public Ical4jUser createIcal4jUserFromEmailAndDomain(String email, ObmDomain obmDomain) {
+		return ical4jFactory.createIcal4jUser(email, obmDomain);
 	}
 	
 }

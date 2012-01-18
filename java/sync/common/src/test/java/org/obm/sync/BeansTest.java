@@ -29,63 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.domain;
+package org.obm.sync;
 
-import com.google.common.base.Objects;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-public class ObmDomain {
+import com.google.common.collect.ImmutableList;
 
-	private int id;
-	private String name;
-	private String uuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	public String getName() {
-		return name;
-	}
+public class BeansTest {
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(id, name, uuid);
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
 	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof ObmDomain) {
-			ObmDomain that = (ObmDomain) object;
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.uuid, that.uuid);
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("name", name)
-			.add("uuid", uuid)
-			.toString();
+	@Test
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(ObmDomain.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
 	}
 	
 }

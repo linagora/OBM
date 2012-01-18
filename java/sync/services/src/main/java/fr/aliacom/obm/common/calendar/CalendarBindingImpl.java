@@ -46,7 +46,9 @@ import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -104,6 +106,8 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private final HelperService helperService;
 	private final Ical4jHelper ical4jHelper;
+
+	private final ICalendarFactory calendarFactory;
 	
 
 	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
@@ -123,7 +127,7 @@ public class CalendarBindingImpl implements ICalendar {
 			DomainService domainService, UserService userService,
 			CalendarDao calendarDao,
 			CategoryDao categoryDao, HelperService helperService, 
-			Ical4jHelper ical4jHelper) {
+			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
@@ -131,6 +135,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.categoryDao = categoryDao;
 		this.helperService = helperService;
 		this.ical4jHelper = ical4jHelper;
+		this.calendarFactory = calendarFactory;
 	}
 
 	@Override
@@ -858,18 +863,14 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public String parseEvent(AccessToken token, Event event)
-			throws ServerFault {
-		ObmUser user = userService.getUserFromAccessToken(token);
-		return ical4jHelper.parseEvent(event, user);
+	public String parseEvent(AccessToken token, Event event) throws ServerFault {
+		return ical4jHelper.parseEvent(event, createIcal4jUserFrom(token));
 	}
 
 	@Override
 	@Transactional
-	public String parseEvents(AccessToken token, List<Event> events)
-			throws ServerFault {
-		ObmUser user = userService.getUserFromAccessToken(token);
-		return ical4jHelper.parseEvents(user, events);
+	public String parseEvents(AccessToken token, List<Event> events) throws ServerFault {
+		return ical4jHelper.parseEvents(createIcal4jUserFrom(token), events);
 	}
 
 	@Override
@@ -877,9 +878,8 @@ public class CalendarBindingImpl implements ICalendar {
 	public List<Event> parseICS(AccessToken token, String ics)
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
-		ObmUser user = userService.getUserFromAccessToken(token);
 		String calendar = getDefaultCalendarFromToken(token);
-		List<Event> events = ical4jHelper.parseICSEvent(fixedIcs, user);
+		List<Event> events = ical4jHelper.parseICSEvent(fixedIcs, createIcal4jUserFrom(token));
 		for (Event event: events) {
 			try {
 				EventObmId id = getEventObmIdFromExtId(token, calendar, event.getExtId());
@@ -1300,8 +1300,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
 		try {
-			ObmUser user = userService.getUserFromAccessToken(token);
-			return ical4jHelper.parseICSEvent(icsToString, user);
+			return ical4jHelper.parseICSEvent(icsToString, createIcal4jUserFrom(token));
 		} catch (IOException e) {
 			throw new ImportICalendarException(e);
 		} catch (ParserException e) {
@@ -1371,6 +1370,11 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}		
+	}
+	
+	private Ical4jUser createIcal4jUserFrom(AccessToken accessToken) {
+		ObmUser user = userService.getUserFromAccessToken(accessToken);
+		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
 }

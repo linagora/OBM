@@ -46,10 +46,8 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -89,7 +87,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.junit.internal.matchers.TypeSafeMatcher;
-import org.obm.icalendar.Ical4jHelper;
+import org.obm.push.utils.UserEmailParserUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -163,13 +161,13 @@ public class Ical4jHelperTest {
 		return new GregorianCalendar();
 	}
 	
-	protected ObmUser getDefaultObmUser() {
+	protected Ical4jUser getDefaultObmUser() {
 		ObmUser obmUser = new ObmUser();
 		ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName("test.tlse.lng");
 		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		obmUser.setDomain(obmDomain);
-		return obmUser;
+		return Ical4jUser.Factory.create().createIcal4jUser("test@test.obm.lng.org", obmDomain);
 	}
 
 	protected Event getTestEvent() {
@@ -790,10 +788,10 @@ public class Ical4jHelperTest {
 		final Event event = buildEvent();
 		final Attendee attendeeReply = event.getAttendees().get(2);
 
-		final ObmUser obmUser = buildObmUser(attendeeReply);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
 		Ical4jHelper ical4jHelper = new Ical4jHelper();
-		final String ics = ical4jHelper.buildIcsInvitationReply(event, obmUser);
+		final String ics = ical4jHelper.buildIcsInvitationReply(event, ical4jUser);
 		
 		String icsAttendee = "ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;" +
 		"CN=OBM USER 3;ROLE=\r\n REQ-PARTICIPANT:mailto:obm3@obm.org";
@@ -844,29 +842,13 @@ public class Ical4jHelperTest {
 		return event;
 	}
 	
-	private ObmUser buildObmUser(final Attendee attendeeReply) {
+	private Ical4jUser buildObmUser(final Attendee attendeeReply) {
 		final ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName(splitEmail(attendeeReply.getEmail()).get("domain"));
+		obmDomain.setName(new UserEmailParserUtils().getDomain(attendeeReply.getEmail()));
 		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		final ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(obmDomain);
-		obmUser.setEmail(splitEmail(attendeeReply.getEmail()).get("email"));
-		return obmUser;
+		return Ical4jUser.Factory.create().createIcal4jUser(attendeeReply.getEmail(), obmDomain);
 	}
 	
-	private Map<String, String> splitEmail(String email) {
-		Map<String, String> split = new HashMap<String, String>();
-		String[] tab = email.split("@");
-		for (String s: tab) {
-			if (!split.containsKey("email")) {
-				split.put("email", s);	
-			} else {
-				split.put("domain", s);
-			}	
-		}
-		return split;
-	}
-
 	private int countStringOccurrences(String str, String occ) {
 		int i = str.indexOf(occ);
 		int countIndexOf = 0;
@@ -886,11 +868,11 @@ public class Ical4jHelperTest {
 		event.addAttendee(superLongAttendee);
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
-		final ObmUser obmUser = buildObmUser(attendeeReply);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
 		
 		checkStringLengthLessThan(icsRequest, 75);
 		checkStringLengthLessThan(icsCancel, 75);
@@ -902,15 +884,15 @@ public class Ical4jHelperTest {
 		Event event = buildEvent();
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
-		final ObmUser obmUser = buildObmUser(attendeeReply);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
 		
-		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN", obmUser.getDomain().getName());
-		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN", obmUser.getDomain().getName());
-		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN", obmUser.getDomain().getName());
+		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN", ical4jUser.getObmDomain().getName());
+		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN", ical4jUser.getObmDomain().getName());
+		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN", ical4jUser.getObmDomain().getName());
 	}
 	
 	private void checkContainIcsProperty(String ics, String propertyName, String propertyValue) {
@@ -922,15 +904,15 @@ public class Ical4jHelperTest {
 		Event event = buildEvent();
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
-		final ObmUser obmUser = buildObmUser(attendeeReply);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 
-		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event);
-		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event);
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser);
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(ical4jUser, event);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(ical4jUser, event);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser);
 		
-		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
-		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
-		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", obmUser.getDomain().getUuid());
+		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
+		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
+		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
 	}
 	
 	private void checkStringLengthLessThan(String ics, int length) {
