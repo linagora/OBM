@@ -42,9 +42,6 @@ import javax.naming.NamingException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.IDBCP;
-
 import bitronix.tm.TransactionManagerServices;
 
 
@@ -82,7 +79,6 @@ public class DataSourceEnv {
 
 		Transaction ut = tm.getTransaction();
 		Class.forName(props.getProperty("driver"));
-		IDBCP dbcp = new DBCP();
 /*
 		DataSource ds = new javax.sql.DataSource(
 				props.getProperty("url"), props.getProperty("login"), props
