@@ -38,6 +38,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
@@ -236,14 +237,17 @@ public class PingHandlerTest {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		Date dateWhenChangesAppear = new Date();
 		int collectionNoChangeIterationCount = noChangeIterationCount;
-		int collectionIdWhereChangesAppear = anyInt();
-		
+		int collectionIdWhereChangesAppear = 1234;
+
 		expectCollectionDaoUnchangeForXIteration(collectionDao, dateFirstSyncFromASSpecs, collectionNoChangeIterationCount);
 
-		int randomCollectionId = anyInt();
 		for (OpushUser user : fakeTestUsers) {
-			String collectionPathWhereChangesAppear = buildCalendarCollectionPath(user);  
-			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPathWhereChangesAppear).anyTimes();
+			String collectionPathWhereChangesAppear = buildCalendarCollectionPath(user);
+			
+			SyncState syncState = new SyncState("sync state");
+			expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).once();
+
+			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPathWhereChangesAppear).anyTimes();
 
 			ChangedCollections hasChangesCollections = buildSyncCollectionWithChanges(
 					dateWhenChangesAppear, collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
@@ -253,6 +257,8 @@ public class PingHandlerTest {
 	
 	private void expectCollectionDaoUnchangeForXIteration(CollectionDao collectionDao, Date activeSyncSpecFirstSyncDate, 
 			int noChangeIterationCount) throws DaoException {
+		SyncState syncState = new SyncState("sync state");
+		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).times(noChangeIterationCount);
 		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).times(noChangeIterationCount);
@@ -260,6 +266,7 @@ public class PingHandlerTest {
 
 	private void mockCalendarBackendHasContentChanges(CalendarBackend calendarBackend)
 			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
 				anyObject(FilterType.class),

@@ -79,7 +79,7 @@ public class ImapMailboxServiceTest {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		BackendSession bs = new BackendSession(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, null);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(bs, "INBOX", before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);

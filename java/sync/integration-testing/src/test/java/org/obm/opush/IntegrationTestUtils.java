@@ -14,6 +14,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -60,6 +61,8 @@ public class IntegrationTestUtils {
 	
 	public static void expectUserCollectionsNeverChange(CollectionDao collectionDao, Collection<OpushUser> users) throws DaoException, CollectionNotFoundException {
 		Date lastSync = new Date();
+		SyncState syncState = new SyncState("sync state");
+		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
