@@ -36,31 +36,27 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.dbcp.DBCP;
 import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class LocatorDbHelper {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(LocatorDbHelper.class);
 
-	private static LocatorDbHelper instance;
 	private final IDBCP dbcp;
 	
-	private LocatorDbHelper(IDBCP dbcp) {
+	@Inject
+	protected LocatorDbHelper(IDBCP dbcp) {
 		this.dbcp = dbcp;
 	}
 	
-	public static synchronized LocatorDbHelper getInstance() {
-		if (instance == null) {
-			instance = new LocatorDbHelper(new DBCP());
-		}
-		return instance;
-	}
-
 	/**
 	 * Returns the ips of the hosts with the given service/property in the users
 	 * domain.

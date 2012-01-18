@@ -42,20 +42,23 @@ import org.obm.locator.impl.LocatorDbHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 /**
  * Locates OBM host IP addresses with a service, service_property, login@domain.
  * This call url should be /location/host/sync/obm_sync/login@domain
  * 
  */
+@Singleton
 public class HostLocationServlet extends HttpServlet {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private LocatorDbHelper locatorDbHelper;
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		locatorDbHelper = LocatorDbHelper.getInstance();
+	@Inject
+	protected HostLocationServlet(LocatorDbHelper locatorDbHelper){
+		this.locatorDbHelper = locatorDbHelper;
 	}
 	
 	@Override
