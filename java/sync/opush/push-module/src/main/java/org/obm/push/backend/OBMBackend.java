@@ -93,13 +93,9 @@ public class OBMBackend implements IBackend {
 		this.contactsPushMonitor = contactsMonitoringThreadFactory
 				.createClient(5000, this.registeredListeners);
 		
-	}
-
-	@Override
-	public void startMonitoring() {
 		startMonitoringThreads(calendarPushMonitor, contactsPushMonitor);
 	}
-	
+
 	private void startMonitoringThreads(
 			CalendarMonitoringThread calendarPushMonitor,
 			ContactsMonitoringThread contactsPushMonitor) {
