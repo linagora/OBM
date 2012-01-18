@@ -345,7 +345,7 @@ class Backup {
     foreach ($addressbooks as $addressbook) {
       if ($addressbook->name!='public_contacts') { // I'd better filter this addressbook on search
         if ($addressbook->isDefault || isset($vcf_contacts[$addressbook->name])) {
-          $addressbook->reset();
+          $addressbook->soft_reset();
           $addressBookByName[$addressbook->name] = $addressbook;
         } else {
           OBM_AddressBook::delete(array('addressbook_id' => $addressbook->id));

@@ -359,6 +359,19 @@ class OBM_AddressBook implements OBM_ISearchable {
     }
   }
   
+  public function soft_reset() {
+    if ($this->name!='public_contacts' && $this->admin) {
+      $db = new DB_OBM;
+      $query = "INSERT INTO DeletedContact(deletedcontact_contact_id, deletedcontact_addressbook_id, deletedcontact_origin)
+                SELECT contact_id, contact_addressbook_id, contact_origin
+                FROM Contact LEFT JOIN DeletedContact ON contact_id = deletedcontact_contact_id
+                WHERE contact_addressbook_id='$this->id' AND deletedcontact_contact_id IS NULL";
+      $db->query($query);
+      $this->reset();
+    }
+  }
+
+
   public function isWritable() {
     return $this->write == 1;
   }
