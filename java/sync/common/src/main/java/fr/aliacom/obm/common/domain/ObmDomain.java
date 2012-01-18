@@ -31,9 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.domain;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 
-public class ObmDomain {
+public class ObmDomain implements Serializable {
 
 	private int id;
 	private String name;

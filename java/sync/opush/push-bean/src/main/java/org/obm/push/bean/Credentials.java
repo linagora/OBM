@@ -34,15 +34,19 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import com.google.common.base.Objects;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class Credentials implements Serializable {
 
 	private final User user;
 	private final String password;
+	private final ObmDomain obmDomain;
 
-	public Credentials(User user, String password) {
+	public Credentials(User user, String password, ObmDomain obmDomain) {
 		super();
 		this.user = user;
 		this.password = password;
+		this.obmDomain = obmDomain;
 	}
 
 	public String getPassword() {
@@ -53,9 +57,13 @@ public class Credentials implements Serializable {
 		return user;
 	}
 
+	public ObmDomain getObmDomain() {
+		return obmDomain;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(user, password);
+		return Objects.hashCode(user, password, obmDomain);
 	}
 	
 	@Override
@@ -63,7 +71,8 @@ public class Credentials implements Serializable {
 		if (object instanceof Credentials) {
 			Credentials that = (Credentials) object;
 			return Objects.equal(this.user, that.user)
-				&& Objects.equal(this.password, that.password);
+				&& Objects.equal(this.password, that.password)
+				&& Objects.equal(this.obmDomain, that.obmDomain);
 		}
 		return false;
 	}
@@ -73,6 +82,7 @@ public class Credentials implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("user", user)
 			.add("password", password)
+			.add("obmDomain", obmDomain)
 			.toString();
 	}
 	

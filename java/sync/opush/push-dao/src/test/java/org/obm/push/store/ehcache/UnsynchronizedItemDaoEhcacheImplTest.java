@@ -51,6 +51,8 @@ import org.obm.push.bean.User.Factory;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 import bitronix.tm.TransactionManagerServices;
 
 public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
@@ -71,7 +73,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
-		this.credentials = new Credentials(user, "password");
+		this.credentials = new Credentials(user, "password", new ObmDomain());
 	}
 	
 	@After

@@ -54,6 +54,8 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager objectStoreManager;
@@ -68,7 +70,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
-		this.credentials = new Credentials(user, "password");
+		this.credentials = new Credentials(user, "password", new ObmDomain());
 	}
 	
 	@After

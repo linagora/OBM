@@ -63,6 +63,8 @@ import org.obm.sync.calendar.EventObmId;
 
 import com.google.common.collect.ImmutableSet;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class SerializableTest {
 
 	private ObjectOutputStream objectOutputStream;
@@ -124,7 +126,7 @@ public class SerializableTest {
 	@Test
 	public void testCredentials() throws IOException {
 		User user = Factory.create().createUser("login@titi", "email", "displayName");
-		Credentials obj = new Credentials(user, "tata");
+		Credentials obj = new Credentials(user, "tata", new ObmDomain());
 		objectOutputStream.writeObject(obj);
 	}
 	

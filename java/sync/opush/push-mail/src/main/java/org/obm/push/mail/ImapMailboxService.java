@@ -51,6 +51,8 @@ import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
@@ -64,7 +66,6 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,21 +82,22 @@ public class ImapMailboxService implements MailboxService {
 	
 	private final SmtpSender smtpProvider;
 	private final EventService eventService;
-	private final LoginService login;
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final ImapClientProvider imapClientProvider;
+	private final Ical4jHelper ical4jHelper;
+	private final Ical4jUser.Factory ical4jUserFactory;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
-			SmtpSender smtpSender,
-			EventService eventService, LoginService login,
-			ImapClientProvider imapClientProvider) {
+			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
+			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
-		this.login = login;
 		this.imapClientProvider = imapClientProvider;
+		this.ical4jHelper = ical4jHelper;
+		this.ical4jUserFactory = ical4jUserFactory;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
@@ -111,7 +113,7 @@ public class ImapMailboxService implements MailboxService {
 			store.select(parseMailBoxName(store, collectionName));
 			
 			final MailMessageLoader mailLoader = 
-					new MailMessageLoader(store, calendarClient, eventService, login);
+					new MailMessageLoader(store, calendarClient, eventService, ical4jHelper, ical4jUserFactory);
 			for (final Long uid: uids) {
 				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
 				if (email != null) {
