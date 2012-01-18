@@ -10,7 +10,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.obm.push.LoggerService;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
-import org.obm.push.bean.User.Factory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
@@ -22,11 +21,11 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final LoggerService loggerService;
-	private final Factory userFactory;
+	private final User.Factory userFactory;
 	private final LoginService loginService;
 
 	protected AuthenticatedServlet(LoginService loginService, 
-			LoggerService loggerService, Factory userFactory) {
+			LoggerService loggerService, User.Factory userFactory) {
 		
 		this.loginService = loginService;
 		this.loggerService = loggerService;
