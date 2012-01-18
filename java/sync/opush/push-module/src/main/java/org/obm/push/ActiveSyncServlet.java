@@ -60,6 +60,7 @@ import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -77,21 +78,30 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 	private DeviceService deviceService;
 	
 	private final ResponderImpl.Factory responderFactory;
+	private final IBackend backend;
 
 	@Inject
-	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
+	protected ActiveSyncServlet(LoginService loginService,
+			SessionService sessionService, LoggerService loggerService,
 			IBackend backend, Factory continuationFactory, DeviceService deviceService, 
 			User.Factory userFactory, ResponderImpl.Factory responderFactory, Handlers handlers) {
 	
-		super(backend, loggerService, userFactory);
+		super(loginService, loggerService, userFactory);
 		
 		this.sessionService = sessionService;
+		this.backend = backend;
 		this.continuationFactory = continuationFactory;
 		this.deviceService = deviceService;
 		this.responderFactory = responderFactory;
 		this.handlers = handlers;
 	}
 
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		backend.startMonitoring();
+	}
+	
 	@Override
 	@Transactional
 	protected void service(HttpServletRequest request,

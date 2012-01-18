@@ -49,6 +49,8 @@ public interface IBackend {
 
 	Policy getDevicePolicy(BackendSession bs);
 
+	void startMonitoring();
+	
 	/**
 	 * Push support
 	 * 

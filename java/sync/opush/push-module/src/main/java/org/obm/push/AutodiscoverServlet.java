@@ -7,17 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.push.backend.IBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
-import org.obm.push.handler.AutodiscoverHandler;
 import org.obm.push.handler.AuthenticatedServlet;
+import org.obm.push.handler.AutodiscoverHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.impl.ResponderImpl.Factory;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,10 +29,10 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 	private final Factory responderFactory;
 	
 	@Inject
-	protected AutodiscoverServlet(IBackend backend, AutodiscoverHandler autodiscoverHandler, 
+	protected AutodiscoverServlet(LoginService loginService, AutodiscoverHandler autodiscoverHandler, 
 			User.Factory userFactory, LoggerService loggerService, ResponderImpl.Factory responderFactory) {
 		
-		super(backend, loggerService, userFactory);
+		super(loginService, loggerService, userFactory);
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
 	}

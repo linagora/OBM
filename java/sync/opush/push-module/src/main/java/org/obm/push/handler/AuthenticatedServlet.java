@@ -8,12 +8,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.LoggerService;
-import org.obm.push.backend.IBackend;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +21,14 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final IBackend backend;
 	private final LoggerService loggerService;
 	private final Factory userFactory;
+	private final LoginService loginService;
 
-	protected AuthenticatedServlet(IBackend backend, LoggerService loggerService, Factory userFactory) {
-		this.backend = backend;
+	protected AuthenticatedServlet(LoginService loginService, 
+			LoggerService loggerService, Factory userFactory) {
+		
+		this.loginService = loginService;
 		this.loggerService = loggerService;
 		this.userFactory = userFactory;
 	}
@@ -76,7 +78,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 	}
 	
 	private AccessToken login(String userId, String password) throws AuthFault {
-		return backend.authenticate(userFactory.getLoginAtDomain(userId), password);
+		return loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
 	}
 	
 	private User createUser(String userId, AccessToken accessToken) {
