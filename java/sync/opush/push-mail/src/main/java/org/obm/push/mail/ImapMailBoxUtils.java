@@ -31,9 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.mail.Flags;
 
+import org.obm.push.bean.Email;
+
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -57,4 +66,14 @@ public class ImapMailBoxUtils {
 		}
 	}
 	
+	public List<Email> orderEmailByUid(Collection<Email> emails) {
+		ArrayList<Email> listOfEmail = Lists.newArrayList(emails);
+		Collections.sort(listOfEmail, new Comparator<Email>() {
+			@Override
+			public int compare(Email o1, Email o2) {
+				return (int) (o1.getUid() - o2.getUid());
+			}
+		});
+		return listOfEmail;
+	}
 }

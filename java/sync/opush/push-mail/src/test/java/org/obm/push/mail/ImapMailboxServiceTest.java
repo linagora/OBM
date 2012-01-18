@@ -32,12 +32,14 @@
 package org.obm.push.mail;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
-
-import java.io.InputStream;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.mail.Flags;
@@ -57,8 +59,10 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.collect.Iterables;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -72,6 +76,7 @@ public class ImapMailboxServiceTest {
 	@Inject ImapMailboxService mailboxService;
 	
 	@Inject GreenMail greenMail;
+	@Inject ImapMailBoxUtils mailboxUtils;
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
@@ -301,5 +306,75 @@ public class ImapMailboxServiceTest {
 	
 	private MailboxFolder inbox() {
 		return folder("INBOX");
+	}
+
+	@Test
+	public void testStoreInInboxReadStatus() throws Exception {
+		List<Boolean> emailsToSendReadStatus = Lists.newArrayList(false, true, false, false, true);
+		Date before = new Date();
+
+		for (boolean emailToSendIsRead : emailsToSendReadStatus) {
+			InputStream emailData =  MailTestsUtils.loadEmail("plainText.eml");
+			mailboxService.storeInInbox(bs, emailData, emailToSendIsRead);
+		}
+		
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		List<Email> orderedEmails = mailboxUtils.orderEmailByUid(emails);
+		Assertions.assertThat(orderedEmails).isNotNull().hasSize(emailsToSendReadStatus.size());
+		assertReadStatus(orderedEmails, emailsToSendReadStatus);
+		assertUniqueUids(orderedEmails);
+	}
+
+	@Test
+	public void testStoreInInboxUniqueUids() throws Exception {
+		int countOfEmailForUidTesting = 15;
+		Date before = new Date();
+
+		for (int emailStored = 0; emailStored < countOfEmailForUidTesting; emailStored++) {
+			InputStream emailData =  MailTestsUtils.loadEmail("plainText.eml");
+			mailboxService.storeInInbox(bs, emailData, true);
+		}
+		
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(countOfEmailForUidTesting);
+		assertUniqueUids(emails);
+	}
+	
+	@Test
+	public void testStoreInInboxInvitation() throws Exception {
+		Date before = new Date();
+		InputStream emailData = MailTestsUtils.loadEmail("androidInvit.eml");
+
+		mailboxService.storeInInbox(bs, emailData, true);
+
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+
+	@Test
+	public void testStoreInInboxNotAnEmail() throws Exception {
+		Date before = new Date();
+		InputStream notAnEmailData = new ByteArrayInputStream(new byte[]{'t','e','s','t'});
+
+		mailboxService.storeInInbox(bs, notAnEmailData, true);
+
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+
+	private void assertReadStatus(List<Email> emails, List<Boolean> emailsExpectedStatus) {
+		int indexEmailExpectedStatus = 0;
+		for (Email storedEmail : emails) {
+			boolean expectedRead = emailsExpectedStatus.get(indexEmailExpectedStatus++);
+			Assertions.assertThat(storedEmail.isRead()).isEqualTo(expectedRead);
+		}
+	}
+
+	private void assertUniqueUids(Collection<Email> emails) {
+		Set<Long> uids = Sets.newHashSet();
+		for (Email storedEmail : emails) {
+			uids.add(storedEmail.getUid());
+		}
+		Assertions.assertThat(uids).hasSize(emails.size());
 	}
 }
