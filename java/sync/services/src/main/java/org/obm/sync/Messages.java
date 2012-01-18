@@ -51,6 +51,10 @@ public class Messages {
 		return getString("NewEventTitle", owner, title);
 	}
 
+	public String newRecurrentEventTitle(String owner, String title) {
+		return getString("NewRecurrentEventTitle", owner, title);
+	}
+	
 	private String getString(String key, Object... arguments) {
 		String isoEncodedString = bundle.getString(key);
 		String string = new String(isoEncodedString.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
@@ -61,9 +65,17 @@ public class Messages {
 	public String canceledEventTitle(String owner, String title) {
 		return getString("CanceledEventTitle", owner, title);
 	}
+	
+	public String canceledRecurrentEventTitle(String owner, String title) {
+		return getString("CanceledRecurrentEventTitle", owner, title);
+	}
 
 	public String updatedEventTitle(String owner, String title) {
 		return getString("UpdatedEventTitle", owner, title);
+	}
+	
+	public String updatedRecurrentEventTitle(String owner, String title) {
+		return getString("UpdatedRecurrentEventTitle", owner, title);
 	}
 
 	public String updateParticipationStateTitle(String title) {
@@ -78,9 +90,75 @@ public class Messages {
 		return getString("ParticipationStateDeclined");
 	}
 
+	public String participationStateNeedsAction() {
+		return getString("ParticipationStateNeedsAction");
+	}
+	
 	public String connectorVersionErrorTitle() {
 		return getString("ConnectorVersionErrorTitle");
 	}
 
+	public String withoutRecurrenceEndDate() {
+		return getString("WithoutRecurrenceEndDate");
+	}
 	
+	public String dailyRecurrenceInfoWithFrequency(int frequency) {
+		return getString("DailyRecurrenceInfo", frequency+" ");
+	}
+	
+	public String dailyRecurrenceInfoWithoutFrequency() {
+		return getString("DailyRecurrenceInfo", "");
+	}
+	
+	public String weeklyRecurrenceInfoWithFrequency(int frequency) {
+		return getString("WeeklyRecurrenceInfo", frequency+" ");
+	}	
+
+	public String weeklyRecurrenceInfoWithoutFrequency() {
+		return getString("WeeklyRecurrenceInfo", "");	
+	}	
+	
+	public String monthlyRecurrenceInfoWithFrequency(int frequency) {
+		return getString("MonthlyRecurrenceInfo", frequency+" ");	
+	}
+
+	public String monthlyRecurrenceInfoWithoutFrequency() {
+		return getString("MonthlyRecurrenceInfo", "");	
+	}
+	
+	public String annuallyRecurrenceInfoWithFrequency(int frequency) {
+		return getString("AnnuallyRecurrenceInfo", frequency+" ");	
+	}
+
+	public String annuallyRecurrenceInfoWithoutFrequency() {
+		return getString("AnnuallyRecurrenceInfo", "");	
+	}
+	
+	public String monday() {
+		return getString("Monday");
+	}
+	
+	public String tuesday() {
+		return getString("Tuesday");
+	}
+	
+	public String wednesday() {
+		return getString("Wednesday");
+	}
+	
+	public String thursday() {
+		return getString("Thursday");
+	}
+	
+	public String friday() {
+		return getString("Friday");
+	}
+	
+	public String saturday() {
+		return getString("Saturday");
+	}
+	
+	public String sunday() {
+		return getString("Sunday");
+	}
 }

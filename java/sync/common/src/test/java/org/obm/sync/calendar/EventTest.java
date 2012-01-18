@@ -494,7 +494,12 @@ public class EventTest {
 		Assert.assertNotNull(instance);
 		Assert.assertEquals(exception, instance);
 	}
-	
+
+	@Test
+	public void testIsNotRecurrentForNullEventRecurrence(){
+		Event ev1 = createOneEvent(1);
+		Assert.assertFalse(ev1.isRecurrent());
+	}
 	
 	private Event createOneEvent(int nbAttendees) {
 		Event event = new Event();
@@ -556,7 +561,7 @@ public class EventTest {
 	private EventRecurrence createRecurrence(Event event) {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setDays("days");
+		recurrence.setDays("1100111");
 		recurrence.setEnd(new Date());
 		recurrence.setFrequence(1);
 		List<Event> events = new LinkedList<Event>();

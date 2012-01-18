@@ -1,13 +1,13 @@
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Appointment Updated
+          Recurrent appointment Updated
         </th>
     </tr>
     <tr>
         <td colspan="2">
-The appointment ${new.subject}, initially scheduled from ${old.start} to ${old.end}, (location : ${old.location}),
-was updated:</td>
+The recurrent appointment ${new.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime} - ${old.endTime}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}),
+was updated : </td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
@@ -16,7 +16,13 @@ was updated:</td>
         <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.end}</td>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.recurrenceEnd}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${new.startTime} - ${new.endTime}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;">${new.recurrenceKind}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${new.location}</td>
@@ -31,9 +37,12 @@ was updated:</td>
         <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;">${new.attendees}</td>
     </tr>
     <tr>
+    	<td colspan="2">
+      		<strong>NB : </strong>If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
+    	</td>
+	</tr>
+    <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED">Accept</a>
-          <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED">Decline</a>
           <a href="${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}">More informations</a>
         </td>
     </tr>

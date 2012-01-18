@@ -35,6 +35,7 @@ package org.obm.sync.calendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.junit.Assert;
@@ -118,6 +119,127 @@ public class EventRecurrenceTest {
 		Event exception = rec1.getEventExceptionWithRecurrenceId(e1.getRecurrenceId());
 		Assert.assertNotNull(exception);
 		Assert.assertEquals(e1, exception);
+	}
+	
+	@Test
+	public void testGetReadableRepeatDays() {
+		EventRecurrence rec1 = new EventRecurrence();
+		
+		rec1.setDays("0101100");
+		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
+		EnumSet<RecurrenceDay> expectedEnumSetOfDays = EnumSet.of(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Thursday);
+		Assert.assertEquals(repeatDays, expectedEnumSetOfDays);
+	}
+	
+	@Test
+	public void testGetReadableRepeatDaysWithAllZeroDays() {
+		EventRecurrence rec1 = new EventRecurrence();
+		
+		rec1.setDays("0000000");
+		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
+		Assert.assertTrue(repeatDays.isEmpty());
+	}
+
+	@Test
+	public void testGetReadableRepeatDaysWithNullRepeatDays() {
+		EventRecurrence rec1 = new EventRecurrence();
+		
+		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
+		Assert.assertTrue(repeatDays.isEmpty());
+	}
+
+	@Test
+	public void testGetReadableRepeatDaysWithEmptyRepeatDays() {
+		EventRecurrence rec1 = new EventRecurrence();
+		
+		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
+		Assert.assertTrue(repeatDays.isEmpty());
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testsetDaysWithMoreDaysThanEnumSize() {
+		EventRecurrence rec1 = new EventRecurrence();
+		rec1.setDays("00000000");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testsetDaysWithLessDaysThanEnumSize() {
+		EventRecurrence rec1 = new EventRecurrence();
+		rec1.setDays("000000");		
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetDaysWithIllegalCharacter() {
+		EventRecurrence rec1 = new EventRecurrence();
+		rec1.setDays("0000200");			
+	}
+	
+	@Test
+	public void testReplaceDeclinedEventExceptionByException() {
+		EventRecurrence rec1 = getOneDailyEventRecurence();
+		
+		Event e1 = createEventException(1, 2);
+		Event e2 = createEventException(2, 3);
+		
+		Attendee attendeeWithDeclinedEvent = new Attendee();
+		attendeeWithDeclinedEvent.setEmail("email0@email.com");
+		e1.getAttendees().get(0).setState(ParticipationState.DECLINED);
+		
+		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEvent);
+		
+		Assert.assertTrue(rec1.getEventExceptions().size() == 1);
+		Assert.assertTrue(rec1.getExceptions().length == 1);
+		Assert.assertEquals(rec1.getExceptions()[0], e1.getRecurrenceId());
+	}
+	
+	@Test
+	public void testDailyIsRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		
+		Assert.assertTrue(rec1.isRecurrent());
+	}
+
+	@Test
+	public void testWeeklyIsRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.weekly);
+		
+		Assert.assertTrue(rec1.isRecurrent());
+	}
+	
+	@Test
+	public void testMonthlyByDayIsRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.monthlybyday);
+		
+		Assert.assertTrue(rec1.isRecurrent());
+	}
+	
+	@Test
+	public void testMonthlyByDateIsRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.monthlybydate);
+		
+		Assert.assertTrue(rec1.isRecurrent());
+	}
+	
+	@Test
+	public void testYearlyIsRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.yearly);
+		
+		Assert.assertTrue(rec1.isRecurrent());
+	}
+	
+	@Test 
+	public void testIsNotRecurrent() {
+		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.none);
+		
+		Assert.assertFalse(rec1.isRecurrent());
+	}
+	
+	private EventRecurrence getOneEventRecurrenceByKind(RecurrenceKind recurrenceKind) {
+		EventRecurrence rec = new EventRecurrence();
+		rec.setKind(recurrenceKind);
+		
+		return rec;
 	}
 	
 	private EventRecurrence getOneDailyEventRecurence() {

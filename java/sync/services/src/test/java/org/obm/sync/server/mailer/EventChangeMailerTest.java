@@ -67,7 +67,9 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
 
 import com.google.common.base.Charsets;
@@ -81,9 +83,10 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @RunWith(Suite.class)
-@SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, 
-	EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, 
-	EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class})
+@SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, EventChangeMailerTest.NeedActionCreationRecurrentEvent.class, 
+	EventChangeMailerTest.AcceptedCreationRecurrentEvent.class, EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.CancelationRecurrentEvent.class,
+	EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class,
+	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class})
 
 public class EventChangeMailerTest {
 
@@ -186,6 +189,33 @@ public class EventChangeMailerTest {
 			event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 			event.setDuration(2700);
 			event.setUid(new EventObmId(1354));
+			EventRecurrence recurrence = new EventRecurrence();
+			recurrence.setKind(RecurrenceKind.lookup("none"));
+			event.setRecurrence(recurrence);
+			return event;
+		}
+		
+		protected Event buildTestRecurrentEvent() {
+			Event event = new Event();
+			event.setTimeCreate(new Date(1244470973000L));
+			event.setTimeUpdate(new Date(1244470995000L));
+			event.addAttendee(createAttendee("Jean Dupont", "jdupont@obm.linagora.com"));
+			event.addAttendee(createAttendee("Pierre Dupond", "pdupond@obm.linagora.com"));
+			event.setTitle("A random recurrent event");
+			event.setOwner("jack");
+			event.setOwnerDisplayName("Jack de Linagora");
+			event.setOwnerEmail("jdlinagora@obm.linagora.com");
+			event.setDate(date(2012, 0, 23, 12, 00));
+			event.setExtId(new EventExtId("1234567890"));
+			event.setDuration(3600);
+			event.setLocation("A random location");
+			event.setUid(new EventObmId(1234));
+			EventRecurrence recurrence = new EventRecurrence();
+			recurrence.setKind(RecurrenceKind.lookup("weekly"));
+			recurrence.setFrequence(2);
+			recurrence.setDays("0101100");
+			recurrence.setEnd(date(2012, 10, 23, 12, 00));
+			event.setRecurrence(recurrence);
 			return event;
 		}
 
@@ -193,7 +223,7 @@ public class EventChangeMailerTest {
 			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
 			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
-					ResourceBundle.getBundle("Messages", Locale.FRENCH));
+					ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
 			Capture<MimeMessage> capturedMessage = new Capture<MimeMessage>();
 			EasyMock.replay(constantService);
 			List<InternetAddress> expectedRecipients = getExpectedRecipients();
@@ -396,6 +426,104 @@ public class EventChangeMailerTest {
 		}
 
 	}
+
+	public static class NeedActionCreationRecurrentEvent extends Common {
+
+		@Override
+		protected Event buildTestRecurrentEvent() {
+			Event event = super.buildTestRecurrentEvent();
+			event.setSequence(5);
+			return event;
+		}
+		
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
+			Event event = buildTestRecurrentEvent();
+			String ics  = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(), event);
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+		}
+		
+		@Test
+		public void invitationRequest() throws IOException, MessagingException {
+			super.testInvitation();
+		}
+
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+		
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
+			checkStringContains(parts.rawMessage, 
+					"From: Obm User <user@test>",
+					"To: Jean Dupont <jdupont@obm.linagora.com>",
+					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora_:_A_random_recurrent_event");
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			checkIcs(parts.textCalendar);
+			checkApplicationIcs(parts.applicationIcs);
+		}
+		
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
+				"du           : 23 janv. 2012", 
+				"au           : 23 nov. 2012",
+				"heure        : 12:00:00 - 13:00:00",
+				"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+				"sujet        : A random recurrent event", 
+				"lieu         : A random location",
+				"organisateur : Jack de Linagora"			
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+				"Invitation à un événement récurrent",
+				"Du 23 janv. 2012", 
+				"Au 23 nov. 2012", 
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora",
+				"Heure 12:00:00 - 13:00:00",
+				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]"
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {
+					"BEGIN:VCALENDAR",
+					"CALSCALE:GREGORIAN",
+					"VERSION:2.0",
+					"METHOD:REQUEST",
+					"BEGIN:VEVENT",
+					"DTSTART:20120123T110000Z",
+					"DURATION:PT1H",
+					"SUMMARY:A random recurrent event",
+					"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+					"UID:1234567890",
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:5",
+					"RRULE:FREQ=WEEKLY;UNTIL=20121124T120000;INTERVAL=2;BYDAY=TH,MO,WE"
+			};
+		}
+		@Override
+		protected List<InternetAddress> getExpectedRecipients() throws AddressException {
+			return createAddressList(
+					"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond " +
+					"<pdupond@obm.linagora.com>");
+		}
+
+	}
 	
 	public static class AcceptedCreation extends Common {
 
@@ -470,6 +598,80 @@ public class EventChangeMailerTest {
 
 	}
 
+	public static class AcceptedCreationRecurrentEvent extends Common {
+
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
+			Event event = buildTestRecurrentEvent();
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
+		}
+		
+		@Test
+		public void invitationRequest() throws IOException, MessagingException {
+			super.testNotification();
+		}
+
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkNotificationStructure(mimeMessage);
+		}
+		
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException, MessagingException {
+			checkStringContains(parts.rawMessage, 
+					"From: Obm User <user@test>",
+					"To: Jean Dupont <jdupont@obm.linagora.com>",
+					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora_:_A_random_recurrent_event");
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+		}
+		
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
+				"du            : 23 janv. 2012", 
+				"au            : 23 nov. 2012",
+				"heure         : 12:00:00 - 13:00:00",
+				"recurrence    : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+				"sujet         : A random recurrent event", 
+				"lieu          : A random location",
+				"organisateur  : Jack de Linagora",		
+				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous."
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+				"Invitation à un événement récurrent",
+				"Du 23 janv. 2012", 
+				"Au 23 nov. 2012", 
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora",
+				"Heure 12:00:00 - 13:00:00",
+				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+			    "Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous."
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {	};
+		}
+		@Override
+		protected List<InternetAddress> getExpectedRecipients() throws AddressException {
+			return createAddressList(
+					"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond " +
+					"<pdupond@obm.linagora.com>");
+		}
+
+	}	
+	
 	public static class NotifyAcceptedUpdateUsersCanWriteOnCalendar extends NotifyAcceptedUpdateUsers {
 		
 		@Override
@@ -685,6 +887,107 @@ public class EventChangeMailerTest {
 
 	}
 	
+	public static class NeedActionUpdateRecurrentEvent extends Common {
+
+		@Test
+		public void invitationUpdate() throws IOException, MessagingException {
+			super.testInvitation();
+		}
+		
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
+			Event before = buildTestRecurrentEvent();
+			Event after = before.clone();
+			after.setDate(date(2012, 01, 15, 13, 00));
+			after.setDuration(7200);
+			for (Attendee att : before.getAttendees()) {
+				att.setState(ParticipationState.NEEDSACTION);
+			}
+			after.setSequence(4);
+			AccessToken token = getStubAccessToken();
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(), after);			
+			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
+		}
+		
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+					"Invitation à un évènement récurrent : mise à jour",
+					"Du 15 févr. 2012", 
+					"Au 23 nov. 2012", 
+					"Sujet A random recurrent event", 
+					"Lieu A random location", 
+					"Organisateur Jack de Linagora",
+					"Heure 13:00:00 - 15:00:00",
+					"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]"
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {
+					"BEGIN:VCALENDAR",
+					"CALSCALE:GREGORIAN",
+					"VERSION:2.0",
+					"METHOD:REQUEST",
+					"BEGIN:VEVENT",
+					"DTSTART:20120215T120000Z",
+					"DURATION:PT2H",
+					"SUMMARY:A random recurrent event",
+					"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+					"UID:1234567890",
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:4"
+				};
+		}
+		
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+					"RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
+					"du 15 févr. 2012", 
+					"au 23 nov. 2012",
+					"de 13:00:00 à 15:00:00",
+					"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+					"lieu : A random location",
+				};
+		}
+		
+		@Override
+		protected List<InternetAddress> getExpectedRecipients()
+				throws AddressException {
+			return createAddressList(
+					"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond " +
+					"<pdupond@obm.linagora.com>");
+		}
+		
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+		
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException,
+				MessagingException {
+			checkStringContains(parts.rawMessage, 
+					"From: Obm User <user@test>",
+					"To: Jean Dupont <jdupont@obm.linagora.com>",
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event");
+
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			checkIcs(parts.textCalendar);
+			checkApplicationIcs(parts.applicationIcs);
+		}
+
+	}
+	
 	public static class Cancelation extends Common {
 
 		@Test
@@ -775,6 +1078,109 @@ public class EventChangeMailerTest {
 					"From: Obm User <user@test>",
 					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 					"Subject: =?UTF-8?Q?Annulation_d'un_=C3=A9v=C3=A9nement_de_Raphael");
+
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertEquals("text/calendar; charset=UTF-8; method=CANCEL;", parts.textCalendar.getContentType());
+			checkIcs(parts.textCalendar);
+			checkApplicationIcs(parts.applicationIcs);
+		}
+
+	}
+	
+	public static class CancelationRecurrentEvent extends Common {
+
+		@Test
+		public void invitationCancel() throws IOException, MessagingException {
+			super.testInvitation();
+		}
+
+		@Override
+		protected Event buildTestRecurrentEvent() {
+			Event event = super.buildTestRecurrentEvent();
+			event.setSequence(2);
+			return event;
+		}
+		
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
+			Event event = buildTestRecurrentEvent();
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(), event);
+			AccessToken token = getStubAccessToken();
+			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+		}
+		
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+					"Annulation d'un événement récurrent",
+					"Du 23 janv. 2012", 
+					"Au 23 nov. 2012", 
+					"Sujet A random recurrent event", 
+					"Lieu A random location", 
+					"Organisateur Jack de Linagora",
+					"Heure 12:00:00 - 13:00:00",
+					"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]"
+			};
+		}
+		
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {
+					"BEGIN:VCALENDAR",
+					"CALSCALE:GREGORIAN",
+					"VERSION:2.0",
+					"METHOD:CANCEL",
+					"BEGIN:VEVENT",
+					"DTSTART:20120123T110000Z",
+					"SUMMARY:A random recurrent event",
+					"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+					"UID:1234567890",
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+					"CREATED:20090608T142253Z",
+					"LAST-MODIFIED:20090608T142315Z",
+					"SEQUENCE:2",
+					"RRULE:FREQ=WEEKLY;UNTIL=20121124T120000;INTERVAL=2;BYDAY=TH,MO,WE"
+				};
+		}
+		
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+					"RENDEZ-VOUS RÉCURRENT ANNULÉ",
+					"du           : 23 janv. 2012", 
+					"au           : 23 nov. 2012",
+					"heure        : 12:00:00 - 13:00:00",
+					"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+					"sujet        : A random recurrent event", 
+					"lieu         : A random location",
+					"organisateur : Jack de Linagora"
+				};
+		}
+		
+		@Override
+		protected List<InternetAddress> getExpectedRecipients()
+				throws AddressException {
+			return createAddressList(
+					"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond " +
+					"<pdupond@obm.linagora.com>");
+		}
+		
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+		
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException,
+				MessagingException {
+			checkStringContains(parts.rawMessage, 
+					"From: Obm User <user@test>",
+					"To: Jean Dupont <jdupont@obm.linagora.com>",
+					"Subject: =?UTF-8?Q?Annulation_d'un_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora");
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);

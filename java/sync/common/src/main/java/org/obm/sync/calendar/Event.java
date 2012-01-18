@@ -538,6 +538,10 @@ public class Event implements Indexed<Integer> {
 		}
 		return instance;
 	}
+	
+	public boolean isRecurrent() {
+		return (this.getRecurrence() != null && getRecurrence().isRecurrent()); 
+	}
 
 	@Override
 	public final int hashCode() {

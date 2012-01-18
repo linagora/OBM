@@ -7,7 +7,28 @@
     <tr>
         <td colspan="2">
 The appointment ${new.subject}, initially scheduled from ${old.start} to ${old.end}, (location : ${old.location}),
-was updated and will take place from ${new.start} to ${new.end}, (location : ${new.location}). </td>
+was updated: </td>
+    </tr>
+    <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.end}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${new.location}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;">${new.organizer}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;">${new.creator}</td>
+    </tr>
+    <tr valign="top">
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;">${new.attendees}</td>
     </tr>
     <tr>
     	<td colspan="2">

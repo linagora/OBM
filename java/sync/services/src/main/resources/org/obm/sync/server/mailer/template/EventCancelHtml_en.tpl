@@ -25,4 +25,7 @@
     <tr>
         <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;">${creator}</td>
     </tr>
+    <tr valign="top">
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;">${attendees}</td>
+    </tr>
 </table>

@@ -25,6 +25,9 @@
     <tr>
         <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;">${creator}</td>
     </tr>
+    <tr valign="top">
+        <td style="text-align:right;padding-right:1em;">Participant(s)</td><td style="font-weight:bold;">${attendees}</td>
+    </tr>
     <tr>
     	<td colspan="2">
     	  <strong>NB : </strong>Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.

@@ -26,6 +26,9 @@ a été modifié :</td>
     <tr>
         <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;">${new.creator}</td>
     </tr>
+    <tr valign="top">
+        <td style="text-align:right;padding-right:1em;">Participant(s)</td><td style="font-weight:bold;">${new.attendees}</td>
+    </tr>
     <tr>
         <td style="text-align:right;" colspan="2">
           <a href="${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED">Accepter</a>
