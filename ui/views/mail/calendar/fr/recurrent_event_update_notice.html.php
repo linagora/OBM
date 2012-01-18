@@ -34,11 +34,49 @@ applicable to the OBM software.
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Appointment Deleted !
+          Invitation à un évènement récurrent : mise à jour
         </th>
     </tr>
     <tr>
-        <td colspan="2">The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.</td>
+        <td colspan="2">
+Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?> (lieu : <?php echo $old_location; ?>),
+a été modifié : </td>
+    </tr>
+    <tr>
+        <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;"><?php echo $startDate; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;"><?php echo $endDate; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Heure</td><td style="font-weight:bold;"><?php echo $startTime." - ".$endTime ; ?></td>
+    </tr>    
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Type de récurrence</td><td style="font-weight:bold;"><?php echo $repeat_kind; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;"><?php echo $location; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Participant(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+          <strong>NB : </strong>Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:right;" colspan="2">
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Plus de détails</a>
+        </td>
     </tr>
 </table>

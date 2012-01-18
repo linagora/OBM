@@ -825,10 +825,18 @@ class OBM_EventMailObserver implements  OBM_IObserver {
   private function sendNewUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
     if (!empty($invit_recipients)) {
-      $this->mailer->sendEventInvitation($new, $invit_recipients);
+      if ($new->repeat_kind == 'none') {
+      	$this->mailer->sendEventInvitation($new, $invit_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventInvitation($new, $invit_recipients);
+      }
     }
     if (!empty($notice_recipients)) {
-      $this->mailer->sendEventNotice($new, $notice_recipients);
+      if ($new->repeat_kind == 'none') {
+        $this->mailer->sendEventNotice($new, $notice_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventNotice($new, $notice_recipients);
+      }  
     } 
   }
 
@@ -843,12 +851,20 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendOldUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
-    if (!empty($invit_recipients)) {
-      $this->mailer->sendEventCancel($old, $invit_recipients);
+      if (!empty($invit_recipients)) {
+        if ($new->repeat_kind == 'none') {
+      	$this->mailer->sendEventCancel($old, $invit_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventCancel($old, $invit_recipients);
+      }
     }
     if (!empty($notice_recipients)) {
-      $this->mailer->sendEventCancelNotice($old, $notice_recipients);
-    }      
+      if ($new->repeat_kind == 'none') {
+        $this->mailer->sendEventCancelNotice($old, $notice_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventCancelNotice($old, $notice_recipients);
+      }  
+    }       
   }
 
   /**
@@ -863,10 +879,18 @@ class OBM_EventMailObserver implements  OBM_IObserver {
   private function sendCurrentUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
     if (!empty($invit_recipients) && self::hasEventFullyChanged($old, $new)) {
-      $this->mailer->sendEventUpdate($new, $old, $invit_recipients);
+      if ($new->repeat_kind == 'none') {
+      	$this->mailer->sendEventUpdate($new, $old, $invit_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventUpdate($new, $old, $invit_recipients);
+      }
     }
     if (!empty($notice_recipients) && $this->hasEventFullyChanged($old, $new)) {
-      $this->mailer->sendEventUpdateNotice($new, $old, $notice_recipients);
+      if ($new->repeat_kind == 'none') {
+        $this->mailer->sendEventUpdateNotice($new, $old, $notice_recipients);
+      } else {
+      	$this->mailer->sendRecurrentEventUpdateNotice($new, $old, $notice_recipients);
+      } 
     }
   }
   
@@ -896,7 +920,11 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendNewContactMail($old, $new, $recipients) {
     if (!empty($recipients)) {
-      $this->mailer->sendContactInvitation($new, $recipients);
+    	if ($new->repeat_kind == 'none') {
+      	  $this->mailer->sendContactInvitation($new, $recipients);
+    	} else {
+    	  $this->mailer->sendRecurrentContactInvitation($new, $recipients);
+    	}
     } 
   }
 
@@ -912,7 +940,11 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendOldContactMail($old, $new, $recipients) {
     if (!empty($recipients)) {
-      $this->mailer->sendContactCancel($old, $recipients);
+    	if ($new->repeat_kind == 'none') {
+      	  $this->mailer->sendContactCancel($old, $recipients);
+    	} else {
+    	  $this->mailer->sendRecurrentContactCancel($old, $recipients);
+    	}
     }       
   }
 
@@ -927,7 +959,11 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendCurrentContactMail($old, $new, $recipients) {
     if (self::hasEventFullyChanged($old, $new)) {
-      $this->mailer->sendContactUpdate($new, $old, $recipients);
+    	if ($new->repeat_kind == 'none') {
+      	  $this->mailer->sendContactUpdate($new, $old, $recipients);
+    	} else {
+    	  $this->mailer->sendRecurrentContactUpdate($new, $old, $recipients);
+    	}
     }
   }
 

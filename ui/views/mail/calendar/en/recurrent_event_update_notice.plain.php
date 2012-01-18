@@ -31,14 +31,33 @@ applicable to the OBM software.
 
 
 ?>
-<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
-    <tr>
-        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Appointment Deleted !
-        </th>
-    </tr>
-    <tr>
-        <td colspan="2">The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.</td>
-    </tr>
-</table>
+This email was automatically sent by OBM
+------------------------------------------------------------------
+RECURRENT APPOINTMENT UPDATED !
+------------------------------------------------------------------
+
+The appointment <?php echo $title; ?>, initially scheduled from <?php echo $old_startDate; ?> to <?php echo $old_endDate; ?> at <?php echo $old_startTime." - ".$old_endTime ; ?> (location : <?php echo $old_location; ?>),
+was updated :
+
+from        : <?php echo $startDate; ?>
+
+to          : <?php echo $endDate; ?>
+
+time        : <?php echo $startTime." - ".$endTime ; ?>
+
+recurrence  : <?php echo $repeat_kind; ?>
+
+subject     : <?php echo $title; ?>
+
+location    : <?php echo $location; ?>
+
+organizer   : <?php echo $organizer; ?>
+
+created by  : <?php echo $creator; ?>
+
+attendee(s) : <?php echo $attendees; ?>
+
+::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
+
+:: More information : 
+<?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

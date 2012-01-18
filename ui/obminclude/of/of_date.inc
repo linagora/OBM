@@ -383,7 +383,17 @@ class Of_Date extends DateTime {
     return $this->format(self::HOUR);
   }
 
-
+  /**
+  * Get the time formated with the outputdatetime option
+  *
+  * @access public
+  * @return void
+  */
+  public function getOutputTime() {
+  	if (self::$_options['timeformat'] == '12H') return $this->get(self::TIME_SHORT_AM);
+  	return $this->get(self::TIME_SHORT);
+  }
+  
   /**
    * Get the date formated with the outputdate option
    * 

@@ -57,6 +57,15 @@ class CalendarMailer extends OBM_Mailer {
     $this->attachIcs($event, "request");
   }
   
+  protected function recurrentEventInvitation($event, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('New recurrent event from %organizer%: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
+  	$this->attachIcs($event, "request");
+  }
+  
   protected function eventNotice($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
@@ -65,6 +74,14 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from);
   }
 
+  protected function recurrentEventNotice($event, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('New recurrent event from %organizer%: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
+  } 
+  
   protected function eventCancel($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
@@ -74,12 +91,29 @@ class CalendarMailer extends OBM_Mailer {
     $this->attachIcs($event, "cancel");
   }
   
+  protected function recurrentEventCancel($event, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('Recurrent event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
+  	$this->attachIcs($event, "cancel");
+  }  
+  
   protected function eventCancelNotice($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
     $this->return_path = $this->getOwner($event);
     $this->subject = __('Event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
+  }
+
+  protected function recurrentEventCancelNotice($event, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('Recurrent event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
   }
   
   protected function eventUpdate($event, $oldEvent, $attendees) {
@@ -91,6 +125,16 @@ class CalendarMailer extends OBM_Mailer {
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     $this->attachIcs($event, "request");
   }
+
+  protected function recurrentEventUpdate($event, $oldEvent, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('Recurrent event from %organizer% updated: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = array_merge($this->extractEventDetails($event, $this->from),
+  	$this->extractEventDetails($oldEvent, $this->from, 'old_'));
+  	$this->attachIcs($event, "request");
+  }
   
   protected function eventUpdateNotice($event, $oldEvent, $attendees) {
     $this->from = $this->getSender();
@@ -100,7 +144,16 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
-
+  
+  protected function recurrentEventUpdateNotice($event, $oldEvent, $attendees) {
+  	$this->from = $this->getSender();
+  	$this->recipients = $this->getRecipients($attendees);
+  	$this->return_path = $this->getOwner($event);
+  	$this->subject = __('Recurrent event from %organizer% updated: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = array_merge($this->extractEventDetails($event, $this->from),
+  	$this->extractEventDetails($oldEvent, $this->from, 'old_'));
+  }
+  
   protected function eventStateUpdate($event, $user, $attendeeState) {
     $userId = null;
     if ( $attendeeState && is_array( $attendeeState ) && array_key_exists("user",$attendeeState) &&
@@ -178,11 +231,27 @@ class CalendarMailer extends OBM_Mailer {
       }
     }
     $this->recipients = $recips;
-    $this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+   	$this->subject = __('New event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
     $this->attachIcs($event, "request", true);
   }
 
+  protected function recurrentContactInvitation($event, $contacts) {
+  	$this->from = $this->getSender();
+  	$recips = array();
+  	foreach($contacts as $contact) {
+  		$contact_info = get_entity_info($contact->id, 'contact');
+  		$label = $contact_info['label'];
+  		$email = $contact_info['email'];
+  		if (trim($email) != "") {
+  			array_push($recips, array($email, $label));
+  		}
+  	}
+  	$this->recipients = $recips;
+  	$this->subject = __('New recurrent event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
+  	$this->attachIcs($event, "request", true);
+  }
 
   protected function contactCancel($event, $contacts) {
     $this->from = $this->getSender();
@@ -201,6 +270,22 @@ class CalendarMailer extends OBM_Mailer {
     $this->attachIcs($event, "cancel");
   }
 
+  protected function recurrentContactCancel($event, $contacts) {
+  	$this->from = $this->getSender();
+  	$recips = array();
+  	foreach($contacts as $contact) {
+  		$contact_info = get_entity_info($contact->id, 'contact');
+  		$label = $contact_info['label'];
+  		$email = $contact_info['email'];
+  		if (trim($email) != "") {
+  			array_push($recips, array($email, $label));
+  		}
+  	}
+  	$this->recipients = $recips;
+  	$this->subject = __('Recurrent event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = $this->extractEventDetails($event, $this->from);
+  	$this->attachIcs($event, "cancel");
+  }
 
   protected function contactUpdate($event, $oldEvent, $contacts) {
     $this->from = $this->getSender();
@@ -218,6 +303,24 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     $this->attachIcs($event, "request", true);
+  }
+  
+  protected function recurrentContactUpdate($event, $oldEvent, $contacts) {
+  	$this->from = $this->getSender();
+  	$recips = array();
+  	foreach($contacts as $contact) {
+  		$contact_info = get_entity_info($contact->id, 'contact');
+  		$label = $contact_info['label'];
+  		$email = $contact_info['email'];
+  		if (trim($email) != "") {
+  			array_push($recips, array($email, $label));
+  		}
+  	}
+  	$this->recipients = $recips;
+  	$this->subject = __('Recurrent event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->body = array_merge($this->extractEventDetails($event, $this->from),
+  	$this->extractEventDetails($oldEvent, $this->from, 'old_'));
+  	$this->attachIcs($event, "request", true);
   }
   
   protected function attachIcs($event, $method, $include_attachments = false) {
@@ -252,22 +355,63 @@ class CalendarMailer extends OBM_Mailer {
     $list_attendees = implode(', ', $list_attendees).$suffix;
 
     return array(
-      'host'             => $GLOBALS['cgp_host'],
-      $prefix.'id'       => $event->id,
-      $prefix.'start'    => $event->date_begin->getOutputDateTime(),
-      $prefix.'startDate'    => $event->date_begin->getOutputDate(),
-      $prefix.'end'      => $event->date_end->getOutputDateTime(),
-      $prefix.'title'    => $event->title,
-      $prefix.'location' => $event->location,
-      $prefix.'organizer'=> $event->owner->label,
-      $prefix.'creator'  => $event->creator->label,
-      $prefix.'target'   => $target->label,
-      $prefix.'targetState' => __($target->state),
-      $prefix.'attendees' => $list_attendees
+      'host'               => $GLOBALS['cgp_host'],
+      $prefix.'id'         => $event->id,
+      $prefix.'start'      => $event->date_begin->getOutputDateTime(),
+      $prefix.'end'        => $event->date_end->getOutputDateTime(),
+      $prefix.'startDate'  => $event->date_begin->getOutputDate(),
+      $prefix.'endDate'    => $event->repeat_end->getOutputDate(),
+      $prefix.'startTime'  => $event->date_begin->getOutputTime(),
+      $prefix.'endTime'    => $event->date_end->getOutputTime(),
+      $prefix.'repeat_kind'=> $this->getReadableRecurrence($event),
+      $prefix.'title'      => $event->title,
+      $prefix.'location'   => $event->location,
+      $prefix.'organizer'  => $event->owner->label,
+      $prefix.'creator'    => $event->creator->label,
+      $prefix.'target'     => $target->label,
+      $prefix.'targetState'=> __($target->state),
+      $prefix.'attendees'  => $list_attendees
     );
   }
-
+  
+  private function getReadableRecurrence($event) {
+  	$recurrence = "";
+  	$repeatfrequency = ($event->repeatfrequency > 1) ? $event->repeatfrequency." " : "";
+  	switch($event->repeat_kind) {
+  		case "daily":
+  			$recurrence .= __('Every %frequency%days', array('%frequency%'=>$repeatfrequency));
+  			break;
+  		case "weekly":
+  			$recurrence .= __('Every %frequency%weeks', array('%frequency%'=>$repeatfrequency));
+  			break;
+  		case "monthly":
+  			$recurrence .= __('Every %frequency%months', array('%frequency%'=>$repeatfrequency));
+  			break;
+  		case "annually":
+  			$recurrence .= __('Every %frequency%years', array('%frequency%'=>$repeatfrequency));
+  			break;
+  	}
+  	if($event->repeat_days && $event->repeat_days!="0000000")
+  		$recurrence .= " [".$this->getReadableRepeatDays($event->repeat_days)."]";
+  	
+  	return $recurrence;
+  }
+  
+  private function getReadableRepeatDays($repeat_days) {
+  	$readableRepeatDays= "";
+  	$arrayOfRepeatDays = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"); 
+    $repeatDaysSplitted = str_split($repeat_days);
+    for($i = 0, $size = sizeof($repeatDaysSplitted); $i < $size; $i++) {
+    	if($repeatDaysSplitted[$i] == '1') {
+    		$readableRepeatDays .= __($arrayOfRepeatDays[$i]).", ";
+    	}
+    }
+	$readableRepeatDays = substr($readableRepeatDays, 0, -2);
+    
+    return $readableRepeatDays;
+  }
 }
+
 
 class shareCalendarMailer extends OBM_Mailer {
   

@@ -34,11 +34,37 @@ applicable to the OBM software.
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Appointment Deleted !
+          Recurrent appointment deleted !
         </th>
     </tr>
     <tr>
-        <td colspan="2">The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.</td>
+        <td colspan="2">The following appointment has been deleted :</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;"><?php echo $startDate; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;"><?php echo $endDate; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;"><?php echo $startTime." - ".$endTime ; ?></td>
+    </tr>    
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;"><?php echo $repeat_kind; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Author</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Participants</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
     </tr>
 </table>
