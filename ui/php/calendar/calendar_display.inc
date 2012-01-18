@@ -5393,8 +5393,8 @@ function html_calendar_dis_delete($current_view, $event_id) {
   $event_details_q = run_query_calendar_detail($event_id);
 
   $is_recurrence = ($event_details_q->f('event_repeatkind') != 'none');
-  $message = $is_recurrence ? $GLOBALS[l_confirm_delete_all] :
-      $GLOBALS[l_confirm_delete_single];
+  $message = $is_recurrence ? $GLOBALS['l_confirm_delete_all'] :
+      $GLOBALS['l_confirm_delete_single'];
   $block = "
    <h1>$message</h1>
    <div class=\"C\">
