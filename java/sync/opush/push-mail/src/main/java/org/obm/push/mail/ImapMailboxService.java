@@ -446,16 +446,24 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Collection<Email> fetchEmails(BackendSession bs, Collection<Long> uids) {
+	public Collection<Email> fetchEmails(BackendSession bs, Collection<Long> uids) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
-		Collection<FastFetch> fetch = store.uidFetchFast(uids);
-		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
-					@Override
-					public Email apply(FastFetch input) {
-						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
-					}
-				});
-		return emails;
+		try {
+			login(store);
+			Collection<FastFetch> fetch = store.uidFetchFast(uids);
+			Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
+						@Override
+						public Email apply(FastFetch input) {
+							return new Email(input.getUid(), input.isRead(), input.getInternalDate());
+						}
+					});
+			return emails;	
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
+		}
+		
 	}
 	
 	@Override

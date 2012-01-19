@@ -678,7 +678,7 @@ public class MailBackendImpl implements MailBackend {
 		return mappingService.getItemIdFromServerId(serverId).longValue();
 	}
 
-	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids) throws DaoException {
+	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids) throws DaoException, MailException {
 		Collection<Email> emails = mailboxService.fetchEmails(bs, ImmutableList.of(mailUids));
 		try {
 			markEmailsAsSynced(devId, collectionId, emails);
