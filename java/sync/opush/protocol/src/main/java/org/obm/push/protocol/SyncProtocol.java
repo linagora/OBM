@@ -220,8 +220,8 @@ public class SyncProtocol {
 					// ParticipationState need-action
 					DOMUtils.createElementAndText(add, "Status",
 							SyncStatus.OK.asXmlValue());
+					processedClientIds.remove(entry.getKey());
 				}
-				processedClientIds.remove(entry.getKey());
 			}
 		}
 		if (responses.getChildNodes().getLength() == 0) {
