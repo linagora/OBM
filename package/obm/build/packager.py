@@ -146,10 +146,13 @@ class Packager(object):
             redefine_platform_params = distname != 'redhat'
             topdir = os.path.abspath(os.path.join(self._target_dir, 'rpm'))
             target_dir = os.path.abspath(self._target_dir)
+            # Use 1 as release number if it is missing, otherwise RPMs are built
+            # with %{obm_release} as release number!
+            rpm_release = self.release if self.release else 1
             command = "rpmbuild -ba --nodeps --define '_topdir %s' " \
                 "--define '_rpmdir %s' --define '_srcrpmdir %s' " \
                 "--define 'obm_version %s' --define 'obm_release %s' " % \
-                (topdir, target_dir, target_dir, self.version, self.release)
+                (topdir, target_dir, target_dir, self.version, rpm_release)
             if redefine_platform_params:
                 # Override the Perl module destination directory
                 command += "--define 'perl_vendorlib " \
