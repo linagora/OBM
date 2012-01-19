@@ -66,6 +66,9 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ImapCommandException;
+import org.obm.push.exception.ImapLogoutException;
+import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -440,6 +443,51 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		} finally {
 			store.logout();
 		}
+	}
+
+	@Override
+	public boolean storeInInboxWithJM(BackendSession bs, InputStream mailContent, boolean isRead) 
+			throws MailException {
+		
+		logger.info("Store mail in folder[Inbox]");
+		boolean commandSuccess = false;
+		ImapStore store = null;
+		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, mailContent, isRead);
+			commandSuccess = true;
+		} catch (ImapCommandException e) {
+			logger.warn(e.getMessage(), e);
+			throw new MailException(e.getMessage(), e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e.getMessage(), e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e.getMessage(), e);
+		} catch (MessagingException e) {
+			throw new MailException(e.getMessage(), e);
+		} finally {
+			logout(store);
+		}
+		return commandSuccess;
+	}
+
+	private void logout(ImapStore store) {
+		try {
+			if (store != null) {
+				store.logout();
+			}
+		} catch (ImapLogoutException e) {
+			logger.warn(e.getMessage(), e);
+		}
+	}
+	
+	private void storeMail(ImapStore store, String folderName, InputStream mailContent, 
+			boolean isRead) throws ImapCommandException, MessagingException {
+		Message msg = store.createMessage(mailContent);
+		msg.setFlag(Flags.Flag.SEEN, isRead);
+		Folder folder = store.getFolder(folderName);
+		folder.appendMessages(new Message[]{msg});
 	}
 
 	/**

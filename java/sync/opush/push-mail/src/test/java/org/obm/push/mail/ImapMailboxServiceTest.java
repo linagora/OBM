@@ -309,12 +309,23 @@ public class ImapMailboxServiceTest {
 	}
 
 	@Test
+	public void testStoreWithJM() throws MailException {
+		Date before = new Date();
+		InputStream emailData = loadEmail("androidInvit.eml");
+		
+		mailboxService.storeInInboxWithJM(bs, emailData, true);
+
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+	
+	@Test
 	public void testStoreInInboxReadStatus() throws Exception {
 		List<Boolean> emailsToSendReadStatus = Lists.newArrayList(false, true, false, false, true);
 		Date before = new Date();
 
 		for (boolean emailToSendIsRead : emailsToSendReadStatus) {
-			InputStream emailData =  MailTestsUtils.loadEmail("plainText.eml");
+			InputStream emailData =  loadEmail("plainText.eml");
 			mailboxService.storeInInbox(bs, emailData, emailToSendIsRead);
 		}
 		
@@ -322,7 +333,6 @@ public class ImapMailboxServiceTest {
 		List<Email> orderedEmails = mailboxUtils.orderEmailByUid(emails);
 		Assertions.assertThat(orderedEmails).isNotNull().hasSize(emailsToSendReadStatus.size());
 		assertReadStatus(orderedEmails, emailsToSendReadStatus);
-		assertUniqueUids(orderedEmails);
 	}
 
 	@Test
@@ -343,7 +353,7 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testStoreInInboxInvitation() throws Exception {
 		Date before = new Date();
-		InputStream emailData = MailTestsUtils.loadEmail("androidInvit.eml");
+		InputStream emailData = loadEmail("androidInvit.eml");
 
 		mailboxService.storeInInbox(bs, emailData, true);
 

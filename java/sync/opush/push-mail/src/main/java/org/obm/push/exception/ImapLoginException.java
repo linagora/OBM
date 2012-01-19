@@ -29,22 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.push.exception;
 
-public interface EmailConfiguration {
-
-	public static final String IMAP_PROTOCOL = "imap";
-	public static final String IMAP_INBOX_NAME = "INBOX";
-	public static final String IMAP_DRAFTS_NAME = "Drafts";
-	public static final String IMAP_SENT_NAME = "Sent";
-	public static final String IMAP_TRASH_NAME = "Trash";
-
-	boolean activateTls();
-
-	boolean loginWithDomain();
-
-	int getMessageMaxSize();
+public class ImapLoginException extends ImapCommandException {
 	
-	int imapPort();
-
+	public ImapLoginException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
 }
