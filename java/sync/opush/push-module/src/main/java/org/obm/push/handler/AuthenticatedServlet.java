@@ -12,6 +12,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
-	protected Credentials authentication(HttpServletRequest request) throws AuthFault {
+	protected Credentials authentication(HttpServletRequest request) throws AuthFault, BadRequestException {
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);
@@ -62,7 +63,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 				}
 			}
 		}
-		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
+		throw new BadRequestException("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
 	private Credentials getCredentials(String userId, String password) throws AuthFault {

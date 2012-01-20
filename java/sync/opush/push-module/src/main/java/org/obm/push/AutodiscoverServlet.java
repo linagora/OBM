@@ -17,6 +17,7 @@ import org.obm.push.impl.ResponderImpl;
 import org.obm.push.impl.ResponderImpl.Factory;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
@@ -53,6 +54,10 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 			autodiscoverHandler.process(null, backendSession, queryString, responder);
 		} catch (AuthFault e) {
 			logger.error(e.getMessage(), e);
+			returnHttpUnauthorized(request, response);
+			return;
+		} catch (BadRequestException e) {
+			logger.warn(e.getMessage());
 			returnHttpUnauthorized(request, response);
 			return;
 		}

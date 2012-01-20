@@ -60,6 +60,7 @@ import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
@@ -149,9 +150,6 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 
 			processActiveSyncMethod(c, creds, asrequest.getDeviceId(), asrequest, response);
 			
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-			throw e;
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
@@ -160,6 +158,10 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			returnHttpUnauthorized(request, response);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
+		} catch (BadRequestException e) {
+			logger.warn(e.getMessage());
+			returnHttpUnauthorized(request, response);
+			return;
 		} finally {
 			getLoggerService().closeSession();
 		}
@@ -188,7 +190,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		}
 	}
 	
-	private Credentials performAuthentication(ActiveSyncRequest request) throws AuthFault, DaoException {
+	private Credentials performAuthentication(ActiveSyncRequest request) throws AuthFault, DaoException, BadRequestException {
 		Credentials credentials = authentication(request.getHttpServletRequest());
 		
 		String deviceId = request.getDeviceId();
