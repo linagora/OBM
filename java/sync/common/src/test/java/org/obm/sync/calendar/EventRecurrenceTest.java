@@ -163,7 +163,7 @@ public class EventRecurrenceTest {
 		event.setType(EventType.VEVENT);
 		event.setUid(new EventObmId(id));
 		
-		Date d1 = getDate(2011, 12, 20);
+		Date d1 = getDate(2011, Calendar.DECEMBER, 20);
 		event.setRecurrenceId(d1);
 		event.setDate(d1);
 		return event;
