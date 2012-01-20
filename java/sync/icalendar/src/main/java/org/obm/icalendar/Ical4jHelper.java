@@ -158,21 +158,6 @@ public class Ical4jHelper {
 		return foldingWriterToString(calendar);
 	}
 	
-	public String buildIcsInvitationRequestForEventException(Ical4jUser iCal4jUser, Event event, EventExtId parentExtId) {
-		Calendar calendar = initCalendar();
-		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event);
-		calendar.getComponents().add(vEvent);
-		if (event.getRecurrence() != null) {
-			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEventException(ee);
-				appendUidToICS(eventExt.getProperties(), ee, parentExtId);
-				calendar.getComponents().add(eventExt);
-			}
-		}
-		calendar.getProperties().add(Method.REQUEST);
-		return foldingWriterToString(calendar);
-	}
-	
 	private String foldingWriterToString(final Calendar calendar) {
 		Writer writer =  new StringWriter();
 		CalendarOutputter calendarOutputter = new CalendarOutputter(true, MAX_FOLD_LENGTH);
@@ -287,10 +272,10 @@ public class Ical4jHelper {
 				if (Component.VEVENT.equals(typeCalendar)) {
 					VEvent vEvent = (VEvent) comp;
 					if (vEvent.getRecurrenceId() == null) {
-						Event event = getEvent(ical4jUser, vEvent);
+						Event event = convertVEventToEvent(ical4jUser, vEvent);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(ical4jUser, vEvent);
+						Event eexcep = convertVEventToEvent(ical4jUser, vEvent);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -303,10 +288,10 @@ public class Ical4jHelper {
 				} else if (Component.VTODO.equals(typeCalendar)) {
 					VToDo vTodo = (VToDo) comp;
 					if (vTodo.getRecurrenceId() == null) {
-						Event event = getEvent(ical4jUser, vTodo);
+						Event event = convertVTodoToEvent(ical4jUser, vTodo);
 						mapEvents.put(event.getExtId(), event);
 					} else {
-						Event eexcep = getEvent(ical4jUser, vTodo);
+						Event eexcep = convertVTodoToEvent(ical4jUser, vTodo);
 						Event event = mapEvents.get(eexcep.getExtId());
 
 						if (event != null) {
@@ -320,7 +305,7 @@ public class Ical4jHelper {
 		return mapEvents;
 	}
 
-	public Event getEvent(Ical4jUser ical4jUser, VEvent vEvent) {
+	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent) {
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
 		appendSummary(event, vEvent.getSummary());
@@ -347,7 +332,7 @@ public class Ical4jHelper {
 		return event;
 	}
 
-	public Event getEvent(Ical4jUser ical4jUser, VToDo vTodo) {
+	/* package */ Event convertVTodoToEvent(Ical4jUser ical4jUser, VToDo vTodo) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
 		appendSummary(event, vTodo.getSummary());
@@ -466,7 +451,7 @@ public class Ical4jHelper {
 		}
 	}
 
-	public void appendAllDay(Event event, DtStart startDate, DateProperty endDate) {
+	/* package */ void appendAllDay(Event event, DtStart startDate, DateProperty endDate) {
 		if (endDate != null && startDate != null && startDate.getDate() != null && endDate.getDate() != null)  {
 			if (startDate.getDate() instanceof DateTime	|| endDate.getDate() instanceof DateTime) {
 				event.setAllday(false);
@@ -619,11 +604,11 @@ public class Ical4jHelper {
 		prop.add(new Duration(new Dur(event.getDate(), event.getEndDate())));
 	}
 	
-	public VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method) {
+	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method) {
 		return getVEvent(iCal4jUser, event, null, null, replyAttendee, method);
 	}
 
-	public VEvent getVEvent(Ical4jUser iCal4jUser, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method) {
+	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -671,7 +656,7 @@ public class Ical4jHelper {
 		}
 	}
 
-	public VToDo getVToDo(Event event, Ical4jUser iCal4jUser) {
+	private VToDo getVToDo(Event event, Ical4jUser iCal4jUser) {
 		return getVTodo(event, null, iCal4jUser, null);
 	}
 
@@ -967,7 +952,7 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	public Recur getRecur(EventRecurrence eventRecurrence, Date eventDate) {
+	/* package */ Recur getRecur(EventRecurrence eventRecurrence, Date eventDate) {
 		Recur recur = null;
 		if (eventRecurrence != null) {
 			boolean isMonthyByDay = false;
@@ -1020,7 +1005,7 @@ public class Ical4jHelper {
 		return recur;
 	}
 
-	public Set<WeekDay> getListDay(EventRecurrence eventRecurrence) {
+	/* package */ Set<WeekDay> getListDay(EventRecurrence eventRecurrence) {
 		Set<WeekDay> listDay = new HashSet<WeekDay>();
 		String days = eventRecurrence.getDays();
 		if (days != null && !"".equals(days)) {
@@ -1044,7 +1029,7 @@ public class Ical4jHelper {
 		return listDay;
 	}
 
-	public int getDuration(DtStart startDate, DateProperty endDate) {
+	private int getDuration(DtStart startDate, DateProperty endDate) {
 		if (startDate != null && endDate != null) {
 			long start = startDate.getDate().getTime();
 			long end = endDate.getDate().getTime();
@@ -1053,16 +1038,7 @@ public class Ical4jHelper {
 		return 0;
 	}
 
-	public int getPrivacy(VToDo vEvent) {
-		if (vEvent.getClassification() != null
-				&& (Clazz.PRIVATE.equals(vEvent.getClassification()) || Clazz.CONFIDENTIAL
-						.equals(vEvent.getClassification()))) {
-			return 1;
-		}
-		return 0;
-	}
-
-	public void appendAlert(Event event, ComponentList cl) {
+	private void appendAlert(Event event, ComponentList cl) {
 		if (cl.size() > 0) {
 			
 			final VAlarm valarm = (VAlarm) cl.get(0);
@@ -1104,7 +1080,7 @@ public class Ical4jHelper {
 		return false;
 	}
 	
-	public void appendRecurence(Event event, CalendarComponent component) {
+	private void appendRecurence(Event event, CalendarComponent component) {
 		RRule rrule = (RRule) component.getProperties().getProperty(
 				Property.RRULE);
 
@@ -1220,7 +1196,7 @@ public class Ical4jHelper {
 		event.setRecurrence(er);
 	}
 
-	public void appendAttendees(Event event, Component vEvent) {
+	private void appendAttendees(Event event, Component vEvent) {
 		Map<String, Attendee> emails = new HashMap<String, Attendee>();
 		for (Property prop : getProperties(vEvent, Property.ATTENDEE)) {
 			Attendee att = new Attendee();
@@ -1301,7 +1277,7 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	public Calendar initCalendar() {
+	private Calendar initCalendar() {
 		Calendar calendar = new Calendar();
 
 		calendar.getProperties().add(
@@ -1312,7 +1288,7 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	public Set<Property> getExDate(Event event) {
+	/* package */ Set<Property> getExDate(Event event) {
 		Set<Property> ret = new HashSet<Property>();
 		if (event.getRecurrence() != null
 				&& event.getRecurrence().getExceptions() != null) {
@@ -1370,7 +1346,7 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	public VAlarm getVAlarm(Integer alert) {
+	/* package */ VAlarm getVAlarm(Integer alert) {
 		if (alert != null && !alert.equals(-1) && !alert.equals(0)) {
 			Dur dur = new Dur(0, 0, 0, -alert);
 			VAlarm va = new VAlarm(dur);
@@ -1383,14 +1359,14 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	public Clazz getClazz(int privacy) {
+	/* package */ Clazz getClazz(int privacy) {
 		if (0 == privacy) {
 			return Clazz.PUBLIC;
 		}
 		return Clazz.PRIVATE;
 	}
 
-	public Organizer getOrganizer(String owner, String ownerEmail) {
+	/* package */ Organizer getOrganizer(String owner, String ownerEmail) {
 		Organizer orga = new Organizer();
 		try {
 			if (owner != null && !"".equals(owner)) {
@@ -1405,7 +1381,7 @@ public class Ical4jHelper {
 		return orga;
 	}
 
-	public Transp getTransp(EventOpacity eo) {
+	/* package */ Transp getTransp(EventOpacity eo) {
 		Transp transp = Transp.OPAQUE;
 		if (EventOpacity.OPAQUE.equals(eo)) {
 			transp = Transp.OPAQUE;
@@ -1424,7 +1400,7 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	public DtEnd getDtEnd(Date start, int duration, boolean isAllDays) {
+	/* package */ DtEnd getDtEnd(Date start, int duration, boolean isAllDays) {
 		if (start != null && duration >= 0) {
 			net.fortuna.ical4j.model.Date dateTimeEnd = null;
 			if (isAllDays) {
@@ -1438,11 +1414,11 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	public DtEnd getDtEnd(Date end) {
+	private DtEnd getDtEnd(Date end) {
 		return new DtEnd(new DateTime(end));
 	}
 
-	public DtStart getDtStart(Date start, Boolean isAllDay) {
+	/* package */ DtStart getDtStart(Date start, Boolean isAllDay) {
 		net.fortuna.ical4j.model.Date dt = null;
 		if (isAllDay) {
 			dt = new net.fortuna.ical4j.model.Date(start.getTime() + SECONDS_IN_DAY);
@@ -1452,13 +1428,13 @@ public class Ical4jHelper {
 		return new DtStart(dt, true);
 	}
 
-	public RecurrenceId getRecurrenceId(Event event) {
+	private RecurrenceId getRecurrenceId(Event event) {
 		net.fortuna.ical4j.model.Date dt = null;
 		dt = new DateTime(event.getRecurrenceId());
 		return new RecurrenceId(dt);
 	}
 
-	public Role getRole(Attendee attendee) {
+	/* package */ Role getRole(Attendee attendee) {
 		Role role = Role.OPT_PARTICIPANT;
 		if (ParticipationRole.CHAIR.equals(attendee.getRequired())) {
 			role = Role.CHAIR;
@@ -1473,14 +1449,14 @@ public class Ical4jHelper {
 		return role;
 	}
 
-	public Cn getCn(Attendee attendee) {
+	/* package */ Cn getCn(Attendee attendee) {
 		if (isEmpty(attendee.getDisplayName())) {
 			return new Cn(attendee.getEmail());
 		}
 		return new Cn(attendee.getDisplayName());
 	}
 
-	public PartStat getPartStat(Attendee attendee) {
+	/* package */ PartStat getPartStat(Attendee attendee) {
 		PartStat partStat = PartStat.NEEDS_ACTION;
 		if (ParticipationState.ACCEPTED.equals(attendee.getState())) {
 			partStat = PartStat.ACCEPTED;
@@ -1500,7 +1476,7 @@ public class Ical4jHelper {
 		return partStat;
 	}
 
-	public RRule getRRule(Event event) {
+	/* package */ RRule getRRule(Event event) {
 		RRule rrule = null;
 		Recur recur = getRecur(event.getRecurrence(), event.getDate());
 		if (recur != null) {
@@ -1509,12 +1485,12 @@ public class Ical4jHelper {
 		return rrule;
 	}
 
-	public ComponentList getComponents(Calendar calendar,
+	/* package */ ComponentList getComponents(Calendar calendar,
 			String component) {
 		return calendar.getComponents(component);
 	}
 
-	public List<Property> getProperties(Component comp, String property) {
+	private List<Property> getProperties(Component comp, String property) {
 		List<Property> propsSet = new ArrayList<Property>();
 		PropertyList propList = comp.getProperties(property);
 		for (Iterator<Property> it = propList.iterator(); it.hasNext();) {
@@ -1524,7 +1500,7 @@ public class Ical4jHelper {
 		return propsSet;
 	}
 
-	public boolean isEmpty(String st) {
+	private boolean isEmpty(String st) {
 		return st == null || "".equals(st);
 	}
 
