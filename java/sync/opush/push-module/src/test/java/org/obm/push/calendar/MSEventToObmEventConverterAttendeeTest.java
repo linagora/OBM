@@ -33,7 +33,7 @@ package org.obm.push.calendar;
 
 import java.util.Date;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;

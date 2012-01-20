@@ -37,7 +37,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;

@@ -26,7 +26,7 @@ public class SendEmailTest {
 
 	@Test
 	public void testMailTextPlain() throws MimeException, IOException {
-		Message message = loadMimeMessage(getClass(), "plainText.eml");
+		Message message = loadMimeMessage("plainText.eml");
 		String defaultFrom = "john@test.opush";
 		SendEmail sendEmail = new SendEmail(defaultFrom, message);
 		Assertions.assertThat(sendEmail.getFrom()).isEqualTo(defaultFrom);
@@ -44,7 +44,7 @@ public class SendEmailTest {
 	
 	@Test
 	public void testMailAsNoFrom() throws MimeException, IOException {
-		Message message = loadMimeMessage(getClass(), "plainTextNoFrom.eml");
+		Message message = loadMimeMessage("plainTextNoFrom.eml");
 		String defaultFrom = "john@test.opush";
 		SendEmail sendEmail = new SendEmail(defaultFrom, message);
 		Assertions.assertThat(sendEmail.getFrom()).isEqualTo(defaultFrom);
@@ -55,21 +55,21 @@ public class SendEmailTest {
 	
 	@Test
 	public void testAndroidIsInvitation() throws MimeException, IOException{
-		Message message = loadMimeMessage(getClass(), "androidInvit.eml");
+		Message message = loadMimeMessage("androidInvit.eml");
 		SendEmail sendEmail = new SendEmail("john@test.opush", message);
 		Assert.assertTrue(sendEmail.isInvitation());
 	}
 	
 	@Test
 	public void testForwardedInvitation() throws MimeException, IOException{
-		Message message = loadMimeMessage(getClass(), "forwardInvitation.eml");
+		Message message = loadMimeMessage("forwardInvitation.eml");
 		SendEmail sendEmail = new SendEmail("john@test.opush", message);
 		Assert.assertFalse(sendEmail.isInvitation());
 	}
 	
 	@Test
 	public void testEmailWithEmbeddedImage() throws MimeException, IOException {
-		Message message = loadMimeMessage(getClass(), "androidEmbeddedImage.eml");
+		Message message = loadMimeMessage("androidEmbeddedImage.eml");
 		SendEmail sendEmail = new SendEmail("john@test.opush", message);
 		Message afterARoundTrip = loadMimeMessage(new ByteArrayInputStream(sendEmail.serializeMimeData().toByteArray()));
 		testEmailWithEmbeddedImage(sendEmail);

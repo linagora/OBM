@@ -38,7 +38,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.bean.CalendarBusyStatus;

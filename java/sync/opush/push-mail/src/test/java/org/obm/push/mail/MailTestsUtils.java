@@ -36,12 +36,12 @@ public class MailTestsUtils {
 
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
 	
-	public static InputStream loadEmail(Class<?> testClass, String name) {
-		return testClass.getClassLoader().getResourceAsStream("eml/" + name);
+	public static InputStream loadEmail(String name) {
+		return ClassLoader.getSystemResourceAsStream("eml/" + name);
 	}
 	
-	public static Message loadMimeMessage(Class<?> testClass, String name) throws MimeException, IOException {
-		InputStream eml = loadEmail(testClass, name);
+	public static Message loadMimeMessage(String name) throws MimeException, IOException {
+		InputStream eml = loadEmail(name);
 		return loadMimeMessage(eml);
 	}
 	

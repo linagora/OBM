@@ -91,7 +91,7 @@ public class MailBackendTest {
 
 		EasyMock.replay(emailManager, calendarClient, backendSession, login);
 
-		InputStream emailStream = loadEmail(getClass(), "bigEml.eml");
+		InputStream emailStream = loadEmail("bigEml.eml");
 		mailBackend.sendEmail(backendSession, ByteStreams.toByteArray(emailStream), true);
 		
 		EasyMock.verify(emailManager, calendarClient, backendSession, login);

@@ -32,7 +32,7 @@
 package org.obm.sync.calendar;
 
 import static org.obm.DateUtils.date;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.push.calendar.ObmEventToMSEventConverter.ACTIVESYNC_DEFAULT_FREQUENCY;
 
@@ -55,7 +55,6 @@ import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
-import org.obm.push.calendar.ObmEventToMSEventConverter;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;

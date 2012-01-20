@@ -28,7 +28,7 @@ public class ForwardEmailTest {
 	@Test
 	public void testForwardMessageMixedMultiPartWithAttachment() throws MimeException, IOException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-		Message message = loadMimeMessage(getClass(), "MAIL-WITH-ATTACHMENT.eml");
+		Message message = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 		
 		ForwardEmail forwardEmail = 
 				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message);
@@ -51,7 +51,7 @@ public class ForwardEmailTest {
 	@Test
 	public void testForwardMessageAlternativeMultiPart() throws MimeException, IOException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-		Message message = loadMimeMessage(getClass(), "OBMFULL-2958.eml");
+		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		ForwardEmail forwardEmail = 
 				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message);

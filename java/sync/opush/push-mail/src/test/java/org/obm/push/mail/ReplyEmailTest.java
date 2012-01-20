@@ -31,7 +31,7 @@ public class ReplyEmailTest {
 	@Test
 	public void testJira2362() throws IOException, MimeException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-		Message reply = loadMimeMessage(getClass(), "jira-2362.eml");
+		Message reply = loadMimeMessage("jira-2362.eml");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
@@ -45,7 +45,7 @@ public class ReplyEmailTest {
 	@Test
 	public void testReplyCopyOfAddress() throws IOException, MimeException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-		Message reply = loadMimeMessage(getClass(), "plainText.eml");
+		Message reply = loadMimeMessage("plainText.eml");
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 	
 		Assertions.assertThat(replyEmail.getFrom()).isEqualToIgnoringCase("from@linagora.test");
@@ -56,7 +56,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyEncodingShouldBeUTF8() throws IOException, MimeException, NotQuotableEmailException {
-		Message reply = loadMimeMessage(getClass(), "plainText.eml");
+		Message reply = loadMimeMessage("plainText.eml");
 		MSEmail original = MailTestsUtils.createMSEmailPlainTextASCII("origin");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
@@ -82,7 +82,7 @@ public class ReplyEmailTest {
 	@Test
 	public void testReplyTextToTextWithAttachment() throws IOException, MimeException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
-		Message reply = loadMimeMessage(getClass(), "MAIL-WITH-ATTACHMENT.eml");
+		Message reply = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		Message message = replyEmail.getMimeMessage();
@@ -265,7 +265,7 @@ public class ReplyEmailTest {
 	@Test
 	public void testTerminationSequenceEndLineInHTMLReplyEmail() throws IOException, MimeException, NotQuotableEmailException {
 		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
-		Message reply = loadMimeMessage(getClass(), "jira-2362.eml");
+		Message reply = loadMimeMessage("jira-2362.eml");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
 		
