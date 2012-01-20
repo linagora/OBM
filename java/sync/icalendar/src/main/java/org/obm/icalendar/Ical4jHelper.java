@@ -283,6 +283,8 @@ public class Ical4jHelper {
 							event.getRecurrence().addEventException(eexcep);
 							// event.getRecurrence().addException(
 							// getRecurrenceId(vEvent));
+						} else {
+							mapEvents.put(eexcep.getExtId(), eexcep);
 						}
 					}
 				} else if (Component.VTODO.equals(typeCalendar)) {
