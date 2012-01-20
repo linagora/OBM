@@ -34,7 +34,7 @@ package org.obm.sync.calendar;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 public class RecurrenceDaysTest {
@@ -110,7 +110,7 @@ public class RecurrenceDaysTest {
 	public void testIteratorWithoutDuplicates() {
 		RecurrenceDays recurrenceDays = new RecurrenceDays(RecurrenceDay.Saturday,
 				RecurrenceDay.Thursday);
-		Assertions.assertThat(recurrenceDays.iterator()).isNotNull()
+		Assertions.assertThat(recurrenceDays).isNotNull()
 				.containsOnly(RecurrenceDay.Saturday, RecurrenceDay.Thursday);
 	}
 
@@ -118,9 +118,9 @@ public class RecurrenceDaysTest {
 	public void testIteratorWithDuplicates() {
 		RecurrenceDays recurrenceDays = new RecurrenceDays(RecurrenceDay.Saturday,
 				RecurrenceDay.Thursday, RecurrenceDay.Saturday);
-		Assertions.assertThat(recurrenceDays.iterator()).isNotNull()
+		Assertions.assertThat(recurrenceDays).isNotNull()
 				.containsOnly(RecurrenceDay.Saturday, RecurrenceDay.Thursday);
-		Assertions.assertThat(recurrenceDays.iterator()).doesNotHaveDuplicates();
+		Assertions.assertThat(recurrenceDays).doesNotHaveDuplicates();
 	}
 
 	@Test
@@ -128,7 +128,6 @@ public class RecurrenceDaysTest {
 		RecurrenceDays recurrenceDays = new RecurrenceDays(RecurrenceDay.Saturday,
 				RecurrenceDay.Thursday, RecurrenceDay.Saturday);
 		Object[] daysAr = recurrenceDays.toArray();
-		Assertions.assertThat(daysAr).hasAllElementsOfType(RecurrenceDay.class);
 		Assertions.assertThat(daysAr).hasSize(2);
 		Assertions.assertThat(daysAr).containsOnly(RecurrenceDay.Saturday, RecurrenceDay.Thursday);
 	}

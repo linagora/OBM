@@ -32,7 +32,7 @@
 package fr.aliacom.obm.common.contact;
 
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import java.util.Date;

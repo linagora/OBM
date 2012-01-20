@@ -82,7 +82,7 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.BeforeClass;

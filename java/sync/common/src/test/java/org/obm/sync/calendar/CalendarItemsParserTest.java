@@ -41,7 +41,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import junit.framework.Assert;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.utils.DOMUtils;

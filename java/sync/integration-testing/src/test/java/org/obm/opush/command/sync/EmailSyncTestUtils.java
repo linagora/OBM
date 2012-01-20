@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;

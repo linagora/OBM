@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.bean.MSEmail;

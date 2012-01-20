@@ -2,7 +2,7 @@ package org.obm.push.backend;
 
 import java.util.TreeSet;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.push.contacts.ComparatorUsingFolderName;

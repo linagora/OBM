@@ -35,7 +35,7 @@ import java.util.Calendar;
 
 import junit.framework.Assert;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 public class DateUtilsTest {

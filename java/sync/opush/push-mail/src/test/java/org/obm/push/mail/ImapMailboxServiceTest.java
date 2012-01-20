@@ -38,7 +38,7 @@ import java.util.Set;
 
 import javax.mail.Flags;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

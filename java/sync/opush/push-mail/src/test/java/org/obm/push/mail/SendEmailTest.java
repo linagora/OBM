@@ -15,7 +15,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 

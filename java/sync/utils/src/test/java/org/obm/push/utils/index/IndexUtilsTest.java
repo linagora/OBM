@@ -34,7 +34,7 @@ package org.obm.push.utils.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -73,7 +73,7 @@ public class IndexUtilsTest {
 		ImmutableList<IntIndexed> emptyList = 
 				ImmutableList.of(new IntIndexed(0), new IntIndexed(1), new IntIndexed(2));
 		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
-		Assertions.assertThat(listIndexes).containsExactly(0, 1, 2);
+		Assertions.assertThat(listIndexes).containsOnly(0, 1, 2);
 	}
 	
 	

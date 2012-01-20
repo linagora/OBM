@@ -6,7 +6,7 @@ import java.util.Locale;
 import javax.xml.transform.TransformerException;
 
 import org.easymock.EasyMock;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;

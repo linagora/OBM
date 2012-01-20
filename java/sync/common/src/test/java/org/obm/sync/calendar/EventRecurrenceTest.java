@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.DateUtils;
@@ -137,7 +137,7 @@ public class EventRecurrenceTest {
 		String attendeeWithDeclinedEventEmail = "email0@email.com";
 		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
 		
-		Assertions.assertThat(rec1.getEventExceptions()).containsExactly(e2);
+		Assertions.assertThat(rec1.getEventExceptions()).containsOnly(e2);
 		Assertions.assertThat(rec1.getExceptions()).containsOnly(e1.getRecurrenceId());
 	}
 

@@ -24,7 +24,7 @@
 		<hornetq.version>2.2.6.Final</hornetq.version>
 		<junit.version>4.8.2</junit.version>
 		<easymock.version>3.0</easymock.version>
-		<fest.version>1.4</fest.version>
+		<fest.version>2.0-mbaechler-SNAPSHOT</fest.version>
 		<guava.version>10.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.0.1</commons-io.version>
@@ -380,7 +380,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 			</dependency>
             		<dependency>
                 		<groupId>org.easytesting</groupId>
-                		<artifactId>fest-assert</artifactId>
+                		<artifactId>fest-assert-core</artifactId>
                 		<version>${fest.version}</version>
                 		<scope>test</scope>
             		</dependency>

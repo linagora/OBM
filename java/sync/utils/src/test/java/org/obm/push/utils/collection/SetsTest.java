@@ -34,7 +34,7 @@ package org.obm.push.utils.collection;
 import java.util.Comparator;
 import java.util.Set;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import com.google.common.base.Objects;

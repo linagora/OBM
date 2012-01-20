@@ -39,7 +39,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.easymock.EasyMock;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.bean.MSEmailBodyType;

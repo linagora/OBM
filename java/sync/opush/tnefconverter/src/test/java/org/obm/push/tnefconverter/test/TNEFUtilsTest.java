@@ -33,7 +33,7 @@ package org.obm.push.tnefconverter.test;
 
 import java.io.InputStream;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;

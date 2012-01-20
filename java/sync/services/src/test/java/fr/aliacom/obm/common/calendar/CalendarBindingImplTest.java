@@ -52,8 +52,8 @@ import java.util.List;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.easymock.EasyMock;
-import org.fest.assertions.Assertions;
 import org.joda.time.DateTime;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.icalendar.ICalendarFactory;

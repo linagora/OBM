@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -43,7 +43,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -106,7 +106,7 @@ public class EventConverterTest {
 		checkOrganizer(backendSession.getCredentials().getUser().getEmail(), organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
-		assertThat(attendees).hasSize(3).excludes(organizer);
+		assertThat(attendees).hasSize(3).doesNotContain(organizer);
 		checkAttendeeParticipationState(attendees);
 	}
 	
@@ -128,7 +128,7 @@ public class EventConverterTest {
 		checkOrganizer("jribiera@obm.lng.org", organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
-		assertThat(attendees).hasSize(3).excludes(organizer);
+		assertThat(attendees).hasSize(3).doesNotContain(organizer);
 		checkAttendeeParticipationState(attendees);
 	}
 

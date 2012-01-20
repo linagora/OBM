@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.fest.assertions.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -293,7 +293,7 @@ public class EventTest {
 		Event secondOccurrence = after.getOccurrence(new DateTime(before.getStartDate()).plusDays(1).toDate());
 		secondOccurrence.setLocation("new location");
 		after.addEventException(secondOccurrence);
-		Assertions.assertThat(after.getEventExceptionsWithImportantChanges(before)).containsExactly(secondOccurrence);
+		Assertions.assertThat(after.getEventExceptionsWithImportantChanges(before)).containsSequence(secondOccurrence);
 	}
 	
 	@Test
