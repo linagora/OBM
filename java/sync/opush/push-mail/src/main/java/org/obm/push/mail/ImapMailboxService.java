@@ -315,23 +315,17 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public List<InputStream> fetchMIMEMails(BackendSession bs, String collectionName, 
-			Set<Long> uids) throws MailException {
-		
-		List<InputStream> mails = new LinkedList<InputStream>();
+	public InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
 			store.select(parseMailBoxName(bs, collectionName));
-			for (Long uid : uids) {
-				mails.add(store.uidFetchMessage(uid));
-			}
+			return store.uidFetchMessage(uid);
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
 			store.logout();
 		}
-		return mails;
 	}
 
 	private void login(StoreClient store) throws IMAPException {

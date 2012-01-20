@@ -61,8 +61,7 @@ public interface MailboxService {
 	Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
 			Long uid) throws MailException, DaoException;
 
-	List<InputStream> fetchMIMEMails(BackendSession bs, String collectionName, 
-			Set<Long> uids) throws MailException;
+	InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException;
 
 	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException;
 
