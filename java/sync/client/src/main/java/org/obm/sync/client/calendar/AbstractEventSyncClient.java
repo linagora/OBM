@@ -66,7 +66,6 @@ import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 public abstract class AbstractEventSyncClient extends AbstractClientImpl implements ICalendar {
@@ -148,8 +147,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 			logger.debug("getSync(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
 		}
-		Multimap<String, String> params = ArrayListMultimap.create();
-		setToken(params, token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		if (lastSync != null) {
 			params.put("lastSync", DateHelper.asString(lastSync));
@@ -176,8 +174,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 			logger.debug("getSyncEventDate(" + token.getSessionId() + ", " + calendar
 					+ ", " + lastSync + ")");
 		}
-		Multimap<String, String> params = ArrayListMultimap.create();
-		setToken(params, token);
+		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		if (lastSync != null) {
 			params.put("lastSync", DateHelper.asString(lastSync));
@@ -200,8 +197,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 
 	@Override
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = ArrayListMultimap.create();
-		setToken(params, token);
+		Multimap<String, String> params = initParams(token);
 		Document doc = execute(token, type + "/listCalendars", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
