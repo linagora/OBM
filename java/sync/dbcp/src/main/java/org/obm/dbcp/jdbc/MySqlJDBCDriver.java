@@ -84,5 +84,13 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 		builder.put("url", getJDBCUrl(dbHost, dbName));
 		return builder.build();
 	}
+	
+	/**
+	 * read-only is disabled due to an exception thrown when the transactionManager try to open a new mysql transaction
+	 */
+	@Override
+	public boolean activeReadOnly() {
+		return false;
+	}
 
 }

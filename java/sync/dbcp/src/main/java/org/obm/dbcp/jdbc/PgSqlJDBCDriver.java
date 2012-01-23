@@ -63,7 +63,10 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 		builder.put("databaseName", dbName);
 		builder.put("serverName", dbHost);
 		return builder.build();
-		
-		
+	}
+
+	@Override
+	public boolean activeReadOnly() {
+		return true;
 	}
 }

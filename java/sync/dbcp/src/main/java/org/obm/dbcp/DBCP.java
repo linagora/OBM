@@ -59,6 +59,7 @@ public class DBCP implements IDBCP{
 	private final ITransactionAttributeBinder transactionAttributeBinder;
 	
 	private DBConnectionPool ds;
+	private IJDBCDriver cf;
 
 	private String lastInsertIdQuery;
 
@@ -88,7 +89,7 @@ public class DBCP implements IDBCP{
 
 	private void createDataSource() {
 		try {
-			IJDBCDriver cf = buildJDBCConnectionFactory(dbType);
+			cf = buildJDBCConnectionFactory(dbType);
 			ds = new DBConnectionPool(cf, dbHost, dbName, login, password);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
@@ -132,16 +133,22 @@ public class DBCP implements IDBCP{
 	@Override
 	public Connection getConnection() throws SQLException {
 		Connection connection = ds.getConnection();
-		try {
-			boolean isReadOnlyTransaction = isReadOnlyTransaction();
-			if(connection.isReadOnly() != isReadOnlyTransaction){
-				connection.setReadOnly(isReadOnlyTransaction);
-			}
-		} catch (TransactionException e) {
-			logger.warn("Error while getting the current transaction, a read-only connection is returned");
-			connection.setReadOnly(true);
-		}
+		setConnectionReadOnlyIfNecessary(connection);
 		return connection;
+	}
+
+	private void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
+		if(cf.activeReadOnly()){
+			try {
+				boolean isReadOnlyTransaction = isReadOnlyTransaction();
+				if(connection.isReadOnly() != isReadOnlyTransaction){
+					connection.setReadOnly(isReadOnlyTransaction);
+				}
+			} catch (TransactionException e) {
+				logger.warn("Error while getting the current transaction, a read-only connection is returned");
+				connection.setReadOnly(true);
+			}
+		}
 	}
 
 	private boolean isReadOnlyTransaction() throws TransactionException {
