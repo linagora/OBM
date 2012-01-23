@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.push.bean.ItemChange;
+import com.google.common.base.Objects;
 
 public class DataDelta {
 	
@@ -73,4 +74,17 @@ public class DataDelta {
 		return count;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("changes", changes)
+			.add("deletions", deletions)
+			.add("syncDate", syncDate)
+			.toString();
+	}
+	
+	public String statistics() {
+		return String.format("%d changes, %d deletions, syncdate %tc", 
+					changes.size(), deletions.size(), syncDate);
+	}
 }

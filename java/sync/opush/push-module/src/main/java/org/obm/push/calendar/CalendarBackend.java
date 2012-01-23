@@ -75,7 +75,9 @@ import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -186,10 +188,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = login(bs);
 		
-		List<ItemChange> addUpd = new LinkedList<ItemChange>();
-		List<ItemChange> deletions = new LinkedList<ItemChange>();
-		Date syncDate = null;
-		
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		String calendar = parseCalendarName(collectionPath);
 
@@ -205,36 +203,52 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			
 			logger.info("Event changes [ {} ]", changes.getUpdated().length);
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
+		
+			DataDelta delta = 
+					buildDataDelta(bs, collectionId, token, changes);
 			
-			final String userEmail = calendarClient.getUserEmail(token);
-			addOrRemoveEventFilter(addUpd, deletions, changes, userEmail, collectionId, bs);
-			syncDate = changes.getLastSync();
+			logger.info("getContentChanges( {}, {}, lastSync = {} ) => {}",
+				new Object[]{calendar, collectionPath, state.getLastSync(), delta.statistics()});
 			
+			return delta;
 		} catch (ServerFault e) {
 			throw new UnknownObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
-		logger.info("getContentChanges( {}, {}, lastSync = {} ) => {} entries.",
-				new Object[]{calendar, collectionPath, state.getLastSync(), addUpd.size()});
-		return new DataDelta(addUpd, deletions, syncDate);
 	}
 
-	private void addOrUpdateEventFilter(List<ItemChange> addUpd, Event[] events, String userEmail, 
+	private DataDelta buildDataDelta(BackendSession bs, Integer collectionId,
+			AccessToken token, EventChanges changes) throws ServerFault,
+			DaoException {
+		final String userEmail = calendarClient.getUserEmail(token);
+		Preconditions.checkNotNull(userEmail, "User has no email address");
+		
+		List<ItemChange> additions = addOrUpdateEventFilter(changes.getUpdated(), userEmail, collectionId, bs);
+		List<ItemChange> deletions = removeEventFilter(changes.getUpdated(), changes.getRemoved(), userEmail, collectionId);
+		Date syncDate = changes.getLastSync();
+		
+		return new DataDelta(additions, deletions, syncDate);
+	}
+
+	private List<ItemChange> addOrUpdateEventFilter(Event[] events, String userEmail, 
 			Integer collectionId, BackendSession bs) throws DaoException {
 		
+		List<ItemChange> items = Lists.newArrayList();
 		for (final Event event : events) {
 			if (checkIfEventCanBeAdded(event, userEmail) && event.getRecurrenceId() == null) {
 				String serverId = getServerIdFor(collectionId, event.getObmId());
 				ItemChange change = createItemChangeToAddFromEvent(bs, event, serverId);
-				addUpd.add(change);
-			}			
+				items.add(change);
+			}	
 		}
+		return items;
 	}
 	
-	private void removeEventFilter(List<ItemChange> deletions, Event[] events, EventObmId[] eventsIdRemoved, 
+	private List<ItemChange> removeEventFilter(Event[] events, EventObmId[] eventsIdRemoved, 
 			String userEmail, Integer collectionId) {
 		
+		List<ItemChange> deletions = Lists.newArrayList();
 		for (final Event event : events) {
 			if (!checkIfEventCanBeAdded(event, userEmail)) {
 				deletions.add(getItemChange(collectionId, event.getObmId()));
@@ -244,17 +258,11 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		for (final EventObmId eventIdRemove : eventsIdRemoved) {
 			deletions.add(getItemChange(collectionId, eventIdRemove));
 		}
+		return deletions;
 	}
 	
 	private ItemChange getItemChange(Integer collectionId,	EventObmId eventIdRemove) {
 		return mappingService.getItemChange(collectionId, eventIdRemove.serializeToString());
-	}
-
-	private void addOrRemoveEventFilter(List<ItemChange> addUpd, List<ItemChange> deletions, 
-			EventChanges eventChanges, String userEmail, Integer collectionId, BackendSession bs) throws DaoException {
-		
-		addOrUpdateEventFilter(addUpd, eventChanges.getUpdated(), userEmail, collectionId, bs);
-		removeEventFilter(deletions, eventChanges.getUpdated(), eventChanges.getRemoved(), userEmail, collectionId);
 	}
 
 	private boolean checkIfEventCanBeAdded(Event event, String userEmail) {
