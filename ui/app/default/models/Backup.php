@@ -285,7 +285,7 @@ class Backup {
     include_once('obminclude/of/vcalendar/reader/OBM.php');
 
     $reader = new Vcalendar_Reader_OBM($calendar_user,NULL,$start,$end);
-    $document = $reader->getDocument();
+    $document = $reader->getDocument('PUBLISH', false, false);
     $writer = new Vcalendar_Writer_ICS();
     $writer->writeDocument($document);
     $document->destroy();

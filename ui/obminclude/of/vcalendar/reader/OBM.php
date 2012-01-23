@@ -139,7 +139,7 @@ class Vcalendar_Reader_OBM {
   /**
    * @return Vcalendar
    */
-  function & getDocument($method = 'PUBLISH', $include_attachments = false) {
+  function & getDocument($method = 'PUBLISH', $include_attachments = false, $privatize_events=true) {
     $this->document = new Vcalendar();
     $this->setHeaders($method);
     foreach($this->eventSets as $set) {
@@ -175,9 +175,11 @@ class Vcalendar_Reader_OBM {
         $this->addExdate($this->vevents[$exceptions->f('eventexception_parent_id')] , $date);
       }    
     }
-    
-    foreach($this->vevents as $id => $vevent) {
-      VCalendar_Utils::privatizeEvent($this->vevents[$id]);
+
+    if ($privatize_events) {
+        foreach($this->vevents as $id => $vevent) {
+          VCalendar_Utils::privatizeEvent($this->vevents[$id]);
+        }
     }
     return $this->document;
   }
