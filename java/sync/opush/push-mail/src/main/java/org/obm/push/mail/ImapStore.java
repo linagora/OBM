@@ -32,8 +32,8 @@
 package org.obm.push.mail;
 
 import java.io.InputStream;
+import java.util.Date;
 
-import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -43,8 +43,12 @@ import javax.mail.internet.MimeMessage;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
+import org.obm.push.mail.imap.client.IMAPClient;
+import org.obm.push.mail.imap.client.StreamMimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.mail.imap.IMAPFolder;
 
 public class ImapStore {
 
@@ -57,9 +61,12 @@ public class ImapStore {
 	private final String userId;
 	private final String host;
 	private final int port;
+	private final IMAPClient imapClient;
 
 	
-	public ImapStore(Session session, Store store, String userId, String password, String host, int port) {
+	public ImapStore(IMAPClient imapClient, Session session, Store store, 
+			String userId, String password, String host, int port) {
+		this.imapClient = imapClient;
 		this.session = session;
 		this.store = store;
 		this.userId = userId;
@@ -70,6 +77,10 @@ public class ImapStore {
 
 	public Message createMessage(InputStream messageContent) throws MessagingException {
 		return new MimeMessage(session, messageContent);
+	}
+
+	public Message createStreamedMessage(InputStream messageContent, int mailSize) {
+		return new StreamMimeMessage(session, messageContent, mailSize, new Date());
 	}
 
 	public String getUserId() {
@@ -96,10 +107,22 @@ public class ImapStore {
 			throw new ImapLogoutException(msg, e);
 		}
 	}
-
-	public Folder getFolder(String folderName) throws ImapCommandException {
+	
+	public void appendMessage(String folderName, Message message) 
+			throws ImapCommandException {
 		try {
-			return store.getDefaultFolder().getFolder(folderName);
+			IMAPFolder folder = getFolder(folderName);
+			imapClient.appendMessage(folder, message);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command APPEND failed. user={}, folder={}", userId, folderName);
+			throw new ImapCommandException(msg, e);
+		}
+	}
+
+	private IMAPFolder getFolder(String folderName) throws ImapCommandException {
+		try {
+			return (IMAPFolder)store.getDefaultFolder().getFolder(folderName);
 		} catch (MessagingException e) {
 			String msg = String.format(
 					"IMAP command getFolder failed. user={}, folder={}", userId, folderName);

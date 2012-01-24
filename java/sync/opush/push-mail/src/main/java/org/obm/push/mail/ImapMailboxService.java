@@ -446,7 +446,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public boolean storeInInboxWithJM(BackendSession bs, InputStream mailContent, boolean isRead) 
+	public boolean storeInInboxWithJM(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) 
 			throws MailException {
 		
 		logger.info("Store mail in folder[Inbox]");
@@ -455,7 +455,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		try {
 			store = imapClientProvider.getImapClientWithJM(bs);
 			store.login();
-			storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, mailContent, isRead);
+			storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, mailContent, mailSize, isRead);
 			commandSuccess = true;
 		} catch (ImapCommandException e) {
 			logger.warn(e.getMessage(), e);
@@ -483,11 +483,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	private void storeMail(ImapStore store, String folderName, InputStream mailContent, 
-			boolean isRead) throws ImapCommandException, MessagingException {
-		Message msg = store.createMessage(mailContent);
+			int mailSize, boolean isRead) throws ImapCommandException, MessagingException {
+		Message msg = store.createStreamedMessage(mailContent, mailSize);
 		msg.setFlag(Flags.Flag.SEEN, isRead);
-		Folder folder = store.getFolder(folderName);
-		folder.appendMessages(new Message[]{msg});
+		store.appendMessage(folderName, msg);
 	}
 
 	/**

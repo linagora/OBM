@@ -40,6 +40,8 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.SmtpLocatorException;
+import org.obm.push.mail.imap.client.IMAPClient;
+import org.obm.push.mail.imap.client.IMAPClientImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.service.EventService;
 import org.obm.sync.client.login.LoginService;
@@ -82,8 +84,9 @@ public class MailEnvModule extends AbstractModule {
 				return new SMTPProtocol(address, smtpPort);
 			}
 		});
-		
+
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
+		bind(IMAPClient.class).to(IMAPClientImpl.class);
 		bind(MailboxService.class).to(ImapMailboxService.class);
 	}
 	

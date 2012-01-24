@@ -45,6 +45,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.NoImapClientAvailableException;
+import org.obm.push.mail.imap.client.IMAPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +60,14 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	private final boolean loginWithDomain;
 	private final int imapPort;
 	private final Session defaultSession;
+	private final IMAPClient imapClient;
 
 	@Inject
 	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, 
-			LocatorService locatorService) {
+			LocatorService locatorService,
+			IMAPClient imapClient) {
 		this.locatorService = locatorService;
+		this.imapClient = imapClient;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.imapPort = emailConfiguration.imapPort();
 		
@@ -111,7 +115,8 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 					new Object[]{login, loginWithDomain});
 
 			javaMailStore = defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
-			return new ImapStore(defaultSession, javaMailStore, login, bs.getPassword(), imapHost, imapPort);
+			return new ImapStore(imapClient, defaultSession, javaMailStore,
+					login, bs.getPassword(), imapHost, imapPort);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);
