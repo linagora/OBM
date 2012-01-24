@@ -45,6 +45,9 @@ applicable to the OBM software.
 //   - $calendar_id (can be Event table dependant if is_numeric(), or world-wide
 //                   unique if begins with "OBM-")
 ///////////////////////////////////////////////////////////////////////////////
+
+require_once(dirname(__file__)."/../contact/addressbook.php");
+
 function run_query_calendar_detail($calendar_id) {
   global $cdg_sql;
 

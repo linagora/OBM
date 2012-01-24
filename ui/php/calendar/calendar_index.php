@@ -60,16 +60,16 @@ $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
-require("$obminclude/global.inc");
+require_once("$obminclude/global.inc");
 //FIXME
 $params = get_global_params('Entity');
 if(isset($params['date']) && !empty($params['date'])) {
   $set_date = true;
 }
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-require("$obminclude/global_pref.inc");
-require('calendar_query.inc');
-require("$obminclude/of/of_contact.php");
+require_once("$obminclude/global_pref.inc");
+require_once('calendar_query.inc');
+require_once("$obminclude/of/of_contact.php");
 
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -123,13 +123,13 @@ $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorchooser.js';
 
-require('calendar_display.inc');
-require('calendar_js.inc');
-require("$obminclude/of/of_right.inc");
-require("$obminclude/of/of_category.inc");
-require('calendar_mailer.php');
-require('event_observer.php');
-require('../contact/addressbook.php');
+require_once('calendar_display.inc');
+require_once('calendar_js.inc');
+require_once("$obminclude/of/of_right.inc");
+require_once("$obminclude/of/of_category.inc");
+require_once('calendar_mailer.php');
+require_once('event_observer.php');
+require_once('../contact/addressbook.php');
 
 if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
   $current_view->set_users($params['sel_user_id']);
