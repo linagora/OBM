@@ -66,7 +66,7 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 	}
 
 	@Override
-	public boolean activeReadOnly() {
+	public boolean readOnlySupported() {
 		return true;
 	}
 }

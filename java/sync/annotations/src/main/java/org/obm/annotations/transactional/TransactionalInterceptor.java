@@ -132,16 +132,16 @@ public class TransactionalInterceptor implements MethodInterceptor {
 
 	private void doBegin(TransactionManager ut, Transactional transactional) throws TransactionException, NotSupportedException, SystemException{
 		ut.begin();
-		transactionAttributeBinder.bindTransactional(transactional);
+		transactionAttributeBinder.bindTransactionalToCurrentTransaction(transactional);
 	}
 	
 	private void doCommit(TransactionManager ut) throws SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException, SystemException, TransactionException{
-		transactionAttributeBinder.invalidateTransactional();
+		transactionAttributeBinder.invalidateTransactionalInCurrentTransaction();
 		ut.commit();
 	}
 	
 	private void doRollBack(TransactionManager ut) throws IllegalStateException, SecurityException, SystemException, TransactionException{
-		transactionAttributeBinder.invalidateTransactional();
+		transactionAttributeBinder.invalidateTransactionalInCurrentTransaction();
 		ut.rollback();
 	}
 	

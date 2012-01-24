@@ -2,10 +2,10 @@ package org.obm.annotations.transactional;
 
 public interface ITransactionAttributeBinder {
 
-	void bindTransactional(Transactional transactional) throws TransactionException;
+	void bindTransactionalToCurrentTransaction(Transactional transactional) throws TransactionException;
 
-	void invalidateTransactional() throws TransactionException;
+	void invalidateTransactionalInCurrentTransaction() throws TransactionException;
 
-	Transactional getCurrentTransactional() throws TransactionException;
+	Transactional getTransactionalInCurrentTransaction() throws TransactionException;
 
 }

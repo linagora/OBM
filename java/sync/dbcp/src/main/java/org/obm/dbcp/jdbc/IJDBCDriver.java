@@ -44,5 +44,5 @@ public interface IJDBCDriver {
 
 	Map<String,String> getDriverProperties(String login, String password, String dbName, String dbHost);
 
-	boolean activeReadOnly();
+	boolean readOnlySupported();
 }

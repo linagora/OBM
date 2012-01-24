@@ -158,7 +158,8 @@ public class TransactionalTest {
 			@Override
 			protected void configure() {
 				bind(TransactionManager.class).toProvider(provider);
-				bind(ITransactionAttributeBinder.class).to(TransactionAttributeBinder.class);
+				bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
+				bind(TransactionConfiguration.class).to(TransactionConfigurationStaticImpl.class);
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), 
 						Matchers.annotatedWith(Transactional.class), 

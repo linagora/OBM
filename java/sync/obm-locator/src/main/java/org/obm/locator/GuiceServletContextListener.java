@@ -55,7 +55,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
 	
-	public static final String ATTRIBUTE_NAME = "LocatorGuiceInjecter";
+	public static final String ATTRIBUTE_NAME = "LocateGuideInjector";
 	
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	

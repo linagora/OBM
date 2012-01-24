@@ -138,7 +138,7 @@ public class DBCP implements IDBCP{
 	}
 
 	private void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
-		if(cf.activeReadOnly()){
+		if(cf.readOnlySupported()){
 			try {
 				boolean isReadOnlyTransaction = isReadOnlyTransaction();
 				if(connection.isReadOnly() != isReadOnlyTransaction){
@@ -152,7 +152,7 @@ public class DBCP implements IDBCP{
 	}
 
 	private boolean isReadOnlyTransaction() throws TransactionException {
-			Transactional transactional = transactionAttributeBinder.getCurrentTransactional();
+			Transactional transactional = transactionAttributeBinder.getTransactionalInCurrentTransaction();
 			return transactional.readOnly();
 	}
 	
