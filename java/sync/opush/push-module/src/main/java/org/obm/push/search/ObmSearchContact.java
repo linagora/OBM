@@ -39,6 +39,7 @@ import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
 import org.obm.push.contacts.ContactConverter;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.login.LoginService;
@@ -71,18 +72,22 @@ public class ObmSearchContact implements ISearchSource {
 	@Override
 	public List<SearchResult> search(BackendSession bs, String query, Integer limit) {
 		IAddressBook bc = getBookClient();
-		AccessToken token = login.login(bs.getUser().getLoginAtDomain(), bs.getPassword());
 		List<SearchResult> ret = new LinkedList<SearchResult>();
-		ContactConverter cc = new ContactConverter();
 		try {
-			List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit);
-			for (Contact contact: contacts) {
-				ret.add(cc.convertToSearchResult(contact));
+			AccessToken token = login.login(bs.getUser().getLoginAtDomain(), bs.getPassword());
+			ContactConverter cc = new ContactConverter();
+			try {
+				List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit);
+				for (Contact contact: contacts) {
+					ret.add(cc.convertToSearchResult(contact));
+				}
+			} catch (ServerFault e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				login.logout(token);
 			}
-		} catch (ServerFault e) {
+		} catch (AuthFault e) {
 			logger.error(e.getMessage(), e);
-		} finally {
-			login.logout(token);
 		}
 		return ret;
 	}

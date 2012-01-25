@@ -50,7 +50,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -239,7 +239,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (PIMDataTypeNotFoundException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;

@@ -32,7 +32,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
-	public AccessToken login(String loginAtDomain, String password) {
+	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
 		Multimap<String, String> params = ArrayListMultimap.create();
 		params.put("login", loginAtDomain);
 		params.put("password", password);
@@ -41,23 +41,34 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		AccessToken token = newAccessToken(loginAtDomain, origin);
 		
 		Document doc = execute(token, "/login/doLogin", params);
+		exceptionFactory.checkLoginExpection(doc);
+		
+		return fillToken(token, doc);
+	}
+
+	private AccessToken fillToken(AccessToken token, Document doc) {
 		Element root = doc.getDocumentElement();
 		String email = DOMUtils.getElementText(root, "email");
 		String displayname = DOMUtils.getElementText(root, "displayname");
 		String sid = DOMUtils.getElementText(root, "sid");
 		Element v = DOMUtils.getUniqueElement(root, "version");
+		Element domain = DOMUtils.getUniqueElement(root, "domain");
+		token.setDomain(getDomain(domain));
+		token.setSessionId(sid);
+		token.setVersion(getVersion(v));
+		token.setUserEmail(email);
+		token.setUserDisplayName(displayname);
+		return token;
+	}
+
+	private MavenVersion getVersion(Element v) {
 		MavenVersion version = new MavenVersion();
 		if (v != null) {
 			version.setMajor(v.getAttribute("major"));
 			version.setMinor(v.getAttribute("minor"));
 			version.setRelease(v.getAttribute("release"));
 		}
-		token.setDomain( getDomain(root) );
-		token.setSessionId(sid);
-		token.setVersion(version);
-		token.setUserEmail(email);
-		token.setUserDisplayName(displayname);
-		return token;
+		return version;
 	}
 
 	@Override
@@ -84,9 +95,8 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		}
 	}
 
-	private ObmDomain getDomain(Element root) {
+	private ObmDomain getDomain(Element domain) {
 		ObmDomain obmDomain = new ObmDomain();
-		Element domain = DOMUtils.getUniqueElement(root, "domain");
 		obmDomain.setName(DOMUtils.getElementText(domain));
 		obmDomain.setUuid(domain.getAttribute("uuid"));
 		return obmDomain;

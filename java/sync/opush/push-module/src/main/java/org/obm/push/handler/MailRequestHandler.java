@@ -41,7 +41,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
@@ -70,7 +70,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, 
-			CollectionNotFoundException, UnknownObmSyncServerException, DaoException, MailException;
+			CollectionNotFoundException, UnexpectedObmSyncServerException, DaoException, MailException;
 	
 	@Override
 	public void process(IContinuation continuation, BackendSession bs, ActiveSyncRequest request, Responder responder) {
@@ -93,7 +93,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			return;
 		} catch (CollectionNotFoundException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
 		} catch (DaoException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);

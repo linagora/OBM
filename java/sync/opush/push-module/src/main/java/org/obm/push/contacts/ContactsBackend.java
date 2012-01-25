@@ -52,7 +52,7 @@ import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -94,7 +94,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return PIMDataType.CONTACTS;
 	}
 	
-	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException {
+	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
 			
@@ -122,12 +122,12 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return treeSet.iterator();
 	}
 
-	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnknownObmSyncServerException {
+	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnexpectedObmSyncServerException {
 		AccessToken token = login(bs);
 		try {
 			return bookClient.listAddressBooksChanged(token, lastSync);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
@@ -201,7 +201,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException {
+			DaoException, UnexpectedObmSyncServerException {
 		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
 		return dataDelta.getItemEstimateSize();
 	}
@@ -209,13 +209,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
-			CollectionNotFoundException, UnknownObmSyncServerException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
 		return getChanged(bs, state, collectionId);
 	}
 	
 	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId) 
-			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
+			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs,collectionId);
 		ContactChanges contactChanges = listContactsChanged(bs,state.getLastSync(), addressBookId);
@@ -235,7 +235,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Integer findAddressBookIdFromCollectionId(BackendSession bs, Integer collectionId) 
-			throws UnknownObmSyncServerException, DaoException, CollectionNotFoundException {
+			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 		
 		List<AddressBook> addressBooks = listAddressBooks(bs);
 		for (AddressBook addressBook: addressBooks) {
@@ -252,23 +252,23 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		throw new CollectionNotFoundException(collectionId);
 	}
 	
-	private List<AddressBook> listAddressBooks(BackendSession bs) throws UnknownObmSyncServerException {
+	private List<AddressBook> listAddressBooks(BackendSession bs) throws UnexpectedObmSyncServerException {
 		AccessToken token = login(bs);
 		try {
 			return bookClient.listAllBooks(token);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
 	}
 
-	private ContactChanges listContactsChanged(BackendSession bs, Date lastSync, Integer addressBookId) throws UnknownObmSyncServerException {
+	private ContactChanges listContactsChanged(BackendSession bs, Date lastSync, Integer addressBookId) throws UnexpectedObmSyncServerException {
 		AccessToken token = login(bs);
 		try {
 			return bookClient.listContactsChanged(token, lastSync, addressBookId);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
@@ -285,7 +285,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException,
+			DaoException, UnexpectedObmSyncServerException,
 			ServerItemNotFoundException {
 
 		MSContact contact = (MSContact) data;
@@ -316,26 +316,26 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Contact modifyContact(BackendSession bs, Integer addressBookId, Contact contact) 
-			throws UnknownObmSyncServerException, NoPermissionException, ContactNotFoundException {
+			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
 		AccessToken token = login(bs);
 		try {
 			return bookClient.modifyContact(token, addressBookId, contact);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
 	}
 	
 	private Contact createContact(BackendSession bs, Integer addressBookId, Contact contact) 
-			throws UnknownObmSyncServerException, NoPermissionException, ContactAlreadyExistException {
+			throws UnexpectedObmSyncServerException, NoPermissionException, ContactAlreadyExistException {
 		
 		AccessToken token = login(bs);
 		try {
 			return bookClient.createContact(token, addressBookId, contact);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
@@ -344,7 +344,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnknownObmSyncServerException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ServerItemNotFoundException {
 		
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
 		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
@@ -358,13 +358,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Contact removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
-			throws UnknownObmSyncServerException, NoPermissionException, ContactNotFoundException {
+			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
 		AccessToken token = login(bs);
 		try {
 			return bookClient.removeContact(token, addressBookId, contactId);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
@@ -372,7 +372,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		for (String serverId: itemIds) {
@@ -393,13 +393,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Contact getContactFromId(BackendSession bs, Integer addressBookId, Integer contactId) 
-			throws UnknownObmSyncServerException, ContactNotFoundException {
+			throws UnexpectedObmSyncServerException, ContactNotFoundException {
 		
 		AccessToken token = login(bs);
 		try {
 			return bookClient.getContactFromId(token, addressBookId, contactId);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}

@@ -47,7 +47,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
@@ -104,7 +104,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			logger.error(e.getMessage(), e);
 		} catch (ProcessingEmailException e) {
 			logger.error(e.getMessage(), e);
@@ -121,7 +121,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
-		UnknownObmSyncServerException, ProcessingEmailException, CollectionNotFoundException {
+		UnexpectedObmSyncServerException, ProcessingEmailException, CollectionNotFoundException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		

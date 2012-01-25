@@ -44,7 +44,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -57,14 +57,14 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
-			ProcessingEmailException, UnknownObmSyncServerException {
+			ProcessingEmailException, UnexpectedObmSyncServerException {
 		throw new CollectionNotFoundException();
 	}
 	
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
-			CollectionNotFoundException, UnknownObmSyncServerException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
 		return new DataDeltaBuilder().withSyncDate(new Date()).build();
 	}
@@ -73,7 +73,7 @@ public class TaskBackend implements PIMBackend {
 	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException {
+			DaoException, UnexpectedObmSyncServerException {
 		return 0;
 	}
 	
@@ -86,7 +86,7 @@ public class TaskBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException,
+			DaoException, UnexpectedObmSyncServerException,
 			ServerItemNotFoundException {
 		return null;
 	}
@@ -101,7 +101,7 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnknownObmSyncServerException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ServerItemNotFoundException {
 		
 	}
 

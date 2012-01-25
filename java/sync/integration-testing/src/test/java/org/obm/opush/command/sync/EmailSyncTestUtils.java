@@ -25,7 +25,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.store.CollectionDao;
@@ -71,7 +71,7 @@ public class EmailSyncTestUtils {
 	public static void mockEmailSyncClasses(
 			String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnknownObmSyncServerException, AuthFault {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockEmailSync(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		replayMocks(classToInstanceMap);
@@ -79,7 +79,7 @@ public class EmailSyncTestUtils {
 	
 	private static void mockEmailSync(String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta,
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnknownObmSyncServerException {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException {
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		mockEmailSyncedCollectionDao(syncedCollectionDao);
 		
@@ -150,7 +150,7 @@ public class EmailSyncTestUtils {
 	}
 
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
 
 		expect(contentsExporter.getChanged(
 				anyObject(BackendSession.class), 

@@ -68,7 +68,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -83,6 +83,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
@@ -201,7 +202,7 @@ public class MailBackendImpl implements MailBackend {
 	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException {
+			DaoException, UnexpectedObmSyncServerException {
 		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
 		DataDelta dataDelta = getDataDelta(bs, collectionId, mailChanges);
 		return dataDelta.getItemEstimateSize();
@@ -210,7 +211,7 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
-			CollectionNotFoundException, UnknownObmSyncServerException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
 		
 		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
@@ -273,7 +274,7 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
-			ProcessingEmailException, UnknownObmSyncServerException {
+			ProcessingEmailException, UnexpectedObmSyncServerException {
 	
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
@@ -329,7 +330,7 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnknownObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException {
+			UnexpectedObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException {
 		try {
 			boolean trash = Objects.firstNonNull(moveToTrash, true);
 			if (trash) {
@@ -372,7 +373,7 @@ public class MailBackendImpl implements MailBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException,
+			DaoException, UnexpectedObmSyncServerException,
 			ServerItemNotFoundException {
 		
 		MSEmail email = (MSEmail) data;
@@ -423,11 +424,13 @@ public class MailBackendImpl implements MailBackend {
 			Message message = mime4jUtils.parseMessage(mailContent);
 			SendEmail sendEmail = new SendEmail(getUserEmail(bs), message);
 			send(bs, sendEmail, saveInSent);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (AuthFault e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -465,13 +468,15 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (AuthFault e) {
 			throw new ProcessingEmailException(e);
 		} 
 	}
@@ -509,7 +514,7 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
@@ -517,20 +522,22 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
+		} catch (AuthFault e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 
-	private AccessToken login(BackendSession session) {
+	private AccessToken login(BackendSession session) throws AuthFault {
 		return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
 	}
 	
-	private String getUserEmail(BackendSession bs) throws UnknownObmSyncServerException {
+	private String getUserEmail(BackendSession bs) throws UnexpectedObmSyncServerException, AuthFault {
 		ICalendar cal = calendarClient;
 		AccessToken at = login(bs);
 		try {
 			return cal.getUserEmail(at);
 		} catch (ServerFault e) {
-			throw new UnknownObmSyncServerException(e);
+			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			login.logout(at);
 		}

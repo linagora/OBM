@@ -46,7 +46,7 @@ import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -164,7 +164,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			} catch (ServerItemNotFoundException e) {
 				logger.error(e.getMessage(), e);
 				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-			} catch (UnknownObmSyncServerException e) {
+			} catch (UnexpectedObmSyncServerException e) {
 				logger.error(e.getMessage(), e);
 				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
 			}

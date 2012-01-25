@@ -29,14 +29,24 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client;
+package org.obm.push.exception;
 
-import org.obm.sync.auth.AccessToken;
+public class UnexpectedObmSyncServerException extends Exception {
 
-public interface ISyncClient {
-
-	AccessToken login(String userAtDomain, String pass, String origin);
-
-	void logout(AccessToken at);
+	public UnexpectedObmSyncServerException() {
+		super();
+	}
+	
+	public UnexpectedObmSyncServerException(String message) {
+		super(message);
+	}
+	
+	public UnexpectedObmSyncServerException(Throwable cause) {
+		super(cause);
+	}
+	
+	public UnexpectedObmSyncServerException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

@@ -50,6 +50,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
@@ -62,7 +63,7 @@ public class MailBackendTest {
 	
 	@Test
 	public void testSendEmailWithBigMail()
-			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException {
+			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException, AuthFault {
 		final User user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		final String password = "pass";
 		final AccessToken at = new AccessToken(1, "o-push");

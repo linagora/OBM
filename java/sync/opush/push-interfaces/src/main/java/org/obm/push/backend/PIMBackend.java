@@ -40,7 +40,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -51,23 +51,23 @@ public interface PIMBackend {
 	String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnknownObmSyncServerException, ServerItemNotFoundException;
+			DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException;
 	
 	String move(BackendSession bs, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,
 			ProcessingEmailException;
 	
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException;
 	
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException;
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException;
 
 	List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnknownObmSyncServerException;
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException;
 
 	int getItemEstimateSize(BackendSession bs, FilterType filterType, Integer collectionId, SyncState state) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException;
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException;
 
 	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException;
 	

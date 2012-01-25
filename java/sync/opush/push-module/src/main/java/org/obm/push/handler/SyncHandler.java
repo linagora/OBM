@@ -63,7 +63,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
@@ -170,7 +170,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (DaoException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (ProcessingEmailException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
@@ -217,7 +217,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, 
 			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException {
+			UnexpectedObmSyncServerException, ProcessingEmailException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -324,7 +324,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
-		UnknownObmSyncServerException, ProcessingEmailException {
+		UnexpectedObmSyncServerException, ProcessingEmailException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
@@ -356,7 +356,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * Handles modifications requested by mobile device
 	 */
 	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) throws CollectionNotFoundException, 
-		DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		for (SyncCollectionChange change: collection.getChanges()) {
@@ -379,7 +379,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private void updateServerItem(BackendSession bs, SyncCollection collection, SyncCollectionChange change) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException,
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ServerItemNotFoundException {
 
 		contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
@@ -388,7 +388,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void addServerItem(BackendSession bs, SyncCollection collection, 
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 
 		String obmId = contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(),
 				change.getClientId(), change.getData());
@@ -404,7 +404,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	
 	private void deleteServerItem(BackendSession bs, SyncCollection collection,
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
 
 		String serverId = change.getServerId();
 		contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), serverId, collection
@@ -429,7 +429,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (CollectionNotFoundException e) {
 			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asXmlValue(), continuation, e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (ProcessingEmailException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
@@ -440,7 +440,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -454,7 +454,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(BackendSession bs,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnknownObmSyncServerException, ProcessingEmailException {
+			UnexpectedObmSyncServerException, ProcessingEmailException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if ("0".equals(syncCollection.getSyncKey())) {
@@ -467,7 +467,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void handleDataSync(BackendSession bs, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
-			UnknownObmSyncServerException, ProcessingEmailException, InvalidServerId {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId {
 		
 		SyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
 		if (st == null) {

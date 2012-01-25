@@ -43,7 +43,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.store.CollectionDao;
@@ -152,7 +152,7 @@ public class PingHandlerTest {
 	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ProcessingEmailException, UnknownObmSyncServerException, AuthFault {
+			ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForNoChangePing();
@@ -160,7 +160,7 @@ public class PingHandlerTest {
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
-			UnknownObmSyncServerException, ProcessingEmailException, AuthFault {
+			UnexpectedObmSyncServerException, ProcessingEmailException, AuthFault {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForCalendarHasChangePing(noChangeIterationCount);
@@ -215,7 +215,7 @@ public class PingHandlerTest {
 	}
 	
 	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException,
-			ProcessingEmailException, UnknownObmSyncServerException {
+			ProcessingEmailException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		mockCalendarBackendHasNoChange(calendarBackend);
 
@@ -224,7 +224,7 @@ public class PingHandlerTest {
 	}
 
 	private void mockForCalendarHasChangePing(int noChangeIterationCount) 
-			throws DaoException, CollectionNotFoundException, UnknownObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 
@@ -265,7 +265,7 @@ public class PingHandlerTest {
 	}
 
 	private void mockCalendarBackendHasContentChanges(CalendarBackend calendarBackend)
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException {
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
@@ -276,7 +276,7 @@ public class PingHandlerTest {
 	}
 
 	private void mockCalendarBackendHasNoChange(CalendarBackend calendarBackend) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnknownObmSyncServerException {
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
 				anyObject(FilterType.class),

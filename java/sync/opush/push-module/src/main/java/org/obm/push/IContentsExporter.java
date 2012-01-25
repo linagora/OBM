@@ -40,7 +40,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
@@ -49,16 +49,16 @@ public interface IContentsExporter {
 	DataDelta getChanged(BackendSession bs, SyncState state,
 			Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws DaoException, CollectionNotFoundException,
-			UnknownObmSyncServerException, ProcessingEmailException;
+			UnexpectedObmSyncServerException, ProcessingEmailException;
 
 	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
 			PIMDataType dataType) throws CollectionNotFoundException,
 			DaoException, ProcessingEmailException,
-			UnknownObmSyncServerException;
+			UnexpectedObmSyncServerException;
 
 	int getItemEstimateSize(BackendSession bs, SyncState state,
 			Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnknownObmSyncServerException;
+			DaoException, UnexpectedObmSyncServerException;
 
 }

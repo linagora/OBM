@@ -36,7 +36,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -45,10 +45,10 @@ import org.obm.push.exception.activesync.ServerItemNotFoundException;
 public interface IContentsImporter {
 
 	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnknownObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException;
 
 	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException;

@@ -36,7 +36,7 @@ import java.util.Date;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 /**
@@ -48,10 +48,10 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(BackendSession bs);
 
-	HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException;
+	HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException;
 
 	int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException;
 
-	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnknownObmSyncServerException;
+	HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException;
 
 }

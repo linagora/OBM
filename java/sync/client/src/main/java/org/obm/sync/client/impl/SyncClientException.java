@@ -34,6 +34,7 @@ package org.obm.sync.client.impl;
 import org.obm.sync.NotAllowedException;
 import javax.naming.NoPermissionException;
 
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -100,6 +101,12 @@ public class SyncClientException {
 			throwEventNotFoundException(doc);
 			throwNotAllowedException(doc);
 			checkServerFaultException(doc);
+		}
+	}
+	
+	public void checkLoginExpection(Document doc) throws AuthFault {
+		if (documentIsError(doc)) {
+			throw new AuthFault(getErrorMessage(doc));
 		}
 	}
 	

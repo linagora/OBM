@@ -15,7 +15,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -24,14 +24,14 @@ import com.google.common.collect.ImmutableList;
 
 public class IntegrationPushTestUtils {
 
-	public static void mockHierarchyChanges(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException, UnknownObmSyncServerException {
+	public static void mockHierarchyChanges(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException, UnexpectedObmSyncServerException {
 		mockAddressBook(classToInstanceMap);
 		mockTask(classToInstanceMap);
 		mockCalendar(classToInstanceMap);
 	}
 	
 	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, UnknownObmSyncServerException {
+			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		expect(calendarBackend.getHierarchyChanges(anyObject(BackendSession.class)))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
@@ -44,7 +44,7 @@ public class IntegrationPushTestUtils {
 	}
 	
 	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, UnknownObmSyncServerException {
+			throws DaoException, UnexpectedObmSyncServerException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
 		expect(contactsBackend.getHierarchyChanges(anyObject(BackendSession.class), anyObject(Date.class)))

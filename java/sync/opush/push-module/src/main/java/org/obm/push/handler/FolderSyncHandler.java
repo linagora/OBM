@@ -46,7 +46,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
-import org.obm.push.exception.UnknownObmSyncServerException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.Responder;
@@ -101,7 +101,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		} catch (DaoException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
-		} catch (UnknownObmSyncServerException e) {
+		} catch (UnexpectedObmSyncServerException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (InvalidServerId e) {
 			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
@@ -118,7 +118,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 	
 	private FolderSyncResponse doTheJob(BackendSession bs, FolderSyncRequest folderSyncRequest) throws InvalidSyncKeyException, 
-		DaoException, UnknownObmSyncServerException, InvalidServerId {
+		DaoException, UnexpectedObmSyncServerException, InvalidServerId {
 		
 		if (isFirstSync(folderSyncRequest)) {
 
@@ -153,14 +153,14 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	private FolderSyncResponse getFolderSyncResponse(BackendSession bs, Date lastSync) throws DaoException, 
-			UnknownObmSyncServerException, InvalidServerId {
+			UnexpectedObmSyncServerException, InvalidServerId {
 		
 		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(bs, lastSync);
 		return createFolderSyncResponse(bs, hierarchyItemsChanges);
 	}
 	
 	private FolderSyncResponse getFolderSyncContactsResponse(BackendSession bs, Date lastSync) throws DaoException, 
-		UnknownObmSyncServerException, InvalidServerId {
+		UnexpectedObmSyncServerException, InvalidServerId {
 
 		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.listContactFoldersChanged(bs, lastSync);
 		return createFolderSyncResponse(bs, hierarchyItemsChanges);

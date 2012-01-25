@@ -153,15 +153,14 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
-		} catch (AuthFault e) {
-			logger.error(e.getMessage(), e);
-			returnHttpUnauthorized(request, response);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
+		} catch (AuthFault e) {
+			logger.warn(e.getMessage(), e);
+			returnHttpUnauthorized(request, response);
 		} catch (BadRequestException e) {
 			logger.warn(e.getMessage());
 			returnHttpUnauthorized(request, response);
-			return;
 		} finally {
 			getLoggerService().closeSession();
 		}

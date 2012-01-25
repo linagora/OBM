@@ -32,8 +32,10 @@
 package org.obm.push.impl;
 
 import org.obm.push.bean.BackendSession;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +53,12 @@ public class ObmSyncBackend {
 		this.login = login;
 	}
 
-	protected AccessToken login(BackendSession session) {
-		return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
+	protected AccessToken login(BackendSession session) throws UnexpectedObmSyncServerException {
+		try {
+			return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
+		} catch (AuthFault e) {
+			throw new UnexpectedObmSyncServerException(e);
+		}
 	}
 
 	protected void logout(AccessToken at) {
