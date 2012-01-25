@@ -334,6 +334,7 @@ public class CalendarItemsParserTest {
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 		
 		Assert.assertEquals(RecurrenceKind.none, ev.getRecurrence().getKind());
+		Assert.assertEquals(null, ev.getRecurrence().getDays());
 	}
 
 	@Test
@@ -396,5 +397,6 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals("test2@par.lng", evEx.getOwnerEmail());
 		Assert.assertEquals(1, evEx.getSequence());
 		Assert.assertEquals(2, evEx.getAttendees().size());
+		Assert.assertEquals("0000000", ev.getRecurrence().getDays());
 	}
 }

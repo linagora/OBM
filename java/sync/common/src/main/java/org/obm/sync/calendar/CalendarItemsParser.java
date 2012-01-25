@@ -188,7 +188,9 @@ public class CalendarItemsParser extends AbstractItemsParser {
 				er.setEnd(DateHelper.asDate(rec.getAttribute("end")));
 			}
 			er.setFrequence(Integer.parseInt(rec.getAttribute("freq")));
-			er.setDays(rec.getAttribute("days"));
+			String daysAttr = rec.getAttribute("days");
+			String days = Strings.isNullOrEmpty(daysAttr) ? "0000000" : daysAttr;
+			er.setDays(days);
 			if (er.getDays() != null && !"".equals(er.getDays())
 					&& !"0000000".equals(er.getDays())) {
 				er.setKind(RecurrenceKind.weekly);
