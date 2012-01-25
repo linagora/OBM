@@ -65,7 +65,7 @@ public interface MailboxService {
 	List<InputStream> fetchMIMEMails(BackendSession bs, ICalendar calendarClient, String collectionName, 
 			Set<Long> uids) throws MailException;
 
-	void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws MailException;
+	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException;
 
 	void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			Boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;

@@ -42,12 +42,18 @@ public class Email implements Indexed<Long> {
 	private final long uid;
 	private final boolean read;
 	private final Date date;
+	private boolean answered;
 	
 	public Email(long uid, boolean read, Date date) {
+		this(uid, read, date, false);
+	}
+	
+	public Email(long uid, boolean read, Date date, boolean answered) {
 		super();
 		this.uid = uid;
 		this.read = read;
 		this.date = date;
+		this.answered = answered;
 	}
 
 	public long getUid() {
@@ -67,9 +73,17 @@ public class Email implements Indexed<Long> {
 		return date;
 	}
 
+	public boolean isAnswered() {
+		return answered;
+	}
+	
+	public void setAnswered(boolean answered) {
+		this.answered = answered;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(uid, read, date);
+		return Objects.hashCode(uid, read, date, answered);
 	}
 	
 	@Override
@@ -78,7 +92,8 @@ public class Email implements Indexed<Long> {
 			Email that = (Email) object;
 			return Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.read, that.read)
-				&& Objects.equal(this.date, that.date);
+				&& Objects.equal(this.date, that.date)
+				&& Objects.equal(this.answered, that.answered);
 		}
 		return false;
 	}
@@ -89,6 +104,7 @@ public class Email implements Indexed<Long> {
 			.add("uid", uid)
 			.add("read", read)
 			.add("date", date)
+			.add("answered", answered)
 			.toString();
 	}
 	

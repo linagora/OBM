@@ -335,21 +335,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void setAnsweredFlag(BackendSession bs, String collectionName, Long uid) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			String mailBoxName = parseMailBoxName(bs, collectionName);
-			store.select(mailBoxName);
-			FlagsList fl = new FlagsList();
-			fl.add(Flag.ANSWERED);
-			store.uidStore(Arrays.asList(uid), fl, true);
-			logger.info("flag  change : ANSWERED on mail {} in {}", new Object[]{uid, mailBoxName});
-		} catch (IMAPException e) {
-			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
+	public void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException {
+		updateMailFlag(bs, collectionName, uid, Flags.Flag.ANSWERED, true);
 	}
 
 	@Override

@@ -246,6 +246,28 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(emailHasRead.isRead()).isTrue();
 	}
 	
+	@Test
+	public void testSetAnsweredFlag() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		Date date = DateUtils.getMidnightCalendar().getTime();
+		
+		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		greenMail.waitForIncomingEmail(1);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		
+		Email email = Iterables.getOnlyElement(emails);
+		mailboxService.setAnsweredFlag(bs, mailBox, email.getUid());
+		
+		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(bs, mailBox, date);
+		Email answeredEmail = Iterables.getOnlyElement(emailsAfterToSetAnsweredFlag);
+		
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+		Assertions.assertThat(emailsAfterToSetAnsweredFlag).isNotNull().hasSize(1);
+		
+		Assertions.assertThat(email.isAnswered()).isFalse();
+		Assertions.assertThat(answeredEmail.isAnswered()).isTrue();
+	}
+	
 	private MailboxFolder folder(String name) {
 		return new MailboxFolder(name);
 	}
