@@ -75,7 +75,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,18 +88,16 @@ public class MailMessageLoader {
 	private static final Logger logger = LoggerFactory
 			.getLogger(MailMessageLoader.class);
 	
-	private final ICalendar calendarClient;
 	private final List<String> htmlMimeSubtypePriority;
 	private final StoreClient storeClient;
 	private final EventService eventService;
 	private final Ical4jHelper ical4jHelper;
 	private final Ical4jUser.Factory ical4jUserFactory;
 	
-	public MailMessageLoader(StoreClient store, ICalendar calendarClient, 
+	public MailMessageLoader(StoreClient store, 
 			EventService eventService, Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory) {
 		
 		this.storeClient = store;
-		this.calendarClient = calendarClient;
 		this.eventService = eventService;
 		this.ical4jHelper = ical4jHelper;
 		this.ical4jUserFactory = ical4jUserFactory;
@@ -176,7 +173,7 @@ public class MailMessageLoader {
 		msEmail.setBcc(convertAllAdressToMSAddress(mailMessage.getBcc()));
 		msEmail.setCc(convertAllAdressToMSAddress(mailMessage.getCc()));
 		
-		if (this.calendarClient != null && mailMessage.getInvitation() != null) {
+		if (mailMessage.getInvitation() != null) {
 			setInvitation(msEmail, bs, mailMessage.getInvitation(), uid, messageId);
 		}
 		

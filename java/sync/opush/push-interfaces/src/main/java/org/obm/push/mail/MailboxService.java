@@ -46,11 +46,10 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.sync.services.ICalendar;
 
 public interface MailboxService {
 
-	List<MSEmail> fetchMails(BackendSession bs, ICalendar calendarClient, Integer collectionId, String collectionName, 
+	List<MSEmail> fetchMails(BackendSession bs, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws MailException;
 
 	void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException;
@@ -62,7 +61,7 @@ public interface MailboxService {
 	Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
 			Long uid) throws MailException, DaoException;
 
-	List<InputStream> fetchMIMEMails(BackendSession bs, ICalendar calendarClient, String collectionName, 
+	List<InputStream> fetchMIMEMails(BackendSession bs, String collectionName, 
 			Set<Long> uids) throws MailException;
 
 	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException;

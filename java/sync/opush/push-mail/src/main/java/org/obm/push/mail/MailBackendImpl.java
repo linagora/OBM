@@ -251,7 +251,7 @@ public class MailBackendImpl implements MailBackend {
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
 			List<MSEmail> msMails = 
-					mailboxService.fetchMails(bs, calendarClient, collectionId, collection, emailsUids);
+					mailboxService.fetchMails(bs, collectionId, collection, emailsUids);
 			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -309,7 +309,7 @@ public class MailBackendImpl implements MailBackend {
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<MSEmail> emails = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
+			final List<MSEmail> emails = mailboxService.fetchMails(bs, collectionId, collectionPath, uids);
 			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(mappingService.getServerIdFor(collectionId, String.valueOf(email.getUid())));
@@ -450,7 +450,7 @@ public class MailBackendImpl implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionPath, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				//TODO uses headers References and In-Reply-To
@@ -487,7 +487,7 @@ public class MailBackendImpl implements MailBackend {
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 
-			List<MSEmail> mail = mailboxService.fetchMails(bs, calendarClient, collectionIdInt, collectionName, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionIdInt, collectionName, uids);
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
@@ -572,7 +572,7 @@ public class MailBackendImpl implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = mailboxService.fetchMails(bs, calendarClient, collectionId, collectionName, uids);
+			List<MSEmail> emails = mailboxService.fetchMails(bs, collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
