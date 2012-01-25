@@ -440,7 +440,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		er.setKind(RecurrenceKind.valueOf(evrs.getString("event_repeatkind")));
 		er.setDays(evrs.getString("event_repeatdays"));
 		er.setFrequence(evrs.getInt("event_repeatfrequence"));
-		er.setEnd(evrs.getTimestamp("event_endrepeat"));
+		if (evrs.getTimestamp("event_endrepeat") != null) {
+			cal.setTimeInMillis(evrs.getTimestamp("event_endrepeat").getTime());
+			er.setEnd(cal.getTime());			
+		}
 		e.setRecurrence(er);
 
 		e.setEntityId(evrs.getInt("evententity_entity_id"));
