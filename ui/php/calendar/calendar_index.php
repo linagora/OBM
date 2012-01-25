@@ -1403,8 +1403,8 @@ function get_calendar_params() {
     if(!is_null($params['repeat_end'])) {
       # Don't remove the two lines below. The side effect is that this sets the
       # end date right.
-      $params['repeat_end']->setHour($params['time_end']);
-      $params['repeat_end']->setMinute($params['min_end']);
+      $params['repeat_end']->setHour($params['date_begin']->getHour());
+      $params['repeat_end']->setMinute($params['date_begin']->getMinute());
     }
   } elseif(!is_null($params['date_end'])) {
     $params['date_end']->setHour($ccalendar_last_hour);
