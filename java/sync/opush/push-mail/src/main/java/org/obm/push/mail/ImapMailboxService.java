@@ -41,9 +41,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.columba.ristretto.smtp.SMTPException;
+import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+
+import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -75,8 +78,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPStore;
 
 @Singleton
@@ -91,17 +96,19 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	private final ImapClientProvider imapClientProvider;
 	private final Ical4jHelper ical4jHelper;
 	private final Ical4jUser.Factory ical4jUserFactory;
+	private final ImapMailBoxUtils imapMailBoxUtils;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
-			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory) {
+			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory, ImapMailBoxUtils imapMailBoxUtils) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
 		this.ical4jHelper = ical4jHelper;
 		this.ical4jUserFactory = ical4jUserFactory;
+		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
@@ -172,7 +179,6 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 
-	
 	@Override
 	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws MailException {
 		StoreClient store = imapClientProvider.getImapClient(bs);
@@ -192,6 +198,61 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 
+	/* package */ void updateMailFlag(BackendSession bs, String collectionName, long uid, Flags.Flag flag, 
+			boolean status) throws MailException {
+		
+		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		try {
+			Message message = getMessage(store, bs, collectionName, uid);
+			message.setFlag(flag, status);
+			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
+					new Object[] { uid, collectionName, imapMailBoxUtils.flagToString(flag), status });
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
+	}
+	
+	private Message getMessage(IMAPStore store, BackendSession bs, String collectionName, long uid) throws MailException {
+		String mailBoxName = parseMailBoxName(bs, collectionName);
+		try {
+			IMAPFolder imapFolder = (IMAPFolder) store.getFolder(mailBoxName);
+			imapFolder.open(Folder.READ_ONLY);
+			Message message = imapFolder.getMessageByUID(Ints.checkedCast(uid));
+			if (message != null) {
+				return message;
+			} else {
+				throw new MailNotFoundException("Mail with UID {" + uid + "} not found in {" + imapFolder.getFullName() + "}");
+			}
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		}
+	}
+	
+	/* package */ Message getMessage(BackendSession bs, String collectionName, long uid) throws MailException {
+		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		try {
+			return getMessage(store, bs, collectionName, uid);
+		} finally {
+			closeQuietly(store);
+		}
+	}
+	
+	/* package */ void expunge(BackendSession bs, String collectionName) throws MailException {
+		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		String mailBoxName = parseMailBoxName(bs, collectionName);
+		try {
+			Folder folder = store.getFolder(mailBoxName);
+			folder.open(Folder.READ_WRITE);
+			folder.expunge();
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
+	}
+	
 	@Override
 	public String parseMailBoxName(BackendSession bs, String collectionName) throws MailException {
 		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent

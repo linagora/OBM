@@ -36,6 +36,8 @@ import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import java.util.Date;
 import java.util.Set;
 
+import javax.mail.Flags;
+
 import org.fest.assertions.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -43,12 +45,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.utils.DateUtils;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -179,6 +184,44 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(result).isTrue();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
+	}
+	
+	@Test(expected=MailNotFoundException.class)
+	public void testExpunge() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		Date date = DateUtils.getMidnightCalendar().getTime();
+
+		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		greenMail.waitForIncomingEmail(1);
+		
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		long uid = Iterables.getOnlyElement(emails).getUid();
+
+		mailboxService.updateMailFlag(bs, mailBox, uid, Flags.Flag.DELETED, true);
+		mailboxService.expunge(bs,  mailBox);
+		mailboxService.getMessage(bs, mailBox, uid);
+	}
+	
+	@Test
+	public void testUpdateMailFlag() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		Date date = DateUtils.getMidnightCalendar().getTime();
+
+		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		greenMail.waitForIncomingEmail(1);
+		
+		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(bs, mailBox, date));
+		
+		mailboxService.updateMailFlag(bs, mailBox, email.getUid(), Flags.Flag.SEEN, true);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		
+		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
+	}
+	
+	@Test(expected=MailNotFoundException.class)
+	public void testUpdateMailFlagWithBadUID() throws Exception {
+		long mailUIDNotExist = 1l;
+		mailboxService.updateMailFlag(bs, EmailConfiguration.IMAP_INBOX_NAME, mailUIDNotExist, Flags.Flag.SEEN, true);
 	}
 	
 	private MailboxFolder folder(String name) {
