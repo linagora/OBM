@@ -180,22 +180,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void updateReadFlag(BackendSession bs, String collectionName, Long uid, boolean read) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			String mailBoxName = parseMailBoxName(bs, collectionName);
-			store.select(mailBoxName);
-			FlagsList fl = new FlagsList();
-			fl.add(Flag.SEEN);
-			store.uidStore(Arrays.asList(uid), fl, read);
-			logger.info("flag  change: " + (read ? "+" : "-") + " SEEN"
-					+ " on mail " + uid + " in " + mailBoxName);
-		} catch (IMAPException e) {
-			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
+	public void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException {
+		updateMailFlag(bs, collectionName, uid, Flags.Flag.SEEN, read);
 	}
 
 	/* package */ void updateMailFlag(BackendSession bs, String collectionName, long uid, Flags.Flag flag, 

@@ -224,6 +224,28 @@ public class ImapMailboxServiceTest {
 		mailboxService.updateMailFlag(bs, EmailConfiguration.IMAP_INBOX_NAME, mailUIDNotExist, Flags.Flag.SEEN, true);
 	}
 	
+	@Test
+	public void testUpdateReadMailFlag() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		Date date = DateUtils.getMidnightCalendar().getTime();
+		
+		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		greenMail.waitForIncomingEmail(1);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		
+		Email emailNotRead = Iterables.getOnlyElement(emails);
+		mailboxService.updateReadFlag(bs, mailBox, emailNotRead.getUid(), true);
+		
+		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(bs, mailBox, date);
+		Email emailHasRead = Iterables.getOnlyElement(emailsAfterToReadMail);
+		
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+		Assertions.assertThat(emailsAfterToReadMail).isNotNull().hasSize(1);
+		
+		Assertions.assertThat(emailNotRead.isRead()).isFalse();
+		Assertions.assertThat(emailHasRead.isRead()).isTrue();
+	}
+	
 	private MailboxFolder folder(String name) {
 		return new MailboxFolder(name);
 	}
