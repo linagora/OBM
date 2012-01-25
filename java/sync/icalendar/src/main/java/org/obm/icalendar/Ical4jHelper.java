@@ -1231,7 +1231,9 @@ public class Ical4jHelper {
 					att.setState(ParticipationState.getValueOf(partStat
 							.getValue()));
 				}
-
+			} else {
+				//rfc5545 : 3.2.12, if PART-STAT is missing, default is NEEDS-ACTION
+				att.setState(ParticipationState.NEEDSACTION);
 			}
 			if (!emails.containsKey(att.getEmail())) {
 				emails.put(att.getEmail(), att);

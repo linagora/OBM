@@ -99,6 +99,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -941,5 +942,15 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2940.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 		Assertions.assertThat(events).isNotNull();
+	}
+	
+	@Test
+	public void testDefaultParticipation() throws IOException, ParserException {
+		String icsFilename = "default-part-stat.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+		Event event = Iterables.getOnlyElement(events);
+		Assertions.assertThat(event.getAttendees()).hasSize(2);
+		Attendee userc = event.getAttendees().get(1);
+		Assertions.assertThat(userc.getState()).isNotNull().isEqualTo(ParticipationState.NEEDSACTION);
 	}
 }
