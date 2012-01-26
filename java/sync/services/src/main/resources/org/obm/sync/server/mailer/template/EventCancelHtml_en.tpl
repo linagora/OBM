@@ -5,7 +5,24 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">The appointment ${subject}, initially scheduled on ${start} to ${end} (location: ${location}),
-has been deleted.</td>
+        <td colspan="2">The next appointment ${subject} has been deleted.</td>
+    </tr>
+    <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${subject}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${start}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${end}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${location}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;">${organizer}</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;">${creator}</td>
     </tr>
 </table>
