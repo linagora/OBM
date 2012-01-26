@@ -416,14 +416,22 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-	
+
 	private void setAttendeeCanWriteOnCalendar(AccessToken accessToken, Event event) {
-		for (Attendee attendee: event.getAttendees()) {
-			if (!StringUtils.isEmpty(attendee.getEmail()) && helperService.canWriteOnCalendar(accessToken,  attendee.getEmail())) {
-				attendee.setCanWriteOnCalendar(true);
-			} else {
-				attendee.setCanWriteOnCalendar(false);
+		applyRightsOnAttendees(accessToken, event.getAttendees());
+		if (event.getRecurrence() != null) {
+			List<Event> exceptions = event.getRecurrence().getEventExceptions();
+			for (Event exception : exceptions) {
+				applyRightsOnAttendees(accessToken, exception.getAttendees());
 			}
+		}
+	}
+
+	private void applyRightsOnAttendees(AccessToken accessToken, Collection<Attendee> attendees) {
+		for (Attendee attendee : attendees) {
+			boolean canWriteOnCalendar = !StringUtils.isEmpty(attendee.getEmail())
+					&& helperService.canWriteOnCalendar(accessToken, attendee.getEmail());
+			attendee.setCanWriteOnCalendar(canWriteOnCalendar);
 		}
 	}
 	
