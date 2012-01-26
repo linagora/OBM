@@ -35,6 +35,7 @@ import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -159,6 +160,122 @@ public class ImapStoreAPITest {
 			Assertions.assertThat(fetchedMailStream).hasContentEqualTo(expectedEmailData);
 		}
 	}
+
+	@Test
+	public void testStoreInInboxStoredEmailOrder() throws Exception {
+		Date before = new Date();
+		int countOfEmailForOrderTesting = 15;
+
+		for (int emailtoStore = 0; emailtoStore < countOfEmailForOrderTesting; emailtoStore++) {
+			InputStream emailContent = StreamMailTestsUtils.getUniqueTinyEmailInputStream(emailtoStore);
+			mailboxService.storeInInboxWithJM(bs, emailContent, emailContent.available(), true);
+		}
+		
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		List<Email> orderedEmails = mailboxUtils.orderEmailByUid(emails);
+		for (int emailStored = 0; emailStored < orderedEmails.size(); emailStored++) {
+			InputStream emailSteamAsExpected = 
+					StreamMailTestsUtils.getUniqueTinyEmailAsShouldBeFetched(emailStored);
+			InputStream emailStreamAsStored = mailboxService.fetchMailStream(
+					bs, IMAP_INBOX_NAME, orderedEmails.get(emailStored).getUid());
+			Assertions.assertThat(emailStreamAsStored).hasContentEqualTo(emailSteamAsExpected);
+		}
+	}
+
+	@Test
+	public void testStoreInInboxInvitationWithJM() throws Exception {
+		Date before = new Date();
+		int emailSize = 3608;
+		InputStream emailData = loadDataFile("androidInvit.eml");
+
+		mailboxService.storeInInboxWithJM(bs, emailData, emailSize, true);
+
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+
+	@Test
+	public void testStoreInInboxNotAnEmailWithJM() throws Exception {
+		Date before = new Date();
+		InputStream notAnEmailData = new ByteArrayInputStream(new byte[]{'t','e','s','t'});
+
+		mailboxService.storeInInboxWithJM(bs, notAnEmailData, notAnEmailData.available(), true);
+
+		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxThrowExceptionWhenGivenMessageSizeIsShorter() throws Exception {
+		int emailGivenSize = 20;
+		InputStream emailStream = StreamMailTestsUtils.getStreamOfFortyChars();
+
+		mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxRollbackWhenGivenMessageSizeIsShorter() throws Exception {
+		Date before = new Date();
+		int emailGivenSize = 20;
+		InputStream emailStream = StreamMailTestsUtils.getStreamOfFortyChars();
+
+		try {
+			mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
+		} catch (MailException e) {
+			Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+			Assertions.assertThat(emails).isNotNull().hasSize(0);
+			throw e;
+		}
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxThrowExceptionWhenGivenMessageSizeIsLonger() throws MailException {
+		int emailGivenSize = 60;
+		InputStream emailStream = StreamMailTestsUtils.getStreamOfFortyChars();
+		
+		try {
+			mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
+		} catch (MailException e) {
+			MailTestsUtils.assertThatIsJavaSocketTimeoutException(e);
+			throw e;
+		}
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxRollbackWhenGivenMessageSizeIsLonger() throws Exception {
+		Date before = new Date();
+		int emailGivenSize = 60;
+		InputStream emailStream = StreamMailTestsUtils.getStreamOfFortyChars();
+
+		try {
+			mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
+		} catch (MailException e) {
+			Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+			Assertions.assertThat(emails).isNotNull().hasSize(0);
+			throw e;
+		}
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxThrowExceptionWhenStreamFail() throws Exception {
+		InputStream failingEmailStream = getStreamFailing();
+
+		mailboxService.storeInInboxWithJM(bs, failingEmailStream, failingEmailStream.available(), true);
+	}
+
+	@Test(expected=MailException.class)
+	public void testStoreInInboxRollbackWhenStreamFail() throws Exception {
+		Date before = new Date();
+		InputStream failingEmailStream = getStreamFailing();
+
+		try {
+			mailboxService.storeInInboxWithJM(bs, failingEmailStream, failingEmailStream.available(), true);
+		} catch (MailException e) {
+			Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+			Assertions.assertThat(emails).isNotNull().hasSize(0);
+			throw e;
+		}
+	}
 	
 	@Test
 	public void testStoreInInboxReadStatusWithJM() throws Exception {
@@ -207,6 +324,36 @@ public class ImapStoreAPITest {
 		Assertions.assertThat(uids).hasSize(emails.size());
 	}
 
+	
+	private InputStream getStreamFailing() {
+		return new InputStream() {
+
+			int count = 0;
+			int shouldWriteByteCount = 20;
+			int willFailAtByteIndex = 10;
+
+			@Override
+			public int available() throws IOException {
+				return shouldWriteByteCount;
+			}
+			
+			@Override
+			public int read() throws IOException {
+				
+				if (count < shouldWriteByteCount) {
+					if (count != willFailAtByteIndex) {
+						count++;
+						return 'C';
+					} else {
+						throw new IOException("Stream has failed");
+					}
+				} else {
+					return -1;
+				}
+			}
+		};
+	}
+	
 	protected InputStream loadDataFile(String name) {
 		return getClass().getClassLoader().getResourceAsStream("eml/" + name);
 	}

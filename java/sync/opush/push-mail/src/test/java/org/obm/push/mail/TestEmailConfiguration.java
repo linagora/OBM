@@ -63,6 +63,6 @@ public class TestEmailConfiguration implements EmailConfiguration {
 
 	@Override
 	public int imapTimeout() {
-		return 2000;
+		return 3000;
 	}
 }

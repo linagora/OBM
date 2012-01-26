@@ -8,6 +8,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.StoreClosedException;
+
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Message;
@@ -39,7 +41,20 @@ public class MailTestsUtils {
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
 
 	public static void assertThatIsJavaSocketTimeoutException(Exception e) {
-		Assertions.assertThat(e).hasMessageContaining(SocketTimeoutException.class.getName());
+		StoreClosedException hasTimeoutException = 
+				getThrowableInCauseOrNull(e, StoreClosedException.class);
+		Assertions.assertThat(hasTimeoutException).hasMessageContaining(SocketTimeoutException.class.getName());
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T extends Throwable> T getThrowableInCauseOrNull(Throwable from, Class<T> seekingCause) {
+		if (from.getClass().equals(seekingCause)) {
+			return (T) from; // Cast unchecked
+		} else if (from.getCause() != null){
+			return getThrowableInCauseOrNull(from.getCause(), seekingCause);
+		} else {
+			return null;
+		}
 	}
 	
 	public static InputStream loadEmail(String name) {

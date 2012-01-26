@@ -32,18 +32,16 @@
 package org.obm.push.mail;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
+import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
-
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Flags;
-import javax.mail.StoreClosedException;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -61,8 +59,8 @@ import org.obm.push.bean.User;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Iterables;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -99,35 +97,20 @@ public class ImapMailboxServiceTest {
 		greenMail.stop();
 	}
 
-	@Test
-	public void testTimeout() {
+	@Test(expected=MailException.class)
+	public void testTimeout() throws MailException {
 		int emailGivenSize = 20;
 		byte[] emailSmallerThanExpectedSize = new String("0123456789").getBytes();
 		InputStream emailStream = new ByteArrayInputStream(emailSmallerThanExpectedSize);
-		MailException exceptionGotten = null;
 		
 		Stopwatch stopWatch = new Stopwatch().start();
 		try {
 			mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
-			exceptionGotten = e;
-		}
-		
-		int acceptedTimeoutDeltaInMs = 500;
-		assertTimeoutIsInAcceptedDelta(stopWatch, acceptedTimeoutDeltaInMs);
-		StoreClosedException hasTimeoutException = 
-				getThrowableInCauseOrNull(exceptionGotten, StoreClosedException.class);
-		MailTestsUtils.assertThatIsJavaSocketTimeoutException(hasTimeoutException);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private <T extends Throwable> T getThrowableInCauseOrNull(Throwable from, Class<T> seekingCause) {
-		if (from.getClass().equals(seekingCause)) {
-			return (T) from; // Cast unchecked
-		} else if (from.getCause() != null){
-			return getThrowableInCauseOrNull(from.getCause(), seekingCause);
-		} else {
-			return null;
+			int acceptedTimeoutDeltaInMs = 500;
+			assertTimeoutIsInAcceptedDelta(stopWatch, acceptedTimeoutDeltaInMs);
+			MailTestsUtils.assertThatIsJavaSocketTimeoutException(e);
+			throw e;
 		}
 	}
 

@@ -33,7 +33,6 @@ package org.obm.push.mail;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
@@ -57,8 +56,6 @@ import org.obm.push.mail.greenmail.GreenMailExternalProcess;
 import com.google.inject.Inject;
 
 public class ImapStoreAPIMemoryTest {
-	
-	private static final byte[] CRLF = { (byte)'\r', (byte)'\n'};
 	
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
@@ -97,7 +94,7 @@ public class ImapStoreAPIMemoryTest {
 	@Test
 	public void testStoreInInboxSmallerThanMemorySize() throws Exception {
 		Date before = new Date();
-		InputStream tinyInputStream = getTinyEmailInputStream();
+		InputStream tinyInputStream = StreamMailTestsUtils.getTinyEmailInputStream();
 
 		mailboxService.storeInInbox(bs, tinyInputStream, true);
 		
@@ -114,12 +111,12 @@ public class ImapStoreAPIMemoryTest {
 
 	@Test
 	public void testStoreInInboxSmallerThanMemorySizeWithJM() throws Exception {
-		final InputStream tinyInputStream = getTinyEmailInputStream();
+		final InputStream tinyInputStream = StreamMailTestsUtils.getTinyEmailInputStream();
 
 		mailboxService.storeInInboxWithJM(bs, tinyInputStream, tinyInputStream.available(), true);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
-		InputStream expectedEmailData = getTinyEmailAsShouldBeFetched();
+		InputStream expectedEmailData = StreamMailTestsUtils.getTinyEmailAsShouldBeFetched();
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 
@@ -132,22 +129,5 @@ public class ImapStoreAPIMemoryTest {
 		mailboxService.storeInInboxWithJM(bs, heavyInputStream, Integer.MAX_VALUE, true);
 		Set<Email> emails = mailboxService.fetchEmails(bs, EmailConfiguration.IMAP_INBOX_NAME, before);
 		Assertions.assertThat(emails).hasSize(1);
-	}
-
-	private InputStream getTinyEmailAsShouldBeFetched() {
-		String lineBreak = new String(CRLF);
-		StringBuilder shouldHasCRLF = new StringBuilder();
-		shouldHasCRLF.append(lineBreak);
-		shouldHasCRLF.append(getTinyEmail());
-		shouldHasCRLF.append(lineBreak); 
-		return new ByteArrayInputStream(shouldHasCRLF.toString().getBytes());
-	}
-	
-	private InputStream getTinyEmailInputStream() {
-		return new ByteArrayInputStream(getTinyEmail().getBytes());
-	}
-	
-	private String getTinyEmail() {
-		return "I'm a small email";
 	}
 }
