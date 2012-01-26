@@ -60,4 +60,9 @@ public class TestEmailConfiguration implements EmailConfiguration {
 	public int imapPort() {
 		return imapPort;
 	}
+
+	@Override
+	public int imapTimeout() {
+		return 2000;
+	}
 }

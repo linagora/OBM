@@ -71,14 +71,21 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.imapPort = emailConfiguration.imapPort();
 		
-		Properties imapProperties = buildProperties(emailConfiguration.activateTls());
-		this.defaultSession = Session.getDefaultInstance(imapProperties);
+		Properties imapProperties = buildProperties(emailConfiguration);
+		this.defaultSession = Session.getInstance(imapProperties);
 	}
 
-
-	private Properties buildProperties(boolean activateTls) {
+	private Properties buildProperties(EmailConfiguration emailConfiguration) {
 		Properties properties = new Properties();
+
+		boolean activateTls = emailConfiguration.activateTls();
+		logger.debug("Java Mail settings : STARTTLS=" + activateTls);
 		properties.put("mail.imap.starttls.enable", activateTls);
+		
+		int imapTimeout = emailConfiguration.imapTimeout();
+		logger.debug("Java Mail settings : TIMEOUT=" + imapTimeout);
+		properties.put("mail.imap.timeout", imapTimeout);
+		
 		return properties;
 	}
 

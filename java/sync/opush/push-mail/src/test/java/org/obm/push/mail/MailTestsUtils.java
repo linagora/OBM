@@ -3,6 +3,7 @@ package org.obm.push.mail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.easymock.EasyMock;
+import org.fest.assertions.api.Assertions;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.MSAttachement;
@@ -35,6 +37,10 @@ import com.google.common.collect.Sets;
 public class MailTestsUtils {
 
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
+
+	public static void assertThatIsJavaSocketTimeoutException(Exception e) {
+		Assertions.assertThat(e).hasMessageContaining(SocketTimeoutException.class.getName());
+	}
 	
 	public static InputStream loadEmail(String name) {
 		return ClassLoader.getSystemResourceAsStream("eml/" + name);
