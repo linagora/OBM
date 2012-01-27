@@ -1,4 +1,4 @@
-{package_name} ({version}~{release}) experimental; urgency=low
+{package_name} ({debian_version}) experimental; urgency=low
 
   * beta build only for test purpose - git revision {sha1}.
 

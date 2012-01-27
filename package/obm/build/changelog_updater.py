@@ -49,9 +49,20 @@ class ChangelogUpdater(object):
             changelog_date = self.date.strftime("%a %b %d %Y")
         else:
             raise ValueError("Unknown package type %s" % self.package_type)
+
+        debian_version = None
+        if self.release:
+            # For autocommit without a version number, no tilde
+            if self.release[0] == "+":
+                debian_version = "%s%s" % (self.version, self.release)
+            else:
+                debian_version = "%s~%s" % (self.version, self.release)
+        else:
+            debian_version = self.version
         params = dict(package_name=package_name,
                 version=self.version,
                 release=self.release,
+                debian_version=debian_version,
                 year=self.date.strftime("%Y"),
                 month=self.date.strftime("%m"),
                 day=self.date.strftime("%d"),
