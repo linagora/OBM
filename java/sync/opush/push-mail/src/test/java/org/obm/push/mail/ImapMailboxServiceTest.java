@@ -186,7 +186,7 @@ public class ImapMailboxServiceTest {
 				inbox(), newFolder);
 	}
 	
-	@Test(expected=MailNotFoundException.class)
+	@Test(expected=ImapMessageNotFoundException.class)
 	public void testExpunge() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
 		Date date = DateUtils.getMidnightCalendar().getTime();
@@ -218,7 +218,7 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
 	}
 	
-	@Test(expected=MailNotFoundException.class)
+	@Test(expected=ImapMessageNotFoundException.class)
 	public void testUpdateMailFlagWithBadUID() throws Exception {
 		long mailUIDNotExist = 1l;
 		mailboxService.updateMailFlag(bs, EmailConfiguration.IMAP_INBOX_NAME, mailUIDNotExist, Flags.Flag.SEEN, true);

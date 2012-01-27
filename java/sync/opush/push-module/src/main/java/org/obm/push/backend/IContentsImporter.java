@@ -38,9 +38,9 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 
 public interface IContentsImporter {
 

@@ -52,7 +52,7 @@ public interface MailboxService {
 	List<MSEmail> fetchMails(BackendSession bs, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws MailException;
 
-	void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException;
+	void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 
 	String parseMailBoxName(BackendSession bs, String collectionName) throws MailException;
 
@@ -64,7 +64,7 @@ public interface MailboxService {
 	List<InputStream> fetchMIMEMails(BackendSession bs, String collectionName, 
 			Set<Long> uids) throws MailException;
 
-	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException;
+	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException;
 
 	void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			Boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;

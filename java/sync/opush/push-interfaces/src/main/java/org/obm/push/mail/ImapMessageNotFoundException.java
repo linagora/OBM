@@ -32,17 +32,17 @@
 package org.obm.push.mail;
 
 
-public class MailNotFoundException extends MailException {
+public class ImapMessageNotFoundException extends Exception {
 
-	public MailNotFoundException(Throwable cause) {
+	public ImapMessageNotFoundException(Throwable cause) {
 		super(cause);
 	}
 
-	public MailNotFoundException(String message) {
+	public ImapMessageNotFoundException(String message) {
 		super(message);
 	}
 
-	public MailNotFoundException(String message, Throwable cause) {
+	public ImapMessageNotFoundException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

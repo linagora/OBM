@@ -71,9 +71,9 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
@@ -368,13 +368,9 @@ public class MailBackendImpl implements MailBackend {
 				+ bs.getUser().getLoginAtDomain();
 	}
 	
-	
 	@Override
-	public String createOrUpdate(BackendSession bs, Integer collectionId,
-			String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException,
-			ItemNotFoundException {
+	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, ItemNotFoundException {
 		
 		MSEmail email = (MSEmail) data;
 		try {
@@ -387,10 +383,10 @@ public class MailBackendImpl implements MailBackend {
 			return serverId;
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (DaoException e) {
-			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new ItemNotFoundException(e);
 		}
 	}
 
@@ -437,7 +433,7 @@ public class MailBackendImpl implements MailBackend {
 
 	@Override
 	public void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)
-			throws ProcessingEmailException, CollectionNotFoundException {
+			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException {
 		
 		try {
 			String collectionPath = "";
@@ -456,7 +452,6 @@ public class MailBackendImpl implements MailBackend {
 			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
-				//TODO uses headers References and In-Reply-To
 				Message message = mime4jUtils.parseMessage(mailContent);
 				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message);
 				send(bs, replyEmail, saveInSent);
@@ -478,6 +473,8 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (AuthFault e) {
 			throw new ProcessingEmailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new ItemNotFoundException(e);
 		} 
 	}
 
@@ -681,8 +678,13 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public Long getEmailUidFromServerId(String serverId){
-		return mappingService.getItemIdFromServerId(serverId).longValue();
+	public Long getEmailUidFromServerId(String serverId) {
+		Integer itemIdFromServerId = mappingService.getItemIdFromServerId(serverId);
+		if (itemIdFromServerId != null) {
+			return itemIdFromServerId.longValue();
+		} else {
+			return null;
+		}
 	}
 
 	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids) throws DaoException, MailException {

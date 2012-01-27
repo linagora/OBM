@@ -33,8 +33,6 @@ package org.obm.push.exception.activesync;
 
 public class ItemNotFoundException extends ActiveSyncException {
 
-	private String serverId;
-	
 	public ItemNotFoundException() {
 		super();
 	}
@@ -47,13 +45,4 @@ public class ItemNotFoundException extends ActiveSyncException {
 		super(message, cause);
 	}
 
-	public ItemNotFoundException(String serverId) {
-		super();
-		this.serverId = serverId;
-	}
-
-	public String getServerId() {
-		return serverId;
-	}
-	
 }

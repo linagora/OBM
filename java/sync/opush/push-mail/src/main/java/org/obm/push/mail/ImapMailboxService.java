@@ -179,12 +179,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException {
+	public void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) 
+			throws MailException, ImapMessageNotFoundException {
+		
 		updateMailFlag(bs, collectionName, uid, Flags.Flag.SEEN, read);
 	}
 
 	/* package */ void updateMailFlag(BackendSession bs, String collectionName, long uid, Flags.Flag flag, 
-			boolean status) throws MailException {
+			boolean status) throws MailException, ImapMessageNotFoundException {
 		
 		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
 		try {
@@ -199,7 +201,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
-	private Message getMessage(IMAPStore store, BackendSession bs, String collectionName, long uid) throws MailException {
+	private Message getMessage(IMAPStore store, BackendSession bs, String collectionName, long uid) 
+			throws MailException, ImapMessageNotFoundException {
+		
 		String mailBoxName = parseMailBoxName(bs, collectionName);
 		try {
 			IMAPFolder imapFolder = (IMAPFolder) store.getFolder(mailBoxName);
@@ -208,14 +212,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			if (message != null) {
 				return message;
 			} else {
-				throw new MailNotFoundException("Mail with UID {" + uid + "} not found in {" + imapFolder.getFullName() + "}");
+				throw new ImapMessageNotFoundException("Mail with UID {" + uid + "} not found in {" + imapFolder.getFullName() + "}");
 			}
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		}
 	}
 	
-	/* package */ Message getMessage(BackendSession bs, String collectionName, long uid) throws MailException {
+	/* package */ Message getMessage(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
 		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
 		try {
 			return getMessage(store, bs, collectionName, uid);
@@ -334,7 +338,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException {
+	public void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
 		updateMailFlag(bs, collectionName, uid, Flags.Flag.ANSWERED, true);
 	}
 

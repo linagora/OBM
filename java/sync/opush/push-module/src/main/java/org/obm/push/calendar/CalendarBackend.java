@@ -54,9 +54,9 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
@@ -332,7 +332,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (EventAlreadyExistException e) {
 			eventId = getEventIdFromExtId(token, collectionPath, calendarClient, event);
 		} catch (EventNotFoundException e) {
-			throw new ItemNotFoundException(serverId);
+			throw new ItemNotFoundException(e);
 		} finally {
 			logout(token);
 		}
@@ -429,7 +429,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			} catch (ServerFault e) {
 				throw new UnexpectedObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
-				throw new ItemNotFoundException(serverId);
+				throw new ItemNotFoundException(e);
 			} catch (org.obm.sync.NotAllowedException e) {
 				logger.error(e.getMessage(), e);
 			} finally {

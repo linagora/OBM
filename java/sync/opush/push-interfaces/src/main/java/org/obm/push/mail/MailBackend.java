@@ -10,6 +10,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface MailBackend extends PIMBackend {
@@ -19,9 +20,8 @@ public interface MailBackend extends PIMBackend {
 	void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent)
 			throws ProcessingEmailException;
 
-	void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent,
-			Integer collectionId, String serverId)
-			throws ProcessingEmailException, CollectionNotFoundException;
+	void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)
+			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 
 	void forwardEmail(BackendSession bs, byte[] mailContent,
 			Boolean saveInSent, String collectionId, String serverId)

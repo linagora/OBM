@@ -67,11 +67,11 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -371,8 +371,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					deleteServerItem(bs, collection, processedClientIds, change);
 				}
 			} catch (ItemNotFoundException e) {
-				logger.warn("Item {} doesn't exist on server. " +
-						"The client has sent a malformed or invalid item. Stop sending the item !", e.getServerId());
+				logger.warn("Item with server id {} not found.", change.getServerId());
 			}
 		}
 		return processedClientIds;
