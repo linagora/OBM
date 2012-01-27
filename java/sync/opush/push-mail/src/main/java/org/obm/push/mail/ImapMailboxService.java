@@ -203,7 +203,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		String mailBoxName = parseMailBoxName(bs, collectionName);
 		try {
 			IMAPFolder imapFolder = (IMAPFolder) store.getFolder(mailBoxName);
-			imapFolder.open(Folder.READ_ONLY);
+			imapFolder.open(Folder.READ_WRITE);
 			Message message = imapFolder.getMessageByUID(Ints.checkedCast(uid));
 			if (message != null) {
 				return message;
