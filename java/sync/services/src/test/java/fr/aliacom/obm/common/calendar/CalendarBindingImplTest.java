@@ -65,11 +65,15 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -524,7 +528,223 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(1, event.getAttendees().size());
 		Assert.assertEquals(true, event.getAttendees().iterator().next().isCanWriteOnCalendar());
 	}
-	
+
+	@Test
+	public void testAttendeeOfExceptionHasRightToWriteOnCalendar() throws FindException,
+			ServerFault, SQLException, EventNotFoundException {
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String calendar = "cal1";
+		String userEmail = "user@domain1";
+		String exceptionAttendeeEmail = "exception_attendee@domain1";
+		EventExtId extId = new EventExtId("extId");
+		boolean updateAttendee = true;
+		boolean notification = false;
+
+		Attendee attendee = getFakeAttendee(userEmail);
+		attendee.setState(ParticipationState.NEEDSACTION);
+
+		Attendee exceptionAttendee = getFakeAttendee(exceptionAttendeeEmail);
+		exceptionAttendee.setState(ParticipationState.ACCEPTED);
+
+		Date recurrenceId = new Date();
+
+		Event beforeEvent = new Event();
+		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setTitle("firstTitle");
+		beforeEvent.setInternalEvent(true);
+		beforeEvent.setExtId(extId);
+		beforeEvent.addAttendee(attendee);
+		beforeEvent.setSequence(0);
+
+		EventRecurrence beforeRecurrence = new EventRecurrence();
+		beforeRecurrence.setKind(RecurrenceKind.daily);
+		beforeEvent.setRecurrence(beforeRecurrence);
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setTitle("firstTitle");
+		event.setInternalEvent(true);
+		event.setExtId(extId);
+		event.addAttendee(attendee);
+		event.setSequence(1);
+		Event exception = new Event();
+		exception.setType(EventType.VEVENT);
+		exception.setTitle("firstTitle");
+		exception.setInternalEvent(true);
+		exception.setExtId(extId);
+		exception.addAttendee(attendee);
+		exception.addAttendee(exceptionAttendee);
+		exception.setSequence(1);
+		exception.setDate(recurrenceId);
+		exception.setRecurrenceId(recurrenceId);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		event.setRecurrence(recurrence);
+
+		Event dummyException = new Event();
+		dummyException.setType(EventType.VEVENT);
+		dummyException.setTitle("firstTitle");
+		dummyException.setInternalEvent(true);
+		dummyException.setExtId(extId);
+		dummyException.addAttendee(attendee);
+		dummyException.setSequence(0);
+		dummyException.setDate(recurrenceId);
+		dummyException.setRecurrenceId(recurrenceId);
+		dummyException.setRecurrence(new EventRecurrence());
+		dummyException.getRecurrence().setKind(RecurrenceKind.none);
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+
+		AccessToken accessToken = mockAccessToken(calendar, fixtures.domain);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+
+		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser)
+				.atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
+				beforeEvent).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false)
+				.atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail()))
+				.andReturn(true).atLeastOnce();
+		expect(
+				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
+						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+		eventChangeHandler.update(obmUser, dummyException, exception, notification, true,
+				accessToken);
+
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, helper, null, null);
+		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
+				notification);
+
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		Assert.assertEquals(ParticipationState.NEEDSACTION,
+				Iterables.getOnlyElement(newEvent.getAttendees()).getState());
+		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
+				.getEventExceptions());
+		Attendee afterExceptionAttendee = afterException
+				.findAttendeeFromEmail(exceptionAttendeeEmail);
+		Assert.assertEquals(ParticipationState.ACCEPTED, afterExceptionAttendee.getState());
+		Assert.assertEquals(true, afterExceptionAttendee.isCanWriteOnCalendar());
+	}
+
+	@Test
+	public void testAttendeeOfExceptionHasNoRightToWriteOnCalendar() throws FindException,
+			ServerFault, SQLException, EventNotFoundException {
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String calendar = "cal1";
+		String userEmail = "user@domain1";
+		String exceptionAttendeeEmail = "exception_attendee@domain1";
+		EventExtId extId = new EventExtId("extId");
+		boolean updateAttendee = true;
+		boolean notification = false;
+
+		Attendee attendee = getFakeAttendee(userEmail);
+		attendee.setState(ParticipationState.NEEDSACTION);
+
+		Attendee exceptionAttendee = getFakeAttendee(exceptionAttendeeEmail);
+		exceptionAttendee.setState(ParticipationState.NEEDSACTION);
+
+		Date recurrenceId = new Date();
+
+		Event beforeEvent = new Event();
+		beforeEvent.setType(EventType.VEVENT);
+		beforeEvent.setTitle("firstTitle");
+		beforeEvent.setInternalEvent(true);
+		beforeEvent.setExtId(extId);
+		beforeEvent.addAttendee(attendee);
+		beforeEvent.setSequence(0);
+
+		EventRecurrence beforeRecurrence = new EventRecurrence();
+		beforeRecurrence.setKind(RecurrenceKind.daily);
+		beforeEvent.setRecurrence(beforeRecurrence);
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setTitle("firstTitle");
+		event.setInternalEvent(true);
+		event.setExtId(extId);
+		event.addAttendee(attendee);
+		event.setSequence(1);
+		Event exception = new Event();
+		exception.setType(EventType.VEVENT);
+		exception.setTitle("firstTitle");
+		exception.setInternalEvent(true);
+		exception.setExtId(extId);
+		exception.addAttendee(attendee);
+		exception.addAttendee(exceptionAttendee);
+		exception.setSequence(1);
+		exception.setDate(recurrenceId);
+		exception.setRecurrenceId(recurrenceId);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		event.setRecurrence(recurrence);
+
+		Event dummyException = new Event();
+		dummyException.setType(EventType.VEVENT);
+		dummyException.setTitle("firstTitle");
+		dummyException.setInternalEvent(true);
+		dummyException.setExtId(extId);
+		dummyException.addAttendee(attendee);
+		dummyException.setSequence(0);
+		dummyException.setDate(recurrenceId);
+		dummyException.setRecurrenceId(recurrenceId);
+		dummyException.setRecurrence(new EventRecurrence());
+		dummyException.getRecurrence().setKind(RecurrenceKind.none);
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setEmail(userEmail);
+
+		AccessToken accessToken = mockAccessToken(calendar, fixtures.domain);
+		HelperService helper = mockRightsHelper(calendar, accessToken);
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		UserService userService = createMock(UserService.class);
+		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
+
+		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(obmUser)
+				.atLeastOnce();
+		expect(calendarDao.findEventByExtId(accessToken, obmUser, event.getExtId())).andReturn(
+				beforeEvent).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false)
+				.atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail()))
+				.andReturn(false).atLeastOnce();
+		expect(
+				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
+						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUser).atLeastOnce();
+		eventChangeHandler.update(obmUser, dummyException, exception, notification, true,
+				accessToken);
+
+		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, helper, null, null);
+		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
+				notification);
+
+		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
+
+		Assert.assertEquals(ParticipationState.NEEDSACTION,
+				Iterables.getOnlyElement(newEvent.getAttendees()).getState());
+		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
+				.getEventExceptions());
+		Attendee afterExceptionAttendee = afterException
+				.findAttendeeFromEmail(exceptionAttendeeEmail);
+		Assert.assertEquals(ParticipationState.NEEDSACTION, afterExceptionAttendee.getState());
+		Assert.assertEquals(false, afterExceptionAttendee.isCanWriteOnCalendar());
+	}
+
 	@Test
 	public void testAttendeeHasNoRightToWriteOnCalendar() throws FindException, ServerFault,
 			SQLException, EventNotFoundException {
