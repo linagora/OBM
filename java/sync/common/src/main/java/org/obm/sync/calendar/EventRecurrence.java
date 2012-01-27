@@ -242,6 +242,18 @@ public class EventRecurrence {
 		return (this.kind != RecurrenceKind.none);
 	}
 	
+	public void replaceDeclinedEventExceptionByException(String attendeeEmail) {
+		List<Event> eventExceptionsCopy = Lists.newArrayList(eventExceptions);
+		for (Event eexp : eventExceptions) {
+			Attendee attendee = eexp.findAttendeeFromEmail(attendeeEmail);
+			if (attendee != null && attendee.getState() == ParticipationState.DECLINED) {
+				exceptions.add(eexp.getRecurrenceId());
+				eventExceptionsCopy.remove(eexp);
+			}
+		}
+		eventExceptions = eventExceptionsCopy;
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(days, end, frequence, kind, exceptions,

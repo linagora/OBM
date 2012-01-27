@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -175,25 +176,6 @@ public class EventRecurrenceTest {
 	}
 	
 	@Test
-	public void testReplaceDeclinedEventExceptionByException() {
-		EventRecurrence rec1 = getOneDailyEventRecurence();
-		
-		Event e1 = createEventException(1, 2);
-		Event e2 = createEventException(2, 3);
-		
-		Attendee attendeeWithDeclinedEvent = new Attendee();
-		attendeeWithDeclinedEvent.setEmail("email0@email.com");
-		e1.getAttendees().get(0).setState(ParticipationState.DECLINED);
-		
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
-		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEvent);
-		
-		Assert.assertTrue(rec1.getEventExceptions().size() == 1);
-		Assert.assertTrue(rec1.getExceptions().length == 1);
-		Assert.assertEquals(rec1.getExceptions()[0], e1.getRecurrenceId());
-	}
-	
-	@Test
 	public void testDailyIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		
@@ -240,6 +222,43 @@ public class EventRecurrenceTest {
 		rec.setKind(recurrenceKind);
 		
 		return rec;
+	}
+	
+	@Test
+	public void testReplaceDeclinedEventExceptionByException() {
+		EventRecurrence rec1 = getOneDailyEventRecurence();
+		
+		Event e1 = createEventException(1, 2);
+		Event e2 = createEventException(2, 3);
+		
+		Attendee firstAttendee = e1.getAttendees().get(0);
+		firstAttendee.setState(ParticipationState.DECLINED);	
+		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		
+		String attendeeWithDeclinedEventEmail = "email0@email.com";
+		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEventEmail);
+		
+		Assertions.assertThat(rec1.getEventExceptions()).containsExactly(e2);
+		Assertions.assertThat(rec1.getExceptions()).containsOnly(e1.getRecurrenceId());
+	}
+	
+	@Test
+	public void testDontReplaceDeclinedEventExceptionByException() {
+		EventRecurrence rec1 = getOneDailyEventRecurence();
+		
+		Event e1 = createEventException(1, 2);
+		Event e2 = createEventException(2, 3);
+		
+		Attendee firstAttendee = e1.getAttendees().get(0);
+		firstAttendee.setState(ParticipationState.DECLINED);
+		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		
+		EventRecurrence rec2 = rec1.clone();
+		
+		String attendeeWithDeclinedEventEmail = "email3@email.com";
+		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEventEmail);
+		
+		Assert.assertEquals(rec1, rec2);
 	}
 	
 	private EventRecurrence getOneDailyEventRecurence() {
@@ -303,6 +322,7 @@ public class EventRecurrenceTest {
 			attendee.setPercent(1);
 			attendee.setRequired(ParticipationRole.REQ);
 			attendee.setState(ParticipationState.NEEDSACTION);
+			attendees.add(attendee);
 		}
 		return attendees;
 	}

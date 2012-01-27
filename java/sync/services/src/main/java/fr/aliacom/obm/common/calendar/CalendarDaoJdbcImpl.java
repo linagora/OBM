@@ -97,6 +97,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -962,7 +963,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		fetchIds.append(" GROUP BY e.event_id, att.eventlink_state, e.event_ext_id, ex.eventexception_parent_id");
 
 		List<DeletedEvent> declined = new LinkedList<DeletedEvent>();
-
+		Set<Event> parentOfDeclinedRecurrentEvent = Sets.newHashSet();
+		
 		StringBuilder fetched = new StringBuilder();
 		fetched.append("(0");
 		boolean fetchedData = false;
@@ -987,12 +989,28 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 			}
 
+			
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
-				Integer eventId = evrs.getInt(1);
-				fetchedData = true;
 				int recurentParentId = evrs.getInt(4);
-				if(recurentParentId > 0){
+				ParticipationState state = ParticipationState.getValueOf(evrs
+						.getString(2));
+				Integer eventId = evrs.getInt(1);
+				if (state == ParticipationState.DECLINED) {
+					if (recurentParentId == 0) {
+						declined.add(new DeletedEvent(
+							new EventObmId(eventId), 
+							new EventExtId(evrs.getString(3))));
+					} else {					
+						Event e = findEventById(token, new EventObmId(recurentParentId));
+						parentOfDeclinedRecurrentEvent.add(e);
+					}
+				} else {
+					fetchedData = true;
+					if(recurentParentId > 0){
+						fetched.append(",");
+						fetched.append(recurentParentId);
+					}
 					fetched.append(",");
 					fetched.append(recurentParentId);
 				}
@@ -1073,14 +1091,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 
 		Connection conComp = null;
+		Date touchDateForFakeExDates;
 		try {
 			conComp = obmHelper.getConnection();
+			touchDateForFakeExDates = obmHelper.selectNow(conComp);
 			if (!changedEvent.isEmpty()) {
 				IntegerIndexedSQLCollectionHelper changedIds = new IntegerIndexedSQLCollectionHelper(changedEvent);
 				loadAttendeesAndAlerts(conComp, token, eventById, changedIds, calendarUser
 						.getDomain().getName());
 				loadExceptions(conComp, cal, eventById, changedIds);
 				loadEventExceptions(conComp, token, eventById, changedIds);
+			}
+
+			touchParentOfDeclinedRecurrentEvents(
+					parentOfDeclinedRecurrentEvent, changedEvent,
+					touchDateForFakeExDates);
+
+			if (!changedEvent.isEmpty()) {
+				replaceDeclinedEventExceptionByException(token, changedEvent);
 			}
 		} catch (SQLException e) {
 			logger.error("error loading attendees, alerts, exceptions, eventException", e);
@@ -1092,6 +1120,35 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				declined));
 		
 		return ret;
+	}
+
+	private void touchParentOfDeclinedRecurrentEvents(
+			Set<Event> parentOfDeclinedRecurrentEvent,
+			List<Event> changedEvents, Date touchDateForFakeExDates) {
+		for (Event parentEvent : parentOfDeclinedRecurrentEvent) {
+			int i = changedEvents.indexOf(parentEvent);
+			boolean isPresent = i > -1;
+			Event event;
+			if (!isPresent) {
+				changedEvents.add(parentEvent);
+				event = parentEvent;
+			} else {
+				event = changedEvents.get(i);
+			}
+			// Do a 'touch' on the event since we added a "fake"
+			// exdate (to force the client to remove declined
+			// exceptions)
+			event.setTimeUpdate(touchDateForFakeExDates);
+		}
+	}
+
+	private void replaceDeclinedEventExceptionByException(AccessToken token,
+			List<Event> changedEvent) {
+		for(Event event: changedEvent) {
+			if(event.isRecurrent()) {
+				event.getRecurrence().replaceDeclinedEventExceptionByException(token.getUserEmail());
+			}
+		}
 	}
 
 	private Set<CalendarInfo> listCalendarRights(ObmUser user, Collection<String> calendarEmails)
