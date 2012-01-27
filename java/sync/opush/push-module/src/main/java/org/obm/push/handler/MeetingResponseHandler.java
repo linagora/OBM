@@ -50,7 +50,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
@@ -161,7 +161,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 				if (!AttendeeStatus.DECLINE.equals(userResponse)) {
 					meetingResponse.setCalId(calId);
 				}
-			} catch (ServerItemNotFoundException e) {
+			} catch (ItemNotFoundException e) {
 				logger.error(e.getMessage(), e);
 				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
 			} catch (UnexpectedObmSyncServerException e) {

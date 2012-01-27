@@ -56,7 +56,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
@@ -299,7 +299,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException {
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException {
 
 		AccessToken token = login(bs);
 		
@@ -332,7 +332,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (EventAlreadyExistException e) {
 			eventId = getEventIdFromExtId(token, collectionPath, calendarClient, event);
 		} catch (EventNotFoundException e) {
-			throw new ServerItemNotFoundException(serverId);
+			throw new ItemNotFoundException(serverId);
 		} finally {
 			logout(token);
 		}
@@ -414,7 +414,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException {
 		
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		if (serverId != null) {
@@ -429,7 +429,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			} catch (ServerFault e) {
 				throw new UnexpectedObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
-				throw new ServerItemNotFoundException(serverId);
+				throw new ItemNotFoundException(serverId);
 			} catch (org.obm.sync.NotAllowedException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
@@ -439,7 +439,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	public String handleMeetingResponse(BackendSession bs, MSEmail invitation, AttendeeStatus status) 
-			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException, ServerItemNotFoundException {
+			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException, ItemNotFoundException {
 		
 		MSEvent event = invitation.getInvitation();
 		AccessToken at = login(bs);
@@ -452,7 +452,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (UnexpectedObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
-			throw new ServerItemNotFoundException(e);
+			throw new ItemNotFoundException(e);
 		} finally {
 			logout(at);
 		}

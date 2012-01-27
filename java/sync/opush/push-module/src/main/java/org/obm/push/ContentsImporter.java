@@ -42,7 +42,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -59,7 +59,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
 		
 		PIMBackend backend = backends.getBackend(data.getType());
 		return backend.createOrUpdate(bs, collectionId, serverId, clientId, data);
@@ -67,7 +67,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-					throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+					throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
 
 		PIMBackend backend = backends.getBackend(type);
 		backend.delete(bs, collectionId, serverId, moveToTrash);

@@ -29,31 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception.activesync;
+package org.obm.push.bean;
 
-public class ServerItemNotFoundException extends ActiveSyncException {
-
-	private String serverId;
+public enum MailRequestStatus {
+    
+	SERVER_ERROR( 110 ),
+	SEND_QUOTA_EXCEEDED( 115 ),
+	ITEM_NOT_FOUND( 150 );
 	
-	public ServerItemNotFoundException() {
-		super();
-	}
+	private int errorCode;
 	
-	public ServerItemNotFoundException(Throwable cause) {
-		super(cause);
-	}
-
-	public ServerItemNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public ServerItemNotFoundException(String serverId) {
-		super();
-		this.serverId = serverId;
-	}
-
-	public String getServerId() {
-		return serverId;
+	private MailRequestStatus(int errorCode) {
+		this.errorCode = errorCode;
 	}
 	
+    public String asXmlValue() {
+    	return String.valueOf(errorCode);
+    }
+    
 }

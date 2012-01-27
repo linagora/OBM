@@ -55,4 +55,14 @@ public class SendMailHandler extends MailRequestHandler {
 		mailBackend.sendEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent());
 	}
 
+	@Override
+	protected String getTargetNamespace() {
+		return "ComposeMail";
+	}
+
+	@Override
+	protected String getElementName() {
+		return "SendMail";
+	}
+
 }

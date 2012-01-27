@@ -36,11 +36,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.bean.MailRequestStatus;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.stream.SizeLimitExceededException;
 import org.obm.push.utils.stream.SizeLimitingInputStream;
+import org.w3c.dom.Document;
 
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
@@ -84,6 +87,12 @@ public class MailProtocol {
 			throw new QuotaExceededException("The message must be smaller than " + maxSize, maxSize, 
 					byteArrayOutputStream.toByteArray());
 		}
+	}
+
+	public Document encodeErrorResponse(String namespace, MailRequestStatus requestStatus) {
+		Document ret = DOMUtils.createDoc(null, namespace);
+		DOMUtils.createElementAndText(ret.getDocumentElement(), "Status", requestStatus.asXmlValue());
+		return ret;
 	}
 
 }

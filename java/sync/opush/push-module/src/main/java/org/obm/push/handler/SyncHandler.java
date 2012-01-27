@@ -71,7 +71,7 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -370,7 +370,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				} else if (change.getModType().equals("Delete")) {
 					deleteServerItem(bs, collection, processedClientIds, change);
 				}
-			} catch (ServerItemNotFoundException e) {
+			} catch (ItemNotFoundException e) {
 				logger.warn("Item {} doesn't exist on server. " +
 						"The client has sent a malformed or invalid item. Stop sending the item !", e.getServerId());
 			}
@@ -380,7 +380,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void updateServerItem(BackendSession bs, SyncCollection collection, SyncCollectionChange change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ServerItemNotFoundException {
+			ProcessingEmailException, ItemNotFoundException {
 
 		contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
 				change.getData());
@@ -388,7 +388,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void addServerItem(BackendSession bs, SyncCollection collection, 
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
 
 		String obmId = contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(),
 				change.getClientId(), change.getData());
@@ -404,7 +404,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	
 	private void deleteServerItem(BackendSession bs, SyncCollection collection,
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
 
 		String serverId = change.getServerId();
 		contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), serverId, collection

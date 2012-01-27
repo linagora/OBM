@@ -44,21 +44,21 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 
 public interface PIMBackend {
 
 	String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException;
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException;
 	
 	String move(BackendSession bs, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,
 			ProcessingEmailException;
 	
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ProcessingEmailException;
 	
 	DataDelta getChanged(BackendSession bs, SyncState state, FilterType filterType, Integer collectionId) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException;

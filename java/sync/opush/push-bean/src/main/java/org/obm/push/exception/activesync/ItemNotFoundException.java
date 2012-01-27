@@ -29,31 +29,31 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.backend;
+package org.obm.push.exception.activesync;
 
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
+public class ItemNotFoundException extends ActiveSyncException {
 
-public interface IContentsImporter {
+	private String serverId;
+	
+	public ItemNotFoundException() {
+		super();
+	}
+	
+	public ItemNotFoundException(Throwable cause) {
+		super(cause);
+	}
 
-	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException;
+	public ItemNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException;
+	public ItemNotFoundException(String serverId) {
+		super();
+		this.serverId = serverId;
+	}
 
-	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
-
-	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
-			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, PIMDataTypeNotFoundException;
+	public String getServerId() {
+		return serverId;
+	}
 	
 }

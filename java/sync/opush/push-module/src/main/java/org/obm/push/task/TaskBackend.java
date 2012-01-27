@@ -48,7 +48,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 
 import com.google.common.collect.ImmutableList;
 
@@ -87,7 +87,7 @@ public class TaskBackend implements PIMBackend {
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
-			ServerItemNotFoundException {
+			ItemNotFoundException {
 		return null;
 	}
 
@@ -101,7 +101,7 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ServerItemNotFoundException {
+			UnexpectedObmSyncServerException, ItemNotFoundException {
 		
 	}
 

@@ -57,5 +57,15 @@ public class SmartForwardHandler extends MailRequestHandler {
 		mailBackend.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
 				mailRequest.getCollectionId(), mailRequest.getServerId());
 	}
+
+	@Override
+	protected String getTargetNamespace() {
+		return "SmartForward";
+	}
+
+	@Override
+	protected String getElementName() {
+		return "SmartForward";
+	}
 	
 }

@@ -73,7 +73,7 @@ import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
@@ -330,7 +330,7 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ServerItemNotFoundException, ProcessingEmailException {
+			UnexpectedObmSyncServerException, ItemNotFoundException, ProcessingEmailException {
 		try {
 			boolean trash = Objects.firstNonNull(moveToTrash, true);
 			if (trash) {
@@ -374,7 +374,7 @@ public class MailBackendImpl implements MailBackend {
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
-			ServerItemNotFoundException {
+			ItemNotFoundException {
 		
 		MSEmail email = (MSEmail) data;
 		try {
