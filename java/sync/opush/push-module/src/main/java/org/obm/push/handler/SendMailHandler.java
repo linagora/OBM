@@ -33,8 +33,6 @@ package org.obm.push.handler;
 
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MailProtocol;
@@ -53,9 +51,7 @@ public class SendMailHandler extends MailRequestHandler {
 	}
 
 	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) 
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException {
-		
+	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException {
 		mailBackend.sendEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent());
 	}
 

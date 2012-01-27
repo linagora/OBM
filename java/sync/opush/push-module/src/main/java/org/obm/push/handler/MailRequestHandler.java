@@ -37,16 +37,11 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.DaoException;
 import org.obm.push.exception.QuotaExceededException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.MailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -69,8 +64,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	}
 
 	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
-			throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, 
-			CollectionNotFoundException, UnexpectedObmSyncServerException, DaoException, MailException;
+			throws ProcessingEmailException, CollectionNotFoundException;
 	
 	@Override
 	public void process(IContinuation continuation, BackendSession bs, ActiveSyncRequest request, Responder responder) {
@@ -82,22 +76,12 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			}
 			doTheJob(mailRequest, bs);
 
-		} catch (SmtpInvalidRcptException se) {
-			notifyUser(bs,  mailRequest.getMailContent(), se);
 		} catch (ProcessingEmailException pe) {	
 			notifyUser(bs,  mailRequest.getMailContent(), pe);
-		} catch (SendEmailException e) {
-			handleSendEmailException(e, responder, bs,  mailRequest.getMailContent());
 		} catch (IOException e) {
 			responder.sendError(HttpStatus.BAD_REQUEST_400);
 			return;
 		} catch (CollectionNotFoundException e) {
-			notifyUser(bs,  mailRequest.getMailContent(), e);
-		} catch (UnexpectedObmSyncServerException e) {
-			notifyUser(bs,  mailRequest.getMailContent(), e);
-		} catch (DaoException e) {
-			notifyUser(bs,  mailRequest.getMailContent(), e);
-		} catch (MailException e) {
 			notifyUser(bs,  mailRequest.getMailContent(), e);
 		} catch (QuotaExceededException e) {
 			notifyUserQuotaExceeded(bs, e);
@@ -107,14 +91,6 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	private void notifyUserQuotaExceeded(BackendSession bs,
 			QuotaExceededException e) {
 		errorManager.sendQuotaExceededError(bs, e);
-	}
-
-	private void handleSendEmailException(SendEmailException e, Responder responder, BackendSession bs, byte[] mailContent) {
-		if (e.getSmtpErrorCode() >= 500) {
-			notifyUser(bs, mailContent, e);
-		} else {
-			responder.sendError(500);
-		}
 	}
 
 	private void notifyUser(BackendSession bs, byte[] mailContent, Throwable t) {

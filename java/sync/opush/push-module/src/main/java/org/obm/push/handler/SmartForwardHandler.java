@@ -33,14 +33,9 @@ package org.obm.push.handler;
 
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.MailException;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
 
@@ -58,9 +53,7 @@ public class SmartForwardHandler extends MailRequestHandler {
 	}
 
 	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException, 
-	SendEmailException, SmtpInvalidRcptException, UnexpectedObmSyncServerException, DaoException, MailException {
-
+	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException {
 		mailBackend.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
 				mailRequest.getCollectionId(), mailRequest.getServerId());
 	}
