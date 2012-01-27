@@ -69,6 +69,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.collect.ImmutableList;
@@ -1020,4 +1021,54 @@ public class CalendarBindingImplTest {
 		
 	}
 	
+	@Test
+	public void testRecurrenceIdAtTheProperFormatInGetSyncResponse() throws FindException, ServerFault{
+		ColdWarFixtures fixtures = new ColdWarFixtures();
+		String calendar = "cal1";
+		String userName = "user";
+		String userEmail = "user@domain1";
+		Date lastSync = new Date(1327680144000L);
+		EventChanges daoChanges = mockEventChanges();
+		
+		ObmUser user = new ObmUser();
+		
+		AccessToken accessToken = mockAccessToken(userName, fixtures.domain);
+		
+		UserService userService = createMock(UserService.class);
+		expect(userService.getUserFromCalendar(calendar, fixtures.domainName)).andReturn(user).atLeastOnce();
+		
+		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
+		
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.getSync(accessToken, user, lastSync, null, null, false)).andReturn(daoChanges).once();
+		
+		Object[] mocks = {calendarDao, accessToken, userService, rightsHelper};
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
+
+		EventChanges sortedChanges = calendarService.getSyncWithSortedChanges(accessToken, calendar, lastSync);
+		EasyMock.verify(mocks);
+		
+		Assert.assertEquals(sortedChanges.getParticipationUpdated()[0].getRecurrenceId().serializeToString(), "20120127T160000Z");
+	}
+	
+	private EventChanges mockEventChanges() {
+		EventChanges newEventChanges = new EventChanges();
+		Event[] changedEvent = new Event[1];
+		Event updatedEvent = new Event();    
+		updatedEvent.setRecurrence(new EventRecurrence());
+		updatedEvent.setTimeCreate(new Date(1327680143000L));
+		updatedEvent.setTimeUpdate(new Date(1327680144000L));
+		updatedEvent.setRecurrenceId(new Date(1327680000000L)); // Fri, 27 Jan 2012 16:00:00 GMT <=> 20120127T160000Z
+
+		Attendee attendee = getFakeAttendee("user2@domain1");
+		attendee.setState(ParticipationState.ACCEPTED);
+		
+		updatedEvent.addAttendee(attendee);
+		
+		changedEvent[0] = updatedEvent;
+		newEventChanges.setUpdated(changedEvent);
+		return newEventChanges;
+	}
 }

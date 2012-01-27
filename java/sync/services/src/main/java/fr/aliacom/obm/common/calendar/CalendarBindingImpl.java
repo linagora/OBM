@@ -662,7 +662,7 @@ public class CalendarBindingImpl implements ICalendar {
 				participationChanges.setAttendees(event.getAttendees());
 				participationChanges.setEventExtId(event.getExtId());
 				if(event.getRecurrenceId() != null) {
-					String recurrenceId = event.getRecurrenceId().toString();
+					String recurrenceId = getRecurrenceIdToIcalFormat(event.getRecurrenceId());
 					participationChanges.setRecurrenceId(new RecurrenceId(recurrenceId));
 				}
 				participationChanges.setEventId(event.getObmId());
@@ -671,6 +671,11 @@ public class CalendarBindingImpl implements ICalendar {
 		}).toArray(new ParticipationChanges[0]);
 	}
 
+	private String getRecurrenceIdToIcalFormat(Date recurrenceId) {
+		DateTime recurrenceIdToIcalFormat = new DateTime(recurrenceId);
+		recurrenceIdToIcalFormat.setUtc(true);
+		return recurrenceIdToIcalFormat.toString();
+	}
 	
 	@Override
 	@Transactional
