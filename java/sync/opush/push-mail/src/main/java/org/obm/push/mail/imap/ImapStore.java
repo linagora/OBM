@@ -35,12 +35,15 @@ import java.io.InputStream;
 import java.util.Date;
 
 import javax.mail.Flags;
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 
+import org.minig.imap.MailboxFolder;
+import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
@@ -106,7 +109,7 @@ public class ImapStore {
 	public void appendMessageStream(String folderName, StreamedLiteral streamedLiteral, Flags flags) 
 			throws ImapCommandException {
 		try {
-			OpushImapFolder folder = getFolder(folderName);
+			OpushImapFolder folder = select(folderName);
 			folder.appendMessageStream(streamedLiteral, flags, null);
 		} catch (MessagingException e) {
 			String msg = String.format(
@@ -118,7 +121,7 @@ public class ImapStore {
 	public void appendMessage(String folderName, Message message) 
 			throws ImapCommandException {
 		try {
-			OpushImapFolder folder = getFolder(folderName);
+			OpushImapFolder folder = select(folderName);
 			folder.appendMessage(message);
 		} catch (MessagingException e) {
 			String msg = String.format(
@@ -127,13 +130,33 @@ public class ImapStore {
 		}
 	}
 
-	private OpushImapFolder getFolder(String folderName) throws ImapCommandException {
+	public OpushImapFolder select(String folderName) throws ImapCommandException {
 		try {
-			return new OpushImapFolder((IMAPFolder) store.getDefaultFolder().getFolder(folderName));
+			IMAPFolder folder = (IMAPFolder) store.getDefaultFolder().getFolder(folderName);
+			folder.open(Folder.READ_WRITE);
+			return new OpushImapFolder(folder);
 		} catch (MessagingException e) {
 			String msg = String.format(
 					"IMAP command getFolder failed. user=%s, folder=%s", userId, folderName);
 			throw new ImapCommandException(msg, e);
 		}
 	}
+
+	public OpushImapFolder getDefaultFolder() throws MessagingException {
+		IMAPFolder defaultFolder = (IMAPFolder) store.getDefaultFolder();
+		return new OpushImapFolder(defaultFolder);
+	}
+
+	public OpushImapFolder create(MailboxFolder folder, int type) throws FolderCreationException {
+		try {
+			IMAPFolder imapFolder = (IMAPFolder) store.getDefaultFolder().getFolder(folder.getName());
+			if (imapFolder.create(type)) {
+				return new OpushImapFolder(imapFolder);
+			}
+			throw new FolderCreationException("Folder {" + folder.getName() + "} not created.");
+		} catch (MessagingException e) {
+			throw new FolderCreationException(e.getMessage(), e);
+		}
+	}
+	
 }

@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,7 +60,6 @@ import org.obm.push.mail.StreamMailTestsUtils;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
-import org.obm.push.mail.imap.ImapMailboxService;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
@@ -74,6 +71,7 @@ public class ImapStoreAPIMemoryTest {
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject ImapMailboxService mailboxService;
+	@Inject EmailConfiguration emailConfiguration;
 	
 	private String mailbox;
 	private String password;
@@ -116,29 +114,6 @@ public class ImapStoreAPIMemoryTest {
 		long thisHeapSizeInByte = Runtime.getRuntime().maxMemory();
 		return thisHeapSizeInByte * 2;
 	}
-
-	@Test
-	public void testStoreInInbox() throws Exception {
-		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
-
-		mailboxService.storeInInbox(bs, tinyInputStream, true);
-
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
-	}
-
-	@Test
-	public void testStoreInInboxStream() throws Exception {
-		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
-
-		mailboxService.storeInInbox(bs, tinyInputStream, 4, true);
-
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
-	}
-
 	
 	@Test(expected=OutOfMemoryError.class)
 	public void testBigMailTriggerOutOfMemory() throws Exception {
@@ -165,4 +140,14 @@ public class ImapStoreAPIMemoryTest {
 		Set<Email> emails = mailboxService.fetchEmails(bs, EmailConfiguration.IMAP_INBOX_NAME, before);
 		Assertions.assertThat(emails).hasSize(1);
 	}
+	
+	@Test
+	public void testFetchMailStream() throws Exception {
+		long size = getTwiceThisHeapSize();
+		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
+		mailboxService.storeInInbox(bs, heavyInputStream, Ints.checkedCast(size), true);
+		InputStream stream = mailboxService.fetchMailStream(bs, EmailConfiguration.IMAP_INBOX_NAME, 1L);
+		Assertions.assertThat(stream).hasContentEqualTo(new RandomGeneratedInputStream(size));
+	}
+	
 }

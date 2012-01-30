@@ -65,4 +65,10 @@ public class TestEmailConfiguration implements EmailConfiguration {
 	public int imapTimeout() {
 		return 6000;
 	}
+
+	@Override
+	public int getImapFetchBlockSize() {
+		return 1 << 20;
+	}
+	
 }

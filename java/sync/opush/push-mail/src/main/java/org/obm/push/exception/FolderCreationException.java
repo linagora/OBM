@@ -29,63 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.exception;
 
-import java.util.Date;
-
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-
-import com.sun.mail.iap.ProtocolException;
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.protocol.IMAPProtocol;
-
-public class OpushImapFolder {
-
-	private final IMAPFolder folder;
-
-	public OpushImapFolder(IMAPFolder folder) {
-		this.folder = folder;
+public class FolderCreationException extends ImapCommandException {
+	
+	public FolderCreationException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public void appendMessageStream(final StreamedLiteral literal, final Flags flags, final Date messageDate) throws MessagingException {
-		folder.doCommand(new ProtocolCommand() {
-			
-			@Override
-			public Object doCommand(IMAPProtocol p)
-				throws ProtocolException {
-				p.append(folder.getFullName(), flags, messageDate, literal);
-				return null;
-			}
-		});
+	public FolderCreationException(String message) {
+		super(message);
 	}
 	
-	public void appendMessage(Message message) throws MessagingException {
-		folder.appendMessages(new Message[]{message});
-	}
-
-	public IMAPMessage getMessageByUID(int uid) throws MessagingException {
-		return (IMAPMessage) folder.getMessageByUID(uid);
-	}
-
-	public void expunge() throws MessagingException {
-		folder.expunge();
-	}
-
-	public String getFullName() {
-		return folder.getFullName();
-	}
-
-	public boolean create(int type) throws MessagingException {
-		return folder.create(type);
-	}
-
-	public Folder[] list(String pattern) throws MessagingException {
-		return folder.list(pattern);
-	}
-
 }

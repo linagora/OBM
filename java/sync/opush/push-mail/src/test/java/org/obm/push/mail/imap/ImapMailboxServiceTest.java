@@ -32,11 +32,9 @@
 package org.obm.push.mail.imap;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -46,12 +44,14 @@ import javax.mail.Flags;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -62,10 +62,8 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Iterables;
-import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -196,12 +194,12 @@ public class ImapMailboxServiceTest {
 				folder("TOP.LEVEL1"));
 	}
 	
-	@Test
+	@Test(expected=MailException.class)
 	public void testCreateCaseInsensitiveInbox() throws Exception {
 		MailboxFolder newFolder = folder("inBox");
-		boolean result = mailboxService.createFolder(bs, newFolder);
+		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(bs);
-		Assertions.assertThat(result).isFalse();
+		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox());
 	}
@@ -209,9 +207,9 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testCreateSpecialNameMailbox() throws Exception {
 		MailboxFolder newFolder = folder("to&to");
-		boolean result = mailboxService.createFolder(bs, newFolder);
+		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(bs);
-		Assertions.assertThat(result).isTrue();
+		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}
@@ -219,9 +217,9 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testCreateUtf8Mailbox() throws Exception {
 		MailboxFolder newFolder = folder("éàêôï");
-		boolean result = mailboxService.createFolder(bs, newFolder);
+		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(bs);
-		Assertions.assertThat(result).isTrue();
+		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}
@@ -308,27 +306,30 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(answeredEmail.isAnswered()).isTrue();
 	}
 
+	@Ignore("GreeeMail BUG")
 	@Test
-	public void testFetchMime() throws Exception {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		greenMail.waitForIncomingEmail(1);
-		InputStream email = mailboxService.fetchMailStream(bs, "INBOX", 1L);
-		Assertions.assertThat(email).isNotNull();
-		String emailAsString = CharStreams.toString(new InputStreamReader(email, Charsets.UTF_8));
-		Assertions.assertThat(emailAsString).contains("from@localhost.com")
-			.contains("subject")
-			.contains("body");
+	public void testStoreInInbox() throws Exception {
+		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
+
+		mailboxService.storeInInbox(bs, tinyInputStream, true);
+
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
+		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
-	
+
+	@Ignore("GreeeMail BUG")
 	@Test
-	public void testFetchMimeBigMail() throws Exception {
-		InputStream expected = loadEmail("bigEml.eml");
-		InputStream inputStream = loadEmail("bigEml.eml");
-		mailboxService.storeInInbox(bs, inputStream, false);
-		InputStream email = mailboxService.fetchMailStream(bs, "INBOX", 1L);
-		Assertions.assertThat(email).isNotNull().hasContentEqualTo(expected);
+	public void testStoreInInboxStream() throws Exception {
+		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
+
+		mailboxService.storeInInbox(bs, tinyInputStream, 4, true);
+
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
+		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
-	
+
 	private MailboxFolder folder(String name) {
 		return new MailboxFolder(name);
 	}

@@ -36,9 +36,6 @@ import org.minig.imap.StoreClient;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.NoImapClientAvailableException;
-import org.obm.push.mail.MailException;
-
-import com.sun.mail.imap.IMAPStore;
 
 public interface ImapClientProvider {
 
@@ -47,5 +44,4 @@ public interface ImapClientProvider {
 	ImapStore getImapClientWithJM(BackendSession bs) throws LocatorClientException, NoImapClientAvailableException;
 	IdleClient getImapIdleClient(BackendSession bs) throws LocatorClientException;
 	
-	IMAPStore getJavaxMailImapClient(BackendSession bs) throws MailException;
 }

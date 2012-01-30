@@ -33,7 +33,6 @@ package org.obm.push.mail.imap;
 
 import java.util.Properties;
 
-import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -45,12 +44,10 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.NoImapClientAvailableException;
-import org.obm.push.mail.MailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-import com.sun.mail.imap.IMAPStore;
 
 public class ImapClientProviderImpl implements ImapClientProvider {
 
@@ -82,7 +79,7 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		int imapTimeout = emailConfiguration.imapTimeout();
 		logger.debug("Java Mail settings : TIMEOUT=" + imapTimeout);
 		properties.put("mail.imap.timeout", imapTimeout);
-		
+		properties.put("mail.imap.fetchsize", emailConfiguration.getImapFetchBlockSize());
 		properties.put("mail.debug", "false");
 		
 		return properties;
@@ -148,20 +145,4 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		return new IdleClient(locateImap(bs), 143, login, bs.getPassword());
 	}
 
-
-	@Override
-	public IMAPStore getJavaxMailImapClient(BackendSession bs) throws MailException {
-		try {
-			Properties properties = new Properties();
-			Session session = Session.getDefaultInstance(properties);
-			Store imapStore = session.getStore("imap");
-			final String imapHost = locateImap(bs);
-			final String login = getLogin(bs);
-			imapStore.connect(imapHost, imapPort, login, bs.getPassword());
-			return (IMAPStore) imapStore;
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		}
-	}
-	
 }

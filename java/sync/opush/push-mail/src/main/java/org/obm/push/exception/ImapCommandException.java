@@ -37,4 +37,8 @@ public class ImapCommandException extends Exception {
 		super(message, cause);
 	}
 	
+	public ImapCommandException(String message) {
+		super(message);
+	}
+	
 }

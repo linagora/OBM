@@ -48,4 +48,6 @@ public interface EmailConfiguration {
 	int imapPort();
 
 	int imapTimeout();
+
+	int getImapFetchBlockSize();
 }

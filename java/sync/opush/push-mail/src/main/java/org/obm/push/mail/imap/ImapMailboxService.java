@@ -43,6 +43,7 @@ import java.util.Set;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
@@ -66,6 +67,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ImapCommandException;
+import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
@@ -90,9 +92,8 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPStore;
 
 @Singleton
 public class ImapMailboxService implements MailboxService, PrivateMailboxService {
@@ -151,8 +152,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	@Override
 	public MailboxFolders listAllFolders(BackendSession bs) throws MailException {
-		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		ImapStore store = null;
 		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
 			Folder[] folders = store.getDefaultFolder().list("*");
 			
 			List<MailboxFolder> mailboxFolders = Lists.newArrayList();
@@ -163,28 +166,41 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			return new MailboxFolders(mailboxFolders);
 		} catch (MessagingException e) {
 			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
 		}
 	}
 	
 	@Override
-	public boolean createFolder(BackendSession bs, MailboxFolder folder) throws MailException {
-		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+	public OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException {
+		ImapStore store = null;
 		try {
-			Folder newFolder = store.getFolder(folder.getName());
-			return newFolder.create(Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
-		} catch (MessagingException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			return store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
 			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
 		}
 	}
 
-	private void closeQuietly(IMAPStore store) throws MailException {
+	private void closeQuietly(ImapStore store) throws MailException {
 		try {
-			store.close();
-		} catch (MessagingException e) {
+			if (store != null) {
+				store.logout();
+			}
+		} catch (ImapLogoutException e) {
 			throw new MailException(e);
 		}
 	}
@@ -199,26 +215,34 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	/* package */ void updateMailFlag(BackendSession bs, String collectionName, long uid, Flags.Flag flag, 
 			boolean status) throws MailException, ImapMessageNotFoundException {
 		
-		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+		ImapStore store = null;
 		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
 			IMAPMessage message = getMessage(store, bs, collectionName, uid);
 			message.setFlag(flag, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
 					new Object[] { uid, collectionName, imapMailBoxUtils.flagToString(flag), status });
 		} catch (MessagingException e) {
 			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
 		}
 	}
 	
-	private IMAPMessage getMessage(IMAPStore store, BackendSession bs, String collectionName, long uid) 
+	private IMAPMessage getMessage(ImapStore store, BackendSession bs, String collectionName, long uid) 
 			throws MailException, ImapMessageNotFoundException {
 		
 		String mailBoxName = parseMailBoxName(bs, collectionName);
 		try {
-			IMAPFolder folder = getFolder(store, mailBoxName);
-			IMAPMessage message = (IMAPMessage) folder.getMessageByUID(Ints.checkedCast(uid));
+			OpushImapFolder folder = store.select(mailBoxName);
+			IMAPMessage message = folder.getMessageByUID(Ints.checkedCast(uid));
 			if (message != null) {
 				return message;
 			} else {
@@ -226,38 +250,48 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			}
 		} catch (MessagingException e) {
 			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
 		}
 	}
 	
-	/* package */ IMAPMessage getMessage(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
-		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
+	/* package */ IMAPMessage getMessage(BackendSession bs, String collectionName, long uid) 
+			throws MailException, ImapMessageNotFoundException {
+		
+		ImapStore store = null;
 		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
 			return getMessage(store, bs, collectionName, uid);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
 		}
 	}
 	
 	/* package */ void expunge(BackendSession bs, String collectionName) throws MailException {
-		IMAPStore store = imapClientProvider.getJavaxMailImapClient(bs);
-		String mailBoxName = parseMailBoxName(bs, collectionName);
+		ImapStore store = null;
 		try {
-			IMAPFolder folder = getFolder(store, mailBoxName);
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			String mailBoxName = parseMailBoxName(bs, collectionName);
+			OpushImapFolder folder = store.select(mailBoxName);
 			folder.expunge();
 		} catch (MessagingException e) {
 			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
-		}
-	}
-
-	private IMAPFolder getFolder(IMAPStore store, String mailBoxName) throws MailException {
-		try {
-			IMAPFolder folder = (IMAPFolder) store.getFolder(mailBoxName);
-			folder.open(Folder.READ_WRITE);
-			return folder;
-		} catch (MessagingException e) {
-			throw new MailException(e);
 		}
 	}
 	
@@ -333,16 +367,28 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	@Override
 	public InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
+		return getMessageInputStream(bs, collectionName, uid);
+	}
+
+	private InputStream getMessageInputStream(BackendSession bs, String collectionName, long messageUID) 
+			throws MailException {
+		
+		ImapStore store = null;
 		try {
-			login(store);
-			store.select(parseMailBoxName(bs, collectionName));
-			return store.uidFetchMessage(uid);
-		} catch (IMAPException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			IMAPMessage imapMessage = getMessage(store, bs, collectionName, messageUID);
+			IMAPInputStream imapInputStream = new IMAPInputStream(imapMessage, null, -1, true);
+			return imapInputStream;
+		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} 
 	}
 
 	private void login(StoreClient store) throws IMAPException {

@@ -42,6 +42,7 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	private static final int IMAP_PORT = 143;
 	private static final int MESSAGE_DEFAULT_MAX_SIZE = 10485760;
 	private static final int BACKEND_IMAP_TIMEOUT_DEFAULT = 5000;
+	private static final int IMAP_FETCH_BLOCK_SIZE = 10485760;
 	
 	private static final String BACKEND_CONF_FILE = "/etc/opush/mail_conf.ini";
 	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
@@ -82,5 +83,10 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	@Override
 	public int imapTimeout() {
 		return getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
+	}
+
+	@Override
+	public int getImapFetchBlockSize() {
+		return IMAP_FETCH_BLOCK_SIZE;
 	}
 }

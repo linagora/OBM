@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 
-import javax.mail.StoreClosedException;
+import javax.mail.FolderClosedException;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -41,8 +41,8 @@ public class MailTestsUtils {
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
 
 	public static void assertThatIsJavaSocketTimeoutException(Exception e) {
-		StoreClosedException hasTimeoutException = 
-				getThrowableInCauseOrNull(e, StoreClosedException.class);
+		FolderClosedException hasTimeoutException = 
+				getThrowableInCauseOrNull(e, FolderClosedException.class);
 		Assertions.assertThat(hasTimeoutException).hasMessageContaining(SocketTimeoutException.class.getName());
 	}
 
