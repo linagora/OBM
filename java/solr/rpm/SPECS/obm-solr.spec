@@ -12,7 +12,7 @@ Source1: solr.xml
 BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  ant
-Requires:        obm-tomcat
+Requires(post): obm-tomcat-common-libs
 
 
 %description
