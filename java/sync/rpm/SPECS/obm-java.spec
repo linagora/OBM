@@ -14,7 +14,7 @@ BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  ant
 Requires: java-devel >= 1.6.0
-Requires: obm-tomcat
+Requires(post): obm-tomcat-common-libs = %{version}-%{release}
 Requires: obm-config
 
 %description
@@ -34,7 +34,7 @@ Summary: Active Sync server for Open Business Management
 Group:	Development/Tools
 Requires: java-devel >= 1.6.0
 Requires: obm-config
-Requires: obm-jetty
+Requires(post): obm-jetty-common-libs = %{version}-%{release}
 
 %description -n opush
 This package synchronizes a Jetty web application to synchronize OBM data with
@@ -50,7 +50,7 @@ Summary: Locator for Open Business Management
 Group:	Development/Tools
 Requires: java-devel >= 1.6.0
 Requires: obm-config
-Requires: obm-jetty
+Requires(post): obm-jetty-common-libs = %{version}-%{release}
 
 %description -n obm-locator
 This package is a J2E web service, which allows can be queried to retrieve
@@ -60,6 +60,33 @@ OBM is a global groupware, messaging and CRM application. It is intended to
 be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+%package -n obm-tomcat-common-libs
+Summary: Tomcat common libs for Open Business Management
+Group:  Development/Tools
+Requires: obm-tomcat
+
+%description -n obm-tomcat-common-libs
+This package contains the library used by obm webapps deployed in tomcat.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+%package -n obm-jetty-common-libs
+Summary: Jetty common libs for Open Business Management
+Group:  Development/Tools
+Requires: obm-jetty
+
+%description -n obm-jetty-common-libs
+This package contains the library used by obm webapps deployed in tomcat.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
 
 %prep
 %setup -q -n obm-java-%{version}
@@ -109,6 +136,16 @@ WEB_INF=`find obm-locator/target -name WEB-INF `
 #cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/obm-locator
 cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 
+# common libs
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/jetty/lib
+cp -p webapp-common-dependencies/target/jetty/*.jar \
+  $RPM_BUILD_ROOT%{_datadir}/jetty6/lib/
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/tomcat/lib
+cp -p webapp-common-dependencies/target/tomcat/*.jar \
+  $RPM_BUILD_ROOT%{_datadir}/tomcat/lib/
+
+
 
 %files -n obm-sync
 %defattr(-,root,root,-)
@@ -129,6 +166,14 @@ cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 #%{_datadir}/jetty/webapps/obm-locator
 /srv/jetty6/webapps/obm-locator
 %{_localstatedir}/log/obm-locator
+
+%files -n obm-tomcat-common-libs
+%defattr(-,root,root,-)
+%{_datadir}/tomcat/lib/*.jar
+
+%files -n obm-jetty-common-libs
+%defattr(-,root,root,-)
+%{_datadir}/jetty6/lib/*.jar
 
 %post -n opush
 [ ! -f %{_sysconfdir}/opush/logback.xml ] && echo "<included/>" > %{_sysconfdir}/opush/logback.xml
