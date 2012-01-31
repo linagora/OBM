@@ -6631,6 +6631,11 @@ Class CalendarView {
 
   /**
    * get the date range
+   * 
+   * The date range return the first and last day displayed in the calendar view
+   * In the week view the first day is the monday and the last day is the sunday
+   * In the month view the first day displayed is the monday if the month begins a monday,
+   * otherwise it's the last monday of the previous month. Etc...
    *
    * @access public
    * @return array
@@ -6640,15 +6645,15 @@ Class CalendarView {
 
     if ($this->cal_range == "day") {
       $begin->setHour(0)->setMinute(0)->setSecond(0);
-      $end = clone $this->get_date();
+      $end = clone $begin;
       $end->addDay(1);
     } else if ($this->cal_range == "week") {
       $begin->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
-      $end = clone $this->get_date();
+      $end = clone $begin;
       $end->addDay(7);
     } else if ($this->cal_range == "month") {
       $begin->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
-      $end = clone $this->get_date();
+      $end = clone $begin;
       $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
     } else if ($this->cal_range == "custom") {
       $end = clone $this->get_date();
