@@ -2565,7 +2565,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "("
 			+ "SELECT event_id "
 			+ "FROM Event e "
-			+ "LEFT JOIN eventexception eexp ON e.event_id = eventexception_child_id "
+			+ "LEFT JOIN EventException eexp ON e.event_id = eventexception_child_id "
 			+ "WHERE event_ext_id = ? "
 			+ "AND eexp.eventexception_date = ?"
 			+ ") AND "
