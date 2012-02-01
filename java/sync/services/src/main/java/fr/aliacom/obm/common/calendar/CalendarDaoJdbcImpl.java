@@ -725,11 +725,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private String getUserObmEmail(ResultSet rs, String domainName)
 			throws SQLException {
-		String[] alias = rs.getString("userobm_email").split("\r\n");
-		if (!alias[0].contains("@")) {
-			return alias[0] + "@" + domainName;
+		String firstEmail = null;
+		String userEmailString = rs.getString("userobm_email");
+		if (userEmailString != null) {
+			String[] alias = userEmailString.split("\r\n");
+			if (!alias[0].contains("@")) {
+				firstEmail = alias[0] + "@" + domainName;
+			}
 		}
-		return alias[0];
+		return firstEmail;
 	}
 
 	private String getCreatorObmEmail(ResultSet rs, String domainName)
