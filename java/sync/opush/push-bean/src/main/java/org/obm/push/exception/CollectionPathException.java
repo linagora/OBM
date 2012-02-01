@@ -29,29 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.exception;
 
-public enum PIMDataType {
+public class CollectionPathException extends Exception {
 
-	EMAIL("Email", "email"), 
-	CALENDAR("Calendar", "calendar"),
-	CONTACTS("Contacts", "contacts"),
-	TASKS("Tasks", "tasks"),
-	FOLDER("", "");
-
-	private final String xmlValue;
-	private final String collectionPathValue;
-
-	private PIMDataType(String xmlValue, String collectionPathValue) {
-		this.xmlValue = xmlValue;
-		this.collectionPathValue = collectionPathValue;
+	public CollectionPathException(String message) {
+		super(message);
 	}
 	
-	public String asXmlValue() {
-		return xmlValue;
-	}
-	
-	public String asCollectionPathValue() {
-		return collectionPathValue;
+	public CollectionPathException(String message, Exception ex) {
+		super(message, ex);
 	}
 }

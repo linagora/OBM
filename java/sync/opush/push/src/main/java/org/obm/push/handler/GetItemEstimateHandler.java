@@ -39,11 +39,12 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
@@ -101,12 +102,18 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, 
 					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
+		} catch (CollectionPathException e) {
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION), e);
 		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION), e);
 		} catch (UnknownObmSyncServerException e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION), e);
 		} catch (ProcessingEmailException e) {
-			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION), e);
 		}
 	}
 
@@ -120,7 +127,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, CollectionNotFoundException, 
-		UnknownObmSyncServerException, ProcessingEmailException {
+		UnknownObmSyncServerException, ProcessingEmailException, CollectionPathException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		
@@ -130,7 +137,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			
 			syncCollection.setCollectionPath(collectionPath);
-			syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
+			syncCollection.setDataType( CollectionPathUtils.recognizePIMDataType(bs, collectionPath) );
 
 			String syncKey = syncCollection.getSyncKey();
 			SyncState state = stMachine.getSyncState(syncKey);

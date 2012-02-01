@@ -40,6 +40,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSAttachementData;
@@ -48,6 +49,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
@@ -110,6 +112,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+		} catch (CollectionPathException e) {
+			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}
 	
@@ -129,7 +133,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
-		UnsupportedStoreException, DaoException, ProcessingEmailException {
+		UnsupportedStoreException, DaoException, ProcessingEmailException, CollectionPathException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
@@ -146,7 +150,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 
 	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, 
-		DaoException, ProcessingEmailException {
+		DaoException, ProcessingEmailException, CollectionPathException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
@@ -157,7 +161,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 
 	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, DaoException, 
-		ProcessingEmailException {
+		ProcessingEmailException, CollectionPathException {
 		
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
@@ -170,7 +174,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 				Integer collectionId = Integer.valueOf(fetch.getCollectionId());
 				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), bs));
 			} catch (NumberFormatException e) {
-				throw new CollectionNotFoundException();
+				throw new CollectionNotFoundException(e);
 			}
 		}
 		return mailboxFetchResponse;
@@ -206,13 +210,14 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchResult;
 	}
 
-	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, BackendSession bs) {
+	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, BackendSession bs) 
+			throws CollectionPathException {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
 		fetchResult.setServerId(serverId);
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+			PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, dataType, ImmutableList.of(serverId));
 			if (itemChanges.isEmpty()) {

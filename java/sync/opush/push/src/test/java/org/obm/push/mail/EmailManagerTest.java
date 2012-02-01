@@ -36,10 +36,20 @@ import java.util.Set;
 
 import org.columba.ristretto.message.Address;
 import org.easymock.EasyMock;
+import org.fest.assertions.Assertions;
+import org.junit.Before;
 import org.junit.Test;
+import org.minig.imap.ListInfo;
+import org.minig.imap.ListResult;
+import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.User;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -50,16 +60,22 @@ import com.google.common.collect.Sets;
 
 public class EmailManagerTest {
 
+	private BackendSession bs;
+	
+	@Before
+	public void setUp() {
+		User user = Factory.create().createUser("user@domain", "user@domain");
+		bs = new BackendSession(new Credentials(user, "test"),
+				null, null, null);
+	}
+	
 	@Test
 	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException {
 		
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
 		LocatorService locatorService = EasyMock.createMock(LocatorService.class);
 		SmtpSender smtpSender = EasyMock.createMock(SmtpSender.class);
-		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
 		
-		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
-		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 		Set<Address> addrs = Sets.newHashSet();
 		smtpSender.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class),
 				EasyMock.anyObject(addrs.getClass()),
@@ -67,18 +83,97 @@ public class EmailManagerTest {
 				EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class));
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.replay(emailConfiguration, smtpSender, backendSession);
+		EasyMock.replay(emailConfiguration, smtpSender);
 		
 		EmailManager emailManager = new EmailManager(null, emailConfiguration, smtpSender, null, locatorService, null);
 
-		emailManager.sendEmail(backendSession,
+		emailManager.sendEmail(bs,
 				new Address("test@test.fr"),
 				addrs,
 				addrs,
 				addrs,
 				loadDataFile("bigEml.eml"), false);
 		
-		EasyMock.verify(emailConfiguration, smtpSender, backendSession);
+		EasyMock.verify(emailConfiguration, smtpSender);
+	}
+
+	@Test
+	public void testParseSentMailBox() throws Exception {
+		StoreClient storeClient = newStoreClientMock("Sent");
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		EasyMock.replay(emailConfiguration, storeClient);
+		
+		EmailManager emailManager = new EmailManager(null, emailConfiguration, null, null, null, null);
+
+		String userSentFolder = 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = emailManager.parseMailBoxName(bs, storeClient, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
+	}
+
+	@Test
+	public void testParseSentMailBoxSentIsInsensitive() throws Exception {
+		StoreClient storeClient = newStoreClientMock("SeNt");
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		EasyMock.replay(emailConfiguration, storeClient);
+		
+		EmailManager emailManager = new EmailManager(null, emailConfiguration, null, null, null, null);
+
+		String userSentFolder = 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = emailManager.parseMailBoxName(bs, storeClient, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo("SeNt");
+	}
+	
+	@Test
+	public void testParseSentMailBoxWhenManyNamedSentBox() throws Exception {
+		StoreClient storeClient = newStoreClientMock("AnyFolderSent", "Sent", "SENT", "AnotherSentfolder");
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		EasyMock.replay(emailConfiguration, storeClient);
+		
+		EmailManager emailManager = new EmailManager(null, emailConfiguration, null, null, null, null);
+
+		String userSentFolder = 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = emailManager.parseMailBoxName(bs, storeClient, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
+	}
+	
+	@Test
+	public void testParseSentMailBox_OBMFULL3133() throws Exception {
+		StoreClient storeClient = newStoreClientMock(
+				"Bo&AO4-tes partag&AOk-es/696846/Sent", "Sent", "Bo&AO4-tes partag&AOk-es/696846/Sent");
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		EasyMock.replay(emailConfiguration, storeClient);
+		
+		EmailManager emailManager = new EmailManager(null, emailConfiguration, null, null, null, null);
+
+		String userSentFolder = 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = emailManager.parseMailBoxName(bs, storeClient, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
+	}
+
+	private StoreClient newStoreClientMock(String...allUserFolders) {
+		StoreClient storeClient = EasyMock.createMock(StoreClient.class);
+		ListResult existingFolder = newListResult(allUserFolders);
+		EasyMock.expect(storeClient.listAll()).andReturn(existingFolder);
+		return storeClient;
+	}
+	
+	private ListResult newListResult(String...itemsName) {
+		ListResult list = new ListResult(itemsName.length);
+		for (String itemName : itemsName) {
+			list.add(new ListInfo(itemName, true, false));
+		}
+		return list;
+	}
+
+	private EmailConfiguration newEmailConfigurationMock() {
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
+		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
+		return emailConfiguration;
 	}
 
 	protected InputStream loadDataFile(String name) {

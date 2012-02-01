@@ -123,5 +123,8 @@ public class GetItemEstimateProtocol {
 		return document;
 	}
 
+	public Document buildError(GetItemEstimateStatus status) {
+		return buildError(status, null);
+	}
 	
 }

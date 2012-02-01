@@ -43,6 +43,7 @@ import org.obm.push.EventConverter;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -119,8 +120,8 @@ public class CalendarBackend extends ObmSyncBackend {
 			String domain = bs.getUser().getDomain();
 			for (CalendarInfo ci : cals) {
 				ItemChange ic = new ItemChange();
-				String col = "obm:\\\\" + bs.getUser().getLoginAtDomain()
-						+ "\\calendar\\" + ci.getUid() + domain;
+				String col = CollectionPathUtils.buildCollectionPath(
+						bs, PIMDataType.CALENDAR, ci.getUid() + domain);
 				Integer collectionId = getCollectionIdFor(bs.getDevice(), col);
 				ic.setServerId(collectionIdToString(collectionId));
 				ic.setParentId("0");
@@ -162,8 +163,8 @@ public class CalendarBackend extends ObmSyncBackend {
 	public List<ItemChange> getHierarchyTaskChanges(BackendSession bs) throws DaoException {
 		List<ItemChange> ret = new ArrayList<ItemChange>(1);
 		ItemChange ic = new ItemChange();
-		String col = "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\tasks\\"
-				+ bs.getUser().getLoginAtDomain();
+		String col = CollectionPathUtils.buildCollectionPath(bs, PIMDataType.TASKS,
+				bs.getUser().getLoginAtDomain());
 		String serverId;
 		try {
 			Integer collectionId = getCollectionIdFor(bs.getDevice(), col);

@@ -43,6 +43,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
@@ -70,7 +71,8 @@ public class SyncProtocol {
 		this.syncDecoder = syncDecoder;
 	}
 	
-	public SyncRequest getRequest(Document doc, BackendSession backendSession) throws NoDocumentException, PartialException, ProtocolException, DaoException {
+	public SyncRequest getRequest(Document doc, BackendSession backendSession) 
+			throws NoDocumentException, PartialException, ProtocolException, DaoException, CollectionPathException {
 		if (doc == null) {
 			throw new NoDocumentException();
 		}

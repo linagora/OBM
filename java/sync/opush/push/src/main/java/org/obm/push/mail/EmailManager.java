@@ -57,10 +57,13 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.User;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.User;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -146,7 +149,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			store.select( parseMailBoxName(store, collectionName) );
+			store.select( parseMailBoxName(bs, store, collectionName) );
 			return emailSync.getSync(store, deviceId, syncState, collectionId);
 		} finally {
 			store.logout();
@@ -161,7 +164,7 @@ public class EmailManager implements IEmailManager {
 		final StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			store.select(parseMailBoxName(store, collectionName));
+			store.select(parseMailBoxName(bs, store, collectionName));
 			
 			final MailMessageLoader mailLoader = new MailMessageLoader(store, calendarClient, eventService);
 			for (final Long uid: uids) {
@@ -185,7 +188,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, store, collectionName);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.SEEN);
@@ -203,26 +206,29 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			return parseMailBoxName(store, collectionName);
+			return parseMailBoxName(bs, store, collectionName);
 		} finally {
 			store.logout();
 		}
 	}
 
-	private String parseMailBoxName(StoreClient store, String collectionName) throws IMAPException {
-		if (collectionName.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
+	/* package */ String parseMailBoxName(BackendSession bs, StoreClient store, String collectionPath) throws IMAPException {
+		if (collectionPath.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
 		
-		int slash = collectionName.lastIndexOf("email\\");
-		final String boxName = collectionName.substring(slash + "email\\".length());
-		final ListResult lr = listAllFolder(store);
-		for (final ListInfo i: lr) {
-			if (i.getName().toLowerCase().contains(boxName.toLowerCase())) {
-				return i.getName();
+		try {
+			final String boxName = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+			final ListResult lr = listAllFolder(store);
+			for (final ListInfo i: lr) {
+				if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
+					return i.getName();
+				}
 			}
+			throw new IMAPException("Cannot find IMAP folder for collection [ " + collectionPath + " ]");
+		} catch (CollectionPathException e) {
+			throw new IMAPException("Cannot find IMAP folder for collection [ " + collectionPath + " ]", e);
 		}
-		throw new IMAPException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
 	}
 	 
 	@Override
@@ -232,7 +238,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionPath);
+			String mailBoxName = parseMailBoxName(bs, store, collectionPath);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
@@ -252,8 +258,8 @@ public class EmailManager implements IEmailManager {
 		Collection<Long> newUid = null;
 		try {
 			login(store);
-			String srcMailBox = parseMailBoxName(store, srcFolder);
-			String dstMailBox = parseMailBoxName(store, dstFolder);
+			String srcMailBox = parseMailBoxName(bs, store, srcFolder);
+			String dstMailBox = parseMailBoxName(bs, store, dstFolder);
 			store.select(srcMailBox);
 			List<Long> uids = Arrays.asList(uid);
 			newUid = store.uidCopy(uids, dstMailBox);
@@ -281,7 +287,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			store.select(parseMailBoxName(store, collectionName));
+			store.select(parseMailBoxName(bs, store, collectionName));
 			for (Long uid : uids) {
 				mails.add(store.uidFetchMessage(uid));
 			}
@@ -302,7 +308,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, store, collectionName);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.ANSWERED);
@@ -367,7 +373,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionName);
+			String mailBoxName = parseMailBoxName(bs, store, collectionName);
 			store.select(mailBoxName);
 			return store.uidFetchPart(mailUid, mimePartAddress);
 		} finally {
@@ -383,7 +389,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(store, collectionPath);
+			String mailBoxName = parseMailBoxName(bs, store, collectionPath);
 			store.select(mailBoxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
 			Collection<Long> uids = store.uidSearch(new SearchQuery());
@@ -429,13 +435,7 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String sentFolderName = null;
-			ListResult lr = listAllFolder(store);
-			for (ListInfo i: lr) {
-				if (i.getName().toLowerCase().endsWith("sent")) {
-					sentFolderName = i.getName();
-				}
-			}
+			String sentFolderName = parseMailBoxName(bs, EmailConfiguration.IMAP_SENT_NAME);
 			return storeMail(store, sentFolderName,true, mail, true);
 		} catch (IMAPException e) {
 			throw new StoreEmailException("Error during store mail in Sent folder", e);

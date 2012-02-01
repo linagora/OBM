@@ -39,9 +39,11 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -112,6 +114,10 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 			sendResponse(responder, 
 					moveItemsProtocol.encodeErrorResponse(MoveItemsStatus.SERVER_ERROR));
+		} catch (CollectionPathException e) {
+			logger.error(e.getMessage(), e);
+			sendResponse(responder, 
+					moveItemsProtocol.encodeErrorResponse(MoveItemsStatus.SERVER_ERROR));
 		}
 	}
 	
@@ -119,7 +125,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 		responder.sendResponse("Move", doc);
 	}
 
-	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, BackendSession bs) {
+	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, BackendSession bs) throws CollectionPathException {
 		final List<MoveItemsItem> moveItemsItems = new ArrayList<MoveItemsResponse.MoveItemsItem>();
 		for (MoveItem item: moveItemsRequest.getMoveItems()) {
 			
@@ -127,7 +133,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
 			if (statusForItem.status == null) {
 				try {
-					PIMDataType dataClass = PIMDataType.getPIMDataType(statusForItem.srcCollection);
+					PIMDataType dataClass =  CollectionPathUtils.recognizePIMDataType(bs, statusForItem.srcCollection);
 					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
