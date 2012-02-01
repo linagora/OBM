@@ -2481,9 +2481,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $event_tag_id = $event_q->f('tag_id') ;
     if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
     if (is_null($event_tag_id)) $event_tag_id = 'NULL' ;
-    $description = $event_q->f('event_description');
+    $description = addslashes($event_q->f('event_description'));
     $properties = $event_q->f('event_properties');
-    $location = $event_q->f('event_location');
+    $location = addslashes($event_q->f('event_location'));
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
     $ext_id = $event_q->f('event_ext_id');
