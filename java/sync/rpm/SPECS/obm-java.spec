@@ -137,7 +137,7 @@ WEB_INF=`find obm-locator/target -name WEB-INF `
 cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 
 # common libs
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/jetty/lib
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/jetty6/lib
 cp -p webapp-common-dependencies/target/jetty/*.jar \
   $RPM_BUILD_ROOT%{_datadir}/jetty6/lib/
 
