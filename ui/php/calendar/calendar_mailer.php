@@ -360,7 +360,7 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'start'      => $event->date_begin->getOutputDateTime(),
       $prefix.'end'        => $event->date_end->getOutputDateTime(),
       $prefix.'startDate'  => $event->date_begin->getOutputDate(),
-      $prefix.'endDate'    => $event->repeat_end->getOutputDate(),
+      $prefix.'endDate'    => $event->repeat_end ? $event->repeat_end->getOutputDate() : "",
       $prefix.'startTime'  => $event->date_begin->getOutputTime(),
       $prefix.'endTime'    => $event->date_end->getOutputTime(),
       $prefix.'repeat_kind'=> $this->getReadableRecurrence($event),

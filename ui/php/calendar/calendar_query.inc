@@ -554,28 +554,6 @@ function run_query_increment_sequence($event_ext_id){
   return $retour;
 }
 
-/*
-	if true we should update event sequence
-*/
-function hasEventChanged($old, $new) {
-	if($old != null && $new == null || $old == null && $new != null ) {
-      return true;
-    }
-    return  $new->location != $old->location
-        || $new->allday  != $old->allday
-        || $new->date_begin->compare($old->date_begin) != 0
-        || $new->duration != $old->duration
-        || $new->repeat_kind    != $old->repeat_kind
-        || $new->repeat_kind    != $old->repeat_kind
-        || ($new->repeat_kind == 'weekly' && $new->repeat_days != $old->repeat_days)
-        || ($new->repeat_kind != 'none' && $new->repeat_end->compareDateIso($old->repeat_end) != 0)
-        || ($new->repeat_kind != 'none' && $new->repeatfrequency != $old->repeatfrequency)
-        || (count(array_udiff($new->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
-        || (count(array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp'))));
-}
-
-
-
 /**
  * Check if the user participation to en event differs from the one given
  *
@@ -1966,7 +1944,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
   
-  if (hasEventChanged($oldEvent, $updatedEvent)) {
+  if ($updatedEvent->shouldIncrementSequence($oldEvent)) {
   	if($oldEvent->repeat_kind == 'none' || $params['all'] == 1) {
   		run_query_calendar_reset_occurrence_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $calendar['calendar_id']);
   	} else {
@@ -2028,6 +2006,8 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   } else {
     $repeat_end = 'NULL';
   }    
+  $oldEvent_repeat_end = $oldEvent->repeat_end ? "'".$oldEvent->repeat_end."'" : "NULL";
+
   $frequency = $calendar['repeatfrequency']; 
   $color = $calendar['color'];
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
@@ -2112,6 +2092,8 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   $obm_q->query($query);
 
   $event_id = $calendar['calendar_id'];
+
+  
 
   if ($datebegin != $oldEvent->date_begin
   	|| $repeat_kind != $oldEvent->repeat_kind 
@@ -2202,7 +2184,7 @@ function run_query_calendar_quick_event_update($calendar) {
 	// reload event from database
 	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
 	// increment sequence
-	if ( hasEventChanged($oldEvent, $newEvent) ) {
+	if ( $newEvent->shouldIncrementSequence($oldEvent) ) {
 		run_query_increment_sequence($newEvent->uid);
 	}
 

@@ -117,9 +117,6 @@ $perm->check_permissions($module, $action);
 
 page_close();
 
-OBM_EventFactory::getInstance();
-
-
 // If no user or resource selected, we select the connected user
 $users = $current_view->get_users();
 $resources = $current_view->get_resources();

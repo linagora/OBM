@@ -304,6 +304,33 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     }
     return $this->ics_files[$key];
   }
+
+  /**
+  * return true if the event is different enough from the passed event so that we have to
+  * bump the sequence number
+  *
+  * @param $old other OBM_Event to compare to
+  * @return boolean whether or not the changes should bring a sequence bump 
+  */
+  public function shouldIncrementSequence($old) {
+	  return $this->location != $old->location
+		|| $this->allday  != $old->allday
+		|| $this->date_begin->compare($old->date_begin) != 0
+		|| $this->duration != $old->duration
+		|| $this->repeat_kind    != $old->repeat_kind
+		|| $this->repeat_kind    != $old->repeat_kind
+		|| ($this->repeat_kind == 'weekly' && $this->repeat_days != $old->repeat_days)
+		|| ($this->repeat_kind != 'none' && ( 
+						($this->repeat_end && !$old->repeat_end) 
+					  || (!$this->repeat_end && $old->repeat_end) 
+					  || $this->repeat_end && $old->repeat_end && $this->repeat_end->compareDateIso($old->repeat_end) != 0 
+						) 
+	  )
+		|| ($this->repeat_kind != 'none' && $this->repeatfrequency != $old->repeatfrequency)
+		|| (count(array_udiff($this->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
+		|| (count(array_udiff($old->date_exception, $this->date_exception, array('Of_Date', 'cmp'))));
+  }
+
 }
 
 /**
@@ -487,7 +514,11 @@ class OBM_EventFactory extends OBM_ASubject {
     $event->color = $this->db->f('event_color');
     $event->repeat_kind = $this->db->f('event_repeatkind');
     $event->repeatfrequency = $this->db->f('event_repeatfrequence');
-    $event->repeat_end = new Of_Date($this->db->f('event_endrepeat'),'GMT');
+    if ( $this->db->f('event_endrepeat') ) {
+      $event->repeat_end = new Of_Date($this->db->f('event_endrepeat'),'GMT');
+    } else {
+      $event->repeat_end = null;
+    }
     $event->description = $this->db->f('event_description');
     $event->event_duration = $this->db->f('event_event_duration');
     $event->repeat_days = $this->db->f('event_repeatdays'); 
@@ -685,14 +716,6 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @return void
    */
   private function send($old, $new, $attendees, $attendeesState=null) {    
-    /* Sequence incrementation must be done before email sending since sequence
-       number is retrieved from database at ics generation */
-/*
-    if(self::mustIncrementSequence($old, $new, $attendeesState)){
-      $eventId = $new->id ? $new->id : $old->id;
-      run_query_increment_sequence($eventId);
-    }
-*/
     // we send mail if the parameters we got through UI tells us so
     if ( !$GLOBALS["send_notification_mail"] ) {
         return ;
@@ -712,7 +735,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       }
     }
     
-    if ($attendeesState != null && !$this->hasEventChanged($old, $new)) {
+    if ($attendeesState != null && !$new->shouldIncrementSequence($old) ) {
       foreach($attendeesState['user'] as $ustate) {
         $this->sendEventStateUpdateMail($new, $ustate, $attendeesState);
       }
@@ -720,39 +743,6 @@ class OBM_EventMailObserver implements  OBM_IObserver {
         $this->sendResourceStateUpdateMail($new, $rstate);
       }
     }
-  }
-
-  /**
-   * Checks if the sequence number should be incremented or not
-   * For now increments in the following cases :
-   * - Modification of location, date start or duration
-   * - Modification of the all day state
-   * - Modification of anything related with event recurrence, including exceptions
-   * - Event Removal
-   *
-   * Not incremented neither for modification of non significative informations (like
-   * title, description, color ...) nor for modification of attendees list or
-   * modification of list of documents or resources
-   *
-   *
-   * @param OBM_Event $old
-   * @param OBM_Event $new
-   * @return boolean  Tells if a change that should affect the sequence number exists
-   */
-  private static function mustIncrementSequence($old, $new){
-    // Sequence incrementation in case of event removal
-    if($old != null && $new == null){
-      return true;
-    }
-    if($new && $old){
-      // Must increment when a significant change occurs (event start, duration,
-      // repeat informations including exceptions, location, allday)
-      if(self::hasEventChanged($old, $new)){
-        return true;
-      }
-    }
-    
-    return false;
   }
 
   /**
@@ -767,7 +757,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       if($new->date_end->compare($today) > 0) {
         $willBeSent = true;
       }
-      if($new->repeat_kind != 'none' && $new->repeat_end->compare($today) > 0) {
+      if($new->repeat_kind != 'none' && (!$new->repeat_end || $new->repeat_end->compare($today) > 0) ) {
         $willBeSent = true;
       }
     }
@@ -775,7 +765,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       if($old->date_end->compare($today) > 0) {
         $willBeSent = true;
       }
-      if($old->repeat_kind != 'none' && $old->repeat_end->compare($today) > 0) {
+      if($old->repeat_kind != 'none' && (!$old->repeat_end || $old->repeat_end->compare($today) > 0) ) {
         $willBeSent = true;
       }
     }
@@ -885,7 +875,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       	$this->mailer->sendRecurrentEventUpdate($new, $old, $invit_recipients);
       }
     }
-    if (!empty($notice_recipients) && $this->hasEventFullyChanged($old, $new)) {
+    if (!empty($notice_recipients) && self::hasEventFullyChanged($old, $new)) {
       if ($new->repeat_kind == 'none') {
         $this->mailer->sendEventUpdateNotice($new, $old, $notice_recipients);
       } else {
@@ -1026,32 +1016,6 @@ class OBM_EventMailObserver implements  OBM_IObserver {
   }  
 
   /**
-   * Perform delta between old and new event to check if
-   * there is signifiant change between both
-   * 
-   * @param OBM_Event $old 
-   * @param OBM_Event $new 
-   * @access private
-   * @return void
-   */
-  public static function hasEventChanged($old, $new) {
-    if(!isset(self::$cache[$old->id])) {
-      self::$cache[$old->id] =  $new->location != $old->location
-        || $new->allday  != $old->allday
-        || $new->date_begin->compare($old->date_begin) != 0
-        || $new->duration != $old->duration
-        || $new->repeat_kind    != $old->repeat_kind
-        || $new->repeat_kind    != $old->repeat_kind
-        || ($new->repeat_kind == 'weekly' && $new->repeat_days != $old->repeat_days)
-        || ($new->repeat_kind != 'none' && $new->repeat_end->compareDateIso($old->repeat_end) != 0)
-        || ($new->repeat_kind != 'none' && $new->repeatfrequency != $old->repeatfrequency)
-        || (count(array_udiff($new->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
-        || (count(array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp'))));
-    }
-    return self::$cache[$old->id];
-  }
-
-  /**
    * Perform delta between old and new event
    * 
    * @param OBM_Event $old 
@@ -1060,7 +1024,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @return void
    */
   public static function hasEventFullyChanged($old, $new) {
-    return self::hasEventChanged($old, $new)
+    return $new->shouldIncrementSequence($old)
       || $new->title != $old->title
       || $new->category1 != $old->category1
       || $new->privacy != $old->privacy
