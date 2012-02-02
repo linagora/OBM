@@ -34,8 +34,8 @@ package org.obm.push.handler;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
@@ -59,16 +59,6 @@ public class SmartReplyHandler extends MailRequestHandler {
 		
 		mailBackend.replyEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
 				Integer.valueOf(mailRequest.getCollectionId()), mailRequest.getServerId());
-	}
-
-	@Override
-	protected String getTargetNamespace() {
-		return "SmartReply";
-	}
-
-	@Override
-	protected String getElementName() {
-		return "SmartReply";
 	}
 
 }

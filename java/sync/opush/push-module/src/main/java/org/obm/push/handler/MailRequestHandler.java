@@ -37,11 +37,10 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.MailRequestStatus;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MailProtocol;
@@ -49,7 +48,6 @@ import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 public abstract class MailRequestHandler implements IRequestHandler {
 
@@ -61,9 +59,6 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
-	
-	protected abstract String getTargetNamespace();
-	protected abstract String getElementName();
 	
 	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol) {
 		this.mailBackend = mailBackend;
@@ -82,28 +77,19 @@ public abstract class MailRequestHandler implements IRequestHandler {
 			doTheJob(mailRequest, bs);
 
 		} catch (ProcessingEmailException pe) {	
-			sendErrorResponse(responder, MailRequestStatus.SERVER_ERROR);
 			notifyUser(bs,  mailRequest.getMailContent(), pe);
 		} catch (IOException e) {
 			responder.sendError(HttpStatus.BAD_REQUEST_400);
 			return;
 		} catch (CollectionNotFoundException e) {
-			sendErrorResponse(responder, MailRequestStatus.ITEM_NOT_FOUND);
 			notifyUser(bs, mailRequest.getMailContent(), e);
 		} catch (QuotaExceededException e) {
-			sendErrorResponse(responder, MailRequestStatus.SEND_QUOTA_EXCEEDED);
 			notifyUserQuotaExceeded(bs, e);
 		} catch (ItemNotFoundException e) {
-			sendErrorResponse(responder, MailRequestStatus.ITEM_NOT_FOUND);
 			notifyUser(bs, mailRequest.getMailContent(), e);
 		}
 	}
 
-	private void sendErrorResponse(Responder responder, MailRequestStatus requestStatus) {
-		Document document = mailProtocol.encodeErrorResponse(getElementName(), requestStatus);
-		responder.sendWBXMLResponse(getTargetNamespace(), document);
-	}
-	
 	private void notifyUserQuotaExceeded(BackendSession bs,
 			QuotaExceededException e) {
 		errorManager.sendQuotaExceededError(bs, e);
