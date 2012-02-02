@@ -29,18 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.dom.Message;
-import org.obm.configuration.ConfigurationService;
-import org.obm.push.bean.MSEmail;
-import org.obm.push.exception.NotQuotableEmailException;
-import org.obm.push.utils.Mime4jUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class ForwardEmail extends ReplyEmail {
+import com.google.common.io.ByteStreams;
+import com.sun.mail.iap.Literal;
 
-	public ForwardEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail forwarded, Message message) throws MimeException, NotQuotableEmailException {
-		super(configuration, mime4jUtils, defaultFrom, forwarded, message);
+public class StreamedLiteral implements Literal {
+
+	private final InputStream message;
+	private final int length;
+    
+	public StreamedLiteral(InputStream messageStream, int length) {
+		this.message = messageStream;
+		this.length = length;
 	}
+
+	@Override
+	public int size() {
+		return length;
+	}
+
+	@Override
+	public void writeTo(OutputStream os) throws IOException {
+		ByteStreams.copy(message, os);
+	}
+
 }

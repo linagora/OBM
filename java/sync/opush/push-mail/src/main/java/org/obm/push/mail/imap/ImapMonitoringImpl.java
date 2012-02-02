@@ -1,4 +1,4 @@
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +12,9 @@ import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.mail.MailBackend;
+import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailboxService;
 import org.obm.push.monitor.EmailMonitoringThread;
 import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.service.PushPublishAndSubscribe.Factory;

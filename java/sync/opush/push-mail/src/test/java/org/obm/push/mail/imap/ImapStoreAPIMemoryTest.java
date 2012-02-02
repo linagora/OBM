@@ -29,30 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
 
+import javax.mail.util.SharedFileInputStream;
+
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.mail.MailEnvModule;
+import org.obm.push.mail.RandomGeneratedInputStream;
+import org.obm.push.mail.StreamMailTestsUtils;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
+import org.obm.push.mail.imap.ImapMailboxService;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
 public class ImapStoreAPIMemoryTest {
@@ -65,68 +78,90 @@ public class ImapStoreAPIMemoryTest {
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
-
+	private long maxHeapSize;
+	
 	private ClosableProcess greenMailProcess;
+	
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
 	
 	@Before
 	public void setUp() throws ExternalProcessException {
 	    mailbox = "to@localhost.com";
 	    password = "password";
-	    int maxHeapSize = getTwiceThisHeapSize();
+	    maxHeapSize = getTwiceThisHeapSize();
 	    greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password, null), null, null, null);
 	}
-	
-	private int getTwiceThisHeapSize() {
-		int byteForOneMegaByte = 1048576;
-		long thisHeapSizeInByte = Runtime.getRuntime().maxMemory();
-		int thisHeapSizeInMo = (int)(thisHeapSizeInByte / byteForOneMegaByte);
-		return thisHeapSizeInMo * 2;
-	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws InterruptedException {
 		greenMailProcess.closeProcess();
 	}
 	
-	@Test
-	public void testStoreInInboxSmallerThanMemorySize() throws Exception {
-		Date before = new Date();
-		InputStream tinyInputStream = StreamMailTestsUtils.getTinyEmailInputStream();
-
-		mailboxService.storeInInbox(bs, tinyInputStream, true);
-		
-		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	private File generateBigEmail(long maxHeapSize) throws IOException,
+			FileNotFoundException {
+		File data = folder.newFile("test-data");
+	    FileOutputStream fileOutputStream = new FileOutputStream(data);
+	    ByteStreams.copy(StreamMailTestsUtils.getHeaders(), fileOutputStream);
+	    ByteStreams.copy(new RandomGeneratedInputStream(maxHeapSize), fileOutputStream);
+	    fileOutputStream.close();
+	    return data;
 	}
 	
-	@Test(expected=OutOfMemoryError.class)
-	public void testStoreInInboxMoreThanMemorySize() throws Exception {
-		InputStream heavyInputStream = new RandomGeneratedInputStream();
-
-		mailboxService.storeInInbox(bs, heavyInputStream, true);
+	private long getTwiceThisHeapSize() {
+		long thisHeapSizeInByte = Runtime.getRuntime().maxMemory();
+		return thisHeapSizeInByte * 2;
 	}
 
 	@Test
-	public void testStoreInInboxSmallerThanMemorySizeWithJM() throws Exception {
-		final InputStream tinyInputStream = StreamMailTestsUtils.getTinyEmailInputStream();
+	public void testStoreInInbox() throws Exception {
+		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
-		mailboxService.storeInInboxWithJM(bs, tinyInputStream, tinyInputStream.available(), true);
+		mailboxService.storeInInbox(bs, tinyInputStream, true);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.getTinyEmailAsShouldBeFetched();
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 
-	@Ignore("This test fails du of a difficulty to set the adapted heap size to greenmail")
 	@Test
-	public void testStoreInInboxMoreThanMemorySizeWithJM() throws Exception {
-		Date before = new Date();
-		final InputStream heavyInputStream = new RandomGeneratedInputStream();
+	public void testStoreInInboxStream() throws Exception {
+		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
-		mailboxService.storeInInboxWithJM(bs, heavyInputStream, Integer.MAX_VALUE, true);
+		mailboxService.storeInInbox(bs, tinyInputStream, 4, true);
+
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
+		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+	}
+
+	
+	@Test(expected=OutOfMemoryError.class)
+	public void testBigMailTriggerOutOfMemory() throws Exception {
+		File data = generateBigEmail(maxHeapSize);
+		ByteStreams.toByteArray(new FileInputStream(data));
+	}
+	
+	@Test
+	public void testStoreInInboxMoreThanMemorySize() throws Exception {
+		Date before = new Date();
+		File data = generateBigEmail(getTwiceThisHeapSize());
+		final InputStream heavyInputStream = new SharedFileInputStream(data);
+		mailboxService.storeInInbox(bs, heavyInputStream, true);
+		Set<Email> emails = mailboxService.fetchEmails(bs, EmailConfiguration.IMAP_INBOX_NAME, before);
+		Assertions.assertThat(emails).hasSize(1);
+	}
+	
+	@Test
+	public void testStoreInInboxMoreThanMemorySizeStream() throws Exception {
+		Date before = new Date();
+		long size = getTwiceThisHeapSize();
+		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
+		mailboxService.storeInInbox(bs, heavyInputStream, Ints.checkedCast(size), true);
 		Set<Email> emails = mailboxService.fetchEmails(bs, EmailConfiguration.IMAP_INBOX_NAME, before);
 		Assertions.assertThat(emails).hasSize(1);
 	}

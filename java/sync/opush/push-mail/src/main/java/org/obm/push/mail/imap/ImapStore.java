@@ -29,11 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 import java.util.Date;
 
+import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -43,8 +44,6 @@ import javax.mail.internet.MimeMessage;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
-import org.obm.push.mail.imap.client.IMAPClient;
-import org.obm.push.mail.imap.client.StreamMimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +60,10 @@ public class ImapStore {
 	private final String userId;
 	private final String host;
 	private final int port;
-	private final IMAPClient imapClient;
 
 	
-	public ImapStore(IMAPClient imapClient, Session session, Store store, 
+	public ImapStore(Session session, Store store, 
 			String userId, String password, String host, int port) {
-		this.imapClient = imapClient;
 		this.session = session;
 		this.store = store;
 		this.userId = userId;
@@ -94,8 +91,7 @@ public class ImapStore {
 		try {
 			store.connect(host, port, userId, password);
 		} catch (MessagingException e) {
-			String msg = "attempt imap login failed"; 
-			throw new ImapLoginException(msg, e);
+			throw new ImapLoginException("attempt imap login failed", e);
 		}
 	}
 
@@ -103,29 +99,40 @@ public class ImapStore {
 		try {
 			store.close();
 		} catch (MessagingException e) {
-			String msg = "Logout failed for user: {} " + userId;
-			throw new ImapLogoutException(msg, e);
+			throw new ImapLogoutException("Logout failed for user: " + userId, e);
+		}
+	}
+
+	public void appendMessageStream(String folderName, StreamedLiteral streamedLiteral, Flags flags) 
+			throws ImapCommandException {
+		try {
+			OpushImapFolder folder = getFolder(folderName);
+			folder.appendMessageStream(streamedLiteral, flags, null);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command APPEND failed. user=%s, folder=%s", userId, folderName);
+			throw new ImapCommandException(msg, e);
 		}
 	}
 	
 	public void appendMessage(String folderName, Message message) 
 			throws ImapCommandException {
 		try {
-			IMAPFolder folder = getFolder(folderName);
-			imapClient.appendMessage(folder, message);
+			OpushImapFolder folder = getFolder(folderName);
+			folder.appendMessage(message);
 		} catch (MessagingException e) {
 			String msg = String.format(
-					"IMAP command APPEND failed. user={}, folder={}", userId, folderName);
+					"IMAP command APPEND failed. user=%s, folder=%s", userId, folderName);
 			throw new ImapCommandException(msg, e);
 		}
 	}
 
-	private IMAPFolder getFolder(String folderName) throws ImapCommandException {
+	private OpushImapFolder getFolder(String folderName) throws ImapCommandException {
 		try {
-			return (IMAPFolder)store.getDefaultFolder().getFolder(folderName);
+			return new OpushImapFolder((IMAPFolder) store.getDefaultFolder().getFolder(folderName));
 		} catch (MessagingException e) {
 			String msg = String.format(
-					"IMAP command getFolder failed. user={}, folder={}", userId, folderName);
+					"IMAP command getFolder failed. user=%s, folder=%s", userId, folderName);
 			throw new ImapCommandException(msg, e);
 		}
 	}

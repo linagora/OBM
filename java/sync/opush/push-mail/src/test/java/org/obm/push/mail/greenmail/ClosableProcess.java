@@ -33,6 +33,6 @@ package org.obm.push.mail.greenmail;
 
 public interface ClosableProcess {
 	
-	void closeProcess();
+	void closeProcess() throws InterruptedException;
 	
 }

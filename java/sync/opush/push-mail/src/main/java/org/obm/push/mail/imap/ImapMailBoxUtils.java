@@ -29,51 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.client;
+package org.obm.push.mail.imap;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import javax.mail.Flags;
 
-public class StreamMimeMessage extends MimeMessage {
+import org.obm.push.bean.Email;
 
-	private final InputStream messageStream;
-	private final int messageSize;
-	private final Date date;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.inject.Singleton;
+
+@Singleton
+public class ImapMailBoxUtils {
+
+	private static final ImmutableMap<Flags.Flag, String> flags = 
+			ImmutableMap.<Flags.Flag, String>builder().
+			put(Flags.Flag.ANSWERED, "ANSWERED").
+			put(Flags.Flag.DELETED, "DELETED").
+			put(Flags.Flag.DRAFT, "DRAFT").
+			put(Flags.Flag.FLAGGED, "FLAGGED").
+			put(Flags.Flag.RECENT, "RECENT").
+			put(Flags.Flag.SEEN, "SEEN").
+			put(Flags.Flag.USER, "USER").build();
 	
-	public StreamMimeMessage(Session session, InputStream message, int messageSize, Date date) {
-		super(session);
-		this.messageStream = message;
-		this.messageSize = messageSize;
-		this.date = date;
+	public String flagToString(Flags.Flag flag) {
+		if (flags.containsKey(flag)) {
+			return "Flag." + flags.get(flag);
+		} else {
+			throw new IllegalArgumentException("Flag not found !");
+		}
 	}
 	
-	@Override
-	public int getSize() throws MessagingException {
-		return messageSize;
-	}
-	
-	@Override
-	public Date getReceivedDate() throws MessagingException {
-		return date;
-	}
-	
-	@Override
-	public InputStream getInputStream() throws IOException, MessagingException {
-		return messageStream;
-	}
-	
-	@Override
-	protected InputStream getContentStream() throws MessagingException {
-		return messageStream;
-	}
-	
-	@Override
-	protected void updateHeaders() throws MessagingException {
-		// Do nothing, this message should already have its headers 
+	public List<Email> orderEmailByUid(Collection<Email> emails) {
+		ArrayList<Email> listOfEmails = Lists.newArrayList(emails);
+		Collections.sort(listOfEmails, new Comparator<Email>() {
+			@Override
+			public int compare(Email o1, Email o2) {
+				return (int) (o1.getUid() - o2.getUid());
+			}
+		});
+		return listOfEmails;
 	}
 }

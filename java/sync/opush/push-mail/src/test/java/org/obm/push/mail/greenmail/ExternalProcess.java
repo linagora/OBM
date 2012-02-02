@@ -71,16 +71,16 @@ public abstract class ExternalProcess {
 	}
 	
 	public ClosableProcess execute() throws ExternalProcessException {
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-
+		final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 		final Executor executor = buildExecutor();
 		executeProcess(resultHandler, executor);
 		waitForProcessStartTime(resultHandler);
 		
 		return new ClosableProcess() {
 			@Override
-			public void closeProcess() {
+			public void closeProcess() throws InterruptedException {
 				executor.getWatchdog().destroyProcess();
+				resultHandler.waitFor();
 			}
 		};
 	}

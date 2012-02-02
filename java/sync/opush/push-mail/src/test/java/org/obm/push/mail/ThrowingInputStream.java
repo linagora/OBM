@@ -29,43 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.client;
+package org.obm.push.mail;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+public class ThrowingInputStream extends FilterInputStream {
 
-import org.obm.push.exception.ImapRuntimeException;
-
-import com.sun.mail.iap.Literal;
-
-public class StreamedLiteral implements Literal {
-
-	private final Message message;
-	public static final byte[] CRLF = { (byte)'\r', (byte)'\n'};
-    
-	public StreamedLiteral(Message msg) {
-		this.message = msg;
+	private final int throwAfterCount;
+	private int count;
+	
+	
+	public ThrowingInputStream(InputStream stream, int throwAfterCount) {
+		super(stream);
+		this.throwAfterCount = throwAfterCount;
+		this.count = 0;
+	}
+	
+	@Override
+	public int read() throws IOException {
+		count += 1;
+		checkCount();
+		return super.read();
+	}
+	
+	@Override
+	public int read(byte[] b) throws IOException {
+		int read = super.read(b);
+		count += read;
+		checkCount();
+		return read;
 	}
 
 	@Override
-	public int size() {
-		try {
-			return message.getSize() + CRLF.length;
-		} catch (MessagingException e) {
-			throw new ImapRuntimeException("Cannot get the message size.", e);
+	public int read(byte[] b, int off, int len) throws IOException {
+		int read = super.read(b, off, len);
+		count += read;
+		checkCount();
+		return read;
+	}
+	
+	private void checkCount() throws IOException {
+		if (count >= throwAfterCount) {
+			throw new IOException("Stream has failed");
 		}
 	}
-
-	@Override
-	public void writeTo(OutputStream os) throws IOException {
-		try {
-			message.writeTo(os);
-		} catch (MessagingException e) {
-			throw new ImapRuntimeException(e);
-		}
-	}
-
 }

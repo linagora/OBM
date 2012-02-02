@@ -29,51 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Date;
 
 import javax.mail.Flags;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 
-import org.obm.push.bean.Email;
+import com.sun.mail.iap.ProtocolException;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
+import com.sun.mail.imap.protocol.IMAPProtocol;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.inject.Singleton;
+public class OpushImapFolder {
 
-@Singleton
-public class ImapMailBoxUtils {
+	private final IMAPFolder folder;
 
-	private static final ImmutableMap<Flags.Flag, String> flags = 
-			ImmutableMap.<Flags.Flag, String>builder().
-			put(Flags.Flag.ANSWERED, "ANSWERED").
-			put(Flags.Flag.DELETED, "DELETED").
-			put(Flags.Flag.DRAFT, "DRAFT").
-			put(Flags.Flag.FLAGGED, "FLAGGED").
-			put(Flags.Flag.RECENT, "RECENT").
-			put(Flags.Flag.SEEN, "SEEN").
-			put(Flags.Flag.USER, "USER").build();
-	
-	public String flagToString(Flags.Flag flag) {
-		if (flags.containsKey(flag)) {
-			return "Flag." + flags.get(flag);
-		} else {
-			throw new IllegalArgumentException("Flag not found !");
-		}
+	public OpushImapFolder(IMAPFolder folder) {
+		this.folder = folder;
 	}
-	
-	public List<Email> orderEmailByUid(Collection<Email> emails) {
-		ArrayList<Email> listOfEmail = Lists.newArrayList(emails);
-		Collections.sort(listOfEmail, new Comparator<Email>() {
+
+	public void appendMessageStream(final StreamedLiteral literal, final Flags flags, final Date messageDate) throws MessagingException {
+		folder.doCommand(new ProtocolCommand() {
+			
 			@Override
-			public int compare(Email o1, Email o2) {
-				return (int) (o1.getUid() - o2.getUid());
+			public Object doCommand(IMAPProtocol p)
+				throws ProtocolException {
+				p.append(folder.getFullName(), flags, messageDate, literal);
+				return null;
 			}
 		});
-		return listOfEmail;
 	}
+	
+	public void appendMessage(Message message) throws MessagingException {
+		folder.appendMessages(new Message[]{message});
+	}
+
 }

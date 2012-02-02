@@ -76,7 +76,7 @@ public class ExternalGreenMailTest {
 	}
 	
 	@After
-	public void tearDown() {
+	public void tearDown() throws InterruptedException {
 		greenMailProcess.closeProcess();
 	}
 	
@@ -88,7 +88,7 @@ public class ExternalGreenMailTest {
 	}
 
 	@Test
-	public void testMailsArePurgedBetweenTwoTest() throws MailException, ExternalProcessException {
+	public void testMailsArePurgedBetweenTwoTest() throws MailException, ExternalProcessException, InterruptedException {
 		Date before = new Date();
 		
 		Set<Email> emailsOfFirstTest = sendOneEmailAndFetchAll(before);
@@ -99,7 +99,7 @@ public class ExternalGreenMailTest {
 		Assertions.assertThat(emailsOfSecondTest).isNotNull().hasSize(1);
 	}
 
-	private void reinitTestContext() throws ExternalProcessException {
+	private void reinitTestContext() throws ExternalProcessException, InterruptedException {
 		tearDown();
 		setUp();
 	}

@@ -6,12 +6,19 @@ import java.io.InputStream;
 
 public class RandomGeneratedInputStream extends InputStream {
 
+	private long length;
+
+	public RandomGeneratedInputStream(long length) {
+		this.length = length;
+	}
+	
 	@Override
 	public int read() throws IOException {
-		return getRandomChar();
+		if (length-- > 0) {
+			return 66;
+		} else {
+			return -1;
+		}
 	}
 
-	private int getRandomChar() {
-		return 100 + (int)(Math.random() * 100);
-	}
 }

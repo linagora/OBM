@@ -29,18 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.dom.Message;
-import org.obm.configuration.ConfigurationService;
-import org.obm.push.bean.MSEmail;
-import org.obm.push.exception.NotQuotableEmailException;
-import org.obm.push.utils.Mime4jUtils;
+import org.minig.imap.IdleClient;
+import org.minig.imap.StoreClient;
+import org.obm.locator.LocatorClientException;
+import org.obm.push.bean.BackendSession;
+import org.obm.push.exception.NoImapClientAvailableException;
+import org.obm.push.mail.MailException;
 
-public class ForwardEmail extends ReplyEmail {
+import com.sun.mail.imap.IMAPStore;
 
-	public ForwardEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail forwarded, Message message) throws MimeException, NotQuotableEmailException {
-		super(configuration, mime4jUtils, defaultFrom, forwarded, message);
-	}
+public interface ImapClientProvider {
+
+	String locateImap(BackendSession bs) throws LocatorClientException;
+	StoreClient getImapClient(BackendSession bs) throws LocatorClientException;
+	ImapStore getImapClientWithJM(BackendSession bs) throws LocatorClientException, NoImapClientAvailableException;
+	IdleClient getImapIdleClient(BackendSession bs) throws LocatorClientException;
+	
+	IMAPStore getJavaxMailImapClient(BackendSession bs) throws MailException;
 }

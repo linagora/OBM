@@ -44,6 +44,7 @@ import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.mail.imap.ImapMailboxService;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;

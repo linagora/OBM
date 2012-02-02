@@ -29,8 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
+import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import java.io.InputStream;
 import java.util.Set;
 
@@ -47,11 +48,12 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.imap.ImapMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
 
 import com.google.common.collect.Sets;
 
-public class EmailManagerTest {
+public class MockBasedImapMailboxServiceTest {
 
 	private BackendSession bs;
 	
@@ -87,7 +89,7 @@ public class EmailManagerTest {
 				addrs,
 				addrs,
 				addrs,
-				loadDataFile("bigEml.eml"), false);
+				loadEmail("bigEml.eml"), false);
 		
 		EasyMock.verify(emailConfiguration, smtpSender);
 	}
@@ -97,10 +99,5 @@ public class EmailManagerTest {
 		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
 		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
 		return emailConfiguration;
-	}
-
-	protected InputStream loadDataFile(String name) {
-		return getClass().getClassLoader().getResourceAsStream(
-				"eml/" + name);
 	}
 }

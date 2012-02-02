@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -73,6 +73,12 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.EmailFactory;
+import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailMessageLoader;
+import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
@@ -430,46 +436,53 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public boolean storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) 
-			throws StoreEmailException {
-		
+	public void storeInInbox(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
-		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
-			login(store);
-			return storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, isRead, mailContent, false);
-		} catch (IMAPException e) {
-			throw new StoreEmailException("Error during store mail in Inbox folder", e);
-		} finally {
-			store.logout();
-		}
-	}
-
-	@Override
-	public boolean storeInInboxWithJM(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) 
-			throws MailException {
-		
-		logger.info("Store mail in folder[Inbox]");
-		boolean commandSuccess = false;
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
-			store.login();
-			storeMail(store, EmailConfiguration.IMAP_INBOX_NAME, mailContent, mailSize, isRead);
-			commandSuccess = true;
-		} catch (ImapCommandException e) {
-			logger.warn(e.getMessage(), e);
-			throw new MailException(e.getMessage(), e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e.getMessage(), e);
+			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
+			try {
+				store.login();
+				Flags flags = new Flags();
+				if (isRead) {
+					flags.add(Flags.Flag.SEEN);
+				}
+				StreamedLiteral streamedLiteral = new StreamedLiteral(mailContent, mailSize);
+				store.appendMessageStream(EmailConfiguration.IMAP_INBOX_NAME, streamedLiteral, flags);
+			} catch (ImapCommandException e) {
+				throw new MailException(e.getMessage(), e);
+			} catch (LocatorClientException e) {
+				throw new MailException(e.getMessage(), e);
+			} finally {
+				logout(store);
+			}
 		} catch (NoImapClientAvailableException e) {
 			throw new MailException(e.getMessage(), e);
-		} catch (MessagingException e) {
-			throw new MailException(e.getMessage(), e);
-		} finally {
-			logout(store);
 		}
-		return commandSuccess;
+	}
+		
+	@Override
+	public void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException {
+		logger.info("Store mail in folder[Inbox]");
+		try {
+			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
+			try {
+				store.login();
+				Message message = store.createMessage(mailContent);
+				message.setFlag(Flags.Flag.SEEN, isRead);
+				store.appendMessage(EmailConfiguration.IMAP_INBOX_NAME, message);
+			} catch (ImapCommandException e) {
+				throw new MailException(e.getMessage(), e);
+			} catch (LocatorClientException e) {
+				throw new MailException(e.getMessage(), e);
+			} catch (MessagingException e) {
+				throw new MailException(e.getMessage(), e);
+			} finally {
+				logout(store);
+			}
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e.getMessage(), e);
+		}
+
 	}
 
 	private void logout(ImapStore store) {
@@ -480,13 +493,6 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		} catch (ImapLogoutException e) {
 			logger.warn(e.getMessage(), e);
 		}
-	}
-	
-	private void storeMail(ImapStore store, String folderName, InputStream mailContent, 
-			int mailSize, boolean isRead) throws ImapCommandException, MessagingException {
-		Message msg = store.createStreamedMessage(mailContent, mailSize);
-		msg.setFlag(Flags.Flag.SEEN, isRead);
-		store.appendMessage(folderName, msg);
 	}
 
 	/**

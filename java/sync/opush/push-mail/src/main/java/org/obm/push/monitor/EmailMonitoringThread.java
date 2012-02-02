@@ -40,8 +40,8 @@ import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.ImapClientProvider;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.imap.ImapClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

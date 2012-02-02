@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.imap;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
@@ -56,6 +56,10 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MailEnvModule;
+import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.base.Charsets;
@@ -105,7 +109,7 @@ public class ImapMailboxServiceTest {
 		
 		Stopwatch stopWatch = new Stopwatch().start();
 		try {
-			mailboxService.storeInInboxWithJM(bs, emailStream, emailGivenSize, true);
+			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
 			int acceptedTimeoutDeltaInMs = 500;
 			assertTimeoutIsInAcceptedDelta(stopWatch, acceptedTimeoutDeltaInMs);

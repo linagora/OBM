@@ -29,49 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.client;
+package org.obm.push.mail.imap;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
-import javax.mail.Flags;
-import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
-import com.google.common.base.Objects;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.sun.mail.iap.ProtocolException;
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.protocol.IMAPProtocol;
+public class StreamMimeMessage extends MimeMessage {
 
-@Singleton
-public class IMAPClientImpl implements IMAPClient {
-
-	@Inject
-	private IMAPClientImpl() {
+	private final InputStream messageStream;
+	private final int messageSize;
+	private final Date date;
+	
+	public StreamMimeMessage(Session session, InputStream message, int messageSize, Date date) {
+		super(session);
+		this.messageStream = message;
+		this.messageSize = messageSize;
+		this.date = date;
 	}
 	
 	@Override
-	public void appendMessage(final IMAPFolder folder, final Message msg) throws MessagingException {
-		final StreamedLiteral streamedLiteral = new StreamedLiteral(msg);
-		
-		final Flags flags = msg.getFlags();
-		final Date msgDate = getMessageDate(msg);
-		
-		folder.doCommand(new ProtocolCommand() {
-			
-			@Override
-			public Object doCommand(IMAPProtocol p)
-				throws ProtocolException {
-				p.append(folder.getFullName(), flags, msgDate, streamedLiteral);
-				return null;
-			}
-		});
-	}
-
-	private Date getMessageDate(final Message msg) throws MessagingException {
-		return Objects.firstNonNull(msg.getReceivedDate(), msg.getSentDate());
+	public int getSize() throws MessagingException {
+		return messageSize;
 	}
 	
+	@Override
+	public Date getReceivedDate() throws MessagingException {
+		return date;
+	}
+	
+	@Override
+	public InputStream getInputStream() throws IOException, MessagingException {
+		return messageStream;
+	}
+	
+	@Override
+	protected InputStream getContentStream() throws MessagingException {
+		return messageStream;
+	}
+	
+	@Override
+	protected void updateHeaders() throws MessagingException {
+		// Do nothing, this message should already have its headers 
+	}
 }

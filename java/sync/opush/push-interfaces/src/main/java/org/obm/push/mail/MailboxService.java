@@ -72,9 +72,18 @@ public interface MailboxService {
 
 	Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 
-	boolean storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws StoreEmailException;
-	boolean storeInInboxWithJM(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) throws MailException;
+	/**
+	 * Store the mail's inputstream in INBOX.
+	 * The mailContent is only guaranteed to be streamed if it's a SharedInputStream.
+	 */
+	void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException;
 
+	/**
+	 * Store the mail's inputstream in INBOX.
+	 * The mailContent is guaranteed to be streamed.
+	 */
+	void storeInInbox(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) throws MailException;
+	
 	boolean getLoginWithDomain();
 
 	boolean getActivateTLS();

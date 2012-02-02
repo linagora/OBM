@@ -26,8 +26,12 @@ public class JavaExternalProcess extends ExternalProcess {
 
 	private void setHeapMaxSize(Config config){
 		if (config.useConfigHeapSize) {
-			addSimpleCliArgument(String.format("-Xmx%dm", config.heapMaxSizeInMo));
+			addSimpleCliArgument(String.format("-Xmx%dm", bytesToMegaBytes(config.heapMaxSizeInByte)));
 		}
+	}
+	
+	private int bytesToMegaBytes(long bytes) {
+		return Long.valueOf(bytes >> 20).intValue();
 	}
 	
 	private void setDebugMode(Config config) {
@@ -46,17 +50,17 @@ public class JavaExternalProcess extends ExternalProcess {
 	}
 	
 	public static class Config {
-		public boolean debug = false;
-		public boolean useConfigHeapSize = false;
-		public int heapMaxSizeInMo = 0;
-		public int processTimeout = 0;
-		public int processStartTimeNeeded = 0;
+		public final boolean debug;
+		public final boolean useConfigHeapSize;
+		public final long heapMaxSizeInByte;
+		public final int processTimeout;
+		public final int processStartTimeNeeded;
 		
-		public Config(boolean debug, boolean useConfigHeapSize, int heapMaxSizeInMo, 
+		public Config(boolean debug, boolean useConfigHeapSize, long heapMaxSizeInByte, 
 				int processTimeout, int processStartTimeNeeded) {
 			this.debug = debug;
 			this.useConfigHeapSize = useConfigHeapSize;
-			this.heapMaxSizeInMo = heapMaxSizeInMo;
+			this.heapMaxSizeInByte = heapMaxSizeInByte;
 			this.processTimeout = processTimeout;
 			this.processStartTimeNeeded = processStartTimeNeeded;
 		}
