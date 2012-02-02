@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -53,7 +54,6 @@ import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.RandomGeneratedInputStream;
-import org.obm.push.mail.StreamMailTestsUtils;
 import org.obm.push.mail.ThrowingInputStream;
 
 import com.google.common.collect.Iterables;

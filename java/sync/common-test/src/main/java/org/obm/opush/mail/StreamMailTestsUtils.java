@@ -1,4 +1,4 @@
-package org.obm.push.mail;
+package org.obm.opush.mail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
@@ -46,17 +47,22 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.util.MimeUtil;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.utils.Mime4jUtils;
+import org.obm.push.utils.MimeContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -72,7 +78,7 @@ public class ErrorsManager implements IErrorsManager {
 	private final Mime4jUtils mime4jUtils;
 	
 	@Inject
-	private ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils) {
+	/* package */ ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils) {
 		this.manager = manager;
 		this.mime4jUtils = mime4jUtils;
 		this.messages = messages;
@@ -101,8 +107,8 @@ public class ErrorsManager implements IErrorsManager {
 		}
 	}
 
-	private Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
-		Message mm = prepareMessageHeaders(bs, subject);
+	/* package */ Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
+		MessageImpl mm = prepareMessageHeaders(bs, subject);
 		
 		Multipart multipart = mime4jUtils.createMultipartMixed();
 
@@ -111,7 +117,11 @@ public class ErrorsManager implements IErrorsManager {
 		mime4jUtils.attach(multipart, errorMail, "error_message.eml",
 				"message/rfc822");
 
-		mm.setBody(multipart);
+		Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(Charsets.UTF_8);
+		String boundary = MimeUtil.createUniqueBoundary();
+		params.put(ContentTypeField.PARAM_BOUNDARY, boundary);
+		
+		mm.setBody(multipart, MimeContentType.MULTIPART_MIXED.getContentType(), params);
 		return mm;
 	}
 
@@ -122,8 +132,8 @@ public class ErrorsManager implements IErrorsManager {
 		return mm;
 	}
 	
-	private Message prepareMessageHeaders(BackendSession bs, String subject) throws ParseException {
-		Message mm = mime4jUtils.createMessage();
+	private MessageImpl prepareMessageHeaders(BackendSession bs, String subject) throws ParseException {
+		MessageImpl mm = mime4jUtils.createMessage();
 		mm.createMessageId(getHostname());
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));
