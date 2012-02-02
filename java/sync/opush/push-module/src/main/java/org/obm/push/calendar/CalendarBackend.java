@@ -42,6 +42,7 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -129,8 +130,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			String domain = bs.getUser().getDomain();
 			for (CalendarInfo ci : cals) {
 				ItemChange ic = new ItemChange();
-				String col = "obm:\\\\" + bs.getUser().getLoginAtDomain()
-						+ "\\calendar\\" + ci.getUid() + domain;
+				String col = CollectionPathUtils.buildCollectionPath(
+						bs, PIMDataType.CALENDAR, ci.getUid() + domain);
 				Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), col);
 				ic.setServerId(mappingService.collectionIdToString(collectionId));
 				ic.setParentId("0");

@@ -36,11 +36,13 @@ import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.User;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -51,15 +53,23 @@ import com.google.common.collect.Sets;
 
 public class EmailManagerTest {
 
+	private BackendSession bs;
+	
+	@Before
+	public void setUp() {
+		String mailbox = "user@domain";
+		String password = "password";
+	    bs = new BackendSession(
+				new Credentials(User.Factory.create()
+						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+	}
+	
 	@Test
 	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException, SMTPException {
 		
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
 		SmtpSender smtpSender = EasyMock.createMock(SmtpSender.class);
-		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
 		
-		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
-		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 		Set<Address> addrs = Sets.newHashSet();
 		smtpSender.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class),
 				EasyMock.anyObject(addrs.getClass()),
@@ -67,19 +77,26 @@ public class EmailManagerTest {
 				EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class));
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.replay(emailConfiguration, smtpSender, backendSession);
+		EasyMock.replay(emailConfiguration, smtpSender);
 		
 		ImapMailboxService emailManager = 
 				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null, null);
 
-		emailManager.sendEmail(backendSession,
+		emailManager.sendEmail(bs,
 				new Address("test@test.fr"),
 				addrs,
 				addrs,
 				addrs,
 				loadDataFile("bigEml.eml"), false);
 		
-		EasyMock.verify(emailConfiguration, smtpSender, backendSession);
+		EasyMock.verify(emailConfiguration, smtpSender);
+	}
+
+	private EmailConfiguration newEmailConfigurationMock() {
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
+		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
+		return emailConfiguration;
 	}
 
 	protected InputStream loadDataFile(String name) {

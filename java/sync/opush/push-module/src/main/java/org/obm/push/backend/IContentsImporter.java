@@ -34,8 +34,8 @@ package org.obm.push.backend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -54,6 +54,6 @@ public interface IContentsImporter {
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
 
 	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
-			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, PIMDataTypeNotFoundException;
+			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, CollectionPathException;
 	
 }

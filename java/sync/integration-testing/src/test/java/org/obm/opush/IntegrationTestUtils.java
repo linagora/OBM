@@ -105,6 +105,6 @@ public class IntegrationTestUtils {
 	}
 	
 	private static String buildCollectionPath(OpushUser opushUser, String dataType) {
-		return opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + opushUser.user.getLoginAtDomain();
+		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + opushUser.user.getLoginAtDomain();
 	}
 }

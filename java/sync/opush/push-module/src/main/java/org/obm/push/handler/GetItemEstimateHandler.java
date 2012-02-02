@@ -39,14 +39,14 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -131,7 +131,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			try {
 				syncCollection.setCollectionPath(collectionPath);
-				syncCollection.setDataType( PIMDataType.getPIMDataType(collectionPath) );
+				syncCollection.setDataType( CollectionPathUtils.recognizePIMDataType(bs, collectionPath) );
 			
 				String syncKey = syncCollection.getSyncKey();
 				SyncState state = stMachine.getSyncState(syncKey);
@@ -145,7 +145,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			
 				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
 
-			} catch (PIMDataTypeNotFoundException e) {
+			} catch (CollectionPathException e) {
 				throw new CollectionNotFoundException("Collection path {" + collectionPath + "} not found.");
 			}			
 		}

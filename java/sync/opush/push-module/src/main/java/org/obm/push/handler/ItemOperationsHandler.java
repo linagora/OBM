@@ -40,6 +40,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSAttachementData;
@@ -48,8 +49,8 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedStoreException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
@@ -132,8 +133,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest) throws CollectionNotFoundException, 
-		UnsupportedStoreException, ProcessingEmailException {
+	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
+			throws CollectionNotFoundException, UnsupportedStoreException, ProcessingEmailException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
@@ -149,8 +150,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return response;
 	}
 
-	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, UnsupportedStoreException, 
-		ProcessingEmailException {
+	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch)
+			throws CollectionNotFoundException, UnsupportedStoreException, ProcessingEmailException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
@@ -160,7 +161,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 
-	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch) throws CollectionNotFoundException, ProcessingEmailException {
+	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch)
+			throws CollectionNotFoundException, ProcessingEmailException {
 		
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
@@ -173,7 +175,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 				Integer collectionId = Integer.valueOf(fetch.getCollectionId());
 				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), bs));
 			} catch (NumberFormatException e) {
-				throw new CollectionNotFoundException();
+				throw new CollectionNotFoundException(e);
 			}
 		}
 		return mailboxFetchResponse;
@@ -214,7 +216,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		fetchResult.setServerId(serverId);
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+			PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {
@@ -237,7 +239,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (ProcessingEmailException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
-		} catch (PIMDataTypeNotFoundException e) {
+		} catch (CollectionPathException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (UnexpectedObmSyncServerException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
@@ -261,7 +263,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (ProcessingEmailException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
-		} catch (PIMDataTypeNotFoundException e) {
+		} catch (CollectionPathException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return emptyFolderContentsResult;

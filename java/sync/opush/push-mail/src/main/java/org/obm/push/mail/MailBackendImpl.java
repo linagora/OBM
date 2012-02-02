@@ -57,6 +57,7 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -155,7 +156,7 @@ public class MailBackendImpl implements MailBackend {
 		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " " + imapFolder);
 		ic.setItemType(type);
 
-		String imapPath = buildPath(bs, imapFolder);
+		String imapPath = CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, imapFolder);
 		String serverId;
 		try {
 			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), imapPath);
@@ -168,18 +169,9 @@ public class MailBackendImpl implements MailBackend {
 		ic.setServerId(serverId);
 		return ic;
 	}
-	
-	private String buildPath(BackendSession bs, String imapFolder) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("obm:\\\\");
-		sb.append(bs.getUser().getLoginAtDomain());
-		sb.append("\\email\\");
-		sb.append(imapFolder);
-		return sb.toString();
-	}
 
 	private String getWasteBasketPath(BackendSession bs) {
-		return buildPath(bs, "Trash");
+		return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, "Trash");
 	}
 
 	private MailChanges getSync(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 

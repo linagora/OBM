@@ -39,11 +39,12 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -128,7 +129,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
 			if (statusForItem.status == null) {
 				try {
-					PIMDataType dataClass = PIMDataType.getPIMDataType(statusForItem.srcCollection);
+					PIMDataType dataClass =  CollectionPathUtils.recognizePIMDataType(bs, statusForItem.srcCollection);
 					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
@@ -139,7 +140,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 				} catch (ProcessingEmailException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
-				} catch (PIMDataTypeNotFoundException e) {
+				} catch (CollectionPathException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 				}
 			}

@@ -37,8 +37,7 @@ import java.util.Map;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
@@ -48,8 +47,8 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
@@ -89,8 +88,7 @@ public class SyncDecoder {
 	}
 
 	public Sync decodeSync(Document doc, BackendSession backendSession) 
-			throws PartialException, ProtocolException, DaoException, PIMDataTypeNotFoundException {
-		
+			throws PartialException, ProtocolException, DaoException, CollectionPathException {
 		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
 		ret.setWait(getWait(root));
@@ -102,7 +100,7 @@ public class SyncDecoder {
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
-			SyncCollection collec = getCollection(backendSession.getCredentials(), backendSession.getDevice(), col, isPartial);
+			SyncCollection collec = getCollection(backendSession, col, isPartial);
 			ret.addCollection(collec);
 		}
 		syncedCollectionStoreService.put(backendSession.getCredentials(), backendSession.getDevice(), ret.getCollections());
@@ -125,15 +123,16 @@ public class SyncDecoder {
 		return ret;
 	}
 
-	private SyncCollection getCollection(Credentials credentials, Device device, Element col, boolean isPartial)
-			throws PartialException, ProtocolException, DaoException, PIMDataTypeNotFoundException{
+	private SyncCollection getCollection(BackendSession bs, Element col, boolean isPartial)
+			throws PartialException, ProtocolException, DaoException, CollectionPathException{
 		
 		SyncCollection collection = new SyncCollection();
 		Integer collectionId = getCollectionId(col);
 		if (collectionId == null) {
 			throw new ProtocolException("CollectionId can't be null");
 		}
-		SyncCollection lastSyncCollection = syncedCollectionStoreService.get(credentials, device, collectionId);
+		SyncCollection lastSyncCollection = 
+				syncedCollectionStoreService.get(bs.getCredentials(), bs.getDevice(), collectionId);
 		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}
@@ -141,7 +140,7 @@ public class SyncDecoder {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+			PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
 			collection.setDataType(dataType);
 			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
 			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));

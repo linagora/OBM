@@ -34,10 +34,11 @@ package org.obm.push;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.PIMDataTypeNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -81,9 +82,10 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
-			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, PIMDataTypeNotFoundException {
+			throws CollectionNotFoundException, NotAllowedException, DaoException, 
+			ProcessingEmailException, CollectionPathException {
 
-		PIMDataType dataType = PIMDataType.getPIMDataType(collectionPath);
+		PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
 		PIMBackend backend = backends.getBackend(dataType);
 		backend.emptyFolderContent(bs, collectionPath, deleteSubFolder);
 	}

@@ -61,8 +61,10 @@ import org.obm.icalendar.Ical4jUser;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -253,7 +255,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		final String boxName = collectionName.substring(slash + "email\\".length());
 		final MailboxFolders lr = listAllFolders(bs);
 		for (final MailboxFolder i: lr) {
-			if (i.getName().toLowerCase().contains(boxName.toLowerCase())) {
+			if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
 				return i.getName();
 			}
 		}
@@ -292,6 +294,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			login(store);
 			String srcMailBox = parseMailBoxName(bs, srcFolder);
 			String dstMailBox = parseMailBoxName(bs, dstFolder);
+
 			store.select(srcMailBox);
 			List<Long> uids = Arrays.asList(uid);
 			newUid = store.uidCopy(uids, dstMailBox);
@@ -460,13 +463,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		try {
 			login(store);
-			String sentFolderName = null;
-			MailboxFolders lr = listAllFolders(bs);
-			for (MailboxFolder i: lr) {
-				if (i.getName().toLowerCase().endsWith("sent")) {
-					sentFolderName = i.getName();
-				}
-			}
+			String sentBoxPath = CollectionPathUtils.buildCollectionPath(
+					bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+			String sentFolderName = parseMailBoxName(bs, sentBoxPath);
 			return storeMail(store, sentFolderName,true, mail, true);
 		} catch (IMAPException e) {
 			throw new MailException("Error during store mail in Sent folder", e);
