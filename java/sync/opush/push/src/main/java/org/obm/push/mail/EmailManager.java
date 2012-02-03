@@ -435,7 +435,8 @@ public class EmailManager implements IEmailManager {
 		StoreClient store = getImapClient(bs);
 		try {
 			login(store);
-			String sentFolderName = parseMailBoxName(bs, EmailConfiguration.IMAP_SENT_NAME);
+			String sentBoxPath = CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+			String sentFolderName = parseMailBoxName(bs, sentBoxPath);
 			return storeMail(store, sentFolderName,true, mail, true);
 		} catch (IMAPException e) {
 			throw new StoreEmailException("Error during store mail in Sent folder", e);
