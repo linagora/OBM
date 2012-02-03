@@ -106,8 +106,10 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		String opacity = DOMUtils.getElementTextInChildren(e, "opacity");
 		ev.setOpacity(EventOpacity.getValueOf(opacity));
 		ev.setTitle(s(e, "title"));
-		ev.setOwner(s(e, "owner"));
+		String owner = s(e, "owner");
+		ev.setOwner(owner);
 		ev.setOwnerEmail(s(e, "ownerEmail"));
+		ev.setOwnerDisplayName(owner);
 		String tz = s(e, "tz");
 		if (tz == null || tz.trim().length() == 0) {
 			tz = "Europe/Paris";

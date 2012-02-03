@@ -91,6 +91,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
+		Assert.assertEquals("john@do.fr", ev.getOwnerDisplayName());
 		Assert.assertEquals(3600, ev.getDuration());
 		Assert.assertEquals("tlse", ev.getLocation());
 		Assert.assertEquals(new Integer(60), ev.getAlert());
@@ -161,6 +162,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
+		Assert.assertEquals("john@do.fr", ev.getOwnerDisplayName());
 		Assert.assertEquals(3600, ev.getDuration());
 		Assert.assertEquals("tlse", ev.getLocation());
 		Assert.assertEquals(new Integer(60), ev.getAlert());
@@ -234,6 +236,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
+		Assert.assertEquals("john@do.fr", ev.getOwnerDisplayName());
 		Assert.assertEquals(3600, ev.getDuration());
 		Assert.assertEquals("tlse", ev.getLocation());
 		Assert.assertEquals(new Integer(60), ev.getAlert());
@@ -296,6 +299,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNull(ev.getExtId().getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
+		Assert.assertEquals("john@do.fr", ev.getOwnerDisplayName());
 		Assert.assertEquals(3600, ev.getDuration());
 		Assert.assertEquals("tlse", ev.getLocation());
 		Assert.assertEquals(new Integer(60), ev.getAlert());
@@ -388,6 +392,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals(EventType.VEVENT, evEx.getType());
 		Assert.assertEquals(1314081000000L, evEx.getRecurrenceId().getTime());
 		Assert.assertEquals("test2", evEx.getOwner());
+		Assert.assertEquals("test2", evEx.getOwnerDisplayName());
 		Assert.assertEquals(new Integer(2), evEx.getPriority());
 		Assert.assertEquals(0, evEx.getPrivacy());
 		Assert.assertEquals(1314077400000L, evEx.getDate().getTime());
