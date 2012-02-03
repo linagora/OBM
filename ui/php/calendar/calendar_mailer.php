@@ -248,7 +248,7 @@ class CalendarMailer extends OBM_Mailer {
   		}
   	}
   	$this->recipients = $recips;
-  	$this->subject = __('New recurrent event created by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->subject = __('New recurrent event from %organizer%: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
   	$this->body = $this->extractEventDetails($event, $this->from);
   	$this->attachIcs($event, "request", true);
   }
@@ -282,7 +282,7 @@ class CalendarMailer extends OBM_Mailer {
   		}
   	}
   	$this->recipients = $recips;
-  	$this->subject = __('Recurrent event cancelled by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->subject = __('Recurrent event from %organizer% cancelled: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
   	$this->body = $this->extractEventDetails($event, $this->from);
   	$this->attachIcs($event, "cancel");
   }
@@ -317,7 +317,7 @@ class CalendarMailer extends OBM_Mailer {
   		}
   	}
   	$this->recipients = $recips;
-  	$this->subject = __('Recurrent event updated by %sender%: %title%', array('%sender%'=>$event->owner->label, '%title%' => $event->title));
+  	$this->subject = __('Recurrent event from %organizer% updated: %title%', array('%organizer%'=>$event->owner->label, '%title%' => $event->title));
   	$this->body = array_merge($this->extractEventDetails($event, $this->from),
   	$this->extractEventDetails($oldEvent, $this->from, 'old_'));
   	$this->attachIcs($event, "request", true);
