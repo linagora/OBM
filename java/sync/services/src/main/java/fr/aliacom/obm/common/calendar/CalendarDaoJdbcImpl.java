@@ -729,7 +729,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String userEmailString = rs.getString("userobm_email");
 		if (userEmailString != null) {
 			String[] alias = userEmailString.split("\r\n");
-			if (!alias[0].contains("@")) {
+			if (alias[0].contains("@")) {
+				firstEmail = alias[0];
+			}
+			else {
 				firstEmail = alias[0] + "@" + domainName;
 			}
 		}
@@ -742,7 +745,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String creatorEmailString = rs.getString("creatorEmail");
 		if (creatorEmailString != null) {
 			String[] alias = creatorEmailString.split("\r\n");
-			if (!alias[0].contains("@")) {
+			if (alias[0].contains("@")) {
+				firstEmail = alias[0];
+			}
+			else {
 				firstEmail = alias[0] + "@" + domainName;
 			}
 		}
