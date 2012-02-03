@@ -111,7 +111,6 @@ require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 require('calendar_mailer.php');
 require('event_observer.php');
-require('../contact/addressbook.php');
 get_calendar_action();
 $perm->check_permissions($module, $action);
 
