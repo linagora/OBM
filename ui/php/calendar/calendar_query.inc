@@ -2099,7 +2099,7 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   	|| $repeat_kind != $oldEvent->repeat_kind 
   	|| $frequency != $oldEvent->repeatfrequency 
   	|| $repeat_days != $oldEvent->repeat_days
-  	|| $repeat_end != $oldEvent->repeat_end) {
+  	|| $repeat_end != $oldEvent_repeat_end) {
     
   	$deletedEventExceptionsId = run_query_delete_event_exceptions($event_id);
   	if(!empty($deletedEventExceptionsId)) {
