@@ -657,7 +657,10 @@ public class CalendarBindingImpl implements ICalendar {
 		List<Event> participationChanged = new ArrayList<Event>();
 		
 		for (Event event: changes.getUpdated()) {
-			if (event.modifiedSince(lastSync) || event.exceptionModifiedSince(lastSync)) {
+			// As Lightning does not know how to differentiate fake Exdate 
+			// from true Exdate from OBMFULL-3116, we put every recurrent event
+			// into updated tag for a getSync response.
+			if (event.modifiedSince(lastSync) || event.isRecurrent()) {
 				updated.add(event);
 			} else {
 				//means that only participation changed
