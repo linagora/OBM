@@ -50,15 +50,15 @@ require_once(dirname(__file__)."/../contact/addressbook.php");
 
 function run_query_calendar_detail($calendar_id) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if(preg_match('/^OBM-/', $calendar_id)) {
-    $get_id = "event_ext_id = '".addslashes($calendar_id)."'";
+    $get_id = "event_ext_id = '".$obm_q->escape($calendar_id)."'";
   } else {
     $parsed_calendar_id = sql_parse_id($calendar_id, true);
     $get_id = "event_id $parsed_calendar_id";
   }
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
@@ -138,15 +138,15 @@ function run_query_calendar_detail($calendar_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_detail_without_usercreate($calendar_id) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if(preg_match('/^OBM-/', $calendar_id)) {
-    $get_id = "event_ext_id = '".addslashes($calendar_id)."'";
+    $get_id = "event_ext_id = '".$obm_q->escape($calendar_id)."'";
   } else {
     $calendar_id = sql_parse_id($calendar_id, true);
     $get_id = "event_id $calendar_id";
   }
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
