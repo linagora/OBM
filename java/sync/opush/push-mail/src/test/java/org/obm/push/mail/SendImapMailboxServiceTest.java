@@ -102,7 +102,6 @@ public class SendImapMailboxServiceTest {
 	public void testParseSentMailBoxWhenManyNamedSentBox() throws Exception {
 		mailboxService.createFolder(bs, folder("AnyFolderSent"));
 		mailboxService.createFolder(bs, folder("Sent"));
-		mailboxService.createFolder(bs, folder("SENT"));
 		mailboxService.createFolder(bs, folder("AnotherSentfolder"));
 
 		String userSentFolder = 
@@ -113,9 +112,9 @@ public class SendImapMailboxServiceTest {
 	
 	@Test
 	public void testParseSentMailBox_OBMFULL3133() throws Exception {
-		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es/696846/Sent"));
+		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
 		mailboxService.createFolder(bs, folder("Sent"));
-		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es/696846/Sent"));
+		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
 
 		String userSentFolder = 
 				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
