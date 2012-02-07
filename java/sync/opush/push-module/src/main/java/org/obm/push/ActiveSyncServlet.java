@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
@@ -48,9 +49,9 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
+import org.obm.push.handler.AuthenticatedServlet;
 import org.obm.push.handler.IContinuationHandler;
 import org.obm.push.handler.IRequestHandler;
-import org.obm.push.handler.AuthenticatedServlet;
 import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.Responder;
@@ -62,9 +63,11 @@ import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
+import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 /**
  * ActiveSync server implementation. Routes all request to appropriate request
@@ -82,12 +85,11 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 	private final IBackend backend;
 
 	@Inject
-	protected ActiveSyncServlet(LoginService loginService,
-			SessionService sessionService, LoggerService loggerService,
-			IBackend backend, Factory continuationFactory, DeviceService deviceService, 
-			User.Factory userFactory, ResponderImpl.Factory responderFactory, Handlers handlers) {
+	protected ActiveSyncServlet(LoginService loginService, SessionService sessionService, LoggerService loggerService,
+			IBackend backend, Factory continuationFactory, DeviceService deviceService, User.Factory userFactory, 
+			ResponderImpl.Factory responderFactory, Handlers handlers, @Named(LoggerModule.AUTH)Logger authLogger) {
 	
-		super(loginService, loggerService, userFactory);
+		super(loginService, loggerService, userFactory, authLogger);
 		
 		this.sessionService = sessionService;
 		this.backend = backend;
@@ -156,7 +158,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} catch (AuthFault e) {
-			logger.warn(e.getMessage(), e);
+			authLogger.info(e.getMessage());
 			returnHttpUnauthorized(request, response);
 		} catch (BadRequestException e) {
 			logger.warn(e.getMessage());
@@ -199,8 +201,8 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		boolean initDevice = deviceService.initDevice(credentials.getUser(), deviceId, deviceType, userAgent);
 		boolean syncAutho = deviceService.syncAuthorized(credentials.getUser(), deviceId);
 		if (initDevice && syncAutho) {
-		
-			logger.debug("login/password ok & the device has been authorized");
+			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
+					new Object[]{ credentials.getUser().getEmail(), deviceType });
 			return credentials;
 		} else {
 			throw new AuthFault("The device has not been authorized");

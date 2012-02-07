@@ -20,21 +20,23 @@ import org.slf4j.LoggerFactory;
 public abstract class AuthenticatedServlet extends HttpServlet {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger authLogger;
 	
 	private final LoggerService loggerService;
 	private final User.Factory userFactory;
 	private final LoginService loginService;
 
 	protected AuthenticatedServlet(LoginService loginService, 
-			LoggerService loggerService, User.Factory userFactory) {
+			LoggerService loggerService, User.Factory userFactory, Logger authLogger) {
 		
 		this.loginService = loginService;
 		this.loggerService = loggerService;
 		this.userFactory = userFactory;
+		this.authLogger = authLogger;
 	}
 
 	protected void returnHttpUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-		logger.warn("invalid auth, sending http 401 ( uri = {}{}{} )", 
+		authLogger.info("Invalid auth, sending http 401 ( uri = {}{}{} )", 
 				new Object[] { 
 					httpServletRequest.getMethod(), 
 					httpServletRequest.getRequestURI(), 

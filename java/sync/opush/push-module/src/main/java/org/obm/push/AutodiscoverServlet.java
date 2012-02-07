@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
@@ -19,9 +20,11 @@ import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
+import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class AutodiscoverServlet extends AuthenticatedServlet {
@@ -31,9 +34,10 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 	
 	@Inject
 	protected AutodiscoverServlet(LoginService loginService, AutodiscoverHandler autodiscoverHandler, 
-			User.Factory userFactory, LoggerService loggerService, ResponderImpl.Factory responderFactory) {
+			User.Factory userFactory, LoggerService loggerService, ResponderImpl.Factory responderFactory, 
+			@Named(LoggerModule.AUTH)Logger authLogger) {
 		
-		super(loginService, loggerService, userFactory);
+		super(loginService, loggerService, userFactory, authLogger);
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
 	}
@@ -53,7 +57,7 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 			
 			autodiscoverHandler.process(null, backendSession, queryString, responder);
 		} catch (AuthFault e) {
-			logger.error(e.getMessage(), e);
+			authLogger.info(e.getMessage());
 			returnHttpUnauthorized(request, response);
 			return;
 		} catch (BadRequestException e) {

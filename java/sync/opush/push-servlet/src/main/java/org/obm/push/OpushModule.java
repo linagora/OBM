@@ -1,4 +1,5 @@
 package org.obm.push;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.OpushImplModule;
 import org.obm.push.mail.OpushMailModule;
 
@@ -10,5 +11,6 @@ public class OpushModule extends AbstractModule {
 	protected void configure() {
 		install(new OpushImplModule());
 		install(new OpushMailModule());
+		install(new LoggerModule());
 	}
 }
