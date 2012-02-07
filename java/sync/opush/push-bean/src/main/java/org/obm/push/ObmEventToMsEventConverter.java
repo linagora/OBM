@@ -54,6 +54,9 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+
 public class ObmEventToMsEventConverter {
 
 	public MSEvent convert(BackendSession bs, Event e, MSEventUid uid) {
@@ -191,8 +194,6 @@ public class ObmEventToMsEventConverter {
 		return r;
 	}
 
-
-
 	private MSAttendee convertAttendee(Attendee at) {
 		MSAttendee msa = new MSAttendee();
 
@@ -207,23 +208,24 @@ public class ObmEventToMsEventConverter {
 	private AttendeeType type() {
 		return AttendeeType.REQUIRED;
 	}
-
-	private AttendeeStatus status(ParticipationState state) {
+	
+	@VisibleForTesting AttendeeStatus status(ParticipationState state) {
+		Preconditions.checkNotNull(state);
 		switch (state) {
-		case COMPLETED:
-		case DELEGATED:
-			return AttendeeStatus.RESPONSE_UNKNOWN;
 		case DECLINED:
 			return AttendeeStatus.DECLINE;
-		case INPROGRESS:
 		case NEEDSACTION:
 			return AttendeeStatus.NOT_RESPONDED;
 		case TENTATIVE:
 			return AttendeeStatus.TENTATIVE;
-		default:
 		case ACCEPTED:
 			return AttendeeStatus.ACCEPT;
+		default:
+		case COMPLETED:
+		case DELEGATED:
+		case INPROGRESS:
+			return AttendeeStatus.RESPONSE_UNKNOWN;
 		}
 	}
-	
+
 }
