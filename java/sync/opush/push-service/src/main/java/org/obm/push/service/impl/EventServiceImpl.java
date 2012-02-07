@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
 		if (msEventUid == null) {
 			msEventUid = createMsEventUidFromEventExtId(event);
 		}
-		MSEvent msEvent = obmEventToMsEventConverter.convert(bs, event, msEventUid);
+		MSEvent msEvent = obmEventToMsEventConverter.convert(event, msEventUid, bs.getCredentials().getUser());
 		return msEvent;
 	}
 	

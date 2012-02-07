@@ -32,8 +32,6 @@
 package org.obm.sync.calendar;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class Attendee {
 
@@ -47,13 +45,11 @@ public class Attendee {
 	private boolean canWriteOnCalendar;
 	
 	public Attendee() {
-		this.emailAlias = ImmutableList.of();
 	}
 
 	public Attendee(Attendee attendee) {
 		this.state = attendee.state;
 		this.email = attendee.email;
-		this.emailAlias = Lists.newArrayList(attendee.emailAlias);
 		this.displayName = attendee.displayName;
 		this.percent = attendee.percent;
 		this.organizer = attendee.organizer;
