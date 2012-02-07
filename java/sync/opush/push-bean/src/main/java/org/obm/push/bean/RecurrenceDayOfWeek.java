@@ -133,4 +133,7 @@ public enum RecurrenceDayOfWeek {
 		return ret;
 	}
 
+	public static RecurrenceDayOfWeek getByIndex(int index) {
+		return values()[index];
+	}
 }

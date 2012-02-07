@@ -33,8 +33,6 @@ package org.obm.push.task;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.obm.push.bean.AttendeeStatus;
@@ -43,7 +41,7 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSTask;
 import org.obm.push.bean.Recurrence;
-import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -139,7 +137,7 @@ public class TaskConverter {
 			break;
 		case weekly:
 			r.setType(RecurrenceType.WEEKLY);
-			r.setDayOfWeek(daysOfWeek(recurrence.getDays()));
+			r.setDayOfWeek(RecurrenceDayOfWeekUtils.fromRecurrenceDays(recurrence.getDays()));
 			break;
 		case yearly:
 			r.setType(RecurrenceType.YEARLY);
@@ -153,78 +151,6 @@ public class TaskConverter {
 		r.setInterval(recurrence.getFrequence());
 
 		return r;
-	}
-
-	private String getDays(Set<RecurrenceDayOfWeek> dayOfWeek) {
-		StringBuilder sb = new StringBuilder();
-		if (dayOfWeek == null) {
-			return "0000000";
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.SUNDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.MONDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.TUESDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.WEDNESDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.THURSDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.FRIDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		if (dayOfWeek.contains(RecurrenceDayOfWeek.SATURDAY)) {
-			sb.append(1);
-		} else {
-			sb.append(0);
-		}
-		return sb.toString();
-	}
-
-	private Set<RecurrenceDayOfWeek> daysOfWeek(String string) {
-		char[] days = string.toCharArray();
-		Set<RecurrenceDayOfWeek> daysList = new HashSet<RecurrenceDayOfWeek>();
-		int i = 0;
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.SUNDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.MONDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.TUESDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.WEDNESDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.THURSDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.FRIDAY);
-		}
-		if (days[i++] == '1') {
-			daysList.add(RecurrenceDayOfWeek.SATURDAY);
-		}
-
-		return daysList;
 	}
 
 	public Event convert(BackendSession bs, Event oldEvent, MSTask task, Boolean isObmInternalEvent) {
@@ -322,7 +248,7 @@ public class TaskConverter {
 		switch (pr.getType()) {
 		case DAILY:
 			or.setKind(RecurrenceKind.daily);
-			or.setDays(getDays(pr.getDayOfWeek()));
+			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
 			multiply = Calendar.DAY_OF_MONTH;
 			break;
 		case MONTHLY:
@@ -335,7 +261,7 @@ public class TaskConverter {
 			break;
 		case WEEKLY:
 			or.setKind(RecurrenceKind.weekly);
-			or.setDays(getDays(pr.getDayOfWeek()));
+			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
 			multiply = Calendar.WEEK_OF_YEAR;
 			break;
 		case YEARLY:

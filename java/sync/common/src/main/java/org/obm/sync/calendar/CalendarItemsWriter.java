@@ -178,7 +178,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			}
 			if (r.getKind() == RecurrenceKind.weekly
 					|| r.getKind() == RecurrenceKind.daily) {
-				rec.setAttribute("days", r.getDays());
+				rec.setAttribute("days", new RecurrenceDaysSerializer().serialize(r.getDays()));
 				if (r.getFrequence() == 0) {
 					r.setFrequence(1);
 				}

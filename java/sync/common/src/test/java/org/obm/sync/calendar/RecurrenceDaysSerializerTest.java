@@ -29,29 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.bean;
+package org.obm.sync.calendar;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import org.fest.assertions.Assertions;
+import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
-public class EqualsVerifierUtils {
-
-	public void test(Class<?>... classes) {
-		for (Class<?> clazz: classes) {
-			createEqualsVerifier(clazz).verify();
-		}
+public class RecurrenceDaysSerializerTest {
+	@Test
+	public void testSerialize() {
+		RecurrenceDays repeatDays = new RecurrenceDays(RecurrenceDay.Monday,
+				RecurrenceDay.Wednesday, RecurrenceDay.Thursday);
+		String expectedString = "0101100";
+		String serializedString = new RecurrenceDaysSerializer().serialize(repeatDays);
+		Assertions.assertThat(serializedString).isEqualTo(expectedString);
 	}
 
-	public void test(ImmutableList<Class<?>> list) {
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
-		}
+	@Test
+	public void testSerializeEmptySet() {
+		RecurrenceDays repeatDays = new RecurrenceDays();
+		String expectedString = "";
+		String serializedString = new RecurrenceDaysSerializer().serialize(repeatDays);
+		Assertions.assertThat(serializedString).isEqualTo(expectedString);
 	}
 
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
+	@Test
+	public void testSerializeAllDays() {
+		RecurrenceDays repeatDays = new RecurrenceDays(RecurrenceDay.values());
+		String expectedString = "1111111";
+		String serializedString = new RecurrenceDaysSerializer().serialize(repeatDays);
+		Assertions.assertThat(serializedString).isEqualTo(expectedString);
 	}
-	
 }

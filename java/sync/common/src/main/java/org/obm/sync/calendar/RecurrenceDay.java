@@ -32,9 +32,10 @@
 package org.obm.sync.calendar;
 
 public enum RecurrenceDay {
+	// WARNING: We rely on values() and ordinal(), the order of the enum should not be modified
 	Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday;
 	
-	public final static int RECURRENCE_DAY_COUNT = 7;
+	public final static int RECURRENCE_DAY_COUNT = values().length;
 	
 	public static RecurrenceDay getByIndex(int i) {
 		return values()[i];

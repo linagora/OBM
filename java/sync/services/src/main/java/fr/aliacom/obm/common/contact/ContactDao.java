@@ -86,6 +86,8 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
@@ -413,7 +415,7 @@ public class ContactDao {
 		e.setDuration(3600);
 		e.setAllday(true);
 		EventRecurrence rec = new EventRecurrence();
-		rec.setDays("0000000");
+		rec.setDays(new RecurrenceDays());
 		rec.setFrequence(1);
 		rec.setKind(RecurrenceKind.yearly);
 		rec.setEnd(null);

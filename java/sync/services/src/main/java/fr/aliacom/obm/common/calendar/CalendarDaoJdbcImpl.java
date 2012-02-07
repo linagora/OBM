@@ -81,6 +81,8 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.DeletedEvent;
+import org.obm.sync.calendar.RecurrenceDaysParser;
+import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.SyncRange;
@@ -437,7 +439,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		EventRecurrence er = new EventRecurrence();
 		er.setKind(RecurrenceKind.valueOf(evrs.getString("event_repeatkind")));
-		er.setDays(evrs.getString("event_repeatdays"));
+		er.setDays(new RecurrenceDaysParser().parse(evrs.getString("event_repeatdays")));
 		er.setFrequence(evrs.getInt("event_repeatfrequence"));
 		if (evrs.getTimestamp("event_endrepeat") != null) {
 			cal.setTimeInMillis(evrs.getTimestamp("event_endrepeat").getTime());
@@ -505,7 +507,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		EventRecurrence r = ev.getRecurrence();
 		ps.setString(idx++, r.getKind().toString());
 		ps.setInt(idx++, r.getFrequence());
-		ps.setString(idx++, r.getDays());
+		ps.setString(idx++, new RecurrenceDaysSerializer().serialize(r.getDays()));
 		if (r.getEnd() != null) {
 			ps.setTimestamp(idx++, new Timestamp(r.getEnd().getTime()));
 		} else {
@@ -1696,7 +1698,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		EventRecurrence er = ev.getRecurrence();
 		ps.setString(13, er.getKind().toString());
 		ps.setInt(14, er.getFrequence());
-		ps.setString(15, er.getDays());
+		ps.setString(15, new RecurrenceDaysSerializer().serialize(er.getDays()));
 		if (er.getEnd() != null) {
 			ps.setTimestamp(16, new Timestamp(er.getEnd().getTime()));
 		} else {
@@ -2492,7 +2494,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ResultSet evrs) throws SQLException {
 		EventRecurrence er = new EventRecurrence();
 		er.setKind(RecurrenceKind.valueOf(evrs.getString("event_repeatkind")));
-		er.setDays(evrs.getString("event_repeatdays"));
+		er.setDays(new RecurrenceDaysParser().parse(evrs.getString("event_repeatdays")));
 		er.setFrequence(evrs.getInt("event_repeatfrequence"));
 		if (evrs.getTimestamp("event_endrepeat") != null) {
 			cal.setTimeInMillis(evrs.getTimestamp("event_endrepeat").getTime());

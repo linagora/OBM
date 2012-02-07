@@ -574,7 +574,7 @@ public class EventChangeMailer extends AbstractMailer {
 	private String buildRepeatDaysFromEventRecurrence(EventRecurrence eventRecurrence, final Locale locale) {
 		String repeatDaysString;
 		if (eventRecurrence.getKind() != RecurrenceKind.daily) {
-			Collection<RecurrenceDay> repeatDays= eventRecurrence.getReadableRepeatDays();
+			Collection<RecurrenceDay> repeatDays= eventRecurrence.getDays();
 			
 			List<RecurrenceDay> recurrenceDays = new ArrayList<RecurrenceDay>(
 					repeatDays.size());

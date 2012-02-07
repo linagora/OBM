@@ -29,29 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.bean;
+package org.obm.sync.calendar;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import java.util.EnumSet;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
-public class EqualsVerifierUtils {
-
-	public void test(Class<?>... classes) {
-		for (Class<?> clazz: classes) {
-			createEqualsVerifier(clazz).verify();
+public class RecurrenceDaysParser {
+	public RecurrenceDays parse(String daysString) {
+		if (Strings.isNullOrEmpty(daysString)) {
+			return new RecurrenceDays();
 		}
-	}
-
-	public void test(ImmutableList<Class<?>> list) {
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
+		Preconditions.checkArgument(daysString.length() == RecurrenceDay.RECURRENCE_DAY_COUNT,
+				"The length of repeat days must be %s: %s", RecurrenceDay.RECURRENCE_DAY_COUNT,
+				daysString.length());
+		for (char c : daysString.toCharArray()) {
+			Preconditions.checkArgument(c == '0' || c == '1', "Illegal char in repeat days: %s", c);
 		}
-	}
+		
+		EnumSet<RecurrenceDay> recurrenceDaysSet = EnumSet.noneOf(RecurrenceDay.class);
+		char[] days = daysString.toCharArray();
 
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
+		for (int i = 0; i < days.length; i++) {
+			if (days[i] == '1') {
+				recurrenceDaysSet.add(RecurrenceDay.getByIndex(i));
+			}
+		}
+		return new RecurrenceDays(recurrenceDaysSet);
 	}
-	
 }

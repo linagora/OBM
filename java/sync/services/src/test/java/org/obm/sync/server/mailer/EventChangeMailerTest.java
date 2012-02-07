@@ -69,6 +69,8 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
 
@@ -214,7 +216,7 @@ public class EventChangeMailerTest {
 			EventRecurrence recurrence = new EventRecurrence();
 			recurrence.setKind(RecurrenceKind.lookup("weekly"));
 			recurrence.setFrequence(2);
-			recurrence.setDays("0101100");
+			recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Thursday));
 			recurrence.setEnd(date(2012, 10, 23, 12, 00));
 			event.setRecurrence(recurrence);
 			return event;

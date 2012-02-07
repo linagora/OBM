@@ -29,29 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.bean;
+package org.obm.push.bean;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import java.util.EnumSet;
+import java.util.Set;
 
-import com.google.common.collect.ImmutableList;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
 
-public class EqualsVerifierUtils {
+import com.google.common.collect.Sets;
 
-	public void test(Class<?>... classes) {
-		for (Class<?> clazz: classes) {
-			createEqualsVerifier(clazz).verify();
+public class RecurrenceDayOfWeekUtils {
+	public static Set<RecurrenceDayOfWeek> fromRecurrenceDays(RecurrenceDays recurrenceDays) {
+		Set<RecurrenceDayOfWeek> recurrenceDaysOfWeek = Sets.newHashSet();
+		for (RecurrenceDay recurrenceDay : recurrenceDays) {
+			RecurrenceDayOfWeek recurrenceDayOfWeek = RecurrenceDayOfWeek.getByIndex(recurrenceDay
+					.ordinal());
+			recurrenceDaysOfWeek.add(recurrenceDayOfWeek);
 		}
+		return recurrenceDaysOfWeek;
 	}
 
-	public void test(ImmutableList<Class<?>> list) {
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
+	public static RecurrenceDays toRecurrenceDays(
+			Set<RecurrenceDayOfWeek> recurrenceDaysOfWeek) {
+		EnumSet<RecurrenceDay> recurrenceDays = EnumSet.noneOf(RecurrenceDay.class);
+		for (RecurrenceDayOfWeek recurrenceDayOfWeek : recurrenceDaysOfWeek) {
+			RecurrenceDay recurrenceDay = RecurrenceDay.getByIndex(recurrenceDayOfWeek.ordinal());
+			recurrenceDays.add(recurrenceDay);
 		}
+		return new RecurrenceDays(recurrenceDays);
 	}
-
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
-	}
-	
 }

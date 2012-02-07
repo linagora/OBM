@@ -29,29 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.bean;
+package org.obm.sync.calendar;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import org.fest.assertions.Assertions;
+import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
-public class EqualsVerifierUtils {
-
-	public void test(Class<?>... classes) {
-		for (Class<?> clazz: classes) {
-			createEqualsVerifier(clazz).verify();
-		}
+public class RecurrenceDaysParserTest {
+	@Test
+	public void testParse() {
+		RecurrenceDays repeatDays = new RecurrenceDaysParser().parse("0101100");
+		RecurrenceDays expectedSetOfDays = new RecurrenceDays(RecurrenceDay.Monday,
+				RecurrenceDay.Wednesday, RecurrenceDay.Thursday);
+		Assertions.assertThat(repeatDays).isEqualTo(expectedSetOfDays);
 	}
 
-	public void test(ImmutableList<Class<?>> list) {
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
-		}
+	@Test
+	public void testParseWithAllZeroDays() {
+		RecurrenceDays repeatDays = new RecurrenceDaysParser().parse("0000000");
+		Assertions.assertThat(repeatDays).isEmpty();
 	}
 
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
+	@Test
+	public void testParseWithNullRepeatDays() {
+		RecurrenceDays repeatDays = new RecurrenceDaysParser().parse(null);
+		Assertions.assertThat(repeatDays).isEmpty();
 	}
-	
+
+	@Test
+	public void testParseWithEmptyRepeatDays() {
+		RecurrenceDays repeatDays = new RecurrenceDaysParser().parse("");
+		Assertions.assertThat(repeatDays).isEmpty();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testParseDaysWithMoreDaysThanEnumSize() {
+		new RecurrenceDaysParser().parse("00000000");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testParseDaysWithLessDaysThanEnumSize() {
+		new RecurrenceDaysParser().parse("000000");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetDaysWithIllegalCharacter() {
+		new RecurrenceDaysParser().parse("0000200");
+	}
+
 }

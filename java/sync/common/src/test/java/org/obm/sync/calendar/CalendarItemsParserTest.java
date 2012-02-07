@@ -34,6 +34,7 @@ package org.obm.sync.calendar;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -339,7 +340,7 @@ public class CalendarItemsParserTest {
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 		
 		Assert.assertEquals(RecurrenceKind.none, ev.getRecurrence().getKind());
-		Assert.assertEquals(null, ev.getRecurrence().getDays());
+		Assert.assertEquals(EnumSet.noneOf(RecurrenceDay.class), ev.getRecurrence().getDays());
 	}
 
 	@Test
@@ -403,6 +404,6 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals("test2@par.lng", evEx.getOwnerEmail());
 		Assert.assertEquals(1, evEx.getSequence());
 		Assert.assertEquals(2, evEx.getAttendees().size());
-		Assert.assertEquals("0000000", ev.getRecurrence().getDays());
+		Assert.assertEquals(EnumSet.noneOf(RecurrenceDay.class), ev.getRecurrence().getDays());
 	}
 }

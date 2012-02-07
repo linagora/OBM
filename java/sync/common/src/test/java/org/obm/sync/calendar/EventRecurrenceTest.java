@@ -35,7 +35,6 @@ package org.obm.sync.calendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.fest.assertions.Assertions;
@@ -72,60 +71,7 @@ public class EventRecurrenceTest {
 		Assert.assertNotNull(exception);
 		Assert.assertEquals(e1, exception);
 	}
-	
-	@Test
-	public void testGetReadableRepeatDays() {
-		EventRecurrence rec1 = new EventRecurrence();
-		
-		rec1.setDays("0101100");
-		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
-		EnumSet<RecurrenceDay> expectedEnumSetOfDays = EnumSet.of(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Thursday);
-		Assert.assertEquals(repeatDays, expectedEnumSetOfDays);
-	}
-	
-	@Test
-	public void testGetReadableRepeatDaysWithAllZeroDays() {
-		EventRecurrence rec1 = new EventRecurrence();
-		
-		rec1.setDays("0000000");
-		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
-		Assert.assertTrue(repeatDays.isEmpty());
-	}
 
-	@Test
-	public void testGetReadableRepeatDaysWithNullRepeatDays() {
-		EventRecurrence rec1 = new EventRecurrence();
-		
-		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
-		Assert.assertTrue(repeatDays.isEmpty());
-	}
-
-	@Test
-	public void testGetReadableRepeatDaysWithEmptyRepeatDays() {
-		EventRecurrence rec1 = new EventRecurrence();
-		
-		EnumSet<RecurrenceDay> repeatDays = rec1.getReadableRepeatDays();
-		Assert.assertTrue(repeatDays.isEmpty());
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testsetDaysWithMoreDaysThanEnumSize() {
-		EventRecurrence rec1 = new EventRecurrence();
-		rec1.setDays("00000000");
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testsetDaysWithLessDaysThanEnumSize() {
-		EventRecurrence rec1 = new EventRecurrence();
-		rec1.setDays("000000");		
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testSetDaysWithIllegalCharacter() {
-		EventRecurrence rec1 = new EventRecurrence();
-		rec1.setDays("0000200");			
-	}
-	
 	@Test
 	public void testDailyIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.daily);

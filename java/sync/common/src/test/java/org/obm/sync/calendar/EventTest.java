@@ -687,7 +687,8 @@ public class EventTest {
 	private EventRecurrence createDailyRecurrenceUntil(Date endDate) {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setDays("1111111");
+		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Sunday, RecurrenceDay.Monday,
+				RecurrenceDay.Thursday, RecurrenceDay.Friday, RecurrenceDay.Saturday));
 		recurrence.setEnd(endDate);
 		recurrence.setFrequence(1);
 		return recurrence;

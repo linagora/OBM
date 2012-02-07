@@ -468,7 +468,9 @@ boolean result = comparator.equivalent(e1, e2);
 		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
 		Event e1 = getMockBeforeSequenceEvent();
 		Event e2 = getMockAfterSequenceEvent();
-		e2.getRecurrence().setDays("1010101");
+		e2.getRecurrence().setDays(
+				new RecurrenceDays(RecurrenceDay.Sunday, RecurrenceDay.Tuesday,
+						RecurrenceDay.Thursday, RecurrenceDay.Saturday));
 		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
@@ -885,7 +887,9 @@ boolean result = comparator.equivalent(e1, e2);
 		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
 		Event e1 = getMockBeforeTimeUpdateEvent();
 		Event e2 = getMockAfterTimeUpdateEvent();
-		e2.getRecurrence().setDays("1010101");
+		e2.getRecurrence().setDays(
+				new RecurrenceDays(RecurrenceDay.Sunday, RecurrenceDay.Tuesday,
+						RecurrenceDay.Thursday, RecurrenceDay.Saturday));
 		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);

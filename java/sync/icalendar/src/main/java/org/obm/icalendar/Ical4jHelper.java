@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -128,12 +129,16 @@ import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
@@ -151,6 +156,12 @@ public class Ical4jHelper {
 	private static final String XOBMORIGIN = "X-OBM-ORIGIN";
 
 	private static Logger logger = LoggerFactory.getLogger(Ical4jHelper.class);
+	private static final BiMap<RecurrenceDay, WeekDay> RECURRENCE_DAY_TO_WEEK_DAY = new ImmutableBiMap.Builder<RecurrenceDay, WeekDay>()
+			.put(RecurrenceDay.Sunday, WeekDay.SU).put(RecurrenceDay.Monday, WeekDay.MO)
+			.put(RecurrenceDay.Tuesday, WeekDay.TU).put(RecurrenceDay.Wednesday, WeekDay.WE)
+			.put(RecurrenceDay.Thursday, WeekDay.TH).put(RecurrenceDay.Friday, WeekDay.FR)
+			.put(RecurrenceDay.Saturday, WeekDay.SA).build();
+	private static final BiMap<WeekDay, RecurrenceDay> WEEK_DAY_TO_RECURRENCE_DAY = RECURRENCE_DAY_TO_WEEK_DAY.inverse();
 	
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
 		Calendar calendar = initCalendar();
@@ -1034,24 +1045,13 @@ public class Ical4jHelper {
 
 	/* package */ Set<WeekDay> getListDay(EventRecurrence eventRecurrence) {
 		Set<WeekDay> listDay = new HashSet<WeekDay>();
-		String days = eventRecurrence.getDays();
-		if (days != null && !"".equals(days)) {
-			char[] c = days.toCharArray();
-			List<WeekDay> listAcceptDay = new ArrayList<WeekDay>();
-			listAcceptDay.add(WeekDay.SU);
-			listAcceptDay.add(WeekDay.MO);
-			listAcceptDay.add(WeekDay.TU);
-			listAcceptDay.add(WeekDay.WE);
-			listAcceptDay.add(WeekDay.TH);
-			listAcceptDay.add(WeekDay.FR);
-			listAcceptDay.add(WeekDay.SA);
-
-			for (int i = 0; i < listAcceptDay.size() || i < c.length; i++) {
-				char day = c[i];
-				if (!"0".equals(String.valueOf(day))) {
-					listDay.add(listAcceptDay.get(i));
-				}
+		RecurrenceDays recurrenceDays = eventRecurrence.getDays();
+		for (RecurrenceDay recurrenceDay : recurrenceDays) {
+			WeekDay weekDay = RECURRENCE_DAY_TO_WEEK_DAY.get(recurrenceDay);
+			if (weekDay == null) {
+				throw new IllegalArgumentException("Unknown recurrence day " + recurrenceDay);
 			}
+			listDay.add(weekDay);
 		}
 		return listDay;
 	}
@@ -1112,19 +1112,17 @@ public class Ical4jHelper {
 				Property.RRULE);
 
 		EventRecurrence er = new EventRecurrence();
+		EnumSet<RecurrenceDay> recurrenceDays = EnumSet.noneOf(RecurrenceDay.class);
 		if (rrule != null) {
 			Recur recur = rrule.getRecur();
-			Map<WeekDay, Integer> days = new HashMap<WeekDay, Integer>();
-			days.put(WeekDay.SU, 0);
-			days.put(WeekDay.MO, 0);
-			days.put(WeekDay.TU, 0);
-			days.put(WeekDay.WE, 0);
-			days.put(WeekDay.TH, 0);
-			days.put(WeekDay.FR, 0);
-			days.put(WeekDay.SA, 0);
 			boolean setDays = false;
 			for (Object ob : recur.getDayList()) {
-				days.put((WeekDay) ob, 1);
+				WeekDay weekDay = (WeekDay) ob;
+				RecurrenceDay recurrenceDay = WEEK_DAY_TO_RECURRENCE_DAY.get(weekDay);
+				if (recurrenceDay == null) {
+					throw new IllegalArgumentException("Unknown week day " + weekDay);
+				}
+				recurrenceDays.add(recurrenceDay);
 				setDays = true;
 			}
 			if (Recur.WEEKLY.equals(rrule.getRecur().getFrequency())
@@ -1135,40 +1133,30 @@ public class Ical4jHelper {
 				cal.setTime(start.getDate());
 				switch (cal.get(GregorianCalendar.DAY_OF_WEEK)) {
 				case 1:
-					days.put(WeekDay.SU, 1);
+					recurrenceDays.add(RecurrenceDay.Sunday);
 					break;
 				case 2:
-					days.put(WeekDay.MO, 1);
+					recurrenceDays.add(RecurrenceDay.Monday);
 					break;
 				case 3:
-					days.put(WeekDay.TU, 1);
+					recurrenceDays.add(RecurrenceDay.Tuesday);
 					break;
 				case 4:
-					days.put(WeekDay.WE, 1);
+					recurrenceDays.add(RecurrenceDay.Wednesday);
 					break;
 				case 5:
-					days.put(WeekDay.TH, 1);
+					recurrenceDays.add(RecurrenceDay.Thursday);
 					break;
 				case 6:
-					days.put(WeekDay.FR, 1);
+					recurrenceDays.add(RecurrenceDay.Friday);
 					break;
 				case 7:
-					days.put(WeekDay.SA, 1);
+					recurrenceDays.add(RecurrenceDay.Saturday);
 					break;
 				}
 
 			}
-			StringBuilder sb = new StringBuilder();
-
-			sb.append(days.get(WeekDay.SU));
-			sb.append(days.get(WeekDay.MO));
-			sb.append(days.get(WeekDay.TU));
-			sb.append(days.get(WeekDay.WE));
-			sb.append(days.get(WeekDay.TH));
-			sb.append(days.get(WeekDay.FR));
-			sb.append(days.get(WeekDay.SA));
-
-			er.setDays(sb.toString());
+			er.setDays(new RecurrenceDays(recurrenceDays));
 			er.setEnd(recur.getUntil());
 			PropertyList exdates = component.getProperties(Property.EXDATE);
 			Set<Date> dates = new HashSet<Date>();
@@ -1185,7 +1173,7 @@ public class Ical4jHelper {
 			}
 
 			er.setFrequence(recur.getInterval());
-			if (isEmpty(er.getDays()) || "0000000".equals(er.getDays())) {
+			if (er.getDays().isEmpty()) {
 				if (Recur.DAILY.equals(recur.getFrequency())) {
 					er.setKind(RecurrenceKind.daily);
 				} else if (Recur.WEEKLY.equals(recur.getFrequency())) {

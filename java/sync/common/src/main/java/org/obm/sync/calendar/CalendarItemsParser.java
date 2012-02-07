@@ -190,11 +190,9 @@ public class CalendarItemsParser extends AbstractItemsParser {
 				er.setEnd(DateHelper.asDate(rec.getAttribute("end")));
 			}
 			er.setFrequence(Integer.parseInt(rec.getAttribute("freq")));
-			String daysAttr = rec.getAttribute("days");
-			String days = Strings.isNullOrEmpty(daysAttr) ? "0000000" : daysAttr;
-			er.setDays(days);
-			if (er.getDays() != null && !"".equals(er.getDays())
-					&& !"0000000".equals(er.getDays())) {
+			RecurrenceDays recurrenceDays = new RecurrenceDaysParser().parse(rec.getAttribute("days"));
+			er.setDays(recurrenceDays);
+			if (!er.getDays().isEmpty()) {
 				er.setKind(RecurrenceKind.weekly);
 				if (er.getFrequence() == 0) {
 					er.setFrequence(1);

@@ -34,8 +34,7 @@ package org.obm.sync;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.obm.sync.calendar.RecurrenceDays;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -50,11 +49,7 @@ public class BeansTest {
 	
 	@Test
 	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ObmDomain.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class);
 	}
 	
 }

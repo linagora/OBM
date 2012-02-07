@@ -29,29 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.bean;
+package org.obm.sync.calendar;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import com.google.common.base.Preconditions;
 
-import com.google.common.collect.ImmutableList;
+public class RecurrenceDaysSerializer {
 
-public class EqualsVerifierUtils {
-
-	public void test(Class<?>... classes) {
-		for (Class<?> clazz: classes) {
-			createEqualsVerifier(clazz).verify();
+	public String serialize(RecurrenceDays days) {
+		Preconditions.checkNotNull(days);
+		if (days.isEmpty()) {
+			return "";
 		}
-	}
 
-	public void test(ImmutableList<Class<?>> list) {
-		for (Class<?> clazz: list) {
-			createEqualsVerifier(clazz).verify();
+		char[] dayChars = new char[RecurrenceDay.RECURRENCE_DAY_COUNT];
+		RecurrenceDay[] allRecurrenceDays = RecurrenceDay.values();
+		for (int i = 0; i < allRecurrenceDays.length; i++) {
+			RecurrenceDay day = allRecurrenceDays[i];
+			char dayChar = days.contains(day) ? '1' : '0';
+			dayChars[i] = dayChar;
 		}
+		return new String(dayChars);
 	}
-
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
-		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
-	}
-	
 }

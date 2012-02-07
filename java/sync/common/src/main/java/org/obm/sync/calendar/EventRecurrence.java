@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,12 +42,11 @@ import org.obm.push.utils.collection.Sets;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class EventRecurrence {
 
-	private String days;
+	private RecurrenceDays days;
 	private Date end;
 	private int frequence;
 	private RecurrenceKind kind;
@@ -59,25 +57,18 @@ public class EventRecurrence {
 		this.exceptions = new LinkedList<Date>();
 		this.eventExceptions = new LinkedList<Event>();
 		this.kind = kind;
+		this.days = new RecurrenceDays();
 	}
 
 	public EventRecurrence() {
 		this(RecurrenceKind.none);
 	}
 
-	public String getDays() {
+	public RecurrenceDays getDays() {
 		return days;
 	}
 
-	public void setDays(String days) {
-		if(!Strings.isNullOrEmpty(days)) {
-			int size = days.length();
-			Preconditions.checkArgument(size == RecurrenceDay.RECURRENCE_DAY_COUNT, "The length of repeat days must be 7: %s", size);
-			for (char c : days.toCharArray()) {
-				Preconditions.checkArgument(c == '0' || c == '1', "Illegal char in repeat days: %s", c);
-			}
-		}
-
+	public void setDays(RecurrenceDays days) {
 		this.days = days;
 	}
 
@@ -174,20 +165,6 @@ public class EventRecurrence {
 			}
 		}
 		return null;
-	}
-	
-	public EnumSet<RecurrenceDay> getReadableRepeatDays() {	
-		EnumSet<RecurrenceDay> recurrenceDaysSet = EnumSet.noneOf(RecurrenceDay.class);
-		if (!Strings.isNullOrEmpty(days) && !days.equals("0000000")) {
-			char[] daysToCharArray = days.toCharArray();
-			
-			for (int i = 0; i < daysToCharArray.length; i++) {
-				if (daysToCharArray[i] == '1') {
-					recurrenceDaysSet.add(RecurrenceDay.getByIndex(i));
-				}
-			}
-		}
-		return recurrenceDaysSet;
 	}
 
 	public boolean isRecurrent() {

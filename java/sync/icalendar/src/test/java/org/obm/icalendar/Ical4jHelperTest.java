@@ -46,6 +46,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +98,8 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Splitter;
@@ -224,7 +227,8 @@ public class Ical4jHelperTest {
 		cal.add(Calendar.MONTH, 1);
 		er.addException(cal.getTime());
 
-		er.setDays("0111110");
+		er.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Tuesday, RecurrenceDay.Wednesday,
+				RecurrenceDay.Thursday, RecurrenceDay.Friday));
 		er.setEnd(null);
 		event1.setRecurrence(er);
 
@@ -247,7 +251,8 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetListDay() {
 		EventRecurrence er = new EventRecurrence();
-		er.setDays("1010101");
+		er.setDays(new RecurrenceDays(RecurrenceDay.Sunday, RecurrenceDay.Tuesday, RecurrenceDay.Thursday,
+				RecurrenceDay.Saturday));
 		Set<WeekDay> swd = getIcal4jHelper().getListDay(er);
 		assertTrue(swd.contains(WeekDay.SU));
 		assertTrue(swd.contains(WeekDay.TU));
@@ -416,7 +421,9 @@ public class Ical4jHelperTest {
 		EventRecurrence er = event.getRecurrence();
 		assertNotNull(er);
 		assertEquals(1, er.getFrequence());
-		assertEquals("0111110", er.getDays());
+		assertEquals(EnumSet.of(RecurrenceDay.Monday, RecurrenceDay.Tuesday,
+				RecurrenceDay.Wednesday, RecurrenceDay.Thursday, RecurrenceDay.Friday),
+				er.getDays());
 		assertEquals(RecurrenceKind.weekly, er.getKind());
 		Assertions.assertThat(er.getExceptions()).hasSize(1);
 	}
@@ -564,7 +571,7 @@ public class Ical4jHelperTest {
 		event.setDate(cal.getTime());
 
 		EventRecurrence er = new EventRecurrence();
-		er.setDays("1111111");
+		er.setDays(new RecurrenceDays());
 		er.setKind(RecurrenceKind.daily);
 
 		Date[] except = new Date[2];
@@ -726,7 +733,8 @@ public class Ical4jHelperTest {
 		cal.add(Calendar.MONTH, 1);
 		er.addException(cal.getTime());
 
-		er.setDays("0111110");
+		er.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Tuesday, RecurrenceDay.Wednesday,
+				RecurrenceDay.Thursday, RecurrenceDay.Friday));
 		er.setEnd(null);
 		event.setRecurrence(er);
 
