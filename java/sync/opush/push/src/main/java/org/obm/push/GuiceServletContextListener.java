@@ -41,6 +41,7 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ObmConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.IBackend;
@@ -119,7 +120,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(LocatorService.class).to(LocatorCache.class);
 				bind(EventService.class).to(EventServiceImpl.class);
 			}
-    	}, new TransactionalModule(), new DaoModule(), new OpushServletModule());
+    	}, new TransactionalModule(), new DaoModule(), new LoggerModule(), new OpushServletModule());
     }
     
     private void failStartup(String message) { 

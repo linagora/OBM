@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
@@ -89,6 +90,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 /**
  * ActiveSync server implementation. Routes all request to appropriate request
@@ -110,13 +112,14 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final User.Factory userFactory;
 
 	private final org.obm.push.impl.ResponderImpl.Factory responderFactory;
+	private final Logger authLogger;
 
 	
 	@Inject
 	protected ActiveSyncServlet(SessionService sessionService, LoggerService loggerService,
 			IBackend backend, Factory continuationFactory,
 			DeviceService deviceService, User.Factory userFactory,
-			ResponderImpl.Factory responderFactory) {
+			ResponderImpl.Factory responderFactory, @Named(LoggerModule.AUTH)Logger authLogger) {
 		super();
 		this.sessionService = sessionService;
 		this.loggerService = loggerService;
@@ -125,6 +128,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.deviceService = deviceService;
 		this.userFactory = userFactory;
 		this.responderFactory = responderFactory;
+		this.authLogger = authLogger;
 	}
 
 	@Override
@@ -287,7 +291,7 @@ public class ActiveSyncServlet extends HttpServlet {
 						} catch (InvalidParameterException e) {
 							//will be logged later
 						} catch (AuthFault e) {
-							logger.error(e.getMessage(), e);
+							authLogger.info(e.getMessage());
 						}
 					}
 				}
@@ -305,8 +309,10 @@ public class ActiveSyncServlet extends HttpServlet {
 		boolean initDevice = deviceService.initDevice(user, deviceId, deviceType, userAgent);
 		boolean syncAutho = deviceService.syncAuthorized(user, deviceId);
 		if (initDevice && syncAutho) {
-			logger.debug("login/password ok & the device has been authorized");
-			return new Credentials(user, password);
+			Credentials credentials = new Credentials(user, password);
+			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
+					new Object[]{ credentials.getUser().getEmail(), deviceType });
+			return credentials;
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}
@@ -315,7 +321,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private void returnHttpUnauthorized(HttpServletRequest httpServletRequest,
 			HttpServletResponse response) {
 
-		logger.warn("invalid auth, sending http 401 ( uri = {}{}{} )", 
+		authLogger.info("Invalid auth, sending http 401 ( uri = {}{}{} )",
 				new Object[] { 
 					httpServletRequest.getMethod(), 
 					httpServletRequest.getRequestURI(), 
