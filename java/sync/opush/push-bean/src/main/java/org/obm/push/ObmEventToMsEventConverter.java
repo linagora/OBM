@@ -154,13 +154,15 @@ public class ObmEventToMsEventConverter {
 		return ret;
 	}
 
-	private CalendarBusyStatus busyStatus(EventOpacity opacity) {
+	@VisibleForTesting CalendarBusyStatus busyStatus(EventOpacity opacity) {
+		Preconditions.checkNotNull(opacity);
 		switch (opacity) {
 		case TRANSPARENT:
 			return CalendarBusyStatus.FREE;
-		default:
+		case OPAQUE:
 			return CalendarBusyStatus.BUSY;
 		}
+		throw new IllegalArgumentException("EventOpacity " + opacity + " can't be converted to MSEvent property");
 	}
 
 	private Recurrence getRecurrence(Event event) {
