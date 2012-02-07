@@ -122,6 +122,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
@@ -550,9 +551,9 @@ public class Ical4jHelper {
 		if (classification != null
 				&& (Clazz.PRIVATE.equals(classification) || Clazz.CONFIDENTIAL
 						.equals(classification))) {
-			event.setPrivacy(1);
+			event.setPrivacy(EventPrivacy.PRIVATE);
 		} else {
-			event.setPrivacy(0);
+			event.setPrivacy(EventPrivacy.PUBLIC);
 		}
 
 	}
@@ -1374,8 +1375,8 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	/* package */ Clazz getClazz(int privacy) {
-		if (0 == privacy) {
+	/* package */ Clazz getClazz(EventPrivacy privacy) {
+		if (EventPrivacy.PUBLIC == privacy) {
 			return Clazz.PUBLIC;
 		}
 		return Clazz.PRIVATE;

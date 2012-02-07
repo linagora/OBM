@@ -44,6 +44,7 @@ import org.apache.solr.common.SolrInputField;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +156,7 @@ public class EventIndexer implements Runnable {
 		f(sid, "is", (e.isAllday() ? "allday" : null),
 				(e.isRecurrent() ? "periodic" : null),
 				(e.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
-				(e.getPrivacy() == 1 ? "private" : null));
+				(e.getPrivacy() == EventPrivacy.PRIVATE ? "private" : null));
 
 		// state is unused
 

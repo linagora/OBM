@@ -45,6 +45,7 @@ import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
@@ -73,7 +74,7 @@ public class TaskConverter {
 		} else {
 			mse.setImportance(2);
 		}
-		mse.setSensitivity(e.getPrivacy() == 0 ? CalendarSensitivity.NORMAL
+		mse.setSensitivity(e.getPrivacy() == EventPrivacy.PUBLIC ? CalendarSensitivity.NORMAL
 				: CalendarSensitivity.PRIVATE);
 
 		if (e.getPercent() != null) {
@@ -221,18 +222,18 @@ public class TaskConverter {
 		return e;
 	}
 
-	private int privacy(Event oldEvent, CalendarSensitivity sensitivity) {
+	private EventPrivacy privacy(Event oldEvent, CalendarSensitivity sensitivity) {
 		if (sensitivity == null) {
-			return oldEvent != null ? oldEvent.getPrivacy() : 0;
+			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
 		}
 		switch (sensitivity) {
 		case CONFIDENTIAL:
 		case PERSONAL:
 		case PRIVATE:
-			return 1;
+			return EventPrivacy.PRIVATE;
 		case NORMAL:
 		default:
-			return 0;
+			return EventPrivacy.PUBLIC;
 		}
 	}
 

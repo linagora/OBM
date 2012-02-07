@@ -396,7 +396,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals("test2", evEx.getOwner());
 		Assert.assertEquals("test2", evEx.getOwnerDisplayName());
 		Assert.assertEquals(new Integer(2), evEx.getPriority());
-		Assert.assertEquals(0, evEx.getPrivacy());
+		Assert.assertEquals(EventPrivacy.PUBLIC, evEx.getPrivacy());
 		Assert.assertEquals(1314077400000L, evEx.getDate().getTime());
 		Assert.assertEquals(3600, evEx.getDuration());
 		Assert.assertEquals(new Integer(-1), evEx.getAlert());

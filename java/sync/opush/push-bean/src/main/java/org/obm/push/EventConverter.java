@@ -51,6 +51,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
@@ -284,18 +285,18 @@ public class EventConverter {
 		return att;
 	}	
 	
-	private int privacy(Event oldEvent, CalendarSensitivity sensitivity) {
+	private EventPrivacy privacy(Event oldEvent, CalendarSensitivity sensitivity) {
 		if (sensitivity == null) {
-			return oldEvent != null ? oldEvent.getPrivacy() : 0;
+			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
 		}
 		switch (sensitivity) {
 		case CONFIDENTIAL:
 		case PERSONAL:
 		case PRIVATE:
-			return 1;
+			return EventPrivacy.PRIVATE;
 		case NORMAL:
 		default:
-			return 0;
+			return EventPrivacy.PUBLIC;
 		}
 
 	}

@@ -195,7 +195,7 @@ public class EventRecurrenceTest {
 		event.setOwnerEmail("owner email");
 		event.setPercent(1);
 		event.setPriority(1);
-		event.setPrivacy(1);
+		event.setPrivacy(EventPrivacy.PRIVATE);
 		event.setSequence(0);
 		event.setTimeCreate(new Date());
 		event.setTimeUpdate(new Date());

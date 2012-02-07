@@ -72,6 +72,7 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventParticipationState;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
@@ -432,7 +433,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setDate(cal.getTime());
 		e.setDuration(evrs.getInt("event_duration"));
 		e.setPriority(evrs.getInt("event_priority"));
-		e.setPrivacy(evrs.getInt("event_privacy"));
+		e.setPrivacy(EventPrivacy.fromSqlIntCode(evrs.getInt("event_privacy")));
 		e.setAllday(evrs.getBoolean("event_allday"));
 		e.setDescription(evrs.getString("event_description"));
 		e.setSequence(evrs.getInt("event_sequence"));
@@ -496,7 +497,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setNull(idx++, Types.INTEGER);
 		}
 		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
-		ps.setInt(idx++, ev.getPrivacy());
+		ps.setInt(idx++, ev.getPrivacy().toSqlIntCode());
 		if (ev.getDate() != null) {
 			ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
 		} else {
@@ -1691,7 +1692,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		// do not allow making a private event become public from sync
 		// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
 		// .getPrivacy());
-		ps.setInt(9, ev.getPrivacy());
+		ps.setInt(9, ev.getPrivacy().toSqlIntCode());
 		ps.setTimestamp(10, new Timestamp(ev.getDate().getTime()));
 		ps.setInt(11, ev.getDuration());
 		ps.setBoolean(12, ev.isAllday());

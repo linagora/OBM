@@ -17,4 +17,8 @@ ALTER TABLE p_domain ADD COLUMN domain_uuid CHAR(36);
 UPDATE p_domain p SET domain_uuid=( select domain_uuid FROM domain d where d.domain_id=p.domain_id);
 ALTER TABLE p_domain ALTER domain_uuid SET NOT NULL;
 
+UPDATE event SET event_privacy=0 WHERE event_privacy IS NULL;
+ALTER TABLE event ALTER event_privacy SET DEFAULT 0;
+ALTER TABLE event ALTER event_privacy SET NOT NULL;
+
 UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';

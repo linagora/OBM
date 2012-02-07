@@ -160,7 +160,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 
 		createIfNotNull(e, "priority", (ev.getPriority() != null ? ""
 				+ ev.getPriority() : "0"));
-		createIfNotNull(e, "privacy", "" + ev.getPrivacy());
+		createIfNotNull(e, "privacy", String.valueOf(ev.getPrivacy().toSqlIntCode()));
 		Element atts = DOMUtils.createElement(e, "attendees");
 		List<Attendee> la = ev.getAttendees();
 		if (la != null) {

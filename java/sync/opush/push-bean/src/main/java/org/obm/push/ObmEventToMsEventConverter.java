@@ -51,6 +51,7 @@ import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
 
@@ -119,8 +120,8 @@ public class ObmEventToMsEventConverter {
 		mse.setDtStamp(mse.getLastUpdate());
 	}
 
-	private CalendarSensitivity getSensitivity(int privacy) {
-		if(privacy == 1){
+	@VisibleForTesting CalendarSensitivity getSensitivity(EventPrivacy privacy) {
+		if(privacy == EventPrivacy.PRIVATE){
 			return CalendarSensitivity.PRIVATE;
 		}
 		return CalendarSensitivity.NORMAL;

@@ -82,6 +82,7 @@ import org.obm.sync.book.Website;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
@@ -419,7 +420,7 @@ public class ContactDao {
 		rec.setKind(RecurrenceKind.yearly);
 		rec.setEnd(null);
 		e.setRecurrence(rec);
-		e.setPrivacy(1);
+		e.setPrivacy(EventPrivacy.PRIVATE);
 		e.setPriority(1);
 		Attendee at = new Attendee();
 		at.setEmail(token.getUserEmail());

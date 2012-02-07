@@ -46,9 +46,10 @@ import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -59,7 +60,7 @@ public class Event implements Indexed<Integer> {
 	private String description;
 	private EventObmId uid;
 	private EventExtId extId;
-	private int privacy;
+	private EventPrivacy privacy;
 	private String owner;
 	private String ownerDisplayName;
 	private String ownerEmail;
@@ -98,6 +99,7 @@ public class Event implements Indexed<Integer> {
 		timezoneName = "Europe/Paris";
 		sequence = 0;
 		recurrence = new EventRecurrence();
+		privacy = EventPrivacy.PUBLIC;
 	}
 
 	public String getTitle() {
@@ -158,14 +160,12 @@ public class Event implements Indexed<Integer> {
 		this.description = description;
 	}
 
-	/*
-	 * public=0 et privé=1
-	 */
-	public int getPrivacy() {
+	public EventPrivacy getPrivacy() {
 		return privacy;
 	}
 
-	public void setPrivacy(int privacy) {
+	public void setPrivacy(EventPrivacy privacy) {
+		Preconditions.checkNotNull(privacy);
 		this.privacy = privacy;
 	}
 

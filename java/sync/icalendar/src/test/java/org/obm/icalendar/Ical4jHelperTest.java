@@ -95,6 +95,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
@@ -316,18 +317,22 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testGetPrivacy() {
+	public void testGetPrivacyPublic() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PUBLIC);
 		Event event = getIcal4jHelper().convertVEventToEvent(getDefaultObmUser(), vEvent);
-		assertEquals(0, event.getPrivacy());
-
-		vEvent = new VEvent();
-		vEvent.getProperties().add(Clazz.PRIVATE);
-		Event event1 = getIcal4jHelper().convertVEventToEvent(getDefaultObmUser(), vEvent);
-		assertEquals(1, event1.getPrivacy());
+		assertEquals(EventPrivacy.PUBLIC, event.getPrivacy());
 	}
 
+	@Test
+	public void testGetPrivacyPrivate() {
+		VEvent vEvent = new VEvent();
+		vEvent.getProperties().add(Clazz.PRIVATE);
+		Event event1 = getIcal4jHelper().convertVEventToEvent(getDefaultObmUser(), vEvent);
+		assertEquals(EventPrivacy.PRIVATE, event1.getPrivacy());
+	}
+
+	
 	@Test
 	public void testGetOwner() throws URISyntaxException {
 		Organizer orga = new Organizer();
@@ -622,17 +627,22 @@ public class Ical4jHelperTest {
 	}	
 	
 	@Test
-	public void testGetClazz() {
+	public void testGetPublicClazz() {
 		Event event = new Event();
-		event.setPrivacy(0);
+		event.setPrivacy(EventPrivacy.PUBLIC);
 		Clazz clazz = getIcal4jHelper().getClazz(event.getPrivacy());
 		assertEquals("PUBLIC", clazz.getValue());
+	}
 
-		event.setPrivacy(1);
-		clazz = getIcal4jHelper().getClazz(event.getPrivacy());
+	@Test
+	public void testGetPrivateClazz() {
+		Event event = new Event();
+		event.setPrivacy(EventPrivacy.PRIVATE);
+		Clazz clazz = getIcal4jHelper().getClazz(event.getPrivacy());
 		assertEquals("PRIVATE", clazz.getValue());
 	}
 
+	
 	@Test
 	public void testGetOrganizer() {
 		Event event = new Event();
