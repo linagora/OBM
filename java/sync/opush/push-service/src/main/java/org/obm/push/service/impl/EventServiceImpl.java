@@ -1,7 +1,7 @@
 package org.obm.push.service.impl;
 
 import org.apache.commons.codec.binary.Hex;
-import org.obm.push.EventConverter;
+import org.obm.push.ObmEventToMsEventConverter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
@@ -21,13 +21,13 @@ import com.google.inject.Singleton;
 public class EventServiceImpl implements EventService {
 
 	private final CalendarDao calendarDao;
-	private final EventConverter eventConverter;
-
+	private final ObmEventToMsEventConverter obmEventToMsEventConverter;
+	
 	@Inject
-	private EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter) {
+	private EventServiceImpl(CalendarDao calendarDao, ObmEventToMsEventConverter obmEventToMsEventConverter) {
 		super();
 		this.calendarDao = calendarDao;
-		this.eventConverter = eventConverter;
+		this.obmEventToMsEventConverter = obmEventToMsEventConverter;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
 		if (msEventUid == null) {
 			msEventUid = createMsEventUidFromEventExtId(event);
 		}
-		MSEvent msEvent = eventConverter.convert(bs, event, msEventUid);
+		MSEvent msEvent = obmEventToMsEventConverter.convert(bs, event, msEventUid);
 		return msEvent;
 	}
 	
