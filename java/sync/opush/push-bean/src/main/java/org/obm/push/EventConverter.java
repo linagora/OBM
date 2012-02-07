@@ -246,7 +246,7 @@ public class EventConverter {
 		Attendee ret = new Attendee();
 		ret.setEmail(at.getEmail());
 		ret.setDisplayName(at.getName());
-		ret.setRequired(ParticipationRole.REQ);
+		ret.setParticipationRole(ParticipationRole.REQ);
 		
 		ParticipationState status = getParticipationState( 
 				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
@@ -280,7 +280,7 @@ public class EventConverter {
 		att.setEmail(email);
 		att.setDisplayName(displayName);
 		att.setState(ParticipationState.ACCEPTED);
-		att.setRequired(ParticipationRole.REQ);
+		att.setParticipationRole(ParticipationRole.REQ);
 		att.setOrganizer(true);
 		return att;
 	}	

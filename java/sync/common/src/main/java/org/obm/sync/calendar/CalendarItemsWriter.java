@@ -205,7 +205,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		at.setAttribute("email", a.getEmail());
 		at.setAttribute("state", (a.getState() != null ? a.getState()
 				.toString() : ParticipationState.NEEDSACTION.toString()));
-		at.setAttribute("required", (a.getRequired() != null ? a.getRequired()
+		at.setAttribute("required", (a.getParticipationRole() != null ? a.getParticipationRole()
 				.toString() : ParticipationRole.OPT.toString()));
 		at.setAttribute("percent", "" + a.getPercent());
 		return at;

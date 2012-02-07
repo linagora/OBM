@@ -699,7 +699,7 @@ public class Ical4jHelperTest {
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		Role role = getIcal4jHelper().getRole(at);
 		assertEquals(role, Role.CHAIR);
@@ -720,7 +720,7 @@ public class Ical4jHelperTest {
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		PartStat ps = getIcal4jHelper().getPartStat(at);
 		assertEquals(ps, PartStat.ACCEPTED);
@@ -846,26 +846,26 @@ public class Ical4jHelperTest {
 		at1.setDisplayName("OBM ORGANIZER");
 		at1.setEmail("obm@obm.org");
 		at1.setState(ParticipationState.ACCEPTED);
-		at1.setRequired(ParticipationRole.CHAIR);
+		at1.setParticipationRole(ParticipationRole.CHAIR);
 		at1.setOrganizer(true);
 		
 		final Attendee at2 = new Attendee();
 		at2.setDisplayName("OBM USER 2");
 		at2.setEmail("obm2@obm.org");
 		at2.setState(ParticipationState.ACCEPTED);
-		at2.setRequired(ParticipationRole.REQ);
+		at2.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at3 = new Attendee();
 		at3.setDisplayName("OBM USER 3");
 		at3.setEmail("obm3@obm.org");
 		at3.setState(ParticipationState.ACCEPTED);
-		at3.setRequired(ParticipationRole.REQ);
+		at3.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at4 = new Attendee();
 		at4.setDisplayName("OBM USER 4");
 		at4.setEmail("obm4@obm.org");
 		at4.setState(ParticipationState.DECLINED);
-		at4.setRequired(ParticipationRole.REQ);
+		at4.setParticipationRole(ParticipationRole.REQ);
 		
 		event.addAttendee(at1);
 		event.addAttendee(at2);

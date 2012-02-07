@@ -86,7 +86,7 @@ public class EventNotificationServiceTestTools {
 	static Attendee createRequiredAttendee(String email, ParticipationState state) {
 		Attendee attendee = new Attendee();
 		attendee.setEmail(email);
-		attendee.setRequired(ParticipationRole.REQ);
+		attendee.setParticipationRole(ParticipationRole.REQ);
 		attendee.setState(state);
 		attendee.setCanWriteOnCalendar(false);
 		return attendee;

@@ -166,7 +166,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			at.setDisplayName(attendee[0]);
 			at.setEmail(attendee[1]);
 			at.setState(ParticipationState.getValueOf(attendee[2]));
-			at.setRequired(ParticipationRole.valueOf(attendee[3]));
+			at.setParticipationRole(ParticipationRole.valueOf(attendee[3]));
 			if (attendee[4] != null && !attendee[4].equals("")) {
 				at.setPercent(Integer.parseInt(attendee[4]));
 			} else {

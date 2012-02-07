@@ -1231,7 +1231,7 @@ public class Ical4jHelper {
 			if (param != null) {
 				int index = param.getValue().indexOf("-");
 				if (index != -1) {
-					att.setRequired(ParticipationRole.valueOf(param.getValue()
+					att.setParticipationRole(ParticipationRole.valueOf(param.getValue()
 							.substring(0, index).replace("-", "")));
 				}
 			}
@@ -1276,7 +1276,7 @@ public class Ical4jHelper {
 						Cn cn = (Cn) cnParam;
 						organizer.setDisplayName(cn.getValue());
 					}
-					organizer.setRequired(ParticipationRole.REQ);
+					organizer.setParticipationRole(ParticipationRole.REQ);
 					organizer.setState(ParticipationState.ACCEPTED);
 					organizer.setOrganizer(true);
 					emails.put(organizer.getEmail(), organizer);
@@ -1452,13 +1452,13 @@ public class Ical4jHelper {
 
 	/* package */ Role getRole(Attendee attendee) {
 		Role role = Role.OPT_PARTICIPANT;
-		if (ParticipationRole.CHAIR.equals(attendee.getRequired())) {
+		if (ParticipationRole.CHAIR.equals(attendee.getParticipationRole())) {
 			role = Role.CHAIR;
-		} else if (ParticipationRole.NON.equals(attendee.getRequired())) {
+		} else if (ParticipationRole.NON.equals(attendee.getParticipationRole())) {
 			role = Role.NON_PARTICIPANT;
-		} else if (ParticipationRole.OPT.equals(attendee.getRequired())) {
+		} else if (ParticipationRole.OPT.equals(attendee.getParticipationRole())) {
 			role = Role.OPT_PARTICIPANT;
-		} else if (ParticipationRole.REQ.equals(attendee.getRequired())) {
+		} else if (ParticipationRole.REQ.equals(attendee.getParticipationRole())) {
 			role = Role.REQ_PARTICIPANT;
 		}
 
@@ -1555,7 +1555,7 @@ public class Ical4jHelper {
 			if (param != null) {
 				int index = param.getValue().indexOf("-");
 				if (index != -1) {
-					att.setRequired(ParticipationRole.valueOf(param.getValue()
+					att.setParticipationRole(ParticipationRole.valueOf(param.getValue()
 							.substring(0, index).replace("-", "")));
 				}
 			}

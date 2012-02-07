@@ -95,14 +95,14 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		la.add(at);
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		la.add(at);
 		ev.setAttendees(la);
 		ev.setAlert(60);
@@ -172,7 +172,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		
 		boolean result = comparator.equivalent(e1, e2);
@@ -218,7 +218,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		boolean result = comparator.equivalent(e1, e2);
 		
@@ -609,7 +609,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		
 		boolean result = comparator.equivalent(e1, e2);
@@ -638,7 +638,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		boolean result = comparator.equivalent(e1, e2);
 		

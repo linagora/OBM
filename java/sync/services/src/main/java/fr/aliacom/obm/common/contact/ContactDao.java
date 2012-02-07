@@ -424,7 +424,7 @@ public class ContactDao {
 		e.setPriority(1);
 		Attendee at = new Attendee();
 		at.setEmail(token.getUserEmail());
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setState(ParticipationState.ACCEPTED);
 		e.addAttendee(at);
 

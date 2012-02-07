@@ -311,7 +311,7 @@ public class TaskConverter {
 		}
 		Attendee ret = new Attendee();
 		ret.setEmail(bs.getCredentials().getUser().getEmail());
-		ret.setRequired(ParticipationRole.REQ);
+		ret.setParticipationRole(ParticipationRole.REQ);
 		ret.setState(status(oldState, AttendeeStatus.ACCEPT));
 		return ret;
 	}

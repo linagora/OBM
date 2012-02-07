@@ -180,7 +180,7 @@ public class EventConverterTest {
 		Assert.assertEquals(email, organizer.getEmail());
 		Assert.assertNull(organizer.getDisplayName());
 		Assert.assertEquals(ParticipationState.ACCEPTED, organizer.getState());
-		Assert.assertEquals(ParticipationRole.REQ, organizer.getRequired());
+		Assert.assertEquals(ParticipationRole.REQ, organizer.getParticipationRole());
 		Assert.assertTrue(organizer.isOrganizer());
 	}
 

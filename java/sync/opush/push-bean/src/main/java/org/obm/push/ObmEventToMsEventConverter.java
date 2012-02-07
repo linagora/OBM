@@ -53,6 +53,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -164,6 +165,49 @@ public class ObmEventToMsEventConverter {
 		}
 		throw new IllegalArgumentException("EventOpacity " + opacity + " can't be converted to MSEvent property");
 	}
+	
+	private MSAttendee convertAttendee(Attendee at) {
+		MSAttendee msa = new MSAttendee();
+
+		msa.setAttendeeStatus(status(at.getState()));
+		msa.setEmail(at.getEmail());
+		msa.setName(at.getDisplayName());
+		msa.setAttendeeType(participationRole(at.getParticipationRole()));
+
+		return msa;
+	}
+
+	@VisibleForTesting AttendeeStatus status(ParticipationState state) {
+		Preconditions.checkNotNull(state);
+		switch (state) {
+		case DECLINED:
+			return AttendeeStatus.DECLINE;
+		case NEEDSACTION:
+			return AttendeeStatus.NOT_RESPONDED;
+		case TENTATIVE:
+			return AttendeeStatus.TENTATIVE;
+		case ACCEPTED:
+			return AttendeeStatus.ACCEPT;
+		default:
+		case COMPLETED:
+		case DELEGATED:
+		case INPROGRESS:
+			return AttendeeStatus.RESPONSE_UNKNOWN;
+		}
+	}
+
+	@VisibleForTesting AttendeeType participationRole(ParticipationRole role) {
+		Preconditions.checkNotNull(role);
+		switch (role) {
+		case REQ:
+		case CHAIR:
+			return AttendeeType.REQUIRED;
+		case NON:
+		case OPT:
+			return AttendeeType.OPTIONAL;
+		}
+		throw new IllegalArgumentException("ParticipationRole " + role + " can't be converted to MSEvent property");
+	}
 
 	private Recurrence getRecurrence(Event event) {
 		
@@ -199,40 +243,6 @@ public class ObmEventToMsEventConverter {
 		r.setInterval(recurrence.getFrequence());
 
 		return r;
-	}
-
-	private MSAttendee convertAttendee(Attendee at) {
-		MSAttendee msa = new MSAttendee();
-
-		msa.setAttendeeStatus(status(at.getState()));
-		msa.setEmail(at.getEmail());
-		msa.setName(at.getDisplayName());
-		msa.setAttendeeType(type());
-
-		return msa;
-	}
-
-	private AttendeeType type() {
-		return AttendeeType.REQUIRED;
-	}
-	
-	@VisibleForTesting AttendeeStatus status(ParticipationState state) {
-		Preconditions.checkNotNull(state);
-		switch (state) {
-		case DECLINED:
-			return AttendeeStatus.DECLINE;
-		case NEEDSACTION:
-			return AttendeeStatus.NOT_RESPONDED;
-		case TENTATIVE:
-			return AttendeeStatus.TENTATIVE;
-		case ACCEPTED:
-			return AttendeeStatus.ACCEPT;
-		default:
-		case COMPLETED:
-		case DELEGATED:
-		case INPROGRESS:
-			return AttendeeStatus.RESPONSE_UNKNOWN;
-		}
 	}
 
 }

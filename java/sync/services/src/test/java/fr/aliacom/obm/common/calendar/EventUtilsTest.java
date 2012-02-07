@@ -75,7 +75,7 @@ public class EventUtilsTest {
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(true);
 		la.add(at);
@@ -93,7 +93,7 @@ public class EventUtilsTest {
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(false);
 		la.add(at);
@@ -111,7 +111,7 @@ public class EventUtilsTest {
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
 		la.add(at);
@@ -120,7 +120,7 @@ public class EventUtilsTest {
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(false);
 		la.add(at);
@@ -137,7 +137,7 @@ public class EventUtilsTest {
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
 		at.setState(ParticipationState.NEEDSACTION);
-		at.setRequired(ParticipationRole.CHAIR);
+		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
 		la.add(at);
@@ -146,7 +146,7 @@ public class EventUtilsTest {
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
 		at.setState(ParticipationState.ACCEPTED);
-		at.setRequired(ParticipationRole.OPT);
+		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(true);
 		la.add(at);

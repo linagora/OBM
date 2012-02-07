@@ -42,7 +42,7 @@ public class Attendee {
 	private ParticipationState state;
 	private String email;
 	private List<String> emailAlias;
-	private ParticipationRole required;
+	private ParticipationRole participationRole;
 	private String displayName;
 	private int percent;
 	private boolean organizer;
@@ -57,7 +57,6 @@ public class Attendee {
 		this.state = attendee.state;
 		this.email = attendee.email;
 		this.emailAlias = Lists.newArrayList(attendee.emailAlias);
-		this.required = attendee.required;
 		this.displayName = attendee.displayName;
 		this.percent = attendee.percent;
 		this.organizer = attendee.organizer;
@@ -89,12 +88,12 @@ public class Attendee {
 		this.emailAlias = emailAlias;
 	}
 	
-	public ParticipationRole getRequired() {
-		return required;
+	public ParticipationRole getParticipationRole() {
+		return participationRole;
 	}
 
-	public void setRequired(ParticipationRole role) {
-		this.required = role;
+	public void setParticipationRole(ParticipationRole role) {
+		this.participationRole = role;
 	}
 
 	public String getDisplayName() {
