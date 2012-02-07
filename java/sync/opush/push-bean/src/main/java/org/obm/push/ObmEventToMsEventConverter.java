@@ -89,7 +89,7 @@ public class ObmEventToMsEventConverter {
 		mse.setExtId(e.getExtId());
 		mse.setObmId(e.getObmId());
 		mse.setBusyStatus(busyStatus(e.getOpacity()));
-		mse.setSensitivity(getSensitivity(e.getPrivacy()));
+		mse.setSensitivity(sensitivity(e.getPrivacy()));
 		mse.setObmSequence(e.getSequence());
 		appendCreatedLastUpdate(mse, e);
 		return mse;
@@ -120,11 +120,15 @@ public class ObmEventToMsEventConverter {
 		mse.setDtStamp(mse.getLastUpdate());
 	}
 
-	@VisibleForTesting CalendarSensitivity getSensitivity(EventPrivacy privacy) {
-		if(privacy == EventPrivacy.PRIVATE){
+	@VisibleForTesting CalendarSensitivity sensitivity(EventPrivacy privacy) {
+		Preconditions.checkNotNull(privacy);
+		switch (privacy) {
+		case PRIVATE:
 			return CalendarSensitivity.PRIVATE;
+		case PUBLIC:
+			return CalendarSensitivity.NORMAL;
 		}
-		return CalendarSensitivity.NORMAL;
+		throw new IllegalArgumentException("EventPrivacy " + privacy + " can't be converted to MSEvent property");
 	}
 
 	private List<MSEvent> getException(BackendSession bs, Event event) {

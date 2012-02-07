@@ -35,10 +35,10 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.AttendeeStatus;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.push.bean.CalendarSensitivity;
+import org.obm.sync.calendar.EventPrivacy;
 
-public class ObmEventToMsEventConverterParticipationStateTest {
+public class ObmEventToMsEventConverterSensitivityTest {
 
 	private ObmEventToMsEventConverter converter;
 
@@ -48,50 +48,21 @@ public class ObmEventToMsEventConverterParticipationStateTest {
 	}
 
 	@Test(expected=NullPointerException.class)
-	public void testNullParticipationState() {
-		converter.status(null);
+	public void testNullConversion() {
+		converter.sensitivity(null);
 	}
+
 	
 	@Test
-	public void testAcceptedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.ACCEPTED);
-		assertThat(status).isEqualTo(AttendeeStatus.ACCEPT);
+	public void testPublicConversion() {
+		CalendarSensitivity sensitivity = converter.sensitivity(EventPrivacy.PUBLIC);
+		assertThat(sensitivity).isEqualTo(CalendarSensitivity.NORMAL);
 	}
 
 	@Test
-	public void testCompletedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.COMPLETED);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testDeclinedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DECLINED);
-		assertThat(status).isEqualTo(AttendeeStatus.DECLINE);
-	}
-
-	@Test
-	public void testDelegatedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DELEGATED);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testInProgressParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.INPROGRESS);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testNeedActionParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.NEEDSACTION);
-		assertThat(status).isEqualTo(AttendeeStatus.NOT_RESPONDED);
-	}
-
-	@Test
-	public void testTentativeParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.TENTATIVE);
-		assertThat(status).isEqualTo(AttendeeStatus.TENTATIVE);
+	public void testPrivateConversion() {
+		CalendarSensitivity sensitivity = converter.sensitivity(EventPrivacy.PRIVATE);
+		assertThat(sensitivity).isEqualTo(CalendarSensitivity.PRIVATE);
 	}
 
 }
