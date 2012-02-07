@@ -255,6 +255,32 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.getTimeCreate()).isNull();
 		Assertions.assertThat(convertedEvent.getTimeUpdate()).isNull();
 	}
+
+	@Test
+	public void testConvertAttributeDescription() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withDescription("any description")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getDescription()).isEqualTo(msEvent.getDescription());
+	}
+	
+	@Test
+	public void testConvertAttributeDescriptionNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withDescription(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getDescription()).isNull();
+	}
 	
 	@Test
 	public void testConvertExceptionAttributeDeletedTrue() throws IllegalMSEventStateException {
