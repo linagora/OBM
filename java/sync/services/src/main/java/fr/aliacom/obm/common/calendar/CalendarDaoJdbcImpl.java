@@ -174,7 +174,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "o.userobm_login as owner, domain_name, o.userobm_firstname as ownerFirstName, "
 			+ "o.userobm_lastname as ownerLastName,  o.userobm_commonname as ownerCommonName, " 
 			+ "o.userobm_email,"
-			+ "c.userobm_login as creator, "
 			+ "c.userobm_firstname as creatorFirstName, "
 			+ "c.userobm_lastname as creatorLastName,"
 			+ "c.userobm_commonname as creatorCommonName, "
@@ -452,7 +451,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setOwner(evrs.getString("owner"));
 		e.setOwnerEmail( getUserObmEmail(evrs, evrs.getString("domain_name")) );
 		e.setOwnerDisplayName(getOwnerDisplayName(evrs));
-		e.setCreator(evrs.getString("creator"));
 		e.setCreatorEmail(getCreatorObmEmail(evrs, evrs.getString("domain_name")));
 		e.setCreatorDisplayName(getCreatorDisplayName(evrs));
 		if (evrs.getTimestamp("recurrence_id") != null) {

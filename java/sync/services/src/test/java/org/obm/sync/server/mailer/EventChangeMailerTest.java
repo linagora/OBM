@@ -185,7 +185,6 @@ public class EventChangeMailerTest {
 			event.setOwner("raphael");
 			event.setOwnerDisplayName("Raphael ROUGERON");
 			event.setOwnerEmail("rrougeron@linagora.com");
-			event.setCreator("emmanuel");
 			event.setCreatorDisplayName("Emmanuel SURLEAU");
 			event.setCreatorEmail("esurleau@linagora.com");
 			event.setDate(date(2010, 10, 8, 11, 00));

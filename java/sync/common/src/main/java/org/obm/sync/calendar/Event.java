@@ -64,7 +64,6 @@ public class Event implements Indexed<Integer> {
 	private String owner;
 	private String ownerDisplayName;
 	private String ownerEmail;
-	private String creator;
 	private String creatorDisplayName;
 	private String creatorEmail;
 	private String location;
@@ -302,7 +301,6 @@ public class Event implements Indexed<Integer> {
 		event.setOwner(owner);
 		event.setOwnerDisplayName(ownerDisplayName);
 		event.setOwnerEmail(ownerEmail);
-		event.setCreator(creator);
 		event.setCreatorDisplayName(creatorDisplayName);
 		event.setCreatorEmail(creatorEmail);
 		event.setPercent(percent);
@@ -401,14 +399,6 @@ public class Event implements Indexed<Integer> {
 
 	public void setOwnerDisplayName(String ownerDisplayName) {
 		this.ownerDisplayName = ownerDisplayName;
-	}
-
-	public String getCreator() {
-		return creator;
-	}
-
-	public void setCreator(String creator) {
-		this.creator = creator;
 	}
 
 	public String getCreatorDisplayName() {
@@ -660,7 +650,7 @@ public class Event implements Indexed<Integer> {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(title, domain, description, uid, extId, privacy, owner,
-				ownerDisplayName, ownerEmail, creator, creatorDisplayName, creatorEmail, location,
+				ownerDisplayName, ownerEmail, creatorDisplayName, creatorEmail, location,
 				date, duration, alert, category, priority, allday, attendees, recurrence, type,
 				completion, percent, opacity, entityId, timeUpdate, timeCreate, timezoneName,
 				recurrenceId, internalEvent, sequence);
@@ -679,7 +669,6 @@ public class Event implements Indexed<Integer> {
 				&& Objects.equal(this.owner, that.owner)
 				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName)
 				&& Objects.equal(this.ownerEmail, that.ownerEmail)
-				&& Objects.equal(this.creator, that.creator)
 				&& Objects.equal(this.creatorDisplayName, that.creatorDisplayName)
 				&& Objects.equal(this.creatorEmail, that.creatorEmail)
 				&& Objects.equal(this.location, that.location)
