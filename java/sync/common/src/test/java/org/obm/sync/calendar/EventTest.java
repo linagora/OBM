@@ -633,7 +633,6 @@ public class EventTest {
 		event.setAllday(true);
 		event.setAttendees( createAttendees(nbAttendees) );
 		event.setCategory("category");
-		event.setCompletion(currentDate);
 		event.setDate(currentDate);
 		event.setDescription("description");
 		event.setDomain("domain");

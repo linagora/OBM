@@ -87,8 +87,6 @@ public class TaskConverter {
 		mse.setUtcDueDate(dateTimeEnd);
 		mse.setDueDate(getDateInTimeZone(dateTimeEnd, e.getTimezoneName()));
 
-		mse.setDateCompleted(e.getCompletion());
-
 		// if (e.getAlert() != null && e.getAlert() != 0) {
 		// mse.setReminderSet(true);
 		// Calendar cal = Calendar.getInstance();
@@ -190,7 +188,6 @@ public class TaskConverter {
 			e.setDate(cal.getTime());
 		}
 
-		e.setCompletion(task.getDateCompleted());
 		int importance = Objects.firstNonNull(task.getImportance(), TASK_IMPORTANCE_NORMAL);
 		switch (importance) {
 		case 0:

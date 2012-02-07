@@ -181,7 +181,6 @@ public class EventRecurrenceTest {
 		event.setAllday(true);
 		event.setAttendees( createAttendees(nbAttendees) );
 		event.setCategory("category");
-		event.setCompletion(new Date());
 		event.setDescription("description");
 		event.setDomain("domain");
 		event.setDuration(10);

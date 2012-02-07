@@ -241,14 +241,6 @@ public class Event implements Indexed<Integer> {
 		this.type = type;
 	}
 
-	public Date getCompletion() {
-		return completion;
-	}
-
-	public void setCompletion(Date completion) {
-		this.completion = completion;
-	}
-
 	public Integer getPercent() {
 		return percent;
 	}
@@ -299,7 +291,6 @@ public class Event implements Indexed<Integer> {
 		event.setAllday(allday);
 		event.addAttendees(copyAttendees());
 		event.setCategory(category);
-		event.setCompletion(completion);
 		event.setDate(date);
 		event.setDescription(description);
 		event.setDomain(domain);

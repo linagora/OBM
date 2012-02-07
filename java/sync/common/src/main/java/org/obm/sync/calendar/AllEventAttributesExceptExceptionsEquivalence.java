@@ -58,9 +58,6 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 		if (!Objects.equal(o1.getCategory(), o2.getCategory())) {
 			return false;
 		}
-		if (!Objects.equal(o1.getCompletion(), o2.getCompletion())) {
-			return false;
-		}
 		if (!Objects.equal(o1.getDescription(), o2.getDescription())) {
 			return false;
 		}
@@ -146,7 +143,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 		return Objects.hashCode(t.getTitle(), t.getDomain(), t.getDescription(),
 				t.getObmId(), t.getExtId(), t.getPrivacy(), t.getOwner(), t.getOwnerDisplayName(), t.getOwnerEmail(),
 				t.getLocation(), t.getDate(), t.getDuration(), t.getAlert(), t.getCategory(), t.getPriority(), t.isAllday(),
-				t.getAttendees(), t.getType(), t.getCompletion(), t.getPercent(), t.getOpacity(),
+				t.getAttendees(), t.getType(), t.getPercent(), t.getOpacity(),
 				t.getEntityId(), t.getTimeUpdate(), t.getTimeCreate(), t.getTimezoneName(), t.getRecurrenceId(),
 				t.isInternalEvent(), t.getSequence());
 	}
