@@ -498,11 +498,11 @@ class Vcalendar_Writer_OBM {
 
   function getEventAttendees($eventId){
     $db = new DB_OBM;
-    $query =  "SELECT     userobm.*
-               FROM       event
-               INNER JOIN eventlink ON event.event_id = eventlink.eventlink_event_id
-               INNER JOIN userentity ON eventlink.eventlink_entity_id = userentity.userentity_entity_id
-               INNER JOIN userobm ON userentity.userentity_user_id = userobm.userobm_id
+    $query =  "SELECT     UserObm.*
+               FROM       Event
+               INNER JOIN EventLink ON Event.event_id = EventLink.eventlink_event_id
+               INNER JOIN UserEntity ON EventLink.eventlink_entity_id = UserEntity.userentity_entity_id
+               INNER JOIN UserObm ON UserEntity.userentity_user_id = UserObm.userobm_id
                WHERE      event_id = '".$eventId."'";
     $db->query($query);
     if($db->nf() == 0)
