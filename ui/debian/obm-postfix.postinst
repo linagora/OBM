@@ -47,6 +47,7 @@ fi
 
 echo -n "[obm-postfix] activate obm-satellite postfix module..."
 osenmod postfixSmtpInMaps
+osenmod postfixAccess
 invoke-rc.d obm-satellite restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 
 

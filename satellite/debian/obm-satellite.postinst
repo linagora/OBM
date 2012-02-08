@@ -69,6 +69,13 @@ ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
 ucfr obm-satellite "${CONFIG}"
 chmod 600 ${CONFIG}
 
+NEWFILE=${TEMPDIR}/postfixAccess
+CONFIG=/etc/obm-satellite/mods-available/postfixAccess
+TEMPLATE=/usr/share/obm-satellite/sample/postfixAccess
+cp "${TEMPLATE}" "${NEWFILE}"
+ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
+ucfr obm-satellite "${CONFIG}"
+chmod 600 ${CONFIG}
 
 
 

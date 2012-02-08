@@ -569,6 +569,7 @@ fi
 if [ "$1" = "1" ]; then
   echo -n "[obm-postfix] activate obm-satellite postfix module..."
   /usr/sbin/osenmod postfixSmtpInMaps
+  /usr/sbin/osenmod postfixAccess
   /etc/init.d/obmSatellite restart
 fi
 
@@ -577,6 +578,7 @@ if [ "$1" = "0" ]; then
   echo -n "[obm-postfix] remove obm-satellite postfix module..."
   if [ -e /usr/sbin/osdismod ]; then
     /usr/sbin/osdismod postfixSmtpInMaps
+    /usr/sbin/osdismod postfixAccess
   fi
 fi
 

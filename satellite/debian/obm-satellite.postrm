@@ -19,6 +19,8 @@ if [ "$1" = "purge" ]; then
     ucfr --purge obm-satellite /etc/obm-satellite/mods-available/postfixSmtpInMaps
     ucf --purge /etc/obm-satellite/mods-available/backupEntity
     ucfr --purge obm-satellite /etc/obm-satellite/mods-available/backupEntity
+    ucf --purge /etc/obm-satellite/mods-available/postfixAccess
+    ucfr --purge obm-satellite /etc/obm-satellite/mods-available/postfixAccess
   fi
   rm -f /etc/obm-satellite/obmSatellite.ini
   rm -f /etc/obm-satellite/obmSatellite.ini-old
@@ -30,6 +32,8 @@ if [ "$1" = "purge" ]; then
   rm -f /etc/obm-satellite/mods-available/postfixSmtpInMaps-old
   rm -f /etc/obm-satellite/mods-available/backupEntity
   rm -f /etc/obm-satellite/mods-available/backupEntity-old
+  rm -f /etc/obm-satellite/mods-available/postfixAccess
+  rm -f /etc/obm-satellite/mods-available/postfixAccess-old
   db_purge
 fi
 

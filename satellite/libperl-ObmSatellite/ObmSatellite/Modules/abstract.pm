@@ -117,50 +117,52 @@ sub processHttpRequest {
             return $self->_putMethod( $requestUri, $requestBody );
             last SWITCH;
         }
+
+        if( uc($requestMethod) eq 'DELETE' ) {
+            return $self->_deleteMethod( $requestUri, $requestBody );
+            last SWITCH;
+        }
     }
 
     return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'Method '.$requestMethod.' not allowed' );
 }
 
+sub _methodNotAllowed {
+    my ($self, $method, $requestUri, $requestBody) = @_;
+
+    $self->_log( "No handler for the HTTP method $method implemented in module ".$self->getModuleName(), 0 );
+    $self->_log( "Request method : $method", 5 );
+    $self->_log( "Request URI : $requestUri", 5 );
+    $self->_log( "Request Body : $requestBody", 5 );
+
+    return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, "method '$method' not allowed in module ".$self->getModuleName() );;
+}
 
 sub _postMethod {
-    my $self = shift;
-    my( $requestUri, $requestBody ) = @_;
+    my ($self, $requestUri, $requestBody ) = @_;
 
-    $self->_log( '\'_postMethod\' method not implemented on module '.$self->getModuleName(), 0 );
-    $self->_log( 'Request method : POST', 5 );
-    $self->_log( 'Request URI : '.$requestUri, 5 );
-    $self->_log( 'Request Body : '.$requestBody, 5 );
-
-    return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'POST\' not allowed on module '.$self->getModuleName() );;
+    return $self->_methodNotAllowed('POST', $requestUri, $requestBody);
 }
 
 
 sub _getMethod {
-    my $self = shift;
-    my( $requestUri, $requestBody ) = @_;
+    my ($self, $requestUri, $requestBody ) = @_;
 
-    $self->_log( '\'_getMethod\' method not implemented on module '.$self->getModuleName(), 0 );
-    $self->_log( 'Request method : GET', 5 );
-    $self->_log( 'Request URI : '.$requestUri, 5 );
-    $self->_log( 'Request Body : '.$requestBody, 5 );
-
-    return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'GET\' not allowed on module '.$self->getModuleName() );
+    return $self->_methodNotAllowed('GET', $requestUri, $requestBody);
 }
 
 
 sub _putMethod {
-    my $self = shift;
-    my( $requestUri, $requestBody ) = @_;
+    my ($self, $requestUri, $requestBody ) = @_;
 
-    $self->_log( '\'_putMethod\' method not implemented on module '.$self->getModuleName(), 0 );
-    $self->_log( 'Request method : PUT', 5 );
-    $self->_log( 'Request URI : '.$requestUri, 5 );
-    $self->_log( 'Request Body : '.$requestBody, 5 );
-
-    return $self->_returnStatus( RC_METHOD_NOT_ALLOWED, 'method \'GET\' not allowed on module '.$self->getModuleName() );
+    return $self->_methodNotAllowed('PUT', $requestUri, $requestBody);
 }
 
+sub _deleteMethod {
+    my ($self, $requestUri, $requestBody ) = @_;
+
+    return $self->_methodNotAllowed('DELETE', $requestUri, $requestBody);
+}
 
 sub _splitUrlPath {
     my $self = shift;
