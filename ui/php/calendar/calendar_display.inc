@@ -3196,7 +3196,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $ACCEPTED = '';
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
-        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw') {
+
+        $owner_login = $event_q->f('usercreate');
+        $block_status = isset($GLOBALS['ccalendar_block_status'])
+        				&& $GLOBALS['ccalendar_block_status']
+        				&& (strcasecmp($owner_login, $GLOBALS['block_status_str']) == 0);
+        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw' && $block_status == false) {
           $user_alert = $ccalendar_alerts;
           if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
             $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);

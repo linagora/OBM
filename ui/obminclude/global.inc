@@ -191,6 +191,11 @@ $ccalendar_ics_encoding = 'base64';
 //$stomp_login = '';
 //$stomp_passcode = '';
 
+// Block users from changing their status if $block_status_str is the organizer
+//$ccalendar_block_status = true;
+//$block_status_str = "login";
+
+
 // Remote calendar cache time to live
 $cremote_calendar_ics_ttl = 60;
 
