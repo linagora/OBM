@@ -68,22 +68,20 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 			sb.append("NOOP");
 		}
 		String cmd = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+		
 		if (uids.isEmpty()) {
 			data = new InternalDate[0];
 			return;
 		}
 		
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		if (isOK) {
 			data = new InternalDate[rs.size() - 1];
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; i < rs.size() - 1; i++) {
@@ -117,6 +115,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 				data[i] = new InternalDate(uid,parseDate(internalDate));
 			}
 		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("error on fetch: " + ok.getPayload());
 			data = new InternalDate[0];
 		}

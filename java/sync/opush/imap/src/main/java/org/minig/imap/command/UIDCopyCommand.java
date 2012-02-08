@@ -57,24 +57,20 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 		sb.append(' ');
 		sb.append(toUtf7(destMailbox));
 		String cmd = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		IMAPResponse ok = rs.get(rs.size() - 1);
+		boolean isOK = isOk(rs);
 
-		if (ok.isOk() && ok.getPayload().contains("[")) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("ok: " + ok.getPayload());
-			}
+		IMAPResponse ok = rs.get(rs.size() - 1);
+		if (isOK && ok.getPayload().contains("[")) {
+			logger.debug("ok: " + ok.getPayload());
 			data = parseMessageSet(ok.getPayload());
 		} else {
-			if (ok.isOk()) {
+			if (isOK) {
 				logger.warn("cyrus did not send [COPYUID ...] token: "
 						+ ok.getPayload());
 			} else {
@@ -88,9 +84,7 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 		int idx = payload.lastIndexOf("]");
 		int space = payload.lastIndexOf(" ", idx);
 		String set = payload.substring(space + 1, idx);
-		if (logger.isDebugEnabled()) {
-			logger.debug("set to parse: " + set);
-		}
+		logger.debug("set to parse: " + set);
 		Collection<Long> ret = MessageSet.asLongCollection(set, uids.size());
 		return ret;
 	}

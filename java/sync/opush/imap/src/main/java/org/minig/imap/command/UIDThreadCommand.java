@@ -41,9 +41,6 @@ import org.minig.imap.impl.MailThread;
 
 public class UIDThreadCommand extends Command<List<MailThread>> {
 
-	public UIDThreadCommand() {
-	}
-
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = "UID THREAD REFERENCES UTF-8 NOT DELETED";
@@ -53,10 +50,9 @@ public class UIDThreadCommand extends Command<List<MailThread>> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
 		data = new LinkedList<MailThread>();
-
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		if (isOK) {
 			String threads = null;
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int j = 0; j < rs.size() - 1; j++) {
@@ -69,9 +65,7 @@ public class UIDThreadCommand extends Command<List<MailThread>> {
 
 			if (threads != null) {
 				parseParenList(data, threads.substring("* THREAD ".length()));
-				if (logger.isDebugEnabled()) {
-					logger.debug("extracted " + data.size() + " threads");
-				}
+				logger.debug("extracted " + data.size() + " threads");
 			}
 		}
 	}

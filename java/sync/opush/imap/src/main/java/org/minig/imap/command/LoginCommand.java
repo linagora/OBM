@@ -44,7 +44,7 @@ public class LoginCommand extends SimpleCommand<Boolean> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		data = rs.get(0).isOk();
+		data = isOk(rs);
 	}
 
 	private static String escapeString(String s) {

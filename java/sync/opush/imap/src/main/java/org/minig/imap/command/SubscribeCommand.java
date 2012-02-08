@@ -42,11 +42,9 @@ public class SubscribeCommand extends SimpleCommand<Boolean> {
 		super("SUBSCRIBE "+toUtf7(mailbox));
 	}
 
-	
-
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		data = rs.get(rs.size() - 1).isOk();
+		data = isOk(rs);
 	}
 
 }

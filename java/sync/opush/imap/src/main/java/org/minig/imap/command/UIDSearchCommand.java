@@ -73,10 +73,10 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
 		data = Collections.emptyList();
 
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		if (isOK) {
 			String uidString = null;
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int j = 0; j < rs.size() - 1; j++) {

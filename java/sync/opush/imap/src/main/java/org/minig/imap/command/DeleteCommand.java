@@ -44,7 +44,7 @@ public class DeleteCommand extends SimpleCommand<Boolean> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		data = rs.get(rs.size() - 1).isOk();
+		data = isOk(rs);
 	}
 
 }

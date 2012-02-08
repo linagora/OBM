@@ -74,26 +74,20 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 			sb.append("NOOP");
 		}
 		String cmd = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+
 		if (uids.isEmpty()) {
 			data = Collections.emptyList();
 			return;
 		}
-
-		// for (IMAPResponse r : rs) {
-		// logger.info("S: " + r.getPayload());
-		// }
-
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		
+		if (isOK) {
 			List<Envelope> tmp = new ArrayList<Envelope>(uids.size());
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; it.hasNext() && i < uids.size();) {
@@ -124,10 +118,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 				try {
 					Envelope envelope = parseEnvelope(envelData.substring(0, envelData.length() - 1).getBytes());
 					envelope.setUid(uid);
-					if (logger.isDebugEnabled()) {
-						logger.info("uid: " + uid + " env.from: "
+					logger.info("uid: " + uid + " env.from: "
 								+ envelope.getFrom());
-					}
 					tmp.add(envelope);
 				} catch (Throwable t) {
 					logger.error("fail parsing envelope for message UID " + uid, t);
@@ -138,6 +130,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 			}
 			data = tmp;
 		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("error on fetch: " + ok.getPayload());
 			data = Collections.emptyList();
 		}

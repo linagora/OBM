@@ -38,19 +38,12 @@ import org.minig.imap.impl.IMAPResponse;
 
 public class StartIdleCommand extends Command<Boolean> {
 
-	public StartIdleCommand() {
-	}
-
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-	}
+	public void responseReceived(List<IMAPResponse> rs) {}
 
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = "IDLE";
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		return new CommandArgument(cmd, null);
 	}
 

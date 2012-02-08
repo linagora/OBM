@@ -40,6 +40,8 @@ import java.util.List;
 import org.minig.imap.impl.IMAPResponse;
 import org.obm.push.utils.FileUtils;
 
+import com.google.common.collect.Iterables;
+
 public class UIDFetchMessageCommand extends Command<InputStream> {
 
 	private long uid;
@@ -57,9 +59,10 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+		
 		IMAPResponse stream = rs.get(0);
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk() && stream.getStreamData() != null) {
+		if (isOK && stream.getStreamData() != null) {
 			InputStream in = stream.getStreamData();
 			
 			// -1 pattern of the day to remove "\0" at end of stream
@@ -72,7 +75,7 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 			}
 			data = new ByteArrayInputStream(dest);
 		} else {
-			if (ok.isOk()) {
+			if (isOK) {
 				logger
 						.warn("fetch is ok with no stream in response. Printing received responses :");
 				for (IMAPResponse ir : rs) {
@@ -81,7 +84,7 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 				data = new ByteArrayInputStream("".getBytes());
 			} else {
 				logger.error("UIDFetchMessage failed for uid " + uid + ": "
-						+ ok.getPayload());
+						+ Iterables.getLast(rs).getPayload());
 			}
 		}
 	}

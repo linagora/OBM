@@ -180,11 +180,9 @@ public class ClientSupport {
 	}
 
 	private <T> T run(ICommand<T> cmd) {
-		if (logger.isDebugEnabled()) {
-			logger.debug(Integer.toHexString(hashCode()) + " CMD: "
-					+ cmd.getClass().getName() + " Permits: "
-					+ lock.availablePermits());
-		}
+		logger.debug(Integer.toHexString(hashCode()) + " CMD: "
+				+ cmd.getClass().getName() + " Permits: "
+				+ lock.availablePermits());
 		// grab lock, this one should be ok, except on first call
 		// where we might wait for cyrus welcome text.
 		lock();
@@ -208,10 +206,8 @@ public class ClientSupport {
 	 * @param rs
 	 */
 	public void setResponses(List<IMAPResponse> rs) {
-		if (logger.isDebugEnabled()) {
-			for (IMAPResponse ir : rs) {
-				logger.debug("S: " + ir.getPayload());
-			}
+		for (IMAPResponse ir : rs) {
+			logger.debug("S: " + ir.getPayload());
 		}
 
 		synchronized (lastResponses) {

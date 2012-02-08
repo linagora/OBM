@@ -41,28 +41,23 @@ import org.minig.imap.impl.TagProducer;
 
 public class StopIdleCommand extends Command<Boolean> {
 
-	public StopIdleCommand() {
-	}
-
 	@Override
 	public void execute(IoSession session, TagProducer tp, Semaphore lock,
 			List<IMAPResponse> lastResponses) {
+		
 		CommandArgument args = buildCommand();
-		session.write(args.getCommandString());
+		String commandString = args.getCommandString();
+		logger.info(commandString);
+		session.write(commandString);
 		lock.release();
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-	}
+	public void responseReceived(List<IMAPResponse> rs) {}
 
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = "DONE";
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
-
 		return new CommandArgument(cmd, null);
 	}
 

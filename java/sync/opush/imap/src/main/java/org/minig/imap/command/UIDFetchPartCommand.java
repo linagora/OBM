@@ -57,20 +57,21 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		if (logger.isDebugEnabled()) {
-			for (IMAPResponse r : rs) {
-				logger.debug("r: " + r.getPayload() + " [stream:"
-						+ (r.getStreamData() != null) + "]");
-			}
+		boolean isOK = isOk(rs);
+		
+		for (IMAPResponse r : rs) {
+			logger.debug("r: " + r.getPayload() + " [stream:"
+					+ (r.getStreamData() != null) + "]");
 		}
+		
 		IMAPResponse stream = rs.get(0);
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk() && stream.getStreamData() != null) {
+		if (isOK && stream.getStreamData() != null) {
 			data = stream.getStreamData();
 		} else {
-			if (ok.isOk()) {
+			if (isOK) {
 				data = new ByteArrayInputStream("[empty]".getBytes());
 			} else {
+				IMAPResponse ok = rs.get(rs.size() - 1);
 				logger.warn("Fetch of part " + section + " in uid " + uid
 						+ " failed: " + ok.getPayload());
 			}

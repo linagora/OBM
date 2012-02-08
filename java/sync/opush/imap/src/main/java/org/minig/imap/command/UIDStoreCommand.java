@@ -53,22 +53,14 @@ public class UIDStoreCommand extends Command<Boolean> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		data = ok.isOk();
-		if (logger.isDebugEnabled()) {
-			logger.debug(ok.getPayload());
-		}
+		boolean isOK = isOk(rs);
+		data = isOK;
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = "UID STORE " + MessageSet.asString(uids) + " "
 				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.toString();
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
-
 		return new CommandArgument(cmd, null);
 	}
 
