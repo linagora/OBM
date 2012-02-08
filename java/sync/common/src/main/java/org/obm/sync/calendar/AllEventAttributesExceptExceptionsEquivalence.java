@@ -140,7 +140,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 
 	@Override
 	protected int doHash(Event t) {
-		return Objects.hashCode(t.getTitle(), t.getDomain(), t.getDescription(),
+		return Objects.hashCode(t.getTitle(), t.getDescription(),
 				t.getObmId(), t.getExtId(), t.getPrivacy(), t.getOwner(), t.getOwnerDisplayName(), t.getOwnerEmail(),
 				t.getLocation(), t.getStartDate(), t.getDuration(), t.getAlert(), t.getCategory(), t.getPriority(), t.isAllday(),
 				t.getAttendees(), t.getType(), t.getPercent(), t.getOpacity(),

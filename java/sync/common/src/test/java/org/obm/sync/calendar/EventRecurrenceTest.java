@@ -182,7 +182,6 @@ public class EventRecurrenceTest {
 		event.setAttendees( createAttendees(nbAttendees) );
 		event.setCategory("category");
 		event.setDescription("description");
-		event.setDomain("domain");
 		event.setDuration(10);
 		event.setEntityId(1);
 		event.setExtId(new EventExtId("1"));

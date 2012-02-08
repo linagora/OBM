@@ -56,7 +56,6 @@ import com.google.common.collect.Maps;
 public class Event implements Indexed<Integer> {
 
 	private String title;
-	private String domain;
 	private String description;
 	private EventObmId uid;
 	private EventExtId extId;
@@ -292,7 +291,6 @@ public class Event implements Indexed<Integer> {
 		event.setCategory(category);
 		event.setStartDate(startDate);
 		event.setDescription(description);
-		event.setDomain(domain);
 		event.setDuration(duration);
 		event.setEntityId(entityId);
 		event.setExtId(extId);
@@ -383,14 +381,6 @@ public class Event implements Indexed<Integer> {
 
 	public void setInternalEvent(boolean internalEvent) {
 		this.internalEvent = internalEvent;
-	}
-
-	public String getDomain() {
-		return domain;
-	}
-
-	public void setDomain(String domain) {
-		this.domain = domain;
 	}
 
 	public String getOwnerDisplayName() {
@@ -649,7 +639,7 @@ public class Event implements Indexed<Integer> {
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(title, domain, description, uid, extId, privacy, owner,
+		return Objects.hashCode(title, description, uid, extId, privacy, owner,
 				ownerDisplayName, ownerEmail, creatorDisplayName, creatorEmail, location,
 				startDate, duration, alert, category, priority, allday, attendees, recurrence, type,
 				completion, percent, opacity, entityId, timeUpdate, timeCreate, timezoneName,
@@ -661,7 +651,6 @@ public class Event implements Indexed<Integer> {
 		if (object instanceof Event) {
 			Event that = (Event) object;
 			return Objects.equal(this.title, that.title)
-				&& Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.description, that.description)
 				&& Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.extId, that.extId)
