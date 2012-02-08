@@ -65,39 +65,40 @@ public class ResponderImpl implements Responder {
 		
 		private final IntEncoder intEncoder;
 		private final WBXMLTools wbxmlTools;
+		private final DOMDumper domDumper;
 
 		@Inject
-		private Factory(IntEncoder intEncoder, WBXMLTools wbxmlTools) {
+		private Factory(IntEncoder intEncoder, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 			this.intEncoder = intEncoder;
 			this.wbxmlTools = wbxmlTools;
+			this.domDumper = domDumper;
 		}
 		
 		public Responder createResponder(HttpServletResponse resp) {
-			return new ResponderImpl(resp, intEncoder, wbxmlTools);
+			return new ResponderImpl(resp, intEncoder, wbxmlTools, domDumper);
 		}
 		
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ResponderImpl.class);
-
 	private HttpServletResponse resp;
-
 	private final IntEncoder intEncoder;
-
 	private final WBXMLTools wbxmlTools;
+	private final DOMDumper domDumper;
 	
-	/* package */ ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools) {
+	/* package */ ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools, 
+			DOMDumper domDumper) {
+		
 		this.resp = resp;
 		this.intEncoder = intEncoder;
 		this.wbxmlTools = wbxmlTools;
+		this.domDumper = domDumper;
 	}
 
 	@Override
 	public void sendWBXMLResponse(String defaultNamespace, Document doc) {
 		logger.debug("response: send response");
-		if (logger.isDebugEnabled()) {
-			DOMDumper.dumpXml(logger, doc);
-		}
+		domDumper.dumpXml(doc);
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
@@ -111,7 +112,7 @@ public class ResponderImpl implements Responder {
 
 	@Override
 	public void sendXMLResponse(String defaultNamespace, Document doc) {
-		DOMDumper.dumpXml(logger, doc);
+		domDumper.dumpXml(doc);
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			DOMUtils.serialise(doc, out);

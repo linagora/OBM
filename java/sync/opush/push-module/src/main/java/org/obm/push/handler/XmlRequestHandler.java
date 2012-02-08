@@ -50,7 +50,12 @@ import org.xml.sax.SAXException;
 public abstract class XmlRequestHandler implements IRequestHandler {
 
 	protected Logger logger = LoggerFactory.getLogger(XmlRequestHandler.class);
+	private final DOMDumper domDumper;
 
+	protected XmlRequestHandler(DOMDumper domDumper) {
+		this.domDumper = domDumper;
+	}
+	
 	@Override
 	public void process(IContinuation continuation, BackendSession bs,
 			ActiveSyncRequest request, Responder responder) throws IOException {
@@ -60,7 +65,7 @@ public abstract class XmlRequestHandler implements IRequestHandler {
 		if (in != null) {
 			try {
 				doc = DOMUtils.parse(in);
-				DOMDumper.dumpXml(logger, doc);
+				domDumper.dumpXml(doc);
 			} catch (SAXException e) {
 				logger.error("Error parsing command xml data.", e);
 			} catch (FactoryConfigurationError e) {

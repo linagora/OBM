@@ -43,6 +43,7 @@ import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
 import org.obm.push.exception.activesync.XMLValidationException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SearchProtocol;
 import org.obm.push.protocol.bean.SearchRequest;
@@ -73,10 +74,10 @@ public class SearchHandler extends WbxmlRequestHandler {
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			SearchProtocol searchProtocol, CollectionDao collectionDao,
-			WBXMLTools wbxmlTools) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.protocol = searchProtocol;
 		this.sources = ImmutableMultimap.of(

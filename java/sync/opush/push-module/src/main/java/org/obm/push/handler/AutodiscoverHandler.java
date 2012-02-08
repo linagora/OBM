@@ -44,6 +44,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
 import org.obm.push.bean.autodiscover.AutodiscoverStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.AutodiscoverProtocol;
 import org.w3c.dom.Document;
@@ -59,8 +60,9 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 	private final ConfigurationService configurationService;
 
 	@Inject AutodiscoverHandler(AutodiscoverProtocol autodiscoverProtocol, 
-			ConfigurationService configurationService) {
+			ConfigurationService configurationService, DOMDumper domDumper) {
 		
+		super(domDumper);
 		this.protocol = autodiscoverProtocol;
 		this.configurationService = configurationService; 
 	}

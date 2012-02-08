@@ -57,6 +57,7 @@ import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.ItemOperationsProtocol;
@@ -93,9 +94,11 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol protocol,
 			CollectionDao collectionDao, WBXMLTools wbxmlTools,
-			MailBackend mailBackend) {
+			MailBackend mailBackend, DOMDumper domDumper) {
+		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
+		
 		this.protocol = protocol;
 		this.mailBackend = mailBackend;
 	}

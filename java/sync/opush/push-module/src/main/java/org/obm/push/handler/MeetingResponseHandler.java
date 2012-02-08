@@ -51,6 +51,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
@@ -83,10 +84,11 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter,	StateMachine stMachine, 
 			MeetingProtocol meetingProtocol, CollectionDao collectionDao,
 			MailBackend mailBackend, WBXMLTools wbxmlTools,
-			CalendarBackend calendarBackend) {
+			CalendarBackend calendarBackend, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
+		
 		this.meetingProtocol = meetingProtocol;
 		this.mailBackend = mailBackend;
 		this.calendarBackend = calendarBackend;
