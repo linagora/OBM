@@ -1067,20 +1067,16 @@ sub _restoreMailbox {
 
 sub _createRestoreMailboxFolder {
     my $self = shift;
-    my( $entity, $retry ) = @_;
+    my( $entity) = @_;
 
-    if( !$retry ) {
-        $retry = 0;
-
-        if( my $result = $self->_isEntityMailboxDefined($entity) ) {
-            if( $result->isError() ) {
-                return $result;
-            }
-    
-            $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\' isn\'t restored', 4 );
-            $self->_log( $result->asString(), 5 );
-            return undef;
+    if( my $result = $self->_isEntityMailboxDefined($entity) ) {
+        if( $result->isError() ) {
+            return $result;
         }
+
+        $self->_log( 'Mailbox \''.$entity->getLogin().'@'.$entity->getRealm().'\' isn\'t restored', 4 );
+        $self->_log( $result->asString(), 5 );
+        return undef;
     }
 
     my $cyrusConn = $self->_getCyrusConn();
@@ -1097,32 +1093,32 @@ sub _createRestoreMailboxFolder {
             content => [ 'Cyrus error: '.$cyrusConn->error() ]
             } );
     }
+    my $contentUid = (stat($entity->getMailboxRestorePath()))[4];
+    my $contentGid = (stat($entity->getMailboxRestorePath()))[5];
 
-    # If mailbox already exist, retry with another mailbox name
-    if( ($#mailBox >= 0) && ($retry < 5) ) {
-        return $self->_createRestoreMailboxFolder($entity, $retry++);
+    if (@mailBox) {
+        if (!$self->_backupCurrentMailbox($entity)) {
+            $self->_log("Failed to move current mailbox: $!", 0);
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                    content => [ "$@" ]
+                } );
+        }
     }
+    else {
+        # Maybe the mailbox was deleted in Cyrus?
+        $self->_log( 'Create mailbox: '.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder(), 4 );
 
-    if( $retry >= 5 ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Can\'t find a valid mailbox folder to restore data' ]
-            } );
+        $cyrusConn->create( $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder() );
+        if( $cyrusConn->error() ) {
+            $self->_log( 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() );
+            return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+                content => [ 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() ]
+                } );
+        }
     }
-
-
-    # Creating restore mailbox
-    $self->_log( 'Create mailbox: '.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder(), 4 );
-
-    $cyrusConn->create( $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder() );
-    if( $cyrusConn->error() ) {
-        $self->_log( 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() );
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Fail to create mailbox \''.$entity->getMailboxPrefix().$entity->getMailboxRestoreFolder().'\': '.$cyrusConn->error() ]
-            } );
-    }
-
 
     # Restore mailbox content
+    mkdir $entity->getMailboxRestorePath();
     my $cmd = $self->{'tarCmd'}.' --strip '.$entity->getRestoreMailboxArchiveStrip().' -C '.$entity->getMailboxRestorePath().' -xzf '.$entity->getBackupFileName().' '.$entity->getArchiveMailboxPath().' > /dev/null 2>&1';
     $self->_log( 'Executing '.$cmd, 4 );
 
@@ -1133,20 +1129,20 @@ sub _createRestoreMailboxFolder {
                     } );
     }
 
-    my $contentUid = (stat($entity->getMailboxRestorePath()))[4];
-    my $contentGid = (stat($entity->getMailboxRestorePath()))[5];
     my $mailboxRestorePath = $entity->getMailboxRestorePath();
+
     find( {
             wanted => sub {
                 my $path = $_;
-                if( $path =~ /^($mailboxRestorePath\/(.+\/)*(cyrus\..+|[0-9]+\.))$/ ) {
+                # Untaint $path
+                if ($path =~ /(.+)/) {
                     chown( $contentUid, $contentGid, $1 );
-                    chmod( 0600, $1 );
+                    my $filePermissions = -f $1 ? 0600 : 0700;
+                    chmod($filePermissions, $1);
                 }
             },
             no_chdir  => 1
         }, $entity->getMailboxRestorePath() );
-
     my $reconstructMailbox = $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder();
     $reconstructMailbox =~ s/^(.+)@/$1\*@/;
     $cmd = 'su -l -c \'PATH="'.RECONSTRUCT_PATH.'" '.RECONSTRUCT_CMD.' -r -f -x '.$reconstructMailbox.'\' cyrus';
@@ -1171,6 +1167,22 @@ sub _createRestoreMailboxFolder {
 
  
     return undef;
+}
+
+sub _backupCurrentMailbox {
+    my ($self, $entity) = @_;
+
+    my $currentMailboxDir = $entity->getMailboxRestorePath();
+    my $backupCurrentMailboxDir = $entity->getTmpBackupCurrentMailboxPath();
+    $self->_log("Backing up $currentMailboxDir to $backupCurrentMailboxDir", 2);
+    my $moveSuccessful;
+    if (-d $currentMailboxDir) {
+        $moveSuccessful = move($currentMailboxDir, $backupCurrentMailboxDir);
+    }
+    else {
+        $moveSuccessful = 1;
+    }
+    return $moveSuccessful;
 }
 
 

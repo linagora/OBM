@@ -71,13 +71,26 @@ sub getCyrusMailboxRoots {
     return \@mailboxTree;
 }
 
+sub _firstLetter {
+    my ($self, $string) = @_;
+
+    (my $cleanString = $string) =~ s!\.!!g;
+    my $firstLetter;
+    if (lc($cleanString) =~ /^(\w)/) {
+        $firstLetter = $1;
+    }
+    else {
+        $firstLetter = 'q';
+    }
+    return $firstLetter;
+}
+
 
 sub getMailboxRestorePath {
     my $self = shift;
 
-    return $self->_getMailboxesRoot().'/q/'.$self->getLogin().'/'.$self->getRestoreFolder();
-
-    return undef;
+    my $firstLetter = $self->_firstLetter($self->getLogin());
+    return $self->_getMailboxesRoot()."/$firstLetter/".$self->getLogin().'/';
 }
 
 

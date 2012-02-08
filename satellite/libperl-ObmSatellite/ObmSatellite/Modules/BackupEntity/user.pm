@@ -235,7 +235,7 @@ sub getMailboxRestorePath {
     my $mailboxRestorePath = $self->_getMailboxRoot();
 
 
-    return $self->_getMailboxRoot().'/'.$self->getRestoreFolder();
+    return $self->_getMailboxRoot().'/';
 }
 
 

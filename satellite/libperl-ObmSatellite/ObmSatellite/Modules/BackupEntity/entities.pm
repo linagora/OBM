@@ -227,6 +227,11 @@ sub getTmpVcardPath {
     return undef;
 }
 
+sub getTmpBackupCurrentMailboxPath {
+    my $self = shift;
+
+    return $self->getTmpBackupArchiveRoot().'/mailbox_before_restore';
+}
 
 sub getTmpMailboxPath {
     my $self = shift;
@@ -387,29 +392,20 @@ sub getMailboxPrefix {
 }
 
 
-# Get Cyrus mailbox folder restauration name
-sub getRestoreFolder {
-    my $self = shift;
-    my( $new ) = @_;
-
-    if( $new || !$self->{'folderRestore'} ) {
-        my $login = $self->getLogin() ;
-        $login =~ /^(\w)/;
-        $login =~ s/\./^/g;
-        $self->{'folderRestore'} = '_'.$login.'-'.$self->_getStringDate();
-        $self->_log( 'generate mailbox restore folder name: '.$self->{'folderRestore'}, 4 );
-    }
-
-    return $self->{'folderRestore'};
+sub _cleanLogin {
+    my ($self) = @_;
+    my $login = $self->getLogin() ;
+    $login =~ /^(\w)/;
+    $login =~ s/\./^/g;
+    return $login;
 }
-
 
 # Get Cyrus mailbox restauration name
 sub getMailboxRestoreFolder {
     my $self = shift;
     my( $new ) = @_;
 
-    return $self->getLogin().'/'.$self->getRestoreFolder($new).'@'.$self->getRealm();
+    return $self->getLogin().'/'.$self->_cleanLogin().'@'.$self->getRealm();
 }
 
 

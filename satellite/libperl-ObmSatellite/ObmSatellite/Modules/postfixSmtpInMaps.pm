@@ -8,16 +8,12 @@ use 5.006_001;
 require Exporter;
 
 use ObmSatellite::Modules::abstract;
+use ObmSatellite::Modules::Postfix::constants qw/POSTMAP_CMD MAILBOX_MAP ALIAS_MAP TRANSPORT_MAP DOMAIN_MAP
+    LDAP_MAILBOX_QUERY LDAP_ALIAS_QUERY LDAP_TRANSPORT_QUERY LDAP_DOMAIN_QUERY/;
 @ISA = qw(ObmSatellite::Modules::abstract);
 use strict;
 
 use HTTP::Status;
-
-use constant POSTMAP_CMD => '/usr/sbin/postmap';
-use constant MAILBOX_MAP => '/etc/postfix/virtual_mailbox';
-use constant ALIAS_MAP => '/etc/postfix/virtual_alias';
-use constant TRANSPORT_MAP => '/etc/postfix/transport';
-use constant DOMAIN_MAP => '/etc/postfix/virtual_domains';
 
 sub _setUri {
     my $self = shift;
@@ -37,26 +33,10 @@ sub _initHook {
     $self->{'domainMap'} = DOMAIN_MAP;
 
     $self->{'description'} = {
-        'mailboxMap' => {
-            ldap_attibute_left => [ 'mailbox' ],
-            ldap_attibute_right => 'OK',
-            ldap_filter => '(&(|(objectclass=obmuser)(objectclass=obmmailshare))(mailAccess=PERMIT)%d)'
-        },
-        'aliasMap' => {
-            ldap_attibute_left => [ 'mail', 'mailAlias' ],
-            ldap_attibute_right => [ 'mailbox', 'externalContactEmail' ],
-            ldap_filter => '(&(mailAccess=PERMIT)%d)'
-        },
-        'transportMap' => {
-            ldap_attibute_left => [ 'mailbox' ],
-            ldap_attibute_right => [ 'mailBoxServer' ],
-            ldap_filter => '(&(|(objectClass=obmUser)(objectClass=obmMailShare))(mailAccess=PERMIT)%d)'
-        },
-        'domainMap' => {
-            ldap_attibute_left => [ 'myDestination' ],
-            ldap_attibute_right => 'OK',
-            ldap_filter => '(&(objectClass=obmMailServer)%d)'
-        }
+        'mailboxMap'    => LDAP_MAILBOX_QUERY,
+        'aliasMap'      => LDAP_ALIAS_QUERY,
+        'transportMap'  => LDAP_TRANSPORT_QUERY,
+        'domainMap'     => LDAP_DOMAIN_QUERY,
     };
 
 
