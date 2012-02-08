@@ -68,12 +68,12 @@ public class ObmEventToMsEventConverter {
 		mse.setDescription(e.getDescription());
 		mse.setLocation(e.getLocation());
 		mse.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
-		mse.setStartTime(e.getDate());
+		mse.setStartTime(e.getStartDate());
 		mse.setExceptionStartTime(e.getRecurrenceId());
 		mse.setUid(uid);
 		
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		c.setTimeInMillis(e.getDate().getTime());
+		c.setTimeInMillis(e.getStartDate().getTime());
 		c.add(Calendar.SECOND, e.getDuration());
 		mse.setEndTime(c.getTime());
 		

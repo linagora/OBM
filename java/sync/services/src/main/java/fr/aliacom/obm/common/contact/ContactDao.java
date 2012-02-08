@@ -411,7 +411,7 @@ public class ContactDao {
 
 		Event e = new Event();
 		e.setTitle(displayName);
-		e.setDate(cal.getTime());
+		e.setStartDate(cal.getTime());
 		e.setDuration(3600);
 		e.setAllday(true);
 		EventRecurrence rec = new EventRecurrence();
@@ -477,7 +477,7 @@ public class ContactDao {
 			FindException {
 		logger.info("eventId != null");
 		Event e = calendarDao.findEventById(at, dateId);
-		e.setDate(date);
+		e.setStartDate(date);
 		calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
 		return e.getObmId();
 	}

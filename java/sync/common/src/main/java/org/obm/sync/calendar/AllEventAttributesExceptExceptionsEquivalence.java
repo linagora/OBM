@@ -82,7 +82,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 		if (!Objects.equal(o1.getLocation(), o2.getLocation())) {
 			return false;
 		}
-		if (!Objects.equal(o1.getDate(), o2.getDate())) {
+		if (!Objects.equal(o1.getStartDate(), o2.getStartDate())) {
 			return false;
 		}
 		if (!Objects.equal(o1.getRecurrenceId(), o1.getRecurrenceId())) {
@@ -142,7 +142,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 	protected int doHash(Event t) {
 		return Objects.hashCode(t.getTitle(), t.getDomain(), t.getDescription(),
 				t.getObmId(), t.getExtId(), t.getPrivacy(), t.getOwner(), t.getOwnerDisplayName(), t.getOwnerEmail(),
-				t.getLocation(), t.getDate(), t.getDuration(), t.getAlert(), t.getCategory(), t.getPriority(), t.isAllday(),
+				t.getLocation(), t.getStartDate(), t.getDuration(), t.getAlert(), t.getCategory(), t.getPriority(), t.isAllday(),
 				t.getAttendees(), t.getType(), t.getPercent(), t.getOpacity(),
 				t.getEntityId(), t.getTimeUpdate(), t.getTimeCreate(), t.getTimezoneName(), t.getRecurrenceId(),
 				t.isInternalEvent(), t.getSequence());

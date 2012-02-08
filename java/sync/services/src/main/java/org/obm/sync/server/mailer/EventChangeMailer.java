@@ -504,9 +504,9 @@ public class EventChangeMailer extends AbstractMailer {
 			String recurrence = recurrenceInfo + " "
 					+ buildRepeatDaysFromEventRecurrence(currentEventRecurrence, locale);
 
-			datamodel.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATE))
+			datamodel.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE))
 					 .put("recurrenceKind", recurrence)
-					 .put("startTime", new SimpleDate(event.getDate(), TemplateDateModel.TIME))
+					 .put("startTime", new SimpleDate(event.getStartDate(), TemplateDateModel.TIME))
 					 .put("endTime", new SimpleDate(event.getEndDate(), TemplateDateModel.TIME));
 
 			Date recurrenceEnd = currentEventRecurrence.getEnd();
@@ -517,7 +517,7 @@ public class EventChangeMailer extends AbstractMailer {
 			}
 			
 		} else {
-			datamodel.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATETIME))
+			datamodel.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
 					 .put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME));
 		}
 
@@ -681,7 +681,7 @@ public class EventChangeMailer extends AbstractMailer {
 			.put("user", attendeeUpdated.getDisplayName())
 			.put("participationState", state)
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
-			.put("start", new SimpleDate(event.getDate(), TemplateDateModel.DATE));
+			.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE));
 		return datamodel;
 	}
 	

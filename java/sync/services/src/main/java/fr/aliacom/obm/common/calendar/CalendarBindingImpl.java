@@ -489,7 +489,7 @@ public class CalendarBindingImpl implements ICalendar {
 			if (isEventExists(token, calendar, event)) {
 				final String message = String
 				.format("Calendar : duplicate with same extId found for event [%s, %s, %d, %s]",
-						event.getTitle(), event.getDate()
+						event.getTitle(), event.getStartDate()
 						.toString(), event.getDuration(),
 						event.getExtId());
 				logger.info(LogUtils.prefix(token) + message);
@@ -1160,7 +1160,7 @@ public class CalendarBindingImpl implements ICalendar {
 				recurrence.setKind(RecurrenceKind.lookup("none"));
 				eventException.setRecurrence(recurrence);
 				if (recurrenceId != null) {
-					eventException.setDate(new DateTime(recurrenceId.getRecurrenceId()));
+					eventException.setStartDate(new DateTime(recurrenceId.getRecurrenceId()));
 					eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));					
 				}	
 				parentEvent.getRecurrence().addEventException(eventException);

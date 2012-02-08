@@ -189,7 +189,7 @@ public class Ical4jHelperTest {
 		final EventRecurrence er = new EventRecurrence();
 		er.setKind(RecurrenceKind.monthlybydate);
 		er.setFrequence(1);
-		er.addException(ev.getDate());
+		er.addException(ev.getStartDate());
 		cal.add(Calendar.MONTH, 1);
 		er.addException(cal.getTime());
 		er.setEnd(null);
@@ -234,7 +234,7 @@ public class Ical4jHelperTest {
 		event1.setRecurrence(er);
 
 		Recur recur = getIcal4jHelper().getRecur(event1.getRecurrence(),
-				event1.getDate());
+				event1.getStartDate());
 		assertTrue(recur.getDayList().contains(WeekDay.MO));
 		assertTrue(recur.getDayList().contains(WeekDay.TU));
 		assertTrue(recur.getDayList().contains(WeekDay.WE));
@@ -573,7 +573,7 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		event.setDate(cal.getTime());
+		event.setStartDate(cal.getTime());
 
 		EventRecurrence er = new EventRecurrence();
 		er.setDays(new RecurrenceDays());
@@ -674,9 +674,9 @@ public class Ical4jHelperTest {
 		Event event = new Event();
 		Calendar cal = getCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
-		event.setDate(cal.getTime());
+		event.setStartDate(cal.getTime());
 		event.setDuration(3600);
-		DtEnd dtend = getIcal4jHelper().getDtEnd(event.getDate(),
+		DtEnd dtend = getIcal4jHelper().getDtEnd(event.getStartDate(),
 				event.getDuration(), false);
 		assertEquals(cal.getTime().getTime() + 3600000, dtend.getDate()
 				.getTime());
@@ -687,8 +687,8 @@ public class Ical4jHelperTest {
 		Event event = new Event();
 		Calendar cal = getCalendar();
 		cal.set(Calendar.MILLISECOND, 0);
-		event.setDate(cal.getTime());
-		DtStart dtstart = getIcal4jHelper().getDtStart(event.getDate(),
+		event.setStartDate(cal.getTime());
+		DtStart dtstart = getIcal4jHelper().getDtStart(event.getStartDate(),
 				event.isAllday());
 		assertEquals(cal.getTime().getTime(), dtstart.getDate().getTime());
 	}
@@ -834,7 +834,7 @@ public class Ical4jHelperTest {
 	
 	private Event buildEvent() {
 		final Event event = new Event();
-		event.setDate(new Date());
+		event.setStartDate(new Date());
 
 		event.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262eza9"));
 		event.setTitle("rdv " + System.currentTimeMillis());

@@ -52,7 +52,7 @@ public class EventUtilsTest {
 		ev.setInternalEvent(true);
 		Calendar cal = new GregorianCalendar();
 		cal.setTimeInMillis(1295258400000L);
-		ev.setDate(cal.getTime());
+		ev.setStartDate(cal.getTime());
 		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");

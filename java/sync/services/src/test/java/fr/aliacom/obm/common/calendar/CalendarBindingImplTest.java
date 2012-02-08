@@ -684,7 +684,7 @@ public class CalendarBindingImplTest {
 		exception.addAttendee(attendee);
 		exception.addAttendee(exceptionAttendee);
 		exception.setSequence(1);
-		exception.setDate(recurrenceId);
+		exception.setStartDate(recurrenceId);
 		exception.setRecurrenceId(recurrenceId);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
@@ -698,7 +698,7 @@ public class CalendarBindingImplTest {
 		dummyException.setExtId(extId);
 		dummyException.addAttendee(attendee);
 		dummyException.setSequence(0);
-		dummyException.setDate(recurrenceId);
+		dummyException.setStartDate(recurrenceId);
 		dummyException.setRecurrenceId(recurrenceId);
 		dummyException.setRecurrence(new EventRecurrence());
 		dummyException.getRecurrence().setKind(RecurrenceKind.none);
@@ -788,7 +788,7 @@ public class CalendarBindingImplTest {
 		exception.addAttendee(attendee);
 		exception.addAttendee(exceptionAttendee);
 		exception.setSequence(1);
-		exception.setDate(recurrenceId);
+		exception.setStartDate(recurrenceId);
 		exception.setRecurrenceId(recurrenceId);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
@@ -802,7 +802,7 @@ public class CalendarBindingImplTest {
 		dummyException.setExtId(extId);
 		dummyException.addAttendee(attendee);
 		dummyException.setSequence(0);
-		dummyException.setDate(recurrenceId);
+		dummyException.setStartDate(recurrenceId);
 		dummyException.setRecurrenceId(recurrenceId);
 		dummyException.setRecurrence(new EventRecurrence());
 		dummyException.getRecurrence().setKind(RecurrenceKind.none);
@@ -1262,7 +1262,7 @@ public class CalendarBindingImplTest {
 		String calendar = "cal1";
 		Event event = new Event();
 		event.setExtId(new EventExtId("123"));
-		event.setDate(new Date());
+		event.setStartDate(new Date());
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, defaultObmUser.getDomain().getName())).andReturn(defaultObmUser).atLeastOnce();
@@ -1283,7 +1283,7 @@ public class CalendarBindingImplTest {
 		String calendar = "cal1";
 		Event event = new Event();
 		event.setExtId(new EventExtId("123"));
-		event.setDate(new Date());
+		event.setStartDate(new Date());
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, defaultObmUser.getDomain().getName())).andReturn(defaultObmUser).atLeastOnce();

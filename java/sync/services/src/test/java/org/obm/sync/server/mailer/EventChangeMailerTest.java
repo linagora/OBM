@@ -187,7 +187,7 @@ public class EventChangeMailerTest {
 			event.setOwnerEmail("rrougeron@linagora.com");
 			event.setCreatorDisplayName("Emmanuel SURLEAU");
 			event.setCreatorEmail("esurleau@linagora.com");
-			event.setDate(date(2010, 10, 8, 11, 00));
+			event.setStartDate(date(2010, 10, 8, 11, 00));
 			event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 			event.setDuration(2700);
 			event.setUid(new EventObmId(1354));
@@ -207,7 +207,7 @@ public class EventChangeMailerTest {
 			event.setOwner("jack");
 			event.setOwnerDisplayName("Jack de Linagora");
 			event.setOwnerEmail("jdlinagora@obm.linagora.com");
-			event.setDate(date(2012, 0, 23, 12, 00));
+			event.setStartDate(date(2012, 0, 23, 12, 00));
 			event.setExtId(new EventExtId("1234567890"));
 			event.setDuration(3600);
 			event.setLocation("A random location");
@@ -717,7 +717,7 @@ public class EventChangeMailerTest {
 			AccessToken token = getStubAccessToken();
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setDate(date(2010, 10, 8, 12, 00));
+			after.setStartDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
 			for (Attendee att: before.getAttendees()) {
 				att.setState(ParticipationState.ACCEPTED);
@@ -798,7 +798,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setDate(date(2010, 10, 8, 12, 00));
+			after.setStartDate(date(2010, 10, 8, 12, 00));
 			after.setDuration(3600);
 			for (Attendee att : before.getAttendees()) {
 				att.setState(ParticipationState.NEEDSACTION);
@@ -900,7 +900,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestRecurrentEvent();
 			Event after = before.clone();
-			after.setDate(date(2012, 01, 15, 13, 00));
+			after.setStartDate(date(2012, 01, 15, 13, 00));
 			after.setDuration(7200);
 			for (Attendee att : before.getAttendees()) {
 				att.setState(ParticipationState.NEEDSACTION);

@@ -89,7 +89,7 @@ public class CalendarItemsParserTest {
 		cal.setTimeInMillis(1295258400000L);
 		
 		Assert.assertTrue(ev.isInternalEvent());
-		Assert.assertEquals(cal.getTime(), ev.getDate());
+		Assert.assertEquals(cal.getTime(), ev.getStartDate());
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
@@ -124,7 +124,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getStartDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 	}
 	
@@ -160,7 +160,7 @@ public class CalendarItemsParserTest {
 		cal.setTimeInMillis(1295258400000L);
 		
 		Assert.assertFalse(ev.isInternalEvent());
-		Assert.assertEquals(cal.getTime(), ev.getDate());
+		Assert.assertEquals(cal.getTime(), ev.getStartDate());
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
@@ -195,7 +195,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getStartDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 	}
 	
@@ -234,7 +234,7 @@ public class CalendarItemsParserTest {
 		
 		
 		Assert.assertFalse(ev.isInternalEvent());
-		Assert.assertEquals(cal.getTime(), ev.getDate());
+		Assert.assertEquals(cal.getTime(), ev.getStartDate());
 		Assert.assertEquals(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"), ev.getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
@@ -262,7 +262,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getStartDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 		
 		Assert.assertEquals(1289988000000L,ev.getTimeCreate().getTime());
@@ -297,7 +297,7 @@ public class CalendarItemsParserTest {
 		
 		
 		Assert.assertFalse(ev.isInternalEvent());
-		Assert.assertEquals(cal.getTime(), ev.getDate());
+		Assert.assertEquals(cal.getTime(), ev.getStartDate());
 		Assert.assertNull(ev.getExtId().getExtId());
 		Assert.assertEquals("fake rdv", ev.getTitle());
 		Assert.assertEquals("john@do.fr", ev.getOwner());
@@ -397,7 +397,7 @@ public class CalendarItemsParserTest {
 		Assert.assertEquals("test2", evEx.getOwnerDisplayName());
 		Assert.assertEquals(new Integer(2), evEx.getPriority());
 		Assert.assertEquals(EventPrivacy.PUBLIC, evEx.getPrivacy());
-		Assert.assertEquals(1314077400000L, evEx.getDate().getTime());
+		Assert.assertEquals(1314077400000L, evEx.getStartDate().getTime());
 		Assert.assertEquals(3600, evEx.getDuration());
 		Assert.assertEquals(new Integer(-1), evEx.getAlert());
 		Assert.assertEquals(EventOpacity.OPAQUE, evEx.getOpacity());

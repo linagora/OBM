@@ -148,8 +148,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(e, "owner", ev.getOwner());
 		createIfNotNull(e, "ownerEmail", ev.getOwnerEmail());
 		createIfNotNull(e, "tz", ev.getTimezoneName());
-		if (ev.getDate() != null) {
-			createIfNotNull(e, "date", DateHelper.asString(ev.getDate()));
+		if (ev.getStartDate() != null) {
+			createIfNotNull(e, "date", DateHelper.asString(ev.getStartDate()));
 		}
 		createIfNotNull(e, "duration", "" + ev.getDuration());
 		createIfNotNull(e, "category", ev.getCategory());

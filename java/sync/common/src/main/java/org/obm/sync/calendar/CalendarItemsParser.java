@@ -116,7 +116,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		}
 		ev.setTimezoneName(tz);
 		ev.setDescription(s(e, "description"));
-		ev.setDate(d(e, "date"));
+		ev.setStartDate(d(e, "date"));
 		ev.setPrivacy(EventPrivacy.fromXmlIntCode(i(e, "privacy")));
 		ev.setPriority(i(e, "priority"));
 		ev.setDuration(i(e, "duration"));

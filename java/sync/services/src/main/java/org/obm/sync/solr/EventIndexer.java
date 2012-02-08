@@ -131,7 +131,7 @@ public class EventIndexer implements Runnable {
 		f(sid, "title", e.getTitle());
 		f(sid, "location", e.getLocation());
 		f(sid, "category", e.getCategory());
-		f(sid, "date", e.getDate());
+		f(sid, "date", e.getStartDate());
 		f(sid, "duration", e.getDuration());
 
 		// owner: login ownerEmail: lAtDomain

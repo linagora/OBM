@@ -421,7 +421,7 @@ public class EventNotificationServiceTest {
 			ObmUser defaultObmUser = getDefaultObmUser();
 
 			Event event = new Event();
-			event.setDate(after());
+			event.setStartDate(after());
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
@@ -451,9 +451,9 @@ public class EventNotificationServiceTest {
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Event event = new Event();
-			event.setDate(after());
+			event.setStartDate(after());
 			Event eventAfter = new Event();
-			eventAfter.setDate(longAfter());
+			eventAfter.setStartDate(longAfter());
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
@@ -482,12 +482,12 @@ public class EventNotificationServiceTest {
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setSequence(0);
 			
 			Event currentEvent = new Event();
-			currentEvent.setDate(longAfter());
+			currentEvent.setStartDate(longAfter());
 			currentEvent.addAttendee(attendee);
 			currentEvent.setSequence(1);
 			
@@ -523,12 +523,12 @@ public class EventNotificationServiceTest {
 
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setSequence(0);
 			
 			Event currentEvent = new Event();
-			currentEvent.setDate(longAfter());
+			currentEvent.setStartDate(longAfter());
 			currentEvent.addAttendee(attendee);
 			currentEvent.setSequence(1);
 			
@@ -566,7 +566,7 @@ public class EventNotificationServiceTest {
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
@@ -597,7 +597,7 @@ public class EventNotificationServiceTest {
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
@@ -630,11 +630,11 @@ public class EventNotificationServiceTest {
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.NEEDSACTION);
 			
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 
 			Event currentEvent = new Event();
-			currentEvent.setDate(after());
+			currentEvent.setStartDate(after());
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
 			
@@ -672,11 +672,11 @@ public class EventNotificationServiceTest {
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.ACCEPTED);
 			
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 
 			Event currentEvent = new Event();
-			currentEvent.setDate(after());
+			currentEvent.setStartDate(after());
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
 			
@@ -712,12 +712,12 @@ public class EventNotificationServiceTest {
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			attendee.setCanWriteOnCalendar(true);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setSequence(0);
 			
 			Event currentEvent = new Event();
-			currentEvent.setDate(longAfter());
+			currentEvent.setStartDate(longAfter());
 			currentEvent.addAttendee(attendee);
 			currentEvent.setSequence(1);
 			
@@ -756,12 +756,12 @@ public class EventNotificationServiceTest {
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.ACCEPTED);
 
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setOwnerEmail("attendee1@test");
 
 			Event currentEvent = new Event();
-			currentEvent.setDate(after());
+			currentEvent.setStartDate(after());
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
 			currentEvent.setOwnerEmail("attendee1@test");
@@ -798,13 +798,13 @@ public class EventNotificationServiceTest {
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
-			previousEvent.setDate(after());
+			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setOwnerEmail("attendee1@test");
 			previousEvent.setSequence(0);
 			
 			Event currentEvent = new Event();
-			currentEvent.setDate(longAfter());
+			currentEvent.setStartDate(longAfter());
 			currentEvent.addAttendee(attendee);
 			currentEvent.setOwnerEmail("attendee1@test");
 			currentEvent.setSequence(1);
@@ -848,7 +848,7 @@ public class EventNotificationServiceTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			
 			Event event = new Event();
-			event.setDate(after());
+			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
 			
@@ -904,7 +904,7 @@ public class EventNotificationServiceTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			
 			Event event = new Event();
-			event.setDate(after());
+			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
 			
@@ -956,7 +956,7 @@ public class EventNotificationServiceTest {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			
 			Event event = new Event();
-			event.setDate(after());
+			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
 			

@@ -107,7 +107,7 @@ public class ToolBox {
 
 	public static Event getFakeDailyRecurrentEvent(Date date, int sequence, Attendee... attendees) {
 		Event event = new Event();
-		event.setDate(date);
+		event.setStartDate(date);
 		event.setSequence(sequence);
 		event.setExtId(new EventExtId("extId"));
 
@@ -122,7 +122,7 @@ public class ToolBox {
 
 	public static Event getFakeNegativeExceptionEvent(Event event, Date exceptionDate) {
 		Event ex = event.clone();
-		ex.setDate(exceptionDate);
+		ex.setStartDate(exceptionDate);
 		ex.setRecurrenceId(exceptionDate);
 		ex.setRecurrence(new EventRecurrence());
 		return ex;

@@ -429,7 +429,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setTitle(evrs.getString("event_title"));
 		e.setLocation(evrs.getString("event_location"));
 		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
-		e.setDate(cal.getTime());
+		e.setStartDate(cal.getTime());
 		e.setDuration(evrs.getInt("event_duration"));
 		e.setPriority(evrs.getInt("event_priority"));
 		e.setPrivacy(EventPrivacy.fromSqlIntCode(evrs.getInt("event_privacy")));
@@ -496,8 +496,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
 		ps.setInt(idx++, ev.getPrivacy().toSqlIntCode());
-		if (ev.getDate() != null) {
-			ps.setTimestamp(idx++, new Timestamp(ev.getDate().getTime()));
+		if (ev.getStartDate() != null) {
+			ps.setTimestamp(idx++, new Timestamp(ev.getStartDate().getTime()));
 		} else {
 			ps.setNull(idx++, Types.DATE);
 		}
@@ -641,12 +641,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 				java.util.Calendar dayAfter = java.util.Calendar.getInstance();
 				dayAfter.setTimeZone(TimeZone.getTimeZone("GMT"));
-				dayAfter.setTimeInMillis(event.getDate().getTime());
+				dayAfter.setTimeInMillis(event.getStartDate().getTime());
 				dayAfter.add(java.util.Calendar.HOUR_OF_DAY, 11);
 
 				java.util.Calendar dayBefore = java.util.Calendar.getInstance();
 				dayBefore.setTimeZone(TimeZone.getTimeZone("GMT"));
-				dayBefore.setTimeInMillis(event.getDate().getTime());
+				dayBefore.setTimeInMillis(event.getStartDate().getTime());
 				dayBefore.add(java.util.Calendar.HOUR_OF_DAY, -11);
 
 				query.setTimestamp(index++,
@@ -656,7 +656,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						new java.sql.Timestamp(dayAfter.getTimeInMillis()));
 			} else {
 				query.setTimestamp(index++, new java.sql.Timestamp(event
-						.getDate().getTime()));
+						.getStartDate().getTime()));
 				query.setInt(index++, event.getDuration());
 			}
 
@@ -668,7 +668,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ret.add(rs.getString(1));
 			}
 			logger.info("Found " + ret.size() + " results with title "
-					+ event.getTitle() + " date: " + event.getDate()
+					+ event.getTitle() + " date: " + event.getStartDate()
 					+ " duration: " + event.getDuration() + " domain_id: "
 					+ (domain != null ? domain.getId() : "null"));
 		} catch (Exception e) {
@@ -1573,7 +1573,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			boolean updateAttendees, int sequence, Boolean useObmUser) throws SQLException, FindException, ServerFault, EventNotFoundException {
 
 		logger.info("should modify event with title " + ev.getTitle()
-				+ " date: " + ev.getDate() + " id: " + ev.getObmId());
+				+ " date: " + ev.getStartDate() + " id: " + ev.getObmId());
 		
 		Connection con = null;
 
@@ -1592,7 +1592,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			boolean updateAttendees, Boolean useObmUser) throws SQLException, FindException, EventNotFoundException, ServerFault {
 
 		logger.info("should modify event with title " + ev.getTitle()
-				+ " date: " + ev.getDate() + " id: " + ev.getObmId());
+				+ " date: " + ev.getStartDate() + " id: " + ev.getObmId());
 		
 		Connection con = null;
 
@@ -1691,7 +1691,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
 		// .getPrivacy());
 		ps.setInt(9, ev.getPrivacy().toSqlIntCode());
-		ps.setTimestamp(10, new Timestamp(ev.getDate().getTime()));
+		ps.setTimestamp(10, new Timestamp(ev.getStartDate().getTime()));
 		ps.setInt(11, ev.getDuration());
 		ps.setBoolean(12, ev.isAllday());
 		EventRecurrence er = ev.getRecurrence();

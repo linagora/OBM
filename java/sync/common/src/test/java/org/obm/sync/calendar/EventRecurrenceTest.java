@@ -153,7 +153,7 @@ public class EventRecurrenceTest {
 		EventRecurrence rec2 = getOneDailyEventRecurence();
 
 		rec2.addEventException(e2);
-		rec2.addException(e1.getDate());
+		rec2.addException(e1.getStartDate());
 
 		String attendeeWithDeclinedEventEmail = "email2@email.com";
 		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
@@ -205,7 +205,7 @@ public class EventRecurrenceTest {
 		
 		Date d1 = getDate(2011, Calendar.DECEMBER, 20);
 		event.setRecurrenceId(d1);
-		event.setDate(d1);
+		event.setStartDate(d1);
 		return event;
 	}
 	

@@ -47,7 +47,7 @@ public class ComparatorUsingEventHasImportantChanges implements Comparator<Event
 		if (locationCompare != 0) {
 			return locationCompare;
 		}
-		int dateCompare = compare(o1.getDate(), o2.getDate());
+		int dateCompare = compare(o1.getStartDate(), o2.getStartDate());
 		if (dateCompare != 0) {
 			return dateCompare;
 		}
