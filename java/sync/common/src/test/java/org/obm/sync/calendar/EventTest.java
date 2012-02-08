@@ -643,7 +643,6 @@ public class EventTest {
 		event.setOwner("owner");
 		event.setOwnerDisplayName("owner displayname");
 		event.setOwnerEmail("owner email");
-		event.setPercent(1);
 		event.setPriority(1);
 		event.setPrivacy(EventPrivacy.PRIVATE);
 		event.setSequence(0);

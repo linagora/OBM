@@ -87,7 +87,6 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		ev.setDescription("description");
 		ev.setLocation("tlse");
 		ev.setOpacity(EventOpacity.OPAQUE);
-		ev.setPercent(1);
 		ev.setPriority(1);
 		List<Attendee> la = new LinkedList<Attendee>();
 		Attendee at = new Attendee();
@@ -296,28 +295,6 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getStubBeforeSequenceEvent();
 		Event e2 = getStubAfterSequenceEvent();
 		e2.setOpacity(EventOpacity.TRANSPARENT);
-		boolean result = comparator.equivalent(e1, e2);
-		
-		Assert.assertEquals(false, result);
-	}
-	
-	@Test
-	public void testComparePercent(){
-		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
-		Event e1 = getStubBeforeSequenceEvent();
-		Event e2 = getStubAfterSequenceEvent();
-		e2.setPercent(e1.getPercent() + 10);
-		boolean result = comparator.equivalent(e1, e2);
-		
-		Assert.assertEquals(false, result);
-	}
-	
-	@Test
-	public void testCompareLesserPercent(){
-		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
-		Event e1 = getStubBeforeSequenceEvent();
-		Event e2 = getStubAfterSequenceEvent();
-		e2.setPercent(e1.getPercent() - 10);
 		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
@@ -696,29 +673,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		
 		Assert.assertEquals(false, result);
 	}
-	
-	@Test
-	public void testComparePercentWithDifferentTimeUpdateEvent(){
-		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
-		Event e1 = getStubBeforeTimeUpdateEvent();
-		Event e2 = getStubAfterTimeUpdateEvent();
-		e2.setPercent(e1.getPercent() + 10);
-		boolean result = comparator.equivalent(e1, e2);
-		
-		Assert.assertEquals(false, result);
-	}
-	
-	@Test
-	public void testCompareLesserPercentWithDifferentTimeUpdateEvent(){
-		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
-		Event e1 = getStubBeforeTimeUpdateEvent();
-		Event e2 = getStubAfterTimeUpdateEvent();
-		e2.setPercent(e1.getPercent() - 10);
-		boolean result = comparator.equivalent(e1, e2);
-		
-		Assert.assertEquals(false, result);
-	}
-	
+
 	@Test
 	public void testComparePriorityWithDifferentTimeUpdateEvent(){
 		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();

@@ -239,14 +239,6 @@ public class Event implements Indexed<Integer> {
 		this.type = type;
 	}
 
-	public Integer getPercent() {
-		return percent;
-	}
-
-	public void setPercent(Integer percent) {
-		this.percent = percent;
-	}
-
 	public void addAttendee(Attendee att) {
 		attendees.add(att);
 	}
@@ -292,7 +284,6 @@ public class Event implements Indexed<Integer> {
 		event.setOwnerEmail(ownerEmail);
 		event.setCreatorDisplayName(creatorDisplayName);
 		event.setCreatorEmail(creatorEmail);
-		event.setPercent(percent);
 		event.setPriority(priority);
 		event.setPrivacy(privacy);
 		event.setRecurrence(recurrence.clone());

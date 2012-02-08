@@ -77,10 +77,6 @@ public class TaskConverter {
 		mse.setSensitivity(e.getPrivacy() == EventPrivacy.PUBLIC ? CalendarSensitivity.NORMAL
 				: CalendarSensitivity.PRIVATE);
 
-		if (e.getPercent() != null) {
-			mse.setComplete(e.getPercent() >= 100);
-		}
-
 		Date dateTimeEnd = new Date(e.getStartDate().getTime() + e.getDuration()
 				* 1000);
 
