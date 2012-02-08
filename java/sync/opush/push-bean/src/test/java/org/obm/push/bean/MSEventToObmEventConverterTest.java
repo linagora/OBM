@@ -8,6 +8,7 @@ import java.util.TimeZone;
 
 import org.fest.assertions.Assertions;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obm.push.MSEventToObmEventConverter;
 import org.obm.push.exception.IllegalMSEventStateException;
@@ -36,6 +37,19 @@ public class MSEventToObmEventConverterTest {
 						.createUser(mailbox, mailbox, null), password, null), null, null, null);
 	}
 
+	@Ignore("We should find in OBMEvent the corresponding UID of MSEvent")
+	@Test
+	public void testConvertAttributeUID() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withUid(new MSEventUid("{81412D3C-2A24-4E9D-B20E-11F7BBE92799}"))
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+	
 	@Test
 	public void testConvertAttributeAllDayFalse() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
