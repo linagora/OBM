@@ -872,6 +872,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_event_data($calendar, $organizer) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM();
 
   if (array_key_exists('ext_id', $calendar)) {
     $ext_id = $calendar['ext_id'];
@@ -976,11 +977,11 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
     '$organizer',
     '".Of_Date::getOption('timezone')."',
     '$opacity', 
-    '$title',
+    '".$obm_q->escape($title)."',
     '$datebegin',
-    '$description',
+    '".$obm_q->escape($description)."',
     '$properties',
-    '$location',
+    '".$obm_q->escape($location)."',
     $category1_id,
     $priority,
     $privacy,
@@ -994,7 +995,6 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
     $repeat_end,
     $obm[domain_id])";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
-  $obm_q = new DB_OBM();
   $obm_q->query($query);
 
   $id = $obm_q->lastid();
@@ -1020,6 +1020,7 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, $state, $is_organizer = false) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $entity_id = sql_parse_id($entity_id);
   $uid = sql_parse_id($obm['uid']);
@@ -1039,12 +1040,11 @@ function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 
     $event_id,
     ".of_entity_subquery($entity, $entity_id).",
     'REQ',
-    '$state',
+    '".$obm_q->escape($state)."',
     $is_organizer,
     '')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_entity_event()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q; 
 }
@@ -1263,15 +1263,15 @@ function get_event_desc_with_attachements($attachments_urls, $description) {
 function run_query_update_description_with_attachments($event_entity_id)
 {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $event_id = select_eventid_from_evententity($event_entity_id);
 
   if (!empty($event_id)) {
     $new_description = get_event_desc_with_attachements(get_event_attachments_urls($event_id), get_event_description($event_id));
     $query_update_desc = "UPDATE Event
-    SET event_description = '".addslashes($new_description)."'
+    SET event_description = '".$obm_q->escape($new_description)."'
     WHERE event_id = $event_id";
-    $obm_q = new DB_OBM;
     $obm_q->query($query_update_desc);
   }
   else {
@@ -1500,14 +1500,14 @@ function run_query_icalendar_insert($params, $force = false) {
 ///////////////////////////////////////////////////////////////////////////////
 function search_user_by_name($lastname, $firstname) {
   global $c_none ;
+  $obm_q = new DB_OBM();
 
   $sql = "SELECT userobm_id from UserObm ";
   $sql .= "WHERE ";
-  $sql .= "UPPER(userobm_lastname) = '".strtoupper($lastname)."' AND ";
-  $sql .= "UPPER(userobm_firstname) = '".strtoupper($firstname)."' AND ";
+  $sql .= "UPPER(userobm_lastname) = '".$obm_q->escape(strtoupper($lastname))."' AND ";
+  $sql .= "UPPER(userobm_firstname) = '".$obm_q->escape(strtoupper($firstname))."' AND ";
   $sql .= "userobm_archive = '0';";
 
-  $obm_q = new DB_OBM();
   $result = $obm_q->query($sql);
   if ($obm_q->num_rows() == 1) {
     $obm_q->next_record();
@@ -2034,16 +2034,16 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
       event_userupdate = $obm[uid], 
-      event_title = '$title', 
-      event_date = '$datebegin',     
-      event_description = '$description',
-      event_properties = '$properties', 
-      event_location = '$location',
+      event_title = '".$obm_q->escape($title)."', 
+      event_date = '".$obm_q->escape($datebegin)."',     
+      event_description = '".$obm_q->escape($description)."',
+      event_properties = '".$obm_q->escape($properties)."', 
+      event_location = '".$obm_q->escape($location)."',
       event_category1_id = $category1_id,
       event_priority = '$priority',
       event_privacy = '$privacy', 
       event_opacity = '$opacity', 
-      event_duration = '$event_duration',
+      event_duration = '".$obm_q->escape($event_duration)."',
       event_allday = $all_day, 
       event_tag_id = $event_tag_id,
       event_allow_documents = '$allow_documents',
@@ -2139,7 +2139,7 @@ function run_query_calendar_quick_event_update($calendar) {
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
       event_userupdate = $obm[uid],
-      event_title = '$title',
+      event_title = '".$obm_q->escape($title)."',
       $event_date
       event_origin = '$GLOBALS[c_origin_ajax]',
       event_duration = '$event_duration',
@@ -2206,10 +2206,10 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
       $datebegin->setHour(0)->setMinute(0)->setSecond(0);
       $calendar['all_day'] = 1;
     }
-    $event_location = addslashes($q->f("event_location"));
+    $event_location = $q->f("event_location");
     $calendar['location'] = $event_location; 
     $event_privacy = $q->f("event_privacy");
-    $event_description = addslashes($q->f("event_description"));
+    $event_description = $q->f("event_description");
     $calendar['description'] = $event_description; 
     $event_priority = $q->f("event_priority");
     $event_repeatkind = $q->f("event_repeatkind");
@@ -2272,19 +2272,19 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     '$GLOBALS[c_origin_ajax]',
     ".$organizerId.",
     '".Of_Date::getOption('timezone')."', 
-    '$title', 
-    '$datebegin',     
+    '".$obm_q->escape($title)."', 
+    '".$obm_q->escape($datebegin)."',     
     '$event_duration',
     $all_day,
     '$opacity',
-    '$event_description',
-    '$event_properties',
+    '".$obm_q->escape($event_description)."',
+    '".$obm_q->escape($event_properties)."',
     $event_privacy,
     '$event_repeatkind',
     $event_repeatfrequence,
     $event_endrepeat,
     '$event_repeatdays',
-    '$event_location',
+    '".$obm_q->escape($event_location)."',
     $event_category1_id
     $event_priority,
     $obm[domain_id],
@@ -2443,9 +2443,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $event_tag_id = $event_q->f('tag_id') ;
     if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
     if (is_null($event_tag_id)) $event_tag_id = 'NULL' ;
-    $description = addslashes($event_q->f('event_description'));
+    $description = $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
-    $location = addslashes($event_q->f('event_location'));
+    $location = $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
     $ext_id = $event_q->f('event_ext_id');
@@ -2491,11 +2491,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
       '$GLOBALS[c_origin_web]',
       $oldOwner,
       '".Of_Date::getOption('timezone')."',
-      '$title',
-      '$datebegin',
-      '$description',
+      '".$obm_q->escape($title)."',
+      '".$obm_q->escape($datebegin)."',
+      '".$obm_q->escape($description)."',
       '$properties',
-      '$location',
+      '".$obm_q->escape($location)."',
       $category1_id,
       $priority,
       $privacy,
@@ -2915,11 +2915,11 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
     $query = "UPDATE EventTemplate SET
       eventtemplate_timeupdate = NOW(),
       eventtemplate_owner = '$owner',
-      eventtemplate_title = '$title', 
-      eventtemplate_date = '$datebegin',     
-      eventtemplate_description = '$description',
-      eventtemplate_properties = '$properties',
-      eventtemplate_location = '$location',
+      eventtemplate_title = '".$obm_q->escape($title)."', 
+      eventtemplate_date = '".$obm_q->escape($datebegin)."',     
+      eventtemplate_description = '".$obm_q->escape($description)."',
+      eventtemplate_properties = '".$obm_q->escape($properties)."',
+      eventtemplate_location = '".$obm_q->escape($location)."',
       eventtemplate_category1_id = $category1_id,
       eventtemplate_priority = $priority,
       eventtemplate_privacy = $privacy,
@@ -2978,16 +2978,16 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_show_user_calendar,
       eventtemplate_show_resource_calendar)
       VALUES (
-      '$name',
+      '".$obm_q->escape($name)."',
       NOW(),
       NOW(),
       '$obm[uid]',
       '$owner',
-      '$title',
-      '$datebegin',
-      '$description',
-      '$properties',
-      '$location',
+      '".$obm_q->escape($title)."',
+      '".$obm_q->escape($datebegin)."',
+      '".$obm_q->escape($description)."',
+      '".$obm_q->escape($properties)."',
+      '".$obm_q->escape($location)."',
       $category1_id,
       $priority,
       $privacy,
@@ -3036,7 +3036,7 @@ function run_query_check_exists_template_by_name($templateName){
 
   $query = "SELECT eventtemplate_id 
             FROM EventTemplate
-            WHERE eventtemplate_name = '".$templateName."'";
+            WHERE eventtemplate_name = '".$obm_q->escape($templateName)."'";
   display_debug_msg($query, $cdg_sql, 'run_query_check_exists_template_by_name()');
   
   $obm_q = new DB_OBM;
@@ -3344,11 +3344,11 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
  */
 function run_query_calendar_set_template_name($template_id, $new_name) {
   global $obm;
-  
-  $template_id = (int) $template_id;
-  $query = "UPDATE EventTemplate SET eventtemplate_name = '$new_name' 
-    WHERE eventtemplate_id = $template_id AND eventtemplate_usercreate = $obm[uid]";
   $obm_q = new DB_OBM;
+
+  $template_id = (int) $template_id;
+  $query = "UPDATE EventTemplate SET eventtemplate_name = '".$obm_q->escape($new_name)."' 
+    WHERE eventtemplate_id = $template_id AND eventtemplate_usercreate = $obm[uid]";
   return $obm_q->query($query);
 }
 
@@ -3361,7 +3361,8 @@ function run_query_calendar_set_template_name($template_id, $new_name) {
  */
 function run_query_calendar_import_template($xml) {
   global $obm, $cdg_sql;
-  
+  $obm_q = new DB_OBM ;
+
   if ($xml->getName() == 'event_templates') {
     foreach ($xml->event_template as $template) {
       if (!run_query_calendar_import_template($template)) {
@@ -3381,7 +3382,7 @@ function run_query_calendar_import_template($xml) {
     'contact_ids','resource_ids','group_ids','document_ids', 'organizer');
     
   foreach ($columns as $column) {
-    $value = addslashes((string) $xml->{$column});
+    $value = (string) $xml->{$column};
     $$column = ($value == '') ? 'NULL' : "'$value'";
   }
   
@@ -3427,16 +3428,16 @@ function run_query_calendar_import_template($xml) {
       eventtemplate_document_ids,
       eventtemplate_organizer)
       VALUES (
-      $name,
+      ".$obm_q->escape($name).",
       NOW(),
       NOW(),
       '$obm[uid]',
       $owner,
-      $title,
-      $date,
-      $description,
+      ".$obm_q->escape($title).",
+      ".$obm_q->escape($date).",
+      ".$obm_q->escape($description).",
       '$properties',
-      $location,
+      ".$obm_q->escape($location).",
       $category1_id,
       $priority,
       $privacy,
@@ -3458,7 +3459,6 @@ function run_query_calendar_import_template($xml) {
       $organizer)";
   
   display_debug_msg($query, $cdg_sql,"run_query_calendar_import_template()");
-  $obm_q = new DB_OBM ;
   return $obm_q->query($query);
 }
 
@@ -5430,7 +5430,7 @@ function run_query_add_contact_shared_calendar($params) {
   $query = "DELETE FROM Website WHERE website_entity_id = $entityid";
   display_debug_msg($query, $cdg_sql, 'run_query_add_contact_shared_calendar()');
   $obm_q->query($query);
-  $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($entityid, '$url', 'CALURI;X-OBM-Ref1')";
+  $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($entityid, '".$obm_q->escape($url)."', 'CALURI;X-OBM-Ref1')";
   display_debug_msg($query, $cdg_sql, 'run_query_add_contact_shared_calendar()');
   $obm_q->query($query);
   
@@ -5470,22 +5470,22 @@ function run_query_calendar_create_or_update_tag(&$calendar) {
   
   if ($taglabel != '') {
     $query = "SELECT eventtag_id FROM EventTag 
-              WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+              WHERE eventtag_label = '".$obm_q->escape($taglabel)."' and eventtag_user_id = ".$obm['uid']." ;" ;
     $obm_q->query($query);
     if ($obm_q->num_rows() > 0) {
       $query = "UPDATE EventTag SET 
-                eventtag_color = '$tagcolor '
-                WHERE eventtag_label = '$taglabel'
+                eventtag_color = '".$obm_q->escape($tagcolor)." '
+                WHERE eventtag_label = '".$obm_q->escape($taglabel)."'
                 AND eventtag_user_id = ".$obm['uid']." ;" ;
       $obm_q->query($query) ; 
     } else {
       $query = "INSERT INTO EventTag 
                 (eventtag_label, eventtag_color, eventtag_user_id) 
-                VALUES ('$taglabel', '$tagcolor', ".$obm['uid'].") ;" ;
+                VALUES ('".$obm_q->escape($taglabel)."', '".$obm_q->escape($tagcolor)."', ".$obm['uid'].") ;" ;
       $obm_q->query($query) ;
       // get back the last inserted eventtag_id
       $query = "SELECT eventtag_id FROM EventTag 
-                WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+                WHERE eventtag_label = '".$obm_q->escape($taglabel)."' and eventtag_user_id = ".$obm['uid']." ;" ;
       $obm_q->query($query) ;
       $obm_q->next_record() ;
       $tagid = $obm_q->f('eventtag_id') ;
@@ -5536,7 +5536,7 @@ function run_query_tag_update($uid, $params) {
   $tagcolor = $params['tag_color'] ;
   
   $query = "UPDATE EventTag 
-      SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
+      SET eventtag_label = '".$obm_q->escape($taglabel)."', eventtag_color = '".$obm_q->escape($tagcolor)."' 
       WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
 
   return $obm_q->query($query) ;
@@ -5561,7 +5561,7 @@ function run_query_tag_insert($uid, $params) {
   // verifier si le tag n'existe pas deja
   $query = "SELECT eventtag_id 
       FROM EventTag 
-      WHERE eventtag_label = '$taglabel' 
+      WHERE eventtag_label = '".$obm_q->escape($taglabel)."' 
       AND eventtag_user_id = $uid" ;
   $obm_q->query($query) ;
   
@@ -5570,14 +5570,14 @@ function run_query_tag_insert($uid, $params) {
     $obm_q->next_record() ;
     $tagid = $obm_q->f('eventtag_id') ;
     $query = "UPDATE EventTag 
-      SET eventtag_label = '$taglabel', eventtag_color = '$tagcolor' 
+      SET eventtag_label = '".$obm_q->escape($taglabel)."', eventtag_color = '".$obm_q->escape($tagcolor)."' 
       WHERE eventtag_id = $tagid AND eventtag_user_id = $uid ;" ;
   }
   else {
     // create the tag
     $query = "INSERT INTO EventTag 
               (eventtag_label, eventtag_color, eventtag_user_id)
-              VALUES ('$taglabel', '$tagcolor', $uid) ;" ;
+              VALUES ('".$obm_q->escape($taglabel)."', '".$obm_q->escape($tagcolor)."', $uid) ;" ;
   }
   
   return $obm_q->query($query) ;
@@ -7084,7 +7084,7 @@ Class CalendarView {
       obmbookmark_label,
       obmbookmark_entity) VALUES (
         $user_id,
-        '{$this->label}',
+        '{".$obm_q->escape($this->label)."}',
         'calendar')";
     display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
     $obm_q->query($query);
@@ -7099,7 +7099,7 @@ Class CalendarView {
         obmbookmarkproperty_value) VALUES (
           {$this->id},
           '$property',
-          '$value')";
+          '".$obm_q->escape($value)."')";
       display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
       $obm_q->query($query);
     }
@@ -7305,14 +7305,15 @@ function run_query_writable_calendars($obm_user_id, $selected_calendars) {
 
 function run_query_get_recurring_event_id_from_ext_id($ext_id, $obm_user_id) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
+
   $query = "SELECT e.event_id AS event_id
         FROM Event e
         LEFT JOIN EventException ee
         ON e.event_id = ee.eventexception_child_id
-        WHERE e.event_ext_id = '".addslashes($ext_id)."'
+        WHERE e.event_ext_id = '".$obm_q->escape($ext_id)."'
         AND e.event_owner = $obm_user_id
         AND ee.eventexception_parent_id IS NULL";
-  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
 
