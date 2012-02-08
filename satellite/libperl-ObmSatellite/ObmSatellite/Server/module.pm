@@ -46,7 +46,11 @@ sub _loadModules {
 
         eval {
             require $modulePath;
-        } or next;
+        };
+        if ($@) {
+            $self->_log("Couldn't load module ".$modules[$i].": $@", 1);
+            next;
+        }
 
         my $module = $moduleClass->new();
         if( !defined($module) ) {
