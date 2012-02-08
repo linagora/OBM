@@ -45,6 +45,7 @@ abstract class OBM_Satellite_Query {
    * @access public
    **/
   public function __construct($auth, $args, $data = null) {
+    $this->data = $data;
     $this->request = curl_init();
 
     // default options

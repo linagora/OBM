@@ -127,10 +127,32 @@ class Backup {
     );
     $data = array_merge($data,$options);
     try {
+      $updateEmail = ($method === 'mailbox' || $method === 'all');
+      if ($updateEmail) {
+          $this->updatePostfixAccess(false);
+      }
       $query = new OBM_Satellite_RestoreEntity(Backup::$auth, $url_args, $data);
       $this->$restoreFunc($query->execute(),$method);
+      if ($updateEmail) {
+          $this->updatePostfixAccess(true);
+      }
     } catch (Exception $e) {
       throw new Exception($GLOBALS['l_err_cant_restore'].' ('.$e->getMessage().')');
+    }
+  }
+
+  private function updatePostfixAccess($enableAccess) {
+    foreach ($this->details['smtpServers'] as $smtpServer) {
+        $params = array(
+            'host'  => $smtpServer,
+            'login' => $this->details['login'],
+            'realm' => $this->details['realm'],
+        );
+        $query = new OBM_Satellite_PostfixAccess(Backup::$auth, $params, array('enableAccess' => $enableAccess));
+        $response = $query->execute();
+        if (!$response['postfixAccessUpdate']['success']) {
+          throw new Exception("Unable to update Postfix access: ".$response['postfixAccessUpdate']['msg']);
+        }
     }
   }
 
@@ -152,6 +174,7 @@ class Backup {
         userobm_login as login,
         'user' as entity,
         domain_name as realm,
+        domain_id as realm_id,
         ms.host_ip as host
       FROM UserObm
       LEFT JOIN Domain on userobm_domain_id=domain_id
@@ -176,7 +199,21 @@ class Backup {
 //      throw new Exception($GLOBALS['l_err_backup_no_mail']);
 //    }
 
-    $this->details = $obm_q->Record;
+    $user_details = $obm_q->Record;
+    $realm_id = $user_details['realm_id'];
+    $smtp_query = "SELECT
+        DISTINCT host_name AS smtpServer
+        FROM Host
+        INNER JOIN ServiceProperty ON host_id=serviceproperty_value
+        INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id
+        WHERE domainentity_domain_id=$realm_id AND serviceproperty_service='mail' AND serviceproperty_property='smtp_in'";
+    $obm_q->query($smtp_query);
+    $smtp_servers = array();
+    while ($obm_q->next_record()) {
+        array_push($smtp_servers, $obm_q->f('smtpServer'));
+    }
+    $user_details['smtpServers'] = $smtp_servers;
+    $this->details = $user_details;
   }
 
   /**
