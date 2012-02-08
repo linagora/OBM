@@ -144,7 +144,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 				t.getObmId(), t.getExtId(), t.getPrivacy(), t.getOwner(), t.getOwnerDisplayName(), t.getOwnerEmail(),
 				t.getLocation(), t.getStartDate(), t.getDuration(), t.getAlert(), t.getCategory(), t.getPriority(), t.isAllday(),
 				t.getAttendees(), t.getType(), t.getPercent(), t.getOpacity(),
-				t.getEntityId(), t.getTimeUpdate(), t.getTimeCreate(), t.getTimezoneName(), t.getRecurrenceId(),
+				t.getTimeUpdate(), t.getTimeCreate(), t.getTimezoneName(), t.getRecurrenceId(),
 				t.isInternalEvent(), t.getSequence());
 	}
 

@@ -67,6 +67,7 @@ import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -81,7 +82,6 @@ import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
-import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
@@ -109,7 +109,6 @@ import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 import fr.aliacom.obm.utils.RFC2445;
@@ -325,9 +324,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		ps.close();
 
-		LinkedEntity le = obmHelper.linkEntity(con, "EventEntity", "event_id",
-				id.getObmId());
-		ev.setEntityId(le.getEntityId());
+		obmHelper.linkEntity(con, "EventEntity", "event_id", id.getObmId());
 
 		insertAttendees(editor, calendar, ev, con, ev.getAttendees(), useObmUser);
 
@@ -447,7 +444,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		e.setRecurrence(er);
 
-		e.setEntityId(evrs.getInt("evententity_entity_id"));
 		e.setOwner(evrs.getString("owner"));
 		e.setOwnerEmail( getUserObmEmail(evrs, evrs.getString("domain_name")) );
 		e.setOwnerDisplayName(getOwnerDisplayName(evrs));

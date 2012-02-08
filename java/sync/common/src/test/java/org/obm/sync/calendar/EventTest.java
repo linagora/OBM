@@ -636,7 +636,6 @@ public class EventTest {
 		event.setStartDate(currentDate);
 		event.setDescription("description");
 		event.setDuration(10);
-		event.setEntityId(1);
 		event.setExtId(new EventExtId("1"));
 		event.setInternalEvent(true);
 		event.setLocation("location");
