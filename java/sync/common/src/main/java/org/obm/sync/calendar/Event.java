@@ -55,6 +55,8 @@ import com.google.common.collect.Maps;
 
 public class Event implements Indexed<Integer> {
 
+	public static final int SECONDS_IN_A_DAY = 3600 * 24;
+	
 	private String title;
 	private String description;
 	private EventObmId uid;
@@ -120,10 +122,15 @@ public class Event implements Indexed<Integer> {
 	 * @return duration in second
 	 */
 	public int getDuration() {
+		if (allday) {
+			return SECONDS_IN_A_DAY;
+		}
 		return duration;
 	}
 
 	public void setDuration(int duration) {
+		Preconditions.checkArgument(duration >= 0, "Duration must be a positive integer value");
+		Preconditions.checkState(allday == false, "Duration can't be set on an AllDay event");
 		this.duration = duration;
 	}
 
@@ -269,35 +276,34 @@ public class Event implements Indexed<Integer> {
 
 	public Event clone() {
 		Event event = new Event();
-		event.setAlert(alert);
-		event.setAllday(allday);
-		event.addAttendees(copyAttendees());
-		event.setCategory(category);
-		event.setStartDate(startDate);
-		event.setDescription(description);
-		event.setDuration(duration);
-		event.setExtId(extId);
-		event.setLocation(location);
-		event.setOpacity(opacity);
-		event.setOwner(owner);
-		event.setOwnerDisplayName(ownerDisplayName);
-		event.setOwnerEmail(ownerEmail);
-		event.setCreatorDisplayName(creatorDisplayName);
-		event.setCreatorEmail(creatorEmail);
-		event.setPriority(priority);
-		event.setPrivacy(privacy);
-		event.setRecurrence(recurrence.clone());
-		event.setTimeUpdate(timeUpdate);
-		event.setTimezoneName(timezoneName);
-		event.setTitle(title);
-		event.setType(type);
-		event.setUid(uid);
-		event.setRecurrenceId(recurrenceId);
-		event.setInternalEvent(internalEvent);
-		event.setSequence(sequence);
-		
-		event.setTimeCreate(timeCreate);
-		event.setTimeUpdate(timeUpdate);
+		event.alert = alert;
+		event.allday = allday;
+		event.attendees = copyAttendees();
+		event.category = category;
+		event.startDate = startDate;
+		event.description = description;
+		event.duration = duration;
+		event.extId = extId;
+		event.location = location;
+		event.opacity = opacity;
+		event.owner = owner;
+		event.ownerDisplayName = ownerDisplayName;
+		event.ownerEmail = ownerEmail;
+		event.creatorDisplayName = creatorDisplayName;
+		event.creatorEmail = creatorEmail;
+		event.priority = priority;
+		event.privacy = privacy;
+		event.recurrence = recurrence.clone();
+		event.timeUpdate = timeUpdate;
+		event.timezoneName = timezoneName;
+		event.title = title;
+		event.type = type;
+		event.uid = uid;
+		event.recurrenceId = recurrenceId;
+		event.internalEvent = internalEvent;
+		event.sequence = sequence;
+		event.timeCreate = timeCreate;
+		event.timeUpdate = timeUpdate;
 		return event;
 	}
 

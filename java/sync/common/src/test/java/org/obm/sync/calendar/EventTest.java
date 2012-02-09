@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static org.obm.DateUtils.date;
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -626,6 +629,76 @@ public class EventTest {
 		return event;
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testNegativeDuration() {
+		Event event = new Event();
+		event.setDuration(-10);
+	}
+	
+	@Test
+	public void testDurationThenAllDay() {
+		Event event = new Event();
+		event.setDuration(10);
+		event.setAllday(true);
+		int secondsInADay = 3600*24;
+		assertThat(event.getDuration()).isEqualTo(secondsInADay);
+		assertThat(event.isAllday()).isEqualTo(true);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testAllDayThenDuration() {
+		Event event = new Event();
+		event.setAllday(true);
+		event.setDuration(10);
+	}
+	
+	@Test
+	public void testDurationThenAllDayThenNotAllDay() {
+		Event event = new Event();
+		event.setDuration(10);
+		event.setAllday(true);
+		event.setAllday(false);
+		assertThat(event.getDuration()).isEqualTo(10);
+		assertThat(event.isAllday()).isEqualTo(false);
+	}
+	
+	@Test
+	public void testEndDateAllDay() {
+		Event event = new Event();
+		event.setAllday(true);
+		event.setStartDate(date("2004-12-11T11:15:10Z"));
+		assertThat(event.getEndDate()).isEqualTo(date("2004-12-12T11:15:10Z"));
+	}
+	
+	@Test
+	public void testEndDateNullStartDateAndAllDay() {
+		Event event = new Event();
+		event.setAllday(true);
+		assertThat(event.getEndDate()).isNull();
+	}
+	
+	@Test
+	public void testEndDateNullStartDate() {
+		Event event = new Event();
+		event.setDuration(10);
+		assertThat(event.getEndDate()).isNull();
+	}
+	
+	@Test
+	public void testEndDate() {
+		Event event = new Event();
+		event.setDuration(120);
+		event.setStartDate(date("2004-12-11T11:15:10Z"));
+		assertThat(event.getEndDate()).isEqualTo(date("2004-12-11T11:17:10Z"));
+	}
+	
+	@Test
+	public void testEndDateUndefinedDuration() {
+		Event event = new Event();
+		event.setStartDate(date("2004-12-11T11:15:10Z"));
+		assertThat(event.getEndDate()).isEqualTo(date("2004-12-11T11:15:10Z"));
+	}
+	
 	private Event createOneEvent(int nbAttendees) {
 		Date currentDate = new Date();
 		Event event = new Event();
@@ -635,7 +708,6 @@ public class EventTest {
 		event.setCategory("category");
 		event.setStartDate(currentDate);
 		event.setDescription("description");
-		event.setDuration(10);
 		event.setExtId(new EventExtId("1"));
 		event.setInternalEvent(true);
 		event.setLocation("location");
