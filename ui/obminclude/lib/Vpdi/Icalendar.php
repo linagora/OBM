@@ -82,7 +82,17 @@ class Vpdi_Icalendar extends Vpdi_Entity {
     }
     return $comps;
   }
-  
+ 
+  public function getVevents($type = null) {
+    $vevents = array();
+    foreach($this->getComponents($type) as $component) {
+      if ( $component instanceof Vpdi_Icalendar_Vevent) {
+        $vevents[] = $component;
+      }
+    }
+    return $vevents;
+  }
+ 
   public function getBusyPeriods() {
     $periods = array();
     if (count($this->getComponents(Vpdi_Icalendar_Component::VFREEBUSY)) > 0) {

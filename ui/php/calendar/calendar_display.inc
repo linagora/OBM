@@ -2899,21 +2899,19 @@ function dis_calendar_event_consult($id) {
 function dis_calendar_event_consult_ext($contact_id, $id) {
   global $display, $l_err_reference;
 	
-  if ($id) 	
-  {
-	  $contact = OBM_Contact::get($contact_id);
-	  $contact_calendar = $contact->getCalendar();
-	  $events = $contact_calendar->getComponents();
-	  foreach ($events as $event) {
-		  if  ($event->getUid() == substr($id,4)) //remove 'ext-' to compare
+  if ($id) {
+	$searched_uid = substr($id,4);
+	$contact = OBM_Contact::get($contact_id);
+	$contact_calendar = $contact->getCalendar();
+	$events = $contact_calendar->getVevents();
+	foreach ($events as $event) {
+		if  ($event->getUid() == $searched_uid) {
 			$event_q = new Vpdi_Icalendar_Event($event);
-	  }
-	  $attendees =  $event_q->getAttendees();
-	  /*$exception_q = run_query_get_one_event_exception($id);
-      $alerts = get_one_event_user_alert($id);
-      $display['detailInfo'] = display_record_info($eve_q);*/
-	  $block = html_calendar_event_consult_ext($event_q, "", $attendees, "");
-	  // $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
+			$attendees =  $event_q->getAttendees();
+			$block = html_calendar_event_consult_ext($event_q, "", $attendees, "");
+			return $block;
+		  } 
+	}
   } else {
 	  $display['msg'] .= display_err_msg($l_err_reference);
   }
