@@ -581,6 +581,198 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 	}
 
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyNDayNeedInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(15);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+	}
+
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyNDayIntervalIllegal() throws IllegalMSEventStateException {
+		Integer monthlyIntervalShouldLessThan = 100;
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(monthlyIntervalShouldLessThan);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthlyNDay() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
+		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+	}
+	
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyNDayUntilAndOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		recurrence.setOccurrences(3);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayUntil() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayUntilNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		recurrence.setOccurrences(3);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		Integer monthsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Date untilDateExpected = addMonthsToDate(msEventRecurrent.getStartTime(), monthsNeededToContainsOccurrence);
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayOccurenceNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		recurrence.setOccurrences(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyNDayOnNinthDayEachTwoMonth() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		recurrence.setUntil(null);
+		recurrence.setOccurrences(null);
+		recurrence.setInterval(2);
+		recurrence.setDayOfMonth(9);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject").withRecurrence(recurrence).build();
+
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEventRecurrent.getStartTime());
+		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
+		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+	}
+
 	private Calendar getInitializedCalendar(Date initTime) {
 		Calendar instance = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		instance.setTime(initTime);
