@@ -43,6 +43,7 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
@@ -156,11 +157,12 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private String getCollectionPath(BackendSession bs, String folderName)  {
+		
 		if (isDefaultFolder(folderName)) {
-			return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\\\" + folderName;
+			return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.CONTACTS, folderName);
 		} else {
-			return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\\\" + 
-						contactConfiguration.getDefaultAddressBookName() + "\\\\" + folderName;
+			return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.CONTACTS, 
+					contactConfiguration.getDefaultAddressBookName(), folderName);
 		}
 	}
 	
