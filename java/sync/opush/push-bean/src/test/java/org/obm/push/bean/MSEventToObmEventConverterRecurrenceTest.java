@@ -413,10 +413,172 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		convertToOBMEvent(msEventRecurrent);
 	}
 
-	private Date addYearsToDate(Date startTime, Integer years) {
-		Calendar cal = getInitializedCalendar(startTime);
-		cal.add(Calendar.YEAR, years);
-		return cal.getTime();
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyNeedInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(10);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+	}
+
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyIntervalIllegal() throws IllegalMSEventStateException {
+		Integer monthlyIntervalShouldLessThan = 100;
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(monthlyIntervalShouldLessThan);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthly() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
+		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybydate);
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+	}
+	
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeMonthlyUntilAndOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		recurrence.setOccurrences(3);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthlyUntil() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+	}
+	
+	@Test
+	public void testConvertAttributeTypeMonthlyUntilNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		recurrence.setOccurrences(5);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		Integer monthsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Date untilDateExpected = addMonthsToDate(msEventRecurrent.getStartTime(), monthsNeededToContainsOccurrence);
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
+	}
+
+	@Test
+	public void testConvertAttributeTypeMonthlyOccurenceNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.MONTHLY);
+		recurrence.setInterval(1);
+		recurrence.setUntil(null);
+		recurrence.setOccurrences(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 	}
 
 	private Calendar getInitializedCalendar(Date initTime) {
@@ -427,6 +589,18 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	private Event convertToOBMEvent(MSEvent msEvent) throws IllegalMSEventStateException {
 		return converter.convert(bs, null, msEvent, false);
+	}
+
+	private Date addMonthsToDate(Date startTime, Integer months) {
+		Calendar cal = getInitializedCalendar(startTime);
+		cal.add(Calendar.MONTH, months);
+		return cal.getTime();
+	}
+	
+	private Date addYearsToDate(Date startTime, Integer years) {
+		Calendar cal = getInitializedCalendar(startTime);
+		cal.add(Calendar.YEAR, years);
+		return cal.getTime();
 	}
 	
 	private Date date(String date) {
