@@ -57,7 +57,7 @@ public enum RecurrenceType {
 			throw new IllegalMSEventRecurrenceException(msg);
 		}
 	}
-
+	
 	public String asIntString() {
 		switch (this) {
 		case DAILY:

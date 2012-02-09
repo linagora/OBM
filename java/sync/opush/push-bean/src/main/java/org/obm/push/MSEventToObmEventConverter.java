@@ -323,7 +323,7 @@ public class MSEventToObmEventConverter {
 			multiply = Calendar.YEAR;
 			break;
 		case YEARLY_NDAY:
-			or.setKind(RecurrenceKind.yearly);
+			or.setKind(RecurrenceKind.yearlybyday);
 			multiply = Calendar.YEAR;
 			break;
 		}

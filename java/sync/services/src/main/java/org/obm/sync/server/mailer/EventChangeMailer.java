@@ -540,6 +540,7 @@ public class EventChangeMailer extends AbstractMailer {
 				recurrenceInfo.append(getMessages(locale).monthlyRecurrenceInfoWithFrequency(frequency));
 				break;
 			case yearly:
+			case yearlybyday:
 				recurrenceInfo.append(getMessages(locale).annuallyRecurrenceInfoWithFrequency(frequency));	
 				break;
 			case none:
@@ -563,6 +564,7 @@ public class EventChangeMailer extends AbstractMailer {
 				recurrenceInfo.append(getMessages(locale).monthlyRecurrenceInfoWithoutFrequency());
 				break;
 			case yearly:
+			case yearlybyday:
 				recurrenceInfo.append(getMessages(locale).annuallyRecurrenceInfoWithoutFrequency());	
 				break;
 			case none:

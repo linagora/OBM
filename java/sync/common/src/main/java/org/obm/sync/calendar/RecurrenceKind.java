@@ -33,7 +33,7 @@ package org.obm.sync.calendar;
 
 
 public enum RecurrenceKind {
-	none, daily, weekly, monthlybydate, monthlybyday, yearly;
+	none, daily, weekly, monthlybydate, monthlybyday, yearly, yearlybyday;
 	
 	/**
 	 * Same as valueOf but return none when not found
