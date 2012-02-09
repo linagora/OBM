@@ -2361,11 +2361,11 @@ Obm.CalendarQuickForm = new Class({
       this.gotoURI += '&action='+action;
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
-    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='
+    this.gotoURI += '&utf8=1&date_begin='
       +encodeURIComponent(this.eventData.date_begin)+'&duration='
       +this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)
       +'&new_user_id[]='+this.eventData.entity_id;
-    if(this.eventData.all_day){
+    if(this.eventData.all_day == '1'  && obm.vars.consts.calendarRange != 'month'){
       this.gotoURI += '&all_day=1&opacity=TRANSPARENT'
     } 
     gotoUriContainsActionNew = new RegExp("action=new");
