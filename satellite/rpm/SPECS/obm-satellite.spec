@@ -99,6 +99,7 @@ install -p -m 640 doc/conf/logrotate.obm-satellite.sample $RPM_BUILD_ROOT%{_sysc
 
 #postfix configuration file
 install -p -m 755 mods-available/postfixSmtpInMaps $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
+install -p -m 755 mods-available/postfixAccess $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
 #Cyrus configuration file
 install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
 
@@ -132,6 +133,7 @@ perl -MXML::SAX -e "XML::SAX->add_parser(q(XML::SAX::PurePerl))->save_parsers()"
 %{_localstatedir}/log/obm-satellite
 %config(noreplace) %{_sysconfdir}/obm-satellite/obmSatellite.ini
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/postfixSmtpInMaps
+%config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/postfixAccess
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/cyrusPartition
 %{_sysconfdir}/obm-satellite/mods-enabled
 %{_sysconfdir}/init.d/obmSatellite
