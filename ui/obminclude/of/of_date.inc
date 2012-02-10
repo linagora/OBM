@@ -209,12 +209,13 @@ class Of_Date extends DateTime {
 
   public function __construct($time=null, $timezone=null, $parse=true) {
     self::loadOptions();
+     if(is_null($time) || empty($time)) {
+      $this->_error = self::WARN_EMPTY_DATE;
+    }
+    
     if(is_numeric($time) && $parse) {
       $time = ceil($time);
       $time = "@$time";
-    }
-    if(empty($time)) {
-      $this->_error = self::WARN_EMPTY_DATE;
     }
     try {
       if(!is_null($timezone)) {

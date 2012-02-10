@@ -126,6 +126,15 @@ class Vpdi_Property {
     return strcasecmp($this->name, $name) == 0;
   }
   
+  public function isCanceledException(){
+	return $this->nameEquals('EXDATE');
+  }
+  
+  public function isMovedException(){
+	return $this->nameEquals('RECURRENCE-ID');
+  }
+  
+  
   public function typeEquals($type) {
     $types = $this->getParam('TYPE');
     if (!$types) {

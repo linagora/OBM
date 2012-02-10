@@ -162,7 +162,7 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
     }
     return Vpdi::decodeText($uid->value());
   }
-
+  
   public function getDescription() {
     if (($desc = $this->getProperty('DESCRIPTION')) === null) {
       return "";
@@ -202,9 +202,54 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
   }
 
   public function getRecurrenceId() {
-    return $this->getDateTime('RECURRENCE-ID');
+	$recurrenceIdDate = $this->getDateTime('RECURRENCE-ID');
+	if ( $recurrenceIdDate === null) {
+		return '';
+	}
+	  return $recurrenceIdDate;
+  }
+  
+   public function getExceptionRecurrenceId() {
+	$recurrenceId = $this->getProperty('RECURRENCE-ID');
+	if ( $recurrenceId === null) {
+		return '';
+	}
+	return Vpdi::decodeText($recurrenceId->value());
   }
 
+  public function getExceptionRecurrenceIdProperty() {
+	$recurrenceIdProperty= $this->getPropertiesByName('RECURRENCE-ID');
+	if ( $recurrenceIdProperty  === null ) {
+		  return '';
+	}
+	return $recurrenceIdProperty;
+  }
+  
+  public function getCanceledExceptionExtEvents() {
+	$cancelException = $this->getPropertiesByName('EXDATE');
+	if ( $cancelException === null ) {
+		  return '';
+	}
+	return $cancelException;
+  }
+  
+  public function getMovedExceptionExtEvents() {
+	$movedException = $this->getPropertiesByName('DTSTART') ;
+	$recurrenceId =  $this->getExceptionRecurrenceId();
+	if ( $recurrenceId  === null ) {
+	  return '';
+	}
+	return $movedException;
+  }
+  
+  public function extractDateValue(){
+	$value_dtstart = $this[0]->value();
+	$str_date = strtotime( $value_dtstart);
+	$date = new Of_Date($str_date, 'GMT');
+	$date_value = $date->getOutputDateTime();
+	return  $date_value;
+  }
+  
   public function getRrule() {
     if (($rrule = $this->getProperty('RRULE')) === null) {
       return null;

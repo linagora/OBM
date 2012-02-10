@@ -2895,37 +2895,98 @@ function dis_calendar_event_consult($id) {
 // Parameters:
 //   - $id : event id
 //	 - $contact_id : contact id
-///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_consult_ext($contact_id, $id) {
-  global $display, $l_err_reference;
-	
-  if ($id) {
-	$searched_uid = substr($id,4);
-	$contact = OBM_Contact::get($contact_id);
+/////////////////////////////////////////////////////////////////////////////// 
+function dis_calendar_event_consult_ext( $contact_id, $id ) {
+	global $display, $l_err_reference; 
+	if ( !$id ) {
+		$display['msg'] .= display_err_msg( $l_err_reference );
+		return $block;
+	}
+	$uid = _get_ext_event_uid_and_suffix( $id );
+	$contact = OBM_Contact::get( $contact_id );
 	$contact_calendar = $contact->getCalendar();
 	$events = $contact_calendar->getVevents();
+	if ( _is_exception( $uid['suffix'] ) ) {
+		return _exception_event_consult_ext( $events, $uid['searched_uid'], $uid['suffix'] );
+	}
+	return _standard_event_consult_ext( $events, $uid['searched_uid'] );
+}
+function _get_ext_event_uid_and_suffix( $id ){
+	$searched_uid = substr( $id,4 ); 
+	$suffix = '';
+	$extract_uid_and_suffix_from_url =  '/(.+)-(\d+)$/';
+	if(preg_match($extract_uid_and_suffix_from_url, $searched_uid, $matches )) {
+		$searched_uid = $matches[1];
+		$suffix = $matches[2];
+	}
+	return array( 'searched_uid' => $searched_uid, 'suffix' => $suffix );
+}
+function _is_exception( $suffix ){
+	return !empty( $suffix );
+}
+function _exception_event_consult_ext( $events, $searched_uid, $searched_suffix ){
+	$i = 0;
+	$searched_suffix += 0;
 	foreach ($events as $event) {
-		if  ($event->getUid() == $searched_uid) {
+		$recurrenceId =  $event->getExceptionRecurrenceId();
+		if  ( $event->getUid() == $searched_uid && !is_null( $recurrenceId ) ) {
+			if( $i == $searched_suffix ){
+				$event_q = new Vpdi_Icalendar_Event($event);
+				$attendees =  $event_q->getAttendees();
+				$mem_date  = $event->getDtstart();
+				$exception_q = $event->getExceptionRecurrenceIdProperty();
+				$block = html_calendar_event_consult_ext($event_q, $exception_q, $attendees, "");
+				return $block;
+			}
+			$i++;
+		}
+	}
+	return '';
+}
+function _standard_event_consult_ext($events, $searched_uid){
+	foreach ( $events as $event ) {
+		if  ( $event->getUid() == $searched_uid) {
 			$event_q = new Vpdi_Icalendar_Event($event);
 			$attendees =  $event_q->getAttendees();
-			$block = html_calendar_event_consult_ext($event_q, "", $attendees, "");
+			$exdate_q = $event->getCanceledExceptionExtEvents();
+			$draganddrop_q = _drag_and_drop_exception_search($events, $searched_uid, $event);
+			$unsort_tab_exception = array_merge($exdate_q, $draganddrop_q);
+			$exception_q =  _sort_exceptions_table($unsort_tab_exception);
+			$block = html_calendar_event_consult_ext($event_q, $exception_q, $attendees, "");
 			return $block;
-		  } 
+		}
 	}
-  } else {
-	  $display['msg'] .= display_err_msg($l_err_reference);
-  }
-  return $block;
+	return '';
 }
-
+function _drag_and_drop_exception_search( $events, $searched_uid, $event_mem ){
+	$draganddrop_q= array();
+	$value_mem = $event_mem->extractDateValue();
+	foreach ( $events as $event ) {
+		$event_exceptions = $event->getMovedExceptionExtEvents();
+		$value_event =  $event->extractDateValue();
+		$event_uid = $event->getUid();
+		if ( $value_event != $value_mem  && $searched_uid == $event_uid) {
+			$draganddrop_q = array_merge( $draganddrop_q, $event_exceptions );
+		}
+	}
+	return $draganddrop_q;
+}
+function _sort_exceptions_table($table){
+	$sort_table = array();
+	foreach($table as $unsort){
+		$date_value =  $unsort->value();
+		$sort_table[$date_value] = $unsort;
+	}
+	ksort($sort_table);
+	return $sort_table;
+}
 function event_details_access_rights() {
   $access_type = 'rw';
-  if (isset($GLOBALS['token']) && ($GLOBALS['token']['type'] == 'public')) {
+  if ( isset($GLOBALS['token']) && ( $GLOBALS['token']['type'] == 'public' )) {
     $access_type = 'r';
   }
   return $access_type;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
@@ -3470,7 +3531,6 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
   global $ico_add, $ico_delete, $ico_spinner;
 
   $id = $event->getUid();
- //FIXME $is_exception = $event_q->f('event_is_exception');
   
   if (!$event->isPrivate()) {
 
@@ -3524,28 +3584,41 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
   } else {
     $opacity = $l_opacity_free;
   }
-
- /* FIXME if ($is_exception) {
-    $parent_event_id = $event_q->f('event_eventexception_parent_id');
-    $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
-    $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
-    $repeat_block = "
-    <div class=\"detail infos\">
-     <h1>$l_repeat</h1>
-     <table>   
-      <tr>    
-       <th>$GLOBALS[l_exception] :</th> 
-       <td>$GLOBALS[l_event_is_exception]</td>
-      </tr>
-      <tr>    
-       <th>$GLOBALS[l_parent_event] :</th> 
-       <td>$show_parent_link</td>
-      </tr>
-     </table>
-    </div>";
-
-  } else */
-
+  
+	// Exception
+	$block_exception_detail = '';
+	if(!empty($exception_q)){
+		$exception_cancel_desc = $GLOBALS['l_eventexception_canceled'];
+		$exception_moved_desc = $GLOBALS['l_eventexception_moved_to'];
+		$event_is_exception = $GLOBALS['l_event_is_exception'];
+		$block_exception_detail  .= "<tr><th>$l_exception : </th><td>";
+		foreach($exception_q as $exception){ 
+			$str_date = strtotime( $exception->value() );
+			$date = new Of_Date($str_date, 'GMT');
+			$exception_date = $date->getOutputDate();
+			$exception_date_time = $date->getOutputDateTime();
+			if ( $exception->isMovedException() ){
+				$dates .= $event_is_exception;
+				$block_exception_detail  .= $dates."</td></tr>";
+				$repeat_block = "
+					<div class=\"detail infos\">
+					<h1>$l_repeat</h1>
+					<table>   
+					$block_exception_detail
+					</table>
+					</div>
+				";
+			}
+		}
+		if( $exception->isCanceledException() ){
+			$dates .= $exception_date." ($exception_cancel_desc) <br/>";
+		}else{
+			$sprintf = sprintf($GLOBALS['l_eventexception_moved_to'], $exception_date_time);
+			$dates .= "$exception_date ($sprintf)<br/>";
+		}
+		$block_exception_detail  .= $dates."</td></tr>";
+	}
+    
   if ($repeats=$event->getRrule()) {
     $kind = $GLOBALS['l_'.$repeats['freq']];
     $kind_unit = $GLOBALS['l_'.$repeats['freq'].'_unit'];
@@ -3573,11 +3646,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
        <th>$l_repeatdays :</th>
        <td>$dis_repeat_days</td>
       </tr>";
-    }
-
-    // Exception
-    $block_exception_detail = '';
-    
+    }      
     $repeat_block = "
     <div class=\"detail infos\">
      <h1>$l_repeat</h1>
@@ -3595,6 +3664,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
        <td>$repeat_end</td>
       </tr>
       $dis_repeat_days
+      $block_exception_detail
      </table>
      </div>";
   } 
@@ -3625,7 +3695,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 
   if ($dis_contact_list != "") {
    $dis_contacts_block ="  <div class=\"detail infos\">
-    <h1>$GLOBALS[l_contacts]</h1>
+    <h1>$GLOBALS[l_users]</h1>
     <table  class=\"spreadSheet\">
     <thead>
     <tr>
@@ -3744,7 +3814,6 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
     <th>$l_location :</th>
     <td>$location</td>
   </tr>
-
   $block_category1
   </table>
   </div>
@@ -3773,13 +3842,11 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
       <th>$l_opacity :</th>
       <td>$opacity</td>
     </tr>
-   </table>
+   </table> 
    </div>
   $repeat_block
   $dis_users_block
-
-  <p class=\"LC\"></p>
-  $dis_contacts_block
+  $dis_contacts_block 
   $dis_resource_block
   $dis_item_list
 
