@@ -36,9 +36,8 @@ public enum PIMDataType {
 	EMAIL("Email", "email"), 
 	CALENDAR("Calendar", "calendar"),
 	CONTACTS("Contacts", "contacts"),
-	TASKS("Tasks", "tasks"),
-	FOLDER("", "");
-
+	TASKS("Tasks", "tasks");
+	
 	private final String xmlValue;
 	private final String collectionPathValue;
 

@@ -36,10 +36,18 @@ import org.obm.push.exception.CollectionPathException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+/**
+ *
+ * 	Pattern :
+ * 
+ *  obm:\\login@domain\email\Sent
+ *  obm:\\login@domain\calendar\login@domain
+ *  obm:\\login@domain\contacts
+ *  obm:\\login@domain\contacts\collected_contacts
+ * 
+ */
 public class CollectionPathUtils {
 
-	// Pattern: obm:\\user@domain\email\Sent
-	
 	private static final char BACKSLASH = '\\';
 	private static final String PROTOCOL = "obm:" + BACKSLASH + BACKSLASH;
 
@@ -56,8 +64,6 @@ public class CollectionPathUtils {
 			return PIMDataType.CONTACTS;
 		} else if (pathStartWithTypedUserPath(collectionPath, userPath, PIMDataType.TASKS)) {
 			return PIMDataType.TASKS;
-		} else if (pathStartWithTypedUserPath(collectionPath, userPath, PIMDataType.FOLDER)) {
-			return PIMDataType.FOLDER;
 		}
 		String msg = String.format( 
 				"Cannot reconize a PIMDataType from the collection path given . collection:{%s}",
@@ -83,17 +89,27 @@ public class CollectionPathUtils {
 		Preconditions.checkNotNull(Strings.emptyToNull(imapFolder));
 		
 		StringBuilder userPath = getUserPathByCollection(bs, collectionType);
+		userPath.append(BACKSLASH);
 		userPath.append(imapFolder);
+		return userPath.toString();
+	}
+	
+	public static String buildCollectionPath(BackendSession bs, PIMDataType collectionType, String...imapFolders) {
+		Preconditions.checkNotNull(bs);
+		Preconditions.checkNotNull(collectionType);
+		
+		StringBuilder userPath = getUserPathByCollection(bs, collectionType);
+		for (String folder: imapFolders) {
+			userPath.append(BACKSLASH);
+			userPath.append(folder);
+		}
 		return userPath.toString();
 	}
 	
 	public static String buildDefaultCollectionPath(BackendSession bs, PIMDataType collectionType) {
 		Preconditions.checkNotNull(bs);
 		Preconditions.checkNotNull(collectionType);
-		
-		StringBuilder defaultPath = getUserPathByCollection(bs, collectionType);
-		trimEndingBackslash(defaultPath);
-		return defaultPath.toString();
+		return getUserPathByCollection(bs, collectionType).toString();
 	}
 
 	public static String extractImapFolder(BackendSession bs,
@@ -105,7 +121,7 @@ public class CollectionPathUtils {
 		String userPath = getUserPathByCollection(bs, collectionType).toString();
 		
 		if (collectionPath.startsWith(userPath)) {
-			return extractFirstImapFolder(collectionPath, userPath);
+			return extractFirstImapFolder(bs, collectionPath, userPath);
 		} else {
 			String msg = String.format( 
 					"The collection path given doesn't start with the user path. collection:{%s} user:{%s} ",
@@ -114,8 +130,12 @@ public class CollectionPathUtils {
 		}
 	}
 
-	private static String extractFirstImapFolder(String collectionPath, String userPath) {
-		int imapFolderStartIndex = userPath.length();
+	private static String extractFirstImapFolder(BackendSession bs, String collectionPath, String userPath) {
+		int backslashLength = 1;
+		int imapFolderStartIndex = userPath.length() + backslashLength;
+		if (imapFolderStartIndex > collectionPath.length()) {
+			imapFolderStartIndex = getUserPath(bs).length();
+		}
 		int imapFolderEndIndex = collectionPath.indexOf(BACKSLASH, imapFolderStartIndex);
 		if (imapFolderEndIndex == -1) {
 			return collectionPath.substring(imapFolderStartIndex);
@@ -127,9 +147,6 @@ public class CollectionPathUtils {
 	private static StringBuilder getUserPathByCollection(BackendSession bs, PIMDataType collectionType) {
 		StringBuilder userPath = getUserPath(bs);
 		userPath.append(collectionType.asCollectionPathValue());
-		if (collectionType != PIMDataType.FOLDER) {
-			userPath.append(BACKSLASH);
-		}
 		return userPath;
 	}
 	
@@ -141,10 +158,4 @@ public class CollectionPathUtils {
 		return userPath;
 	}
 
-	private static void trimEndingBackslash(StringBuilder defaultPath) {
-		int lastCharIndex = defaultPath.length() -1;
-		if (defaultPath.charAt(lastCharIndex) == BACKSLASH) {
-			defaultPath.deleteCharAt(lastCharIndex);
-		}
-	}
 }

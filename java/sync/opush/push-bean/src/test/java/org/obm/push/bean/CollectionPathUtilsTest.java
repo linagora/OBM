@@ -70,9 +70,9 @@ public class CollectionPathUtilsTest {
 	
 	@Test
 	public void testParseImapFolderCalendar()  throws CollectionPathException {
-		String collectionPath = "obm:\\\\user@domain\\calendar\\test";
+		String collectionPath = "obm:\\\\user@domain\\calendar\\user@domain";
 		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.CALENDAR);
-		Assertions.assertThat(parsedFolder).isEqualTo("test");
+		Assertions.assertThat(parsedFolder).isEqualTo("user@domain");
 	}
 
 	@Test
@@ -84,18 +84,11 @@ public class CollectionPathUtilsTest {
 	
 	@Test
 	public void testParseImapFolderContacts()  throws CollectionPathException {
-		String collectionPath = "obm:\\\\user@domain\\contacts\\";
+		String collectionPath = "obm:\\\\user@domain\\contacts";
 		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.CONTACTS);
-		Assertions.assertThat(parsedFolder).isEqualTo("");
+		Assertions.assertThat(parsedFolder).isEqualTo("contacts");
 	}
 
-	@Test
-	public void testParseImapFolderTypeFolder()  throws CollectionPathException {
-		String collectionPath = "obm:\\\\user@domain\\mydata";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.FOLDER);
-		Assertions.assertThat(parsedFolder).isEqualTo("mydata");
-	}
-	
 	@Test
 	public void testParseImapFolderTwoLevel()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX\\test";
@@ -196,24 +189,13 @@ public class CollectionPathUtilsTest {
 
 	@Test(expected=NullPointerException.class)
 	public void testBuildCollectionPathWhenNullPath() {
-		CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, null);
+		String folderName = null;
+		CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, folderName);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testBuildCollectionPathWhenEmptyPath() {
 		CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, "");
-	}
-
-	@Test
-	public void testRecognizePIMDataTypeFolder() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\mydata");
-		Assertions.assertThat(type).isEqualTo(PIMDataType.FOLDER);
-	}
-	
-	@Test
-	public void testRecognizePIMDataTypeSubFolder() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\mydata\\anydata");
-		Assertions.assertThat(type).isEqualTo(PIMDataType.FOLDER);
 	}
 
 	@Test
@@ -233,17 +215,17 @@ public class CollectionPathUtilsTest {
 		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
 	}
+	
+	@Test
+	public void testRecognizePIMDataTypeCollectedContacts() throws CollectionPathException {
+		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts\\collected_contacts");
+		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
+	}
 
 	@Test
 	public void testRecognizePIMDataTypeTasks() throws CollectionPathException {
 		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\tasks\\user@domain");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.TASKS);
-	}
-
-	@Test(expected=CollectionPathException.class)
-	public void testRecognizePIMDataTypeWhenNoDomain() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user\\mydata");
-		Assertions.assertThat(type).isEqualTo(PIMDataType.FOLDER);
 	}
 
 	@Test(expected=CollectionPathException.class)

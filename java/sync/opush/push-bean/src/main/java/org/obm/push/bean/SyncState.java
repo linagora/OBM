@@ -75,8 +75,6 @@ public class SyncState implements Serializable {
 			this.dataType = PIMDataType.TASKS;
 		} else if (path.contains("\\email")) {
 			this.dataType = PIMDataType.EMAIL;
-		} else {
-			this.dataType = PIMDataType.FOLDER;
 		}
 		this.key = key;
 	}

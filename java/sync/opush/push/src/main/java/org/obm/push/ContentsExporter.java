@@ -137,8 +137,6 @@ public class ContentsExporter implements IContentsExporter {
 		case TASKS:
 			delta = getTasksChanges(bs, state, collectionId, filterType);
 			break;
-		case FOLDER:
-			break;
 		}
 		return delta;
 	}
@@ -158,8 +156,6 @@ public class ContentsExporter implements IContentsExporter {
 		case CALENDAR:
 		case TASKS:
 			changes.addAll(calBackend.fetchItems(bs, fetchServerIds));
-			break;
-		case FOLDER:
 			break;
 		}
 		return changes;
@@ -192,8 +188,6 @@ public class ContentsExporter implements IContentsExporter {
 				return getItemEstimateSize(bs, state, filterType, collectionId);
 			case EMAIL:
 				return getItemEmailEstimateSize(bs, state, filterType, collectionId);
-			case FOLDER:
-				return getItemEstimateSize(bs, state, filterType, collectionId);
 			case TASKS:
 				return getItemEstimateSize(bs, state, filterType, collectionId);
 			}
