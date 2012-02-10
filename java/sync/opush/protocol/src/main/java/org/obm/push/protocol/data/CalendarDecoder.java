@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obm.push.bean.AttendeeStatus;
@@ -42,6 +41,8 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventCommon;
+import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
@@ -50,6 +51,8 @@ import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import com.google.common.collect.Lists;
 
 public class CalendarDecoder extends Decoder implements IDataDecoder {
 
@@ -165,20 +168,11 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 			NodeList exceptionsNodeList = containerNode.getElementsByTagName("Exception");
 			if (exceptionsNodeList != null) {
 
-				final List<MSEvent> exceptions = new ArrayList<MSEvent>();
-				for (int i = 0, n = exceptionsNodeList.getLength(); i < n; i += 1) {
-		
-					MSEvent exception = new MSEvent();
-
+				int exceptionsListLength = exceptionsNodeList.getLength();
+				final List<MSEventException> exceptions = Lists.newArrayListWithExpectedSize(exceptionsListLength);
+				for (int i = 0; i < exceptionsListLength; i += 1) {
 					Element subnode = (Element) exceptionsNodeList.item(i);
-					setEventCalendar(exception, subnode);
-					exception.setDeleted(parseDOMInt2Boolean(DOMUtils
-							.getUniqueElement(subnode, "ExceptionIsDeleted")));
-					exception.setExceptionStartTime(parseDOMDate(DOMUtils
-							.getUniqueElement(subnode, "ExceptionStartTime")));
-					exception.setMeetingStatus(getMeetingStatus(subnode));
-					exception.setSensitivity(getCalendarSensitivity(subnode));
-					exception.setBusyStatus(getCalendarBusyStatus(subnode));
+					MSEventException exception = buildEventException(subnode);
 					exceptions.add(exception);
 				}
 				
@@ -242,12 +236,35 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		return calendar;
 	}
 
-	void setEventCalendar(MSEvent calendar, Element domSource) {
-		calendar.setLocation(parseDOMString(DOMUtils.getUniqueElement(
-				domSource, "Location")));
+	private MSEventException buildEventException(Element dom) {
+		MSEventException exception = new MSEventException();
+		fillEventCommon(exception, dom);
+		exception.setDeleted(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, "ExceptionIsDeleted")));
+		exception.setExceptionStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "ExceptionStartTime")));
+		return exception;
+	}
+	
+	private void fillEventCommon(MSEventCommon common, Element dom) {
+		common.setLocation(parseDOMString(DOMUtils.getUniqueElement(dom, "Location")));
+		Element body = DOMUtils.getUniqueElement(dom, "Body");
+		common.setDescription(decodeBody(body));
+		common.setDtStamp(parseDOMDate(DOMUtils.getUniqueElement(dom, "DTStamp")));
+		common.setSubject(parseDOMString(DOMUtils.getUniqueElement(dom, "Subject")));
+		common.setEndTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "EndTime")));
+		common.setStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "StartTime")));
+		common.setAllDayEvent(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, "AllDayEvent")));
+		common.setReminder(parseDOMInt(DOMUtils.getUniqueElement(dom, "ReminderMinsBefore")));
+		common.setCategories(parseDOMStringCollection(DOMUtils.getUniqueElement(dom, "Categories"), "Category"));
+		common.setBusyStatus(getCalendarBusyStatus(dom));
+		common.setSensitivity(getCalendarSensitivity(dom));
+		common.setMeetingStatus(getMeetingStatus(dom));
+	}
+	
+	private void setEventCalendar(MSEvent event, Element dom) {
+		fillEventCommon(event, dom);
+	}
 
-		// description
-		Element body = DOMUtils.getUniqueElement(domSource, "Body");
+	private String decodeBody(Element body) {
 		if (body != null) {
 			Element data = DOMUtils.getUniqueElement(body, "Data");
 			if (data != null) {
@@ -255,50 +272,21 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 						.getUniqueElement(body, "Type").getTextContent()));
 				String txt = data.getTextContent();
 				if (bodyType == Type.PLAIN_TEXT) {
-					calendar.setDescription(data.getTextContent());
+					return data.getTextContent();
 				} else if (bodyType == Type.RTF) {
-					calendar.setDescription(RTFUtils.extractB64CompressedRTF(txt));
+					return RTFUtils.extractB64CompressedRTF(txt);
 				} else {
 					logger.warn("Unsupported body type: " + bodyType + "\n"
 							+ txt);
 				}
 			}
+			Element rtf = DOMUtils.getUniqueElement(body, "Compressed_RTF");
+			if (rtf != null) {
+				String txt = rtf.getTextContent();
+				return RTFUtils.extractB64CompressedRTF(txt);
+			}
 		}
-		Element rtf = DOMUtils.getUniqueElement(domSource, "Compressed_RTF");
-		if (rtf != null) {
-			String txt = rtf.getTextContent();
-			calendar.setDescription(RTFUtils.extractB64CompressedRTF(txt));
-		}
-
-		calendar.setDtStamp(parseDOMDate(DOMUtils.getUniqueElement(domSource,
-				"DTStamp")));
-		calendar.setSubject(parseDOMString(DOMUtils.getUniqueElement(domSource,
-				"Subject")));
-		calendar.setEndTime(parseDOMDate(DOMUtils.getUniqueElement(domSource,
-				"EndTime")));
-		calendar.setStartTime(parseDOMDate(DOMUtils.getUniqueElement(domSource,
-				"StartTime")));
-		calendar.setAllDayEvent(parseDOMInt2Boolean(DOMUtils.getUniqueElement(
-				domSource, "AllDayEvent")));
-		calendar.setReminder(parseDOMInt(DOMUtils.getUniqueElement(domSource,
-				"ReminderMinsBefore")));
-		calendar.setCategories(parseDOMStringCollection(DOMUtils
-				.getUniqueElement(domSource, "Categories"), "Category"));
-
-		calendar.setBusyStatus(getCalendarBusyStatus(domSource));
-		if (calendar.getBusyStatus() != null) {
-			logger.info("parse busyStatus: " + calendar.getBusyStatus());
-		}
-
-		calendar.setSensitivity(getCalendarSensitivity(domSource));
-		if (calendar.getSensitivity() != null) {
-			logger.info("parse sensitivity: " + calendar.getSensitivity());
-		}
-
-		calendar.setMeetingStatus(getMeetingStatus(domSource));
-		if (calendar.getMeetingStatus() != null) {
-			logger.info("parse meetingStatus: " + calendar.getMeetingStatus());
-		}
+		return null;
 	}
 
 	private CalendarBusyStatus getCalendarBusyStatus(Element domSource) {

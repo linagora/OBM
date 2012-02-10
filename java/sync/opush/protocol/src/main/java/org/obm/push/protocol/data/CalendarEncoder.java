@@ -44,6 +44,7 @@ import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
@@ -52,6 +53,7 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
 public class CalendarEncoder extends Encoder implements IDataEncoder {
@@ -137,11 +139,11 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 		s(p, "Calendar:Location", ev.getLocation());
 		s(p, "Calendar:EndTime", ev.getEndTime(),sdf);
 
-		encodeBody(bs, p, ev);
+		encodeBody(bs, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev);
-			encodeExceptions(bs, p, ev.getExceptions());
+			encodeExceptions(bs, ev, p, ev.getExceptions());
 		}
 
 		s(p, "Calendar:Sensitivity", ev.getSensitivity().asIntString());
@@ -175,11 +177,12 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 	}
 
 	private void encodeExceptions(BackendSession bs,
-			Element p, List<MSEvent> excepts) {
+			MSEvent parent,
+			Element p, List<MSEventException> excepts) {
 		// Exceptions.Exception
 		if(excepts.size()>0){
 			Element es = DOMUtils.createElement(p, "Calendar:Exceptions");
-			for (MSEvent ex : excepts) {
+			for (MSEventException ex : excepts) {
 				Element e = DOMUtils.createElement(es, "Calendar:Exception");
 				if (ex.isDeletedException()) {
 				
@@ -189,7 +192,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 				} else {
 					if (bs.checkHint("hint.loadAttendees", true)
-						&& ex.getAttendees().size() > 1) {
+						&& parent.getAttendees().size() > 1) {
 						s(e, "Calendar:MeetingStatus",
 							CalendarMeetingStatus.IS_IN_MEETING.asIntString());
 					} else {
@@ -198,7 +201,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 							.asIntString());
 					}
 
-					encodeBody(bs, e, ex);
+					encodeBody(bs, e, ex.getDescription());
 
 					s(e, "Calendar:Location", ex.getLocation());
 					s(e, "Calendar:Sensitivity", ex.getSensitivity().asIntString());
@@ -219,15 +222,12 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 	}
 
 	private void encodeBody(BackendSession bs, Element p,
-			MSEvent event) {
-		String body = "";
-		if (event.getDescription() != null) {
-			body = event.getDescription().trim();
-		}
+			String description) {
+		String body = Strings.nullToEmpty(description).trim();
 		if (bs.getProtocolVersion().compareTo(TWELVE) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
-			s(d, "AirSyncBase:EstimatedDataSize", "" + body.length());
+			s(d, "AirSyncBase:EstimatedDataSize", body.length());
 			if (body.length() > 0) {
 				DOMUtils.createElementAndText(d, "AirSyncBase:Data", body);
 			}

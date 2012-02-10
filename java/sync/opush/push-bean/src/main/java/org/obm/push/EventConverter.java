@@ -44,6 +44,8 @@ import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventCommon;
+import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.sync.calendar.Attendee;
@@ -139,10 +141,10 @@ public class EventConverter {
 			EventRecurrence r = getRecurrence(event);
 			e.setRecurrence(r);
 			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
-				for (MSEvent excep : event.getExceptions()) {
+				for (MSEventException excep : event.getExceptions()) {
 					if (!excep.isDeletedException()) {
 						
-						Event obmEvent = convertEventOne(bs, oldEvent, e, excep, isObmInternalEvent);
+						Event obmEvent = convertEventException(bs, oldEvent, e, excep, isObmInternalEvent);
 						obmEvent.setExtId(extId);
 						obmEvent.setUid(obmId);
 						
@@ -157,10 +159,13 @@ public class EventConverter {
 		return e;
 	}
 
-	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
-	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
-	// optional.
-	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) {
+	private Event convertEventException(BackendSession bs, Event oldEvent, Event parentEvent, MSEventException data, boolean isObmInternalEvent) {
+		Event e = convertEventCommon(bs, oldEvent, parentEvent, data, isObmInternalEvent);
+		e.setRecurrenceId(data.getExceptionStartTime());
+		return e;
+	}
+	
+	private Event convertEventCommon(BackendSession bs, Event oldEvent, Event parentEvent, MSEventCommon data, boolean isObmInternalEvent) {
 		Event e = new Event();
 		defineOwner(bs, e, oldEvent);
 		e.setInternalEvent(isObmInternalEvent);
@@ -184,7 +189,6 @@ public class EventConverter {
 		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
 		e.setDuration(duration);
 		e.setAllday(data.getAllDayEvent() != null ? data.getAllDayEvent() : false);
-		e.setRecurrenceId(data.getExceptionStartTime());
 		
 		if (data.getReminder() != null && data.getReminder() > 0) {
 			e.setAlert(data.getReminder() * 60);
@@ -204,9 +208,16 @@ public class EventConverter {
 			e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
 		}
 		
+		return e;
+	}
+	
+	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
+	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
+	// optional.
+	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) {
+		Event e = convertEventCommon(bs, oldEvent, parentEvent, data, isObmInternalEvent);
 		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
 		defineOrganizer(e, data, bs);
-		
 		return e;
 	}
 

@@ -73,6 +73,7 @@ public class BeansTest {
 					.add(MSContact.class)
 					.add(MSEmailBody.class)
 					.add(MSEvent.class)
+					.add(MSEventException.class)
 					.add(MSTask.class)
 					.add(Recurrence.class)
 					.add(SearchResult.class)

@@ -29,43 +29,59 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.bean;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+public interface MSEventCommon {
 
-public class Encoder {
+	String getLocation();
 
-	
-	protected Encoder(){
-	}
-	
-	protected void s(Element p, String name, String val) {
-		if (val != null && val.length() > 0) {
-			DOMUtils.createElementAndText(p, name, val);
-		}
-	}
+	void setLocation(String location);
 
-	protected void s(Element p, String name, Integer val) {
-		if (val != null) {
-			DOMUtils.createElementAndText(p, name, String.valueOf(val));
-		}
-	}
+	String getSubject();
 
-	protected void s(Element p, String name, Date val, SimpleDateFormat sdf) {
-		if (val != null) {
-			DOMUtils.createElementAndText(p, name, sdf.format(val));
-		}
-	}
+	void setSubject(String subject);
 
-	protected void s(Element p, String name, Boolean val) {
-		if (val == null) {
-			val = false;
-		}
-		DOMUtils.createElementAndText(p, name, val ? "1" : "0");
-	}
+	Boolean getAllDayEvent();
+
+	void setAllDayEvent(Boolean allDayEvent);
+
+	CalendarBusyStatus getBusyStatus();
+
+	void setBusyStatus(CalendarBusyStatus busyStatus);
+
+	CalendarSensitivity getSensitivity();
+
+	void setSensitivity(CalendarSensitivity sensitivity);
+
+	CalendarMeetingStatus getMeetingStatus();
+
+	void setMeetingStatus(CalendarMeetingStatus meetingStatus);
+
+	Integer getReminder();
+
+	void setReminder(Integer reminder);
+
+	List<String> getCategories();
+
+	void setCategories(List<String> categories);
+
+	Date getDtStamp();
+
+	void setDtStamp(Date dtStamp);
+
+	Date getEndTime();
+
+	void setEndTime(Date endTime);
+
+	Date getStartTime();
+
+	void setStartTime(Date startTime);
+
+	String getDescription();
+
+	void setDescription(String description);
 	
 }

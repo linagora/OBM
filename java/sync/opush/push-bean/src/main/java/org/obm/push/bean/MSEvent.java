@@ -43,19 +43,11 @@ import org.obm.sync.calendar.EventObmId;
 
 import com.google.common.base.Objects;
 
-public class MSEvent implements IApplicationData, Serializable {
+public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	
-	private final Set<MSAttendee> attendees;
-	private String organizerName;
-	private String organizerEmail;
 	private String location;
 	private String subject;
-	private EventObmId obmId;
-	private EventExtId extId;
-	private MSEventUid uid;
 	private String description;
-	private Date created;
-	private Date lastUpdate;
 	private Date dtStamp;
 	private Date endTime;
 	private Date startTime;
@@ -65,11 +57,18 @@ public class MSEvent implements IApplicationData, Serializable {
 	private CalendarMeetingStatus meetingStatus;
 	private Integer reminder;
 	private List<String> categories;
+
+	private final Set<MSAttendee> attendees;
+	private String organizerName;
+	private String organizerEmail;
+	private EventObmId obmId;
+	private EventExtId extId;
+	private MSEventUid uid;
+	private Date created;
+	private Date lastUpdate;
 	private Recurrence recurrence;
-	private List<MSEvent> exceptions;
+	private List<MSEventException> exceptions;
 	private TimeZone timeZone;
-	private Date exceptionStartTime;
-	private boolean deletedException;
 	private Integer obmSequence;
 	private transient Set<String> attendeeEmails;
 	
@@ -102,6 +101,86 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.organizerEmail = organizerEmail;
 	}
 
+	public EventObmId getObmId() {
+		return obmId;
+	}
+
+	public void setObmId(EventObmId obmId) {
+		this.obmId = obmId;
+	}
+	
+	public EventExtId getExtId() {
+		return extId;
+	}
+	
+	public void setExtId(EventExtId extId) {
+		this.extId = extId;
+	}
+
+	public Set<MSAttendee> getAttendees() {
+		return attendees;
+	}
+	
+	public void addAttendee(MSAttendee att) {
+		if(!attendeeEmails.contains(att.getEmail())){
+			attendees.add(att);
+			attendeeEmails.add(att.getEmail());
+		}
+	}
+	
+	public Recurrence getRecurrence() {
+		return recurrence;
+	}
+
+	public void setRecurrence(Recurrence recurrence) {
+		this.recurrence = recurrence;
+	}
+
+	public List<MSEventException> getExceptions() {
+		return exceptions;
+	}
+
+	public void setExceptions(List<MSEventException> exceptions) {
+		this.exceptions = exceptions;
+	}
+
+	@Override
+	public PIMDataType getType() {
+		return PIMDataType.CALENDAR;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
+	public Integer getObmSequence() {
+		return obmSequence;
+	}
+
+	public void setObmSequence(Integer obmSequence) {
+		this.obmSequence = obmSequence;
+	}
+	
+	public MSEventUid getUid() {
+		return uid;
+	}
+	
+	public void setUid(MSEventUid uid) {
+		this.uid = uid;
+	}
+	
 	public String getLocation() {
 		return location;
 	}
@@ -118,20 +197,39 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.subject = subject;
 	}
 
-	public EventObmId getObmId() {
-		return obmId;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setObmId(EventObmId obmId) {
-		this.obmId = obmId;
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	
-	public EventExtId getExtId() {
-		return extId;
+
+	public Date getDtStamp() {
+		if(dtStamp != null){
+			return dtStamp;
+		}
+		return new Date(0);
 	}
-	
-	public void setExtId(EventExtId extId) {
-		this.extId = extId;
+
+	public void setDtStamp(Date dtStamp) {
+		this.dtStamp = dtStamp;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
 	}
 
 	public Boolean getAllDayEvent() {
@@ -174,17 +272,6 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.reminder = reminder;
 	}
 
-	public Set<MSAttendee> getAttendees() {
-		return attendees;
-	}
-	
-	public void addAttendee(MSAttendee att) {
-		if(!attendeeEmails.contains(att.getEmail())){
-			attendees.add(att);
-			attendeeEmails.add(att.getEmail());
-		}
-	}
-
 	public List<String> getCategories() {
 		return categories;
 	}
@@ -193,110 +280,14 @@ public class MSEvent implements IApplicationData, Serializable {
 		this.categories = categories;
 	}
 
-	public Recurrence getRecurrence() {
-		return recurrence;
+	public Set<String> getAttendeeEmails() {
+		return attendeeEmails;
 	}
 
-	public void setRecurrence(Recurrence recurrence) {
-		this.recurrence = recurrence;
+	public void setAttendeeEmails(Set<String> attendeeEmails) {
+		this.attendeeEmails = attendeeEmails;
 	}
 
-	public List<MSEvent> getExceptions() {
-		return exceptions;
-	}
-
-	public void setExceptions(List<MSEvent> exceptions) {
-		this.exceptions = exceptions;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deletedException = deleted;
-	}
-
-	public boolean isDeletedException() {
-		return deletedException;
-	}
-
-	@Override
-	public PIMDataType getType() {
-		return PIMDataType.CALENDAR;
-	}
-
-	public Date getDtStamp() {
-		if(dtStamp != null){
-			return dtStamp;
-		}
-		return new Date(0);
-	}
-
-	public void setDtStamp(Date dtStamp) {
-		this.dtStamp = dtStamp;
-	}
-
-	public Date getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
-
-	public Date getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
-
-	public Date getExceptionStartTime() {
-		return exceptionStartTime;
-	}
-
-	public void setExceptionStartTime(Date exceptionStartTime) {
-		this.exceptionStartTime = exceptionStartTime;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	public Date getLastUpdate() {
-		return lastUpdate;
-	}
-
-	public void setLastUpdate(Date lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
-
-	public Integer getObmSequence() {
-		return obmSequence;
-	}
-
-	public void setObmSequence(Integer obmSequence) {
-		this.obmSequence = obmSequence;
-	}
-	
-	public MSEventUid getUid() {
-		return uid;
-	}
-	
-	public void setUid(MSEventUid uid) {
-		this.uid = uid;
-	}
-	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
@@ -322,8 +313,6 @@ public class MSEvent implements IApplicationData, Serializable {
 			.add("recurrence", recurrence)
 			.add("exceptions", exceptions)
 			.add("timeZone", timeZone)
-			.add("exceptionStartTime", exceptionStartTime)
-			.add("deletedException", deletedException)
 			.add("obmSequence", obmSequence)
 			.add("uid", uid)
 			.toString();
@@ -334,8 +323,7 @@ public class MSEvent implements IApplicationData, Serializable {
 		return Objects.hashCode(attendees, organizerName, organizerEmail, location, 
 				subject, obmId, extId, description, created, lastUpdate, dtStamp, 
 				endTime, startTime, allDayEvent, busyStatus, sensitivity, meetingStatus, 
-				reminder, categories, recurrence, exceptions, timeZone, exceptionStartTime, 
-				deletedException, obmSequence, uid);
+				reminder, categories, recurrence, exceptions, timeZone, obmSequence, uid);
 	}
 	
 	@Override
@@ -364,8 +352,6 @@ public class MSEvent implements IApplicationData, Serializable {
 				&& Objects.equal(this.recurrence, that.recurrence)
 				&& Objects.equal(this.exceptions, that.exceptions)
 				&& Objects.equal(this.timeZone, that.timeZone)
-				&& Objects.equal(this.exceptionStartTime, that.exceptionStartTime)
-				&& Objects.equal(this.deletedException, that.deletedException)
 				&& Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.obmSequence, that.obmSequence);
 		}
