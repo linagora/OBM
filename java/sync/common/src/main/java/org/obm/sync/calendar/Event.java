@@ -211,6 +211,9 @@ public class Event implements Indexed<Integer> {
 	}
 
 	public void setAlert(Integer alert) {
+		if (alert != null && alert < 0) {
+			throw new IllegalArgumentException("alert must be a positive value");
+		}
 		this.alert = alert;
 	}
 

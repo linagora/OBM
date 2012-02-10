@@ -45,6 +45,7 @@ public class Attendee {
 	private boolean canWriteOnCalendar;
 	
 	public Attendee() {
+		super();
 	}
 
 	public Attendee(Attendee attendee) {

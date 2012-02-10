@@ -630,6 +630,19 @@ public class EventTest {
 	}
 
 	@Test(expected=IllegalArgumentException.class)
+	public void testAlertNegativeInteger() {
+		Event event = new Event();
+		event.setAlert(-10);
+	}
+	
+	@Test
+	public void testAlertNullInteger() {
+		Event event = new Event();
+		event.setAlert(null);
+		assertThat(event.getAlert()).isNull();
+	}
+
+	@Test(expected=IllegalArgumentException.class)
 	public void testNegativeDuration() {
 		Event event = new Event();
 		event.setDuration(-10);
