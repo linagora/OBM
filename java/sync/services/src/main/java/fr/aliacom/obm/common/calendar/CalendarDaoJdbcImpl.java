@@ -334,7 +334,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					.getEventExceptions(), con, id, useObmUser);
 		}
 		Integer a = ev.getAlert();
-		if (a != null && a >= 0) {
+		if (a != null) {
 			ps = con.prepareStatement("insert into EventAlert "
 					+ "(eventalert_event_id, eventalert_user_id, eventalert_duration, eventalert_usercreate) "
 					+ "values (?, ?, ?, ?)");
@@ -2012,7 +2012,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Statement st = null;
 		try {
 			st = con.createStatement();
-			if (ev.getAlert() == null || ev.getAlert() < 0) {
+			if (ev.getAlert() == null) {
 				st.executeUpdate("delete from EventAlert where eventalert_user_id="
 						+ updater.getObmId()
 						+ " AND eventalert_event_id="
@@ -2050,7 +2050,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Statement st = null;
 		try {
 			st = con.createStatement();
-			if (ev.getAlert() == null || ev.getAlert() < 0) {
+			if (ev.getAlert() == null) {
 				st.executeUpdate("delete from EventAlert where eventalert_user_id="
 						+ updater.getObmId()
 						+ " AND eventalert_event_id="

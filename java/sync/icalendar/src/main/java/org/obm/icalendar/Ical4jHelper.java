@@ -1081,7 +1081,7 @@ public class Ical4jHelper {
 					Dur durZero = new Dur(0, 0, 0, 0);
 					
 					if (dur==null || dur.equals(durZero)) {
-						event.setAlert(-1);
+						event.setAlert(null);
 						return;
 					} else if (dur.isNegative()) {
 						dur = dur.negate();
@@ -1096,8 +1096,9 @@ public class Ical4jHelper {
 					return;
 				}
 			}
+		} else {
+			event.setAlert(null);
 		}
-		event.setAlert(-1);
 	}
 
 	private boolean isVAlarmRepeat(final VAlarm valarm) {
@@ -1363,7 +1364,7 @@ public class Ical4jHelper {
 	}
 
 	/* package */ VAlarm getVAlarm(Integer alert) {
-		if (alert != null && !alert.equals(-1) && !alert.equals(0)) {
+		if (alert != null && !alert.equals(0)) {
 			Dur dur = new Dur(0, 0, 0, -alert);
 			VAlarm va = new VAlarm(dur);
 			va.getProperties().add(Action.DISPLAY);

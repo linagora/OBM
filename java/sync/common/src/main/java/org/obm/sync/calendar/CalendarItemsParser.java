@@ -122,7 +122,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setDuration(i(e, "duration"));
 		ev.setCategory(s(e, "category"));
 		ev.setLocation(s(e, "location"));
-		ev.setAlert(i(e, "alert"));
+		ev.setAlert(getAlert(e));
 		ev.setTimeUpdate(d(e, "timeupdate"));
 		ev.setTimeCreate(d(e, "timecreate"));
 
@@ -142,6 +142,14 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			}
 		}
 		return ev;
+	}
+
+	private Integer getAlert(Element e) {
+		Integer alert = i(e, "alert");
+		if (alert == null || alert < 0) {
+			return null;
+		}
+		return alert;
 	}
 
 	private Event parseEventException(Event eventReference, Element item) {
@@ -290,7 +298,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		eps.setUid(e.getAttribute("id"));
 		eps.setTitle(s(e, "title"));
 		eps.setState(ParticipationState.getValueOf(s(e, "state")));
-		eps.setAlert(i(e, "alert"));
+		eps.setAlert(getAlert(e));
 		eps.setDate(d(e, "date"));
 		return eps;
 	}

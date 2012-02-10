@@ -155,7 +155,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(e, "category", ev.getCategory());
 		createIfNotNull(e, "location", ev.getLocation());
 		if (ev.getAlert() != null) {
-			createIfNotNull(e, "alert", "" + ev.getAlert());
+			createIfNotNull(e, "alert", String.valueOf(ev.getAlert()));
 		}
 
 		createIfNotNull(e, "priority", (ev.getPriority() != null ? ""
