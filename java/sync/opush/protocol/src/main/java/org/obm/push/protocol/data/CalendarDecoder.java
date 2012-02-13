@@ -299,7 +299,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		case 2:
 			return CalendarBusyStatus.BUSY;
 		case 3:
-			return CalendarBusyStatus.OUT_OF_OFFICE;
+			return CalendarBusyStatus.UNAVAILABLE;
 		}
 		return null;
 	}

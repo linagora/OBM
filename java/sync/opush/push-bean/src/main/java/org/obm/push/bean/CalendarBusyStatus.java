@@ -32,23 +32,15 @@
 package org.obm.push.bean;
 
 public enum CalendarBusyStatus {
-	FREE, // 0
-	TENTATIVE, // 1
-	BUSY, // 2
-	OUT_OF_OFFICE; // 3
+	FREE("0"), TENTATIVE("1"), BUSY("2"), UNAVAILABLE("3");
 	
+	private final String status;
+	
+	private CalendarBusyStatus(String status) {
+		this.status = status;
+	}
+
 	public String asIntString() {
-		switch (this) {
-		case FREE:
-			return "0";
-		case TENTATIVE:
-			return "1";
-		case BUSY:
-			return "2";
-		case OUT_OF_OFFICE:
-			return "3";
-		default:
-			return "4";
-		}
+		return status;
 	}
 }
