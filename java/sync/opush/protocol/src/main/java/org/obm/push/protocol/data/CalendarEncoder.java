@@ -157,11 +157,11 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 
 		if (bs.checkHint("hint.loadAttendees", true)
 				&& ev.getAttendees().size() > 1) {
-			s(p, "Calendar:MeetingStatus", CalendarMeetingStatus.IS_IN_MEETING
+			s(p, "Calendar:MeetingStatus", CalendarMeetingStatus.IS_A_MEETING
 					.asIntString());
 		} else {
 			s(p, "Calendar:MeetingStatus",
-					CalendarMeetingStatus.IS_NOT_IN_MEETING.asIntString());
+					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
 		if (isReponse && bs.getProtocolVersion().compareTo(TWELVE) > 0) {
@@ -194,10 +194,10 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 					if (bs.checkHint("hint.loadAttendees", true)
 						&& parent.getAttendees().size() > 1) {
 						s(e, "Calendar:MeetingStatus",
-							CalendarMeetingStatus.IS_IN_MEETING.asIntString());
+							CalendarMeetingStatus.IS_A_MEETING.asIntString());
 					} else {
 						s(e, "Calendar:MeetingStatus",
-							CalendarMeetingStatus.IS_NOT_IN_MEETING
+							CalendarMeetingStatus.IS_NOT_A_MEETING
 							.asIntString());
 					}
 

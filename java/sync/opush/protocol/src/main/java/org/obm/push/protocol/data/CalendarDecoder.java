@@ -323,9 +323,9 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(domSource,
 				"MeetingStatus"))) {
 		case 0:
-			return CalendarMeetingStatus.IS_NOT_IN_MEETING;
+			return CalendarMeetingStatus.IS_NOT_A_MEETING;
 		case 1:
-			return CalendarMeetingStatus.IS_IN_MEETING;
+			return CalendarMeetingStatus.IS_A_MEETING;
 		case 3:
 			return CalendarMeetingStatus.MEETING_RECEIVED;
 		case 5:
