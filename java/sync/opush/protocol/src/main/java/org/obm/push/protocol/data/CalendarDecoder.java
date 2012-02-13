@@ -44,7 +44,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.tnefconverter.RTFUtils;
@@ -184,7 +184,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		containerNode = DOMUtils.getUniqueElement(syncData, "Recurrence");
 		if (containerNode != null) {
 			logger.info("decode recurrence");
-			Recurrence recurrence = new Recurrence();
+			MSRecurrence recurrence = new MSRecurrence();
 
 			recurrence.setUntil(parseDOMDate(DOMUtils.getUniqueElement(
 					containerNode, "RecurrenceUntil")));

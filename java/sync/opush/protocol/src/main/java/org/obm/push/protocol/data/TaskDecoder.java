@@ -34,7 +34,7 @@ package org.obm.push.protocol.data;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSTask;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.tnefconverter.RTFUtils;
@@ -105,11 +105,11 @@ public class TaskDecoder extends Decoder implements IDataDecoder {
 	}
 
 	private void appendRecurrence(Element syncData, MSTask task) {
-		Recurrence recurrence = null;
+		MSRecurrence recurrence = null;
 		Element containerNode = DOMUtils.getUniqueElement(syncData, "Recurrence");
 		if (containerNode != null) {
 			
-			recurrence = new Recurrence();
+			recurrence = new MSRecurrence();
 
 			recurrence.setStart(parseDOMDate(DOMUtils.getUniqueElement(syncData,
 				"Start")));

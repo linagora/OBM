@@ -52,7 +52,7 @@ import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSTask;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -106,14 +106,14 @@ public class SerializableTest {
 		msEvent.addAttendee(new MSAttendee());
 		msEvent.setObmId(new EventObmId(12));
 		msEvent.setExtId(new EventExtId("1fqe45"));
-		msEvent.setRecurrence(new Recurrence());
+		msEvent.setRecurrence(new MSRecurrence());
 		objectOutputStream.writeObject(msEvent);
 	}
 	
 	@Test
 	public void testMSTask() throws IOException {
 		MSTask msTask = new MSTask();
-		msTask.setRecurrence(new Recurrence());
+		msTask.setRecurrence(new MSRecurrence());
 		objectOutputStream.writeObject(msTask);
 	}
 	

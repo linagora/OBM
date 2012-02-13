@@ -39,7 +39,7 @@ import java.util.TimeZone;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSTask;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
@@ -88,7 +88,7 @@ public class TaskEncoder extends Encoder implements IDataEncoder {
 	}
 
 	private void encodeRecurrence(Element p, MSTask task) {
-		Recurrence rec = task.getRecurrence();
+		MSRecurrence rec = task.getRecurrence();
 		Element r = DOMUtils.createElement(p, "Tasks:Recurrence");
 
 		s(r, "Tasks:RecurrenceType", rec.getType().asIntString());

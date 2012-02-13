@@ -50,7 +50,7 @@ public class MSTask implements IApplicationData, Serializable {
 	private Date UtcDueDate;
 	private Date dueDate;
 	private List<String> categories;
-	private Recurrence recurrence;
+	private MSRecurrence recurrence;
 	private Boolean complete;
 	private Date dateCompleted;
 	private CalendarSensitivity sensitivity;
@@ -114,11 +114,11 @@ public class MSTask implements IApplicationData, Serializable {
 		this.categories = categories;
 	}
 
-	public Recurrence getRecurrence() {
+	public MSRecurrence getRecurrence() {
 		return recurrence;
 	}
 
-	public void setRecurrence(Recurrence recurrence) {
+	public void setRecurrence(MSRecurrence recurrence) {
 		this.recurrence = recurrence;
 	}
 

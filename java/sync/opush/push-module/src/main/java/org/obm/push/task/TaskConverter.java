@@ -39,8 +39,8 @@ import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
-import org.obm.push.bean.Recurrence;
 import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
@@ -114,12 +114,12 @@ public class TaskConverter {
 		return cal.getTime();
 	}
 
-	private Recurrence getRecurrence(EventRecurrence recurrence) {
+	private MSRecurrence getRecurrence(EventRecurrence recurrence) {
 		if (recurrence.getKind() == RecurrenceKind.none) {
 			return null;
 		}
 
-		Recurrence r = new Recurrence();
+		MSRecurrence r = new MSRecurrence();
 		switch (recurrence.getKind()) {
 		case daily:
 			r.setType(RecurrenceType.DAILY);
@@ -234,7 +234,7 @@ public class TaskConverter {
 		if (mst.getRecurrence() == null) {
 			return null;
 		}
-		Recurrence pr = mst.getRecurrence();
+		MSRecurrence pr = mst.getRecurrence();
 		EventRecurrence or = new EventRecurrence();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 

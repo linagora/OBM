@@ -51,7 +51,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
@@ -357,7 +357,7 @@ public class EmailEncoder implements IDataEncoder {
 	}
 	
 	private void appendRecurence(Element parent, MSEvent invi) {
-		Recurrence recur = invi.getRecurrence();
+		MSRecurrence recur = invi.getRecurrence();
 		if (recur != null) {
 			Element ers = DOMUtils.createElement(parent, "Email:Recurrences");
 			Element r = DOMUtils.createElement(ers, "Email:Recurrence");

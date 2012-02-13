@@ -46,7 +46,7 @@ import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -67,7 +67,7 @@ public class EventConverter {
 
 	private EventRecurrence getRecurrence(MSEvent msev) {
 		Date startDate = msev.getStartTime();
-		Recurrence pr = msev.getRecurrence();
+		MSRecurrence pr = msev.getRecurrence();
 		EventRecurrence or = new EventRecurrence();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 

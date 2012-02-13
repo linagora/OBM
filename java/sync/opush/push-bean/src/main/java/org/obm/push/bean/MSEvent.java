@@ -66,7 +66,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	private MSEventUid uid;
 	private Date created;
 	private Date lastUpdate;
-	private Recurrence recurrence;
+	private MSRecurrence recurrence;
 	private List<MSEventException> exceptions;
 	private TimeZone timeZone;
 	private Integer obmSequence;
@@ -128,11 +128,11 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 		}
 	}
 	
-	public Recurrence getRecurrence() {
+	public MSRecurrence getRecurrence() {
 		return recurrence;
 	}
 
-	public void setRecurrence(Recurrence recurrence) {
+	public void setRecurrence(MSRecurrence recurrence) {
 		this.recurrence = recurrence;
 	}
 

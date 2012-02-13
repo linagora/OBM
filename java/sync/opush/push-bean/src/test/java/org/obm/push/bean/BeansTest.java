@@ -75,7 +75,7 @@ public class BeansTest {
 					.add(MSEvent.class)
 					.add(MSEventException.class)
 					.add(MSTask.class)
-					.add(Recurrence.class)
+					.add(MSRecurrence.class)
 					.add(SearchResult.class)
 					.add(ServerId.class)
 					.add(Sync.class)

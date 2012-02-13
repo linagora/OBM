@@ -46,7 +46,7 @@ import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
@@ -272,7 +272,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 		}
 	}
 
-	private Recurrence rec(MSEvent ev) {
+	private MSRecurrence rec(MSEvent ev) {
 		return ev.getRecurrence();
 	}
 }

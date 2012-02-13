@@ -46,7 +46,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.Recurrence;
+import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
@@ -224,14 +224,14 @@ public class ObmEventToMsEventConverter {
 		throw new IllegalArgumentException("ParticipationRole " + role + " can't be converted to MSEvent property");
 	}
 
-	private Recurrence getRecurrence(Event event) {
+	private MSRecurrence getRecurrence(Event event) {
 		
 		if (!event.isRecurrent()) {
 			return null;
 		}
 
 		EventRecurrence recurrence = event.getRecurrence();
-		Recurrence r = new Recurrence();
+		MSRecurrence r = new MSRecurrence();
 		switch (recurrence.getKind()) {
 		case daily:
 			r.setType(RecurrenceType.DAILY);

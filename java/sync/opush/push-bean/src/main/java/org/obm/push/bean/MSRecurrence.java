@@ -37,7 +37,7 @@ import java.util.Set;
 import com.google.common.base.Objects;
 
 
-public class Recurrence implements Serializable {
+public class MSRecurrence implements Serializable {
 	
 	private Date until;
 	private RecurrenceType type;
@@ -128,8 +128,8 @@ public class Recurrence implements Serializable {
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof Recurrence) {
-			Recurrence that = (Recurrence) object;
+		if (object instanceof MSRecurrence) {
+			MSRecurrence that = (MSRecurrence) object;
 			return Objects.equal(this.until, that.until)
 				&& Objects.equal(this.type, that.type)
 				&& Objects.equal(this.weekOfMonth, that.weekOfMonth)
