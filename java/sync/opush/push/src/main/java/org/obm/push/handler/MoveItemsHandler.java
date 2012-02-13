@@ -48,6 +48,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.protocol.bean.MoveItemsRequest;
@@ -77,10 +78,10 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter, 
 			StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
-				stMachine, collectionDao, wbxmlTools);
+				stMachine, collectionDao, wbxmlTools, domDumper);
 		this.moveItemsProtocol = moveItemsProtocol;
 	}
 

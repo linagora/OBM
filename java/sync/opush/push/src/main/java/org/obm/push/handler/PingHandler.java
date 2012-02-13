@@ -49,6 +49,7 @@ import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
@@ -81,10 +82,10 @@ public class PingHandler extends WbxmlRequestHandler implements
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
 			CollectionDao collectionDao, HearbeatDao hearbeatDao,
-			WBXMLTools wbxmlTools) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
 		this.hearbeatDao = hearbeatDao;

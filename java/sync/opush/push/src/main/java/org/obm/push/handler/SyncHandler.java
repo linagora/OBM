@@ -73,6 +73,7 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.exception.activesync.ServerItemNotFoundException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -133,10 +134,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			WBXMLTools wbxmlTools) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
-				stMachine, collectionDao, wbxmlTools);
+				stMachine, collectionDao, wbxmlTools, domDumper);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;

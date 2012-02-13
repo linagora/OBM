@@ -50,6 +50,7 @@ import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
@@ -77,10 +78,10 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
-			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools) {
+			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.protocol = protocol;
 	}

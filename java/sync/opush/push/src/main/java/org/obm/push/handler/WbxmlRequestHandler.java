@@ -67,12 +67,13 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 	protected final CollectionDao collectionDao;
 
 	private final WBXMLTools wbxmlTools;
+	private final DOMDumper domDumper;
 
 	protected WbxmlRequestHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, CollectionDao collectionDao,
-			WBXMLTools wbxmlTools) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		this.backend = backend;
 		this.encoderFactory = encoderFactory;
@@ -81,6 +82,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 		this.stMachine = stMachine;
 		this.collectionDao = collectionDao;
 		this.wbxmlTools = wbxmlTools;
+		this.domDumper = domDumper;
 	}
 
 	@Override
@@ -115,8 +117,8 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 			// specified.
 		}
 
-		if (doc != null && logger.isInfoEnabled()) {
-			DOMDumper.dumpXml(logger, doc);
+		if (doc != null) {
+			domDumper.dumpXml(doc);
 		}
 
 		process(continuation, bs, doc, request, responder);

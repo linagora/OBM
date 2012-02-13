@@ -32,20 +32,36 @@
 package org.obm.push.impl;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import javax.xml.transform.TransformerException;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
+@Singleton
 public class DOMDumper {
 
-	private static boolean withData = new File("/etc/opush/data.in.logs")
-			.exists();
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private final Logger trimREQlogger;
+	private final Logger fullREQLogger;
+
+	@Inject
+	private  DOMDumper(@Named(LoggerModule.TRIMMED_REQUEST)Logger trimRequestlogger, 
+			@Named(LoggerModule.FULL_REQUEST)Logger fullLogger) {
+
+		this.trimREQlogger = trimRequestlogger;
+		this.fullREQLogger = fullLogger;
+	}
 
 	/**
 	 * Seeing email/cal/contact data is a security issue for some
@@ -53,29 +69,42 @@ public class DOMDumper {
 	 * 
 	 * @param doc
 	 */
-	public static void dumpXml(Logger logger, Document doc) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			Document c = DOMUtils.cloneDOM(doc);
-
-			if (!withData) {
-				NodeList nl = c.getElementsByTagName("ApplicationData");
-				for (int i = 0; i < nl.getLength(); i++) {
-					Node e = nl.item(i);
-					NodeList children = e.getChildNodes();
-					for (int j = 0; j < children.getLength(); j++) {
-						Node child = children.item(j);
-						e.removeChild(child);
-					}
-
-					e.setTextContent("[trimmed_output]");
-				}
-			}
-
-			DOMUtils.serialise(c, out, true);
-			logger.debug(out.toString());
+	public void dumpXml(Document doc) {
+		try {	
+			fullRequestLogging(DOMUtils.cloneDOM(doc));
+			trimRequestLogging(DOMUtils.cloneDOM(doc));
 		} catch (TransformerException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
+
+	private void fullRequestLogging(Document doc) throws TransformerException {
+		if (fullREQLogger.isInfoEnabled()) {
+			log(fullREQLogger, doc);
+		}
+	}
+
+	private void trimRequestLogging(Document doc) throws TransformerException {
+		if (trimREQlogger.isInfoEnabled()) {
+			NodeList nl = doc.getElementsByTagName("ApplicationData");
+			for (int i = 0; i < nl.getLength(); i++) {
+				Node e = nl.item(i);
+				NodeList children = e.getChildNodes();
+				for (int j = 0; j < children.getLength(); j++) {
+					Node child = children.item(j);
+					e.removeChild(child);
+				}
+				e.setTextContent("[trimmed_output]");
+			}
+			log(trimREQlogger, doc);
+		}
+	}
+
+	private void log(Logger logger, Document doc) throws TransformerException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialise(doc, out, true);
+		logger.info(out.toString());
+	}
+
+
 }

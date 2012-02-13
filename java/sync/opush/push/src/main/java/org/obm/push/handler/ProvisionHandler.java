@@ -40,6 +40,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.protocol.bean.ProvisionRequest;
@@ -65,10 +66,10 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			Random random, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
-			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools) {
+			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
-				stMachine, collectionDao, wbxmlTools);
+				stMachine, collectionDao, wbxmlTools, domDumper);
 		this.random = random;
 		this.protocol = provisionProtocol;
 	}

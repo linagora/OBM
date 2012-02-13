@@ -49,6 +49,7 @@ import org.obm.push.exception.UnknownObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.protocol.bean.FolderSyncRequest;
@@ -75,10 +76,10 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			IContentsImporter contentsImporter, IHierarchyExporter hierarchyExporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			CollectionDao collectionDao, FolderSyncProtocol protocol,
-			WBXMLTools wbxmlTools) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.hierarchyExporter = hierarchyExporter;
 		this.protocol = protocol;

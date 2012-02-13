@@ -36,6 +36,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -54,10 +55,10 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, 
-				contentsExporter, stMachine, collectionDao, wbxmlTools);
+				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 	}
 
 	@Override

@@ -45,10 +45,13 @@ public class ResponderImplTest {
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		Document document = EasyMock.createMock(Document.class);
+		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
+		domDumper.dumpXml(EasyMock.anyObject(Document.class));
+		EasyMock.expectLastCall().anyTimes();
 		
 		EasyMock.expect(wbxmlTools.toWbxml(namespace, document)).andReturn(data);
-		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document, domDumper);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		
 		try {
@@ -67,6 +70,9 @@ public class ResponderImplTest {
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		Document document = EasyMock.createMock(Document.class);
+		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
+		domDumper.dumpXml(EasyMock.anyObject(Document.class));
+		EasyMock.expectLastCall().anyTimes();
 		
 		EasyMock.expect(wbxmlTools.toWbxml(namespace, document)).andReturn(data);
 		servletResponse.setContentType("application/vnd.ms-sync.wbxml");
@@ -76,8 +82,8 @@ public class ResponderImplTest {
 		servletOutputStream.flush();
 		servletOutputStream.close();
 		
-		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document, domDumper);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		responder.sendResponse(namespace, document);
 		
@@ -116,7 +122,7 @@ public class ResponderImplTest {
 		servletResponse.setStatus(200);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, null);
 		
 		responder.sendResponseFile(contentType, new ByteArrayInputStream(data));
 		
@@ -133,7 +139,7 @@ public class ResponderImplTest {
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, null);
 		
 		try {
 			responder.sendResponseFile(contentType, new ByteArrayInputStream(data));
@@ -152,7 +158,7 @@ public class ResponderImplTest {
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, null);
 		
 		try {
 			responder.sendResponseFile(contentType, null);
@@ -170,7 +176,7 @@ public class ResponderImplTest {
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		servletResponse.sendError(status);
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, null);
 		responder.sendError(status);
 		EasyMock.verify(servletResponse, intEncoder, wbxmlTools);
 	}
@@ -202,7 +208,7 @@ public class ResponderImplTest {
 		servletOutputStream.close();
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools);
+		ResponderImpl responder = new ResponderImpl(servletResponse, intEncoder, wbxmlTools, null);
 		
 		responder.sendMSSyncMultipartResponse(namespace, document, Arrays.asList(binaryPart), false);
 		
