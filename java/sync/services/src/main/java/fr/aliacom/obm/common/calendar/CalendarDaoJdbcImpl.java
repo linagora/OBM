@@ -1012,10 +1012,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						fetched.append(recurentParentId);
 					}
 					fetched.append(",");
-					fetched.append(recurentParentId);
+					fetched.append(eventId);
 				}
-				fetched.append(",");
-				fetched.append(eventId);
 			}
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
@@ -2207,8 +2205,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
 				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
 				+ "WHERE e.event_type=? AND ue.userentity_user_id=? "
-				+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) OR "
-				+ "(event_date >= ? AND event_date <= ?) )";
+				+ "AND ((event_repeatkind != 'none' AND event_endrepeat <= ?) OR "
+				+ "(event_repeatkind = 'none' AND event_date >= ? AND event_date <= ?) )";
 		
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
@@ -2225,7 +2223,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
 			evps.setObject(idx++, obmUser.getUid());
-			evps.setTimestamp(idx++, new Timestamp(startDate.getTime()));
+			evps.setTimestamp(idx++, new Timestamp(endDate.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(startDate.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(endDate.getTime()));
 			evrs = evps.executeQuery();
