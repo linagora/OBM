@@ -37,6 +37,40 @@ import com.google.common.base.Objects;
 
 public class MSAttendee implements Serializable {
 	
+	public static class Builder {
+		
+		private final MSAttendee attendee;
+		
+		public Builder() {
+			super();
+			attendee = new MSAttendee();
+		}
+		
+		public Builder withEmail(String email) {
+			attendee.email = email;
+			return this;
+		}
+		
+		public Builder withName(String name) {
+			attendee.name = name;
+			return this;
+		}
+		
+		public Builder withStatus(AttendeeStatus status) {
+			attendee.attendeeStatus = status;
+			return this;
+		}
+		
+		public Builder withType(AttendeeType type) {
+			attendee.attendeeType = type;
+			return this;
+		}
+		
+		public MSAttendee build() {
+			return attendee;
+		}
+	}
+	
 	private String email;
 	private String name;
 	private AttendeeStatus attendeeStatus;

@@ -33,13 +33,13 @@ package org.obm.push;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
+import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
@@ -59,8 +59,8 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 public class ObmEventToMsEventConverter {
 
@@ -87,33 +87,56 @@ public class ObmEventToMsEventConverter {
 		mse.setDescription(e.getDescription());
 		mse.setLocation(e.getLocation());
 		mse.setStartTime(e.getStartDate());
-		
-		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		c.setTimeInMillis(e.getStartDate().getTime());
-		c.add(Calendar.SECOND, e.getDuration());
-		mse.setEndTime(c.getTime());
+	
+		Date endtTime = endTime(e.getStartDate().getTime(), e.getDuration());
+		mse.setEndTime(endtTime);
 		
 		mse.setAllDayEvent(e.isAllday());
 
-		mse.setReminder(Objects.firstNonNull(e.getAlert(), 0) / 60);
+		mse.setReminder(reminder(e));
 		mse.setBusyStatus(busyStatus(e.getOpacity()));
 		mse.setSensitivity(sensitivity(e.getPrivacy()));
 
+		mse.setCategories(category(e));
+		mse.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
+	}
+
+	private Date endTime(long startTime, int duration) {
+		if (duration > 0) {
+			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			c.setTimeInMillis(startTime);
+			c.add(Calendar.SECOND, duration);
+			return c.getTime();
+		}
+		throw new IllegalArgumentException("Duration must to be positive value");
+	}
+	
+	private List<String> category(Event e) {
+		if (e.getCategory() != null) {
+			return Lists.newArrayList(e.getCategory());
+		} else {
+			return null;
+		}
+	}
+
+	private Integer reminder(Event e) {
+		Integer alert = e.getAlert();
+		if (alert == null) {
+			return null;
+		} else {
+			return alert / 60;
+		}
 	}
 
 	private List<MSEventException> getException(Event event) {
-		List<MSEventException> ret = new LinkedList<MSEventException>();
+		List<MSEventException> ret = Lists.newArrayList();
 		if (!event.isRecurrent()) {
 			return ret;
 		}
 		
 		EventRecurrence recurrence = event.getRecurrence();
 		for (Date excp : recurrence.getExceptions()) {
-			MSEventException e = new MSEventException();
-			e.setDeleted(true);
-			e.setExceptionStartTime(excp);
-			e.setStartTime(excp);
-			e.setDtStamp(new Date());
+			MSEventException e = deletionException(excp);
 			ret.add(e);
 		}
 
@@ -121,8 +144,14 @@ public class ObmEventToMsEventConverter {
 			MSEventException e = convertException(exception);
 			ret.add(e);
 		}
-
 		return ret;
+	}
+
+	private MSEventException deletionException(Date excp) {
+		MSEventException e = new MSEventException();
+		e.setDeleted(true);
+		e.setExceptionStartTime(excp);
+		return e;
 	}
 	
 	private MSEventException convertException(Event exception) {

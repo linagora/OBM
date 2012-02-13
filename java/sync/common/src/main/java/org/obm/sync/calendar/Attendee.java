@@ -35,6 +35,60 @@ import com.google.common.base.Objects;
 
 public class Attendee {
 
+	public static class Builder {
+		
+		private final Attendee attendee;
+		
+		public Builder() {
+			super();
+			attendee = new Attendee();
+		}
+		
+		public Builder withParticipationState(ParticipationState state) {
+			attendee.state = state;
+			return this;
+		}
+		
+		public Builder withEmail(String email) {
+			attendee.email = email;
+			return this;
+		}
+		
+		public Builder withParticipationRole(ParticipationRole role) {
+			attendee.participationRole = role;
+			return this;
+		}
+		
+		public Builder withDisplayName(String name) {
+			attendee.displayName = name;
+			return this;
+		}
+		
+		public Builder asOrganizer() {
+			attendee.organizer = true;
+			return this;
+		}
+		
+		public Builder asUser() {
+			attendee.obmUser = true;
+			return this;
+		}
+		
+		public Builder asContact() {
+			attendee.obmUser = false;
+			return this;
+		}
+		
+		public Attendee build() {
+			return attendee;
+		}
+
+		public Builder asAttendee() {
+			attendee.organizer = false;
+			return this;
+		}
+	}
+	
 	private ParticipationState state;
 	private String email;
 	private ParticipationRole participationRole;

@@ -206,7 +206,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	}
 
 	public Date getDtStamp() {
-		if(dtStamp != null){
+		if (dtStamp != null) {
 			return dtStamp;
 		}
 		return new Date(0);

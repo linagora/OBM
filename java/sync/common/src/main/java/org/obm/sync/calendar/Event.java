@@ -80,7 +80,7 @@ public class Event implements Indexed<Integer> {
 	private EventType type;
 	private Date completion;
 	private Integer percent;
-	private EventOpacity opacity = EventOpacity.OPAQUE;
+	private EventOpacity opacity;
 
 	private Integer entityId;
 	private Date timeUpdate;
@@ -100,6 +100,7 @@ public class Event implements Indexed<Integer> {
 		sequence = 0;
 		recurrence = new EventRecurrence();
 		privacy = EventPrivacy.PUBLIC;
+		opacity = EventOpacity.OPAQUE;
 	}
 
 	public String getTitle() {
