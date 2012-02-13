@@ -537,6 +537,7 @@ function run_query_contact_remove_rights($contact_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_update($contact) {
   global $obm, $cgp_show, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $multidomain = sql_multidomain('contact');
   $id =  $contact['contact_id'];
@@ -608,39 +609,38 @@ function run_query_contact_update($contact) {
   $query = "UPDATE Contact SET
     contact_timeupdate=NOW(),
     contact_userupdate='".$obm['uid']."',
-    contact_datasource_id=$dsrc,
-    contact_addressbook_id=$addressbook,
-    contact_company_id=$comp_id,
-    contact_company='$company',
-    contact_kind_id=$kind,
-    contact_marketingmanager_id=$market,
-    contact_lastname='$lastname',
-    contact_firstname='$firstname',
-    contact_commonname='$commonname',
-    contact_middlename='$mname',
-    contact_suffix='$suffix',
-    contact_aka='$aka',
-    contact_sound='$sound',
-    contact_manager='$manager',
-    contact_assistant='$assistant',
-    contact_spouse='$spouse',
-    contact_category='$category',
-    contact_service='$service',
-    contact_function_id=$func,
-    contact_title='$title',
-    contact_mailing_ok=$mailok,
-    contact_newsletter=$newsletter,
-    contact_archive=$archive,
+    contact_datasource_id=".$obm_q->escape($dsrc).",
+    contact_addressbook_id=".$obm_q->escape($addressbook).",
+    contact_company_id=".$obm_q->escape($comp_id).",
+    contact_company='".$obm_q->escape($company)."',
+    contact_kind_id=".$obm_q->escape($kind).",
+    contact_marketingmanager_id=".$obm_q->escape($market).",
+    contact_lastname='".$obm_q->escape($lastname)."',
+    contact_firstname='".$obm_q->escape($firstname)."',
+    contact_commonname='".$obm_q->escape($commonname)."',
+    contact_middlename='".$obm_q->escape($mname)."',
+    contact_suffix='".$obm_q->escape($suffix)."',
+    contact_aka='".$obm_q->escape($aka)."',
+    contact_sound='".$obm_q->escape($sound)."',
+    contact_manager='".$obm_q->escape($manager)."',
+    contact_assistant='".$obm_q->escape($assistant)."',
+    contact_spouse='".$obm_q->escape($spouse)."',
+    contact_category='".$obm_q->escape($category)."',
+    contact_service='".$obm_q->escape($service)."',
+    contact_function_id=".$obm_q->escape($func).",
+    contact_title='".$obm_q->escape($title)."',
+    contact_mailing_ok=".$obm_q->escape($mailok).",
+    contact_newsletter=".$obm_q->escape($newsletter).",
+    contact_archive=".$obm_q->escape($archive).",
     $query_date
-    contact_comment='$comment',
-    contact_comment2='$comment2',
-    contact_comment3='$comment3',
+    contact_comment='".$obm_q->escape($comment)."',
+    contact_comment2='".$obm_q->escape($comment2)."',
+    contact_comment3='".$obm_q->escape($comment3)."',
     contact_origin='$GLOBALS[c_origin_web]'
   WHERE contact_id $sql_id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($cgp_show['module']['company']) {
@@ -765,12 +765,12 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
           address_label
         ) VALUES (
           $id, 
-          '$address[street]',
-          '$address[zipcode]',
-          '$address[town]',
-          '$address[expresspostal]',
-          '$address[country_iso3166]',
-          '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
+          '".$obm_q->escape($address[street])."',
+          '".$obm_q->escape($address[zipcode])."',
+          '".$obm_q->escape($address[town])."',
+          '".$obm_q->escape($address[expresspostal])."',
+          '".$obm_q->escape($address[country_iso3166])."',
+          '".$obm_q->escape($address[label]).";X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
@@ -788,7 +788,7 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
       if(trim($website['url']) != '' ) {
         $website['label'] = str_replace('_', ';', $website['label']);
         $cpt[$website['label']]++;
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '".$obm_q->escape($website[url])."', '".$obm_q->escape($website[label]).";X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
         $obm_q->query($query);
       }
@@ -804,7 +804,7 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
         $cpt[$im['protocol']]++;          
-        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '".$obm_q->escape($im[address])."', '".$obm_q->escape($im[protocol])."', '".$obm_q->escape($im[protocol]).";X-OBM-Ref".$cpt[$im['protocol']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(IM)');
         $obm_q->query($query);
       }
@@ -821,7 +821,7 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".$obm_q->escape(trim($email['address']))."', '".$obm_q->escape().";X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);
       }
@@ -1431,8 +1431,8 @@ function run_query_contact_kind_insert($contact) {
       '$timecreate',
       $usercreate,
       $domain_id,
-      '$label',
-      '$header',
+      '".$obm_q->escape($label)."',
+      '".$obm_q->escape($header)."',
       '$lang',
       $default)";
 
@@ -1492,8 +1492,8 @@ function run_query_contact_kind_update($contact) {
   $query = "UPDATE Kind SET
     kind_timeupdate='$timeupdate',
     kind_userupdate='$userupdate',
-    kind_minilabel='$label',
-    kind_header='$header',
+    kind_minilabel='".$obm_q->escape($label)."',
+    kind_header='".$obm_q->escape($header)."',
     kind_lang='$lang',
     kind_default=$default
     WHERE
@@ -1654,7 +1654,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
     case $insert_event:
       $duration = 3600*24;
       $label = ${"l_${date}_event_title"};
-      $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullastname));
+      $title = sprintf($label, $contact_fullastname);
       $ext_id = generateUniqueKey();
 
       $query = "INSERT INTO Event
@@ -1691,8 +1691,8 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
         '$ext_id',
         '$contact_usercreate',
         '".Of_Date::getOption('timezone')."',
-        '$title',
-        '$new_value',
+        '".$obm_q->escape($title)."',
+        '".$obm_q->escape($new_value)."',
         '',
         '',
         '',
@@ -1747,7 +1747,7 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
     case $update_event:
       $sql_id = sql_parse_id($event_id);
       $query = "UPDATE Event SET
-        event_date = '$new_value',
+        event_date = '".$obm_q->escape($new_value)."',
         event_origin = '$GLOBALS[c_origin_web]'
       WHERE
         event_id = $sql_id

@@ -4483,7 +4483,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
     $tagid = $event_q->f('event_tag_id');
-    $taglabel = $event_q->f('eventtag_label');
+    $taglabel = htmlspecialchars($event_q->f('eventtag_label'));
     $tagcolor = $event_q->f('eventtag_color');
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');

@@ -597,6 +597,7 @@ class OBM_Contact implements OBM_ISearchable {
   
   public static function store($contact) {
     global $obm, $cgp_show, $cdg_sql;
+    $obm_q = new DB_OBM;
 
     if (!$contact->id) return false;
 
@@ -618,36 +619,35 @@ class OBM_Contact implements OBM_ISearchable {
       contact_userupdate='{$uid}',
       contact_datasource_id=$dsrc,
       contact_company_id=$comp_id,
-      contact_company='".addslashes($contact->company)."',
+      contact_company='".$obm_q->escape($contact->company)."',
       contact_kind_id=$kind,
       contact_marketingmanager_id=$market_id,
-      contact_lastname='".addslashes($contact->lastname)."',
-      contact_firstname='".addslashes($contact->firstname)."',
-      contact_commonname='".addslashes($contact->commonname)."',
-      contact_middlename='".addslashes($contact->mname)."',
-      contact_suffix='".addslashes($contact->suffix)."',
-      contact_aka='".addslashes($contact->aka)."',
-      contact_sound='".addslashes($contact->sound)."',
-      contact_manager='".addslashes($contact->manager)."',
-      contact_assistant='".addslashes($contact->assistant)."',
-      contact_spouse='".addslashes($contact->spouse)."',
-      contact_category='".addslashes($contact->category)."',
-      contact_service='".addslashes($contact->service)."',
+      contact_lastname='".$obm_q->escape($contact->lastname)."',
+      contact_firstname='".$obm_q->escape($contact->firstname)."',
+      contact_commonname='".$obm_q->escape($contact->commonname)."',
+      contact_middlename='".$obm_q->escape($contact->mname)."',
+      contact_suffix='".$obm_q->escape($contact->suffix)."',
+      contact_aka='".$obm_q->escape($contact->aka)."',
+      contact_sound='".$obm_q->escape($contact->sound)."',
+      contact_manager='".$obm_q->escape($contact->manager)."',
+      contact_assistant='".$obm_q->escape($contact->assistant)."',
+      contact_spouse='".$obm_q->escape($contact->spouse)."',
+      contact_category='".$obm_q->escape($contact->category)."',
+      contact_service='".$obm_q->escape($contact->service)."',
       contact_function_id=$func,
-      contact_title='".addslashes($contact->title)."',
+      contact_title='".$obm_q->escape($contact->title)."',
       contact_mailing_ok={$contact->mailok},
       contact_newsletter={$contact->newsletter},
       contact_archive={$contact->archive},
       contact_date=$date,
-      contact_comment='".addslashes($contact->comment)."',
-      contact_comment2='".addslashes($contact->comment2)."',
-      contact_comment3='".addslashes($contact->comment3)."',
+      contact_comment='".$obm_q->escape($contact->comment)."',
+      contact_comment2='".$obm_q->escape($contact->comment2)."',
+      contact_comment3='".$obm_q->escape($contact->comment3)."',
       contact_origin='{$GLOBALS['c_origin_web']}'
     WHERE contact_id $sql_id 
       $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'OBM_Contact::store()');
-    $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
 
     if ($cgp_show['module']['company']) {
@@ -1410,10 +1410,10 @@ class OBM_Contact implements OBM_ISearchable {
             address_label
           ) VALUES (
             $id, 
-            '".addslashes($address[street])."',
-            '".addslashes($address[zipcode])."',
-            '".addslashes($address[town])."',
-            '".addslashes($address[expresspostal])."',
+            '".$obm_q->escape($address[street])."',
+            '".$obm_q->escape($address[zipcode])."',
+            '".$obm_q->escape($address[town])."',
+            '".$obm_q->escape($address[expresspostal])."',
             '$address[country_iso3166]',
             '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
           )";
@@ -1438,7 +1438,7 @@ class OBM_Contact implements OBM_ISearchable {
             $website['label'] = str_replace('_', ';', $website['label']);
           }              
           $cpt[$website['label']]++;
-          $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '".addslashes($website[url])."', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+          $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '".$obm_q->escape($website[url])."', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(website)');
           $obm_q->query($query);
         }
@@ -1454,7 +1454,7 @@ class OBM_Contact implements OBM_ISearchable {
       foreach($contact->im as $im) {
         if(trim($im['address']) != '' ) {
           $cpt[$im['protocol']]++;          
-          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '".addslashes($im[address])."', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
+          $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '".$obm_q->escape($im[address])."', '$im[protocol]', '$im[protocol];X-OBM-Ref".$cpt[$im['protocol']]."')";
           display_debug_msg($query, $cdg_sql, 'OBM_Contact::storeCoords(IM)');
           $obm_q->query($query);
         }

@@ -584,8 +584,9 @@ function get_import_similar_company($fields, $map, &$countries) {
   }
   $cgp_import_precision = 3;
   $short_name = substr($name, 0, $cgp_import_precision);
-  $zip = $fields["comp_zip"];
-  $town = $fields["comp_town"];
+  $name = $obm_q->escape($name);
+  $zip = $obm_q->escape($fields["comp_zip"]);
+  $town = $obm_q->escape($fields["comp_town"]);
   if( $ctry == "") {
     $zip_query = "OR (address_zipcode $like '".$obm_q->escape($zip)."' OR address_town $like '".$obm_q->escape($town)."')";
   }
@@ -640,6 +641,7 @@ function get_import_similar_company($fields, $map, &$countries) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$userdata) {
   global $cdg_sql, $obm, $field_size;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -654,9 +656,15 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     }
   }
 
+<<<<<<< HEAD
   $num = $fields["comp_num"];
   $archive = "0";
   $name = $fields["comp_name"];
+=======
+  $num = $obm_q->escape($fields["comp_num"]);
+  $archive = "0";
+  $name = $obm_q->escape($fields["comp_name"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   $auto_aka = format_name($name, 0, true, true);
   $aka = $auto_aka;
   $sound = phonetic_key($name);
@@ -664,12 +672,21 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
 
+<<<<<<< HEAD
   $ad1 = $fields["comp_ad1"];
   $ad2 = $fields["comp_ad2"];
   $ad3 = $fields["comp_ad3"];
   $zip = $fields["comp_zip"];
   $town = $fields["comp_town"];
   $cdx = $fields["comp_cdx"];
+=======
+  $ad1 = $obm_q->escape($fields["comp_ad1"]);
+  $ad2 = $obm_q->escape($fields["comp_ad2"]);
+  $ad3 = $obm_q->escape($fields["comp_ad3"]);
+  $zip = $fields["comp_zip"];
+  $town = $obm_q->escape($fields["comp_town"]);
+  $cdx = $obm_q->escape($fields["comp_cdx"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["comp_ctry"]])) {
     $ctry = $countries[$fields["comp_ctry"]];
@@ -698,7 +715,11 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);
 
+<<<<<<< HEAD
   $com = $fields["comp_com"];
+=======
+  $com = $obm_q->escape($fields["comp_com"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
 
   $query = "INSERT INTO Company (
     company_domain_id,
@@ -877,6 +898,7 @@ function run_query_entity_coords_update($id, $params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$userdata, $company_id) {
   global $obm, $cdg_sql, $field_size;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -890,19 +912,34 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     }
   }
 
+<<<<<<< HEAD
   $num = $fields["comp_num"];
   // Name should be the same (expect case), so we don't update aka or sound
   $name = $fields["comp_name"];
+=======
+  $num = $obm_q->escape($fields["comp_num"]);
+  // Name should be the same (expect case), so we don't update aka or sound
+  $name = $obm_q->escape($fields["comp_name"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
 
+<<<<<<< HEAD
   $ad1 = $fields["comp_ad1"];
   $ad2 = $fields["comp_ad2"];
   $ad3 = $fields["comp_ad3"];
   $zip = $fields["comp_zip"];
   $town = $fields["comp_town"];
   $cdx = $fields["comp_cdx"];
+=======
+  $ad1 = $obm_q->escape($fields["comp_ad1"]);
+  $ad2 = $obm_q->escape($fields["comp_ad2"]);
+  $ad3 = $obm_q->escape($fields["comp_ad3"]);
+  $zip = $fields["comp_zip"];
+  $town = $obm_q->escape($fields["comp_town"]);
+  $cdx = $obm_q->escape($fields["comp_cdx"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["comp_ctry"]])) {
     $ctry = $countries[$fields["comp_ctry"]];
@@ -932,7 +969,11 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);
 
+<<<<<<< HEAD
   $com = $fields["comp_com"];
+=======
+  $com = $obm_q->escape($fields["comp_com"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   $comp_id = sql_parse_id($company_id, true);
   $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -974,7 +1015,11 @@ function get_import_similar_contact($fields, $cid) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $cid = sql_parse_id($cid, true);
+<<<<<<< HEAD
   $lname = $fields["con_ln"];
+=======
+  $lname = $obm_q->escape($fields["con_ln"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   $fname = $fields["con_fn"];
 
   $query = "SELECT DISTINCT contact_id, contact_lastname, contact_firstname 
@@ -1010,6 +1055,7 @@ function get_import_similar_contact($fields, $cid) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -1027,8 +1073,13 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
+<<<<<<< HEAD
   $lname = $fields["con_ln"];
   $fname = $fields["con_fn"];
+=======
+  $lname = $obm_q->escape($fields["con_ln"]);
+  $fname = $obm_q->escape($fields["con_fn"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a lang has been found we get the corresponding kind
   if (isset($kinds[strtoupper($fields["con_lang"])])) {
     $kind_id = $kinds[strtoupper($fields["con_lang"])];
@@ -1047,6 +1098,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   }
   $function_id = sql_parse_id($function_id);
 
+<<<<<<< HEAD
   $title = $fields["con_tit"];
   $ad1 = $fields["con_ad1"];
   $ad2 = $fields["con_ad2"];
@@ -1054,6 +1106,15 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $zip = $fields["con_zip"];
   $town = $fields["con_town"];
   $cdx = $fields["con_cdx"];
+=======
+  $title = $obm_q->escape($fields["con_tit"]);
+  $ad1 = $obm_q->escape($fields["con_ad1"]);
+  $ad2 = $obm_q->escape($fields["con_ad2"]);
+  $ad3 = $obm_q->escape($fields["con_ad3"]);
+  $zip = $fields["con_zip"];
+  $town = $obm_q->escape($fields["con_town"]);
+  $cdx = $obm_q->escape($fields["con_cdx"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["con_ctry"]])) {
     $ctry = $countries[$fields["con_ctry"]];
@@ -1085,7 +1146,11 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     'country' => $ctry);
 
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
+<<<<<<< HEAD
   $com = $fields["con_com"];
+=======
+  $com = $obm_q->escape($fields["con_com"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   $arch = '0';
   $company_id = sql_parse_id($comp_id);
   $contact_addressbook_id = OBM_AddressBook::lookupPublicAddressBookIdFor($domain_id);
@@ -1166,6 +1231,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata, $contact_id) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -1182,8 +1248,13 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
+<<<<<<< HEAD
   $lname = $fields["con_ln"];
   $fname = $fields["con_fn"];
+=======
+  $lname = $obm_q->escape($fields["con_ln"]);
+  $fname = $obm_q->escape($fields["con_fn"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a lang has been found we get the corresponding kind
   if (isset($kinds[strtoupper($fields["con_lang"])])) {
     $kind_id = $kinds[strtoupper($fields["con_lang"])];
@@ -1197,6 +1268,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     $function_id = $fields["con_func"];
   }
   $function_id = sql_parse_id($function_id);
+<<<<<<< HEAD
   $title = $fields["con_tit"];
   $ad1 = $fields["con_ad1"];
   $ad2 = $fields["con_ad2"];
@@ -1204,6 +1276,15 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $zip = $fields["con_zip"];
   $town = $fields["con_town"];
   $cdx = $fields["con_cdx"];
+=======
+  $title = $obm_q->escape($fields["con_tit"]);
+  $ad1 = $obm_q->escape($fields["con_ad1"]);
+  $ad2 = $obm_q->escape($fields["con_ad2"]);
+  $ad3 = $obm_q->escape($fields["con_ad3"]);
+  $zip = $fields["con_zip"];
+  $town = $obm_q->escape($fields["con_town"]);
+  $cdx = $obm_q->escape($fields["con_cdx"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["con_ctry"]])) {
     $ctry = $countries[$fields["con_ctry"]];
@@ -1234,7 +1315,11 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);  
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
+<<<<<<< HEAD
   $com = $fields["con_com"];
+=======
+  $com = $obm_q->escape($fields["con_com"]);
+>>>>>>> OBMFULL-796: Escape calendar and contact queries
   $arch = '0';
   $cont_id = sql_parse_id($contact_id, true);
   $query = "UPDATE Contact SET
