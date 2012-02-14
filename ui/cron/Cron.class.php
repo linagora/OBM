@@ -64,6 +64,16 @@ class Cron {
    */
   var $logger;
 
+
+
+  /**
+  * PID file
+  *
+  * @var string
+  * @access private
+  */
+  var $pidfile = "/var/run/obm-core.cron.php.pid";
+
   /**
    * Cron 
    * 
@@ -125,6 +135,18 @@ class Cron {
    */
   function lock() {
     $this->logger->debug("Trying to get lock");
+    if ( file_exists($this->pidfile) ) {
+      $pid = trim(file_get_contents($this->pidfile));
+      if ( $pid && file_exists("/proc/".$pid) ) {
+        $this->logger->debug("Another cron process, PID $pid, is already running");
+        return false;
+      }
+    }
+    $ok = file_put_contents($this->pidfile, getmypid());
+    if ($ok===false) {
+      $this->logger->debug("Unable to write to file ".$this->pidfile);
+      return false;
+    }
     $this->logger->debug("Cron locked");
     return true;
   }
@@ -138,6 +160,10 @@ class Cron {
    */
   function unlock() {
     $this->logger->debug("Unlocking cron process");
+    $ok = @unlink($this->pidfile);
+    if ( !$ok ) {
+      $this->logger->debug("Failed to unlink ".$this->pidfile);
+    }
   }
 
   /**
