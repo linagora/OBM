@@ -154,7 +154,6 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msEvent.getExtId()).isEqualTo(new EventExtId("36cb5540-aa8c-4c89-9dfc-3dff56c68df2"));
 		assertThat(msEvent.getLocation()).isEqualTo("Lyon, France");
 		assertThat(msEvent.getMeetingStatus()).isEqualTo(CalendarMeetingStatus.IS_A_MEETING);
-		assertThat(msEvent.getObmId()).isEqualTo(new EventObmId(121));
 		assertThat(msEvent.getObmSequence()).isEqualTo(1);
 		assertThat(msEvent.getOrganizerEmail()).isEqualTo("jaures@sfio.fr");
 		assertThat(msEvent.getOrganizerName()).isEqualTo("Jean Jaures");
