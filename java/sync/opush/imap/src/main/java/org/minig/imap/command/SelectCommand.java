@@ -44,13 +44,10 @@ public class SelectCommand extends SimpleCommand<Boolean> {
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		if (logger.isDebugEnabled()) {
-			for (IMAPResponse r : rs) {
-				logger.debug("selectResponse: " + r.getPayload());
-			}
+		for (IMAPResponse r : rs) {
+			logger.debug("selectResponse: " + r.getPayload());
 		}
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		data = ok.isOk();
+		data = isOk(rs);
 	}
 
 }

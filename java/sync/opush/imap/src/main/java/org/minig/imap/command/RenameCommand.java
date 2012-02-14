@@ -37,17 +37,14 @@ import java.util.List;
 import org.minig.imap.impl.IMAPResponse;
 
 public class RenameCommand extends SimpleCommand<Boolean> {
-
-
 	
 	public RenameCommand(String mailbox, String newMailbox) {
-		
 		super("RENAME " + toUtf7(mailbox) + " " + toUtf7(newMailbox));
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		data = rs.get(rs.size() - 1).isOk();
+		data = isOk(rs);
 	}
 
 }

@@ -80,30 +80,27 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 			sb.append("NOOP");
 		}
 		String cmd = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+		
 		if (uids.isEmpty()) {
 			data = ImmutableSet.of();
 			return;
 		}
-		IMAPResponse ok = rs.get(rs.size() - 1);
+		
 		Builder<FastFetch> buildSet = ImmutableSet.builder();
-		if (ok.isOk()) {
+		if (isOK) {
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; it.hasNext() && i < uids.size(); ) {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH")) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("not a fetch: "+payload);
-					}
+					logger.debug("not a fetch: "+payload);
 					continue;
 				}
 				
@@ -113,6 +110,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 				buildSet.add(new FastFetch(uid, internalDate, flags));
 			}
 		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("error on fetch: " + ok.getPayload());
 		}
 		

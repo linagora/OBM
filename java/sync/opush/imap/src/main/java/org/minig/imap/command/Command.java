@@ -42,25 +42,27 @@ import org.minig.imap.impl.TagProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+
 public abstract class Command<T> implements ICommand<T> {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger imaplogger = LoggerFactory.getLogger("IMAP.COMMAND");
+	
 	protected T data;
-
+	
 	@Override
-	public void execute(IoSession session, TagProducer tp, Semaphore lock,
+	public void execute(IoSession session, TagProducer tp, Semaphore lock, 
 			List<IMAPResponse> lastResponses) {
+		
 		CommandArgument args = buildCommand();
-
 		String cmd = args.getCommandString();
 		StringBuilder sb = new StringBuilder(10 + cmd.length());
 		sb.append(tp.nextTag());
 		sb.append(' ');
 		sb.append(cmd);
 		String sent = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("=> '" + sent + "'");
-		}
+		imaplogger.info("{}", sent);
 		session.write(sent);
 		if (args.hasLiteralData()) {
 			lock(lock);
@@ -94,7 +96,9 @@ public abstract class Command<T> implements ICommand<T> {
 	}
 
 	protected boolean isOk(List<IMAPResponse> rs) {
-		return rs.get(rs.size() - 1).isOk();
+		boolean isOK = Iterables.getLast(rs).isOk();
+		imaplogger.info("{}", isOK);
+		return isOK;
 	}
 
 	protected static String fromUtf7(String mailbox) {

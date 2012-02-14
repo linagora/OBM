@@ -63,22 +63,20 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 			sb.append("NOOP");
 		}
 		String cmd = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cmd: " + cmd);
-		}
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+		
 		if (uids.isEmpty()) {
 			data = Collections.emptyList();
 			return;
 		}
 		
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		if (isOK) {
 			ArrayList<FlagsList> list = new ArrayList<FlagsList>(rs.size() - 1);
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; i < rs.size() - 1; i++) {
@@ -116,6 +114,7 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 			}
 			data = list;
 		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("error on fetch: " + ok.getPayload());
 			data = Collections.emptyList();
 		}

@@ -65,14 +65,14 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
-		if (logger.isDebugEnabled()) {
-			for (IMAPResponse r : rs) {
-				logger.debug("ri: " + r.getPayload() + " [stream:"
-						+ (r.getStreamData() != null) + "]");
-			}
+		boolean isOK = isOk(rs);
+		
+		for (IMAPResponse r : rs) {
+			logger.debug("ri: " + r.getPayload() + " [stream:"
+					+ (r.getStreamData() != null) + "]");
 		}
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (ok.isOk()) {
+		
+		if (isOK) {
 			List<MimeMessage> mts = new LinkedList<MimeMessage>();
 			Iterator<IMAPResponse> it = rs.iterator();
 			int len = rs.size() - 1;
@@ -110,6 +110,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 			}
 			data = mts;
 		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("bodystructure failed : " + ok.getPayload());
 			data = Collections.emptyList();
 		}

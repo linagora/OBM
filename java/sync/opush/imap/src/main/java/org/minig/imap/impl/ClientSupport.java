@@ -95,6 +95,7 @@ import org.slf4j.LoggerFactory;
 public class ClientSupport {
 
 	private final static Logger logger = LoggerFactory.getLogger(ClientSupport.class);
+	protected final Logger imaplogger = LoggerFactory.getLogger("IMAP.COMMAND");
 	
 	private final IoHandler handler;
 	private IoSession session;
@@ -189,17 +190,21 @@ public class ClientSupport {
 	}
 
 	private <T> T run(ICommand<T> cmd) {
-		if (logger.isDebugEnabled()) {
-			logger.debug(Integer.toHexString(hashCode()) + " CMD: "
-					+ cmd.getClass().getName() + " Permits: "
-					+ lock.availablePermits());
-		}
+		logger.debug(Integer.toHexString(hashCode()) + " CMD: "
+				+ cmd.getClass().getName() + " Permits: "
+				+ lock.availablePermits());
 		// grab lock, this one should be ok, except on first call
 		// where we might wait for cyrus welcome text.
 		lock();
 		cmd.execute(session, tagsProducer, lock, lastResponses);
 		lock(); // this one should wait until this.setResponses is called
 		try {
+			if (imaplogger.isInfoEnabled()) {
+				imaplogger.info("response :");
+				for (IMAPResponse response: lastResponses) {
+					imaplogger.info("payload : {} , has stream {}", response.getPayload(), response.getStreamData() != null);		
+				}
+			}
 			cmd.responseReceived(lastResponses);
 		} catch (Throwable t) {
 			logger.error("receiving/parsing imap response to cmd "
@@ -217,10 +222,8 @@ public class ClientSupport {
 	 * @param rs
 	 */
 	public void setResponses(List<IMAPResponse> rs) {
-		if (logger.isDebugEnabled()) {
-			for (IMAPResponse ir : rs) {
-				logger.debug("S: " + ir.getPayload());
-			}
+		for (IMAPResponse ir : rs) {
+			logger.debug("S: " + ir.getPayload());
 		}
 
 		synchronized (lastResponses) {
