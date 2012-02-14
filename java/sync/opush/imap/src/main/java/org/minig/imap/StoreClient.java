@@ -81,32 +81,11 @@ public class StoreClient {
 
 	/**
 	 * Logs into the IMAP store
-	 * 
-	 * @return true if login is successful
-	 * @throws IMAPException
 	 */
-	public boolean login() {
-		return login(true);
-	}
-	
-	/**
-	 * Logs into the IMAP store
-	 * 
-	 * @return true if login is successful
-	 * @throws IMAPException
-	 */
-	public boolean login(Boolean activateTLS) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("login attempt to " + hostname + ":" + port + " for "
-					+ login + " / " + password);
-		}
-
+	public void login(Boolean activateTLS) throws IMAPException {
+		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
 		SocketAddress sa = new InetSocketAddress(hostname, port);
-		boolean ret = false;
-		if (cs.login(login, password, connector, sa, activateTLS)) {
-			ret = true;
-		}
-		return ret;
+		cs.login(login, password, connector, sa, activateTLS);
 	}
 
 	/**

@@ -43,24 +43,22 @@ public class LoginTests extends IMAPTestCase {
 		assertNotNull(storeClient);
 	}
 
-	public void testLoginLogout() {
+	public void testLoginLogout() throws IMAPException {
 		StoreClient sc = new StoreClient(confValue("imap"), 143,
 				confValue("login"), confValue("password"));
 		try {
-			boolean ok = sc.login();
-			assertTrue(ok);
+			sc.login(true);
 		} finally {
 			sc.logout();
 		}
 	}
 
-	public void testLoginLogoutSpeed() {
+	public void testLoginLogoutSpeed() throws IMAPException {
 		StoreClient sc = new StoreClient(confValue("imap"), 143,
 				confValue("login"), confValue("password"));
 		int COUNT = 1000;
 		for (int i = 0; i < COUNT; i++) {
-			boolean ok = sc.login();
-			assertTrue(ok);
+			sc.login(true);
 			sc.logout();
 		}
 	}

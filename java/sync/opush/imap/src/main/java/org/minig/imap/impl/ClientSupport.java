@@ -50,6 +50,7 @@ import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.FlagsList;
+import org.minig.imap.IMAPException;
 import org.minig.imap.IMAPHeaders;
 import org.minig.imap.InternalDate;
 import org.minig.imap.NameSpaceInfo;
@@ -117,42 +118,35 @@ public class ClientSupport {
 		}
 	}
 
-	public boolean login(String login, String password,
-			SocketConnector connector, SocketAddress address) {
-		return this.login(login, password, connector, address, true);
-	}
 
-	public boolean login(String login, String password,
+	public void login(String login, String password,
 			SocketConnector connector, SocketAddress address,
-			Boolean activateTLS) {
+			Boolean activateTLS) throws IMAPException {
 		if (session != null && session.isConnected()) {
 			throw new IllegalStateException(
 					"Already connected. Disconnect first.");
 		}
 
-		try {
-			lock(); // waits for "* OK IMAP4rev1 server...
-			ConnectFuture cf = connector.connect(address, handler);
-			cf.join();
-			if (!cf.isConnected()) {
-				lock.release();
-				return false;
+		lock(); // waits for "* OK IMAP4rev1 server...
+		ConnectFuture cf = connector.connect(address, handler);
+		cf.join();
+		if (!cf.isConnected()) {
+			lock.release();
+			throw new IMAPException("Cannot log into imap server");
+		}
+		session = cf.getSession();
+		logger.debug("Connection established");
+		if (activateTLS) {
+			boolean tlsActivated = run(new StartTLSCommand());
+			if (tlsActivated) {
+				activateSSL();
+			} else {
+				logger.debug("TLS not supported by IMAP server.");
 			}
-			session = cf.getSession();
-			logger.debug("Connection established");
-			if (activateTLS) {
-				boolean tlsActivated = run(new StartTLSCommand());
-				if (tlsActivated) {
-					activateSSL();
-				} else {
-					logger.debug("TLS not supported by IMAP server.");
-				}
-			}
-			logger.debug("Sending " + login + " login informations.");
-			return run(new LoginCommand(login, password));
-		} catch (Exception e) {
-			logger.error("login error", e);
-			return false;
+		}
+		logger.debug("Sending " + login + " login informations.");
+		if (!run(new LoginCommand(login, password))) {
+			throw new IMAPException("Cannot log into imap server");
 		}
 	}
 

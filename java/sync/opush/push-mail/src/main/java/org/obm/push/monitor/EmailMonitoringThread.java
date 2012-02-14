@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.monitor;
 
+import org.minig.imap.IMAPException;
 import org.minig.imap.IdleClient;
 import org.minig.imap.idle.IIdleCallback;
 import org.minig.imap.idle.IdleLine;
@@ -70,11 +71,15 @@ public class EmailMonitoringThread implements MonitoringService {
 				try{
 					stopIdle();
 				} catch (Throwable e) {
-					logger.error(e.getMessage(),e );
+					logger.error(e.getMessage(), e);
 				}
 			}
 			if (remainConnected){
-				startIdle();
+				try {
+					startIdle();
+				} catch (Throwable e) {
+					logger.error(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -106,18 +111,12 @@ public class EmailMonitoringThread implements MonitoringService {
 		mailBoxName = emailManager.parseMailBoxName(bs, collectionName);
 	}
 
-	public synchronized void startIdle() {
+	public synchronized void startIdle() throws IMAPException {
 		if (store == null) {
 			store = imapClientProvider.getImapIdleClient(bs);
 			store.login(emailManager.getActivateTLS());
-			try {
-				store.select(mailBoxName);
-				store.startIdle(new Callback());
-			} catch (RuntimeException e) {
-				logger.error("Error lauching idle", e);
-				store.logout();
-				throw e;
-			}
+			store.select(mailBoxName);
+			store.startIdle(new Callback());
 		}
 		remainConnected = true;
 		logger.info("Start monitoring for collection : '{}'", collectionName);

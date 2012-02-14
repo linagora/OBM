@@ -66,18 +66,11 @@ public class IdleClient {
 		icb.setClient(cs);
 	}
 
-	public boolean login(Boolean activateTLS) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("login called");
-		}
+	public void login(Boolean activateTLS) throws IMAPException {
+		logger.debug("login called");
 		SocketAddress sa = new InetSocketAddress(hostname, port);
 		SocketConnector connector = new SocketConnector();
-
-		boolean ret = false;
-		if (cs.login(login, password, connector, sa, activateTLS)) {
-			ret = true;
-		}
-		return ret;
+		cs.login(login, password, connector, sa, activateTLS);
 	}
 
 	public void logout() {

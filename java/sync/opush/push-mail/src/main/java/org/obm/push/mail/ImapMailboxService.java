@@ -335,9 +335,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	private void login(StoreClient store) throws IMAPException {
-		if (!store.login(activateTLS)) {
-			throw new IMAPException("Cannot log into imap server");
-		}
+		store.login(activateTLS);
 	}
 
 	@Override

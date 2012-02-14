@@ -49,8 +49,7 @@ public class IdleClientLoginTests extends IMAPTestCase {
 	public void testLoginLogout() {
 		IdleClient sc = create();
 		try {
-			boolean ok = sc.login(true);
-			assertTrue(ok);
+			sc.login(true);
 			sc.select("INBOX");
 			sc.stopIdle();
 		} catch (Throwable e) {
@@ -64,12 +63,11 @@ public class IdleClientLoginTests extends IMAPTestCase {
 		}
 	}
 
-	public void testLoginLogoutSpeed() {
+	public void testLoginLogoutSpeed() throws IMAPException {
 		IdleClient sc = create();
 		int COUNT = 1000;
 		for (int i = 0; i < COUNT; i++) {
-			boolean ok = sc.login(true);
-			assertTrue(ok);
+			sc.login(true);
 			sc.select("INBOX");
 			sc.stopIdle();
 			sc.logout();

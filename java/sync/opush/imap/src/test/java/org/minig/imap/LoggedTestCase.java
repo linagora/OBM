@@ -49,8 +49,9 @@ public abstract class LoggedTestCase extends IMAPTestCase {
 		}
 		sc = new StoreClient(confValue("imap"), Integer.parseInt(port), confValue("login"),
 				confValue("password"));
-		boolean login = sc.login();
-		if (!login) {
+		try {
+			sc.login(true);
+		} catch (IMAPException e) {
 			fail("login failed for "+confValue("login")+" / "+confValue("password"));
 		}
 	}

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.minig.imap.IMAPException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PushMonitoringManager;
@@ -88,6 +89,8 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 				emailPushMonitors.put(collectionId, emt);
 			}
 		} catch (MailException e) {
+			stopIdle(emt, collectionId, e);
+		} catch (IMAPException e) {
 			stopIdle(emt, collectionId, e);
 		}
 	}
