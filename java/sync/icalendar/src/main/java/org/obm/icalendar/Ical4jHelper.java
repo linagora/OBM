@@ -350,6 +350,7 @@ public class Ical4jHelper {
 		appendOwner(event, vEvent.getOrganizer());
 		appendCategory(event, vEvent.getProperty(Property.CATEGORIES));
 		appendLocation(event, vEvent.getLocation());
+		appendSequence(event, vEvent.getSequence());
 		appendDate(event, vEvent.getStartDate());
 		appendDuration(event, vEvent.getStartDate(), vEvent.getEndDate());
 		appendAllDay(event, vEvent.getStartDate(), vEvent.getEndDate());
@@ -515,6 +516,12 @@ public class Ical4jHelper {
 		}
 	}
 
+	private void appendSequence(Event event, Sequence sequence) {
+		if (sequence != null) {
+			event.setSequence(sequence.getSequenceNo());
+		}
+	}
+	
 	private void appendCategory(Event event, Property category) {
 		if (category != null) {
 			event.setCategory(category.getValue());
