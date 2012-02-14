@@ -38,7 +38,7 @@
 		<freemarker.version>2.3.18</freemarker.version>
 		<jsoup.version>1.6.1</jsoup.version>
 		<guice.version>3.0</guice.version>
-		<apache-mime4j.version>0.7.1</apache-mime4j.version>
+		<apache-mime4j.version>0.7.2</apache-mime4j.version>
 		<btm.version>2.1.0</btm.version>
 	</properties>
 
