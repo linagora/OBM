@@ -226,17 +226,17 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser obmUser, 
+	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser attendeeUpdated, 
 			final ParticipationState newState, final Locale locale, final TimeZone timezone, String ics, AccessToken token) {
 	
 		try {
 			final EventMail mail = 
 				new EventMail(
-						extractSenderAddress(obmUser),
+						extractSenderAddress(attendeeUpdated),
 						event.getAttendees(), 
 						updateParticipationStateTitle(event.getTitle(), locale), 
-						updateParticipationStateBodyTxt(event, obmUser, newState, locale, timezone),
-						updateParticipationStateBodyHtml(event, obmUser, newState, locale, timezone),
+						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale, timezone),
+						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale, timezone),
 						ics, "REPLY"
 						);
 			sendNotificationMessageToOrganizer(organizer, mail, token);

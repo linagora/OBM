@@ -104,6 +104,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.Comment;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -156,7 +157,31 @@ public class Ical4jHelperTest {
 			return item.contains(field);
 		}
 	}
-	
+
+	private static class StringDoesntContainsIcsProperty extends TypeSafeMatcher<String> {
+
+		private final String propertyName;
+		private final String propertyValue;
+
+
+		public StringDoesntContainsIcsProperty(String propertyName, String propertyValue) {
+			this.propertyName = propertyName;
+			this.propertyValue = propertyValue;
+
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("check that given string doesn't contains the ics property named" + propertyName + " with the value "+propertyValue);
+		}
+
+		@Override
+		public boolean matchesSafely(String item) {
+			String field = propertyName+":"+propertyValue+"\r\n";
+			return !item.contains(field);
+		}
+	}
+
 	@BeforeClass
 	public static void setUpOnce() {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
@@ -1078,6 +1103,10 @@ public class Ical4jHelperTest {
 		Assert.assertThat(ics, new StringContainsIcsProperty(propertyName, propertyValue));
 	}
 
+	private void checkDoesntContainIcsProperty(String ics, String propertyName, String propertyValue) {
+		Assert.assertThat(ics, new StringDoesntContainsIcsProperty(propertyName, propertyValue));
+	}
+
 	@Test
 	public void testXObmDomainUUIDInInvitation() {
 		Event event = buildEvent();
@@ -1095,6 +1124,51 @@ public class Ical4jHelperTest {
 		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
 	}
 	
+	@Test
+	public void testCommentPropertyInReply() {
+		Event event = buildEvent();
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		ParticipationState status = attendeeReply.getState();
+		status.setComment(new Comment("I declined your invitation."));
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
+
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
+
+		checkContainIcsProperty(icsReply, "COMMENT", status.getComment().serializeToString());
+	}
+
+	@Test
+	public void testEmptyCommentNotAppendedInICS() {
+		Event event = buildEvent();
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		ParticipationState status = attendeeReply.getState();
+		status.setComment(new Comment(""));
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
+
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
+
+		checkDoesntContainIcsProperty(icsReply, "COMMENT", status.getComment().serializeToString());
+	}
+
+	@Test
+	public void testNullCommentNotAppendedInICS() {
+		Event event = buildEvent();
+
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		ParticipationState status = attendeeReply.getState();
+		status.setComment(null);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
+
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
+
+		checkDoesntContainIcsProperty(icsReply, "COMMENT", "");
+	}
+
 	private void checkStringLengthLessThan(String ics, int length) {
 		Iterable<String> lines = Splitter.on("\r\n").split(ics);
 		for (String line: lines) {

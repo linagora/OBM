@@ -88,6 +88,7 @@ import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Categories;
 import net.fortuna.ical4j.model.property.Clazz;
+import net.fortuna.ical4j.model.property.Comment;
 import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.Description;
@@ -684,6 +685,7 @@ public class Ical4jHelper {
 			appendAttendeesToICS(prop, event.getAttendees());
 		} else {
 			appendAttendeesToICS(prop, ImmutableList.of(replyAttendee));
+			appendReplyCommentToICS(prop, replyAttendee);
 		}
 		appendCategoryToICS(prop, event);
 		appendDtStartToICS(prop, event);
@@ -852,6 +854,20 @@ public class Ical4jHelper {
 
 	private void appendSummaryToICS(PropertyList prop, Event event) {
 		prop.add(new Summary(event.getTitle()));
+	}
+
+	private void appendReplyCommentToICS(PropertyList prop, Attendee attendee) {
+		ParticipationState status = attendee.getState();
+		org.obm.sync.calendar.Comment comment = status.getComment();
+
+		String replyComment = "";
+		if (comment != null) {
+			replyComment = comment.serializeToString();
+		}
+
+		if (!isEmpty(replyComment)) {
+			prop.add(new Comment(replyComment));
+		}
 	}
 
 	private void appendPrivacyToICS(PropertyList prop, Event event) {

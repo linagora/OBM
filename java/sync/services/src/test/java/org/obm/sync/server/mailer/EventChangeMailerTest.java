@@ -64,6 +64,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -78,7 +79,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.ServicesToolBox;
-import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -89,7 +89,7 @@ import freemarker.template.Template;
 @SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, EventChangeMailerTest.NeedActionCreationRecurrentEvent.class, 
 	EventChangeMailerTest.AcceptedCreationRecurrentEvent.class, EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.CancelationRecurrentEvent.class,
 	EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class,
-	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class})
+	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class, EventChangeMailerTest.AcceptedParticipationStateChangeEvent.class})
 
 public class EventChangeMailerTest {
 
@@ -347,7 +347,7 @@ public class EventChangeMailerTest {
 			Event event = buildTestEvent();
 			AccessToken token = getStubAccessToken();
 			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, token);
-			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyNeedActionNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Test
@@ -443,7 +443,7 @@ public class EventChangeMailerTest {
 			Event event = buildTestRecurrentEvent();
 			AccessToken token = getStubAccessToken();
 			String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, token);
-			eventChangeMailer.notifyNeedActionNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyNeedActionNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Test
@@ -533,7 +533,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestEvent();
 			AccessToken token = getStubAccessToken();
-			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
+			eventChangeMailer.notifyAcceptedNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
 		}
 		
 		@Test
@@ -606,7 +606,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event event = buildTestRecurrentEvent();
 			AccessToken token = getStubAccessToken();
-			eventChangeMailer.notifyAcceptedNewUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
+			eventChangeMailer.notifyAcceptedNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, token);
 		}
 		
 		@Test
@@ -678,7 +678,7 @@ public class EventChangeMailerTest {
 		
 		@Override
 		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after, AccessToken token) {
-			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(ToolBox.getDefaultObmUser(), before.getAttendees(), 
+			eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), 
 					before, after, Locale.FRENCH, TIMEZONE, token);
 		}
 		
@@ -709,7 +709,7 @@ public class EventChangeMailerTest {
 		}
 		
 		protected void notifyAcceptedUpdateUsers(EventChangeMailer eventChangeMailer, Event before, Event after, AccessToken token) {
-			eventChangeMailer.notifyAcceptedUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", token);
+			eventChangeMailer.notifyAcceptedUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", token);
 		}
 		
 		@Override
@@ -806,7 +806,7 @@ public class EventChangeMailerTest {
 			after.setSequence(4);
 			AccessToken token = getStubAccessToken();
 			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, token);
-			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyNeedActionUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override
@@ -908,7 +908,7 @@ public class EventChangeMailerTest {
 			after.setSequence(4);
 			AccessToken token = getStubAccessToken();
 			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, token);
-			eventChangeMailer.notifyNeedActionUpdateUsers(ToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyNeedActionUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override
@@ -1009,7 +1009,7 @@ public class EventChangeMailerTest {
 			Event event = buildTestEvent();
 			AccessToken token = getStubAccessToken();
 			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, token);
-			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyRemovedUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override
@@ -1109,7 +1109,7 @@ public class EventChangeMailerTest {
 			Event event = buildTestRecurrentEvent();
 			AccessToken token = getStubAccessToken();
 			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, token);
-			eventChangeMailer.notifyRemovedUsers(ToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
+			eventChangeMailer.notifyRemovedUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, token);
 		}
 		
 		@Override
@@ -1187,6 +1187,117 @@ public class EventChangeMailerTest {
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
 			Assert.assertEquals("text/calendar; charset=UTF-8; method=CANCEL;", parts.textCalendar.getContentType());
+			checkIcs(parts.textCalendar);
+			checkApplicationIcs(parts.applicationIcs);
+		}
+
+	}
+
+	public static class AcceptedParticipationStateChangeEvent extends Common {
+
+		@Test
+		public void participationStateChange() throws IOException, MessagingException {
+			super.testInvitation();
+		}
+
+		@Override
+		protected Event buildTestEvent() {
+			Event event = super.buildTestEvent();
+			event.setSequence(4);
+			List<Attendee> attendees = event.getAttendees();
+			Attendee updatedAttendee = attendees.get(2);
+			updatedAttendee.setState(ParticipationState.ACCEPTED);
+			ParticipationState updatedAttendeeStatus = updatedAttendee.getState();
+			updatedAttendeeStatus.setComment(new Comment("This is a random comment"));
+
+			event.addAttendee(createAttendee("Raphael ROUGERON", "rrougeron@linagora.com"));
+			Attendee organizer = attendees.get(4);
+			organizer.setOrganizer(true);
+
+			return event;
+		}
+
+		@Override
+		protected void executeProcess(EventChangeMailer eventChangeMailer,
+				Ical4jHelper ical4jHelper) {
+			Event event = buildTestEvent();
+			AccessToken token = getStubAccessToken();
+			String ics = ical4jHelper.buildIcsInvitationReply(event,
+					ServicesToolBox.getIcal4jUserFrom("mbaechler@linagora.com"), token);
+
+			ParticipationState accepted = ParticipationState.ACCEPTED;
+			eventChangeMailer.notifyUpdateParticipationState(
+					event,
+					event.findOrganizer(),
+					ServicesToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
+					accepted, Locale.FRENCH, TIMEZONE, ics, token);
+		}
+
+		@Override
+		protected String[] getExpectedHtmlStrings() {
+			return new String[] {
+					"Participation : mise à jour ",
+					"Matthieu BAECHLER a accepté",
+					"l'événement Sprint planning OBM prévu le 8 nov. 2010"
+			};
+		}
+
+		@Override
+		protected String[] getExpectedIcsStrings() {
+			return new String[] {
+					"BEGIN:VCALENDAR",
+					"CALSCALE:GREGORIAN",
+					"VERSION:2.0",
+					"METHOD:REPLY",
+					"BEGIN:VEVENT",
+					"DTSTART:20101108T100000Z",
+					"SUMMARY:Sprint planning OBM",
+					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
+					"UID:f1514f44bf39311568d64072c1fec10f47fe",
+					"X-OBM-DOMAIN:test.tlse.lng",
+					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+					"CREATED:20090608T142253Z",
+					"SEQUENCE:4",
+					"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;CN=Matthieu BAECHLE\r\n R;ROLE=OPT-P" +
+					"ARTICIPANT:mailto:mbaechler@linagora.com",
+					"COMMENT:This is a random comment"
+				};
+		}
+
+		@Override
+		protected String[] getExpectedPlainStrings() {
+			return new String[] {
+					"PARTICIPATION AU RENDEZ-VOUS",
+					"Matthieu BAECHLER a accepté",
+					"l'événement Sprint planning OBM prévu le 8 nov. 2010"
+				};
+		}
+
+		@Override
+		protected List<InternetAddress> getExpectedRecipients()
+				throws AddressException {
+			return createAddressList(
+					"Raphael ROUGERON <rrougeron@linagora.com>");
+		}
+
+		@Override
+		protected InvitationParts checkStructure(MimeMessage mimeMessage)
+				throws UnsupportedEncodingException, IOException,
+				MessagingException {
+			return checkInvitationStructure(mimeMessage);
+		}
+
+		@Override
+		protected void checkContent(InvitationParts parts) throws IOException,
+				MessagingException {
+			checkStringContains(parts.rawMessage,
+					"From: Matthieu BAECHLER <mbaechler@linagora.com>",
+					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
+					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_de_participation_?=\r\n =?UTF-8?Q?dans_OBM_:_Sprint_planning_OBM");
+
+			checkPlainMessage(parts.plainText);
+			checkHtmlMessage(parts.htmlText);
+			Assert.assertEquals("text/calendar; charset=UTF-8; method=REPLY;", parts.textCalendar.getContentType());
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}

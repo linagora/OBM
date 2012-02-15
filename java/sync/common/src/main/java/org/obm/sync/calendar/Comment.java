@@ -31,68 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import java.lang.reflect.Method;
-import java.sql.SQLException;
+import java.io.Serializable;
 
-import org.obm.sync.base.ObmDbType;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
-public enum ParticipationState {
+public class Comment implements Serializable {
 
-	// grr, '-' in java enums not allowed
-	NEEDSACTION, ACCEPTED, DECLINED, TENTATIVE, DELEGATED, COMPLETED, INPROGRESS;
+	private final String comment;
 
-	private Comment comment;
+	public Comment(String comment) {
+		this.comment = Strings.emptyToNull(comment);
+	}
 
-	public Comment getComment() {
+	public String getComment() {
 		return comment;
 	}
 
-	public void setComment(Comment comment) {
-		this.comment = comment;
+	public String serializeToString() {
+		return comment;
 	}
 
-	public Object getJdbcObject(ObmDbType type) throws SQLException {
-		if (type == ObmDbType.PGSQL) {
-			try {
-				Object o = Class.forName("org.postgresql.util.PGobject")
-						.newInstance();
-				Method setType = o.getClass()
-						.getMethod("setType", String.class);
-				Method setValue = o.getClass().getMethod("setValue",
-						String.class);
-
-				setType.invoke(o, "vpartstat");
-				setValue.invoke(o, toString());
-				return o;
-			} catch (Throwable e) {
-				throw new SQLException(e.getMessage(), e);
-			}
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof Comment) {
+			Comment other = (Comment) obj;
+			return Objects.equal(comment, other.comment);
 		}
-		return toString();
+		return false;
 	}
 
-	public static final ParticipationState getValueOf(String s) {
-		if ("NEEDS-ACTION".equals(s)) {
-			return NEEDSACTION;
-		} else if ("IN-PROGRESS".equals(s)) {
-			return INPROGRESS;
-		} else {
-			try {
-				return ParticipationState.valueOf(s);
-			} catch (IllegalArgumentException iae) {
-				return ACCEPTED;
-			}
-		}
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(comment);
 	}
 
 	@Override
 	public String toString() {
-		if (NEEDSACTION == this) {
-			return "NEEDS-ACTION";
-		} else if (INPROGRESS == this) {
-			return "IN-PROGRESS";
-		} else {
-			return super.toString();
-		}
+		return Objects.toStringHelper(this)
+			.add("comment", comment)
+			.toString();
 	}
+
 }

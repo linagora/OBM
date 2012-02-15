@@ -39,12 +39,41 @@ import org.obm.icalendar.Ical4jUser;
 
 import com.linagora.obm.sync.Producer;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserSettings;
 
 public class ServicesToolBox {
+
+	public static ObmDomain getDefaultObmDomain() {
+		ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setName("test.tlse.lng");
+		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		return obmDomain;
+	}
+
+	public static ObmUser getDefaultObmUser(){
+		ObmDomain obmDomain = getDefaultObmDomain();
+		ObmUser obmUser = new ObmUser();
+		obmUser.setFirstName("Obm");
+		obmUser.setLastName("User");
+		obmUser.setLogin("user");
+		obmUser.setEmail("user@test");
+		obmUser.setDomain(obmDomain);
+		return obmUser;
+	}
+
+	public static ObmUser getSpecificObmUserFrom(String email, String firstName, String lastName) {
+		ObmDomain obmDomain = getDefaultObmDomain();
+		ObmUser obmUser = new ObmUser();
+		obmUser.setFirstName(firstName);
+		obmUser.setLastName(lastName);
+		obmUser.setEmail(email);
+		obmUser.setDomain(obmDomain);
+		return obmUser;
+	}
+
 	public static Ical4jUser getIcal4jUser() {
 		ObmUser obmUser = ToolBox.getDefaultObmUser();
 		return getIcal4jUser(obmUser);
@@ -53,6 +82,11 @@ public class ServicesToolBox {
 	public static Ical4jUser getIcal4jUser(ObmUser obmUser) {
 		return Ical4jUser.Factory.create()
 				.createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
+	}
+
+	public static Ical4jUser getIcal4jUserFrom(String email) {
+		ObmDomain obmDomain = getDefaultObmDomain();
+		return Ical4jUser.Factory.create().createIcal4jUser(email, obmDomain);
 	}
 
 	public static UserSettings getDefaultSettings() {
