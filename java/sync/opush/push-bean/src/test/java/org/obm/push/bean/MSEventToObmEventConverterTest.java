@@ -39,6 +39,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withAllDayEvent(false)
 				.build();
 
@@ -52,6 +53,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withAllDayEvent(true)
 				.build();
 
@@ -65,6 +67,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withAllDayEvent(null)
 				.build();
 
@@ -100,6 +103,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.FREE)
 				.build();
 
@@ -113,6 +117,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.BUSY)
 				.build();
 
@@ -127,6 +132,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withBusyStatus(CalendarBusyStatus.UNAVAILABLE)
+				.withSubject("Any Subject")
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -139,6 +145,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.TENTATIVE)
 				.build();
 
@@ -152,6 +159,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withBusyStatus(null)
 				.build();
 		
@@ -165,6 +173,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withCategories(new ArrayList<String>())
 				.build();
 		
@@ -178,6 +187,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withCategories(Lists.newArrayList("category1", "category2"))
 				.build();
 		
@@ -191,6 +201,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withCategories(null)
 				.build();
 		
@@ -206,6 +217,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withCategories(Arrays.asList(tooMuchCategories))
 				.build();
 		
@@ -217,6 +229,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T11:15:10Z"))
 				.build();
 		
@@ -235,6 +248,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T12:15:10Z"))
 				.build();
 		
@@ -249,6 +263,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withDtStamp(null)
 				.build();
 		
@@ -263,6 +278,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withDescription("any description")
 				.build();
 		
@@ -276,6 +292,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withDescription(null)
 				.build();
 		
@@ -289,6 +306,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withTimeZone(TimeZone.getTimeZone("America/Tijuana"))
 				.build();
 		
@@ -302,6 +320,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withTimeZone(null)
 				.build();
 		
@@ -311,10 +330,74 @@ public class MSEventToObmEventConverterTest {
 	}
 	
 	@Test
+	public void testConvertAttributeLocation() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withLocation("Any location")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getLocation()).isEqualTo(msEvent.getLocation());
+	}
+	
+	@Test
+	public void testConvertAttributeLocationNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withLocation(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getLocation()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeSubject() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(msEvent.getSubject());
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeSubjectEmpty() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("")
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeSubjectNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject(null)
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+	
+	@Test
 	public void testConvertAttributeOrganizerNameOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withOrganizerName("Any Name")
 				.build();
 		
@@ -329,6 +412,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withOrganizerName(null)
 				.build();
 		
@@ -343,6 +427,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withOrganizerEmail("email@domain")
 				.build();
 		
@@ -358,6 +443,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withOrganizerEmail(null)
 				.build();
 		
@@ -373,6 +459,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withOrganizerName("Any Name")
 				.withOrganizerEmail("user@domain")
 				.build();
@@ -388,6 +475,7 @@ public class MSEventToObmEventConverterTest {
 	public void testConvertAttributeStartTimeOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -397,6 +485,7 @@ public class MSEventToObmEventConverterTest {
 	public void testConvertAttributeStartTimeNullOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
+				.withSubject("Any Subject")
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -406,6 +495,7 @@ public class MSEventToObmEventConverterTest {
 	public void testConvertAttributeEndTimeOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -415,6 +505,7 @@ public class MSEventToObmEventConverterTest {
 	public void testConvertAttributeEndTimeNullOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withEndTime(null)
+				.withSubject("Any Subject")
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -425,6 +516,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(null)
+				.withSubject("Any Subject")
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -435,6 +527,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -448,6 +541,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -461,6 +555,7 @@ public class MSEventToObmEventConverterTest {
 	public void testCalculatedAttributeDurationByAllDayOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withAllDayEvent(true)
 				.build();
 		
@@ -476,6 +571,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-11T12:15:10Z"))
+				.withSubject("Any Subject")
 				.withAllDayEvent(true)
 				.build();
 		
@@ -493,10 +589,12 @@ public class MSEventToObmEventConverterTest {
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(true);
-
+		msEventException.setSubject("Any Subject");
+		
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
@@ -517,10 +615,12 @@ public class MSEventToObmEventConverterTest {
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(false);
+		msEventException.setSubject("Any Subject");
 		
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
 				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();

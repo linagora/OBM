@@ -63,6 +63,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
 
@@ -114,13 +115,9 @@ public class MSEventToObmEventConverter {
 		converted.setInternalEvent(isObmInternalEvent);
 		converted.setType(EventType.VEVENT);
 		
-		if (parentEvent != null && parentEvent.getTitle() != null && !parentEvent.getTitle().isEmpty()) {
-			converted.setTitle(parentEvent.getTitle());
-		} else {
-			converted.setTitle(data.getSubject());
-		}
+		convertSubject(parentEvent, data, converted);
 		
-		if (parentEvent != null && parentEvent.getDescription() != null && !parentEvent.getDescription().isEmpty()) {
+		if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getDescription())) {
 			converted.setDescription(parentEvent.getDescription());
 		} else {
 			converted.setDescription(data.getDescription());
@@ -252,6 +249,16 @@ public class MSEventToObmEventConverter {
 			return EventPrivacy.PUBLIC;
 		}
 
+	}
+
+	private void convertSubject(Event parentEvent, MSEventCommon data, Event converted) throws IllegalMSEventStateException {
+		if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getTitle())) {
+			converted.setTitle(parentEvent.getTitle());
+		} else if (!Strings.isNullOrEmpty(data.getSubject())) {
+			converted.setTitle(data.getSubject());
+		} else {
+			throw new IllegalMSEventStateException("Subject is required");
+		}
 	}
 
 	private void convertDtStamp(MSEventCommon data, Event converted, Event oldEvent) {
