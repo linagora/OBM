@@ -94,6 +94,15 @@ public class ObmConfigurationService extends AbstractConfigurationService {
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 	
+	public int getTransactionTimeout() {
+		return getIntValue("transaction-timeout", 1);
+	}
+	
+	public TimeUnit getTransactionTimeoutUnit() {
+		String key = getStringValue("transaction-timeout-unit");
+		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+	}
+	
 	private TimeUnit getTimeUnitOrDefault(String key, TimeUnit defaultUnit) {
 		if (key != null) {
 			TimeUnit unit = timeUnits.get(key.toLowerCase());

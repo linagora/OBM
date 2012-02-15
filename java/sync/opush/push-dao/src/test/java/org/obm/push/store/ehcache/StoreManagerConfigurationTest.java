@@ -32,6 +32,7 @@
 package org.obm.push.store.ehcache;
 
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import org.easymock.EasyMock;
 import org.obm.configuration.ObmConfigurationService;
@@ -42,6 +43,8 @@ public class StoreManagerConfigurationTest {
 	protected ObmConfigurationService initConfigurationServiceMock() throws StoreNotFoundException {
 		ObmConfigurationService configurationService = EasyMock.createMock(ObmConfigurationService.class);
 		EasyMock.expect(configurationService.getStoreConfiguration()).andReturn( getStoreConfiguration() );
+		EasyMock.expect(configurationService.getTransactionTimeoutUnit()).andReturn(TimeUnit.SECONDS);
+		EasyMock.expect(configurationService.getTransactionTimeout()).andReturn(2);
 		EasyMock.replay(configurationService);
 		
 		return configurationService;
