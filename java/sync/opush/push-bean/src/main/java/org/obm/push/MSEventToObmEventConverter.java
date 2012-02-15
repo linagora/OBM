@@ -126,20 +126,18 @@ public class MSEventToObmEventConverter {
 			converted.setDescription(data.getDescription());
 		}
 		
-		converted.setLocation(data.getLocation());
+		convertLocation(parentEvent, data, converted);
 		converted.setStartDate(data.getStartTime());
 		convertDtStamp(data, converted, oldEvent);
 		
 		convertDurationAttribute(data, converted);
 		convertAllDayAttribute(parentEvent, data, converted);
-		convertCategories(data, converted);
+		convertCategories(parentEvent, data, converted);
 		convertMeetingStatus(data, converted);
-		
-		if (data.getReminder() != null) {
-			converted.setAlert(data.getReminder() * 60);
-		}
 
-		convertBusyStatus(data, converted);
+		convertReminder(parentEvent, data, converted);
+
+		convertBusyStatus(parentEvent, data, converted);
 
 		if (data.getSensitivity() == null && parentEvent != null) {
 			converted.setPrivacy(parentEvent.getPrivacy());
@@ -224,11 +222,27 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
+	private void convertLocation(Event parentEvent, MSEventCommon data, Event converted) {
+		if (!Strings.isNullOrEmpty(data.getLocation())) {
+			converted.setLocation(data.getLocation());
+		} else if (parentEvent != null) {
+			converted.setLocation(parentEvent.getLocation());
+		}
+	}
+
+	private void convertReminder(Event parentEvent, MSEventCommon data, Event converted) {
+		if (data.getReminder() != null) {
+			converted.setAlert(data.getReminder() * 60);
+		} else if (parentEvent != null) {
+			converted.setAlert(parentEvent.getAlert());
+		}
+	}
+
 	private void convertSubject(Event parentEvent, MSEventCommon data, Event converted) throws IllegalMSEventStateException {
-		if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getTitle())) {
-			converted.setTitle(parentEvent.getTitle());
-		} else if (!Strings.isNullOrEmpty(data.getSubject())) {
+		if (!Strings.isNullOrEmpty(data.getSubject())) {
 			converted.setTitle(data.getSubject());
+		} else if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getTitle())) {
+			converted.setTitle(parentEvent.getTitle());
 		} else {
 			throw new IllegalMSEventStateException("Subject is required");
 		}
@@ -396,6 +410,14 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
+	private void convertBusyStatus(Event parentEvent, MSEventCommon from, Event to) {
+		if (from.getBusyStatus() != null) {
+			convertBusyStatus(from, to);
+		} else if (parentEvent != null) {
+			to.setOpacity(parentEvent.getOpacity());
+		}
+	}
+	
 	private void convertBusyStatus(MSEventCommon from, Event to) {
 		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
 			to.setOpacity(EventOpacity.TRANSPARENT);
@@ -404,13 +426,17 @@ public class MSEventToObmEventConverter {
 		}
 	}
 	
-	private void convertCategories(MSEventCommon from, Event to) throws org.obm.push.exception.IllegalMSEventStateException {
+	private void convertCategories(Event parentEvent, MSEventCommon from, Event to) throws IllegalMSEventStateException {
 		if (eventHasCategories(from)) {
-			checkEventCategoriesValidity(from);
-			to.setCategory(Iterables.getFirst(from.getCategories(), null));
-		} else {
-			to.setCategory(null);
+			convertCategories(from, to);
+		} else if (parentEvent != null) {
+			to.setCategory(parentEvent.getCategory());
 		}
+	}
+	
+	private void convertCategories(MSEventCommon from, Event to) throws IllegalMSEventStateException {
+		checkEventCategoriesValidity(from);
+		to.setCategory(Iterables.getFirst(from.getCategories(), null));
 	}
 
 	private void checkEventCategoriesValidity(MSEventCommon event) throws IllegalMSEventStateException {
@@ -460,14 +486,40 @@ public class MSEventToObmEventConverter {
 	}
 	
 	private void checkEventTimesValidity(MSEventCommon event) throws IllegalMSEventStateException {
-		if (event.getEndTime() == null) {
-			throw new IllegalMSEventStateException("EndTime is required");
-		} else if (!isAllDayEvent(event) && event.getStartTime() == null) {
-			throw new IllegalMSEventStateException("If not AllDayEvent then StartTime is required");
+		if (!eventHasAStartTime(event)) {
+			throw new IllegalMSEventStateException("StartTime is required");
+		} else if (!isAllDayEvent(event) && !eventHasAEndTime(event)) {
+			throw new IllegalMSEventStateException("If not AllDayEvent then EndTime is required");
 		}
 	}
 
+	private boolean eventHasAStartTime(MSEventCommon event) {
+		return event.getStartTime() != null;
+	}
+	
+	private boolean eventHasAEndTime(MSEventCommon event) {
+		return event.getEndTime() != null;
+	}
+
 	private void assertExceptionValidity(MSEventException exception) throws IllegalMSEventExceptionStateException {
+		assertExceptionStartTime(exception);
+		assertExceptionDtStamp(exception);
+		assertExceptionMeetingStatus(exception);
+	}
+
+	private void assertExceptionMeetingStatus(MSEventException exception) throws IllegalMSEventExceptionStateException {
+		if (exception.getMeetingStatus() == null) {
+			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.MeetingStatus is required");
+		}
+	}
+
+	private void assertExceptionDtStamp(MSEventException exception) throws IllegalMSEventExceptionStateException {
+		if (exception.getDtStamp() == null) {
+			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.DtStamp is required");
+		}
+	}
+
+	private void assertExceptionStartTime(MSEventException exception) throws IllegalMSEventExceptionStateException {
 		if (exception.getExceptionStartTime() == null) {
 			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.ExceptionStartTime is required");
 		}
