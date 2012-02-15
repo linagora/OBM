@@ -9,14 +9,15 @@ import java.util.TimeZone;
 import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.DateUtils;
 import org.obm.push.MSEventToObmEventConverter;
 import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 
 public class MSEventToObmEventConverterTest {
 
@@ -393,6 +394,49 @@ public class MSEventToObmEventConverterTest {
 	}
 	
 	@Test
+	public void testConvertAttributeReminder() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withReminder(150)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		int reminderInSecond = (int) minuteToSecond(msEvent.getReminder());
+		Assertions.assertThat(convertedEvent.getAlert()).isEqualTo(reminderInSecond);
+	}
+
+	@Test
+	public void testConvertAttributeReminderZero() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withReminder(0)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getAlert()).isEqualTo(0);
+	}
+
+	@Test
+	public void testConvertAttributeReminderNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withReminder(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getAlert()).isNull();
+	}
+	
+	@Test
 	public void testConvertAttributeOrganizerNameOnly() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -548,7 +592,7 @@ public class MSEventToObmEventConverterTest {
 
 		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
 		Assertions.assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
-		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneYearInSecond());
+		Assertions.assertThat(converted.getDuration()).isEqualTo((int) getOneYearInSecond());
 	}
 
 	@Test
@@ -563,7 +607,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
 		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
-		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 
 	@Test
@@ -579,7 +623,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
 		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
-		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 	
 	@Test
@@ -650,14 +694,18 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	private Date date(String date) {
-		return DateUtils.date(date);
+		return org.obm.DateUtils.date(date);
 	}
 
-	private Integer getOneDayInSecond() {
-		return 24 * 3600;
+	private long getOneDayInSecond() {
+		return DateUtils.daysToSeconds(1);
 	}
 
-	private int getOneYearInSecond() {
-		return 365 * getOneDayInSecond();
+	private long getOneYearInSecond() {
+		return DateUtils.yearsToSeconds(1);
+	}
+
+	private long minuteToSecond(int minutes) {
+		return DateUtils.minutesToSeconds(minutes);
 	}
 }

@@ -131,7 +131,7 @@ public class MSEventToObmEventConverter {
 		convertAllDayAttribute(parentEvent, data, converted);
 		convertCategories(data, converted);
 		
-		if (data.getReminder() != null && data.getReminder() > 0) {
+		if (data.getReminder() != null) {
 			converted.setAlert(data.getReminder() * 60);
 		}
 
