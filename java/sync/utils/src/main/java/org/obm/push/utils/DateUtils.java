@@ -62,11 +62,30 @@ public class DateUtils {
 	
 	public static Calendar getMidnightCalendar() {
 		Calendar calendar = getCurrentGMTCalendar();
-		calendar.set(Calendar.HOUR, 0);
+		setTimeToZero(calendar);
+		return calendar;
+	}
+	
+	public static Date getMidnightOfDayEarly(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		setTimeToZero(cal);
+		return cal.getTime();
+	}
+	
+	public static Date getMidnightOfDayLate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DATE, 1);
+		setTimeToZero(cal);
+		return cal.getTime();
+	}
+
+	private static void setTimeToZero(Calendar calendar) {
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return calendar;
 	}
 	
 	public static int getWeekOfCurrentDayWithoutStartShift(Calendar cal) {
@@ -82,7 +101,7 @@ public class DateUtils {
 		}
 		return eventWeekOfMonth;
 	}
-
+	
 	private static int getRealWeekOfDay(int startDay) {
 		return (int) Math.ceil(startDay / 7d);
 	}

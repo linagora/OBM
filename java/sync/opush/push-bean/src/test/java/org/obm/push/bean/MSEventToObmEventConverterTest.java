@@ -73,7 +73,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.isAllday()).isFalse();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalMSEventStateException.class)
 	public void testConvertAttributeAllDayFalseNeedStartTime() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
@@ -84,7 +84,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 	
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalMSEventStateException.class)
 	public void testConvertAttributeAllDayNullNeedStartTime() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
@@ -383,6 +383,108 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
 		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
 	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeStartTimeOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeStartTimeNullOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(null)
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeEndTimeOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeEndTimeNullOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withEndTime(null)
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=IllegalMSEventStateException.class)
+	public void testConvertAttributeEndTimeNullAndStartTime() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(null)
+				.build();
+		
+		convertToOBMEvent(msEvent);
+	}
+	
+	@Test
+	public void testConvertAttributeStartAndEndTime() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		Assertions.assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
+	}
+
+	@Test
+	public void testCalculatedAttributeDurationByStartAndEndTime() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		Assertions.assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
+		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneYearInSecond());
+	}
+
+	@Test
+	public void testCalculatedAttributeDurationByAllDayOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withAllDayEvent(true)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
+		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+	}
+
+	@Test
+	public void testCalculatedAttributeDurationByAllDayWhenHasEndTime() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T12:15:10Z"))
+				.withAllDayEvent(true)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
+		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+	}
 	
 	@Test
 	public void testConvertExceptionAttributeDeletedTrue() throws IllegalMSEventStateException {
@@ -446,8 +548,16 @@ public class MSEventToObmEventConverterTest {
 	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws IllegalMSEventStateException {
 		return converter.convert(bs, editingEvent, msEvent, false);
 	}
-	
+
 	private Date date(String date) {
 		return DateUtils.date(date);
+	}
+
+	private Integer getOneDayInSecond() {
+		return 24 * 3600;
+	}
+
+	private int getOneYearInSecond() {
+		return 365 * getOneDayInSecond();
 	}
 }

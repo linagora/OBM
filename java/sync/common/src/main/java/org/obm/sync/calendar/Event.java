@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
 
@@ -359,7 +360,14 @@ public class Event implements Indexed<Integer> {
 	public Date getEndDate() {
 		if (getStartDate() == null) {
 			return null;
+		} else if (allday){
+			return DateUtils.getMidnightOfDayLate(getStartDate());
+		} else {
+			return getEndDateByDuration();
 		}
+	}
+
+	private Date getEndDateByDuration() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(getStartDate());
 		calendar.add(Calendar.SECOND, getDuration());

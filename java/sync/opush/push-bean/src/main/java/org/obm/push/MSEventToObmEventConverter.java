@@ -49,6 +49,7 @@ import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -62,7 +63,6 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
 
@@ -131,7 +131,7 @@ public class MSEventToObmEventConverter {
 		convertDtStamp(data, converted, oldEvent);
 		
 		convertDurationAttribute(data, converted);
-		convertAllDayAttribute(data, converted);
+		convertAllDayAttribute(parentEvent, data, converted);
 		convertCategories(data, converted);
 		
 		if (data.getReminder() != null && data.getReminder() > 0) {
@@ -372,15 +372,26 @@ public class MSEventToObmEventConverter {
 		return event.getCategories() != null && !event.getCategories().isEmpty();
 	}
 
-	private void convertAllDayAttribute(MSEventCommon from, Event to) {
-		to.setAllday(isAllDayEvent(from));
+	private void convertAllDayAttribute(Event parentEvent, MSEventCommon from, Event to) {
+		if (from.getAllDayEvent() != null) {
+			to.setAllday(isAllDayEvent(from));
+		} else if (parentEvent != null) {
+			to.setAllday(parentEvent.isAllday());
+		}
+		convertStartTimeByAllDay(to);
+	}
+
+	private void convertStartTimeByAllDay(Event event) {
+		if (event.isAllday()) {
+			event.setStartDate(DateUtils.getMidnightOfDayEarly(event.getStartDate()));
+		}
 	}
 
 	private Boolean isAllDayEvent(MSEventCommon from) {
 		return Objects.firstNonNull(from.getAllDayEvent(), false);
 	}
 
-	private void convertDurationAttribute(MSEventCommon data, Event converted) {
+	private void convertDurationAttribute(MSEventCommon data, Event converted) throws IllegalMSEventStateException {
 		if (isAllDayEvent(data)) {
 			converted.setDuration(EVENT_ALLDAY_DURATION_IN_MS);
 		} else {
@@ -388,11 +399,19 @@ public class MSEventToObmEventConverter {
 		}
 	}
 	
-	private void convertDurationAttributeByStartTime(MSEventCommon data, Event converted) {
-		Preconditions.checkNotNull(data.getStartTime(), "StartTime is required for duration");
+	private void convertDurationAttributeByStartTime(MSEventCommon data, Event converted) throws IllegalMSEventStateException {
+		checkEventTimesValidity(data);
 		
-		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
+		int duration = (int) ((data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000);
 		converted.setDuration(duration);
+	}
+	
+	private void checkEventTimesValidity(MSEventCommon event) throws IllegalMSEventStateException {
+		if (event.getEndTime() == null) {
+			throw new IllegalMSEventStateException("EndTime is required");
+		} else if (!isAllDayEvent(event) && event.getStartTime() == null) {
+			throw new IllegalMSEventStateException("If not AllDayEvent then StartTime is required");
+		}
 	}
 
 	private void assertExceptionValidity(MSEventException exception) throws IllegalMSEventExceptionStateException {
