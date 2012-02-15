@@ -352,5 +352,4 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	}
 	
 	
-	
 }

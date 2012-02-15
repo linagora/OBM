@@ -120,6 +120,7 @@ public class MSRecurrence implements Serializable {
 	public void setDeadOccur(Boolean deadOccur) {
 		this.deadOccur = deadOccur;
 	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(until, type, weekOfMonth, monthOfYear, dayOfMonth, 

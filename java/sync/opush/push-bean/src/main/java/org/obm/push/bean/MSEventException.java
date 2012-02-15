@@ -58,7 +58,7 @@ public class MSEventException implements MSEventCommon, Serializable {
 		this.deleted = false;
 	}
 
-	public boolean isDeletedException() {
+	public boolean isDeleted() {
 		return deleted;
 	}
 	
@@ -168,10 +168,6 @@ public class MSEventException implements MSEventCommon, Serializable {
 
 	public void setCategories(List<String> categories) {
 		this.categories = categories;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
 	}
 
 	@Override

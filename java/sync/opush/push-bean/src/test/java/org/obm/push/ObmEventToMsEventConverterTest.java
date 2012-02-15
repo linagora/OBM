@@ -218,7 +218,7 @@ public class ObmEventToMsEventConverterTest {
 		List<MSEventException> exceptions = msEvent.getExceptions();
 		assertThat(exceptions).hasSize(1);
 		MSEventException deletedException = Iterables.getOnlyElement(exceptions);
-		assertThat(deletedException.isDeletedException()).isTrue();
+		assertThat(deletedException.isDeleted()).isTrue();
 		assertThat(deletedException.getExceptionStartTime()).isEqualTo(date("2004-12-14T21:39:45Z"));
 		assertThat(deletedException.getAllDayEvent()).isNull();
 		assertThat(deletedException.getBusyStatus()).isNull();

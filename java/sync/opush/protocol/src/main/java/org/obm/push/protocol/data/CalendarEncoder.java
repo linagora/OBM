@@ -184,7 +184,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 			Element es = DOMUtils.createElement(p, "Calendar:Exceptions");
 			for (MSEventException ex : excepts) {
 				Element e = DOMUtils.createElement(es, "Calendar:Exception");
-				if (ex.isDeletedException()) {
+				if (ex.isDeleted()) {
 				
 					s(e, "Calendar:ExceptionIsDeleted", "1");
 					s(e, "Calendar:MeetingStatus",

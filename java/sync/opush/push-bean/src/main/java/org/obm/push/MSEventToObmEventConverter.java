@@ -87,15 +87,14 @@ public class MSEventToObmEventConverter {
 			e.setRecurrence(r);
 			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
 				for (MSEventException excep : event.getExceptions()) {
-					if (!excep.isDeletedException()) {
-						
+					if (excep.isDeleted()) {
+						r.addException(excep.getExceptionStartTime());
+					} else {
 						Event obmEvent = convertEventException(bs, oldEvent, e, excep, isObmInternalEvent);
 						obmEvent.setExtId(extId);
 						obmEvent.setUid(obmId);
 						
 						r.addEventException(obmEvent);
-					} else {
-						r.addException(excep.getExceptionStartTime());
 					}
 				}
 			}

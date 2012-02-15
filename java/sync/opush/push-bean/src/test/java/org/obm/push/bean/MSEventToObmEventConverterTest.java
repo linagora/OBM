@@ -253,7 +253,57 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.getTimeCreate()).isNull();
 		Assertions.assertThat(convertedEvent.getTimeUpdate()).isNull();
 	}
+	
+	@Test
+	public void testConvertExceptionAttributeDeletedTrue() {
+		MSEventException msEventException = new MSEventException();
+		msEventException.setStartTime(date("2004-12-11T11:15:10Z"));
+		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
+		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
+		msEventException.setDeleted(true);
 
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
+				.withExceptions(Lists.newArrayList(msEventException))
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+
+		Date[] exceptions = convertedEvent.getRecurrence().getExceptions();
+		Assertions.assertThat(exceptions).hasSize(1);
+		Assertions.assertThat(exceptions[0]).isEqualTo(msEventException.getExceptionStartTime());
+	}
+
+	@Test
+	public void testConvertExceptionAttributeDeletedFalse() {
+		MSEventException msEventException = new MSEventException();
+		msEventException.setStartTime(date("2004-12-11T11:15:10Z"));
+		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
+		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
+		msEventException.setDeleted(false);
+		
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
+				.withExceptions(Lists.newArrayList(msEventException))
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Date[] exceptions = convertedEvent.getRecurrence().getExceptions();
+		Assertions.assertThat(exceptions).isEmpty();
+	}
+
+	private MSRecurrence simpleRecurrence(RecurrenceType type) {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setInterval(1);
+		recurrence.setType(type);
+		return recurrence;
+	}
+	
 	private Event convertToOBMEvent(MSEvent msEvent) {
 		return convertToOBMEventWithEditingEvent(msEvent, null);
 	}
