@@ -31,13 +31,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import org.obm.push.exception.IllegalMSEventRecurrenceException;
+
 public enum RecurrenceType {
-	DAILY, // 0
-	WEEKLY, // 1
-	MONTHLY, // 2
-	MONTHLY_NDAY, // 3
-	YEARLY, // 5
-	YEARLY_NDAY; // 6
+	DAILY(999), // 0
+	WEEKLY(99), // 1
+	MONTHLY(99), // 2
+	MONTHLY_NDAY(99), // 3
+	YEARLY(1), // 5
+	YEARLY_NDAY(1); // 6
+
+	private final int maxIntervalValue;
+
+	private RecurrenceType(int maxIntervalValue) {
+		this.maxIntervalValue = maxIntervalValue;
+	}
+	
+	public void validIntervalOrException(Integer interval) throws IllegalMSEventRecurrenceException {
+		if (interval == null) {
+			throw new IllegalMSEventRecurrenceException("Recurrence.Interval is required");
+			
+		} else if (maxIntervalValue < interval) {
+			String msg = String.format("Recurrence.Interval is higher than accepted value. " +
+					"Type:%s MaxInterval:%d Interval:%d", name(), maxIntervalValue, interval);
+			throw new IllegalMSEventRecurrenceException(msg);
+		}
+	}
 
 	public String asIntString() {
 		switch (this) {

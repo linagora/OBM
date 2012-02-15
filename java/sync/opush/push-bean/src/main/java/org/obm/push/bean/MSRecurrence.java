@@ -34,6 +34,7 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
 import com.google.common.base.Objects;
 
 
@@ -119,6 +120,10 @@ public class MSRecurrence implements Serializable {
 	}
 	public void setDeadOccur(Boolean deadOccur) {
 		this.deadOccur = deadOccur;
+	}
+
+	public boolean hasOccurences() {
+		return occurrences != null && occurrences > 0;
 	}
 	
 	@Override

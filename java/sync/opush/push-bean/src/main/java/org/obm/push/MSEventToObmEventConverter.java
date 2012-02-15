@@ -51,6 +51,7 @@ import org.obm.push.bean.RecurrenceDayOfWeekUtils;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.push.exception.IllegalMSEventRecurrenceException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -283,7 +284,7 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
-	private EventRecurrence getRecurrence(MSEvent msev) {
+	private EventRecurrence getRecurrence(MSEvent msev) throws IllegalMSEventRecurrenceException {
 		Date startDate = msev.getStartTime();
 		MSRecurrence pr = msev.getRecurrence();
 		EventRecurrence or = new EventRecurrence();
@@ -310,12 +311,15 @@ public class MSEventToObmEventConverter {
 			multiply = Calendar.WEEK_OF_YEAR;
 			break;
 		case YEARLY:
+			if (pr.getDayOfMonth() == null || pr.getMonthOfYear() == null) {
+				throw new IllegalMSEventRecurrenceException("Yearly recurrence need DayOfMonth and MonthOfYear attributes");
+			}
 			or.setKind(RecurrenceKind.yearly);
 			cal.setTimeInMillis(startDate.getTime());
 			cal.set(Calendar.DAY_OF_MONTH, pr.getDayOfMonth());
 			cal.set(Calendar.MONTH, pr.getMonthOfYear() - 1);
 			msev.setStartTime(cal.getTime());
-			or.setFrequence(1);
+			startDate = msev.getStartTime();
 			multiply = Calendar.YEAR;
 			break;
 		case YEARLY_NDAY:
@@ -325,13 +329,14 @@ public class MSEventToObmEventConverter {
 		}
 
 		// interval
-		if (pr.getInterval() != null) {
-			or.setFrequence(pr.getInterval());
-		}
+		convertRecurrenceInterval(pr, or);
 
 		// occurence or end date
 		Date endDate = null;
-		if (pr.getOccurrences() != null && pr.getOccurrences() > 0) {
+		boolean hasOccurences = pr.hasOccurences();
+		if (hasOccurences && pr.getUntil() != null) {
+			throw new IllegalMSEventRecurrenceException("Recurrence cannot has Until AND Occurences");
+		} else if (hasOccurences) {
 			cal.setTimeInMillis(startDate.getTime());
 			cal.add(multiply, pr.getOccurrences() - 1);
 			endDate = new Date(cal.getTimeInMillis());
@@ -342,6 +347,13 @@ public class MSEventToObmEventConverter {
 
 		return or;
 	}
+	
+	private void convertRecurrenceInterval(MSRecurrence from, EventRecurrence to) throws IllegalMSEventRecurrenceException {
+		Integer interval = from.getInterval();
+		from.getType().validIntervalOrException(interval);
+		to.setFrequence(interval);
+	}
+
 	
 	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data)
 			throws IllegalMSEventExceptionStateException {
