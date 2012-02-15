@@ -136,8 +136,7 @@ if ($action == 'ics_export') {
   dis_calendar_export_handle($params, $GLOBALS['token']['entity'], $GLOBALS['token']['entityId'], $GLOBALS['token']['type'] == 'private');
   # Remove the session to force auth next time (Mantis #3007)
   $sess->delete();
-  exit();
-  
+  exit();  
 } 
 
 $GLOBALS['js']['vars']['conf']['displayRange'] = 'true';
