@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -67,6 +68,7 @@ public interface IBackend {
 	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
 
 	Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException;
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ConversionException;
 	
 }

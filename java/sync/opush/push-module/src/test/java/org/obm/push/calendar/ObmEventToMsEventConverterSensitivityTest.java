@@ -29,23 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.calendar;
 
-public class MSObjectException extends Exception {
+import static org.fest.assertions.Assertions.assertThat;
 
-	public MSObjectException() {
-		super();
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
+import org.obm.sync.calendar.EventPrivacy;
+
+public class ObmEventToMsEventConverterSensitivityTest {
+
+	private ObmEventToMSEventConverterImpl converter;
+
+	@Before
+	public void setUp() {
+		converter = new ObmEventToMSEventConverterImpl();
 	}
 
-	public MSObjectException(String message, Throwable cause) {
-		super(message, cause);
+	@Test(expected=NullPointerException.class)
+	public void testNullConversion() {
+		converter.sensitivity(null);
 	}
 
-	public MSObjectException(String message) {
-		super(message);
+	
+	@Test
+	public void testPublicConversion() {
+		CalendarSensitivity sensitivity = converter.sensitivity(EventPrivacy.PUBLIC);
+		assertThat(sensitivity).isEqualTo(CalendarSensitivity.NORMAL);
 	}
 
-	public MSObjectException(Throwable cause) {
-		super(cause);
+	@Test
+	public void testPrivateConversion() {
+		CalendarSensitivity sensitivity = converter.sensitivity(EventPrivacy.PRIVATE);
+		assertThat(sensitivity).isEqualTo(CalendarSensitivity.PRIVATE);
 	}
+
 }

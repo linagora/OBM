@@ -50,6 +50,7 @@ import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.CollectionPathException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedStoreException;
@@ -245,6 +246,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		} catch (CollectionPathException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		} catch (UnexpectedObmSyncServerException e) {
+			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
+		} catch (ConversionException e) {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;

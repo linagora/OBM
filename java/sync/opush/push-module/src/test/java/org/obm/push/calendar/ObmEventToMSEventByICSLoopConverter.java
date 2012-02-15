@@ -29,37 +29,59 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
+import net.fortuna.ical4j.data.ParserException;
+
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Event;
 
-public interface IContentsExporter {
+import com.google.common.collect.Iterables;
 
-	DataDelta getChanged(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws DaoException, CollectionNotFoundException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
-			PIMDataType dataType) throws CollectionNotFoundException,
-			DaoException, ProcessingEmailException,
-			UnexpectedObmSyncServerException, ConversionException;
+public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventConverter {
 
-	int getItemEstimateSize(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException, ConversionException;
+
+	private Ical4jHelper ical4j;
+	private ObmEventToMSEventConverter obmEventToMSEventConverter;
+	
+	public ObmEventToMSEventByICSLoopConverter() {
+		ical4j = new Ical4jHelper();
+		obmEventToMSEventConverter = new ObmEventToMSEventConverterImpl();
+	}
+	
+	@Override
+	public MSEvent convert(Event eventToConvert, MSEventUid uid, User user) throws ConversionException {
+				
+		try {
+			Ical4jUser ical4jUser = convertIcal4jUser(user);
+			String eventAsICS = ical4j.parseEvent(eventToConvert, ical4jUser, new AccessToken(0, "unit testing"));
+			List<Event> eventsFromICS = ical4j.parseICSEvent(eventAsICS, ical4jUser);
+			Event eventFromICS = Iterables.getOnlyElement(eventsFromICS);
+			return obmEventToMSEventConverter.convert(eventFromICS, uid, user);
+		} catch (ParserException e) {
+			throw new ConversionException(e);
+		} catch (IOException e) {
+			throw new ConversionException(e);
+		}
+	}
+
+	private Ical4jUser convertIcal4jUser(User user) {
+		ObmDomain obmDomain = new ObmDomain();
+		obmDomain.setId(1);
+		obmDomain.setName(user.getDomain());
+		obmDomain.setUuid("83bff451-11b7-8f55-d06b-7013cb8a0531");
+		return Ical4jUser.Factory.create().createIcal4jUser(user.getLoginAtDomain(), obmDomain);
+	}
 
 }

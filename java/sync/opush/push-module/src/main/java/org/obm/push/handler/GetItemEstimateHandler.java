@@ -45,6 +45,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionPathException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -110,6 +111,8 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		} catch (ProcessingEmailException e) {
 			logger.error(e.getMessage(), e);
+		} catch (ConversionException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -123,7 +126,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
-		UnexpectedObmSyncServerException, ProcessingEmailException, CollectionNotFoundException {
+		UnexpectedObmSyncServerException, ProcessingEmailException, CollectionNotFoundException, ConversionException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		

@@ -52,8 +52,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.IllegalMSEventStateException;
-import org.obm.push.exception.MSObjectException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -177,7 +176,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException {
+			DaoException, UnexpectedObmSyncServerException, ConversionException {
 		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
 		return dataDelta.getItemEstimateSize();
 	}
@@ -186,7 +185,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public DataDelta getChanged(BackendSession bs, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException,
-			ProcessingEmailException {
+			ProcessingEmailException, ConversionException {
 		
 		AccessToken token = login(bs);
 		
@@ -222,7 +221,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private DataDelta buildDataDelta(BackendSession bs, Integer collectionId,
 			AccessToken token, EventChanges changes) throws ServerFault,
-			DaoException {
+			DaoException, ConversionException {
 		final String userEmail = calendarClient.getUserEmail(token);
 		Preconditions.checkNotNull(userEmail, "User has no email address");
 		
@@ -234,7 +233,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private List<ItemChange> addOrUpdateEventFilter(Event[] events, String userEmail, 
-			Integer collectionId, BackendSession bs) throws DaoException {
+			Integer collectionId, BackendSession bs) throws DaoException, ConversionException {
 		
 		List<ItemChange> items = Lists.newArrayList();
 		for (final Event event : events) {
@@ -284,7 +283,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return collectionPath.substring(slash + 1, at);
 	}
 
-	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Event event, String serverId) throws DaoException {
+	private ItemChange createItemChangeToAddFromEvent(final BackendSession bs, final Event event, String serverId)
+			throws DaoException, ConversionException {
+		
 		IApplicationData ev = eventService.convertEventToMSEvent(bs, event);
 		ItemChange ic = new ItemChangeBuilder()
 			.withServerId(serverId)
@@ -301,7 +302,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, MSObjectException {
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException {
 
 		AccessToken token = login(bs);
 		
@@ -318,7 +319,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				oldEvent = calendarClient.getEventFromId(token, bs.getUser().getLoginAtDomain(), eventId);	
 			}
 
-			boolean isInternal = EventConverter.isInternalEvent(oldEvent, true);
+			boolean isInternal = eventConverter.isInternalEvent(oldEvent, true);
 			event = convertMSObjectToObmObject(bs, data, oldEvent, isInternal);
 
 			if (eventId != null) {
@@ -397,8 +398,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event convertMSObjectToObmObject(BackendSession bs,
-			IApplicationData data, Event oldEvent, boolean isInternal) throws IllegalMSEventStateException {
-		return eventConverter.convert(bs, oldEvent, (MSEvent) data, isInternal);
+			IApplicationData data, Event oldEvent, boolean isInternal) throws ConversionException {
+		return eventConverter.convert(bs.getUser(), oldEvent, (MSEvent) data, isInternal);
 	}
 	
 	private EventObmId getEventIdFromExtId(AccessToken token, String collectionPath, ICalendar cc, Event event)
@@ -442,7 +443,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	public String handleMeetingResponse(BackendSession bs, MSEmail invitation, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
-			ItemNotFoundException, IllegalMSEventStateException {
+			ItemNotFoundException, ConversionException {
 		
 		MSEvent event = invitation.getInvitation();
 		AccessToken at = login(bs);
@@ -462,12 +463,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event, AccessToken at) 
-			throws UnexpectedObmSyncServerException, EventNotFoundException, IllegalMSEventStateException {
+			throws UnexpectedObmSyncServerException, EventNotFoundException, ConversionException {
 		
 		try {
 			Event obmEvent = getEventFromExtId(bs, event, at);
 			
-			boolean isInternal = EventConverter.isInternalEvent(obmEvent, false);
+			boolean isInternal = eventConverter.isInternalEvent(obmEvent, false);
 			Event newEvent = convertMSObjectToObmObject(bs, event, null, isInternal);
 			
 			if (obmEvent == null) {
@@ -511,7 +512,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			AccessToken at) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		logger.info("update user status[ {} in calendar ]", status.toString());
-		ParticipationState participationStatus = EventConverter.getParticipationState(null, status);
+		ParticipationState participationStatus = eventConverter.getParticipationState(null, status);
 		try {
 			calCli.changeParticipationState(at, bs.getUser().getLoginAtDomain(), msEvent.getExtId(), participationStatus, msEvent.getObmSequence(), true);
 			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), getDefaultCalendarName(bs));
@@ -524,7 +525,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
-			ProcessingEmailException, UnexpectedObmSyncServerException {
+			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(bs);

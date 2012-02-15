@@ -70,6 +70,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MessageClass;
 import org.obm.push.bean.MethodAttachment;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
@@ -131,6 +132,9 @@ public class MailMessageLoader {
 		} catch (StoreException e) {
 			logger.error(e.getMessage(), e);
 			return null;
+		} catch (ConversionException e) {
+			logger.error(e.getMessage(), e);
+			return null;
 		}
 		return msEmail;
 	}
@@ -157,7 +161,7 @@ public class MailMessageLoader {
 	}
 
 	private MSEmail convertMailMessageToMSEmail(final MailMessage mailMessage, final BackendSession bs, 
-			final long uid, final Integer collectionId, long messageId) {
+			final long uid, final Integer collectionId, long messageId) throws ConversionException {
 		
 		final MSEmail msEmail = new MSEmail();
 		msEmail.setSubject(mailMessage.getSubject());
@@ -181,7 +185,7 @@ public class MailMessageLoader {
 	}
 
 	private void setInvitation(final MSEmail msEmail, final BackendSession bs, final MailMessageInvitation mailMessageInvitation, 
-			final long uid, final long messageId) {			
+			final long uid, final long messageId) throws ConversionException {			
 		final IMimePart mimePart = mailMessageInvitation.getPart();
 		try {	
 			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
@@ -206,7 +210,7 @@ public class MailMessageLoader {
 		return null;
 	}
 	
-	private MSEvent getInvitation(BackendSession bs, InputStream invitation) throws IOException {
+	private MSEvent getInvitation(BackendSession bs, InputStream invitation) throws IOException, ConversionException {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
 			try {
@@ -254,7 +258,7 @@ public class MailMessageLoader {
 	}
 	
 	private Set<MSEmail> convertAllMailMessageToMSEmail(final Set<MailMessage> set, final BackendSession bs, 
-			final long uid, final Integer collectionId, final long messageId) {
+			final long uid, final Integer collectionId, final long messageId) throws ConversionException {
 		final Set<MSEmail> msEmails = new HashSet<MSEmail>();
 		for (final MailMessage mailMessage: set) {
 			msEmails.add(convertMailMessageToMSEmail(mailMessage, bs, uid, collectionId, messageId));

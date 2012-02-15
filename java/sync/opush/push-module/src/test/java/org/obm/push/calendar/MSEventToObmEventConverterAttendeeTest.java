@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.calendar;
 
 import java.util.Date;
 
@@ -37,7 +37,12 @@ import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
-import org.obm.push.MSEventToObmEventConverter;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.AttendeeType;
+import org.obm.push.bean.MSAttendee;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.User;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -48,20 +53,20 @@ import com.google.common.collect.Sets;
 
 public class MSEventToObmEventConverterAttendeeTest {
 
-	private MSEventToObmEventConverter converter;
+	private MSEventToObmEventConverterImpl converter;
 
 	private User user;
 	
 	@Before
 	public void setUp() {
-		converter = new MSEventToObmEventConverter();
+		converter = new MSEventToObmEventConverterImpl();
 		String mailbox = "user@domain";
 	    user = User.Factory.create()
 				.createUser(mailbox, mailbox, null);
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttendeeAttributeNameOnly() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeNameOnly() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setName("Any name");
 		attendee.setEmail(null);
@@ -71,7 +76,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeEmailOnly() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeEmailOnly() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setName(null);
 		attendee.setEmail("anyuser@domain");
@@ -85,7 +90,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	@Test
-	public void testConvertAttendeeAttributeNameAndEmail() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeNameAndEmail() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setName("Any Name");
 		attendee.setEmail("anyuser@domain");
@@ -100,7 +105,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeStatusAccepted() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusAccepted() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(AttendeeStatus.ACCEPT);
@@ -113,7 +118,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeStatusDecline() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusDecline() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(AttendeeStatus.DECLINE);
@@ -126,7 +131,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeStatusNotResponded() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusNotResponded() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(AttendeeStatus.NOT_RESPONDED);
@@ -139,7 +144,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	@Test
-	public void testConvertAttendeeAttributeStatusResponseUnknown() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusResponseUnknown() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(AttendeeStatus.RESPONSE_UNKNOWN);
@@ -152,7 +157,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeStatusTentative() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusTentative() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(AttendeeStatus.TENTATIVE);
@@ -165,7 +170,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	@Test
-	public void testConvertAttendeeAttributeStatusNull() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeStatusNull() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeStatus(null);
@@ -178,7 +183,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeTypeRequired() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeTypeRequired() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeType(AttendeeType.REQUIRED);
@@ -191,7 +196,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 
 	@Test
-	public void testConvertAttendeeAttributeTypeOptional() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeTypeOptional() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeType(AttendeeType.OPTIONAL);
@@ -204,7 +209,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	@Test
-	public void testConvertAttendeeAttributeTypeResource() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeTypeResource() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeType(AttendeeType.RESOURCE);
@@ -217,7 +222,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	@Test
-	public void testConvertAttendeeAttributeTypeNull() throws IllegalMSEventStateException {
+	public void testConvertAttendeeAttributeTypeNull() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setEmail("anyuser@domain");
 		attendee.setAttendeeType(null);
@@ -239,11 +244,11 @@ public class MSEventToObmEventConverterAttendeeTest {
 		return msEvent;
 	}
 
-	private Event convertToOBMEvent(MSEvent msEvent) throws IllegalMSEventStateException {
+	private Event convertToOBMEvent(MSEvent msEvent) throws ConversionException {
 		return convertToOBMEventWithEditingEvent(msEvent, null);
 	}
 	
-	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws IllegalMSEventStateException {
+	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws ConversionException {
 		return converter.convert(user, editingEvent, msEvent, false);
 	}
 	

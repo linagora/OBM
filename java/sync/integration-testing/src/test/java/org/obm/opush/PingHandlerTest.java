@@ -1,3 +1,34 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
 
@@ -42,6 +73,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -152,7 +184,7 @@ public class PingHandlerTest {
 	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
-			ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault {
+			ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault, ConversionException {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForNoChangePing();
@@ -160,7 +192,7 @@ public class PingHandlerTest {
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, AuthFault {
+			UnexpectedObmSyncServerException, ProcessingEmailException, AuthFault, ConversionException {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForCalendarHasChangePing(noChangeIterationCount);
@@ -215,7 +247,7 @@ public class PingHandlerTest {
 	}
 	
 	private void mockForNoChangePing() throws DaoException, CollectionNotFoundException,
-			ProcessingEmailException, UnexpectedObmSyncServerException {
+			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		mockCalendarBackendHasNoChange(calendarBackend);
 
@@ -224,7 +256,8 @@ public class PingHandlerTest {
 	}
 
 	private void mockForCalendarHasChangePing(int noChangeIterationCount) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 
@@ -265,7 +298,9 @@ public class PingHandlerTest {
 	}
 
 	private void mockCalendarBackendHasContentChanges(CalendarBackend calendarBackend)
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException {
+		
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
@@ -276,7 +311,9 @@ public class PingHandlerTest {
 	}
 
 	private void mockCalendarBackendHasNoChange(CalendarBackend calendarBackend) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException {
+		
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(BackendSession.class), 
 				anyObject(FilterType.class),

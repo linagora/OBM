@@ -5,6 +5,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 
@@ -14,6 +15,6 @@ public interface EventService {
 	
 	EventObmId getEventObmIdFor(MSEventUid msEventUid, Device device) throws DaoException;
 	
-	MSEvent convertEventToMSEvent(BackendSession bs, Event event)  throws DaoException;
+	MSEvent convertEventToMSEvent(BackendSession bs, Event event)  throws DaoException, ConversionException;
 	
 }

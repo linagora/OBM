@@ -29,51 +29,70 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.AttendeeType;
-import org.obm.sync.calendar.ParticipationRole;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
+import org.obm.sync.calendar.ParticipationState;
 
-public class ObmEventToMsEventConverterParticipationRoleTest {
+public class ObmEventToMsEventConverterParticipationStateTest {
 
-	private ObmEventToMsEventConverter converter;
+	private ObmEventToMSEventConverterImpl converter;
 
 	@Before
 	public void setUp() {
-		converter = new ObmEventToMsEventConverter();
+		converter = new ObmEventToMSEventConverterImpl();
 	}
 
 	@Test(expected=NullPointerException.class)
-	public void testNullParticipationRole() {
-		converter.participationRole(null);
-	}
-
-	@Test
-	public void testChairParticipationRole() {
-		AttendeeType role = converter.participationRole(ParticipationRole.CHAIR);
-		assertThat(role).isEqualTo(AttendeeType.REQUIRED);
-	}
-
-	@Test
-	public void testNonParticipationRole() {
-		AttendeeType role = converter.participationRole(ParticipationRole.NON);
-		assertThat(role).isEqualTo(AttendeeType.OPTIONAL);
+	public void testNullParticipationState() {
+		converter.status(null);
 	}
 	
 	@Test
-	public void testOptionalParticipationRole() {
-		AttendeeType role = converter.participationRole(ParticipationRole.OPT);
-		assertThat(role).isEqualTo(AttendeeType.OPTIONAL);
+	public void testAcceptedParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.ACCEPTED);
+		assertThat(status).isEqualTo(AttendeeStatus.ACCEPT);
 	}
-	
+
 	@Test
-	public void testRequiredParticipationRole() {
-		AttendeeType role = converter.participationRole(ParticipationRole.REQ);
-		assertThat(role).isEqualTo(AttendeeType.REQUIRED);
+	public void testCompletedParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.COMPLETED);
+		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
+	}
+
+	@Test
+	public void testDeclinedParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.DECLINED);
+		assertThat(status).isEqualTo(AttendeeStatus.DECLINE);
+	}
+
+	@Test
+	public void testDelegatedParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.DELEGATED);
+		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
+	}
+
+	@Test
+	public void testInProgressParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.INPROGRESS);
+		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
+	}
+
+	@Test
+	public void testNeedActionParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.NEEDSACTION);
+		assertThat(status).isEqualTo(AttendeeStatus.NOT_RESPONDED);
+	}
+
+	@Test
+	public void testTentativeParticipationState() {
+		AttendeeStatus status = converter.status(ParticipationState.TENTATIVE);
+		assertThat(status).isEqualTo(AttendeeStatus.TENTATIVE);
 	}
 
 }

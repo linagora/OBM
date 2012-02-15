@@ -29,37 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.exception;
 
-import java.util.List;
+public class ConversionException extends Exception {
 
-import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
-import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
+	public ConversionException() {
+		super();
+	}
 
-public interface IContentsExporter {
+	public ConversionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	DataDelta getChanged(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws DaoException, CollectionNotFoundException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
+	public ConversionException(String message) {
+		super(message);
+	}
 
-	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
-			PIMDataType dataType) throws CollectionNotFoundException,
-			DaoException, ProcessingEmailException,
-			UnexpectedObmSyncServerException, ConversionException;
-
-	int getItemEstimateSize(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException, ConversionException;
-
+	public ConversionException(Throwable cause) {
+		super(cause);
+	}
 }

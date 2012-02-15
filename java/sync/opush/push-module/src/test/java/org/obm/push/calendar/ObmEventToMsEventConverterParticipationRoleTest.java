@@ -29,40 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.CalendarBusyStatus;
-import org.obm.sync.calendar.EventOpacity;
+import org.obm.push.bean.AttendeeType;
+import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
+import org.obm.sync.calendar.ParticipationRole;
 
-public class ObmEventToMsEventConverterBusyTest {
+public class ObmEventToMsEventConverterParticipationRoleTest {
 
-	private ObmEventToMsEventConverter converter;
+	private ObmEventToMSEventConverterImpl converter;
 
 	@Before
 	public void setUp() {
-		converter = new ObmEventToMsEventConverter();
+		converter = new ObmEventToMSEventConverterImpl();
 	}
 
 	@Test(expected=NullPointerException.class)
-	public void testNullConversion() {
-		converter.busyStatus(null);
+	public void testNullParticipationRole() {
+		converter.participationRole(null);
 	}
 
+	@Test
+	public void testChairParticipationRole() {
+		AttendeeType role = converter.participationRole(ParticipationRole.CHAIR);
+		assertThat(role).isEqualTo(AttendeeType.REQUIRED);
+	}
+
+	@Test
+	public void testNonParticipationRole() {
+		AttendeeType role = converter.participationRole(ParticipationRole.NON);
+		assertThat(role).isEqualTo(AttendeeType.OPTIONAL);
+	}
 	
 	@Test
-	public void testTransparentConversion() {
-		CalendarBusyStatus busyStatus = converter.busyStatus(EventOpacity.TRANSPARENT);
-		assertThat(busyStatus).isEqualTo(CalendarBusyStatus.FREE);
+	public void testOptionalParticipationRole() {
+		AttendeeType role = converter.participationRole(ParticipationRole.OPT);
+		assertThat(role).isEqualTo(AttendeeType.OPTIONAL);
 	}
-
+	
 	@Test
-	public void testBusyConversion() {
-		CalendarBusyStatus busyStatus = converter.busyStatus(EventOpacity.OPAQUE);
-		assertThat(busyStatus).isEqualTo(CalendarBusyStatus.BUSY);
+	public void testRequiredParticipationRole() {
+		AttendeeType role = converter.participationRole(ParticipationRole.REQ);
+		assertThat(role).isEqualTo(AttendeeType.REQUIRED);
 	}
 
 }

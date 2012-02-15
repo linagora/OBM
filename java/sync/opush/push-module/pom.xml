@@ -171,6 +171,18 @@
 			<artifactId>protocol</artifactId>
 			<version>${obm.version}</version>
 		</dependency>	
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>icalendar</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>

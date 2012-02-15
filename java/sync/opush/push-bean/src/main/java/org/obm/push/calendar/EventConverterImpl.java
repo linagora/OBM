@@ -29,37 +29,56 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
 
-import java.util.List;
+package org.obm.push.calendar;
 
-import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.ParticipationState;
 
-public interface IContentsExporter {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	DataDelta getChanged(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws DaoException, CollectionNotFoundException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
+/**
+ * Convert events between OBM-Sync object model & Microsoft object model
+ */
+@Singleton
+public class EventConverterImpl implements EventConverter {
+	
+	private final MSEventToObmEventConverter msEventToObmEventConverter;
+	private final ObmEventToMSEventConverter obmEventToMsEventConverter;
 
-	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
-			PIMDataType dataType) throws CollectionNotFoundException,
-			DaoException, ProcessingEmailException,
-			UnexpectedObmSyncServerException, ConversionException;
+	@Inject
+	@VisibleForTesting EventConverterImpl(MSEventToObmEventConverterImpl msEventToObmEventConverter, 
+			ObmEventToMSEventConverterImpl obmEventToMsEventConverter) {
+		
+		this.msEventToObmEventConverter = msEventToObmEventConverter;
+		this.obmEventToMsEventConverter = obmEventToMsEventConverter;
+	}
 
-	int getItemEstimateSize(BackendSession bs, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException, ConversionException;
+	@Override
+	public ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
+		return msEventToObmEventConverter.getParticipationState(oldParticipationState, attendeeStatus);
+	}
 
+	@Override
+	public boolean isInternalEvent(Event event, boolean defaultValue){
+		return msEventToObmEventConverter.isInternalEvent(event, defaultValue);
+	}
+
+	@Override
+	public Event convert(User user, Event oldEvent, MSEvent data, boolean isInternal) throws ConversionException {
+		return msEventToObmEventConverter.convert(user, oldEvent, data, isInternal);
+	}
+
+	@Override
+	public MSEvent convert(Event event, MSEventUid msEventUid, User user) throws ConversionException {
+		return obmEventToMsEventConverter.convert(event, msEventUid, user);
+	}
+	
 }

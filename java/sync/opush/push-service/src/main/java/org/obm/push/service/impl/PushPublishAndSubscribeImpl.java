@@ -41,6 +41,7 @@ import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -118,6 +119,8 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 						} catch (UnexpectedObmSyncServerException e) {
 							logger.error(e.getMessage(), e);
 						} catch (ProcessingEmailException e) {
+							logger.error(e.getMessage(), e);
+						} catch (ConversionException e) {
 							logger.error(e.getMessage(), e);
 						}
 					}

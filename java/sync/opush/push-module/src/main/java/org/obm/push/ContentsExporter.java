@@ -41,6 +41,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -61,14 +62,14 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
 		return backend.getChanged(bs, state, filterType, collectionId);
 	}
 
 	@Override
 	public List<ItemChange> fetch(BackendSession bs, List<String> fetchServerIds, PIMDataType dataType) 
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException {
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
 		changes.addAll(backend.fetch(bs, fetchServerIds));
@@ -77,7 +78,7 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public int getItemEstimateSize(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
 		return backend.getItemEstimateSize(bs, filterType, collectionId, state);
 	}

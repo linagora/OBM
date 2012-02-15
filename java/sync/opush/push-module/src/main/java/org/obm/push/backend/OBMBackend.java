@@ -39,6 +39,7 @@ import java.util.Set;
 import org.obm.push.IContentsExporter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -164,7 +165,8 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ConversionException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final BackendSession backendSession = collectionChangeListener.getSession();
@@ -181,7 +183,8 @@ public class OBMBackend implements IBackend {
 	}
 	
 	private int getItemEstimateSize(BackendSession backendSession, SyncCollection syncCollection) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ConversionException {
 		
 		return contentsExporter.getItemEstimateSize(backendSession, syncCollection.getSyncState(),
 				syncCollection.getCollectionId(), syncCollection.getOptions().getFilterType(), syncCollection.getDataType());

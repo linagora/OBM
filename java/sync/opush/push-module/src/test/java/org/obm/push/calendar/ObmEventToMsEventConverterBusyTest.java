@@ -29,69 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.AttendeeStatus;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.push.bean.CalendarBusyStatus;
+import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
+import org.obm.sync.calendar.EventOpacity;
 
-public class ObmEventToMsEventConverterParticipationStateTest {
+public class ObmEventToMsEventConverterBusyTest {
 
-	private ObmEventToMsEventConverter converter;
+	private ObmEventToMSEventConverterImpl converter;
 
 	@Before
 	public void setUp() {
-		converter = new ObmEventToMsEventConverter();
+		converter = new ObmEventToMSEventConverterImpl();
 	}
 
 	@Test(expected=NullPointerException.class)
-	public void testNullParticipationState() {
-		converter.status(null);
+	public void testNullConversion() {
+		converter.busyStatus(null);
 	}
+
 	
 	@Test
-	public void testAcceptedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.ACCEPTED);
-		assertThat(status).isEqualTo(AttendeeStatus.ACCEPT);
+	public void testTransparentConversion() {
+		CalendarBusyStatus busyStatus = converter.busyStatus(EventOpacity.TRANSPARENT);
+		assertThat(busyStatus).isEqualTo(CalendarBusyStatus.FREE);
 	}
 
 	@Test
-	public void testCompletedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.COMPLETED);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testDeclinedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DECLINED);
-		assertThat(status).isEqualTo(AttendeeStatus.DECLINE);
-	}
-
-	@Test
-	public void testDelegatedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DELEGATED);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testInProgressParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.INPROGRESS);
-		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
-	}
-
-	@Test
-	public void testNeedActionParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.NEEDSACTION);
-		assertThat(status).isEqualTo(AttendeeStatus.NOT_RESPONDED);
-	}
-
-	@Test
-	public void testTentativeParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.TENTATIVE);
-		assertThat(status).isEqualTo(AttendeeStatus.TENTATIVE);
+	public void testBusyConversion() {
+		CalendarBusyStatus busyStatus = converter.busyStatus(EventOpacity.OPAQUE);
+		assertThat(busyStatus).isEqualTo(CalendarBusyStatus.BUSY);
 	}
 
 }

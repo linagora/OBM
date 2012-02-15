@@ -1,4 +1,35 @@
-package org.obm.push.bean;
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
+package org.obm.push.calendar;
 
 
 import java.util.Arrays;
@@ -10,7 +41,16 @@ import java.util.List;
 import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.MSEventToObmEventConverter;
+import org.obm.push.bean.CalendarBusyStatus;
+import org.obm.push.bean.CalendarMeetingStatus;
+import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventException;
+import org.obm.push.bean.MSRecurrence;
+import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.RecurrenceType;
+import org.obm.push.bean.User;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.utils.DateUtils;
@@ -24,20 +64,20 @@ import com.google.common.collect.Lists;
 
 public class MSEventToObmEventConverterExceptionTest {
 
-	private MSEventToObmEventConverter converter;
+	private MSEventToObmEventConverterImpl converter;
 
 	private User user;
 	
 	@Before
 	public void setUp() {
-		converter = new MSEventToObmEventConverter();
+		converter = new MSEventToObmEventConverterImpl();
 		String mailbox = "user@domain";
 	    user = User.Factory.create()
 				.createUser(mailbox, mailbox, null);
 	}
 
 	@Test
-	public void testConvertAttributeSubjectWhenSpecified() throws IllegalMSEventStateException {
+	public void testConvertAttributeSubjectWhenSpecified() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -57,7 +97,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSubjectEmptyGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeSubjectEmptyGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -77,7 +117,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSubjectNull() throws IllegalMSEventStateException {
+	public void testConvertAttributeSubjectNull() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -97,7 +137,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeStartTimeOnly() throws IllegalMSEventStateException {
+	public void testConvertAttributeStartTimeOnly() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -111,7 +151,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeStartTimeNullOnly() throws IllegalMSEventStateException {
+	public void testConvertAttributeStartTimeNullOnly() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -125,7 +165,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeEndTimeOnly() throws IllegalMSEventStateException {
+	public void testConvertAttributeEndTimeOnly() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -139,7 +179,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeEndTimeNullOnly() throws IllegalMSEventStateException {
+	public void testConvertAttributeEndTimeNullOnly() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -153,7 +193,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeEndTimeNullAndStartTime() throws IllegalMSEventStateException {
+	public void testConvertAttributeEndTimeNullAndStartTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -168,7 +208,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeStartAndEndTime() throws IllegalMSEventStateException {
+	public void testConvertAttributeStartAndEndTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -187,7 +227,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeDtStampJustCreated() throws IllegalMSEventStateException {
+	public void testConvertAttributeDtStampJustCreated() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -206,7 +246,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeDtStampAlreadyCreated() throws IllegalMSEventStateException {
+	public void testConvertAttributeDtStampAlreadyCreated() throws ConversionException {
 		Date previousDtStampDate = date("2004-12-11T11:15:10Z");
 		Event editingEvent = new Event();
 		editingEvent.setTimeCreate(previousDtStampDate);
@@ -238,7 +278,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeDtStampInExceptionIsRequired() throws IllegalMSEventStateException {
+	public void testConvertAttributeDtStampInExceptionIsRequired() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -254,7 +294,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeDtStampInExceptionDontGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeDtStampInExceptionDontGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -271,7 +311,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeMeetingStatusIsInMeeting() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusIsInMeeting() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -290,7 +330,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeMeetingStatusIsNotInMeeting() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusIsNotInMeeting() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -309,7 +349,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeMeetingStatusMeetingCanceledAndReceived() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusMeetingCanceledAndReceived() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -328,7 +368,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeMeetingStatusMeetingReceived() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusMeetingReceived() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -347,7 +387,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeMeetingStatusMeetingCanceled() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusMeetingCanceled() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -366,7 +406,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeMeetingStatusIsRequired() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusIsRequired() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -382,7 +422,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeMeetingStatusDontGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeMeetingStatusDontGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -399,7 +439,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeDeletedTrue() throws IllegalMSEventStateException {
+	public void testConvertAttributeDeletedTrue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -428,7 +468,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeDeletedFalse() throws IllegalMSEventStateException {
+	public void testConvertAttributeDeletedFalse() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -451,7 +491,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testCalculatedAttributeDurationByStartAndEndTime() throws IllegalMSEventStateException {
+	public void testCalculatedAttributeDurationByStartAndEndTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -471,7 +511,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testCalculatedAttributeDurationByAllDayOnly() throws IllegalMSEventStateException {
+	public void testCalculatedAttributeDurationByAllDayOnly() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -491,7 +531,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testCalculatedAttributeDurationByAllDayWhenHasEndTime() throws IllegalMSEventStateException {
+	public void testCalculatedAttributeDurationByAllDayWhenHasEndTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -512,7 +552,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayFalse() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayFalse() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -531,7 +571,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayTrue() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayTrue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -550,7 +590,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayNull() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayNull() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -569,7 +609,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeAllDayFalseNeedStartTime() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayFalseNeedStartTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -584,7 +624,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeAllDayNullNeedStartTime() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayNullNeedStartTime() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -599,7 +639,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -619,7 +659,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayNullAndParentNullToo() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayNullAndParentNullToo() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -639,7 +679,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeAllDayMakeEventStartMidnightAndFinishAtMidnight() throws IllegalMSEventStateException {
+	public void testConvertAttributeAllDayMakeEventStartMidnightAndFinishAtMidnight() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -662,7 +702,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeBusyStatusFree() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusFree() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -681,7 +721,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeBusyStatusBusy() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusBusy() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -700,7 +740,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeBusyStatusOutOfOffice() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusOutOfOffice() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -719,7 +759,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeBusyStatusTentative() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusTentative() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -738,7 +778,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeBusyStatusNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -759,7 +799,7 @@ public class MSEventToObmEventConverterExceptionTest {
 
 
 	@Test
-	public void testConvertAttributeBusyStatusNullAndParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusNullAndParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -779,7 +819,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeBusyStatusNullAndParentNullToo() throws IllegalMSEventStateException {
+	public void testConvertAttributeBusyStatusNullAndParentNullToo() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -799,7 +839,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeCategoryEmpty() throws IllegalMSEventStateException {
+	public void testConvertAttributeCategoryEmpty() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -818,7 +858,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeCategoryIsFirst() throws IllegalMSEventStateException {
+	public void testConvertAttributeCategoryIsFirst() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -837,7 +877,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeCategoryNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeCategoryNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -857,7 +897,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeCategoryNullAndParentNullToo() throws IllegalMSEventStateException {
+	public void testConvertAttributeCategoryNullAndParentNullToo() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -877,7 +917,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test(expected=IllegalMSEventStateException.class)
-	public void testConvertAttributeCategoryBeyondThreeHundred() throws IllegalMSEventStateException {
+	public void testConvertAttributeCategoryBeyondThreeHundred() throws ConversionException {
 		String[] tooMuchCategories = new String[301];
 		Arrays.fill(tooMuchCategories, "a category");
 		MSEventException msEventException = new MSEventExceptionBuilder()
@@ -895,7 +935,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeReminder() throws IllegalMSEventStateException {
+	public void testConvertAttributeReminder() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -917,7 +957,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeReminderZero() throws IllegalMSEventStateException {
+	public void testConvertAttributeReminderZero() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -938,7 +978,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeReminderNull() throws IllegalMSEventStateException {
+	public void testConvertAttributeReminderNull() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -959,7 +999,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeReminderNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeReminderNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -981,7 +1021,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeReminderNotNullDontGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeReminderNotNullDontGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1002,7 +1042,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeSensitivityNormal() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityNormal() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1022,7 +1062,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeSensitivityConfidential() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityConfidential() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1042,7 +1082,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityPersonal() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityPersonal() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1062,7 +1102,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityPrivate() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityPrivate() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1082,7 +1122,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityNullAndParentNullTooIsPublic() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityNullAndParentNullTooIsPublic() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1103,7 +1143,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeSensitivityNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1124,7 +1164,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeLocation() throws IllegalMSEventStateException {
+	public void testConvertAttributeLocation() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1144,7 +1184,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeLocationNullAndParentNullToo() throws IllegalMSEventStateException {
+	public void testConvertAttributeLocationNullAndParentNullToo() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1165,7 +1205,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeLocationNullGetFromParent() throws IllegalMSEventStateException {
+	public void testConvertAttributeLocationNullGetFromParent() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1210,11 +1250,11 @@ public class MSEventToObmEventConverterExceptionTest {
 		return Iterables.getOnlyElement(convertedEvent.getRecurrence().getEventExceptions());
 	}
 
-	private Event convertToOBMEvent(MSEvent msEvent) throws IllegalMSEventStateException {
+	private Event convertToOBMEvent(MSEvent msEvent) throws ConversionException {
 		return convertToOBMEventWithEditingEvent(msEvent, null);
 	}
 	
-	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws IllegalMSEventStateException {
+	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws ConversionException {
 		return converter.convert(user, editingEvent, msEvent, false);
 	}
 	

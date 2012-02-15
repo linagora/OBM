@@ -35,8 +35,8 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionPathException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.MSObjectException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -46,7 +46,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 public interface IContentsImporter {
 
 	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, MSObjectException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException;

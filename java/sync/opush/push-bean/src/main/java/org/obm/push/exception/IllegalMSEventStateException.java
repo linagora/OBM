@@ -1,6 +1,6 @@
 package org.obm.push.exception;
 
-public class IllegalMSEventStateException extends MSObjectException {
+public class IllegalMSEventStateException extends ConversionException {
 
 	public IllegalMSEventStateException() {
 		super();

@@ -24,6 +24,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -71,7 +72,9 @@ public class EmailSyncTestUtils {
 	public static void mockEmailSyncClasses(
 			String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault,
+			ConversionException {
+		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockEmailSync(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		replayMocks(classToInstanceMap);
@@ -79,7 +82,9 @@ public class EmailSyncTestUtils {
 	
 	private static void mockEmailSync(String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta,
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
+			ConversionException {
+		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		mockEmailSyncedCollectionDao(syncedCollectionDao);
 		
@@ -150,7 +155,7 @@ public class EmailSyncTestUtils {
 	}
 
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException {
 
 		expect(contentsExporter.getChanged(
 				anyObject(BackendSession.class), 

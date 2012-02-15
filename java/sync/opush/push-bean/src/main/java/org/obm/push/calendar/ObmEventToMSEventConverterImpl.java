@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -66,8 +66,9 @@ import com.google.inject.Singleton;
 
 
 @Singleton
-public class ObmEventToMsEventConverter {
+public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverter {
 
+	@Override
 	public MSEvent convert(Event e, MSEventUid uid, User user) {
 		MSEvent mse = new MSEvent();
 

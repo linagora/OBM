@@ -45,6 +45,7 @@ import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.CollectionPathException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
@@ -213,6 +214,9 @@ public class PingHandler extends WbxmlRequestHandler implements
 		} catch (ProcessingEmailException e) {
 			logger.error(e.getMessage(), e);
 			sendError(responder, PingStatus.SERVER_ERROR);
+		} catch (ConversionException e) {
+			logger.error(e.getMessage(), e);
+			sendError(responder, PingStatus.SERVER_ERROR);
 		} 
 	}
 
@@ -221,7 +225,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
-			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
+			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();

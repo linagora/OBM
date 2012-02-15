@@ -47,17 +47,17 @@ import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
-import org.obm.push.MSEventToObmEventConverter;
-import org.obm.push.ObmEventToMsEventConverter;
+import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.User;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
-import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -69,30 +69,33 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class EventConverterTest {
 
-	private EventConverter eventConverter;
+	@Rule
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ConversionModule.class);
+
+	@Inject EventConverterImpl eventConverter;
 	private CalendarDecoder decoder;
 	
 	@Before
 	public void init() {
-		this.eventConverter = new EventConverter(
-				new MSEventToObmEventConverter(), new ObmEventToMsEventConverter());
-		
+		this.eventConverter = new EventConverterImpl(
+				new MSEventToObmEventConverterImpl(), new ObmEventToMSEventConverterImpl());
 		this.decoder = new CalendarDecoder();
 	}
 
 	@Test
 	public void testAttendeesWithNoOrganizerInNewEventStream() 
-			throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
+			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String loginAtDomain = "jribiera@obm.lng.org";
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("HTC-Windows-Mobile-6.1-new_event.xml");
-		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
+		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
 		
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event);  
@@ -108,12 +111,13 @@ public class EventConverterTest {
 	}
 	
 	@Test
-	public void testAttendeesWithOrganizerEmailInNewEventStream() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
+	public void testAttendeesWithOrganizerEmailInNewEventStream()
+			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String loginAtDomain = "jribier@obm.lng.org";
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("Galaxy-S-Android-2.3.4-new_event.xml");
-		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
+		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
 
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event); 
@@ -130,14 +134,15 @@ public class EventConverterTest {
 
 	@Ignore("FIXME for OBMFULL-2728")
 	@Test
-	public void testConvertUpdateOneOnlyExceptionEvent() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
+	public void testConvertUpdateOneOnlyExceptionEvent()
+			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
 		IApplicationData  oldData = getApplicationData("samecase/new-event-with-exception.xml");
-		Event oldEvent = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org"), null, (MSEvent) oldData, true);
+		Event oldEvent = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org").getUser(), null, (MSEvent) oldData, true);
 		
 		IApplicationData  data = getApplicationData("samecase/update-one-exception-of-same-event.xml");
 
-		Event event = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org"), oldEvent, (MSEvent) data, true);
+		Event event = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org").getUser(), oldEvent, (MSEvent) data, true);
 		Event excptEvtUpd = event.getRecurrence().getEventExceptions().get(0);
 
 		
@@ -153,7 +158,8 @@ public class EventConverterTest {
 	}
 	
 	@Test
-	public void testOwnerloginIsNotEqualsToOwnerEmail() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
+	public void testOwnerloginIsNotEqualsToOwnerEmail()
+			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String loginAtDomain = "LOGIN@obm.lng.org";
 		String email = "EMAIL@obm.lng.org";
 		String displayName = "displayName";
@@ -163,7 +169,7 @@ public class EventConverterTest {
 		BackendSession backendSession = buildBackendSession(credentials);
 		
 		IApplicationData data = getApplicationData("OBMFULL-2907.xml");
-		Event event = eventConverter.convert(backendSession, null, (MSEvent) data, true);
+		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
 		
 		Attendee organizer = event.findOrganizer();
 		

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.calendar;
 
 import static org.obm.push.utils.DateUtils.minutesToSeconds;
 
@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -53,7 +54,7 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
-import org.obm.push.calendar.EventConverter;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventRecurrenceException;
 import org.obm.push.exception.IllegalMSEventStateException;
@@ -79,13 +80,15 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
 
 @Singleton
-public class MSEventToObmEventConverter {
+public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverter {
 
 	private static final int EVENT_ALLDAY_DURATION_IN_MS = 24 * 3600;
 	private static final int EVENT_CATEGORIES_MAX = 300;
 
-	public Event convert(User user, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) 
-			throws IllegalMSEventStateException {
+	@Override
+	public Event convert(User user, Event oldEvent, MSEvent event, boolean isObmInternalEvent) 
+			throws ConversionException {
+
 		EventExtId extId = event.getExtId();
 		EventObmId obmId = event.getObmId();
 		
@@ -454,8 +457,7 @@ public class MSEventToObmEventConverter {
 		ret.setDisplayName(at.getName());
 		ret.setParticipationRole(getParticipationRole(at.getAttendeeType()));
 		
-		ParticipationState status = EventConverter.getParticipationState( 
-				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
+		ParticipationState status = getParticipationState(getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
 		ret.setState(status);
 		
 		ret.setOrganizer( isOrganizer(event, at) );
@@ -603,5 +605,30 @@ public class MSEventToObmEventConverter {
 		if (exception.getExceptionStartTime() == null) {
 			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.ExceptionStartTime is required");
 		}
+	}
+	
+	@Override
+	public ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
+		if (attendeeStatus == null) {
+			return oldParticipationState;
+		}
+		
+		switch (attendeeStatus) {
+		case DECLINE:
+			return ParticipationState.DECLINED;
+		case NOT_RESPONDED:
+		case RESPONSE_UNKNOWN:
+			return ParticipationState.NEEDSACTION;
+		case TENTATIVE:
+			return ParticipationState.TENTATIVE;
+		default:
+		case ACCEPT:
+			return ParticipationState.ACCEPTED;
+		}
+	}
+
+	@Override
+	public boolean isInternalEvent(Event event, boolean defaultValue){
+		return event != null ? event.isInternalEvent() : defaultValue;
 	}
 }
