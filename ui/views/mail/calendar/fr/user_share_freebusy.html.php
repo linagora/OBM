@@ -37,7 +37,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-        <td colspan="2"><?php echo $user['firstname'].' '.$user['lastname']; ?> vous autorise désormais à importer ses disponibilités OBM (mode "free/busy").</td>
+        <td colspan="2"><?php echo htmlspecialchars($user['firstname']).' '.htmlspecialchars($user['lastname']); ?> vous autorise désormais à importer ses disponibilités OBM (mode "free/busy").</td>
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">

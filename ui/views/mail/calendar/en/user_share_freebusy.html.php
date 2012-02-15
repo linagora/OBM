@@ -33,11 +33,11 @@ applicable to the OBM software.
 ?><table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          OBM free/busy informations sharing
+          OBM free/busy information sharing
         </th>
     </tr>
     <tr>
-        <td colspan="2"><?php echo $user['firstname'].' '.$user['lastname']; ?> now allows you to import their OBM free/busy informations.</td>
+        <td colspan="2"><?php echo htmlspecialchars($user['firstname']).' '.htmlspecialchars($user['lastname']); ?> now allows you to import their OBM free/busy informations.</td>
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">
