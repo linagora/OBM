@@ -955,7 +955,7 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testImportICSWithRecurrenceIdAfterParentEventDefinition() throws IOException, ParserException, ParseException {
+	public void testImportICSWithRecurrenceIdAfterParentEventDefinition() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2963sorted.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 
