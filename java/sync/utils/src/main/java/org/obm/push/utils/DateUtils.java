@@ -35,6 +35,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.joda.time.Duration;
+
 public class DateUtils {
 	
 	public static Calendar getCurrentGMTCalendar() {
@@ -83,5 +85,17 @@ public class DateUtils {
 
 	private static int getRealWeekOfDay(int startDay) {
 		return (int) Math.ceil(startDay / 7d);
+	}
+
+	public static long minutesToSeconds(long minutes) {
+		return Duration.standardMinutes(minutes).getStandardSeconds();
+	}
+
+	public static long daysToSeconds(long days) {
+		return Duration.standardDays(days).getStandardSeconds();
+	}
+
+	public static long yearsToSeconds(long years) {
+		return daysToSeconds(years * 365);
 	}
 }

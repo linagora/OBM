@@ -59,10 +59,16 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
 
 @Singleton
 public class MSEventToObmEventConverter {
+
+	private static final int EVENT_ALLDAY_DURATION_IN_MS = 24 * 3600;
+	private static final int EVENT_CATEGORIES_MAX = 300;
 
 	public Event convert(BackendSession bs, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) {
 		EventExtId extId = event.getExtId();
@@ -98,48 +104,42 @@ public class MSEventToObmEventConverter {
 		return e;
 	}
 
-	private void fillEventCommonProperties(BackendSession bs, Event e, Event oldEvent, Event parentEvent, 
+	private void fillEventCommonProperties(BackendSession bs, Event converted, Event oldEvent, Event parentEvent, 
 			MSEventCommon data, boolean isObmInternalEvent) {
 		
-		defineOwner(bs, e, oldEvent);
-		e.setInternalEvent(isObmInternalEvent);
-		e.setType(EventType.VEVENT);
+		defineOwner(bs, converted, oldEvent);
+		converted.setInternalEvent(isObmInternalEvent);
+		converted.setType(EventType.VEVENT);
 		
 		if (parentEvent != null && parentEvent.getTitle() != null && !parentEvent.getTitle().isEmpty()) {
-			e.setTitle(parentEvent.getTitle());
+			converted.setTitle(parentEvent.getTitle());
 		} else {
-			e.setTitle(data.getSubject());
+			converted.setTitle(data.getSubject());
 		}
 		
 		if (parentEvent != null && parentEvent.getDescription() != null && !parentEvent.getDescription().isEmpty()) {
-			e.setDescription(parentEvent.getDescription());
+			converted.setDescription(parentEvent.getDescription());
 		} else {
-			e.setDescription(data.getDescription());
+			converted.setDescription(data.getDescription());
 		}
 		
-		e.setLocation(data.getLocation());
-		e.setStartDate(data.getStartTime());
+		converted.setLocation(data.getLocation());
+		converted.setStartDate(data.getStartTime());
 		
-		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
-		e.setDuration(duration);
-		e.setAllday(data.getAllDayEvent() != null ? data.getAllDayEvent() : false);
+		convertDurationAttribute(data, converted);
+		convertAllDayAttribute(data, converted);
+		convertCategories(data, converted);
 		
 		if (data.getReminder() != null && data.getReminder() > 0) {
-			e.setAlert(data.getReminder() * 60);
+			converted.setAlert(data.getReminder() * 60);
 		}
 
-		if (data.getBusyStatus() == null) {
-			if (parentEvent != null) {
-				e.setOpacity(parentEvent.getOpacity());
-			}
-		} else {
-			e.setOpacity(opacity(data.getBusyStatus()));
-		}
+		convertBusyStatus(data, converted);
 
 		if (data.getSensitivity() == null && parentEvent != null) {
-			e.setPrivacy(parentEvent.getPrivacy());
+			converted.setPrivacy(parentEvent.getPrivacy());
 		} else {
-			e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
+			converted.setPrivacy(privacy(oldEvent, data.getSensitivity()));
 		}
 		
 	}
@@ -318,12 +318,55 @@ public class MSEventToObmEventConverter {
 		return or;
 	}
 	
-	private EventOpacity opacity(CalendarBusyStatus busyStatus) {
-		switch (busyStatus) {
-		case FREE:
-			return EventOpacity.TRANSPARENT;
-		default:
-			return EventOpacity.OPAQUE;
+	private void convertBusyStatus(MSEventCommon from, Event to) {
+		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
+			to.setOpacity(EventOpacity.TRANSPARENT);
+		} else {
+			to.setOpacity(EventOpacity.OPAQUE);
 		}
+	}
+	
+	private void convertCategories(MSEventCommon from, Event to) {
+		if (eventHasCategories(from)) {
+			checkEventCategoriesValidity(from);
+			to.setCategory(Iterables.getFirst(from.getCategories(), null));
+		} else {
+			to.setCategory(null);
+		}
+	}
+
+	private void checkEventCategoriesValidity(MSEventCommon event) {
+		if (event.getCategories().size() > EVENT_CATEGORIES_MAX) {
+			String msg = String.format("Categories MUST NOT contain more than 300 elements, found:%d",
+					event.getCategories().size());
+			throw new IllegalArgumentException(msg);
+		}
+	}
+
+	private boolean eventHasCategories(MSEventCommon event) {
+		return event.getCategories() != null && !event.getCategories().isEmpty();
+	}
+
+	private void convertAllDayAttribute(MSEventCommon from, Event to) {
+		to.setAllday(isAllDayEvent(from));
+	}
+
+	private Boolean isAllDayEvent(MSEventCommon from) {
+		return Objects.firstNonNull(from.getAllDayEvent(), false);
+	}
+
+	private void convertDurationAttribute(MSEventCommon data, Event converted) {
+		if (isAllDayEvent(data)) {
+			converted.setDuration(EVENT_ALLDAY_DURATION_IN_MS);
+		} else {
+			convertDurationAttributeByStartTime(data, converted);
+		}
+	}
+	
+	private void convertDurationAttributeByStartTime(MSEventCommon data, Event converted) {
+		Preconditions.checkNotNull(data.getStartTime(), "StartTime is required for duration");
+		
+		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
+		converted.setDuration(duration);
 	}
 }

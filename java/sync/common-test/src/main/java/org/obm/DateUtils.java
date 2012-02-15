@@ -40,5 +40,5 @@ public class DateUtils {
 	public static Date date(String dateAsString) {
 		return new DateTime(dateAsString).toDate();
 	}
-	
+
 }
