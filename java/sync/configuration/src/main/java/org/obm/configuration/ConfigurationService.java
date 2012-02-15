@@ -29,5 +29,9 @@ public interface ConfigurationService {
 	String getActiveSyncServletUrl();
 
 	Charset getDefaultEncoding();
+
+	int getTransactionTimeout();
+
+	TimeUnit getTransactionTimeoutUnit();
 	
 }

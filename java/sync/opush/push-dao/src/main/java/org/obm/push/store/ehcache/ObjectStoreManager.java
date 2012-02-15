@@ -34,6 +34,7 @@ package org.obm.push.store.ehcache;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -41,7 +42,10 @@ import net.sf.ehcache.config.CacheConfiguration;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,17 +53,31 @@ import com.google.inject.Singleton;
 public class ObjectStoreManager {
 
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final CacheManager singletonManager;
 
 	@Inject ObjectStoreManager(ConfigurationService configurationService) throws StoreNotFoundException {
 		InputStream storeConfiguration = configurationService.getStoreConfiguration();
 		this.singletonManager = new CacheManager(storeConfiguration);
+		int transactionTimeoutInSeconds = transactionTimeoutInSeconds(configurationService); 
+		this.singletonManager.getTransactionController().setDefaultTransactionTimeout(transactionTimeoutInSeconds);
+		logger.info("initializing ehcache with transaction timeout = {} seconds", transactionTimeoutInSeconds);
 	}
 
-	public void createNewStore(String storeName) {
-		if (getStore(storeName) == null) {
-			this.singletonManager.addCache(createStore(storeName));
+	private static int transactionTimeoutInSeconds(ConfigurationService configurationService) {
+		TimeUnit transactionTimeoutUnit = configurationService.getTransactionTimeoutUnit();
+		int transactionTimeout = configurationService.getTransactionTimeout();
+		long transactionTimeoutInSeconds = transactionTimeoutUnit.toSeconds(transactionTimeout);
+		return Ints.checkedCast(transactionTimeoutInSeconds);
+	}
+	
+	public Cache createNewStore(String storeName) {
+		Cache store = getStore(storeName);
+		if (store == null) {
+			store = createStore(storeName);
+			this.singletonManager.addCache(store);
 		}
+		return store;
 	}
 
 	private Cache createStore(String storeName) {

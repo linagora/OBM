@@ -31,11 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import junit.framework.Assert;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.transaction.DeadLockException;
 import net.sf.ehcache.transaction.TransactionException;
 
 import org.junit.After;
@@ -46,6 +54,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.push.exception.EhcacheRollbackException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
@@ -86,6 +95,12 @@ public class EhcacheTransactionalModeTest {
 		
 		public int getSizeElementWithoutTransactional(CacheManager manager, String cache) {
 			return manager.getCache(cache).getSize();
+		}
+		
+		@Transactional
+		public void putAndWait(Cache xaCache, Element element, int timeInMilliseconds) throws InterruptedException {
+			xaCache.put(element);
+			Thread.sleep(timeInMilliseconds);
 		}
 		
 	}
@@ -133,6 +148,47 @@ public class EhcacheTransactionalModeTest {
 	
 	private Element buildElement() {
 		return new Element("key", "value");
+	}
+	
+	@Test
+	public void transactionIsShorterThanCacheTimeout() throws InterruptedException, ExecutionException {
+		manager.getTransactionController().setDefaultTransactionTimeout(1);
+		executeTwoPutInParallel(100);
+	}
+
+	@Test(expected=DeadLockException.class)
+	public void transactionIsGreaterThanCacheTimeout() throws Throwable {
+		manager.getTransactionController().setDefaultTransactionTimeout(1);
+		try {
+			executeTwoPutInParallel(1100);
+		} catch (ExecutionException e) {
+			Throwable cause = e.getCause();
+			throw cause;
+		}
+		
+	}
+	
+	private void executeTwoPutInParallel(int timeInMilliseconds) throws InterruptedException,
+			ExecutionException {
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		List<Future<Boolean>> futures = executor.invokeAll(
+				ImmutableList.of(
+						putInCacheTask(timeInMilliseconds), 
+						putInCacheTask(timeInMilliseconds)));
+		for (Future<Boolean> future: futures) {
+			future.get();
+		}
+	}
+
+	private Callable<Boolean> putInCacheTask(final int timeInMilliseconds) {
+		return new Callable<Boolean>() {
+
+			@Override
+			public Boolean call() throws Exception {
+				xaCacheInstance.putAndWait(xaCache, buildElement(), timeInMilliseconds);
+				return true;
+			}
+		};
 	}
 	
 }
