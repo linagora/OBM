@@ -158,6 +158,7 @@ public class MSEventToObmEventConverter {
 		fillEventCommonProperties(bs, e, oldEvent, null, data, isObmInternalEvent);
 		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
 		defineOrganizer(e, data, bs);
+		convertTimeZone(data, e);
 		return e;
 	}
 
@@ -332,6 +333,14 @@ public class MSEventToObmEventConverter {
 		or.setEnd(endDate);
 
 		return or;
+	}
+	
+	private void convertTimeZone(MSEvent from, Event to) {
+		if (from.getTimeZone() != null) {
+			to.setTimezoneName(from.getTimeZone().getID());
+		} else {
+			to.setTimezoneName(null);
+		}
 	}
 	
 	private void convertBusyStatus(MSEventCommon from, Event to) {

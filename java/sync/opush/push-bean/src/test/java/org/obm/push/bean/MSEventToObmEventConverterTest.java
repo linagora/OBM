@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.fest.assertions.Assertions;
 import org.junit.Before;
@@ -280,6 +281,45 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Assertions.assertThat(convertedEvent.getDescription()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeTimezoneDefault() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withTimeZone(TimeZone.getDefault())
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getTimezoneName()).isEqualTo(TimeZone.getDefault().getID());
+	}
+
+	@Test
+	public void testConvertAttributeTimezoneSpecific() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withTimeZone(TimeZone.getTimeZone("America/Tijuana"))
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getTimezoneName()).isEqualTo("America/Tijuana");
+	}
+	
+	@Test
+	public void testConvertAttributeTimezoneNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withTimeZone(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getTimezoneName()).isNull();
 	}
 	
 	@Test
