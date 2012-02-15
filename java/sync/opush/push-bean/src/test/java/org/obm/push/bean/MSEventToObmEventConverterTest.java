@@ -208,8 +208,58 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
+	@Test
+	public void testConvertAttributeDtStampJustCreated() {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withDtStamp(date("2004-12-10T11:15:10Z"))
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getTimeCreate()).isEqualTo(msEvent.getDtStamp());
+		Assertions.assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
+	}
+
+	@Test
+	public void testConvertAttributeDtStampAlreadyCreated() {
+		Date previousDtStampDate = date("2004-12-11T11:15:10Z");
+		Event editingEvent = new Event();
+		editingEvent.setTimeCreate(previousDtStampDate);
+		editingEvent.setTimeUpdate(previousDtStampDate);
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withDtStamp(date("2004-12-10T12:15:10Z"))
+				.build();
+		
+		Event convertedEvent = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		Assertions.assertThat(convertedEvent.getTimeCreate()).isEqualTo(previousDtStampDate);
+		Assertions.assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
+	}
+
+	@Test
+	public void testConvertAttributeDtStampNull() {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withDtStamp(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+
+		Assertions.assertThat(convertedEvent.getTimeCreate()).isNull();
+		Assertions.assertThat(convertedEvent.getTimeUpdate()).isNull();
+	}
+
 	private Event convertToOBMEvent(MSEvent msEvent) {
-		return converter.convert(bs, null, msEvent, false);
+		return convertToOBMEventWithEditingEvent(msEvent, null);
+	}
+
+	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) {
+		return converter.convert(bs, editingEvent, msEvent, false);
 	}
 	
 	private Date date(String date) {

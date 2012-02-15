@@ -206,10 +206,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	}
 
 	public Date getDtStamp() {
-		if (dtStamp != null) {
-			return dtStamp;
-		}
-		return new Date(0);
+		return dtStamp;
 	}
 
 	public void setDtStamp(Date dtStamp) {
@@ -299,8 +296,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 			.add("obmId", obmId)
 			.add("extId", extId)
 			.add("description", description)
-			.add("created", created)
-			.add("lastUpdate", lastUpdate)
 			.add("dtStamp", dtStamp)
 			.add("endTime", endTime)
 			.add("startTime", startTime)
@@ -321,7 +316,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(attendees, organizerName, organizerEmail, location, 
-				subject, obmId, extId, description, created, lastUpdate, dtStamp, 
+				subject, obmId, extId, description, dtStamp, 
 				endTime, startTime, allDayEvent, busyStatus, sensitivity, meetingStatus, 
 				reminder, categories, recurrence, exceptions, timeZone, obmSequence, uid);
 	}
@@ -338,8 +333,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 				&& Objects.equal(this.obmId, that.obmId)
 				&& Objects.equal(this.extId, that.extId)
 				&& Objects.equal(this.description, that.description)
-				&& Objects.equal(this.created, that.created)
-				&& Objects.equal(this.lastUpdate, that.lastUpdate)
 				&& Objects.equal(this.dtStamp, that.dtStamp)
 				&& Objects.equal(this.endTime, that.endTime)
 				&& Objects.equal(this.startTime, that.startTime)
