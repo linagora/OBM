@@ -24,16 +24,14 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	private MSEventToObmEventConverter converter;
 
-	private BackendSession bs;
+	private User user;
 	
 	@Before
 	public void setUp() {
 		converter = new MSEventToObmEventConverter();
 		String mailbox = "user@domain";
-		String password = "password";
-	    bs = new BackendSession(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+	    user = User.Factory.create()
+				.createUser(mailbox, mailbox, null);
 	}
 
 	@Test(expected=IllegalMSEventRecurrenceException.class)
@@ -1262,7 +1260,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	}
 
 	private Event convertToOBMEvent(MSEvent msEvent) throws IllegalMSEventStateException {
-		return converter.convert(bs, null, msEvent, false);
+		return converter.convert(user, null, msEvent, false);
 	}
 
 	private Date addDaysToDate(Date startTime, Integer days) {

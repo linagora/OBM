@@ -88,7 +88,7 @@ public class EventConverter {
 	}
 
 	public Event convert(BackendSession bs, Event oldEvent, MSEvent data, boolean isInternal) throws IllegalMSEventStateException {
-		return msEventConverter.convert(bs, oldEvent, data, isInternal);
+		return msEventConverter.convert(bs.getUser(), oldEvent, data, isInternal);
 	}
 
 	public MSEvent convert(Event event, MSEventUid msEventUid, User user) {

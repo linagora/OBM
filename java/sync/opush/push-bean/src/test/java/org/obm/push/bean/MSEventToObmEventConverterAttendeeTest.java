@@ -50,16 +50,14 @@ public class MSEventToObmEventConverterAttendeeTest {
 
 	private MSEventToObmEventConverter converter;
 
-	private BackendSession bs;
+	private User user;
 	
 	@Before
 	public void setUp() {
 		converter = new MSEventToObmEventConverter();
 		String mailbox = "user@domain";
-		String password = "password";
-	    bs = new BackendSession(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+	    user = User.Factory.create()
+				.createUser(mailbox, mailbox, null);
 	}
 
 	@Test(expected=IllegalMSEventStateException.class)
@@ -246,7 +244,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 	}
 	
 	private Event convertToOBMEventWithEditingEvent(MSEvent msEvent, Event editingEvent) throws IllegalMSEventStateException {
-		return converter.convert(bs, editingEvent, msEvent, false);
+		return converter.convert(user, editingEvent, msEvent, false);
 	}
 	
 	private Date date(String date) {

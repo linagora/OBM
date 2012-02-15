@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.obm.push.bean.AttendeeType;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -50,6 +49,7 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceDayOfWeekConverter;
+import org.obm.push.bean.User;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventRecurrenceException;
@@ -80,12 +80,12 @@ public class MSEventToObmEventConverter {
 	private static final int EVENT_ALLDAY_DURATION_IN_MS = 24 * 3600;
 	private static final int EVENT_CATEGORIES_MAX = 300;
 
-	public Event convert(BackendSession bs, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) 
-			throws org.obm.push.exception.IllegalMSEventStateException {
+	public Event convert(User user, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) 
+			throws IllegalMSEventStateException {
 		EventExtId extId = event.getExtId();
 		EventObmId obmId = event.getObmId();
 		
-		Event e = convertEventOne(bs, oldEvent, null, event, isObmInternalEvent);
+		Event e = convertEventOne(user, oldEvent, null, event, isObmInternalEvent);
 		e.setExtId(extId);
 		e.setUid(obmId);
 		
@@ -102,7 +102,7 @@ public class MSEventToObmEventConverter {
 					if (excep.isDeleted()) {
 						r.addException(excep.getExceptionStartTime());
 					} else {
-						Event obmEvent = convertEventException(bs, oldEvent, e, excep, isObmInternalEvent);
+						Event obmEvent = convertEventException(user, oldEvent, e, excep, isObmInternalEvent);
 						obmEvent.setExtId(extId);
 						obmEvent.setUid(obmId);
 						
@@ -115,10 +115,10 @@ public class MSEventToObmEventConverter {
 		return e;
 	}
 
-	private void fillEventCommonProperties(BackendSession bs, Event converted, Event oldEvent, Event parentEvent, 
+	private void fillEventCommonProperties(User user, Event converted, Event oldEvent, Event parentEvent, 
 			MSEventCommon data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
-		defineOwner(bs, converted, oldEvent);
+		defineOwner(user, converted, oldEvent);
 		converted.setInternalEvent(isObmInternalEvent);
 		converted.setType(EventType.VEVENT);
 		
@@ -154,13 +154,13 @@ public class MSEventToObmEventConverter {
 	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
 	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
 	// optional.
-	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) 
+	private Event convertEventOne(User user, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) 
 			throws org.obm.push.exception.IllegalMSEventStateException {
 		
 		Event e = new Event();
-		fillEventCommonProperties(bs, e, oldEvent, null, data, isObmInternalEvent);
+		fillEventCommonProperties(user, e, oldEvent, null, data, isObmInternalEvent);
 		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
-		defineOrganizer(e, data, bs);
+		defineOrganizer(user, e, data);
 		convertTimeZone(data, e);
 		return e;
 	}
@@ -168,21 +168,13 @@ public class MSEventToObmEventConverter {
 	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
 	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
 	// optional.
-	private Event convertEventException(BackendSession bs, Event oldEvent, Event parentEvent, 
+	private Event convertEventException(User user, Event oldEvent, Event parentEvent, 
 			MSEventException data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
 		Event e = new Event();
-		fillEventCommonProperties(bs, e, oldEvent, parentEvent, data, isObmInternalEvent);
+		fillEventCommonProperties(user, e, oldEvent, parentEvent, data, isObmInternalEvent);
 		e.setRecurrenceId(data.getExceptionStartTime());
 		return e;
-	}
-
-	private void defineOwner(BackendSession bs, Event e, Event oldEvent) {
-		if (oldEvent != null) {
-			e.setOwnerEmail(oldEvent.getOwnerEmail());
-		} else{
-			e.setOwnerEmail(bs.getCredentials().getUser().getEmail());
-		}
 	}
 
 	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
@@ -369,6 +361,14 @@ public class MSEventToObmEventConverter {
 	}
 
 	
+	private void defineOwner(User user, Event e, Event oldEvent) {
+		if (oldEvent != null) {
+			e.setOwnerEmail(oldEvent.getOwnerEmail());
+		} else{
+			e.setOwnerEmail(user.getEmail());
+		}
+	}
+
 	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data)
 			throws IllegalMSEventExceptionStateException {
 		List<Attendee> ret = new LinkedList<Attendee>();
@@ -383,13 +383,13 @@ public class MSEventToObmEventConverter {
 		return ret;
 	}
 	
-	private void defineOrganizer(Event e, MSEvent data, BackendSession bs) {
+	private void defineOrganizer(User user, Event e, MSEvent data) {
 		if (e.findOrganizer() == null) {
 			if (data.getOrganizerEmail() != null) {
 				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
 				e.getAttendees().add(attendee);
 			} else {
-				e.getAttendees().add( getOrganizer(bs.getCredentials().getUser().getEmail(), data.getOrganizerName()) );
+				e.getAttendees().add( getOrganizer(user.getEmail(), data.getOrganizerName()) );
 			}	
 		}
 	}
