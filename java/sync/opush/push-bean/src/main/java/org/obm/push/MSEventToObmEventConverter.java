@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import static org.obm.push.utils.DateUtils.minutesToSeconds;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -49,6 +51,7 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceDayOfWeekConverter;
+import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
@@ -70,6 +73,7 @@ import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
@@ -85,7 +89,7 @@ public class MSEventToObmEventConverter {
 		EventExtId extId = event.getExtId();
 		EventObmId obmId = event.getObmId();
 		
-		Event e = convertEventOne(user, oldEvent, null, event, isObmInternalEvent);
+		Event e = convertMSEventToObmEvent(user, oldEvent, null, event, isObmInternalEvent);
 		e.setExtId(extId);
 		e.setUid(obmId);
 		
@@ -116,37 +120,39 @@ public class MSEventToObmEventConverter {
 	}
 
 	private void fillEventCommonProperties(User user, Event converted, Event oldEvent, Event parentEvent, 
-			MSEventCommon data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
+			MSEventCommon msEvent, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
-		defineOwner(user, converted, oldEvent);
+		assignOwner(user, converted, oldEvent);
 		converted.setInternalEvent(isObmInternalEvent);
 		converted.setType(EventType.VEVENT);
 		
-		convertSubject(parentEvent, data, converted);
+		converted.setTitle(convertSubject(parentEvent, msEvent));
 		
 		if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getDescription())) {
 			converted.setDescription(parentEvent.getDescription());
 		} else {
-			converted.setDescription(data.getDescription());
+			converted.setDescription(msEvent.getDescription());
 		}
 		
-		convertLocation(parentEvent, data, converted);
-		converted.setStartDate(data.getStartTime());
-		convertDtStamp(data, converted, oldEvent);
+		converted.setLocation(convertLocation(parentEvent, msEvent));
 		
-		convertDurationAttribute(data, converted);
-		convertAllDayAttribute(parentEvent, data, converted);
-		convertCategories(parentEvent, data, converted);
-		convertMeetingStatus(data, converted);
+		converted.setTimeUpdate(msEvent.getDtStamp());
+		converted.setTimeCreate(convertDtStamp(msEvent, oldEvent));
+		
+		converted.setDuration(convertDuration(msEvent));
+		converted.setAllday(convertAllDay(parentEvent, msEvent));
+		converted.setStartDate(convertStartTime(msEvent));
+		converted.setCategory(convertCategories(parentEvent, msEvent));
+		converted.setMeetingStatus(convertMeetingStatus(msEvent));
+		
+		converted.setAlert(convertReminder(parentEvent, msEvent));
 
-		convertReminder(parentEvent, data, converted);
+		converted.setOpacity(convertBusyStatus(parentEvent, msEvent));
 
-		convertBusyStatus(parentEvent, data, converted);
-
-		if (data.getSensitivity() == null && parentEvent != null) {
+		if (msEvent.getSensitivity() == null && parentEvent != null) {
 			converted.setPrivacy(parentEvent.getPrivacy());
 		} else {
-			converted.setPrivacy(privacy(oldEvent, data.getSensitivity()));
+			converted.setPrivacy(privacy(oldEvent, msEvent.getSensitivity()));
 		}
 		
 	}
@@ -154,14 +160,14 @@ public class MSEventToObmEventConverter {
 	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
 	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
 	// optional.
-	private Event convertEventOne(User user, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) 
+	private Event convertMSEventToObmEvent(User user, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) 
 			throws org.obm.push.exception.IllegalMSEventStateException {
-		
+
 		Event e = new Event();
 		fillEventCommonProperties(user, e, oldEvent, null, data, isObmInternalEvent);
 		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
-		defineOrganizer(user, e, data);
-		convertTimeZone(data, e);
+		e.setTimezoneName(convertTimeZone(data));
+		assignOrganizer(user, e, data);
 		return e;
 	}
 
@@ -218,41 +224,45 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
-	private void convertLocation(Event parentEvent, MSEventCommon data, Event converted) {
+	private String convertLocation(Event parentEvent, MSEventCommon data) {
 		if (!Strings.isNullOrEmpty(data.getLocation())) {
-			converted.setLocation(data.getLocation());
+			return data.getLocation();
 		} else if (parentEvent != null) {
-			converted.setLocation(parentEvent.getLocation());
+			return parentEvent.getLocation();
+		} else {
+			return null;
 		}
 	}
 
-	private void convertReminder(Event parentEvent, MSEventCommon data, Event converted) {
+	private Integer convertReminder(Event parentEvent, MSEventCommon data) {
 		if (data.getReminder() != null) {
-			converted.setAlert(data.getReminder() * 60);
+			return (int) minutesToSeconds(data.getReminder());
 		} else if (parentEvent != null) {
-			converted.setAlert(parentEvent.getAlert());
+			return parentEvent.getAlert();
+		} else {
+			return null;
 		}
 	}
 
-	private void convertSubject(Event parentEvent, MSEventCommon data, Event converted) throws IllegalMSEventStateException {
+	private String convertSubject(Event parentEvent, MSEventCommon data) throws IllegalMSEventStateException {
 		if (!Strings.isNullOrEmpty(data.getSubject())) {
-			converted.setTitle(data.getSubject());
+			return data.getSubject();
 		} else if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getTitle())) {
-			converted.setTitle(parentEvent.getTitle());
+			return parentEvent.getTitle();
 		} else {
 			throw new IllegalMSEventStateException("Subject is required");
 		}
 	}
 
-	private void convertMeetingStatus(MSEventCommon data, Event converted) {
-		if (data.getMeetingStatus() == null) {
-			converted.setMeetingStatus(null);
+	private EventMeetingStatus convertMeetingStatus(MSEventCommon data) {
+		if (data.getMeetingStatus() != null) {
+			return convertMeetingStatus(data.getMeetingStatus());
 		} else {
-			converted.setMeetingStatus(getMeetingStatus(data.getMeetingStatus()));
+			return null;
 		}
 	}
 
-	private EventMeetingStatus getMeetingStatus(CalendarMeetingStatus meetingStatus) {
+	private EventMeetingStatus convertMeetingStatus(CalendarMeetingStatus meetingStatus) {
 		switch (meetingStatus) {
 		case IS_A_MEETING:
 			return EventMeetingStatus.IS_A_MEETING;
@@ -269,81 +279,75 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
-	private void convertDtStamp(MSEventCommon data, Event converted, Event oldEvent) {
-		converted.setTimeUpdate(data.getDtStamp());
-		if (oldEvent != null) {
-			converted.setTimeCreate(oldEvent.getTimeCreate());
-		}
-		if (converted.getTimeCreate()==null) {
-			converted.setTimeCreate(data.getDtStamp());
+	private Date convertDtStamp(MSEventCommon data, Event oldEvent) {
+		if (oldEvent != null && oldEvent.getTimeCreate() != null) {
+			return oldEvent.getTimeCreate();
+		} else {
+			return data.getDtStamp();
 		}
 	}
 
-	private EventRecurrence getRecurrence(MSEvent msev) throws IllegalMSEventRecurrenceException {
-		Date startDate = msev.getStartTime();
-		MSRecurrence pr = msev.getRecurrence();
-		EventRecurrence or = new EventRecurrence();
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+	private EventRecurrence getRecurrence(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
+		EventRecurrence convertedRecurrence = convertRecurrenceType(msEventRecurrence);
+		convertedRecurrence.setFrequence(convertRecurrenceInterval(msEventRecurrence));
+		convertedRecurrence.setEnd(calculateNewRecurrenceEndDate(msEvent));
+		return convertedRecurrence;
+	}
 
-		int multiply = 0;
-		switch (pr.getType()) {
+	private EventRecurrence convertRecurrenceType(MSRecurrence msEventRecurrence) throws IllegalMSEventRecurrenceException {
+		EventRecurrence convertedRecurrence = new EventRecurrence();
+		switch (msEventRecurrence.getType()) {
 		case DAILY:
-			or.setKind(RecurrenceKind.daily);
-			or.setDays(dailyToDays(pr.getDayOfWeek()));
-			multiply = Calendar.DAY_OF_MONTH;
+			convertedRecurrence.setKind(RecurrenceKind.daily);
+			convertedRecurrence.setDays(dailyToDays(msEventRecurrence.getDayOfWeek()));
 			break;
 		case MONTHLY:
-			or.setKind(RecurrenceKind.monthlybydate);
-			multiply = Calendar.MONTH;
+			convertedRecurrence.setKind(RecurrenceKind.monthlybydate);
 			break;
 		case MONTHLY_NDAY:
-			or.setKind(RecurrenceKind.monthlybyday);
-			multiply = Calendar.MONTH;
+			convertedRecurrence.setKind(RecurrenceKind.monthlybyday);
 			break;
 		case WEEKLY:
-			or.setKind(RecurrenceKind.weekly);
-			if (pr.getDayOfWeek() == null || pr.getDayOfWeek().isEmpty()) {
+			convertedRecurrence.setKind(RecurrenceKind.weekly);
+			if (msEventRecurrence.getDayOfWeek() == null || msEventRecurrence.getDayOfWeek().isEmpty()) {
 				throw new IllegalMSEventRecurrenceException("Weekly recurrence need DayOfWeek attribute");
 			}
-			or.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(pr.getDayOfWeek()));
-			multiply = Calendar.WEEK_OF_YEAR;
+			convertedRecurrence.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(msEventRecurrence.getDayOfWeek()));
+			convertedRecurrence.setKind(RecurrenceKind.weekly);
 			break;
 		case YEARLY:
-			if (pr.getDayOfMonth() == null || pr.getMonthOfYear() == null) {
-				throw new IllegalMSEventRecurrenceException("Yearly recurrence need DayOfMonth and MonthOfYear attributes");
-			}
-			or.setKind(RecurrenceKind.yearly);
-			cal.setTimeInMillis(startDate.getTime());
-			cal.set(Calendar.DAY_OF_MONTH, pr.getDayOfMonth());
-			cal.set(Calendar.MONTH, pr.getMonthOfYear() - 1);
-			msev.setStartTime(cal.getTime());
-			startDate = msev.getStartTime();
-			multiply = Calendar.YEAR;
+			convertedRecurrence.setKind(RecurrenceKind.yearly);
 			break;
 		case YEARLY_NDAY:
-			or.setKind(RecurrenceKind.yearlybyday);
-			multiply = Calendar.YEAR;
+			convertedRecurrence.setKind(RecurrenceKind.yearlybyday);
 			break;
 		}
+		return convertedRecurrence;
+	}
+	
+	private Date calculateNewRecurrenceEndDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
+		boolean hasOccurences = msEventRecurrence.hasOccurences();
 
-		// interval
-		convertRecurrenceInterval(pr, or);
-
-		// occurence or end date
-		Date endDate = null;
-		boolean hasOccurences = pr.hasOccurences();
-		if (hasOccurences && pr.getUntil() != null) {
+		if (hasOccurences && msEventRecurrence.getUntil() != null) {
 			throw new IllegalMSEventRecurrenceException("Recurrence cannot has Until AND Occurences");
 		} else if (hasOccurences) {
-			cal.setTimeInMillis(startDate.getTime());
-			cal.add(multiply, pr.getOccurrences() - 1);
-			endDate = new Date(cal.getTimeInMillis());
+			moveRecurrentEventStartDate(msEvent);
+			return calculateRecurrenceEndDateByOccurences(msEventRecurrence, msEvent.getStartTime());
 		} else {
-			endDate = pr.getUntil();
+			return msEventRecurrence.getUntil();
 		}
-		or.setEnd(endDate);
+	}
 
-		return or;
+	private Date calculateRecurrenceEndDateByOccurences(MSRecurrence msEventRecurrence, Date startDate)
+			throws IllegalMSEventRecurrenceException {
+		
+		int multiplyField = findEndTimeMultiplyCalendarField(msEventRecurrence);
+		Calendar cal = eventCalendarInstance();
+		cal.setTimeInMillis(startDate.getTime());
+		cal.add(multiplyField, msEventRecurrence.getOccurrences() - 1);
+		return new Date(cal.getTimeInMillis());
 	}
 
 	private RecurrenceDays dailyToDays(Set<RecurrenceDayOfWeek> daysOfWeek) {
@@ -354,14 +358,53 @@ public class MSEventToObmEventConverter {
         }
 	}
 	
-	private void convertRecurrenceInterval(MSRecurrence from, EventRecurrence to) throws IllegalMSEventRecurrenceException {
+	private void moveRecurrentEventStartDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+		if (msEvent.getRecurrence().getType() == RecurrenceType.YEARLY) {
+			moveRecurrentYearlyEventStartDate(msEvent);
+		}
+	}
+
+	private void moveRecurrentYearlyEventStartDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
+		if (msEventRecurrence.getDayOfMonth() == null || msEventRecurrence.getMonthOfYear() == null) {
+			throw new IllegalMSEventRecurrenceException("Yearly recurrence need DayOfMonth and MonthOfYear attributes");
+		}
+		Calendar cal = eventCalendarInstance();
+		cal.setTimeInMillis(msEvent.getStartTime().getTime());
+		cal.set(Calendar.DAY_OF_MONTH, msEventRecurrence.getDayOfMonth());
+		cal.set(Calendar.MONTH, msEventRecurrence.getMonthOfYear() - 1);
+		msEvent.setStartTime(cal.getTime());
+	}
+
+	private int findEndTimeMultiplyCalendarField(MSRecurrence msEventRecurrence) throws IllegalMSEventRecurrenceException {
+		Preconditions.checkNotNull(msEventRecurrence.getType(), "Recurrence type should not be null");
+		
+		switch (msEventRecurrence.getType()) {
+		case DAILY:
+			return Calendar.DAY_OF_MONTH;
+		case MONTHLY:
+			return Calendar.MONTH;
+		case MONTHLY_NDAY:
+			return Calendar.MONTH;
+		case WEEKLY:
+			return Calendar.WEEK_OF_YEAR;
+		case YEARLY:
+			return Calendar.YEAR;
+		case YEARLY_NDAY:
+			return Calendar.YEAR;
+		}
+		throw new IllegalMSEventRecurrenceException(String.format(
+				"The recurrence type cannot be found, value:{%s}", String.valueOf(msEventRecurrence.getType())));
+	}
+
+	private Integer convertRecurrenceInterval(MSRecurrence from) throws IllegalMSEventRecurrenceException {
 		Integer interval = from.getInterval();
 		from.getType().validIntervalOrException(interval);
-		to.setFrequence(interval);
+		return interval;
 	}
 
 	
-	private void defineOwner(User user, Event e, Event oldEvent) {
+	private void assignOwner(User user, Event e, Event oldEvent) {
 		if (oldEvent != null) {
 			e.setOwnerEmail(oldEvent.getOwnerEmail());
 		} else{
@@ -383,7 +426,7 @@ public class MSEventToObmEventConverter {
 		return ret;
 	}
 	
-	private void defineOrganizer(User user, Event e, MSEvent data) {
+	private void assignOrganizer(User user, Event e, MSEvent data) {
 		if (e.findOrganizer() == null) {
 			if (data.getOrganizerEmail() != null) {
 				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
@@ -394,11 +437,11 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
-	private void convertTimeZone(MSEvent from, Event to) {
+	private String convertTimeZone(MSEvent from) {
 		if (from.getTimeZone() != null) {
-			to.setTimezoneName(from.getTimeZone().getID());
+			return from.getTimeZone().getID();
 		} else {
-			to.setTimezoneName(null);
+			return null;
 		}
 	}
 	
@@ -436,36 +479,40 @@ public class MSEventToObmEventConverter {
 		}
 	}
 
-	private void convertBusyStatus(Event parentEvent, MSEventCommon from, Event to) {
+	private EventOpacity convertBusyStatus(Event parentEvent, MSEventCommon from) {
 		if (from.getBusyStatus() != null) {
-			convertBusyStatus(from, to);
+			return convertBusyStatus(from);
 		} else if (parentEvent != null) {
-			to.setOpacity(parentEvent.getOpacity());
-		}
-	}
-	
-	private void convertBusyStatus(MSEventCommon from, Event to) {
-		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
-			to.setOpacity(EventOpacity.TRANSPARENT);
+			return parentEvent.getOpacity();
 		} else {
-			to.setOpacity(EventOpacity.OPAQUE);
+			return EventOpacity.OPAQUE;
 		}
 	}
 	
-	private void convertCategories(Event parentEvent, MSEventCommon from, Event to) throws IllegalMSEventStateException {
+	private EventOpacity convertBusyStatus(MSEventCommon from) {
+		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
+			return EventOpacity.TRANSPARENT;
+		} else {
+			return EventOpacity.OPAQUE;
+		}
+	}
+	
+	private String convertCategories(Event parentEvent, MSEventCommon from) throws IllegalMSEventStateException {
 		if (eventHasCategories(from)) {
-			convertCategories(from, to);
+			return convertCategories(from);
 		} else if (parentEvent != null) {
-			to.setCategory(parentEvent.getCategory());
+			return parentEvent.getCategory();
+		} else {
+			return null;
 		}
 	}
 	
-	private void convertCategories(MSEventCommon from, Event to) throws IllegalMSEventStateException {
-		checkEventCategoriesValidity(from);
-		to.setCategory(Iterables.getFirst(from.getCategories(), null));
+	private String convertCategories(MSEventCommon from) throws IllegalMSEventStateException {
+		assertEventCategoriesValidity(from);
+		return Iterables.getFirst(from.getCategories(), null);
 	}
 
-	private void checkEventCategoriesValidity(MSEventCommon event) throws IllegalMSEventStateException {
+	private void assertEventCategoriesValidity(MSEventCommon event) throws IllegalMSEventStateException {
 		if (event.getCategories().size() > EVENT_CATEGORIES_MAX) {
 			String msg = String.format("Categories MUST NOT contain more than 300 elements, found:%d",
 					event.getCategories().size());
@@ -477,18 +524,13 @@ public class MSEventToObmEventConverter {
 		return event.getCategories() != null && !event.getCategories().isEmpty();
 	}
 
-	private void convertAllDayAttribute(Event parentEvent, MSEventCommon from, Event to) {
+	private boolean convertAllDay(Event parentEvent, MSEventCommon from) {
 		if (from.getAllDayEvent() != null) {
-			to.setAllday(isAllDayEvent(from));
+			return isAllDayEvent(from);
 		} else if (parentEvent != null) {
-			to.setAllday(parentEvent.isAllday());
-		}
-		convertStartTimeByAllDay(to);
-	}
-
-	private void convertStartTimeByAllDay(Event event) {
-		if (event.isAllday()) {
-			event.setStartDate(DateUtils.getMidnightOfDayEarly(event.getStartDate()));
+			return parentEvent.isAllday();
+		} else {
+			return false;
 		}
 	}
 
@@ -496,35 +538,47 @@ public class MSEventToObmEventConverter {
 		return Objects.firstNonNull(from.getAllDayEvent(), false);
 	}
 
-	private void convertDurationAttribute(MSEventCommon data, Event converted) throws IllegalMSEventStateException {
-		if (isAllDayEvent(data)) {
-			converted.setDuration(EVENT_ALLDAY_DURATION_IN_MS);
+	private Date convertStartTime(MSEventCommon from) {
+		if (isAllDayEvent(from)) {
+			return DateUtils.getMidnightOfDayEarly(from.getStartTime());
 		} else {
-			convertDurationAttributeByStartTime(data, converted);
+			return from.getStartTime();
+		}
+	}
+
+	private int convertDuration(MSEventCommon data) throws IllegalMSEventStateException {
+		if (isAllDayEvent(data)) {
+			return EVENT_ALLDAY_DURATION_IN_MS;
+		} else {
+			return convertDurationAttributeByStartTime(data);
 		}
 	}
 	
-	private void convertDurationAttributeByStartTime(MSEventCommon data, Event converted) throws IllegalMSEventStateException {
-		checkEventTimesValidity(data);
+	private int convertDurationAttributeByStartTime(MSEventCommon data) throws IllegalMSEventStateException {
+		assertEventTimesValidity(data);
 		
 		int duration = (int) ((data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000);
-		converted.setDuration(duration);
+		return duration;
 	}
 	
-	private void checkEventTimesValidity(MSEventCommon event) throws IllegalMSEventStateException {
-		if (!eventHasAStartTime(event)) {
+	private void assertEventTimesValidity(MSEventCommon event) throws IllegalMSEventStateException {
+		if (!eventHasStartTime(event)) {
 			throw new IllegalMSEventStateException("StartTime is required");
-		} else if (!isAllDayEvent(event) && !eventHasAEndTime(event)) {
+		} else if (!isAllDayEvent(event) && !eventHasEndTime(event)) {
 			throw new IllegalMSEventStateException("If not AllDayEvent then EndTime is required");
 		}
 	}
 
-	private boolean eventHasAStartTime(MSEventCommon event) {
+	private boolean eventHasStartTime(MSEventCommon event) {
 		return event.getStartTime() != null;
 	}
 	
-	private boolean eventHasAEndTime(MSEventCommon event) {
+	private boolean eventHasEndTime(MSEventCommon event) {
 		return event.getEndTime() != null;
+	}
+
+	private Calendar eventCalendarInstance() {
+		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	}
 
 	private void assertExceptionValidity(MSEventException exception) throws IllegalMSEventExceptionStateException {
