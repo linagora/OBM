@@ -431,6 +431,20 @@ class shareCalendarMailer extends OBM_Mailer {
       array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
     $this->body = array('user' => $user, 'url' => $this->getHtmlCalUri($user)); 
   }
+  
+  public function userShareFreebusy($user) {
+  	$this->from = $this->getSender();
+  	$this->subject = __('Partage de l\'agenda des disponibilités : %firstname% %name%',
+  	array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
+  	$this->body = array('user' => $user, 'url' => $this->getFreebusyCalUri($user));
+  	
+  	if ($this->attachVcard) {
+  		$this->attachments[] = array(
+  	        'content' => (string) $this->generateVcard($user), 
+  	        'filename' => 'contact.vcf', 'content_type' => 'text/x-vcard'
+  		);
+  	}
+  } 
 
   public function userShareIcs($user) {
     $this->from = $this->getSender();
@@ -486,6 +500,11 @@ class shareCalendarMailer extends OBM_Mailer {
     $card[] = new Vpdi_Property('caluri', $this->getCalUri($user));
     
     return $card;
+  }
+  
+  private function getFreebusyCalUri($user) {
+  	return $GLOBALS['cgp_host'].'calendar/calendar_freebusy_export.php?action=freebusy_export'
+  	.'&email='.urlencode($user['email']);
   }
   
   private function getCalUri($user) {

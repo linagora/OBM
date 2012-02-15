@@ -843,13 +843,17 @@ function showSharePopup(type,format,token, userEmail){
   var elem = new Element('a');
   if(type=='private'){
     var text = \"$l_share_calendar_private\";
-  } else {
+  } else if(type=='public') {
     var text = \"$l_share_calendar_public\";
+  }else {
+  	var text = \"$l_share_calendar_freebusy\";
+  	url+='calendar/calendar_freebusy_export.php?action=freebusy_export&email='+encodeURI(userEmail);
+    elem.setProperty('href',url).appendText(url);		
   }
-  if(format=='Ics'){
+  if(format=='Ics' & type != 'freebusy'){
     url+='calendar/calendar_render.php?action=ics_export&externalToken='+token+'&email='+encodeURI(userEmail);
     elem.setProperty('href',url).appendText(url);
-  } else {
+  } else if(format=='Html'){
     url+='calendar/calendar_render.php?externalToken='+token;
     elem.setProperty('href',url).appendText(url);
   }
@@ -885,9 +889,12 @@ function sendSharePopup(type,format){
   if(type=='private'){
     var title = \"$l_send_calendar_private\";
     var text = \"$l_desc_share_adresse_private\";
-  } else {
+  } else if(type=='public'){
     var title = \"$l_send_calendar_public\";
     var text = \"$l_desc_share_adresse_public\";
+  } else {
+    var title = \"$l_send_calendar_freebusy\";
+    var text = \"$l_desc_share_adresse_freebusy\";
   }
   var div = new Element('div').setProperty('id','sharePopup')
                               .setProperty('class','obmPopup')

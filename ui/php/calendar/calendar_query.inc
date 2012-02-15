@@ -7291,6 +7291,7 @@ function run_query_writable_calendars($obm_user_id, $selected_calendars) {
   return $writable_calendars;
 }
 
+
 function run_query_get_recurring_event_id_from_ext_id($ext_id, $obm_user_id) {
   global $cdg_sql;
   $query = "SELECT e.event_id AS event_id
@@ -7309,6 +7310,21 @@ function run_query_get_recurring_event_id_from_ext_id($ext_id, $obm_user_id) {
     $event_id = $obm_q->f('event_id');
   }
   return $event_id;
+}
+
+# Get the user id from the email adress 
+# return the user id or false 
+function get_userid_from_mail($mail){
+	list($left,$right) = split('@',$mail);
+	
+	$query = "SELECT userobm_id FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE userobm_email #LIKE '$left' AND domain_name #LIKE '$right' ";
+	
+	$obm_q = new DB_OBM;
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return ($obm_q->f('userobm_id')) ? $obm_q->f('userobm_id') : false ;
+	
+
 }
 
 ?>

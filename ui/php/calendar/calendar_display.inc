@@ -8084,6 +8084,8 @@ function html_share_calendar($id,$name) {
 
   //$params = get_calendar_entity_share($id,$entity_type);
   $share_pop_up = html_share_popup($params['accept_public']); 
+  //get the Calendar public freebusy preferences of the current user
+  $user_pref = get_one_user_pref($id, 'set_public_fb');
   $block = "
       $user
       <table class=\"spreadSheet share\">
@@ -8101,7 +8103,24 @@ function html_share_calendar($id,$name) {
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody> ";
+  
+  // test if the OBM freebusy information charing is permitted for the current user
+  if($user_pref[$id]['value'] == 'yes'){
+  	$block .= "
+    	      <tr>
+              <th>$GLOBALS[l_share_freebusy]
+              <div class=\"sharedesc\">
+                  <a id=\"tooltip_freebusy\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
+                </div>
+              </th>
+              <td>
+                <a href=\"javascript: getShareUrl('freebusy','Ics');\" title=\"$GLOBALS[l_share_calendar_freebusy]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+                <a href=\"javascript: sendSharePopup('freebusy','Freebusy');\" title=\"$GLOBALS[l_send_calendar_freebusy]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>
+              </td><td></td><td></td>
+            </tr>";
+  }
+  $block .="
           <tr>
             <th>
               $GLOBALS[l_share_calendar_public]
@@ -8118,7 +8137,7 @@ function html_share_calendar($id,$name) {
               <a href=\"javascript: sendSharePopup('public','Html');\" title=\"$GLOBALS[l_send_calendar_public]\" style=\"$mail_display_css\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
             </td>
             <td>
-              <a href=\"javascript: reinitSharePopup('public');\"><label>$GLOBALS[l_share_reinit_public]</label></a>               
+              <a href=\"javascript: reinitSharePopup('public');\"><label>$GLOBALS[l_share_reinit_public]</label></a>
             </td>
           </tr>
           <tr>
@@ -8139,7 +8158,9 @@ function html_share_calendar($id,$name) {
             <td>
               <a href=\"javascript: reinitSharePopup('private');\"><label>$GLOBALS[l_share_reinit_private]</label></a>               
             </td>
-          </tr>
+          </tr>";
+  
+  $block .="
         </tbody>
       </table>
       <input id=\"share_entity_id\" type=\"hidden\" value=\"$id\"/>
@@ -8148,8 +8169,10 @@ function html_share_calendar($id,$name) {
         window.addEvent('domready', function() {
           $('tooltip_public').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_public]</label>\");
           $('tooltip_private').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_private]</label>\");
+          $('tooltip_freebusy').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_freebusy]</label>\");
           new Obm.Tip($('tooltip_public'), {fixed:false, click:false}, 'shareTip');
           new Obm.Tip($('tooltip_private'), {fixed:false, click:false}, 'shareTip');
+          new Obm.Tip($('tooltip_freebusy'), {fixed:false, click:false}, 'shareTip');
         });
       </script>
       $share_pop_up

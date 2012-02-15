@@ -65,11 +65,11 @@ page_open(array('sess' => 'OBM_Session', 'auth' => 'OBM_Token_Auth', 'perm' => '
 include("$obminclude/global_pref.inc");
 require('calendar_query.inc');
 require_once("$obminclude/of/of_contact.php");
-
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
 if (isset($_SESSION['set_cal_first_hour'])) {
   $ccalendar_first_hour = $_SESSION['set_cal_first_hour'];
+ 
 }
 if (isset($_SESSION['set_cal_last_hour'])) {
   $ccalendar_last_hour = $_SESSION['set_cal_last_hour'];
@@ -137,7 +137,8 @@ if ($action == 'ics_export') {
   # Remove the session to force auth next time (Mantis #3007)
   $sess->delete();
   exit();
-}
+  
+} 
 
 $GLOBALS['js']['vars']['conf']['displayRange'] = 'true';
 
@@ -290,7 +291,7 @@ function get_calendar_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
-
+  
   // PDF export options form
   $actions['calendar']['pdf_export_form'] = array (
     'Url'      => "$path/calendar/calendar_render.php?action=pdf_export_form&amp;date=$date&output_target=print",

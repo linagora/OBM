@@ -192,7 +192,7 @@ if ($popup) {
     // display_end();
   } elseif ($action == 'ics_export') {
     dis_calendar_export_handle($params);
-  } 
+  }
   exit();
 }
 
@@ -1370,7 +1370,7 @@ if (!$params['ajax']) {
 } elseif ($action == 'send_url') {
 ///////////////////////////////////////////////////////////////////////////////
   if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params)) {
-    $format = $params['format'];
+  	$format = $params['format'];
     $params['others_attendees'][]=$params['mail'];
     $entity = get_user_info($params['entity_id']);
     $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
