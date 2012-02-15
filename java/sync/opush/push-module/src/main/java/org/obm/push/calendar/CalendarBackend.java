@@ -52,6 +52,8 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.push.exception.MSObjectException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -299,7 +301,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException {
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, MSObjectException {
 
 		AccessToken token = login(bs);
 		
@@ -395,7 +397,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event convertMSObjectToObmObject(BackendSession bs,
-			IApplicationData data, Event oldEvent, boolean isInternal) {
+			IApplicationData data, Event oldEvent, boolean isInternal) throws IllegalMSEventStateException {
 		return eventConverter.convert(bs, oldEvent, (MSEvent) data, isInternal);
 	}
 	
@@ -439,7 +441,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	public String handleMeetingResponse(BackendSession bs, MSEmail invitation, AttendeeStatus status) 
-			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException, ItemNotFoundException {
+			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
+			ItemNotFoundException, IllegalMSEventStateException {
 		
 		MSEvent event = invitation.getInvitation();
 		AccessToken at = login(bs);
@@ -459,7 +462,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event, AccessToken at) 
-			throws UnexpectedObmSyncServerException, EventNotFoundException {
+			throws UnexpectedObmSyncServerException, EventNotFoundException, IllegalMSEventStateException {
 		
 		try {
 			Event obmEvent = getEventFromExtId(bs, event, at);

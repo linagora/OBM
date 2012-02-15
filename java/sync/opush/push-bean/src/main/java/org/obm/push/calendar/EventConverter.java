@@ -39,6 +39,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
+import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 
@@ -85,7 +86,7 @@ public class EventConverter {
 		return event != null ? event.isInternalEvent() : defaultValue;
 	}
 
-	public Event convert(BackendSession bs, Event oldEvent, MSEvent data, boolean isInternal) {
+	public Event convert(BackendSession bs, Event oldEvent, MSEvent data, boolean isInternal) throws IllegalMSEventStateException {
 		return msEventConverter.convert(bs, oldEvent, data, isInternal);
 	}
 

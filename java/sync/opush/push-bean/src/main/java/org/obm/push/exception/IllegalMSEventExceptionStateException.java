@@ -29,32 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.backend;
+package org.obm.push.exception;
 
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.exception.CollectionPathException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.MSObjectException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
-import org.obm.push.exception.activesync.NotAllowedException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
+public class IllegalMSEventExceptionStateException extends IllegalMSEventStateException {
 
-public interface IContentsImporter {
+	public IllegalMSEventExceptionStateException() {
+		super();
+	}
 
-	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, MSObjectException;
+	public IllegalMSEventExceptionStateException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException;
+	public IllegalMSEventExceptionStateException(String message) {
+		super(message);
+	}
 
-	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
-
-	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
-			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, CollectionPathException;
-	
+	public IllegalMSEventExceptionStateException(Throwable cause) {
+		super(cause);
+	}
 }

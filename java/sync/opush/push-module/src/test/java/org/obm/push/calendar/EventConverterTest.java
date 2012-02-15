@@ -57,6 +57,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.User;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -85,7 +86,8 @@ public class EventConverterTest {
 	}
 
 	@Test
-	public void testAttendeesWithNoOrganizerInNewEventStream() throws SAXException, IOException, FactoryConfigurationError {
+	public void testAttendeesWithNoOrganizerInNewEventStream() 
+			throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
 		String loginAtDomain = "jribiera@obm.lng.org";
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
@@ -106,7 +108,7 @@ public class EventConverterTest {
 	}
 	
 	@Test
-	public void testAttendeesWithOrganizerEmailInNewEventStream() throws SAXException, IOException, FactoryConfigurationError {
+	public void testAttendeesWithOrganizerEmailInNewEventStream() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
 		String loginAtDomain = "jribier@obm.lng.org";
 		BackendSession backendSession = buildBackendSession(loginAtDomain);
 		
@@ -128,7 +130,7 @@ public class EventConverterTest {
 
 	@Ignore("FIXME for OBMFULL-2728")
 	@Test
-	public void testConvertUpdateOneOnlyExceptionEvent() throws SAXException, IOException, FactoryConfigurationError {
+	public void testConvertUpdateOneOnlyExceptionEvent() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
 		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
 		IApplicationData  oldData = getApplicationData("samecase/new-event-with-exception.xml");
 		Event oldEvent = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org"), null, (MSEvent) oldData, true);
@@ -151,7 +153,7 @@ public class EventConverterTest {
 	}
 	
 	@Test
-	public void testOwnerloginIsNotEqualsToOwnerEmail() throws SAXException, IOException, FactoryConfigurationError {
+	public void testOwnerloginIsNotEqualsToOwnerEmail() throws SAXException, IOException, FactoryConfigurationError, IllegalMSEventStateException {
 		String loginAtDomain = "LOGIN@obm.lng.org";
 		String email = "EMAIL@obm.lng.org";
 		String displayName = "displayName";

@@ -40,6 +40,7 @@ import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.MSObjectException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -51,7 +52,7 @@ public interface PIMBackend {
 	String createOrUpdate(BackendSession bs, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException;
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, MSObjectException;
 	
 	String move(BackendSession bs, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,
