@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.obm.push.EventConverter;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;

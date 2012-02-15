@@ -29,7 +29,6 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push;
 
 import java.util.Calendar;
@@ -38,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -48,6 +46,7 @@ import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeekUtils;
+import org.obm.push.calendar.EventConverter;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -60,10 +59,204 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
-/**
- * Convert events between OBM-Sync object model & Microsoft object model
- */
-public class EventConverter {
+import com.google.inject.Singleton;
+
+@Singleton
+public class MSEventToObmEventConverter {
+
+	public Event convert(BackendSession bs, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) {
+		EventExtId extId = event.getExtId();
+		EventObmId obmId = event.getObmId();
+		
+		Event e = convertEventOne(bs, oldEvent, null, event, isObmInternalEvent);
+		e.setExtId(extId);
+		e.setUid(obmId);
+		
+		if(event.getObmSequence() != null){
+			e.setSequence(event.getObmSequence());
+		}
+		
+		if (event.getRecurrence() != null) {
+			EventRecurrence r = getRecurrence(event);
+			e.setRecurrence(r);
+			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
+				for (MSEventException excep : event.getExceptions()) {
+					if (!excep.isDeletedException()) {
+						
+						Event obmEvent = convertEventException(bs, oldEvent, e, excep, isObmInternalEvent);
+						obmEvent.setExtId(extId);
+						obmEvent.setUid(obmId);
+						
+						r.addEventException(obmEvent);
+					} else {
+						r.addException(excep.getExceptionStartTime());
+					}
+				}
+			}
+		}
+
+		return e;
+	}
+
+	private void fillEventCommonProperties(BackendSession bs, Event e, Event oldEvent, Event parentEvent, 
+			MSEventCommon data, boolean isObmInternalEvent) {
+		
+		defineOwner(bs, e, oldEvent);
+		e.setInternalEvent(isObmInternalEvent);
+		e.setType(EventType.VEVENT);
+		
+		if (parentEvent != null && parentEvent.getTitle() != null && !parentEvent.getTitle().isEmpty()) {
+			e.setTitle(parentEvent.getTitle());
+		} else {
+			e.setTitle(data.getSubject());
+		}
+		
+		if (parentEvent != null && parentEvent.getDescription() != null && !parentEvent.getDescription().isEmpty()) {
+			e.setDescription(parentEvent.getDescription());
+		} else {
+			e.setDescription(data.getDescription());
+		}
+		
+		e.setLocation(data.getLocation());
+		e.setStartDate(data.getStartTime());
+		
+		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
+		e.setDuration(duration);
+		e.setAllday(data.getAllDayEvent() != null ? data.getAllDayEvent() : false);
+		
+		if (data.getReminder() != null && data.getReminder() > 0) {
+			e.setAlert(data.getReminder() * 60);
+		}
+
+		if (data.getBusyStatus() == null) {
+			if (parentEvent != null) {
+				e.setOpacity(parentEvent.getOpacity());
+			}
+		} else {
+			e.setOpacity(opacity(data.getBusyStatus()));
+		}
+
+		if (data.getSensitivity() == null && parentEvent != null) {
+			e.setPrivacy(parentEvent.getPrivacy());
+		} else {
+			e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
+		}
+		
+	}
+	
+	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
+	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
+	// optional.
+	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) {
+		Event e = new Event();
+		fillEventCommonProperties(bs, e, oldEvent, null, data, isObmInternalEvent);
+		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
+		defineOrganizer(e, data, bs);
+		return e;
+	}
+
+	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
+	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
+	// optional.
+	private Event convertEventException(BackendSession bs, Event oldEvent, Event parentEvent, 
+			MSEventException data, boolean isObmInternalEvent) {
+		
+		Event e = new Event();
+		fillEventCommonProperties(bs, e, oldEvent, parentEvent, data, isObmInternalEvent);
+		e.setRecurrenceId(data.getExceptionStartTime());
+		return e;
+	}
+
+	private void defineOwner(BackendSession bs, Event e, Event oldEvent) {
+		if (oldEvent != null) {
+			e.setOwnerEmail(oldEvent.getOwnerEmail());
+		} else{
+			e.setOwnerEmail(bs.getCredentials().getUser().getEmail());
+		}
+	}
+
+	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data) {
+		List<Attendee> ret = new LinkedList<Attendee>();
+		if (parentEvent != null && data.getAttendees().isEmpty()) {
+			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
+			ret.addAll(parentEvent.getAttendees());
+		} else {
+			for (MSAttendee at: data.getAttendees()) {
+				ret.add( convertAttendee(oldEvent, data, at) );
+			}
+		}
+		return ret;
+	}
+	
+	private void defineOrganizer(Event e, MSEvent data, BackendSession bs) {
+		if (e.findOrganizer() == null) {
+			if (data.getOrganizerEmail() != null) {
+				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
+				e.getAttendees().add(attendee);
+			} else {
+				e.getAttendees().add( getOrganizer(bs.getCredentials().getUser().getEmail(), null) );
+			}	
+		}
+	}
+	
+	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) {
+		Attendee ret = new Attendee();
+		ret.setEmail(at.getEmail());
+		ret.setDisplayName(at.getName());
+		ret.setParticipationRole(ParticipationRole.REQ);
+		
+		ParticipationState status = EventConverter.getParticipationState( 
+				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
+		ret.setState(status);
+		
+		ret.setOrganizer( isOrganizer(event, at) );
+		return ret;
+	}
+
+	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
+		if (oldEvent != null) {
+			Attendee attendee = oldEvent.findAttendeeFromEmail(at.getEmail());
+			if (attendee != null) {
+				return attendee.getState();
+			}
+		}
+		return ParticipationState.NEEDSACTION;
+	}
+
+	private boolean isOrganizer(MSEvent event, MSAttendee at) {
+		if(at.getEmail() != null  && at.getEmail().equals(event.getOrganizerEmail())){
+			return true;
+		} else if(at.getName() != null  && at.getName().equals(event.getOrganizerName())){
+			return true;
+		}
+		return false;
+	}
+	
+	private Attendee getOrganizer(String email, String displayName) {
+		Attendee att = new Attendee();
+		att.setEmail(email);
+		att.setDisplayName(displayName);
+		att.setState(ParticipationState.ACCEPTED);
+		att.setParticipationRole(ParticipationRole.REQ);
+		att.setOrganizer(true);
+		return att;
+	}	
+	
+	private EventPrivacy privacy(Event oldEvent, CalendarSensitivity sensitivity) {
+		if (sensitivity == null) {
+			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
+		}
+		switch (sensitivity) {
+		case CONFIDENTIAL:
+		case PERSONAL:
+		case PRIVATE:
+			return EventPrivacy.PRIVATE;
+		case NORMAL:
+		default:
+			return EventPrivacy.PUBLIC;
+		}
+
+	}
 
 	private EventRecurrence getRecurrence(MSEvent msev) {
 		Date startDate = msev.getStartTime();
@@ -124,194 +317,7 @@ public class EventConverter {
 
 		return or;
 	}
-
-	public Event convert(BackendSession bs, Event oldEvent, MSEvent event, Boolean isObmInternalEvent) {
-		EventExtId extId = event.getExtId();
-		EventObmId obmId = event.getObmId();
-		
-		Event e = convertEventOne(bs, oldEvent, null, event, isObmInternalEvent);
-		e.setExtId(extId);
-		e.setUid(obmId);
-		
-		if(event.getObmSequence() != null){
-			e.setSequence(event.getObmSequence());
-		}
-		
-		if (event.getRecurrence() != null) {
-			EventRecurrence r = getRecurrence(event);
-			e.setRecurrence(r);
-			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
-				for (MSEventException excep : event.getExceptions()) {
-					if (!excep.isDeletedException()) {
-						
-						Event obmEvent = convertEventException(bs, oldEvent, e, excep, isObmInternalEvent);
-						obmEvent.setExtId(extId);
-						obmEvent.setUid(obmId);
-						
-						r.addEventException(obmEvent);
-					} else {
-						r.addException(excep.getExceptionStartTime());
-					}
-				}
-			}
-		}
-
-		return e;
-	}
-
-	private Event convertEventException(BackendSession bs, Event oldEvent, Event parentEvent, MSEventException data, boolean isObmInternalEvent) {
-		Event e = convertEventCommon(bs, oldEvent, parentEvent, data, isObmInternalEvent);
-		e.setRecurrenceId(data.getExceptionStartTime());
-		return e;
-	}
 	
-	private Event convertEventCommon(BackendSession bs, Event oldEvent, Event parentEvent, MSEventCommon data, boolean isObmInternalEvent) {
-		Event e = new Event();
-		defineOwner(bs, e, oldEvent);
-		e.setInternalEvent(isObmInternalEvent);
-		e.setType(EventType.VEVENT);
-		
-		if (parentEvent != null && parentEvent.getTitle() != null && !parentEvent.getTitle().isEmpty()) {
-			e.setTitle(parentEvent.getTitle());
-		} else {
-			e.setTitle(data.getSubject());
-		}
-		
-		if (parentEvent != null && parentEvent.getDescription() != null && !parentEvent.getDescription().isEmpty()) {
-			e.setDescription(parentEvent.getDescription());
-		} else {
-			e.setDescription(data.getDescription());
-		}
-		
-		e.setLocation(data.getLocation());
-		e.setStartDate(data.getStartTime());
-		
-		int duration = (int) (data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000;
-		e.setDuration(duration);
-		e.setAllday(data.getAllDayEvent() != null ? data.getAllDayEvent() : false);
-		
-		if (data.getReminder() != null && data.getReminder() > 0) {
-			e.setAlert(data.getReminder() * 60);
-		}
-
-		if (data.getBusyStatus() == null) {
-			if (parentEvent != null) {
-				e.setOpacity(parentEvent.getOpacity());
-			}
-		} else {
-			e.setOpacity(opacity(data.getBusyStatus()));
-		}
-
-		if (data.getSensitivity() == null && parentEvent != null) {
-			e.setPrivacy(parentEvent.getPrivacy());
-		} else {
-			e.setPrivacy(privacy(oldEvent, data.getSensitivity()));
-		}
-		
-		return e;
-	}
-	
-	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
-	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
-	// optional.
-	private Event convertEventOne(BackendSession bs, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) {
-		Event e = convertEventCommon(bs, oldEvent, parentEvent, data, isObmInternalEvent);
-		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
-		defineOrganizer(e, data, bs);
-		return e;
-	}
-
-	private void defineOwner(BackendSession bs, Event e, Event oldEvent) {
-		if (oldEvent != null) {
-			e.setOwnerEmail(oldEvent.getOwnerEmail());
-		} else{
-			e.setOwnerEmail(bs.getCredentials().getUser().getEmail());
-		}
-	}
-
-	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data) {
-		List<Attendee> ret = new LinkedList<Attendee>();
-		if (parentEvent != null && data.getAttendees().isEmpty()) {
-			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
-			ret.addAll(parentEvent.getAttendees());
-		} else {
-			for (MSAttendee at: data.getAttendees()) {
-				ret.add( convertAttendee(oldEvent, data, at) );
-			}
-		}
-		return ret;
-	}
-	
-	private void defineOrganizer(Event e, MSEvent data, BackendSession bs) {
-		if (e.findOrganizer() == null) {
-			if (data.getOrganizerEmail() != null) {
-				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
-				e.getAttendees().add(attendee);
-			} else {
-				e.getAttendees().add( getOrganizer(bs.getCredentials().getUser().getEmail(), null) );
-			}	
-		}
-	}
-	
-	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) {
-		Attendee ret = new Attendee();
-		ret.setEmail(at.getEmail());
-		ret.setDisplayName(at.getName());
-		ret.setParticipationRole(ParticipationRole.REQ);
-		
-		ParticipationState status = getParticipationState( 
-				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
-		ret.setState(status);
-		
-		ret.setOrganizer( isOrganizer(event, at) );
-		return ret;
-	}
-
-	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
-		if (oldEvent != null) {
-			Attendee attendee = oldEvent.findAttendeeFromEmail(at.getEmail());
-			if (attendee != null) {
-				return attendee.getState();
-			}
-		}
-		return ParticipationState.NEEDSACTION;
-	}
-
-	private boolean isOrganizer(MSEvent event, MSAttendee at) {
-		if(at.getEmail() != null  && at.getEmail().equals(event.getOrganizerEmail())){
-			return true;
-		} else if(at.getName() != null  && at.getName().equals(event.getOrganizerName())){
-			return true;
-		}
-		return false;
-	}
-	
-	private Attendee getOrganizer(String email, String displayName) {
-		Attendee att = new Attendee();
-		att.setEmail(email);
-		att.setDisplayName(displayName);
-		att.setState(ParticipationState.ACCEPTED);
-		att.setParticipationRole(ParticipationRole.REQ);
-		att.setOrganizer(true);
-		return att;
-	}	
-	
-	private EventPrivacy privacy(Event oldEvent, CalendarSensitivity sensitivity) {
-		if (sensitivity == null) {
-			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
-		}
-		switch (sensitivity) {
-		case CONFIDENTIAL:
-		case PERSONAL:
-		case PRIVATE:
-			return EventPrivacy.PRIVATE;
-		case NORMAL:
-		default:
-			return EventPrivacy.PUBLIC;
-		}
-
-	}
-
 	private EventOpacity opacity(CalendarBusyStatus busyStatus) {
 		switch (busyStatus) {
 		case FREE:
@@ -320,27 +326,4 @@ public class EventConverter {
 			return EventOpacity.OPAQUE;
 		}
 	}
-
-	public static ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
-		if (attendeeStatus == null) {
-			return oldParticipationState;
-		}
-		
-		switch (attendeeStatus) {
-		case DECLINE:
-			return ParticipationState.DECLINED;
-		case NOT_RESPONDED:
-		case RESPONSE_UNKNOWN:
-		case TENTATIVE:
-			return ParticipationState.NEEDSACTION;
-		default:
-		case ACCEPT:
-			return ParticipationState.ACCEPTED;
-		}
-	}
-	
-	public static boolean isInternalEvent(Event event, boolean defaultValue){
-		return event != null ? event.isInternalEvent() : defaultValue;
-	}
-	
 }
