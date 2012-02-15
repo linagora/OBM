@@ -12,3 +12,5 @@ ALTER TABLE P_Domain MODIFY domain_uuid CHAR(36) NOT NULL;
 UPDATE opush_sync_mail SET timestamp='1970-01-01 01:00:01' WHERE timestamp='0000-00-00 00:00:00';
 
 UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
+
+ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);

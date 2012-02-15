@@ -22,3 +22,5 @@ ALTER TABLE event ALTER event_privacy SET DEFAULT 0;
 ALTER TABLE event ALTER event_privacy SET NOT NULL;
 
 UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
+
+ALTER TABLE eventlink ADD COLUMN eventlink_comment VARCHAR(255);
