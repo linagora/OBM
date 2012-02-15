@@ -62,7 +62,7 @@ public abstract class Command<T> implements ICommand<T> {
 		sb.append(' ');
 		sb.append(cmd);
 		String sent = sb.toString();
-		imaplogger.info("{}", sent);
+		imaplogger.info(sent);
 		session.write(sent);
 		if (args.hasLiteralData()) {
 			lock(lock);
