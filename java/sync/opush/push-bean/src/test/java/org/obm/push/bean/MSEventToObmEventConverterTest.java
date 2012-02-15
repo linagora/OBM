@@ -799,10 +799,12 @@ public class MSEventToObmEventConverterTest {
 	@Test
 	public void testConvertExceptionAttributeDeletedTrue() throws IllegalMSEventStateException {
 		MSEventException msEventException = new MSEventException();
+		msEventException.setDtStamp(date("2004-12-10T11:15:10Z"));
 		msEventException.setStartTime(date("2004-12-11T11:15:10Z"));
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(true);
+		msEventException.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
 		msEventException.setSubject("Any Subject");
 		
 		MSEvent msEvent = new MSEventBuilder()
@@ -825,10 +827,12 @@ public class MSEventToObmEventConverterTest {
 	@Test
 	public void testConvertExceptionAttributeDeletedFalse() throws IllegalMSEventStateException {
 		MSEventException msEventException = new MSEventException();
+		msEventException.setDtStamp(date("2004-12-10T11:15:10Z"));
 		msEventException.setStartTime(date("2004-12-11T11:15:10Z"));
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(false);
+		msEventException.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
 		msEventException.setSubject("Any Subject");
 		
 		MSEvent msEvent = new MSEventBuilder()

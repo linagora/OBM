@@ -47,7 +47,7 @@ import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
-import org.obm.push.bean.RecurrenceDayOfWeekUtils;
+import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.sync.calendar.Attendee;
@@ -274,7 +274,7 @@ public class ObmEventToMsEventConverter {
 			break;
 		case weekly:
 			r.setType(RecurrenceType.WEEKLY);
-			r.setDayOfWeek(RecurrenceDayOfWeekUtils.fromRecurrenceDays(recurrence.getDays()));
+			r.setDayOfWeek(RecurrenceDayOfWeekConverter.fromRecurrenceDays(recurrence.getDays()));
 			break;
 		case yearly:
 			r.setType(RecurrenceType.YEARLY);

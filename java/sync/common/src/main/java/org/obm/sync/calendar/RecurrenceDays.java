@@ -43,6 +43,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 public class RecurrenceDays implements Set<RecurrenceDay> {
+	
+	public static final RecurrenceDays ALL_DAYS = new RecurrenceDays(RecurrenceDay.values());
+	
 	@Nonnull
 	private Set<RecurrenceDay> value;
 

@@ -39,7 +39,7 @@ import org.obm.sync.calendar.RecurrenceDays;
 
 import com.google.common.collect.Sets;
 
-public class RecurrenceDayOfWeekUtils {
+public class RecurrenceDayOfWeekConverter {
 	public static Set<RecurrenceDayOfWeek> fromRecurrenceDays(RecurrenceDays recurrenceDays) {
 		Set<RecurrenceDayOfWeek> recurrenceDaysOfWeek = Sets.newHashSet();
 		for (RecurrenceDay recurrenceDay : recurrenceDays) {

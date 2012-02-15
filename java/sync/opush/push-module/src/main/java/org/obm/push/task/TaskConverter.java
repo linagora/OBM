@@ -41,7 +41,7 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
-import org.obm.push.bean.RecurrenceDayOfWeekUtils;
+import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -132,7 +132,7 @@ public class TaskConverter {
 			break;
 		case weekly:
 			r.setType(RecurrenceType.WEEKLY);
-			r.setDayOfWeek(RecurrenceDayOfWeekUtils.fromRecurrenceDays(recurrence.getDays()));
+			r.setDayOfWeek(RecurrenceDayOfWeekConverter.fromRecurrenceDays(recurrence.getDays()));
 			break;
 		case yearly:
 			r.setType(RecurrenceType.YEARLY);
@@ -245,7 +245,7 @@ public class TaskConverter {
 		switch (pr.getType()) {
 		case DAILY:
 			or.setKind(RecurrenceKind.daily);
-			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
+			or.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(pr.getDayOfWeek()));
 			multiply = Calendar.DAY_OF_MONTH;
 			break;
 		case MONTHLY:
@@ -258,7 +258,7 @@ public class TaskConverter {
 			break;
 		case WEEKLY:
 			or.setKind(RecurrenceKind.weekly);
-			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
+			or.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(pr.getDayOfWeek()));
 			multiply = Calendar.WEEK_OF_YEAR;
 			break;
 		case YEARLY:

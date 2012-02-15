@@ -2,6 +2,8 @@ package org.obm.push.bean;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.TimeZone;
 
 import org.fest.assertions.Assertions;
@@ -13,7 +15,10 @@ import org.obm.push.exception.IllegalMSEventRecurrenceException;
 import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceKind;
+
+import com.google.common.collect.Sets;
 
 public class MSEventToObmEventConverterRecurrenceTest {
 
@@ -119,7 +124,6 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.yearly);
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
@@ -303,9 +307,8 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.yearlybyday);
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
-		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 
 	@Test
@@ -479,9 +482,8 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybydate);
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
-		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 	
 	@Test(expected=IllegalMSEventRecurrenceException.class)
@@ -647,9 +649,8 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
-		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 	
 	@Test(expected=IllegalMSEventRecurrenceException.class)
@@ -769,8 +770,239 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getDays()).isNull();
-		Assertions.assertThat(convertedRecurrence.getReadableRepeatDays()).isEmpty();
+		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
+	}
+
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeWeeklyNeedInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyInterval() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setOccurrences(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeWeeklyIntervalIllegal() throws IllegalMSEventStateException {
+		Integer weeklyIntervalShouldLessThan = 100;
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(weeklyIntervalShouldLessThan);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeWeeklyNeedDay() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(new HashSet<RecurrenceDayOfWeek>());
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+	
+	@Test
+	public void testConvertAttributeTypeWeekly() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
+		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.weekly);
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(daySetOf(RecurrenceDay.Friday));
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyUntil() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+	}
+	
+	@Test
+	public void testConvertAttributeTypeWeeklyUntilNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setUntil(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setOccurrences(5);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		Integer weeksNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Date untilDateExpected = addWeeksToDate(msEventRecurrent.getStartTime(), weeksNeededToContainsOccurrence);
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyOccurenceNull() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setOccurrences(null);
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
+	}
+	
+	@Test(expected=IllegalMSEventRecurrenceException.class)
+	public void testConvertAttributeTypeWeeklyUntilAndOccurence() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(1);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		recurrence.setOccurrences(3);
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		convertToOBMEvent(msEventRecurrent);
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyEachTwoMonday() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(2);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.MONDAY));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(daySetOf(RecurrenceDay.Monday));
+	}
+
+	@Test
+	public void testConvertAttributeTypeWeeklyEachFourFridayAndSundayUntilOneYear() throws IllegalMSEventStateException {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.WEEKLY);
+		recurrence.setInterval(4);
+		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY, RecurrenceDayOfWeek.SUNDAY));
+		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSEvent msEventRecurrent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withRecurrence(recurrence)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEventRecurrent);
+
+		EventRecurrence convertedRecurrence = converted.getRecurrence();
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(
+				daySetOf(RecurrenceDay.Friday, RecurrenceDay.Sunday));
 	}
 
 	private Calendar getInitializedCalendar(Date initTime) {
@@ -783,6 +1015,12 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		return converter.convert(bs, null, msEvent, false);
 	}
 
+	private Date addWeeksToDate(Date startTime, Integer weeks) {
+		Calendar cal = getInitializedCalendar(startTime);
+		cal.add(Calendar.WEEK_OF_YEAR, weeks);
+		return cal.getTime();
+	}
+	
 	private Date addMonthsToDate(Date startTime, Integer months) {
 		Calendar cal = getInitializedCalendar(startTime);
 		cal.add(Calendar.MONTH, months);
@@ -797,5 +1035,9 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	private Date date(String date) {
 		return DateUtils.date(date);
+	}
+	
+	private Object[] daySetOf(RecurrenceDay... days) {
+		return Sets.newHashSet(days).toArray();
 	}
 }

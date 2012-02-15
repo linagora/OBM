@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.obm.push.bean.AttendeeType;
@@ -47,11 +48,12 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
-import org.obm.push.bean.RecurrenceDayOfWeekUtils;
+import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
-import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.exception.IllegalMSEventRecurrenceException;
+import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -64,6 +66,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
@@ -294,7 +297,7 @@ public class MSEventToObmEventConverter {
 		switch (pr.getType()) {
 		case DAILY:
 			or.setKind(RecurrenceKind.daily);
-			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
+			or.setDays(dailyToDays(pr.getDayOfWeek()));
 			multiply = Calendar.DAY_OF_MONTH;
 			break;
 		case MONTHLY:
@@ -307,7 +310,10 @@ public class MSEventToObmEventConverter {
 			break;
 		case WEEKLY:
 			or.setKind(RecurrenceKind.weekly);
-			or.setDays(RecurrenceDayOfWeekUtils.toRecurrenceDays(pr.getDayOfWeek()));
+			if (pr.getDayOfWeek() == null || pr.getDayOfWeek().isEmpty()) {
+				throw new IllegalMSEventRecurrenceException("Weekly recurrence need DayOfWeek attribute");
+			}
+			or.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(pr.getDayOfWeek()));
 			multiply = Calendar.WEEK_OF_YEAR;
 			break;
 		case YEARLY:
@@ -346,6 +352,14 @@ public class MSEventToObmEventConverter {
 		or.setEnd(endDate);
 
 		return or;
+	}
+
+	private RecurrenceDays dailyToDays(Set<RecurrenceDayOfWeek> daysOfWeek) {
+        if (daysOfWeek != null) {
+                return RecurrenceDayOfWeekConverter.toRecurrenceDays(daysOfWeek);
+        } else {
+                return RecurrenceDays.ALL_DAYS;
+        }
 	}
 	
 	private void convertRecurrenceInterval(MSRecurrence from, EventRecurrence to) throws IllegalMSEventRecurrenceException {
