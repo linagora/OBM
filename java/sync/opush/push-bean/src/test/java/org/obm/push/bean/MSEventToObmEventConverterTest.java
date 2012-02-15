@@ -15,6 +15,7 @@ import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventMeetingStatus;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 
@@ -666,6 +667,90 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test
+	public void testConvertAttributeMeetingStatusIsInMeeting() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_A_MEETING);
+	}
+
+	@Test
+	public void testConvertAttributeMeetingStatusIsNotInMeeting() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.build();
+	
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_NOT_A_MEETING);
+	}
+
+	@Test
+	public void testConvertAttributeMeetingStatusMeetingCanceledAndReceived() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_IS_CANCELED_AND_RECEIVED)
+				.build();
+	
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED_AND_RECEIVED);
+	}
+	
+	@Test
+	public void testConvertAttributeMeetingStatusMeetingReceived() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_RECEIVED);
+	}
+	
+	@Test
+	public void testConvertAttributeMeetingStatusMeetingCanceled() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_IS_CANCELED)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED);
+	}
+
+	@Test
+	public void testConvertAttributeMeetingStatusNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(null)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(converted.getMeetingStatus()).isNull();
+	}
+
+	@Test
 	public void testCalculatedAttributeDurationByStartAndEndTime() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -769,7 +854,7 @@ public class MSEventToObmEventConverterTest {
 		recurrence.setType(type);
 		return recurrence;
 	}
-	
+
 	private Event convertToOBMEvent(MSEvent msEvent) throws IllegalMSEventStateException {
 		return convertToOBMEventWithEditingEvent(msEvent, null);
 	}

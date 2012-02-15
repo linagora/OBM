@@ -39,6 +39,7 @@ import java.util.TimeZone;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
+import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
@@ -53,6 +54,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventMeetingStatus;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
@@ -130,6 +132,7 @@ public class MSEventToObmEventConverter {
 		convertDurationAttribute(data, converted);
 		convertAllDayAttribute(parentEvent, data, converted);
 		convertCategories(data, converted);
+		convertMeetingStatus(data, converted);
 		
 		if (data.getReminder() != null) {
 			converted.setAlert(data.getReminder() * 60);
@@ -254,6 +257,31 @@ public class MSEventToObmEventConverter {
 			converted.setTitle(data.getSubject());
 		} else {
 			throw new IllegalMSEventStateException("Subject is required");
+		}
+	}
+
+	private void convertMeetingStatus(MSEventCommon data, Event converted) {
+		if (data.getMeetingStatus() == null) {
+			converted.setMeetingStatus(null);
+		} else {
+			converted.setMeetingStatus(getMeetingStatus(data.getMeetingStatus()));
+		}
+	}
+
+	private EventMeetingStatus getMeetingStatus(CalendarMeetingStatus meetingStatus) {
+		switch (meetingStatus) {
+		case IS_A_MEETING:
+			return EventMeetingStatus.IS_A_MEETING;
+		case IS_NOT_A_MEETING:
+			return EventMeetingStatus.IS_NOT_A_MEETING;
+		case MEETING_IS_CANCELED:
+			return EventMeetingStatus.MEETING_IS_CANCELED;
+		case MEETING_IS_CANCELED_AND_RECEIVED:
+			return EventMeetingStatus.MEETING_IS_CANCELED_AND_RECEIVED;
+		case MEETING_RECEIVED:
+			return EventMeetingStatus.MEETING_RECEIVED;
+		default:
+			return EventMeetingStatus.IS_A_MEETING;
 		}
 	}
 
