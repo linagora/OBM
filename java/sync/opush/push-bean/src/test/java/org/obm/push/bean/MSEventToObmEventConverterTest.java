@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.MSEventToObmEventConverter;
 import org.obm.push.exception.IllegalMSEventStateException;
+import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 
@@ -284,19 +285,6 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test
-	public void testConvertAttributeTimezoneDefault() throws IllegalMSEventStateException {
-		MSEvent msEvent = new MSEventBuilder()
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
-				.withTimeZone(TimeZone.getDefault())
-				.build();
-		
-		Event convertedEvent = convertToOBMEvent(msEvent);
-		
-		Assertions.assertThat(convertedEvent.getTimezoneName()).isEqualTo(TimeZone.getDefault().getID());
-	}
-
-	@Test
 	public void testConvertAttributeTimezoneSpecific() throws IllegalMSEventStateException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -320,6 +308,80 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Assertions.assertThat(convertedEvent.getTimezoneName()).isNull();
+	}
+	
+	@Test
+	public void testConvertAttributeOrganizerNameOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withOrganizerName("Any Name")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+
+		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
+		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
+	}
+
+	@Test
+	public void testConvertAttributeOrganizerNameOnlyNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withOrganizerName(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
+		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeOrganizerEmailOnly() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withOrganizerEmail("email@domain")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
+		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
+	}
+
+	@Test
+	public void testConvertAttributeOrganizerEmailOnlyNullGetFromSession() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withOrganizerEmail(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
+		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(bs.getUser().getEmail());
+	}
+	
+	@Test
+	public void testConvertAttributeOrganizerNameAndEmail() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withOrganizerName("Any Name")
+				.withOrganizerEmail("user@domain")
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
+		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
+		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
 	}
 	
 	@Test
