@@ -434,7 +434,7 @@ class shareCalendarMailer extends OBM_Mailer {
   
   public function userShareFreebusy($user) {
   	$this->from = $this->getSender();
-  	$this->subject = __('Partage de l\'agenda des disponibilités : %firstname% %name%',
+  	$this->subject = __('OBM free/busy information sharing : %firstname% %name%',
   	array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
   	$this->body = array('user' => $user, 'url' => $this->getFreebusyCalUri($user));
   	

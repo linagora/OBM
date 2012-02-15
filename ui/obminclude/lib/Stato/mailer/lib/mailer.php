@@ -186,6 +186,7 @@ class SMailer
             throw new SMailException('Template root not set');
             
         $template_path = self::$template_root.'/'.$template_name.'.php';
+        
         return $template_path;
     }
     
