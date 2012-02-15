@@ -74,8 +74,9 @@ public class EventConverter {
 			return ParticipationState.DECLINED;
 		case NOT_RESPONDED:
 		case RESPONSE_UNKNOWN:
-		case TENTATIVE:
 			return ParticipationState.NEEDSACTION;
+		case TENTATIVE:
+			return ParticipationState.TENTATIVE;
 		default:
 		case ACCEPT:
 			return ParticipationState.ACCEPTED;

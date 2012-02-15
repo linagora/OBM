@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -180,33 +181,6 @@ public class MSEventToObmEventConverter {
 		} else{
 			e.setOwnerEmail(bs.getCredentials().getUser().getEmail());
 		}
-	}
-
-	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data) {
-		List<Attendee> ret = new LinkedList<Attendee>();
-		if (parentEvent != null && data.getAttendees().isEmpty()) {
-			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
-			ret.addAll(parentEvent.getAttendees());
-		} else {
-			for (MSAttendee at: data.getAttendees()) {
-				ret.add( convertAttendee(oldEvent, data, at) );
-			}
-		}
-		return ret;
-	}
-	
-	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) {
-		Attendee ret = new Attendee();
-		ret.setEmail(at.getEmail());
-		ret.setDisplayName(at.getName());
-		ret.setParticipationRole(ParticipationRole.REQ);
-		
-		ParticipationState status = EventConverter.getParticipationState( 
-				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
-		ret.setState(status);
-		
-		ret.setOrganizer( isOrganizer(event, at) );
-		return ret;
 	}
 
 	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
@@ -355,6 +329,20 @@ public class MSEventToObmEventConverter {
 		return or;
 	}
 	
+	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data)
+			throws IllegalMSEventExceptionStateException {
+		List<Attendee> ret = new LinkedList<Attendee>();
+		if (parentEvent != null && data.getAttendees().isEmpty()) {
+			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
+			ret.addAll(parentEvent.getAttendees());
+		} else {
+			for (MSAttendee at: data.getAttendees()) {
+				ret.add( convertAttendee(oldEvent, data, at) );
+			}
+		}
+		return ret;
+	}
+	
 	private void defineOrganizer(Event e, MSEvent data, BackendSession bs) {
 		if (e.findOrganizer() == null) {
 			if (data.getOrganizerEmail() != null) {
@@ -374,6 +362,40 @@ public class MSEventToObmEventConverter {
 		}
 	}
 	
+	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) throws IllegalMSEventExceptionStateException {
+		if (Strings.isNullOrEmpty(Strings.emptyToNull(at.getEmail()))) {
+			throw new IllegalMSEventExceptionStateException("Attendees.Attendee.Email is required");
+		}
+		Attendee ret = new Attendee();
+		ret.setEmail(at.getEmail());
+		ret.setDisplayName(at.getName());
+		ret.setParticipationRole(getParticipationRole(at.getAttendeeType()));
+		
+		ParticipationState status = EventConverter.getParticipationState( 
+				getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
+		ret.setState(status);
+		
+		ret.setOrganizer( isOrganizer(event, at) );
+		return ret;
+	}
+
+	public ParticipationRole getParticipationRole(AttendeeType attendeeType) {
+		if (attendeeType == null) {
+			return ParticipationRole.NON;
+		}
+		
+		switch (attendeeType) {
+		case OPTIONAL:
+			return ParticipationRole.OPT;
+		case REQUIRED:
+			return ParticipationRole.REQ;
+		case RESOURCE:
+			return ParticipationRole.CHAIR;
+		default:
+			return ParticipationRole.NON;
+		}
+	}
+
 	private void convertBusyStatus(MSEventCommon from, Event to) {
 		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
 			to.setOpacity(EventOpacity.TRANSPARENT);
