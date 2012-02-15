@@ -33,9 +33,12 @@
 package org.obm.push.calendar;
 
 import org.obm.push.MSEventToObmEventConverter;
+import org.obm.push.ObmEventToMsEventConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.User;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 
@@ -50,10 +53,14 @@ import com.google.inject.Singleton;
 public class EventConverter {
 	
 	private final MSEventToObmEventConverter msEventConverter;
+	private final ObmEventToMsEventConverter obmEventToMsEventConverter;
 
 	@Inject
-	@VisibleForTesting EventConverter(MSEventToObmEventConverter msEventConverter) {
+	@VisibleForTesting EventConverter(MSEventToObmEventConverter msEventConverter, 
+			ObmEventToMsEventConverter obmEventToMsEventConverter) {
+		
 		this.msEventConverter = msEventConverter;
+		this.obmEventToMsEventConverter = obmEventToMsEventConverter;
 	}
 
 	public static ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
@@ -80,6 +87,10 @@ public class EventConverter {
 
 	public Event convert(BackendSession bs, Event oldEvent, MSEvent data, boolean isInternal) {
 		return msEventConverter.convert(bs, oldEvent, data, isInternal);
+	}
+
+	public MSEvent convert(Event event, MSEventUid msEventUid, User user) {
+		return obmEventToMsEventConverter.convert(event, msEventUid, user);
 	}
 	
 }

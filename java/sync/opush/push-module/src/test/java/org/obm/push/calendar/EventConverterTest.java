@@ -49,6 +49,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obm.push.MSEventToObmEventConverter;
+import org.obm.push.ObmEventToMsEventConverter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -77,7 +78,9 @@ public class EventConverterTest {
 	
 	@Before
 	public void init() {
-		this.eventConverter = new EventConverter(new MSEventToObmEventConverter());
+		this.eventConverter = new EventConverter(
+				new MSEventToObmEventConverter(), new ObmEventToMsEventConverter());
+		
 		this.decoder = new CalendarDecoder();
 	}
 

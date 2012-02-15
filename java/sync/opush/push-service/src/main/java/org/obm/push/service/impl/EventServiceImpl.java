@@ -1,11 +1,11 @@
 package org.obm.push.service.impl;
 
 import org.apache.commons.codec.binary.Hex;
-import org.obm.push.ObmEventToMsEventConverter;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
+import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
 import org.obm.push.store.CalendarDao;
@@ -21,13 +21,13 @@ import com.google.inject.Singleton;
 public class EventServiceImpl implements EventService {
 
 	private final CalendarDao calendarDao;
-	private final ObmEventToMsEventConverter obmEventToMsEventConverter;
+	private final EventConverter eventConverter;
 	
 	@Inject
-	private EventServiceImpl(CalendarDao calendarDao, ObmEventToMsEventConverter obmEventToMsEventConverter) {
+	private EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter) {
 		super();
 		this.calendarDao = calendarDao;
-		this.obmEventToMsEventConverter = obmEventToMsEventConverter;
+		this.eventConverter = eventConverter;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
 		if (msEventUid == null) {
 			msEventUid = createMsEventUidFromEventExtId(event);
 		}
-		MSEvent msEvent = obmEventToMsEventConverter.convert(event, msEventUid, bs.getCredentials().getUser());
+		MSEvent msEvent = eventConverter.convert(event, msEventUid, bs.getCredentials().getUser());
 		return msEvent;
 	}
 	

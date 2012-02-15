@@ -61,7 +61,9 @@ import org.obm.sync.calendar.ParticipationState;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ObmEventToMsEventConverter {
 
 	public MSEvent convert(Event e, MSEventUid uid, User user) {
