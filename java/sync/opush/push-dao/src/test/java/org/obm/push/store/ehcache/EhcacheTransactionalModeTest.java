@@ -38,7 +38,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import junit.framework.Assert;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -47,6 +46,7 @@ import net.sf.ehcache.transaction.DeadLockException;
 import net.sf.ehcache.transaction.TransactionException;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -153,14 +153,28 @@ public class EhcacheTransactionalModeTest {
 	@Test
 	public void transactionIsShorterThanCacheTimeout() throws InterruptedException, ExecutionException {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
-		executeTwoPutInParallel(100);
+		List<Future<Boolean>> futures = executeTwoPutInParallel(100);
+		assertFuturesSuccess(futures);
 	}
 
+	private void assertFuturesSuccess(List<Future<Boolean>> futures)
+			throws InterruptedException, ExecutionException {
+		for (Future<Boolean> future: futures) {
+			Boolean result = future.get();
+			Assert.assertTrue(result);
+		}
+	}
+	
 	@Test(expected=DeadLockException.class)
 	public void transactionIsGreaterThanCacheTimeout() throws Throwable {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		try {
-			executeTwoPutInParallel(1100);
+			List<Future<Boolean>> futures = executeTwoPutInParallel(1100);
+			
+			for (Future<Boolean> future: futures) {
+				future.get();
+			}
+			
 		} catch (ExecutionException e) {
 			Throwable cause = e.getCause();
 			throw cause;
@@ -168,18 +182,15 @@ public class EhcacheTransactionalModeTest {
 		
 	}
 	
-	private void executeTwoPutInParallel(int timeInMilliseconds) throws InterruptedException,
-			ExecutionException {
+	private List<Future<Boolean>> executeTwoPutInParallel(int timeInMilliseconds) throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		List<Future<Boolean>> futures = executor.invokeAll(
 				ImmutableList.of(
 						putInCacheTask(timeInMilliseconds), 
 						putInCacheTask(timeInMilliseconds)));
-		for (Future<Boolean> future: futures) {
-			future.get();
-		}
+		return futures;
 	}
-
+	
 	private Callable<Boolean> putInCacheTask(final int timeInMilliseconds) {
 		return new Callable<Boolean>() {
 
