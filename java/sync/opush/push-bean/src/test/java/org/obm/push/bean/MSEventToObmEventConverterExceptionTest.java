@@ -4,6 +4,7 @@ package org.obm.push.bean;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.fest.assertions.Assertions;
@@ -227,7 +228,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T12:15:10Z"))
-				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
+				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
 		
@@ -415,7 +416,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
+				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
 		
@@ -1192,17 +1193,18 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
+				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(exception))
 				.build();
 
 		return msEvent;
 	}
 	
-	private MSRecurrence simpleRecurrence(RecurrenceType type) {
+	private MSRecurrence simpleDailyRecurrence(RecurrenceType type, RecurrenceDayOfWeek day) {
 		MSRecurrence recurrence = new MSRecurrence();
 		recurrence.setInterval(1);
 		recurrence.setType(type);
+		recurrence.setDayOfWeek(EnumSet.of(day));
 		return recurrence;
 	}
 
