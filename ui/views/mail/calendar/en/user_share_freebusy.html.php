@@ -33,7 +33,7 @@ applicable to the OBM software.
 ?><table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          OBM free/busy informations share
+          OBM free/busy informations sharing
         </th>
     </tr>
     <tr>

@@ -32,7 +32,7 @@ applicable to the OBM software.
 
 ?>This email was automatically sent by OBM
 ------------------------------------------------------------------
-OBM free/busy informations share
+OBM free/busy informations sharing
 ------------------------------------------------------------------
 
 <?php echo $user['firstname'].' '.$user['lastname']; ?> now allows you to import their OBM free/busy informations.
