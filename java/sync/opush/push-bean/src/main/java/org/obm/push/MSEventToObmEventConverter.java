@@ -239,16 +239,12 @@ public class MSEventToObmEventConverter {
 		if (sensitivity == null) {
 			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
 		}
-		switch (sensitivity) {
-		case CONFIDENTIAL:
-		case PERSONAL:
-		case PRIVATE:
-			return EventPrivacy.PRIVATE;
-		case NORMAL:
-		default:
-			return EventPrivacy.PUBLIC;
-		}
 
+		if (sensitivity == CalendarSensitivity.NORMAL) {
+			return EventPrivacy.PUBLIC;
+		} else {
+			return EventPrivacy.PRIVATE;
+		}
 	}
 
 	private void convertSubject(Event parentEvent, MSEventCommon data, Event converted) throws IllegalMSEventStateException {

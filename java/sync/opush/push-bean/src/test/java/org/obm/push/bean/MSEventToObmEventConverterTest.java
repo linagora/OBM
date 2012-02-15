@@ -15,6 +15,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -434,6 +435,76 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Assertions.assertThat(convertedEvent.getAlert()).isNull();
+	}
+
+	@Test
+	public void testConvertAttributeSensitivityNormal() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withSensitivity(CalendarSensitivity.NORMAL)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
+	}
+	
+	@Test
+	public void testConvertAttributeSensitivityConfidential() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withSensitivity(CalendarSensitivity.CONFIDENTIAL)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+	}
+
+	@Test
+	public void testConvertAttributeSensitivityPersonal() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withSensitivity(CalendarSensitivity.PERSONAL)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+	}
+
+	@Test
+	public void testConvertAttributeSensitivityPrivate() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withSensitivity(CalendarSensitivity.PRIVATE)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+	}
+
+	@Test
+	public void testConvertAttributeSensitivityNull() throws IllegalMSEventStateException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any subject")
+				.withSensitivity(null)
+				.build();
+		
+		Event convertedEvent = convertToOBMEvent(msEvent);
+		
+		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 	
 	@Test
