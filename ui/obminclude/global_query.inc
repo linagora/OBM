@@ -707,6 +707,7 @@ function run_query_global_document_delete_file($id) {
 function run_query_global_insert_document($params, $id, $entity) {
   global $cdg_sql, $obm, $l_create_file_error;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
 
   $title = $params['title'];
@@ -746,10 +747,10 @@ function run_query_global_insert_document($params, $id, $entity) {
       null,
       $uid,
       $domain_id,
-      '$title',
-      '$author',
-      '$name',
-      '$path',
+      '".$obm_q->escape($title)."',
+      '".$obm_q->escape($author)."',
+      '".$obm_q->escape($name)."',
+      '".$obm_q->escape($path)."',
       $kind,
       $size,
       $mime,
@@ -757,7 +758,6 @@ function run_query_global_insert_document($params, $id, $entity) {
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(1)');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $uid = sql_parse_id($obm['uid'], true);
 
@@ -804,7 +804,8 @@ function run_query_global_insert_document($params, $id, $entity) {
 function run_query_global_update_document($params, $id) {
   global $obm, $cdg_sql;
   global  $l_delete_file_error, $l_create_file_error;
-
+  
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   
   $mime = $params['type'];
@@ -817,12 +818,11 @@ function run_query_global_update_document($params, $id) {
      document_timeupdate=NOW(),
      document_userupdate=$uid,
      document_size=$size,
-     document_name='$name',
-     document_title='$title'
+     document_name='".$obm_q->escape($name)."',
+     document_title='".$obm_q->escape($title)."'
    WHERE document_id $id ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_document_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Delete old file
