@@ -34,12 +34,14 @@ package org.obm.sync.calendar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.obm.DateUtils;
 
 import com.google.common.collect.Lists;
 
@@ -160,7 +162,92 @@ public class EventRecurrenceTest {
 
 		Assert.assertEquals(rec1, rec2);
 	}
+	
+	@Test
+	public void testHasAnyExceptionAtDateOnEventException() {
+		Event exception = new Event();
+		exception.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		exception.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setExceptions(Collections.<Date>emptyList());
+		
+		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
+		Assertions.assertThat(exceptionFound).isTrue();
+	}
 
+	@Test
+	public void testHasAnyExceptionAtDateOnDeletedException() {
+		Date deletedException = DateUtils.date("2004-12-14T22:00:00Z");
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Lists.newArrayList(deletedException));
+		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		
+		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
+		Assertions.assertThat(exceptionFound).isTrue();
+	}
+
+	@Test
+	public void testHasAnyExceptionAtDateNotFound() {
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Collections.<Date>emptyList());
+		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		
+		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
+		Assertions.assertThat(exceptionFound).isFalse();
+	}
+
+	@Test
+	public void testHasDeletedException() {
+		Date exceptionDeleted = DateUtils.date("2004-12-14T22:00:00Z");
+		
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
+		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		
+		boolean exceptionFound = recurrence.hasException();
+		Assertions.assertThat(exceptionFound).isTrue();
+	}
+
+	@Test
+	public void testHasEventException() {
+		Event eventException = new Event();
+		eventException.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		eventException.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Collections.<Date>emptyList());
+		recurrence.setEventExceptions(Lists.newArrayList(eventException));
+		
+		boolean exceptionFound = recurrence.hasEventException();
+		Assertions.assertThat(exceptionFound).isTrue();
+	}
+
+	@Test
+	public void testHasDeletedExceptionIsFalseWhenEventExceptions() {
+		Event eventException = new Event();
+		eventException.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		eventException.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+		
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Collections.<Date>emptyList());
+		recurrence.setEventExceptions(Lists.newArrayList(eventException));
+		
+		boolean exceptionFound = recurrence.hasException();
+		Assertions.assertThat(exceptionFound).isFalse();
+	}
+
+	@Test
+	public void testHasEventExceptionIsFalseWhenDeletedExceptions() {
+		Date exceptionDeleted = DateUtils.date("2004-12-14T22:00:00Z");
+		
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
+		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		
+		boolean exceptionFound = recurrence.hasEventException();
+		Assertions.assertThat(exceptionFound).isFalse();
+	}
+	
 	private EventRecurrence getOneDailyEventRecurence() {
 		EventRecurrence rec = new EventRecurrence();
 		rec.setKind(RecurrenceKind.daily);

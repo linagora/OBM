@@ -45,6 +45,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
@@ -60,7 +61,6 @@ import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.WeekDay;
 import net.fortuna.ical4j.model.component.VAlarm;
@@ -74,6 +74,7 @@ import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Repeat;
@@ -106,6 +107,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -568,12 +570,12 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetExDate() {
-		Event event = new Event();
 		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		event.setStartDate(cal.getTime());
 
+		Event event = new Event();
+		event.setStartDate(cal.getTime());
 		EventRecurrence er = new EventRecurrence();
 		er.setDays(new RecurrenceDays());
 		er.setKind(RecurrenceKind.daily);
@@ -584,11 +586,63 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
 		except[1] = cal.getTime();
 		er.setExceptions(Arrays.asList(except));
+		Date exceptionOne = org.obm.push.utils.DateUtils.getOneDayLater(cal.getTime());
+		Date exceptionTwo = org.obm.push.utils.DateUtils.getOneDayLater(exceptionOne);
+		er.setExceptions(Lists.newArrayList(exceptionOne, exceptionTwo));
 		event.setRecurrence(er);
 
-		Set<Property> ret = getIcal4jHelper().getExDate(event);
-		assertEquals(2, ret.size());
+		DateTime expectedExceptionOne = new DateTime(exceptionOne);
+		DateTime expectedExceptionTwo = new DateTime(exceptionTwo);
+		ExDate ret = getIcal4jHelper().getExDate(event);
+		assertEquals(2, ret.getDates().size());
+		Assertions.assertThat(ret.getDates()).containsOnly(expectedExceptionOne, expectedExceptionTwo);
+	}
 
+	@Test
+	public void testGetExDateReturnNullWhenNoException() {
+		Calendar cal = getCalendarPrecisionOfSecond();
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+
+		EventRecurrence er = new EventRecurrence();
+		er.setExceptions(Collections.<Date>emptyList());
+		Event event = new Event();
+		event.setStartDate(cal.getTime());
+		event.setRecurrence(er);
+
+		ExDate exDate = getIcal4jHelper().getExDate(event);
+		assertNull(exDate);
+	}
+
+	@Test
+	public void testGetExDateWhenDeletedAndRegularExceptionsExists() {
+		Calendar cal = getCalendarPrecisionOfSecond();
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+
+		Date deletedExceptionOne = org.obm.push.utils.DateUtils.getOneDayLater(cal.getTime());
+		Date deletedExceptionTwo = org.obm.push.utils.DateUtils.getOneDayLater(deletedExceptionOne);
+
+		Event regularException = new Event();
+		Date regularExceptionDate = org.obm.push.utils.DateUtils.getOneDayLater(deletedExceptionTwo);
+		regularException.setRecurrenceId(regularExceptionDate);
+		regularException.setStartDate(DateUtils.date("2004-12-14T21:39:45Z"));
+
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setExceptions(Lists.newArrayList(deletedExceptionOne, deletedExceptionTwo));
+		recurrence.setEventExceptions(Lists.newArrayList(regularException));
+		
+		Event event = new Event();
+		event.setRecurrence(recurrence);
+
+		ExDate ret = getIcal4jHelper().getExDate(event);
+
+		DateTime expectedExceptionOne = new DateTime(deletedExceptionOne);
+		DateTime expectedExceptionTwo = new DateTime(deletedExceptionTwo);
+		DateTime expectedExceptionThree = new DateTime(regularExceptionDate);
+		Assertions.assertThat(ret.getDates()).hasSize(3);
+		Assertions.assertThat(ret.getDates()).containsOnly(
+				expectedExceptionOne, expectedExceptionTwo, expectedExceptionThree);
 	}
 
 	@Test

@@ -1200,14 +1200,77 @@ public class MSEventToObmEventConverterExceptionTest {
 		Assertions.assertThat(exception.getLocation()).isEqualTo(msEvent.getLocation());
 	}
 
-	private MSEvent makeMSEventWithException(MSEventException exception) {
+	@Test
+	public void testConvertWhenExistDeletedAndRegularExceptions() throws ConversionException {
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(date("2004-10-11T12:15:10Z"))
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEventException msEventExceptionDeleted = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(date("2004-10-12T12:15:10Z"))
+				.withSubject("Any Subject")
+				.withDeleted(true)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventExceptionDeleted);
+
+		Event converted = convertToOBMEvent(msEvent);
+		List<Event> convertedExceptions = converted.getRecurrence().getEventExceptions();
+		List<Date> convertedExceptionsDeleted = converted.getRecurrence().getExceptions();
+
+		Assertions.assertThat(convertedExceptions).hasSize(1);
+		Assertions.assertThat(convertedExceptions.get(0).getRecurrenceId())
+			.isEqualTo(msEventException.getExceptionStartTime());
+		Assertions.assertThat(convertedExceptionsDeleted).hasSize(1);
+		Assertions.assertThat(convertedExceptionsDeleted).containsOnly(date("2004-10-12T12:15:10Z"));
+	}
+	
+	@Test(expected=IllegalMSEventExceptionStateException.class)
+	public void testConvertWhenExistDeletedAndRegularExceptionsAtSameDate() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEventException msEventExceptionDeleted = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(true)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventExceptionDeleted);
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	private MSEvent makeMSEventWithException(MSEventException... exceptions) {
 		MSEvent msEvent = new MSEventBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
-				.withExceptions(Lists.newArrayList(exception))
+				.withExceptions(Lists.newArrayList(exceptions))
 				.build();
 
 		return msEvent;

@@ -643,6 +643,11 @@ public class Event implements Indexed<Integer> {
 		}
 	}
 	
+
+	public boolean hasAnyExceptionAtDate(Date exceptionDateToFind) {
+		return recurrence.hasAnyExceptionAtDate(exceptionDateToFind);
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(title, description, uid, extId, privacy, owner,

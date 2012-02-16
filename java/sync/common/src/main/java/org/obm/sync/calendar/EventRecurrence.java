@@ -97,7 +97,7 @@ public class EventRecurrence {
 		this.kind = kind;
 	}
 
-	public Iterable<Date> getExceptions() {
+	public List<Date> getExceptions() {
 		return exceptions;
 	}
 
@@ -131,7 +131,7 @@ public class EventRecurrence {
 			eventExceptions.add(event.clone());
 		}
 		eventRecurrence.setEventExceptions(eventExceptions);
-		eventRecurrence.setExceptions(getExceptions());
+		eventRecurrence.setExceptions(exceptions);
 		eventRecurrence.setFrequence(this.frequence);
 		eventRecurrence.setKind(this.kind);
 		return eventRecurrence;
@@ -186,6 +186,32 @@ public class EventRecurrence {
 		eventExceptions = eventExceptionsCopy;
 	}
 
+	public boolean hasAnyExceptionAtDate(Date exceptionDateToFind) {
+		return hasEventExceptionAtDate(exceptionDateToFind) ||
+				hasDeletedExceptionAtDate(exceptionDateToFind);
+	}
+
+	private boolean hasEventExceptionAtDate(Date exceptionDateToFind) {
+		for (Event eventException : eventExceptions) {
+			if (eventException.getRecurrenceId().equals(exceptionDateToFind)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasDeletedExceptionAtDate(Date exceptionDateToFind) {
+		return exceptions.contains(exceptionDateToFind);
+	}
+
+	public boolean hasException() {
+		return exceptions != null && !exceptions.isEmpty();
+	}
+	
+	public boolean hasEventException() {
+		return eventExceptions != null && !eventExceptions.isEmpty();
+	}
+	
 	public boolean frequencyIsSpecified() {
 		return frequence != UNSPECIFIED_FREQUENCY_VALUE;
 	}
