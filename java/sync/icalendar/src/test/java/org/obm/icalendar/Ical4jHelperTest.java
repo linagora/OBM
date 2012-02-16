@@ -89,6 +89,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.junit.internal.matchers.TypeSafeMatcher;
+import org.obm.DateUtils;
 import org.obm.push.utils.UserEmailParserUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -163,8 +164,11 @@ public class Ical4jHelperTest {
 		return new Ical4jHelper();
 	}
 
-	private Calendar getCalendar() {
-		return new GregorianCalendar();
+	private Calendar getCalendarPrecisionOfSecond() {
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(DateUtils.date("2004-12-14T21:39:45Z"));
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar;
 	}
 	
 	protected Ical4jUser getDefaultObmUser() {
@@ -179,10 +183,9 @@ public class Ical4jHelperTest {
 	protected Event getTestEvent() {
 		final Event ev = buildEvent();
 
-		final Calendar cal = getCalendar();
+		final Calendar cal = getCalendarPrecisionOfSecond();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 	
 		ev.setAlert(60);
 
@@ -213,11 +216,10 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetRecur() {
-		Calendar cal = getCalendar();
+		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.setTime(new Date());
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 
 		Event event1 = new Event();
 
@@ -266,10 +268,9 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetIsAllDay() {
 
-		Calendar cal = getCalendar();
+		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 
 		DtStart dtStart = new DtStart(new net.fortuna.ical4j.model.Date(cal.getTime()));
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 1);
@@ -298,11 +299,10 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDuration() {
 
-		Calendar cal = getCalendar();
+		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.set(Calendar.HOUR, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 
 		DtStart dtStart = new DtStart(new DateTime(cal.getTime()));
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 2);
@@ -569,10 +569,9 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetExDate() {
 		Event event = new Event();
-		Calendar cal = getCalendar();
+		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 		event.setStartDate(cal.getTime());
 
 		EventRecurrence er = new EventRecurrence();
@@ -624,7 +623,73 @@ public class Ical4jHelperTest {
 		
 		getIcal4jHelper().appendAllDay(event, startDate, endDate);
 		assertTrue(event.isAllday());
-	}	
+	}
+	
+	@Test
+	public void testAppendAllDayWithDurationOfOneDay() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:39:45Z"),
+				DateUtils.date("2004-12-15T21:39:45Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertTrue(event.isAllday());
+	}
+	
+	@Test
+	public void testAppendAllDayWithDurationOfThreeDay() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:39:45Z"),
+				DateUtils.date("2004-12-17T21:39:45Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertTrue(event.isAllday());
+	}
+	
+	@Test
+	public void testAppendAllDayWithDurationOfOneWeek() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:39:45Z"),
+				DateUtils.date("2004-12-21T21:39:45Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertFalse(event.isAllday());
+	}
+
+	@Test
+	public void testAppendAllDayWithDurationOfOneHour() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:39:45Z"),
+				DateUtils.date("2004-12-14T22:39:45Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertFalse(event.isAllday());
+	}
+	
+	@Test
+	public void testAppendAllDayWithDurationOfQuiteOneDay() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:40:00Z"),
+				DateUtils.date("2004-12-15T21:30:00Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertFalse(event.isAllday());
+	}
+
+	@Test
+	public void testAppendAllDayWithDurationOfOneMinute() {
+		final Event event = new Event();
+		final Duration allDayDuration = new Duration(
+				DateUtils.date("2004-12-14T21:39:45Z"),
+				DateUtils.date("2004-12-14T21:40:45Z"));
+		
+		getIcal4jHelper().appendAllDay(event, allDayDuration);
+		assertFalse(event.isAllday());
+	}
 	
 	@Test
 	public void testGetPublicClazz() {
@@ -672,8 +737,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDtEnd() {
 		Event event = new Event();
-		Calendar cal = getCalendar();
-		cal.set(Calendar.MILLISECOND, 0);
+		Calendar cal = getCalendarPrecisionOfSecond();
 		event.setStartDate(cal.getTime());
 		event.setDuration(3600);
 		DtEnd dtend = getIcal4jHelper().getDtEnd(event.getStartDate(),
@@ -685,12 +749,40 @@ public class Ical4jHelperTest {
 	@Test
 	public void testGetDtStart() {
 		Event event = new Event();
-		Calendar cal = getCalendar();
-		cal.set(Calendar.MILLISECOND, 0);
+		Calendar cal = getCalendarPrecisionOfSecond();
 		event.setStartDate(cal.getTime());
-		DtStart dtstart = getIcal4jHelper().getDtStart(event.getStartDate(),
-				event.isAllday());
+		
+		DtStart dtstart = getIcal4jHelper().getDtStart(event.getStartDate());
+		
 		assertEquals(cal.getTime().getTime(), dtstart.getDate().getTime());
+	}
+
+	@Test
+	public void testGetDtStartAllDay() {
+		Calendar cal = getCalendarPrecisionOfSecond();
+		Event event = new Event();
+		event.setAllday(true);
+		event.setStartDate(cal.getTime());
+
+		DtStart dtstart = getIcal4jHelper().getDtStart(event.getStartDate());
+
+		assertEquals(dtstart.getDate().getTime(), event.getStartDate().getTime());
+	}
+
+	@Test
+	public void testGetDurationAllDay() {
+		Event event = new Event();
+		Calendar cal = getCalendarPrecisionOfSecond();
+		event.setStartDate(cal.getTime());
+		event.setAllday(true);
+		
+		Duration duration = getIcal4jHelper().getDuration(event.getStartDate(), event.getEndDate());
+		
+		assertEquals(duration.getDuration().getWeeks(), 0);
+		assertEquals(duration.getDuration().getDays(), 1);
+		assertEquals(duration.getDuration().getHours(), 0);
+		assertEquals(duration.getDuration().getMinutes(), 0);
+		assertEquals(duration.getDuration().getSeconds(), 0);
 	}
 
 	@Test
@@ -728,11 +820,10 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testGetRRule() {
-		Calendar cal = getCalendar();
+		Calendar cal = getCalendarPrecisionOfSecond();
 		cal.setTime(new Date());
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
 
 		Event event = new Event();
 
