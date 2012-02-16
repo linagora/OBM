@@ -3585,7 +3585,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
     $opacity = $l_opacity_free;
   }
   
-	// Exception
+	// Exception 
 	$block_exception_detail = '';
 	if(!empty($exception_q)){
 		$exception_cancel_desc = $GLOBALS['l_eventexception_canceled'];
@@ -3609,16 +3609,15 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 					</div>
 				";
 			}
+			if( $exception->isCanceledException() ){
+				$dates .= $exception_date." ($exception_cancel_desc) <br/>";
+			}else{
+				$sprintf = sprintf($GLOBALS['l_eventexception_moved_to'], $exception_date_time);
+				$dates .= "$exception_date ($sprintf)<br/>";
+			}
 		}
-		if( $exception->isCanceledException() ){
-			$dates .= $exception_date." ($exception_cancel_desc) <br/>";
-		}else{
-			$sprintf = sprintf($GLOBALS['l_eventexception_moved_to'], $exception_date_time);
-			$dates .= "$exception_date ($sprintf)<br/>";
-		}
-		$block_exception_detail  .= $dates."</td></tr>";
 	}
-    
+  $block_exception_detail  .= $dates."</td></tr>";
   if ($repeats=$event->getRrule()) {
     $kind = $GLOBALS['l_'.$repeats['freq']];
     $kind_unit = $GLOBALS['l_'.$repeats['freq'].'_unit'];
