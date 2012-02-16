@@ -691,6 +691,22 @@ public class MSEventToObmEventConverterTest {
 	}
 	
 	@Test
+	public void testConvertAttributeEndTimeWhenAllDay() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T12:15:10Z"))
+				.withAllDayEvent(true)
+				.build();
+
+		Event converted = convertToOBMEvent(msEvent);
+
+		Date oneDayLaterStartDate = DateUtils.getOneDayLater(msEvent.getStartTime());
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		Assertions.assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
+	}
+	
+	@Test
 	public void testConvertAttributeStartAndEndTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -804,6 +820,24 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test
+	public void testCalculatedAttributeDurationByStartAndEndTimeWhenAllDay() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2005-12-11T12:15:10Z"))
+				.withAllDayEvent(true)
+				.build();
+		
+		Event converted = convertToOBMEvent(msEvent);
+
+		Date oneDayLaterStartDate = DateUtils.getOneDayLater(msEvent.getStartTime());
+		Assertions.assertThat(converted.isAllday()).isTrue();
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		Assertions.assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
+		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+	}
+
+	@Test
 	public void testCalculatedAttributeDurationByAllDayOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -813,8 +847,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
 		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 
@@ -829,8 +862,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Date midnightOfDay = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEvent.getStartTime());
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(midnightOfDay);
+		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
 		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 	

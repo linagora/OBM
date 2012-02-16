@@ -58,7 +58,6 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.IllegalMSEventExceptionStateException;
 import org.obm.push.exception.IllegalMSEventRecurrenceException;
 import org.obm.push.exception.IllegalMSEventStateException;
-import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -144,7 +143,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 		converted.setDuration(convertDuration(msEvent));
 		converted.setAllday(convertAllDay(parentEvent, msEvent));
-		converted.setStartDate(convertStartTime(msEvent));
+		converted.setStartDate(msEvent.getStartTime());
 		converted.setCategory(convertCategories(parentEvent, msEvent));
 		converted.setMeetingStatus(convertMeetingStatus(msEvent));
 		
@@ -538,14 +537,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 	private Boolean isAllDayEvent(MSEventCommon from) {
 		return Objects.firstNonNull(from.getAllDayEvent(), false);
-	}
-
-	private Date convertStartTime(MSEventCommon from) {
-		if (isAllDayEvent(from)) {
-			return DateUtils.getMidnightOfDayEarly(from.getStartTime());
-		} else {
-			return from.getStartTime();
-		}
 	}
 
 	private int convertDuration(MSEventCommon data) throws IllegalMSEventStateException {

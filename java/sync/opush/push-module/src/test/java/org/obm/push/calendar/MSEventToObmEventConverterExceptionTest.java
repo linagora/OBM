@@ -525,8 +525,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Event eventException = exceptionOf(convertedEvent);
-		Date earlyMidnight = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEventException.getStartTime());
-		Assertions.assertThat(eventException.getStartDate()).isEqualTo(earlyMidnight);
+		Assertions.assertThat(eventException.getStartDate()).isEqualTo(msEventException.getStartTime());
 		Assertions.assertThat(eventException.getDuration()).isEqualTo(getOneDayInSecond());
 	}
 
@@ -546,8 +545,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Event eventException = exceptionOf(convertedEvent);
-		Date earlyMidnight = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEventException.getStartTime());
-		Assertions.assertThat(eventException.getStartDate()).isEqualTo(earlyMidnight);
+		Assertions.assertThat(eventException.getStartDate()).isEqualTo(msEventException.getStartTime());
 		Assertions.assertThat(eventException.getDuration()).isEqualTo(getOneDayInSecond());
 	}
 
@@ -676,29 +674,6 @@ public class MSEventToObmEventConverterExceptionTest {
 		
 		Event eventException = exceptionOf(convertedEvent);
 		Assertions.assertThat(eventException.isAllday()).isFalse();
-	}
-
-	@Test
-	public void testConvertAttributeAllDayMakeEventStartMidnightAndFinishAtMidnight() throws ConversionException {
-		MSEventException msEventException = new MSEventExceptionBuilder()
-				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
-				.withDtStamp(date("2004-12-11T11:15:10Z"))
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
-				.withSubject("Any Subject")
-				.withAllDayEvent(true)
-				.withExceptionStartTime(date("2004-10-11T11:15:10Z"))
-				.build();
-		MSEvent msEvent = makeMSEventWithException(msEventException);
-		msEvent.setAllDayEvent(null);
-		
-		Event convertedEvent = convertToOBMEvent(msEvent);
-		
-		Date earlyMidnight = org.obm.push.utils.DateUtils.getMidnightOfDayEarly(msEventException.getStartTime());
-		Date lateMidnight = org.obm.push.utils.DateUtils.getMidnightOfDayLate(msEventException.getStartTime());
-		Event eventException = exceptionOf(convertedEvent);
-		Assertions.assertThat(eventException.getStartDate()).isEqualTo(earlyMidnight);
-		Assertions.assertThat(eventException.getEndDate()).isEqualTo(lateMidnight);
 	}
 
 	@Test

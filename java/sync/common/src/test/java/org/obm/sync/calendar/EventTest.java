@@ -680,7 +680,7 @@ public class EventTest {
 		Event event = new Event();
 		event.setAllday(true);
 		event.setStartDate(date("2004-12-11T11:15:10"));
-		assertThat(event.getEndDate()).isEqualTo(date("2004-12-12T00:00:00"));
+		assertThat(event.getEndDate()).isEqualTo(date("2004-12-12T11:15:10"));
 	}
 	
 	@Test

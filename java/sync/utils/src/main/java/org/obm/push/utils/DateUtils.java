@@ -66,19 +66,16 @@ public class DateUtils {
 		return calendar;
 	}
 	
-	public static Date getMidnightOfDayEarly(Date date) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		setTimeToZero(cal);
+	public static Date getOneDayLater(Date date) {
+		Calendar cal = getOneDayLaterCalendar(date);
 		return cal.getTime();
 	}
-	
-	public static Date getMidnightOfDayLate(Date date) {
+
+	private static Calendar getOneDayLaterCalendar(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.DATE, 1);
-		setTimeToZero(cal);
-		return cal.getTime();
+		return cal;
 	}
 
 	private static void setTimeToZero(Calendar calendar) {

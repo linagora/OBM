@@ -127,7 +127,6 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		return User.Factory.create().createUser("jaures@domain", "jaures@sfio.fr", "Jean Jaures");
 	}
 
-	@Ignore
 	@Test
 	public void testSimpleObmEvent() throws ConversionException {
 		Event event = basicEvent();
