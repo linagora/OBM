@@ -4873,23 +4873,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $event_end->setTimezone($tz);
       $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
       if ($addOcc) {
-        switch ($repeatkind) {
-        case 'daily' :
-          calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-          break;
-        case 'weekly' :
-          calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-          break;
-        case 'monthlybyday' :
-          $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-          break;
-        case 'monthlybydate' :
-          $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-          break;
-        case 'yearly' :
-          $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-          break;
-        }
+        calendar_add_anonymous_occurrences($repeatkind,$date,$event_start,$event_end,$repeatfrequence,$event,$entity_id, $entity,$entity_state,$repeatdays);
       }
     }
   }
@@ -5023,6 +5007,32 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
   }
 
   return $of->getOccurrences(); 
+}
+
+function calendar_add_anonymous_occurrences($repeatkind, $date, $event_start, $event_end, $repeatfrequence, $event, $entity_id, $entity, $entity_state, $repeatdays = null) {
+  // OBMFULL-3223
+  // repeatfrequence shouldn't be 0 or the occurrences fetching algorithm will never increment
+  if ( $repeatfrequence == 0 ) {
+    $repeatfrequence = 1;
+  }
+
+  switch ($repeatkind) {
+  case 'daily' :
+    calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+    break;
+  case 'weekly' :
+    calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+    break;
+  case 'monthlybyday' :
+    calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+    break;
+  case 'monthlybydate' :
+    calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+    break;
+  case 'yearly' :
+    calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+    break;
+  }
 }
 
 

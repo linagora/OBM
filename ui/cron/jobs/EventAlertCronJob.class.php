@@ -289,23 +289,7 @@ class EventAlertCronJob extends CronJob{
       $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
       $event_end->setTimezone($tz);
       $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond($duration);
-      switch ($repeatkind) {
-      case 'daily' :
-        calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'weekly' :
-        calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'monthlybyday' :
-        $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'monthlybydate' :
-        $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      case 'yearly' :
-        $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
-        break;
-      }
+      calendar_add_anonymous_occurrences($repeatkind, $date, $event_start, $event_end, $repeatfrequence, $event, $entity_id, $entity, $entity_state, $repeatdays);
     }
     $this->logger->debug("Removing exceptions");
     if (count($of->events) > 0) {
@@ -315,7 +299,7 @@ class EventAlertCronJob extends CronJob{
         $of->removeOccurrences($exception_q->f('eventexception_parent_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
       }
     }
-  }    
+  }
 
   /**
    * getAlertDelta 
