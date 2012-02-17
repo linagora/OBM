@@ -197,6 +197,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		Event convertedEvent = new Event();
 		fillEventExceptionProperties(user, convertedEvent, eventFromDB, parentEvent, msEventException, isObmInternalEvent);
 		convertedEvent.setRecurrenceId(msEventException.getExceptionStartTime());
+		convertedEvent.setAttendees(parentEvent.getAttendees());
 		return convertedEvent;
 	}
 	
