@@ -40,7 +40,7 @@ import org.obm.sync.calendar.ParticipationState;
 
 public interface MSEventToObmEventConverter {
 	
-	Event convert(User user, Event oldEvent, MSEvent data, boolean isInternal) throws ConversionException;
+	Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) throws ConversionException;
 
 	boolean isInternalEvent(Event event, boolean defaultValue);
 	

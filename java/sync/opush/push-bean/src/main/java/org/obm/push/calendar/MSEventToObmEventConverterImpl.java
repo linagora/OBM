@@ -83,32 +83,32 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 	private static final int EVENT_ALLDAY_DURATION_IN_MS = 24 * 3600;
 	private static final int EVENT_CATEGORIES_MAX = 300;
-
+	
 	@Override
-	public Event convert(User user, Event oldEvent, MSEvent event, boolean isObmInternalEvent) 
+	public Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent)
 			throws ConversionException {
 
-		EventExtId extId = event.getExtId();
-		EventObmId obmId = event.getObmId();
+		EventExtId extId = msEvent.getExtId();
+		EventObmId obmId = msEvent.getObmId();
 		
-		Event e = convertMSEventToObmEvent(user, oldEvent, null, event, isObmInternalEvent);
-		e.setExtId(extId);
-		e.setUid(obmId);
+		Event convertedEvent = convertMSEventToObmEvent(user, eventFromDB, msEvent, isObmInternalEvent);
+		convertedEvent.setExtId(extId);
+		convertedEvent.setUid(obmId);
 		
-		if(event.getObmSequence() != null){
-			e.setSequence(event.getObmSequence());
+		if(msEvent.getObmSequence() != null){
+			convertedEvent.setSequence(msEvent.getObmSequence());
 		}
 		
-		if (event.getRecurrence() != null) {
-			EventRecurrence r = getRecurrence(event);
-			e.setRecurrence(r);
-			if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
-				for (MSEventException excep : event.getExceptions()) {
+		if (msEvent.getRecurrence() != null) {
+			EventRecurrence r = getRecurrence(msEvent);
+			convertedEvent.setRecurrence(r);
+			if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
+				for (MSEventException excep : msEvent.getExceptions()) {
 					assertExceptionValidity(r, excep);
 					if (excep.isDeleted()) {
 						r.addException(excep.getExceptionStartTime());
 					} else {
-						Event obmEvent = convertEventException(user, oldEvent, e, excep, isObmInternalEvent);
+						Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, excep, isObmInternalEvent);
 						obmEvent.setExtId(extId);
 						obmEvent.setUid(obmId);
 						
@@ -118,11 +118,11 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			}
 		}
 
-		return e;
+		return convertedEvent;
 	}
 
 	private void fillEventCommonProperties(User user, Event converted, Event oldEvent, Event parentEvent, 
-			MSEventCommon msEvent, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
+			MSEventCommon msEvent, boolean isObmInternalEvent) throws IllegalMSEventStateException {
 		
 		assignOwner(user, converted, oldEvent);
 		converted.setInternalEvent(isObmInternalEvent);
@@ -159,23 +159,17 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 	}
 	
-	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
-	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
-	// optional.
-	private Event convertMSEventToObmEvent(User user, Event oldEvent, Event parentEvent, MSEvent data, boolean isObmInternalEvent) 
-			throws org.obm.push.exception.IllegalMSEventStateException {
+	private Event convertMSEventToObmEvent(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) 
+			throws IllegalMSEventStateException {
 
-		Event e = new Event();
-		fillEventCommonProperties(user, e, oldEvent, null, data, isObmInternalEvent);
-		e.setAttendees( getAttendees(oldEvent, parentEvent, data) );
-		e.setTimezoneName(convertTimeZone(data));
-		assignOrganizer(user, e, data);
-		return e;
+		Event convertedEvent = new Event();
+		fillEventCommonProperties(user, convertedEvent, eventFromDB, null, msEvent, isObmInternalEvent);
+		convertedEvent.setAttendees( getAttendees(eventFromDB, msEvent) );
+		convertedEvent.setTimezoneName(convertTimeZone(msEvent));
+		assignOrganizer(user, convertedEvent, msEvent);
+		return convertedEvent;
 	}
 
-	// Exceptions.Exception.Body (section 2.2.3.9): This element is optional.
-	// Exceptions.Exception.Categories (section 2.2.3.8): This element is
-	// optional.
 	private Event convertEventException(User user, Event oldEvent, Event parentEvent, 
 			MSEventException data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
@@ -414,18 +408,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private List<Attendee> getAttendees(Event oldEvent, Event parentEvent, MSEvent data)
-			throws IllegalMSEventExceptionStateException {
-		List<Attendee> ret = new LinkedList<Attendee>();
-		if (parentEvent != null && data.getAttendees().isEmpty()) {
-			// copy parent attendees. CalendarBackend ensured parentEvent has attendees.
-			ret.addAll(parentEvent.getAttendees());
+	private List<Attendee> getAttendees(Event eventFromDB, MSEvent msEvent) throws IllegalMSEventExceptionStateException {
+		List<Attendee> attendees = new LinkedList<Attendee>();
+		if (msEvent.getAttendees().isEmpty()) {
+			attendees.addAll(eventFromDB.getAttendees());
 		} else {
-			for (MSAttendee at: data.getAttendees()) {
-				ret.add( convertAttendee(oldEvent, data, at) );
+			for (MSAttendee at: msEvent.getAttendees()) {
+				attendees.add( convertAttendee(eventFromDB, msEvent, at) );
 			}
 		}
-		return ret;
+		return attendees;
 	}
 	
 	private void assignOrganizer(User user, Event e, MSEvent data) {
@@ -447,7 +439,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 	
-	private Attendee convertAttendee(Event oldEvent, MSEvent event, MSAttendee at) throws IllegalMSEventExceptionStateException {
+	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee at) throws IllegalMSEventExceptionStateException {
 		if (Strings.isNullOrEmpty(Strings.emptyToNull(at.getEmail()))) {
 			throw new IllegalMSEventExceptionStateException("Attendees.Attendee.Email is required");
 		}
@@ -456,10 +448,11 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		ret.setDisplayName(at.getName());
 		ret.setParticipationRole(getParticipationRole(at.getAttendeeType()));
 		
-		ParticipationState status = getParticipationState(getAttendeeState(oldEvent, at) , at.getAttendeeStatus());
+		ParticipationState status = getParticipationState( 
+				getAttendeeState(eventFromDB, at) , at.getAttendeeStatus());
 		ret.setState(status);
 		
-		ret.setOrganizer( isOrganizer(event, at) );
+		ret.setOrganizer( isOrganizer(msEvent, at) );
 		return ret;
 	}
 
