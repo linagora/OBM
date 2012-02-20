@@ -60,9 +60,7 @@ import org.obm.push.exception.IllegalMSEventRecurrenceException;
 import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventMeetingStatus;
-import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
@@ -88,49 +86,27 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	public Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent)
 			throws ConversionException {
 
-		EventExtId extId = msEvent.getExtId();
-		EventObmId obmId = msEvent.getObmId();
-		
 		Event convertedEvent = convertMSEventToObmEvent(user, eventFromDB, msEvent, isObmInternalEvent);
-		convertedEvent.setExtId(extId);
-		convertedEvent.setUid(obmId);
-		
-		if(msEvent.getObmSequence() != null){
-			convertedEvent.setSequence(msEvent.getObmSequence());
-		}
-		
-		if (msEvent.getRecurrence() != null) {
-			EventRecurrence r = getRecurrence(msEvent);
-			convertedEvent.setRecurrence(r);
-			if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
-				for (MSEventException msEventException : msEvent.getExceptions()) {
-					assertExceptionValidity(r, msEventException);
-					if (msEventException.isDeleted()) {
-						r.addException(msEventException.getExceptionStartTime());
-					} else {
-						Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
-								msEventException, isObmInternalEvent);
-						
-						obmEvent.setExtId(extId);
-						obmEvent.setUid(obmId);
-						
-						r.addEventException(obmEvent);
-					}
-				}
-			}
-		}
+		fillEventRecurrence(user, eventFromDB, msEvent, isObmInternalEvent, convertedEvent);
 
 		return convertedEvent;
 	}
-
+	
 	private Event convertMSEventToObmEvent(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) 
 			throws IllegalMSEventStateException {
 
 		Event convertedEvent = new Event();
-		fillEventProperties(user, convertedEvent, eventFromDB, msEvent, isObmInternalEvent);
+		convertedEvent.setExtId(msEvent.getExtId());
+		convertedEvent.setUid(msEvent.getObmId());
 		convertedEvent.setAttendees( getAttendees(eventFromDB, msEvent) );
 		convertedEvent.setTimezoneName(convertTimeZone(msEvent));
+		if (msEvent.getObmSequence() != null) {
+			convertedEvent.setSequence(msEvent.getObmSequence());
+		}
+		
 		assignOrganizer(user, convertedEvent, msEvent);
+		fillEventProperties(user, convertedEvent, eventFromDB, msEvent, isObmInternalEvent);
+		
 		return convertedEvent;
 	}
 	
@@ -182,13 +158,46 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setMeetingStatus(meetingStatus);
 	}
 
-	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
-			MSEventException data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
+	private void fillEventRecurrence(User user, Event eventFromDB, MSEvent msEvent, 
+			boolean isObmInternalEvent, Event convertedEvent) throws IllegalMSEventStateException {
 		
-		Event e = new Event();
-		fillEventExceptionProperties(user, e, eventFromDB, parentEvent, data, isObmInternalEvent);
-		e.setRecurrenceId(data.getExceptionStartTime());
-		return e;
+		if (msEvent.getRecurrence() != null) {
+			
+			EventRecurrence eventRecurrence = getRecurrence(msEvent);
+			convertedEvent.setRecurrence(eventRecurrence);
+			
+			fillEventException(user, eventFromDB, msEvent, isObmInternalEvent, convertedEvent, eventRecurrence);
+		}
+	}
+
+	private void fillEventException(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent, 
+			Event convertedEvent, EventRecurrence eventRecurrence) throws IllegalMSEventStateException {
+		
+		if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
+		
+			for (MSEventException msEventException : msEvent.getExceptions()) {
+				assertExceptionValidity(eventRecurrence, msEventException);
+				if (msEventException.isDeleted()) {
+					eventRecurrence.addException(msEventException.getExceptionStartTime());
+				} else {
+					Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
+							msEventException, isObmInternalEvent);
+
+					obmEvent.setExtId(msEvent.getExtId());
+					obmEvent.setUid(msEvent.getObmId());
+					eventRecurrence.addEventException(obmEvent);
+				}
+			}
+		}
+	}
+	
+	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
+			MSEventException msEventException, boolean isObmInternalEvent) throws IllegalMSEventStateException {
+		
+		Event convertedEvent = new Event();
+		fillEventExceptionProperties(user, convertedEvent, eventFromDB, parentEvent, msEventException, isObmInternalEvent);
+		convertedEvent.setRecurrenceId(msEventException.getExceptionStartTime());
+		return convertedEvent;
 	}
 	
 	private void fillEventExceptionProperties(User user, Event convertedEvent, Event eventFromDB, Event parentEvent, 
