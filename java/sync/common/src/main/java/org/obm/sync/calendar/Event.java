@@ -478,7 +478,7 @@ public class Event implements Indexed<Integer> {
 		ComparatorUsingEventHasImportantChanges comparator = new ComparatorUsingEventHasImportantChanges();
 		boolean hasImportantChanges = false;
 		if (comparator.equals(this, event)) {
-			if (this.recurrence != null) {
+			if (this.isRecurrent()) {
 				hasImportantChanges =  this.recurrence.hasImportantChanges(event.getRecurrence());
 			}
 		} else {
@@ -491,7 +491,7 @@ public class Event implements Indexed<Integer> {
 		ComparatorUsingEventHasImportantChanges comparator = new ComparatorUsingEventHasImportantChanges();
 		boolean hasImportantChanges = false;
 		if (comparator.equals(this, event)) {
-			if (this.recurrence != null) {
+			if (this.isRecurrent()) {
 				hasImportantChanges =  this.recurrence.hasImportantChangesExceptedEventException(event.getRecurrence());
 			}
 		} else {
