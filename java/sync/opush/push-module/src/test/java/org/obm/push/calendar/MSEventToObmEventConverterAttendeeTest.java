@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
+import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User;
@@ -240,6 +241,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAttendees(Sets.newHashSet(attendee))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		return msEvent;
 	}

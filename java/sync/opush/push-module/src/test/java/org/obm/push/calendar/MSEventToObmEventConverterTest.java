@@ -96,6 +96,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(false)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -110,6 +111,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(true)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -124,6 +126,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -160,6 +163,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.FREE)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -174,6 +178,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.BUSY)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -188,6 +193,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withBusyStatus(CalendarBusyStatus.UNAVAILABLE)
 				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -202,6 +208,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withBusyStatus(CalendarBusyStatus.TENTATIVE)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -216,6 +223,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withBusyStatus(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -230,6 +238,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withCategories(new ArrayList<String>())
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -244,6 +253,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withCategories(Lists.newArrayList("category1", "category2"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -258,6 +268,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withCategories(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -270,10 +281,12 @@ public class MSEventToObmEventConverterTest {
 		String[] tooMuchCategories = new String[301];
 		Arrays.fill(tooMuchCategories, "a category");
 		MSEvent msEvent = new MSEventBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withCategories(Arrays.asList(tooMuchCategories))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event event = convertToOBMEvent(msEvent);
@@ -287,6 +300,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -306,6 +320,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T12:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
@@ -321,6 +336,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDtStamp(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -336,6 +352,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDescription("any description")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -350,6 +367,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withDescription(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -364,6 +382,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withTimeZone(TimeZone.getTimeZone("America/Tijuana"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -378,6 +397,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withTimeZone(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -392,6 +412,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withLocation("Any location")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -406,6 +427,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withLocation(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -419,6 +441,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -432,6 +455,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -443,6 +467,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEvent);
@@ -455,6 +480,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withReminder(150)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -470,6 +496,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withReminder(0)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -484,6 +511,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withReminder(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -498,6 +526,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withSensitivity(CalendarSensitivity.NORMAL)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -512,6 +541,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withSensitivity(CalendarSensitivity.CONFIDENTIAL)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -526,6 +556,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withSensitivity(CalendarSensitivity.PERSONAL)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -540,6 +571,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withSensitivity(CalendarSensitivity.PRIVATE)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -554,6 +586,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any subject")
 				.withSensitivity(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -568,6 +601,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withOrganizerName("Any Name")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -583,6 +617,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withOrganizerName(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -598,6 +633,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withOrganizerEmail("email@domain")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -614,6 +650,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withOrganizerEmail(null)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -631,6 +668,7 @@ public class MSEventToObmEventConverterTest {
 				.withSubject("Any Subject")
 				.withOrganizerName("Any Name")
 				.withOrganizerEmail("user@domain")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -698,6 +736,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-11T12:15:10Z"))
 				.withAllDayEvent(true)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event converted = convertToOBMEvent(msEvent);
@@ -713,6 +752,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2005-12-11T11:15:10Z"))
 				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -791,7 +831,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED);
 	}
 
-	@Test
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeMeetingStatusNull() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -811,6 +851,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2005-12-11T11:15:10Z"))
 				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -827,6 +868,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2005-12-11T12:15:10Z"))
 				.withAllDayEvent(true)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -844,6 +886,7 @@ public class MSEventToObmEventConverterTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(true)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);
@@ -859,6 +902,7 @@ public class MSEventToObmEventConverterTest {
 				.withEndTime(date("2004-12-11T12:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(true)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEvent);

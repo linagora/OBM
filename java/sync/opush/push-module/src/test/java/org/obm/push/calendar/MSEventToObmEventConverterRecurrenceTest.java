@@ -41,6 +41,7 @@ import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
+import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
@@ -111,6 +112,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -149,6 +151,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -174,6 +177,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -195,6 +199,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -216,6 +221,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -239,6 +245,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -261,6 +268,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -294,6 +302,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -332,6 +341,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -357,6 +367,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -378,6 +389,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -399,6 +411,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -422,6 +435,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -444,6 +458,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -473,6 +488,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -492,6 +508,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -507,6 +524,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -531,6 +549,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -547,6 +566,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -566,6 +586,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -586,6 +607,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -608,6 +630,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -625,6 +648,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -640,6 +664,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -659,6 +684,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -674,6 +700,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -698,6 +725,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -714,6 +742,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -733,6 +762,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -753,6 +783,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -775,6 +806,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -794,7 +826,9 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
-				.withSubject("Any Subject").withRecurrence(recurrence).build();
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.withRecurrence(recurrence).build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
@@ -815,6 +849,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -832,6 +867,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -868,6 +904,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -884,6 +921,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -908,6 +946,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -928,6 +967,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -948,6 +988,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -970,6 +1011,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -991,6 +1033,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -1007,6 +1050,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1027,6 +1071,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1048,6 +1093,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -1064,6 +1110,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1083,6 +1130,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -1121,6 +1169,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1145,6 +1194,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1165,6 +1215,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1186,6 +1237,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1209,6 +1261,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1230,6 +1283,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -1251,6 +1305,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
@@ -1278,6 +1333,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withRecurrence(recurrence)
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);

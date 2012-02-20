@@ -299,6 +299,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withDtStamp(null)
 				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(msEventException))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
@@ -403,7 +404,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Assertions.assertThat(exception.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED);
 	}
 
-	@Test(expected=IllegalMSEventExceptionStateException.class)
+	@Test
 	public void testConvertAttributeMeetingStatusIsRequired() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -431,7 +432,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.build();
 		
 		MSEvent msEvent = makeMSEventWithException(msEventException);
-		msEvent.setMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING);
+		msEvent.setMeetingStatus(null);
 		
 		convertToOBMEvent(msEvent);
 	}
@@ -454,6 +455,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withSubject("Any Subject")
 				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(msEventException))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -1270,6 +1272,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withSubject("Any Subject")
 				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(exceptions))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		return msEvent;

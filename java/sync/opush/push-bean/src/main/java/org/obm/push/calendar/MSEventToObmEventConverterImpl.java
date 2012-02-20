@@ -143,7 +143,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setTimeUpdate(msEvent.getDtStamp());
 		convertedEvent.setDuration(convertDuration(msEvent));
 		convertedEvent.setStartDate(msEvent.getStartTime());
-		convertedEvent.setMeetingStatus(convertMeetingStatus(msEvent));
 	}
 	
 	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEventCommon msEvent, 
@@ -178,6 +177,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 		Date dtStamp = convertDtStamp(eventFromDB, msEvent);
 		convertedEvent.setTimeCreate(dtStamp);
+		
+		EventMeetingStatus meetingStatus = convertMeetingStatus(msEvent);
+		convertedEvent.setMeetingStatus(meetingStatus);
 	}
 
 	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
@@ -221,6 +223,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 		Date dtStamp = convertDtStamp(parentEvent, eventFromDB, msEvent);
 		convertedEvent.setTimeCreate(dtStamp);
+		
+		EventMeetingStatus meetingStatus = convertMeetingStatus(parentEvent, msEvent);
+		convertedEvent.setMeetingStatus(meetingStatus);
 	}
 	
 	private String convertDescription(MSEventCommon msEvent) {
@@ -348,12 +353,22 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private EventMeetingStatus convertMeetingStatus(MSEventCommon data) {
-		if (data.getMeetingStatus() != null) {
-			return convertMeetingStatus(data.getMeetingStatus());
+	private EventMeetingStatus convertMeetingStatus(MSEventCommon msEvent) throws IllegalMSEventExceptionStateException {
+		if (msEvent.getMeetingStatus() != null) {
+			return convertMeetingStatus(msEvent.getMeetingStatus());
 		} else {
-			return null;
+			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.MeetingStatus is required");	
 		}
+	}
+	
+	private EventMeetingStatus convertMeetingStatus(Event parentEvent, MSEventCommon msEvent) {
+		EventMeetingStatus eventMeetingStatus;
+		try {
+			eventMeetingStatus = convertMeetingStatus(msEvent);
+		} catch (IllegalMSEventExceptionStateException e) {
+			eventMeetingStatus = parentEvent.getMeetingStatus();
+		}
+		return eventMeetingStatus;
 	}
 
 	private EventMeetingStatus convertMeetingStatus(CalendarMeetingStatus meetingStatus) {
@@ -693,19 +708,12 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			throws IllegalMSEventExceptionStateException {
 		assertExceptionDoesntExistInRecurrence(recurrence, exception);
 		assertExceptionStartTime(exception);
-		assertExceptionMeetingStatus(exception);
 	}
 
 	private void assertExceptionDoesntExistInRecurrence(EventRecurrence recurrence, MSEventException exception)
 			throws IllegalMSEventExceptionStateException {
 		if (recurrence.hasAnyExceptionAtDate(exception.getExceptionStartTime())) {
 			throw new IllegalMSEventExceptionStateException("Try to add an already existing exception date");
-		}
-	}
-
-	private void assertExceptionMeetingStatus(MSEventException exception) throws IllegalMSEventExceptionStateException {
-		if (exception.getMeetingStatus() == null) {
-			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.MeetingStatus is required");
 		}
 	}
 
