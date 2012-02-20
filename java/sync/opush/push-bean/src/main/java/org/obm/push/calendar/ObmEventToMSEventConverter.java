@@ -38,6 +38,8 @@ import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Event;
 
 public interface ObmEventToMSEventConverter {
+
+	public static final int ACTIVESYNC_DEFAULT_FREQUENCY = 1;
 	
 	MSEvent convert(Event eventToConvert, MSEventUid uid, User user) throws ConversionException;
 	

@@ -33,6 +33,7 @@ package org.obm.push.calendar;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.obm.DateUtils.date;
+import static org.obm.push.calendar.ObmEventToMSEventConverter.ACTIVESYNC_DEFAULT_FREQUENCY;
 
 import java.util.Arrays;
 import java.util.List;
@@ -175,7 +176,6 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msEvent.getReminder()).isNull();
 	}
 	
-	@Ignore
 	@Test
 	public void testAllDayEvent() throws ConversionException {
 		Event event = basicEvent();
@@ -186,7 +186,6 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-14T21:39:45Z"));
 	}
 	
-	@Ignore
 	@Test
 	public void testDailyRecurrence() throws ConversionException {
 		Event event = basicEvent();
@@ -201,7 +200,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msRecurrence.getDayOfMonth()).isNull();
 		assertThat(msRecurrence.getDayOfWeek()).isNull();
 		assertThat(msRecurrence.getDeadOccur()).isNull();
-		assertThat(msRecurrence.getInterval()).isEqualTo(0);
+		assertThat(msRecurrence.getInterval()).isEqualTo(ACTIVESYNC_DEFAULT_FREQUENCY);
 		assertThat(msRecurrence.getMonthOfYear()).isNull();
 		assertThat(msRecurrence.getOccurrences()).isNull();
 		assertThat(msRecurrence.getRegenerate()).isNull();

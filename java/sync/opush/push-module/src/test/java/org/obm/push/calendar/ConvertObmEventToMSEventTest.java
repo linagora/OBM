@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
 
 public class ConvertObmEventToMSEventTest extends ConvertObmEventToMsEventIntegrityTest{
 
@@ -39,5 +38,5 @@ public class ConvertObmEventToMSEventTest extends ConvertObmEventToMsEventIntegr
 	protected ObmEventToMSEventConverter newObmEventToMSEventConverter() {
 		return new ObmEventToMSEventConverterImpl();
 	}
-	
+
 }

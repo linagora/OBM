@@ -46,6 +46,7 @@ import com.google.common.collect.Lists;
 
 public class EventRecurrence {
 
+	private static final int UNSPECIFIED_FREQUENCY_VALUE = 0;
 	private RecurrenceDays days;
 	private Date end;
 	private int frequence;
@@ -185,6 +186,10 @@ public class EventRecurrence {
 		eventExceptions = eventExceptionsCopy;
 	}
 
+	public boolean frequencyIsSpecified() {
+		return frequence != UNSPECIFIED_FREQUENCY_VALUE;
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(days, end, frequence, kind, exceptions,
