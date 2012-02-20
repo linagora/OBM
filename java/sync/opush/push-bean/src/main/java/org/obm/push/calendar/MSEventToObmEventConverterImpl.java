@@ -121,67 +121,123 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return convertedEvent;
 	}
 
-	private void fillEventCommonProperties(User user, Event converted, Event oldEvent, Event parentEvent, 
-			MSEventCommon msEvent, boolean isObmInternalEvent) throws IllegalMSEventStateException {
-		
-		assignOwner(user, converted, oldEvent);
-		converted.setInternalEvent(isObmInternalEvent);
-		converted.setType(EventType.VEVENT);
-		
-		converted.setTitle(convertSubject(parentEvent, msEvent));
-		
-		if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getDescription())) {
-			converted.setDescription(parentEvent.getDescription());
-		} else {
-			converted.setDescription(msEvent.getDescription());
-		}
-		
-		converted.setLocation(convertLocation(parentEvent, msEvent));
-		
-		converted.setTimeUpdate(msEvent.getDtStamp());
-		converted.setTimeCreate(convertDtStamp(msEvent, oldEvent));
-		
-		converted.setDuration(convertDuration(msEvent));
-		converted.setAllday(convertAllDay(parentEvent, msEvent));
-		converted.setStartDate(msEvent.getStartTime());
-		converted.setCategory(convertCategories(parentEvent, msEvent));
-		converted.setMeetingStatus(convertMeetingStatus(msEvent));
-		
-		converted.setAlert(convertReminder(parentEvent, msEvent));
-
-		converted.setOpacity(convertBusyStatus(parentEvent, msEvent));
-
-		if (msEvent.getSensitivity() == null && parentEvent != null) {
-			converted.setPrivacy(parentEvent.getPrivacy());
-		} else {
-			converted.setPrivacy(privacy(oldEvent, msEvent.getSensitivity()));
-		}
-		
-	}
-	
 	private Event convertMSEventToObmEvent(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) 
 			throws IllegalMSEventStateException {
 
 		Event convertedEvent = new Event();
-		fillEventCommonProperties(user, convertedEvent, eventFromDB, null, msEvent, isObmInternalEvent);
+		fillEventProperties(user, convertedEvent, eventFromDB, msEvent, isObmInternalEvent);
 		convertedEvent.setAttendees( getAttendees(eventFromDB, msEvent) );
 		convertedEvent.setTimezoneName(convertTimeZone(msEvent));
 		assignOrganizer(user, convertedEvent, msEvent);
 		return convertedEvent;
+	}
+	
+	private void fillEventCommonProperties(User user, Event convertedEvent, Event eventFromDB, MSEventCommon msEvent, 
+			boolean isObmInternalEvent) throws IllegalMSEventStateException {
+		
+		assignOwner(user, convertedEvent, eventFromDB);
+		convertedEvent.setInternalEvent(isObmInternalEvent);
+		convertedEvent.setType(EventType.VEVENT);
+		convertedEvent.setTimeUpdate(msEvent.getDtStamp());
+		convertedEvent.setTimeCreate(convertDtStamp(msEvent, eventFromDB));
+		convertedEvent.setDuration(convertDuration(msEvent));
+		convertedEvent.setStartDate(msEvent.getStartTime());
+		convertedEvent.setMeetingStatus(convertMeetingStatus(msEvent));
+	}
+	
+	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEventCommon msEvent, 
+			boolean isObmInternalEvent) throws IllegalMSEventStateException {
+		
+		fillEventCommonProperties(user, convertedEvent, eventFromDB, 
+				msEvent, isObmInternalEvent);
+		
+		String title = convertSubjectToTitle(msEvent);
+		convertedEvent.setTitle(title);
+		
+		String description = convertDescription(msEvent);
+		convertedEvent.setDescription(description);
+		
+		String location = convertLocation(msEvent);
+		convertedEvent.setLocation(location);
+		
+		boolean isAllDay = isAllDayEvent(msEvent);
+		convertedEvent.setAllday(isAllDay);
+		
+		String category = convertCategories(msEvent);
+		convertedEvent.setCategory(category);
+		
+		Integer reminder = convertReminder(msEvent);
+		convertedEvent.setAlert(reminder);
+
+		EventOpacity busyStatus = convertBusyStatusToOpacity(msEvent);
+		convertedEvent.setOpacity(busyStatus);
+
+		EventPrivacy eventPrivacy = convertSensitivityToPrivacy(msEvent);
+		convertedEvent.setPrivacy(eventPrivacy);
+		
 	}
 
 	private Event convertEventException(User user, Event oldEvent, Event parentEvent, 
 			MSEventException data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
 		Event e = new Event();
-		fillEventCommonProperties(user, e, oldEvent, parentEvent, data, isObmInternalEvent);
+		fillEventExceptionProperties(user, e, oldEvent, parentEvent, data, isObmInternalEvent);
 		e.setRecurrenceId(data.getExceptionStartTime());
 		return e;
 	}
+	
+	private void fillEventExceptionProperties(User user, Event convertedEvent, Event eventFromDB, Event parentEvent, 
+			MSEventException msEvent, boolean isObmInternalEvent) throws IllegalMSEventStateException {
+		
+		fillEventCommonProperties(user, convertedEvent, eventFromDB, 
+				msEvent, isObmInternalEvent);
+		
+		String title = convertSubjectToTitle(parentEvent, msEvent);
+		convertedEvent.setTitle(title);
+		
+		String description = convertDescription(parentEvent, msEvent);
+		convertedEvent.setDescription(description);
+		
+		String location = convertLocation(parentEvent, msEvent);
+		convertedEvent.setLocation(location);
+		
+		boolean isAllDay = convertAllDay(parentEvent, msEvent);
+		convertedEvent.setAllday(isAllDay);
+		
+		String category = convertCategories(parentEvent, msEvent);
+		convertedEvent.setCategory(category);
+		
+		Integer reminder = convertReminder(parentEvent, msEvent);
+		convertedEvent.setAlert(reminder);
 
-	private ParticipationState getAttendeeState(Event oldEvent, MSAttendee at) {
-		if (oldEvent != null) {
-			Attendee attendee = oldEvent.findAttendeeFromEmail(at.getEmail());
+		EventOpacity busyStatus = convertBusyStatusToOpacity(parentEvent, msEvent);
+		convertedEvent.setOpacity(busyStatus);
+
+		EventPrivacy eventPrivacy = convertSensitivityToPrivacy(parentEvent, msEvent);
+		convertedEvent.setPrivacy(eventPrivacy);
+	}
+	
+	private String convertDescription(MSEventCommon msEvent) {
+		if (!Strings.isNullOrEmpty(msEvent.getDescription())) {
+			return msEvent.getDescription();
+		} else {
+			return null;
+		}
+	}
+	
+	private String convertDescription(Event parentEvent, MSEventCommon msEvent) {
+		String description = convertDescription(msEvent);
+		if (description == null) {
+			if (!Strings.isNullOrEmpty(parentEvent.getDescription())) {
+				description = parentEvent.getDescription();
+			}
+		}
+		return description;
+	}
+
+	private ParticipationState getAttendeeState(Event eventFromBD, MSAttendee msAttendee) {
+		if (eventFromBD != null) {
+			Attendee attendee = eventFromBD.findAttendeeFromEmail(msAttendee.getEmail());
 			if (attendee != null) {
 				return attendee.getState();
 			}
@@ -208,45 +264,81 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return att;
 	}	
 	
-	private EventPrivacy privacy(Event oldEvent, CalendarSensitivity sensitivity) {
-		if (sensitivity == null) {
-			return oldEvent != null ? oldEvent.getPrivacy() : EventPrivacy.PUBLIC;
-		}
-
-		if (sensitivity == CalendarSensitivity.NORMAL) {
+	private EventPrivacy convertSensitivityToPrivacy(MSEventCommon msEvent) {
+		if (msEvent.getSensitivity() != null) {
+			if (msEvent.getSensitivity() == CalendarSensitivity.NORMAL) {
+				return EventPrivacy.PUBLIC;
+			} else {
+				return EventPrivacy.PRIVATE;
+			}
+		} else {
 			return EventPrivacy.PUBLIC;
-		} else {
-			return EventPrivacy.PRIVATE;
 		}
 	}
 
-	private String convertLocation(Event parentEvent, MSEventCommon data) {
-		if (!Strings.isNullOrEmpty(data.getLocation())) {
-			return data.getLocation();
-		} else if (parentEvent != null) {
-			return parentEvent.getLocation();
+	private EventPrivacy convertSensitivityToPrivacy(Event parentEvent, MSEventCommon msEvent) {
+		EventPrivacy eventPrivacy = EventPrivacy.PUBLIC;
+		if (msEvent.getSensitivity() != null) {
+			eventPrivacy = convertSensitivityToPrivacy(msEvent);
 		} else {
-			return null;
+			if (parentEvent.getPrivacy() != null) {
+				eventPrivacy = parentEvent.getPrivacy();
+			}
 		}
+		return eventPrivacy;
 	}
 
-	private Integer convertReminder(Event parentEvent, MSEventCommon data) {
-		if (data.getReminder() != null) {
-			return (int) minutesToSeconds(data.getReminder());
-		} else if (parentEvent != null) {
-			return parentEvent.getAlert();
+	private String convertLocation(MSEventCommon msEvent) {
+		if (!Strings.isNullOrEmpty(msEvent.getLocation())) {
+			return msEvent.getLocation();
 		} else {
 			return null;
 		}
 	}
+	
+	private String convertLocation(Event parentEvent, MSEventCommon msEvent) {
+		String location = convertLocation(msEvent);
+		if (location == null) {
+			if (!Strings.isNullOrEmpty(parentEvent.getLocation())) {
+				location = parentEvent.getLocation();
+			}
+		}
+		return location;
+	}
 
-	private String convertSubject(Event parentEvent, MSEventCommon data) throws IllegalMSEventStateException {
-		if (!Strings.isNullOrEmpty(data.getSubject())) {
-			return data.getSubject();
-		} else if (parentEvent != null && !Strings.isNullOrEmpty(parentEvent.getTitle())) {
-			return parentEvent.getTitle();
+	private Integer convertReminder(MSEventCommon msEvent) {
+		if (msEvent.getReminder() != null) {
+			return minutesToSeconds(msEvent.getReminder());
+		} else {
+			return null;
+		}
+	}
+	
+	private Integer convertReminder(Event parentEvent, MSEventCommon msEvent) {
+		Integer reminder = convertReminder(msEvent);
+		if (reminder == null) {
+			reminder = parentEvent.getAlert();
+		} 
+		return reminder;
+	}
+
+	private String convertSubjectToTitle(MSEventCommon msEvent) throws IllegalMSEventStateException {
+		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
+			return msEvent.getSubject();
 		} else {
 			throw new IllegalMSEventStateException("Subject is required");
+		}
+	}
+	
+	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) throws IllegalMSEventStateException {
+		try {
+			return convertSubjectToTitle(msEvent);
+		} catch (IllegalMSEventStateException ex) {
+			if (!Strings.isNullOrEmpty(parentEvent.getTitle())) {
+				return parentEvent.getTitle();
+			} else {
+				throw ex;
+			}
 		}
 	}
 
@@ -410,11 +502,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 	private List<Attendee> getAttendees(Event eventFromDB, MSEvent msEvent) throws IllegalMSEventExceptionStateException {
 		List<Attendee> attendees = new LinkedList<Attendee>();
+		if ( msEvent.getAttendees().isEmpty() && 
+				(eventFromDB == null || eventFromDB.getAttendees().isEmpty()) ) {
+			return attendees;
+		}
+		
 		if (msEvent.getAttendees().isEmpty()) {
 			attendees.addAll(eventFromDB.getAttendees());
 		} else {
-			for (MSAttendee at: msEvent.getAttendees()) {
-				attendees.add( convertAttendee(eventFromDB, msEvent, at) );
+			for (MSAttendee msAttendee: msEvent.getAttendees()) {
+				attendees.add( convertAttendee(eventFromDB, msEvent, msAttendee) );
 			}
 		}
 		return attendees;
@@ -439,20 +536,23 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 	
-	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee at) throws IllegalMSEventExceptionStateException {
-		if (Strings.isNullOrEmpty(Strings.emptyToNull(at.getEmail()))) {
+	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee msAttendee) throws IllegalMSEventExceptionStateException {
+		if (Strings.isNullOrEmpty(Strings.emptyToNull(msAttendee.getEmail()))) {
 			throw new IllegalMSEventExceptionStateException("Attendees.Attendee.Email is required");
 		}
+		
 		Attendee ret = new Attendee();
-		ret.setEmail(at.getEmail());
-		ret.setDisplayName(at.getName());
-		ret.setParticipationRole(getParticipationRole(at.getAttendeeType()));
+		ret.setEmail(msAttendee.getEmail());
+		ret.setDisplayName(msAttendee.getName());
+		ret.setParticipationRole( 
+				getParticipationRole(msAttendee.getAttendeeType()) );
 		
 		ParticipationState status = getParticipationState( 
-				getAttendeeState(eventFromDB, at) , at.getAttendeeStatus());
+				getAttendeeState(eventFromDB, msAttendee) , msAttendee.getAttendeeStatus() );
+		
 		ret.setState(status);
 		
-		ret.setOrganizer( isOrganizer(msEvent, at) );
+		ret.setOrganizer( isOrganizer(msEvent, msAttendee) );
 		return ret;
 	}
 
@@ -473,37 +573,47 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private EventOpacity convertBusyStatus(Event parentEvent, MSEventCommon from) {
-		if (from.getBusyStatus() != null) {
-			return convertBusyStatus(from);
-		} else if (parentEvent != null) {
-			return parentEvent.getOpacity();
-		} else {
-			return EventOpacity.OPAQUE;
+	private EventOpacity convertBusyStatusToOpacity(MSEventCommon msEvent) {
+		EventOpacity eventOpacity = EventOpacity.OPAQUE;
+		if (msEvent.getBusyStatus() != null) {
+			if (msEvent.getBusyStatus() == CalendarBusyStatus.FREE) {
+				eventOpacity = EventOpacity.TRANSPARENT;
+			}
 		}
+		return eventOpacity;
+	}
+
+	private EventOpacity convertBusyStatusToOpacity(Event parentEvent, MSEventCommon msEvent) {
+		EventOpacity eventOpacity = EventOpacity.OPAQUE;
+		if (msEvent.getBusyStatus() != null) {
+			eventOpacity = convertBusyStatusToOpacity(msEvent);
+		} else {
+			if (parentEvent.getOpacity() != null) {
+				eventOpacity = parentEvent.getOpacity();
+			}
+		}
+		return eventOpacity;
 	}
 	
-	private EventOpacity convertBusyStatus(MSEventCommon from) {
-		if (from.getBusyStatus() == CalendarBusyStatus.FREE) {
-			return EventOpacity.TRANSPARENT;
-		} else {
-			return EventOpacity.OPAQUE;
-		}
-	}
-	
-	private String convertCategories(Event parentEvent, MSEventCommon from) throws IllegalMSEventStateException {
-		if (eventHasCategories(from)) {
-			return convertCategories(from);
-		} else if (parentEvent != null) {
-			return parentEvent.getCategory();
+	private String convertCategories(MSEventCommon msEvent) {
+		if (msEvent.getCategories() != null && !msEvent.getCategories().isEmpty()) {
+			try {
+				assertEventCategoriesValidity(msEvent);
+				return Iterables.getFirst(msEvent.getCategories(), null);
+			} catch (IllegalMSEventStateException e) {
+				return null;
+			}
 		} else {
 			return null;
 		}
 	}
 	
-	private String convertCategories(MSEventCommon from) throws IllegalMSEventStateException {
-		assertEventCategoriesValidity(from);
-		return Iterables.getFirst(from.getCategories(), null);
+	private String convertCategories(Event parentEvent, MSEventCommon msEvent) {
+		String category = convertCategories(msEvent);
+		if (category == null) {
+			category = parentEvent.getCategory();
+		}
+		return category;
 	}
 
 	private void assertEventCategoriesValidity(MSEventCommon event) throws IllegalMSEventStateException {
@@ -514,22 +624,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private boolean eventHasCategories(MSEventCommon event) {
-		return event.getCategories() != null && !event.getCategories().isEmpty();
-	}
-
-	private boolean convertAllDay(Event parentEvent, MSEventCommon from) {
-		if (from.getAllDayEvent() != null) {
-			return isAllDayEvent(from);
-		} else if (parentEvent != null) {
-			return parentEvent.isAllday();
+	private boolean convertAllDay(Event parentEvent, MSEventCommon msEvent) {
+		if (msEvent.getAllDayEvent() != null) {
+			return msEvent.getAllDayEvent();
 		} else {
-			return false;
+			return parentEvent.isAllday();
 		}
 	}
 
-	private Boolean isAllDayEvent(MSEventCommon from) {
-		return Objects.firstNonNull(from.getAllDayEvent(), false);
+	private boolean isAllDayEvent(MSEventCommon msEvent) {
+		return Objects.firstNonNull(msEvent.getAllDayEvent(), false);
 	}
 
 	private int convertDuration(MSEventCommon data) throws IllegalMSEventStateException {

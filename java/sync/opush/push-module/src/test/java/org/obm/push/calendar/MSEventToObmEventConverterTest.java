@@ -265,7 +265,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.getCategory()).isNull();
 	}
 	
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test
 	public void testConvertAttributeCategoryBeyondThreeHundred() throws ConversionException {
 		String[] tooMuchCategories = new String[301];
 		Arrays.fill(tooMuchCategories, "a category");
@@ -276,7 +276,8 @@ public class MSEventToObmEventConverterTest {
 				.withCategories(Arrays.asList(tooMuchCategories))
 				.build();
 		
-		convertToOBMEvent(msEvent);
+		Event event = convertToOBMEvent(msEvent);
+		Assertions.assertThat(event.getCategory()).isNull();
 	}
 
 	@Test
@@ -950,6 +951,6 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	private int minuteToSecond(int minutes) {
-		return (int) DateUtils.minutesToSeconds(minutes);
+		return DateUtils.minutesToSeconds(minutes);
 	}
 }

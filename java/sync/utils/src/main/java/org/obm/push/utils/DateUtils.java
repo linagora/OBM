@@ -37,6 +37,8 @@ import java.util.TimeZone;
 
 import org.joda.time.Duration;
 
+import com.google.common.primitives.Ints;
+
 public class DateUtils {
 	
 	public static Calendar getCurrentGMTCalendar() {
@@ -103,8 +105,9 @@ public class DateUtils {
 		return (int) Math.ceil(startDay / 7d);
 	}
 
-	public static long minutesToSeconds(long minutes) {
-		return Duration.standardMinutes(minutes).getStandardSeconds();
+	public static int minutesToSeconds(long minutes) {
+		return Ints.checkedCast( 
+				Duration.standardMinutes(minutes).getStandardSeconds() );
 	}
 
 	public static long daysToSeconds(long days) {
