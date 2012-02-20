@@ -47,6 +47,7 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_country_insert($ctry) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $timecreate = date('Y-m-d H:i:s');
   $usercreate = sql_parse_id( $obm['uid']);
@@ -67,14 +68,13 @@ function run_query_admin_ref_country_insert($ctry) {
     ) VALUES (
      '$timecreate',
      '$usercreate',
-     '$iso',
-     '$name',
-     '$lang',
-     '$phone',
+     '".$obm_q->escape($iso)."',
+     '".$obm_q->escape($name)."',
+     '".$obm_q->escape($lang)."',
+     '".$obm_q->escape($phone)."',
      $domain_id)";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_country_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -88,6 +88,7 @@ function run_query_admin_ref_country_insert($ctry) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_country_update($ctry) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $timeupdate = date('Y-m-d H:i:s');
   $userupdate = sql_parse_id( $obm['uid']);
@@ -101,19 +102,18 @@ function run_query_admin_ref_country_update($ctry) {
   $multidomain = sql_multidomain('country');
 
   $query = "UPDATE Country SET
-      country_iso3166='$iso',
-      country_name='$name',
-      country_lang='$lang',
-      country_phone='$phone',
+      country_iso3166='".$obm_q->escape($iso)."',
+      country_name='".$obm_q->escape($name)."',
+      country_lang='".$obm_q->escape($lang)."',
+      country_phone='".$obm_q->escape($phone)."',
       country_timeupdate='$timeupdate',
       country_userupdate='$userupdate'
     WHERE
-      country_iso3166='$old_iso'
-      AND country_lang='$old_lang'
+      country_iso3166='".$obm_q->escape($old_iso)."'
+      AND country_lang='".$obm_q->escape($old_lang)."'
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_country_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -245,7 +245,7 @@ function run_query_admin_ref_datasource_insert($dsrc) {
     VALUES (
       '$timecreate',
       $usercreate,
-      '$name',
+      '".$obm_q->escape($name)."',
       $domain_id
     )";
 
@@ -390,6 +390,7 @@ function get_admin_ref_datasource_name($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_tasktype_insert($tt) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $timecreate = date('Y-m-d H:i:s');
   $usercreate = sql_parse_id( $obm['uid']);
@@ -407,14 +408,13 @@ function run_query_admin_ref_tasktype_insert($tt) {
     ) VALUES (
       '$timecreate',
       $usercreate,
-      '$int',
-      '$code',
-      '$label',
+      '".$obm_q->escape($int)."',
+      '".$obm_q->escape($code)."',
+      '".$obm_q->escape($label)."',
       $domain_id
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_tasktype_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -428,6 +428,7 @@ function run_query_admin_ref_tasktype_insert($tt) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_ref_tasktype_update($tt) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $multidomain = sql_multidomain('tasktype');
   $timeupdate = date('Y-m-d H:i:s');
@@ -437,8 +438,8 @@ function run_query_admin_ref_tasktype_update($tt) {
   $label = $tt['tt_label'];
 
   $query = "UPDATE TaskType SET
-      tasktype_code='$code',
-      tasktype_label='$label',
+      tasktype_code='".$obm_q->escape($code)."',
+      tasktype_label='".$obm_q->escape($label)."',
       tasktype_timeupdate='$timeupdate',
       tasktype_userupdate=$userupdate
     WHERE
@@ -446,7 +447,6 @@ function run_query_admin_ref_tasktype_update($tt) {
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_tasktype_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;

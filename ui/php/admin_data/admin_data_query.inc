@@ -405,16 +405,16 @@ function get_admin_data_contact_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_admin_data_sound_aka_one_company($id, $aka, $sound) {
   global $cdg_sql;
+  $u_q = new DB_OBM;
 
-  $aka_s = addslashes($aka);
+  $aka_s = $u_q->escape($aka);
   $id = sql_parse_id( $id, true);
   $query = "UPDATE Company SET
       company_aka='$aka_s',
-      company_sound='$sound'
+      company_sound='".$u_q->escape($sound)."'
     WHERE company_id $id"; 
 
   display_debug_msg($query, $cdg_sql);
-  $u_q = new DB_OBM;
   $retour = $u_q->query($query);
 
   return $retour;
@@ -430,16 +430,16 @@ function update_admin_data_sound_aka_one_company($id, $aka, $sound) {
 ///////////////////////////////////////////////////////////////////////////////
 function update_admin_data_sound_aka_one_contact($id, $aka, $sound) {
   global $cdg_sql;
+  $u_q = new DB_OBM;
 
-  $aka_s = addslashes($aka);
+  $aka_s = $u_q->($aka);
   $id = sql_parse_id( $id, true);
   $query = "UPDATE Contact SET
       contact_aka='$aka_s',
-      contact_sound='$sound'
+      contact_sound='".$u_q->escape($sound)."'
     WHERE contact_id $id"; 
 
   display_debug_msg($query, $cdg_sql);
-  $u_q = new DB_OBM;
   $retour = $u_q->query($query);
 
   return $retour;

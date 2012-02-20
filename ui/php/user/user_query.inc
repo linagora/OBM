@@ -499,6 +499,7 @@ function run_query_user_detail($p_id) {
 function run_query_user_insert($user) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_user, $cg_gid_user;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
   $login = strtolower($user['login']);
@@ -521,7 +522,7 @@ function run_query_user_insert($user) {
     } else {
       $passwd_crypt = $passwd;
     }
-    $passwd_crypt = addslashes($passwd_crypt);
+    $passwd_crypt = $obm_q->escape($passwd_crypt);
   }
 
   // infos
@@ -644,7 +645,7 @@ function run_query_user_insert($user) {
     $vacation_enable,
     $vacation_datebegin,
     $vacation_dateend,
-    '".addslashes($vacation_message)."'";
+    '".$obm_q->escape($vacation_message)."'";
   }
 
   // Section Samba
@@ -741,30 +742,30 @@ function run_query_user_insert($user) {
     $hidden,
     $datebegin,
     $dateexp,
-    '$kind',
-    '$cname',
-    '$lname',
-    '$fname',
-    '$title',
-    '$company',
-    '$direction',
-    '$service',
-    '$ad1',
-    '$ad2',
-    '$ad3',
-    '$zip',
-    '$town',
-    '$cdx',
-    '$country',
-    '$phone',
-    '$phone2',
-    '$mobile',
-    '$fax',
-    '$fax2',
-    '$email'
+    '".$obm_q->escape($kind)."',
+    '".$obm_q->escape($cname)."',
+    '".$obm_q->escape($lname)."',
+    '".$obm_q->escape($fname)."',
+    '".$obm_q->escape($title)."',
+    '".$obm_q->escape($company)."',
+    '".$obm_q->escape($direction)."',
+    '".$obm_q->escape($service)."',
+    '".$obm_q->escape($ad1)."',
+    '".$obm_q->escape($ad2)."',
+    '".$obm_q->escape($ad3)."',
+    '".$obm_q->escape($zip)."',
+    '".$obm_q->escape($town)."',
+    '".$obm_q->escape($cdx)."',
+    '".$obm_q->escape($country)."',
+    '".$obm_q->escape($phone)."',
+    '".$obm_q->escape($phone2)."',
+    '".$obm_q->escape($mobile)."',
+    '".$obm_q->escape($fax)."',
+    '".$obm_q->escape($fax2)."',
+    '".$obm_q->escape($email)."'
     $q_value_delegation_target
     $q_delegation[value],
-    '$desc'
+    '".$obm_q->escape($desc)."'
     $query_values_web
     $query_values_mail
     $query_values_mail_nomad
@@ -773,7 +774,6 @@ function run_query_user_insert($user) {
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
@@ -874,7 +874,7 @@ function run_query_user_addressbook_insert($user_id, $domain_id) {
       $uid,
       '$GLOBALS[c_origin_web]',
       $user_id,
-      '$addressbook_type',
+      '".$obm_q->escape($addressbook_type)."',
       true,
       $syncable)";
     display_debug_msg($query, $cdg_sql, "run_query_user_addressbook_insert($addressbook_type)");
@@ -1119,33 +1119,33 @@ function run_query_user_update($u_id, $user) {
     userobm_userupdate = $obm[uid],
     $passwd_update_q
     $user_update_q
-    userobm_perms = '$profile',
+    userobm_perms = '".$obm_q->escape($profile)."',
     userobm_gid = '$gid',
     userobm_archive = $archive,
     userobm_hidden = $hidden,
     userobm_datebegin = $datebegin,
     userobm_account_dateexp = $dateexp,
-    userobm_kind = '$kind',
-    userobm_commonname = '$cname',
-    userobm_lastname = '$lname',
-    userobm_firstname = '$fname',
-    userobm_title = '$title',
-    userobm_phone = '$phone',
-    userobm_phone2 = '$phone2',
-    userobm_mobile = '$mobile',
-    userobm_fax = '$fax',
-    userobm_fax2 = '$fax2',
-    userobm_company = '$company',
-    userobm_direction = '$direction',
-    userobm_service = '$service',
-    userobm_address1 = '$ad1',
-    userobm_address2 = '$ad2',
-    userobm_address3 = '$ad3',
-    userobm_zipcode = '$zip',
-    userobm_town = '$town',
-    userobm_expresspostal = '$cdx',
-    userobm_email = '$email',
-    userobm_description = '$desc'
+    userobm_kind = '".$obm_q->escape($kind)."',
+    userobm_commonname = '".$obm_q->escape($cname)."',
+    userobm_lastname = '".$obm_q->escape($lname)."',
+    userobm_firstname = '".$obm_q->escape($fname)."',
+    userobm_title = '".$obm_q->escape($title)."',
+    userobm_phone = '".$obm_q->escape($phone)."',
+    userobm_phone2 = '".$obm_q->escape($phone2)."',
+    userobm_mobile = '".$obm_q->escape($mobile)."',
+    userobm_fax = '".$obm_q->escape($fax)."',
+    userobm_fax2 = '".$obm_q->escape($fax2)."',
+    userobm_company = '".$obm_q->escape($company)."',
+    userobm_direction = '".$obm_q->escape($direction)."',
+    userobm_service = '".$obm_q->escape($servic)."e',
+    userobm_address1 = '".$obm_q->escape($ad1)."',
+    userobm_address2 = '".$obm_q->escape($ad2)."',
+    userobm_address3 = '".$obm_q->escape($ad3)."',
+    userobm_zipcode = '".$obm_q->escape($zip)."',
+    userobm_town = '".$obm_q->escape($town)."',
+    userobm_expresspostal = '".$obm_q->escape($cdx)."',
+    userobm_email = '".$obm_q->escape($email)."',
+    userobm_description = '".$obm_q->escape($desc)."'
     $q_delegation_target
     $q_delegation
     $query_web
@@ -2599,6 +2599,8 @@ function check_users_error_data($params, $users_id_error) {
  * @return unknown
  */
 function run_query_batch_processing_update($params, $users_id) {
+  $obm_q = new DB_OBM;
+
   // user
   $archive = $params['archive'];
   $profile = $params["profile_name"];
@@ -2673,24 +2675,23 @@ function run_query_batch_processing_update($params, $users_id) {
   if (isset($nomade_local_copy)) { $set[] = "userobm_nomade_local_copy=$nomade_local_copy"; }
   
   // Coords
-  if ($is_phone_up) { $set[] = "userobm_phone='$phone'"; }
-  if ($is_phone2_up) { $set[] = "userobm_phone2='$phone2'"; }
-  if ($is_mobile_up) { $set[] = "userobm_mobile='$mobile'"; }
-  if ($is_fax_up) { $set[] = "userobm_fax='$fax'"; }
-  if ($is_fax2_up) { $set[] = "userobm_fax2='$fax2'"; }
-  if ($is_company_up) { $set[] = "userobm_company='$company'"; }
-  if ($is_direction_up) { $set[] = "userobm_direction='$direction'"; }
-  if ($is_service_up) { $set[] = "userobm_service='$service'"; }
-  if ($is_address1_up) { $set[] = "userobm_address1='$address1'"; }
-  if ($is_address2_up) { $set[] = "userobm_address2='$address2'"; }
-  if ($is_address3_up) { $set[] = "userobm_address3='$address3'"; }
-  if ($is_zipcode_up) { $set[] = "userobm_zipcode='$zipcode'"; }
-  if ($is_town_up) { $set[] = "userobm_town='$town'"; }
-  if ($is_expresspostal_up) { $set[] = "userobm_expresspostal='$expresspostal'"; }
+  if ($is_phone_up) { $set[] = "userobm_phone='".$obm_q->escape($phone)."'"; }
+  if ($is_phone2_up) { $set[] = "userobm_phone2='".$obm_q->escape($phone2)."'"; }
+  if ($is_mobile_up) { $set[] = "userobm_mobile='".$obm_q->escape($mobile)."'"; }
+  if ($is_fax_up) { $set[] = "userobm_fax='".$obm_q->escape($fax)."'"; }
+  if ($is_fax2_up) { $set[] = "userobm_fax2='".$obm_q->escape($fax2)."'"; }
+  if ($is_company_up) { $set[] = "userobm_company='".$obm_q->escape($company)."'"; }
+  if ($is_direction_up) { $set[] = "userobm_direction='".$obm_q->escape($direction)."'"; }
+  if ($is_service_up) { $set[] = "userobm_service='".$obm_q->escape($service)."'"; }
+  if ($is_address1_up) { $set[] = "userobm_address1='".$obm_q->escape($address1)."'"; }
+  if ($is_address2_up) { $set[] = "userobm_address2='".$obm_q->escape($address2)."'"; }
+  if ($is_address3_up) { $set[] = "userobm_address3='".$obm_q->escape($address3)."'"; }
+  if ($is_zipcode_up) { $set[] = "userobm_zipcode='".$obm_q->escape($zipcode)."'"; }
+  if ($is_town_up) { $set[] = "userobm_town='".$obm_q->escape($town)."'"; }
+  if ($is_expresspostal_up) { $set[] = "userobm_expresspostal='".$obm_q->escape($expresspostal)."'"; }
   if ($is_delelagation_target ) { $set[] = "userobm_delegation_target = '$delegation_target'";}
-  if ($is_delelagation ) { $set[] = "userobm_delegation = '$delegation'";}
+  if ($is_delelagation ) { $set[] = "userobm_delegation = '".$obm_q->escape($delegation)."'";}
   
-  $obm_q = new DB_OBM;
   
   // Get users who have actual value of there archive state different of archive state data form 
   if (isset($archive)) {
@@ -2997,6 +2998,7 @@ function run_query_userobm_get_devices($user_id) {
  * @return void
  */
 function run_query_userobm_mobile_add_partnership($user) {
+  $obm_q = new DB_OBM;
 
   $owner = $user['owner'];
   $device_id = $user['device_id'];
@@ -3005,10 +3007,9 @@ function run_query_userobm_mobile_add_partnership($user) {
     owner,
     device_id,
     policy) VALUES(
-    '$owner',
+    '".$obm_q->escape($owner)."',
     '$device_id',
     NULL)";
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 
