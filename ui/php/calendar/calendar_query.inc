@@ -2080,21 +2080,15 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
 
   $event_id = $calendar['calendar_id'];
 
-  
 
   if ($datebegin->getTimestamp() != $oldEvent->date_begin->getTimestamp()
   	|| $repeat_kind != $oldEvent->repeat_kind 
   	|| $frequency != $oldEvent->repeatfrequency 
   	|| $repeat_days != $oldEvent->repeat_days
   	|| $repeat_end != $oldEvent_repeat_end) {
-    
-  	$deletedEventExceptionsId = run_query_delete_event_exceptions($event_id);
-  	if(!empty($deletedEventExceptionsId)) {
-	  	foreach($deletedEventExceptionsId as $deletedEventId) {
-	  		$deletedEvent = OBM_EventFactory::getInstance()->getById($deletedEventId);
-			OBM_EventFactory::getInstance()->delete($deletedEvent);
-	  	}
-  	}
+
+  	run_query_reinitialize_recurrent_event($event_id);
+
     return;
   }
 
@@ -2639,8 +2633,10 @@ function run_query_delete_event_exceptions($event_id) {
       $child_id = $obm_q->f('eventexception_child_id');
       // SOLR
       OBM_IndexingService::delete('event', $child_id);
-      if (!empty($child_id))
+      if (!empty($child_id)) {
         $childs[] = $child_id;
+        of_entity_delete('event', $child_id);
+      }
     }
 
     if (!empty($childs)) {
@@ -2671,8 +2667,9 @@ function run_query_delete_one_event_exception($event_id, $eventexception_date, $
 
   $obm_q = new DB_OBM;
   $event_id = sql_parse_id($event_id);
-  if (!empty($child_id)) {
+  if ($child_id) {
     $child_id = sql_parse_id($child_id);
+    of_entity_delete('event', child_id);
     $query = "DELETE FROM Event WHERE event_id = $child_id";
     // SOLR
     OBM_IndexingService::delete('event', $child_id);
@@ -2684,6 +2681,23 @@ function run_query_delete_one_event_exception($event_id, $eventexception_date, $
           ."AND eventexception_date = '$eventexception_date'";
   display_debug_msg($query, $cdg_sql, 'run_query_delete_one_event_exception(2)');
   $obm_q->query($query);
+}
+
+function run_query_reinitialize_recurrent_event($event_id) {
+	$events_exception_to_delete = run_query_get_one_event_exception($event_id);
+
+	while ($events_exception_to_delete->next_record()) {
+		$child_id = $events_exception_to_delete->f('eventexception_child_id');
+		$exception_date = $events_exception_to_delete->f('eventexception_date');
+		if($child_id) {
+			$exception_to_delete= OBM_EventFactory::getInstance()->getById($child_id);
+			$exception_to_delete->getIcs($GLOBALS['obm']['uid'],"cancel",false);
+			run_query_delete_one_event_exception($event_id, $exception_date, $child_id);
+			OBM_EventFactory::getInstance()->delete($exception_to_delete);
+		} else {
+			run_query_delete_one_event_exception($event_id, $exception_date);
+		}
+	}
 }
 
 
