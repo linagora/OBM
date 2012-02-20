@@ -103,12 +103,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			EventRecurrence r = getRecurrence(msEvent);
 			convertedEvent.setRecurrence(r);
 			if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
-				for (MSEventException excep : msEvent.getExceptions()) {
-					assertExceptionValidity(r, excep);
-					if (excep.isDeleted()) {
-						r.addException(excep.getExceptionStartTime());
+				for (MSEventException msEventException : msEvent.getExceptions()) {
+					assertExceptionValidity(r, msEventException);
+					if (msEventException.isDeleted()) {
+						r.addException(msEventException.getExceptionStartTime());
 					} else {
-						Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, excep, isObmInternalEvent);
+						Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
+								msEventException, isObmInternalEvent);
+						
 						obmEvent.setExtId(extId);
 						obmEvent.setUid(obmId);
 						
@@ -139,7 +141,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setInternalEvent(isObmInternalEvent);
 		convertedEvent.setType(EventType.VEVENT);
 		convertedEvent.setTimeUpdate(msEvent.getDtStamp());
-		convertedEvent.setTimeCreate(convertDtStamp(msEvent, eventFromDB));
 		convertedEvent.setDuration(convertDuration(msEvent));
 		convertedEvent.setStartDate(msEvent.getStartTime());
 		convertedEvent.setMeetingStatus(convertMeetingStatus(msEvent));
@@ -175,13 +176,15 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		EventPrivacy eventPrivacy = convertSensitivityToPrivacy(msEvent);
 		convertedEvent.setPrivacy(eventPrivacy);
 		
+		Date dtStamp = convertDtStamp(eventFromDB, msEvent);
+		convertedEvent.setTimeCreate(dtStamp);
 	}
 
-	private Event convertEventException(User user, Event oldEvent, Event parentEvent, 
+	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
 			MSEventException data, boolean isObmInternalEvent) throws org.obm.push.exception.IllegalMSEventStateException {
 		
 		Event e = new Event();
-		fillEventExceptionProperties(user, e, oldEvent, parentEvent, data, isObmInternalEvent);
+		fillEventExceptionProperties(user, e, eventFromDB, parentEvent, data, isObmInternalEvent);
 		e.setRecurrenceId(data.getExceptionStartTime());
 		return e;
 	}
@@ -215,6 +218,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 		EventPrivacy eventPrivacy = convertSensitivityToPrivacy(parentEvent, msEvent);
 		convertedEvent.setPrivacy(eventPrivacy);
+		
+		Date dtStamp = convertDtStamp(parentEvent, eventFromDB, msEvent);
+		convertedEvent.setTimeCreate(dtStamp);
 	}
 	
 	private String convertDescription(MSEventCommon msEvent) {
@@ -367,12 +373,24 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private Date convertDtStamp(MSEventCommon data, Event oldEvent) {
-		if (oldEvent != null && oldEvent.getTimeCreate() != null) {
-			return oldEvent.getTimeCreate();
-		} else {
-			return data.getDtStamp();
+	private Date convertDtStamp(Event eventFromDB, MSEventCommon msEvent) {
+		Date dtStamp = msEvent.getDtStamp(); 
+		if (eventFromDB != null && eventFromDB.getTimeCreate() != null) {
+			dtStamp = eventFromDB.getTimeCreate();
 		}
+		return dtStamp;
+	}
+	
+	private Date convertDtStamp(Event eventFromDB, Event parentEvent, MSEventCommon msEvent) {
+		Date dtStamp = msEvent.getDtStamp(); 
+		if (eventFromDB != null && eventFromDB.getTimeCreate() != null) {
+			dtStamp = eventFromDB.getTimeCreate();
+		} else {
+			if (parentEvent != null && parentEvent.getTimeCreate() != null) {
+				dtStamp = parentEvent.getTimeCreate();
+			}
+		}
+		return dtStamp;
 	}
 
 	private EventRecurrence getRecurrence(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
@@ -675,7 +693,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			throws IllegalMSEventExceptionStateException {
 		assertExceptionDoesntExistInRecurrence(recurrence, exception);
 		assertExceptionStartTime(exception);
-		assertExceptionDtStamp(exception);
 		assertExceptionMeetingStatus(exception);
 	}
 
@@ -689,12 +706,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private void assertExceptionMeetingStatus(MSEventException exception) throws IllegalMSEventExceptionStateException {
 		if (exception.getMeetingStatus() == null) {
 			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.MeetingStatus is required");
-		}
-	}
-
-	private void assertExceptionDtStamp(MSEventException exception) throws IllegalMSEventExceptionStateException {
-		if (exception.getDtStamp() == null) {
-			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.DtStamp is required");
 		}
 	}
 

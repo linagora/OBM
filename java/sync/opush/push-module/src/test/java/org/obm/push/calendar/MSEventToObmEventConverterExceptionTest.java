@@ -226,7 +226,6 @@ public class MSEventToObmEventConverterExceptionTest {
 		Assertions.assertThat(exception.getEndDate()).isEqualTo(msEventException.getEndTime());
 	}
 
-	@Test
 	public void testConvertAttributeDtStampJustCreated() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
@@ -241,11 +240,10 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		Assertions.assertThat(exception.getTimeCreate()).isEqualTo(msEventException.getDtStamp());
+		Assertions.assertThat(exception.getTimeCreate()).isEqualTo(msEvent.getDtStamp());
 		Assertions.assertThat(exception.getTimeUpdate()).isEqualTo(msEventException.getDtStamp());
 	}
 
-	@Test
 	public void testConvertAttributeDtStampAlreadyCreated() throws ConversionException {
 		Date previousDtStampDate = date("2004-12-11T11:15:10Z");
 		Event editingEvent = new Event();
@@ -254,18 +252,18 @@ public class MSEventToObmEventConverterExceptionTest {
 
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10"))
+				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
-				.withExceptionStartTime(date("2004-10-11T11:15:10Z"))
-				.withDtStamp(date("2004-12-10T11:15:10Z"))
+				.withExceptionStartTime(date("2004-10-11T11:15:10"))
+				.withDtStamp(date("2004-12-10T11:15:10"))
 				.build();
 		
 		MSEvent msEvent = new MSEventBuilder()
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10"))
+				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
-				.withDtStamp(date("2004-12-10T12:15:10Z"))
+				.withDtStamp(date("2004-12-10T12:15:10"))
 				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
@@ -277,39 +275,39 @@ public class MSEventToObmEventConverterExceptionTest {
 		Assertions.assertThat(exception.getTimeUpdate()).isEqualTo(msEventException.getDtStamp());
 	}
 
-	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeDtStampInExceptionIsRequired() throws ConversionException {
+	@Test
+	public void testConvertAttributeDtStampCreatedByException() throws ConversionException {
+		Date previousDtStampDate = date("2004-12-11T11:15:10Z");
+		Event editingEvent = new Event();
+		editingEvent.setTimeCreate(null);
+		editingEvent.setTimeUpdate(previousDtStampDate);
+
+		Date dateException = date("2004-12-10T11:15:10");
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10"))
+				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
-				.withExceptionStartTime(date("2004-10-11T11:15:10Z"))
-				.withDtStamp(null)
+				.withExceptionStartTime(date("2004-10-11T11:15:10"))
+				.withDtStamp(dateException)
 				.build();
 		
-		MSEvent msEvent = makeMSEventWithException(msEventException);
-		
-		convertToOBMEvent(msEvent);
-	}
-
-	@Test(expected=IllegalMSEventExceptionStateException.class)
-	public void testConvertAttributeDtStampInExceptionDontGetFromParent() throws ConversionException {
-		MSEventException msEventException = new MSEventExceptionBuilder()
-				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
-				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2004-12-12T11:15:10Z"))
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10"))
+				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
-				.withExceptionStartTime(date("2004-10-11T11:15:10Z"))
 				.withDtStamp(null)
+				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
+				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
 		
-		MSEvent msEvent = makeMSEventWithException(msEventException);
-		msEvent.setDtStamp(date("2004-12-10T12:15:10Z"));
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 		
-		convertToOBMEvent(msEvent);
+		Event exception = exceptionOf(converted);
+		Assertions.assertThat(exception.getTimeCreate()).isEqualTo(dateException);
+		Assertions.assertThat(exception.getTimeUpdate()).isEqualTo(msEventException.getDtStamp());
 	}
-
+	
 	@Test
 	public void testConvertAttributeMeetingStatusIsInMeeting() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
