@@ -1238,7 +1238,8 @@ public class EventChangeMailerTest {
 			return new String[] {
 					"Participation : mise à jour ",
 					"Matthieu BAECHLER a accepté",
-					"l'événement Sprint planning OBM prévu le 8 nov. 2010"
+					"l'événement Sprint planning OBM prévu le 8 nov. 2010",
+					"Commentaire This is a random comment"
 			};
 		}
 
@@ -1267,9 +1268,10 @@ public class EventChangeMailerTest {
 		@Override
 		protected String[] getExpectedPlainStrings() {
 			return new String[] {
-					"PARTICIPATION AU RENDEZ-VOUS",
+					"PARTICIPATION : MISE A JOUR",
 					"Matthieu BAECHLER a accepté",
-					"l'événement Sprint planning OBM prévu le 8 nov. 2010"
+					"l'événement Sprint planning OBM prévu le 8 nov. 2010",
+					"This is a random comment"
 				};
 		}
 

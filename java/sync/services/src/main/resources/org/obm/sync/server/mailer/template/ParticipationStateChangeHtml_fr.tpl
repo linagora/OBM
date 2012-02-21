@@ -6,8 +6,15 @@
     </tr>
     <tr>
       <td colspan="2">
-        ${user} a ${participationState} l'événement ${subject} prévu le ${start}.
+        ${user} a ${participationState} l'événement ${subject} prévu le ${startDate}.
       </td>
     </tr>
-
+    <tr>
+	  <td style="text-align:right;padding-right:1em;">Commentaire</td><td style="font-weight:bold;">${comment}</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;" colspan="2">
+          <a href="${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}">Plus de détails</a>
+        </td>
+    </tr>
 </table>

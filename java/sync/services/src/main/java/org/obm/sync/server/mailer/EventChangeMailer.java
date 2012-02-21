@@ -461,9 +461,10 @@ public class EventChangeMailer extends AbstractMailer {
 	
 	private String applyUpdateParticipationStateOnTemplate(String templateName,
 			Event event, final ObmUser attendeeUpdated, ParticipationState newState,  Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, participationState(newState, locale));
+		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, newState, locale);
+		ImmutableMap<Object, Object> datamodel = defineTechnicalData(builder, event).build();
 		Template template = templateLoader.getTemplate(templateName, locale, timezone);
-		return applyTemplate(builder.build(), template);
+		return applyTemplate(datamodel, template);
 	}
 
 	private Builder<Object, Object> defineTechnicalData(Builder<Object, Object> builder, Event event) {
@@ -678,12 +679,13 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private Builder<Object, Object> buildUpdateParticipationStateDatamodel(
-			Event event, final ObmUser attendeeUpdated, String state) {
+			Event event, final ObmUser attendeeUpdated, ParticipationState status, Locale locale) {
 				Builder<Object, Object> datamodel = ImmutableMap.builder()
 			.put("user", attendeeUpdated.getDisplayName())
-			.put("participationState", state)
+			.put("participationState", participationState(status, locale))
+			.put("comment", status.getComment().serializeToString())
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
-			.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE));
+			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
 		return datamodel;
 	}
 	
