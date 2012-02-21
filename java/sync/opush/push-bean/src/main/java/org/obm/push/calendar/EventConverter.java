@@ -31,6 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-public interface EventConverter extends ObmEventToMSEventConverter, MSEventToObmEventConverter {
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.User;
+import org.obm.push.exception.ConversionException;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.ParticipationState;
 
+public interface EventConverter {
+
+	MSEvent convert(Event eventToConvert, MSEventUid uid, User user) throws ConversionException;
+
+	Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) throws ConversionException;
+
+	boolean isInternalEvent(Event event, boolean defaultValue);
+	
+	ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus);
 }
