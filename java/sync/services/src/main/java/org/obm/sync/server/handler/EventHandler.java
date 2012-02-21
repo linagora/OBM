@@ -48,6 +48,7 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -68,6 +69,7 @@ import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -503,13 +505,13 @@ public class EventHandler extends SecureSyncHandler {
 		if (recursive) {
 			success = binding.changeParticipationState(at, getCalendar(at, params),
 					getExtId(params, "extId"), 
-					ParticipationState.getValueOf(params.getParameter("state")),
+					getParticipationState(params),
 					i(params, "sequence", 0),
 					getNotificationOption(params));
 		} else {
 			success = binding.changeParticipationState(at, getCalendar(at, params),
 					getExtId(params, "extId"), getRecurrenceId(params),
-					ParticipationState.getValueOf(params.getParameter("state")),
+					getParticipationState(params),
 					i(params, "sequence", 0),
 					getNotificationOption(params));
 		}
@@ -552,6 +554,13 @@ public class EventHandler extends SecureSyncHandler {
 			return Boolean.valueOf(recursiveParam);
 		}
 		return true;
+	}
+
+	private ParticipationState getParticipationState(ParametersSource params) {
+		ParticipationState status = ParticipationState.getValueOf(params.getParameter("state"));
+		String comment = params.getParameter("comment");
+		status.setComment(new Comment(comment));
+		return status;
 	}
 
 }

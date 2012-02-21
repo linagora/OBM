@@ -2572,7 +2572,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		PreparedStatement ps = null;
 				
 		String q = "UPDATE EventLink " 
-			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
+			+ "SET eventlink_state = ?, eventlink_userupdate = ?, eventlink_comment = ? "
 			+ "WHERE eventlink_event_id IN "
 			+ "( SELECT event_id FROM Event WHERE event_ext_id = ? ) AND "
 			+ "eventlink_entity_id IN "
@@ -2586,6 +2586,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
+			ps.setString(idx++, participationState.getComment().serializeToString());
 			ps.setString(idx++, extId.getExtId());
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
@@ -2620,7 +2621,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		PreparedStatement ps = null;
 				
 		String q = "UPDATE EventLink " 
-			+ "SET eventlink_state = ?, eventlink_userupdate = ? "
+			+ "SET eventlink_state = ?, eventlink_userupdate = ?, eventlink_comment = ? "
 			+ "WHERE eventlink_event_id IN "
 			+ "("
 			+ "SELECT event_id "
@@ -2640,6 +2641,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
+			ps.setString(idx++, participationState.getComment().serializeToString());
 			ps.setString(idx++, extId.getExtId());
 			Date recId = new DateTime(recurrenceId.getRecurrenceId());
 			ps.setTimestamp(idx++, new Timestamp(recId.getTime()));

@@ -41,7 +41,7 @@ public class Comment implements Serializable {
 	private final String comment;
 
 	public Comment(String comment) {
-		this.comment = Strings.emptyToNull(comment);
+		this.comment = Strings.nullToEmpty(comment);
 	}
 
 	public String getComment() {
