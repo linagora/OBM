@@ -121,7 +121,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setStartDate(msEvent.getStartTime());
 	}
 	
-	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEventCommon msEvent, 
+	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEvent msEvent, 
 			boolean isObmInternalEvent) throws IllegalMSEventStateException {
 		
 		fillEventCommonProperties(user, convertedEvent, eventFromDB, 
@@ -198,6 +198,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		fillEventExceptionProperties(user, convertedEvent, eventFromDB, parentEvent, msEventException, isObmInternalEvent);
 		convertedEvent.setRecurrenceId(msEventException.getExceptionStartTime());
 		convertedEvent.setAttendees(parentEvent.getAttendees());
+		convertedEvent.setTimezoneName(convertTimeZone(eventFromDB, parentEvent));
 		return convertedEvent;
 	}
 	
@@ -577,6 +578,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		} else {
 			return null;
 		}
+	}
+	
+	private String convertTimeZone(Event eventFromDB, Event parentEvent) {
+		String timeZone = parentEvent.getTimezoneName();
+		if (eventFromDB != null && eventFromDB.getTimezoneName() != null) {
+			timeZone = eventFromDB.getTimezoneName();
+		}
+		return timeZone;
 	}
 	
 	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee msAttendee) throws IllegalMSEventExceptionStateException {
