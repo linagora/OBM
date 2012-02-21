@@ -199,6 +199,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setRecurrenceId(msEventException.getExceptionStartTime());
 		convertedEvent.setAttendees(parentEvent.getAttendees());
 		convertedEvent.setTimezoneName(convertTimeZone(eventFromDB, parentEvent));
+		convertedEvent.setSequence(convertSequence(eventFromDB, parentEvent));
 		return convertedEvent;
 	}
 	
@@ -586,6 +587,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			timeZone = eventFromDB.getTimezoneName();
 		}
 		return timeZone;
+	}
+	
+	private int convertSequence(Event eventFromDB, Event parentEvent) {
+		int sequence = parentEvent.getSequence();
+		if (eventFromDB != null) {
+			sequence = eventFromDB.getSequence();
+		}
+		return sequence;
 	}
 	
 	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee msAttendee) throws IllegalMSEventExceptionStateException {
