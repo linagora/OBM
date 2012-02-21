@@ -68,6 +68,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.DeletedEvent;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -202,6 +203,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private static final String ATT_AND_ALERT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
+			+ "eventlink_comment, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
@@ -209,6 +211,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private static final String CONTACT_AND_ALERT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
+			+ "eventlink_comment, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
@@ -758,7 +761,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private ParticipationState getAttendeeState(ResultSet rs)
 			throws SQLException {
-		return ParticipationState.getValueOf(rs.getString("eventlink_state"));
+		ParticipationState status = ParticipationState.getValueOf(rs.getString("eventlink_state"));
+		status.setComment(new Comment(rs.getString("eventlink_comment")));
+		return status;
 	}
 
 	private int getAttendeePercent(ResultSet rs) throws SQLException {
@@ -2306,7 +2311,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
 			AccessToken token, ObmUser calendarUser, Date start, Date end,
 			EventType typeFilter) {
-		String ev = "SELECT e.event_id, e.event_title, att.eventlink_state, e.event_date, e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat, al.eventalert_duration"
+		String ev = "SELECT e.event_id, e.event_title, att.eventlink_state, att.eventlink_comment, e.event_date, e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat, al.eventalert_duration"
 				+ " FROM Event e "
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
 				+ "LEFT JOIN EventAlert al ON eventlink_event_id=eventalert_event_id "
