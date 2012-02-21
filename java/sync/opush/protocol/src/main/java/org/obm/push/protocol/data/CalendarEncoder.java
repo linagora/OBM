@@ -130,7 +130,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 						s(ae, "Calendar:AttendeeStatus", ma.getAttendeeStatus()
 							.asIntString());
 						s(ae, "Calendar:AttendeeType", ma.getAttendeeType()
-							.asIntString());
+							.getId());
 					}
 				}
 			}

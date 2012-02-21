@@ -32,20 +32,18 @@
 package org.obm.push.bean;
 
 public enum AttendeeType {
-	REQUIRED, // 1
-	OPTIONAL, // 2
-	RESOURCE; // 3
+	
+	REQUIRED("1"), 
+	OPTIONAL("2"), 
+	RESOURCE("3");
 
-	public String asIntString() {
-		switch (this) {
-		case OPTIONAL:
-			return "2";
-		case RESOURCE:
-			return "3";
-		default:
-		case REQUIRED:
-			return "1";
-		}
+	private final String id;
 
+	private AttendeeType(String id) {
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
 	}
 }

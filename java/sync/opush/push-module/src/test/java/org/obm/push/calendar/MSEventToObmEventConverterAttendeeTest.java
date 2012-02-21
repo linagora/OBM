@@ -232,7 +232,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipationRole()).isEqualTo(ParticipationRole.NON);
+		Assertions.assertThat(theAttendee.getParticipationRole()).isEqualTo(ParticipationRole.REQ);
 	}
 	
 	private MSEvent makeEventWithAttendee(MSAttendee attendee) {

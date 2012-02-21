@@ -600,20 +600,21 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	public ParticipationRole getParticipationRole(AttendeeType attendeeType) {
-		if (attendeeType == null) {
-			return ParticipationRole.NON;
+		ParticipationRole participationRole = ParticipationRole.REQ;
+		if (attendeeType != null) {
+			switch (attendeeType) {
+			case OPTIONAL:
+				participationRole = ParticipationRole.OPT;
+				break;
+			case REQUIRED:
+				participationRole = ParticipationRole.REQ;
+				break;
+			case RESOURCE:
+				participationRole = ParticipationRole.CHAIR;
+				break;
+			}
 		}
-		
-		switch (attendeeType) {
-		case OPTIONAL:
-			return ParticipationRole.OPT;
-		case REQUIRED:
-			return ParticipationRole.REQ;
-		case RESOURCE:
-			return ParticipationRole.CHAIR;
-		default:
-			return ParticipationRole.NON;
-		}
+		return participationRole;
 	}
 
 	private EventOpacity convertBusyStatusToOpacity(MSEventCommon msEvent) {
