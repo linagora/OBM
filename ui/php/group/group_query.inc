@@ -70,12 +70,12 @@ function run_query_group_search($group) {
   $timecreate = sql_date_format($db_type,'UGroup.group_timecreate', 'timecreate');
   $multidomain = sql_multidomain('group');
 
-  $where = "group_name $like '$name%'";
+  $where = "group_name $like '".$obm_q->escape($name)."%'";
   if ($user != '') {
     $join_user = "
       LEFT JOIN of_usergroup as D ON D.of_usergroup_group_id=group_id
       LEFT JOIN UserObm as C ON D.of_usergroup_user_id = C.userobm_id";
-    $where .= " AND C.userobm_lastname $like '$user%' AND C.userobm_archive = 0";
+    $where .= " AND C.userobm_lastname $like '".$obm_q->escape($user)."%' AND C.userobm_archive = 0";
   }
   // If a user domain indication has been specified, get it
   if (($domain_id != $c_all) && ($domain_id != '')) {
@@ -84,13 +84,13 @@ function run_query_group_search($group) {
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND group_delegation $like '$delegation%'";
+    $where .= " AND group_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($email != '') {
     list($left,$right) = split('@',$email);
     if ($right === null){
-      $left = $left.'%';
-      $right = $left;
+      $left = $obm_q->escape($left).'%';
+      $right = $obm_q->escape($left);
       $condition = 'OR';
     } else {
       $condition = 'AND';
@@ -98,7 +98,7 @@ function run_query_group_search($group) {
     if (!$left) {
       $left = '%';
     }
-    $right = $right.'%';
+    $right = $obm_q->escape($right).'%';
     $where .= " AND
       group_email != '' AND (( group_email #LIKE '$left') $condition ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' )) ";    
   }
@@ -108,7 +108,7 @@ function run_query_group_search($group) {
     $where .= ' AND group_privacy = 1';
   }
   if (trim($desc) != '') {
-    $where .= " AND group_desc $like '%$desc%'";
+    $where .= " AND group_desc $like '%".$obm_q->escape($desc)."%'";
   }
   if ($samba == 1) {
     $where .= " AND group_samba = $samba";
@@ -227,14 +227,14 @@ function run_query_group_search_possible_children($group) {
   // only the one which are allowed (ie. publics )
   $where .=  ' AND ' .sql_obm_entity_privacy('group');
   if ($user != '') {
-    $where .= " AND C.userobm_lastname $like '$user%'";
+    $where .= " AND C.userobm_lastname $like '".$obm_q->escape($user)."%'";
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND group_delegation $like '$delegation%'";
+    $where .= " AND group_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($email != '') {
-    $where .= " AND group_email $like '%$email%'";
+    $where .= " AND group_email $like '%".$obm_q->escape($email)."%'";
   }
   while (list ($key, $g_id) = each($parents)) {
     $g_id = sql_parse_id($g_id, true, true);
@@ -313,6 +313,7 @@ function run_query_group_detail($id) {
 function run_query_group_insert($group) {
   global $cdg_sql, $obm;
 
+  $obm_q = new DB_OBM;
   $id = $group['group_id'];
   $system = sql_parse_int($group['system']);
   $samba = sql_parse_int($group['samba']);
@@ -330,7 +331,7 @@ function run_query_group_insert($group) {
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group['delegation']));
+  $q_delegation = of_delegation_query_insert_clauses('group_delegation', $group['delegation']);
 
   $query = "INSERT INTO UGroup (
   group_timeupdate,
@@ -356,14 +357,13 @@ function run_query_group_insert($group) {
   $samba,
   $priv,
   $gid,
-  '$name'
-  $q_delegation[value],
-  '$desc',
-  '$email'
+  '".$obm_q->escape($name)."'
+  ".$obm_q->escape($q_delegation[value]).",
+  '".$obm_q->escape($desc)."',
+  '".$obm_q->escape($email)."'
   )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $g_id = run_query_group_id($group);
@@ -397,10 +397,10 @@ function run_query_group_id($group) {
   $query = "SELECT MAX(group_id) as  group_id
   FROM UGroup
   WHERE group_system=$system
-  AND group_name='$name'
+  AND group_name='".$obm_q->escape($name)."'
   AND group_privacy=$priv
-  AND group_desc='$desc'
-  AND group_email='$email'
+  AND group_desc='".$obm_q->escape($desc)."'
+  AND group_email='".$obm_q->escape($email)."'
   $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_id()');
@@ -440,18 +440,18 @@ function run_query_group_update($group) {
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('group_delegation', stripslashes($group['delegation']));
+  $q_delegation = of_delegation_query_update_clause('group_delegation', $group['delegation']);
 
   $query = "UPDATE UGroup SET
     group_timeupdate=NOW(),
     group_userupdate=$obm[uid],
     group_samba=$samba,
     group_privacy=$priv,
-    group_name='$name',
-    group_desc='$desc',
-    group_email='$email',
+    group_name='".$obm_q->escape($name)."',
+    group_desc='".$obm_q->escape($desc)."',
+    group_email='".$obm_q->escape($email)."',
     group_manager_id=$manager
-    $q_delegation
+    $obm_q->escape($q_delegation)
   WHERE group_id $id
     $multidomain";
 
@@ -509,7 +509,7 @@ function run_query_group_delete($p_id) {
     VALUES (
     $domain_id,
     $uid,
-    '$delegation',
+    '".$obm_q->escape($delegation)."',
     'UGroup',
     $p_id,
     NOW())";
