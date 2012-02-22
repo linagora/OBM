@@ -66,13 +66,13 @@ function run_query_account_search ($account) {
 
   $where = '1=1';
   if ($label != '') {
-    $where .= " and account_label $like '$label%'";
+    $where .= " and account_label $like '".$obm_q->escape($label)."%'";
   }
   if ($bank != '') {
-    $where .= " and account_bank $like '%$bank%'";
+    $where .= " and account_bank $like '%".$obm_q->escape($bank)."%'";
   }
   if ($number != '') {
-    $where .= " and account_number $like '%$number%'";
+    $where .= " and account_number $like '%".$obm_q->escape($number)."%'";
   }
   $whereq = "where $where $multidomain";
 
@@ -145,6 +145,7 @@ function run_query_account_detail($id) {
 function run_query_account_insert($account) {
   global $cdg_sql, $obm;
 
+  $obm_q = new DB_OBM;
   $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
@@ -173,15 +174,14 @@ function run_query_account_insert($account) {
     null,
     $uid,
     $domain_id,
-    '$bank',
-    '$label',
-    '$number',
-    '$balance',
+    '".$obm_q->escape($bank)."',
+    '".$obm_q->escape($label)."',
+    '".$obm_q->escape($number)."',
+    '".$obm_q->escape($balance)."',
     $balance,
-    '$comment')";
+    '".$obm_q->escape($comment)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_account_insert()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 
@@ -222,12 +222,12 @@ function run_query_account_update($account) {
   $today = $today + $diff;
 
   $query = "UPDATE Account SET 
-    account_label='$label',
-    account_bank='$bank',
-    account_number='$number',
+    account_label='".$obm_q->escape($label)."',
+    account_bank='".$obm_q->escape($bank)."',
+    account_number='".$obm_q->escape($number)."',
     account_today='$today',
     account_balance=$balance,
-    account_comment='$comment',
+    account_comment='".$obm_q->escape($comment)."',
     account_userupdate=$uid,
     account_timeupdate=NOW()
     WHERE account_id $account_id $multidomain";  

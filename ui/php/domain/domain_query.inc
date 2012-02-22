@@ -62,8 +62,8 @@ function run_query_domain_search($domain, $restriction='') {
 
   // If a domain label has been specified, get it
   if (trim($text) != '') {
-    $where .= " AND (domain_label $like '$text%'
-      OR domain_description like '$text%')";
+    $where .= " AND (domain_label $like '".$obm_q->escape($text)."%'
+      OR domain_description like '".$obm_q->escape($text)."%')";
   }
 
   //if ((trim($where) != '') || (trim($where_restriction) != '')) {
@@ -146,6 +146,7 @@ function run_query_domain_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_insert($domain) {
   global $obm, $cdg_sql, $cgp_use;
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $label = $domain['label'];
   $desc = $domain['desc'];
@@ -169,13 +170,12 @@ function run_query_domain_insert($domain) {
       NOW(),
       null,
       $uid,
-      '$label',
-      '$desc',
-      '$domain_name',
-      '$alias',
+      '".$obm_q->escape($label)."',
+      '".$obm_q->escape($desc)."',
+      '".$obm_q->escape($domain_name)."',
+      '".$obm_q->escape($alias)."',
       UUID())";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
@@ -240,7 +240,7 @@ function run_query_domain_insert($domain) {
       NOW(),
       $uid,
       $uid,
-      '$GLOBALS[c_origin_web]',
+      '".$obm_q->escape($GLOBALS[c_origin_web])."',
       $uid,
       'public_contacts',
       true,
@@ -292,8 +292,8 @@ function run_query_domain_replace_properties($domain_id,$domain) {
         domainpropertyvalue_value)
         VALUES (
           $domain_id,
-          '$key',
-          '$value'
+          '".$obm_q->escape($key)."',
+          '".$obm_q->escape($value)."'
         )";
       $obm_q->query($query);
     }
@@ -413,7 +413,7 @@ function run_query_domain_init_groups($domain_id, $windows=false) {
         NOW(),
         $samba,
         $gid,
-        '$gname')";
+        '".$obm_q->escape($gname)."')";
       display_debug_msg($query, $cdg_sql, 'run_query_domain_init_groups(1)');
       $obm_q->query($query);
 
@@ -476,6 +476,7 @@ function check_domain_group_exists($gid, $domain_id) {
 function run_query_domain_update($domain_id, $domain) {
   global $obm, $cdg_sql, $cgp_use;
 
+  $obm_q = new DB_OBM;
   $cur_samba = run_query_domain_samba_properties($domain_id);
 
   $uid = sql_parse_id($obm['uid']);
@@ -489,13 +490,12 @@ function run_query_domain_update($domain_id, $domain) {
   $query = "UPDATE Domain SET
     domain_timeupdate=NOW(),
     domain_userupdate=$uid,
-    domain_label='$label',
-    domain_description='$desc',
-    domain_alias='$alias'
+    domain_label='".$obm_q->escape($label)."',
+    domain_description='".$obm_q->escape($desc)."',
+    domain_alias='".$obm_q->escape($alias)."'
     WHERE domain_id $did ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $entity_id = of_entity_get($GLOBALS['module'], $domain_id);
   if ($cgp_use['service']['mail']) {
@@ -747,6 +747,7 @@ function check_domain_data_form($d_id, $domain) {
 function run_query_domain_get_used_name($alias, $name=null, $id=null) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $return = array();
   $aliases = array();
   if (!empty($alias)) {
@@ -762,13 +763,12 @@ function run_query_domain_get_used_name($alias, $name=null, $id=null) {
   }
   if(count($aliases) > 0) {
     foreach($aliases as $alias) {
-      $alias_query[] = "domain_alias LIKE '%$alias%'";
-      $domain_query [] = "domain_name  = '$alias'";
+      $alias_query[] = "domain_alias LIKE '%".$obm_q->escape($alias)."%'";
+      $domain_query [] = "domain_name  = '".$obm_q->escape($alias)."'";
     }
     $query = "SELECT domain_alias as name FROM Domain WHERE (".implode(' OR ', $alias_query).") $dquery
       UNION
       SELECT domain_name as name FROM Domain WHERE (".implode(' OR ', $domain_query).") $dquery";
-    $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql, 'get_email_used(1)');
     $obm_q->query($query);
     while($obm_q->next_record()) {

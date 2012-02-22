@@ -82,15 +82,15 @@ function run_query_document_search($document) {
   }
 
   if ($title != "") {
-    $where .= " AND document_title $like '%$title%'";
+    $where .= " AND document_title $like '%".$obm_q->escape($title)."%'";
   }
   
   if ($name != "") {
-    $where .= " AND document_name $like '%$name%'";
+    $where .= " AND document_name $like '%".$obm_q->escape($name)."%'";
   }
 
   if (($author != $c_all) && ($author != "")) { 
-    $where .= " AND document_author $like '%$author%'";
+    $where .= " AND document_author $like '%".$obm_q->escape($author)."%'";
   }
   
   if (($mime != $c_all) && ($mime != "")) { 
@@ -244,6 +244,7 @@ function run_query_document_insert(&$document) {
   global $err, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
@@ -296,18 +297,17 @@ function run_query_document_insert(&$document) {
     null,
     $uid,
     $domain_id,
-    '$title',
-    '$author',
-    '$name',
-    '$path',
+    '".$obm_q->escape($title)."',
+    '".$obm_q->escape($author)."',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($path)."',
     $kind,
-    '$size',
+    '".$obm_q->escape($size)."',
     $mime,
     $privacy
   )";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_insert(1)");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $doc_id = $obm_q->lastid();
@@ -401,6 +401,7 @@ function run_query_document_update(&$document) {
   global $err, $l_delete_file_error, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
+  $obm_q = new DB_OBM;
   $uid = $obm["uid"];
 
   $id = sql_parse_id($document["document_id"], true);
@@ -431,25 +432,24 @@ function run_query_document_update(&$document) {
 
   if ($file_update == "yes") {
     $query_file = ",
-    document_path='$path',
-    document_size='$size',
-    document_name='$name',
+    document_path='".$obm_q->escape($path)."',
+    document_size='".$obm_q->escape($size)."',
+    document_name='".$obm_q->escape($name)."',
     document_mimetype_id=$mime";
   }
   
   $query = "UPDATE Document SET
     document_timeupdate=NOW(),
     document_userupdate=$uid,
-    document_title='$title',
+    document_title='".$obm_q->escape($title)."',
     document_kind=$kind,
-    document_author='$author',
+    document_author='".$obm_q->escape($author)."',
     document_privacy='$privacy'
     $query_file
   WHERE document_id $id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if (($kind == $cdoc_kind_file) && ($file_update == "yes")) {
@@ -725,6 +725,7 @@ function get_document_linked_events($document_id) {
 function get_dir_document_nb($dpath, $kind) {
   global $cdg_sql, $cdoc_kind_dir, $c_all;
 
+  $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("document");
   if ($kind != $c_all) {
     $kind = sql_parse_int($kind);
@@ -733,11 +734,10 @@ function get_dir_document_nb($dpath, $kind) {
 
   $query = "SELECT count(document_id) as nb
     FROM Document 
-    WHERE document_path = '$dpath'
+    WHERE document_path = '".$obm_q->escape($dpath)."'
       $where_kind
       $multidomain";
 
-  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "get_dir_document_nb()");
   $obm_q->query($query);
   $obm_q->next_record();
@@ -795,7 +795,7 @@ function document_path_exists($dpath) {
   $query = "SELECT count(document_id) as nb
     FROM Document
     WHERE document_kind = $cdoc_kind_dir
-      AND $concat_path = '$dpath'
+      AND $concat_path = '".$obm_q->escape($dpath)."'
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "document_path_exists()");
@@ -884,6 +884,7 @@ function check_document_data_form($cid, $document) {
 function run_query_document_mime_insert($document) {
   global $cdg_sql, $obm;
 
+  $obm_q = new DB_OBM;
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = sql_parse_id($obm["uid"]);
   $mime = $document["mime_label"];
@@ -905,12 +906,11 @@ function run_query_document_mime_insert($document) {
     $domain_id,
     '$timecreate',
     $usercreate,
-    '$mime',
-    '$extension',
-    '$mimetype')";
+    '".$obm_q->escape($mime)."',
+    '".$obm_q->escape($extension)."',
+    '".$obm_q->escape($mimetype)."')";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_mime_insert()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -925,6 +925,7 @@ function run_query_document_mime_insert($document) {
 function run_query_document_mime_update($document) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = sql_parse_id($obm["uid"]);
   $id = sql_parse_id($document["mime"], true);
@@ -934,9 +935,9 @@ function run_query_document_mime_update($document) {
   $multidomain = sql_multidomain("documentmimetype");
 	
   $query = "UPDATE DocumentMimeType SET
-      documentmimetype_label='$mime',
-      documentmimetype_extension='$extension',
-      documentmimetype_mime='$mimetype',
+      documentmimetype_label='".$obm_q->escape($mime)."',
+      documentmimetype_extension='".$obm_q->escape($extension)."',
+      documentmimetype_mime='".$obm_q->escape($mimetype)."',
       documentmimetype_timeupdate='$timeupdate',
       documentmimetype_userupdate=$userupdate
     WHERE
@@ -944,7 +945,6 @@ function run_query_document_mime_update($document) {
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_mime_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
 }
@@ -1026,6 +1026,7 @@ function run_query_document_mime_delete($id) {
 function run_query_document_insert_dir($document) {
   global $cdg_sql, $cdoc_kind_dir, $obm;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
@@ -1053,15 +1054,14 @@ function run_query_document_insert_dir($document) {
     $domain_id,
     '',
     '',
-    '$name',
-    '$path',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($path)."',
     $cdoc_kind_dir,
     0,
     NULL,
     0)";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_insert_dir()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $id = $obm_q->lastid();
   of_entity_insert('document', $id);
@@ -1078,6 +1078,7 @@ function run_query_document_insert_dir($document) {
 function run_query_document_update_dir($document) {
   global $cdg_sql, $obm, $cdoc_kind_dir;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $path = $document["path"].$document["name"];
   $old_path = $document["path"].$document["old_name"];
@@ -1089,13 +1090,12 @@ function run_query_document_update_dir($document) {
   $query = "UPDATE Document SET
       document_timeupdate = NOW(),
       document_userupdate = $uid,
-      document_name = '$name'
+      document_name = '".$obm_q->escape($name)."'
     WHERE 
       document_id $id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_update_dir(1)");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $query = "SELECT *
     FROM Document 
@@ -1110,7 +1110,7 @@ function run_query_document_update_dir($document) {
     $d_id = sql_parse_id($obm_q->f("document_id"), true);
     $query = "UPDATE Document SET
         document_timeupdate = document_timeupdate,
-        document_path = '$new_path'
+        document_path = '".$obm_q->escape($new_path)."'
       WHERE
         document_id $d_id 
         $multidomain";

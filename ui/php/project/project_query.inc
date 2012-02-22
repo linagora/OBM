@@ -76,11 +76,11 @@ function run_query_project_search($params) {
   $where = "1=1 $multidomain";
 
   if ($name != '') {
-    $where .= " AND project_name $like '$name%'";
+    $where .= " AND project_name $like '".$obm_q->escape($name)."%'";
   }
 
   if ($shortname != '') {
-    $where .= " AND project_shortname $like '$shortname%'";
+    $where .= " AND project_shortname $like '".$obm_q->escape($shortname)."%'";
   }
 
   if ($company) {
@@ -89,13 +89,13 @@ function run_query_project_search($params) {
   }
 
   if ($company_name != '') {
-    $where .= sql_global_company_name_advanced_search($company_name, $like);
+    $where .= sql_global_company_name_advanced_search($obm_q->escape($company_name), $like);
     $join_comp = 'LEFT JOIN Company on project_company_id=company_id';
   }
 
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND userobm_delegation $like '$delegation%'";
+    $where .= " AND userobm_delegation $like '".$obm_q->escape($delegation)."%'";
     $join_delegation = 'LEFT JOIN UserObm on project_usercreate=userobm_id';
   }
 
@@ -352,7 +352,8 @@ function run_query_project_allocation_and_time($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_insert($params) {
   global $obm, $cdg_sql;
-
+  
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $date_now = date('Y-m-d H:i:s');
   $domain_id = sql_parse_id($obm['domain_id']);
@@ -409,8 +410,8 @@ function run_query_project_insert($params) {
     null,
     $uid,
     $domain_id,
-    '$name',
-    '$shortname',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($shortname)."',
     $type_id,
     $tt,
     $comp,
@@ -420,14 +421,13 @@ function run_query_project_insert($params) {
     $datebegin,
     $dateend,
     $archive,
-    '$project_reference_date',
-    '$project_reference_duration',
-    '$project_reference_desc',
-    '$project_reference_tech',
-    '$comment')";
+    '".$obm_q->escape($project_reference_date)."',
+    '".$obm_q->escape($project_reference_duration)."',
+    '".$obm_q->escape($project_reference_desc)."',
+    '".$obm_q->escape($project_reference_tech)."',
+    '".$obm_q->escape($comment)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_insert');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   $pid = $obm_q->lastid();
@@ -448,7 +448,7 @@ function run_query_project_insert($params) {
       $id,
       '$date_now',
       $uid,
-      '$task',
+      '".$obm_q->escape($task)."',
       NULL,
       1)";
 
@@ -564,6 +564,7 @@ function run_query_project_insert($params) {
 function run_query_project_update($pid, $params) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $name = $params['name'];
   $soldtime = ($params['soldtime'] ? "'".$params['soldtime']."'" : 'null');
@@ -590,24 +591,23 @@ function run_query_project_update($pid, $params) {
   $query = "UPDATE Project SET
       project_timeupdate='". date('Y-m-d H:i:s') ."',
       project_userupdate=$uid,
-      project_name='$name',
-      project_shortname='$shortname',
+      project_name='".$obm_q->escape($name)."',
+      project_shortname='".$obm_q->escape($shortname)."',
       project_type_id=$type_id,
       project_tasktype_id=$tt,
       project_soldtime=$soldtime,
       project_estimatedtime=$estimated,
       project_datebegin=$datebegin,
       project_dateend=$dateend,
-      project_reference_date='$reference_date',
-      project_reference_duration='$reference_duration',
-      project_reference_desc='$reference_desc',
-      project_reference_tech='$reference_tech',
+      project_reference_date='".$obm_q->escape($reference_date)."',
+      project_reference_duration='".$obm_q->escape($reference_duration)."',
+      project_reference_desc='".$obm_q->escape($reference_desc)."',
+      project_reference_tech='".$obm_q->escape($reference_tech)."',
       project_archive=$archive,
-      project_comment='$comment'
+      project_comment='".$obm_q->escape($comment)."'
     WHERE project_id $pid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_update');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   // Hook : Post
@@ -790,7 +790,7 @@ function run_query_project_task_insert($params) {
           $pid,
           '". date('Y-m-d H:i:s') ."',
           $obm[uid],
-          '$tasklabel',
+          '".$obm_q->escape($tasklabel)."',
           $ptask,
           1)";
 
@@ -833,6 +833,7 @@ function run_query_project_task_insert($params) {
 function run_query_project_task_update($params) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $task = sql_parse_id($params['task'], true);
   $ptask = sql_parse_id($params['ptask']);
   $tasklabel = $params['tasklabel'];
@@ -841,14 +842,13 @@ function run_query_project_task_update($params) {
       UPDATE ProjectTask SET
         projecttask_timeupdate='". date('Y-m-d H:i:s') ."',
         projecttask_userupdate=$obm[uid],
-        projecttask_label='$tasklabel',
+        projecttask_label='".$obm_q->escape($tasklabel)."',
         projecttask_parenttask_id=$ptask,
         projecttask_rank=1
       WHERE
         projecttask_id $task ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_task_update(2)');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   
   return $obm_q;
@@ -1050,18 +1050,18 @@ function run_query_project_memberlist_delete($params) {
 function run_query_project_memberstatus_change($params) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $p_id = sql_parse_id($params['project_id'], true);
   $m_id = sql_parse_id($params['user_id'], true);
   $m_val = $params['user_status'];
 		
   $query = "
     UPDATE ProjectUser
-    SET projectuser_manager = '$m_val'
+    SET projectuser_manager = '".$obm_q->escape($m_val)."'
     WHERE projectuser_user_id $m_id 
       AND projectuser_project_id $p_id 
       AND projectuser_projecttask_id is null";
 
-  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_project_memberstatus_change');
   $obm_q->query($query);
   if ($m_val == 1) {
@@ -1183,7 +1183,7 @@ function run_query_project_allocate_update($params) {
          UPDATE ProjectUser
          SET projectuser_timeupdate = '$date_now',
              projectuser_userupdate = $uid,
-             projectuser_projectedtime = '$proj'
+             projectuser_projectedtime = '".$obm_q->escape($proj)."'
              $set_miss_time
          WHERE projectuser_user_id $sel_mid 
            AND projectuser_projecttask_id $sel_tid ";
@@ -1210,8 +1210,8 @@ function run_query_project_allocate_update($params) {
            $ins_tid,
            '$date_now',
            $uid,
-           '$proj',
-           '$proj'
+           '".$obm_q->escape($proj)."',
+           '".$obm_q->escape($proj)."'
           )";
 
  	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(4)');
@@ -1303,8 +1303,8 @@ function run_query_project_advance_update($params) {
          UPDATE ProjectUser
          SET projectuser_timeupdate = '$date_now',
              projectuser_userupdate = $uid,
-             projectuser_projectedtime = '$proj_new',
-             projectuser_missingtime = '$set_miss_time'
+             projectuser_projectedtime = '".$obm_q->escape($proj_new)."',
+             projectuser_missingtime = '".$obm_q->escape($set_miss_time)."'
          WHERE projectuser_user_id $sel_mid 
            AND projectuser_projecttask_id $sel_tid ";
 
@@ -1336,8 +1336,8 @@ function run_query_project_advance_update($params) {
            $ins_tid,
            '$date_now',
            $uid,
-           '$proj_new',
-           '$set_miss_time'
+           '".$obm_q->escape($proj_new)."',
+           '".$obm_q->escape($set_miss_time)."'
           )";
 
  	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(4)');
@@ -1634,6 +1634,7 @@ function get_project_closing($id, $clo_id='') {
 function run_query_project_closing_insert($params) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $date_now = date('Y-m-d H:i:s');
   $project_id = sql_parse_id($params['project_id']);
@@ -1658,12 +1659,11 @@ function run_query_project_closing_insert($params) {
     null,
     $uid,
     '$date',
-    '$used',
-    '$remaining',
-    '$comment')";
+    '".$obm_q->escape($used)."',
+    '".$obm_q->escape($remaining)."',
+    '".$obm_q->escape($comment)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $pid = $obm_q->lastid();
   return $pid;
@@ -2181,6 +2181,7 @@ function run_query_project_reftasks(){
 function run_query_project_reftask_insert($params) {
   global $cdg_sql, $cdg_param, $obm;
 
+  $obm_q= new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $tasktype = sql_parse_id($params['tasktype']);
   $label = $params['reftask_label'];
@@ -2201,11 +2202,10 @@ function run_query_project_reftask_insert($params) {
     NOW(),
     $uid,
     $tasktype,
-    '$label'
+    '".$obm_q->escape($label)."'
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_reftask_insert()');
-  $obm_q= new DB_OBM;
   return $obm_q->query($query);
 }
 
@@ -2219,6 +2219,7 @@ function run_query_project_reftask_insert($params) {
 function run_query_project_reftask_update($params) {
   global $cdg_sql, $cdg_param, $obm;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm['uid']);
   $tasktype = sql_parse_id($params['tasktype']);
   $label = $params['reftask_label'];
@@ -2230,14 +2231,13 @@ function run_query_project_reftask_update($params) {
   }
 
   $query = "UPDATE ProjectRefTask 
-  SET projectreftask_label = '$label',
+  SET projectreftask_label = '".$obm_q->escape($label)."',
     projectreftask_tasktype_id = $tasktype,
     projectreftask_userupdate = $uid,
     projectreftask_timeupdate = NOW()
     WHERE projectreftask_id $id ";
     
   display_debug_msg($query, $cdg_sql, 'run_query_project_reftask_update()');
-  $obm_q = new DB_OBM;
   return $obm_q->query($query);  
 }
 
