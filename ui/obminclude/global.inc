@@ -1472,7 +1472,9 @@ function get_global_params($table='') {
       } elseif (($key == 'passwd') || ($key == 'password') || ($key == 'old_password') || ($key == 'new_password') || ($key == 'new_password_bis')) {
         $params[$key] = trim($value);
       } else {
-        $params[$key] = trim(strip_tags($value));
+        // protection from xss vulnerabilities
+        //Simple and double quotes will be escapet in the query section of every module
+        $params[$key] = trim(htmlspecialchars($value,ENT_NOQUOTES));
       }
     }
   }
