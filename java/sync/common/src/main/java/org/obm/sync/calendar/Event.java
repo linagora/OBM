@@ -551,6 +551,26 @@ public class Event implements Indexed<Integer> {
 		}
 	}
 	
+	public void changeParticipationState() {
+		changeAttendeesParticipationState();
+        List<Event> eventsExceptions = getEventsExceptions();
+        for (Event event: eventsExceptions) {
+        	event.changeAttendeesParticipationState();
+        }
+	}
+	
+	private void changeAttendeesParticipationState() {
+		for (Attendee att: getAttendees()) {
+			if (att.isCanWriteOnCalendar()) {
+				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
+					att.setState(ParticipationState.ACCEPTED);
+				}
+			} else {
+				att.setState(ParticipationState.NEEDSACTION);
+			}
+		}
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(title, domain, description, uid, extId, privacy, owner,

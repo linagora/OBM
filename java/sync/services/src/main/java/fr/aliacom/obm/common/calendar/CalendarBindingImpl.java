@@ -389,19 +389,9 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			boolean hasImportantChanges = hasImportantChanges(before, event);
 
-			if (before.hasImportantChangesExceptedEventException(event)) {
-                changePartipationState(event);
-                if(event.isRecurrent()) {
-	                EventRecurrence eventRecurrence = event.getRecurrence();
-	                List<Event> eventsExceptions = eventRecurrence.getEventExceptions();
-	                changePartipationStateOfException(eventsExceptions);
-                }
-            }
+			applyParticipationStateModifications(before, event);
 			
-			List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
-			changePartipationStateOfException(exceptionWithChanges);
-			
-			final Event after = calendarDao.modifyEventForcingSequence(
+			Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
 
 			applyDelegationRightsOnAttendeesToEvent(token, after);
@@ -411,9 +401,10 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 
             ObmUser user = userService.getUserFromAccessToken(token);
-            if(before.hasChangesOnEventAttributesExceptedEventException(after)) {
+            if (before.hasChangesOnEventAttributesExceptedEventException(after)) {
             	eventChangeHandler.update(user, before, after, notification, hasImportantChanges, token);
-            } else if(after != null){
+            } else if(after != null) {
+            	List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
 				for(Event exception : exceptionWithChanges) {
 					Event previousException = before.getEventInstanceWithRecurrenceId(exception.getRecurrenceId());
 					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges, token);
@@ -427,9 +418,14 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private void changePartipationStateOfException(List<Event> exceptionWithChanges) {
-		for(Event exception : exceptionWithChanges) {
-			changePartipationState(exception);
+	private void applyParticipationStateModifications(Event before, Event event) {
+		if (event.hasImportantChangesExceptedEventException(before)) {
+		    event.changeParticipationState();
+		} else {
+			List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
+			for (Event exception: exceptionWithChanges) {
+				exception.changeParticipationState();
+			}
 		}
 	}
 
@@ -582,7 +578,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
-			changePartipationState(event);
+			event.changeParticipationState();
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getObmId());
 			ObmUser user = userService.getUserFromAccessToken(token);
@@ -593,18 +589,6 @@ public class CalendarBindingImpl implements ICalendar {
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
-		}
-	}
-	
-	private void changePartipationState(Event event){
-		for (Attendee att: event.getAttendees()) {
-			if (att.isCanWriteOnCalendar()) {
-				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
-					att.setState(ParticipationState.ACCEPTED);
-				}
-			} else {
-				att.setState(ParticipationState.NEEDSACTION);
-			}
 		}
 	}
 	
