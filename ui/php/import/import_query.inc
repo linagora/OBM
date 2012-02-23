@@ -65,7 +65,7 @@ function run_query_import_search($import) {
   $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
 
-  $where = "import_name $like '$name%'";
+  $where = "import_name $like '".$obm_q->escape($name)."%'";
 
   if (($dsrc != $c_all) && ($dsrc != "")) { 
     $dsrc = sql_parse_id($dsrc, true);
@@ -167,6 +167,7 @@ function run_query_import_detail($id) {
 function run_query_import_insert($import) {
   global $cdg_sql, $obm;
 
+  $obm_q = new DB_OBM;
   $domain_id = sql_parse_id($obm["domain_id"]);
   $id = sql_parse_id($import["import_id"]);
   $name = $import["name"];
@@ -194,15 +195,14 @@ function run_query_import_insert($import) {
     '" . date("Y-m-d H:i:s") ."',
     null,
     " . $obm["uid"] . ",
-    '$name',
+    '".$obm_q->escape($name)."',
     $dsrc,
     $market,
-    '$sep',
-    '$enc',
-    '$desc')";
+    '".$obm_q->escape($sep)."',
+    '".$obm_q->escape($enc)."',
+    '".$obm_q->escape($desc)."')";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_insert()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -217,6 +217,7 @@ function run_query_import_insert($import) {
 function run_query_import_update($import) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("import");
   $id = sql_parse_id($import["import_id"], true);
   $name = $import["name"];
@@ -228,17 +229,16 @@ function run_query_import_update($import) {
 
   $query = "UPDATE Import SET import_timeupdate='". date("Y-m-d H:i:s")."',
     import_userupdate=".$obm["uid"].",
-    import_name='$name',
+    import_name='".$obm_q->escape($name)."',
     import_datasource_id=$dsrc,
     import_marketingmanager_id=$market,
-    import_separator='$sep',
-    import_enclosed='$enc',
-    import_desc='$desc'
+    import_separator='".$obm_q->escape($sep)."',
+    import_enclosed='".$obm_q->escape($enc)."',
+    import_desc='".$obm_q->escape($desc)."'
   WHERE import_id $id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -584,17 +584,16 @@ function get_import_similar_company($fields, $map, &$countries) {
   }
   $cgp_import_precision = 3;
   $short_name = substr($name, 0, $cgp_import_precision);
-  $name = addslashes($name);
-  $zip = addslashes($fields["comp_zip"]);
-  $town = addslashes($fields["comp_town"]);
+  $zip = $fields["comp_zip"];
+  $town = $fields["comp_town"];
   if( $ctry == "") {
-    $zip_query = "OR (address_zipcode $like '$zip' OR address_town $like '$town')";
+    $zip_query = "OR (address_zipcode $like '".$obm_q->escape($zip)."' OR address_town $like '".$obm_q->escape($town)."')";
   }
   $query = "SELECT distinct company_id, company_name, address_zipcode 
     FROM Company 
     INNER JOIN CompanyEntity on companyentity_company_id = company_id
     LEFT JOIN Address ON address_entity_id = companyentity_entity_id
-    WHERE (company_name $like '$short_name%' OR company_aka $like '%$name%')
+    WHERE (company_name $like '$short_name%' OR company_aka $like '%".$obm_q->escape($name)."%')
       AND (address_country $like '$ctry' $zip_query)
       $multidomain";
 
@@ -642,6 +641,7 @@ function get_import_similar_company($fields, $map, &$countries) {
 function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$userdata) {
   global $cdg_sql, $obm, $field_size;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
 
@@ -654,9 +654,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     }
   }
 
-  $num = addslashes($fields["comp_num"]);
+  $num = $fields["comp_num"];
   $archive = "0";
-  $name = addslashes($fields["comp_name"]);
+  $name = $fields["comp_name"];
   $auto_aka = format_name($name, 0, true, true);
   $aka = $auto_aka;
   $sound = phonetic_key($name);
@@ -664,12 +664,12 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
 
-  $ad1 = addslashes($fields["comp_ad1"]);
-  $ad2 = addslashes($fields["comp_ad2"]);
-  $ad3 = addslashes($fields["comp_ad3"]);
+  $ad1 = $fields["comp_ad1"];
+  $ad2 = $fields["comp_ad2"];
+  $ad3 = $fields["comp_ad3"];
   $zip = $fields["comp_zip"];
-  $town = addslashes($fields["comp_town"]);
-  $cdx = addslashes($fields["comp_cdx"]);
+  $town = $fields["comp_town"];
+  $cdx = $fields["comp_cdx"];
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["comp_ctry"]])) {
     $ctry = $countries[$fields["comp_ctry"]];
@@ -698,7 +698,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);
 
-  $com = addslashes($fields["comp_com"]);
+  $com = $fields["comp_com"];
 
   $query = "INSERT INTO Company (
     company_domain_id,
@@ -721,16 +721,15 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     null,
     $uid,
     $dsrc,
-    '$num',
+    '".$obm_q->escape($num)."',
     '$archive',
-    '$name',
-    '$aka',
-    '$sound',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($aka)."',
+    '".$obm_q->escape($sound)."',
     $market,
-    '$com')";
+    '".$obm_q->escape($com)."')";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(1)");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $id = $obm_q->lastid();
@@ -777,7 +776,7 @@ function run_query_entity_coords_update($id, $params) {
       if(trim($phone['number']) != '' ) {
         $phone['label'] = str_replace('_', ';', $phone['label']);
         $cpt[$phone['label']]++;
-        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '".$obm_q->escape($phone[number])."', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(phone)');
         $obm_q->query($query);
       }
@@ -804,11 +803,11 @@ function run_query_entity_coords_update($id, $params) {
           address_label
         ) VALUES (
           $id, 
-          '$address[street]',
-          '$address[zipcode]',
-          '$address[town]',
-          '$address[expresspostal]',
-          '$address[country]',
+          '".$obm_q->escape($address[street])."',
+          '".$obm_q->escape($address[zipcode])."',
+          '".$obm_q->escape($address[town])."',
+          '".$obm_q->escape($address[expresspostal])."',
+          '".$obm_q->escape($address[country])."',
           '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(address)');
@@ -826,7 +825,7 @@ function run_query_entity_coords_update($id, $params) {
       if(trim($website['url']) != '' ) {
         $website['label'] = str_replace('_', ';', $website['label']);
         $cpt[$website['label']]++;
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '".$obm_q->escape($website[url])."', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(website)');
         $obm_q->query($query);        
       }
@@ -841,7 +840,7 @@ function run_query_entity_coords_update($id, $params) {
     $cpt = array();
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
-        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '".$obm_q->escape($im[address])."', '".$obm_q->escape($im[protocol])."', '".$obm_q->escape($im[label])."')";
         display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(IM)');
         $obm_q->query($query);        
       }
@@ -858,7 +857,7 @@ function run_query_entity_coords_update($id, $params) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".$obm_q->escape($email[address])."', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(Email)');
         $obm_q->query($query);        
       }
@@ -879,6 +878,7 @@ function run_query_entity_coords_update($id, $params) {
 function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$userdata, $company_id) {
   global $obm, $cdg_sql, $field_size;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
 
   // Set default values when needed
@@ -890,19 +890,19 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     }
   }
 
-  $num = addslashes($fields["comp_num"]);
+  $num = $fields["comp_num"];
   // Name should be the same (expect case), so we don't update aka or sound
-  $name = addslashes($fields["comp_name"]);
+  $name = $fields["comp_name"];
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
 
-  $ad1 = addslashes($fields["comp_ad1"]);
-  $ad2 = addslashes($fields["comp_ad2"]);
-  $ad3 = addslashes($fields["comp_ad3"]);
+  $ad1 = $fields["comp_ad1"];
+  $ad2 = $fields["comp_ad2"];
+  $ad3 = $fields["comp_ad3"];
   $zip = $fields["comp_zip"];
-  $town = addslashes($fields["comp_town"]);
-  $cdx = addslashes($fields["comp_cdx"]);
+  $town = $fields["comp_town"];
+  $cdx = $fields["comp_cdx"];
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["comp_ctry"]])) {
     $ctry = $countries[$fields["comp_ctry"]];
@@ -932,20 +932,19 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);
 
-  $com = addslashes($fields["comp_com"]);
+  $com = $fields["comp_com"];
   $comp_id = sql_parse_id($company_id, true);
   $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate=$uid,
     company_datasource_id=$dsrc,
     company_marketingmanager_id=$market,
-    company_number='$num',
-    company_name='$name',
-    company_comment='$com'
+    company_number='".$obm_q->escape($num)."',
+    company_name='".$obm_q->escape($name)."',
+    company_comment='".$obm_q->escape($com)."'
   WHERE company_id $comp_id ";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_company_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $entity_id = of_entity_get('company', $company_id);
   run_query_entity_coords_update($entity_id, $coords);
@@ -975,12 +974,12 @@ function get_import_similar_contact($fields, $cid) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $cid = sql_parse_id($cid, true);
-  $lname = addslashes($fields["con_ln"]);
+  $lname = $fields["con_ln"];
   $fname = $fields["con_fn"];
 
   $query = "SELECT DISTINCT contact_id, contact_lastname, contact_firstname 
             FROM Contact
-            WHERE contact_lastname $like '$lname%'
+            WHERE contact_lastname $like '".$obm_q->escape($lname)."%'
               AND contact_company_id $cid ";
 
   display_debug_msg($query, $cdg_sql, "get_import_similar_contact()");
@@ -1012,6 +1011,7 @@ function get_import_similar_contact($fields, $cid) {
 function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
   $mailoks = array("X",'x','1',"1","Y","y");
@@ -1027,8 +1027,8 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
-  $lname = addslashes($fields["con_ln"]);
-  $fname = addslashes($fields["con_fn"]);
+  $lname = $fields["con_ln"];
+  $fname = $fields["con_fn"];
   // If a lang has been found we get the corresponding kind
   if (isset($kinds[strtoupper($fields["con_lang"])])) {
     $kind_id = $kinds[strtoupper($fields["con_lang"])];
@@ -1047,13 +1047,13 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   }
   $function_id = sql_parse_id($function_id);
 
-  $title = addslashes($fields["con_tit"]);
-  $ad1 = addslashes($fields["con_ad1"]);
-  $ad2 = addslashes($fields["con_ad2"]);
-  $ad3 = addslashes($fields["con_ad3"]);
+  $title = $fields["con_tit"];
+  $ad1 = $fields["con_ad1"];
+  $ad2 = $fields["con_ad2"];
+  $ad3 = $fields["con_ad3"];
   $zip = $fields["con_zip"];
-  $town = addslashes($fields["con_town"]);
-  $cdx = addslashes($fields["con_cdx"]);
+  $town = $fields["con_town"];
+  $cdx = $fields["con_cdx"];
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["con_ctry"]])) {
     $ctry = $countries[$fields["con_ctry"]];
@@ -1085,7 +1085,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     'country' => $ctry);
 
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
-  $com = addslashes($fields["con_com"]);
+  $com = $fields["con_com"];
   $arch = '0';
   $company_id = sql_parse_id($comp_id);
   $contact_addressbook_id = OBM_AddressBook::lookupPublicAddressBookIdFor($domain_id);
@@ -1119,16 +1119,15 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     $kind_id,
     '$GLOBALS[c_origin_import]',
     $market,
-    '$lname',
-    '$fname',
+    '".$obm_q->escape($lname)."',
+    '".$obm_q->escape($fname)."',
     $function_id,
-    '$title',
-    '$mailok',
+    '".$obm_q->escape($title)."',
+    '".$obm_q->escape($mailok)."',
     $arch,
-    '$com')";
+    '".$obm_q->escape($com)."')";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert(1)");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $id = $obm_q->lastid();
@@ -1168,6 +1167,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, &$functions, &$userdata, $contact_id) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $mailoks = array("X",'x','1',"1","Y","y");
 
@@ -1182,8 +1182,8 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
 
   $dsrc = sql_parse_id($import_q->f("import_datasource_id"));
   $market = sql_parse_id($import_q->f("import_marketingmanager_id"));
-  $lname = addslashes($fields["con_ln"]);
-  $fname = addslashes($fields["con_fn"]);
+  $lname = $fields["con_ln"];
+  $fname = $fields["con_fn"];
   // If a lang has been found we get the corresponding kind
   if (isset($kinds[strtoupper($fields["con_lang"])])) {
     $kind_id = $kinds[strtoupper($fields["con_lang"])];
@@ -1197,13 +1197,13 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     $function_id = $fields["con_func"];
   }
   $function_id = sql_parse_id($function_id);
-  $title = addslashes($fields["con_tit"]);
-  $ad1 = addslashes($fields["con_ad1"]);
-  $ad2 = addslashes($fields["con_ad2"]);
-  $ad3 = addslashes($fields["con_ad3"]);
+  $title = $fields["con_tit"];
+  $ad1 = $fields["con_ad1"];
+  $ad2 = $fields["con_ad2"];
+  $ad3 = $fields["con_ad3"];
   $zip = $fields["con_zip"];
-  $town = addslashes($fields["con_town"]);
-  $cdx = addslashes($fields["con_cdx"]);
+  $town = $fields["con_town"];
+  $cdx = $fields["con_cdx"];
   // If a country name has been found we get the corresponding iso code
   if (isset($countries[$fields["con_ctry"]])) {
     $ctry = $countries[$fields["con_ctry"]];
@@ -1234,7 +1234,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     'expresspostal' => $cdx,
     'country' => $ctry);  
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
-  $com = addslashes($fields["con_com"]);
+  $com = $fields["con_com"];
   $arch = '0';
   $cont_id = sql_parse_id($contact_id, true);
   $query = "UPDATE Contact SET
@@ -1244,17 +1244,16 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_kind_id $kind_id ,
     contact_function_id $function_id ,
     contact_marketingmanager_id $market ,
-    contact_lastname='$lname',
-    contact_firstname='$fname',
-    contact_country_iso3166='$ctry',
-    contact_title='$title',
-    contact_mailing_ok='$mailok',
-    contact_archive='$arch',
-    contact_comment='$com'
+    contact_lastname='".$obm_q->escape($lname)."',
+    contact_firstname='".$obm_q->escape($fname)."',
+    contact_country_iso3166='".$obm_q->escape($ctry)."',
+    contact_title='".$obm_q->escape($title)."',
+    contact_mailing_ok='".$obm_q->escape($mailok)."',
+    contact_archive='".$obm_q->escape($arch)."',
+    contact_comment='".$obm_q->escape($com)."'
   WHERE contact_id $cont_id ";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_contact_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $entity_id = of_entity_get('contact', $contact_id);
   run_query_entity_coords_update($entity_id, $coords);
