@@ -59,6 +59,10 @@ import com.google.inject.spi.Message;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
+import fr.aliacom.obm.common.calendar.EventNotificationService;
+import fr.aliacom.obm.common.calendar.EventNotificationServiceImpl;
+import fr.aliacom.obm.common.calendar.JMSService;
+import fr.aliacom.obm.common.calendar.JMSServiceImpl;
 import fr.aliacom.obm.common.domain.DomainCache;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.setting.SettingsService;
@@ -108,6 +112,8 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(LocatorService.class).to(LocatorCache.class);
     			bind(HelperService.class).to(HelperServiceImpl.class);
     			bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+    			bind(JMSService.class).to(JMSServiceImpl.class);
+    			bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
     			
     		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
     		    
