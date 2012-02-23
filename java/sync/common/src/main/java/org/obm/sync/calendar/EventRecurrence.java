@@ -127,8 +127,9 @@ public class EventRecurrence {
 		return eventExceptions;
 	}
 
-	public void setEventExceptions(List<Event> eventExceptions) {
-		this.eventExceptions = eventExceptions;
+	public void setEventExceptions(List<Event> eventsExceptions) {
+		Preconditions.checkNotNull(eventsExceptions);
+		this.eventExceptions = eventsExceptions;
 	}
 
 	public void addEventException(Event eventException) {

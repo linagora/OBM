@@ -356,6 +356,7 @@ public class CalendarBindingImpl implements ICalendar {
 				
 			} else {
 				
+				assignDelegationRightsOnAttendees(token, event);
 				if (before.isInternalEvent()) {
 					return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 				} else {
@@ -389,20 +390,21 @@ public class CalendarBindingImpl implements ICalendar {
 			boolean hasImportantChanges = hasImportantChanges(before, event);
 
 			if (before.hasImportantChangesExceptedEventException(event)) {
-                changePartipationState(token, event);
+                changePartipationState(event);
                 if(event.isRecurrent()) {
 	                EventRecurrence eventRecurrence = event.getRecurrence();
 	                List<Event> eventsExceptions = eventRecurrence.getEventExceptions();
-	                changePartipationStateOfException(token, eventsExceptions);
+	                changePartipationStateOfException(eventsExceptions);
                 }
             }
 			
 			List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
-			changePartipationStateOfException(token, exceptionWithChanges);
+			changePartipationStateOfException(exceptionWithChanges);
 			
 			final Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
-			setAttendeeCanWriteOnCalendar(token, after);
+
+			applyDelegationRightsOnAttendeesToEvent(token, after);
 			
 			if (after != null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
@@ -425,31 +427,12 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private void changePartipationStateOfException(AccessToken token,
-			List<Event> exceptionWithChanges) {
+	private void changePartipationStateOfException(List<Event> exceptionWithChanges) {
 		for(Event exception : exceptionWithChanges) {
-			changePartipationState(token, exception);
+			changePartipationState(exception);
 		}
 	}
 
-	private void setAttendeeCanWriteOnCalendar(AccessToken accessToken, Event event) {
-		applyRightsOnAttendees(accessToken, event.getAttendees());
-		if (event.getRecurrence() != null) {
-			List<Event> exceptions = event.getRecurrence().getEventExceptions();
-			for (Event exception : exceptions) {
-				applyRightsOnAttendees(accessToken, exception.getAttendees());
-			}
-		}
-	}
-
-	private void applyRightsOnAttendees(AccessToken accessToken, Collection<Attendee> attendees) {
-		for (Attendee attendee : attendees) {
-			boolean canWriteOnCalendar = !StringUtils.isEmpty(attendee.getEmail())
-					&& helperService.canWriteOnCalendar(accessToken, attendee.getEmail());
-			attendee.setCanWriteOnCalendar(canWriteOnCalendar);
-		}
-	}
-	
 	private boolean hasImportantChanges(Event before, Event after) {
 		boolean hasImportantChanges = before.getSequence() != after.getSequence();
 		return hasImportantChanges;
@@ -516,6 +499,8 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + message);
 				throw new ServerFault(message);
 			}
+			
+			assignDelegationRightsOnAttendees(token, event);
 			Event ev = null;
 			if (event.isInternalEvent()) {
 				ev = createInternalEvent(token, calendar, event, notification);
@@ -597,7 +582,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
-			changePartipationState(token, event);
+			changePartipationState(event);
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getObmId());
 			ObmUser user = userService.getUserFromAccessToken(token);
@@ -611,17 +596,30 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void changePartipationState(AccessToken token, Event event){
+	private void changePartipationState(Event event){
 		for (Attendee att: event.getAttendees()) {
-			if (!StringUtils.isEmpty(att.getEmail()) && helperService.canWriteOnCalendar(token,  att.getEmail())) {
-				att.setCanWriteOnCalendar(true);
+			if (att.isCanWriteOnCalendar()) {
 				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
 					att.setState(ParticipationState.ACCEPTED);
 				}
 			} else {
 				att.setState(ParticipationState.NEEDSACTION);
-				att.setCanWriteOnCalendar(false);
 			}
+		}
+	}
+	
+	private void assignDelegationRightsOnAttendees(AccessToken token, Event event) {
+		applyDelegationRightsOnAttendeesToEvent(token, event);
+		List<Event> eventsExceptions = event.getEventsExceptions();
+		for (Event eventException : eventsExceptions) {
+			applyDelegationRightsOnAttendeesToEvent(token, eventException);
+		}
+	}
+	
+	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) {
+		for (Attendee att: event.getAttendees()) {
+			boolean isWriteOnCalendar = !StringUtils.isEmpty(att.getEmail()) && helperService.canWriteOnCalendar(token,  att.getEmail());
+			att.setCanWriteOnCalendar(isWriteOnCalendar);
 		}
 	}
 	

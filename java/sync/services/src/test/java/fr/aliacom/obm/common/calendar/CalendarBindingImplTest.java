@@ -267,17 +267,22 @@ public class CalendarBindingImplTest {
 		String userName = "user";
 		EventExtId eventExtId = new EventExtId("extid");
 		String userEmail = "user@domain1";
+		String mccarthyEmail = fixtures.mccarthyInfo.getMail();
 		
 		ObmUser user = mockObmUser(userEmail, fixtures.domain);
 		
 		AccessToken accessToken = mockAccessToken(userName, fixtures.domain);
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
+		expect(rightsHelper.canWriteOnCalendar(accessToken, mccarthyEmail)).andReturn(false);
 		
 		final Event event = createMock(Event.class);
 		expect(event.getExtId()).andReturn(eventExtId).atLeastOnce();
 		expect(event.getObmId()).andReturn(null).atLeastOnce();
 		expect(event.isInternalEvent()).andReturn(false).atLeastOnce();
 		expect(event.getTitle()).andReturn("title").atLeastOnce();
+		expect(event.getAttendees()).andReturn(ImmutableList.of(getFakeAttendee(mccarthyEmail))).atLeastOnce();
+		expect(event.getEventsExceptions()).andReturn(ImmutableList.<Event>of());
+		
 		event.findAttendeeFromEmail(userEmail);
 		EasyMock.expectLastCall().andReturn(null).atLeastOnce();
 		
@@ -1082,6 +1087,8 @@ public class CalendarBindingImplTest {
 		
 		AccessToken accessToken = mockAccessToken(calendar, fixtures.domain);
 		HelperService helper = mockRightsHelper(calendar, accessToken);
+		expect(helper.canWriteOnCalendar(accessToken, userEmail)).andReturn(false);
+		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);

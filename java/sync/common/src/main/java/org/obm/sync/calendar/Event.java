@@ -543,6 +543,14 @@ public class Event implements Indexed<Integer> {
 		return (this.getRecurrence() != null && getRecurrence().isRecurrent()); 
 	}
 
+	public List<Event> getEventsExceptions() {
+		if (recurrence == null) {
+			return ImmutableList.of();
+		} else {
+			return recurrence.getEventExceptions();
+		}
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(title, domain, description, uid, extId, privacy, owner,
