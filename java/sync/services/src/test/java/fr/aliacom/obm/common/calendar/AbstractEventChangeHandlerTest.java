@@ -32,7 +32,6 @@
 package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static fr.aliacom.obm.ToolBox.getDefaultProducer;
 import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.before;
@@ -45,14 +44,14 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
 
-import com.linagora.obm.sync.Producer;
-
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
@@ -66,17 +65,16 @@ public abstract class AbstractEventChangeHandlerTest {
 		super();
 	}
 
-	private EventChangeHandler newEventChangeHandler(EventChangeMailer mailer) {
-		UserService userService = EasyMock.createMock(UserService.class);
+	private EventNotificationService newEventChangeHandler(EventChangeMailer mailer, UserService userService) {
 		SettingsService defaultSettingsService = getDefaultSettingsService();
-		Producer producer = getDefaultProducer();
-		EasyMock.replay(userService, defaultSettingsService);
+		EasyMock.replay(defaultSettingsService);
 		Ical4jHelper ical4jHelper = EasyMock.createMock(Ical4jHelper.class);
 		ICalendarFactory calendarFactory = EasyMock.createMock(ICalendarFactory.class);
-		return new EventChangeHandler(mailer, defaultSettingsService, userService, producer, ical4jHelper, calendarFactory);
+		return new EventNotificationServiceImpl(mailer, defaultSettingsService, userService, ical4jHelper, calendarFactory);
 	}
 	
-	protected abstract void processEvent(EventChangeHandler eventChangeHandler, Event event, ObmUser obmUser) throws NotificationException;
+	protected abstract void processEvent(EventNotificationService eventChangeHandler, Event event, ObmUser obmUser, 
+			AccessToken accessToken) throws NotificationException;
 	
 	public void testDefaultEvent()  {
 	
@@ -85,11 +83,16 @@ public abstract class AbstractEventChangeHandlerTest {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
 		
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
 		
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		EasyMock.replay(mailer, userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 
@@ -100,11 +103,16 @@ public abstract class AbstractEventChangeHandlerTest {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
 		
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
 		
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		EasyMock.replay(mailer, userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 
@@ -117,10 +125,15 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(createRequiredAttendee(ownerEmail, ParticipationState.ACCEPTED));
 		
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		
+		EasyMock.replay(mailer, userService);
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 
@@ -134,10 +147,15 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.addAttendee(owner);
 		
 		EventChangeMailer mailer = expectationObmUserIsNotOwner(defaultObmUser, owner);
-
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
 		
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 	
@@ -148,10 +166,13 @@ public abstract class AbstractEventChangeHandlerTest {
 		event.setOwnerEmail("user@test");
 		event.addAttendee(createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED));
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
-		EasyMock.replay(mailer);
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(mailer, userService);
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
 		
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 	
@@ -167,8 +188,14 @@ public abstract class AbstractEventChangeHandlerTest {
 
 		ObmUser obmUSer = getDefaultObmUser();
 		EventChangeMailer mailer = expectationAcceptedAttendees(attendeeAccepted, event, obmUSer);
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, obmUSer);
+		
+		AccessToken accessToken = ToolBox.mockAccessToken(obmUSer.getLogin(), obmUSer.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(obmUSer);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		processEvent(eventChangeHandler, event, obmUSer, accessToken);
 		EasyMock.verify(mailer);
 	}
 	
@@ -188,8 +215,15 @@ public abstract class AbstractEventChangeHandlerTest {
 
 		ObmUser defaultObmUser = getDefaultObmUser();
 		EventChangeMailer mailer = expectationNeedActionAttendees(attendeeNeedAction, ICSDATA, event, defaultObmUser);
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, defaultObmUser);
+
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 	
@@ -209,8 +243,13 @@ public abstract class AbstractEventChangeHandlerTest {
 		
 		EventChangeMailer mailer = expectationDeclinedAttendees(attendeeDeclined, event, defaultObmUser);
 		
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 	
@@ -231,9 +270,14 @@ public abstract class AbstractEventChangeHandlerTest {
 		
 		ObmUser defaultObmUser = getDefaultObmUser();
 		EventChangeMailer mailer = expectationTwoAttendees(attendeeAccepted, attendeeNotAccepted, event, defaultObmUser);
-	
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 
@@ -254,8 +298,13 @@ public abstract class AbstractEventChangeHandlerTest {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		EventChangeMailer mailer = expectationSameAttendeeTwice(attendeeOne, event, defaultObmUser);
 		
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 
@@ -277,8 +326,13 @@ public abstract class AbstractEventChangeHandlerTest {
 		ObmUser defaultObmUser = getDefaultObmUser();
 		EventChangeMailer mailer = expectationManyAttendee(needActionAttendees, accpetedAttendees, event, defaultObmUser);
 		
-		EventChangeHandler eventChangeHandler = newEventChangeHandler(mailer);
-		processEvent(eventChangeHandler, event, defaultObmUser);
+		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+		UserService userService = EasyMock.createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+		EasyMock.replay(userService);
+		
+		EventNotificationService eventChangeHandler = newEventChangeHandler(mailer, userService);
+		processEvent(eventChangeHandler, event, defaultObmUser, accessToken);
 		EasyMock.verify(mailer);
 	}
 

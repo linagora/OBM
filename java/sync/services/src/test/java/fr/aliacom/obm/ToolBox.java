@@ -36,6 +36,7 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.sync.auth.AccessToken;
 
 import com.linagora.obm.sync.Producer;
 
@@ -46,6 +47,27 @@ import fr.aliacom.obm.common.user.UserSettings;
 
 public class ToolBox {
 
+	public static AccessToken mockAccessToken() {
+		ObmUser user = getDefaultObmUser();
+		return mockAccessToken(user.getLogin(), user.getDomain());
+	}
+	
+	public static AccessToken mockAccessToken(String login, ObmDomain domain) {
+		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
+		EasyMock.expect(accessToken.getDomain()).andReturn(domain).atLeastOnce();
+		EasyMock.expect(accessToken.getUserLogin()).andReturn(login).anyTimes();
+		EasyMock.expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
+		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
+		return accessToken;
+	}
+
+	public static ObmUser mockObmUser(String userEmail, ObmDomain domain) {
+		ObmUser user = EasyMock.createMock(ObmUser.class);
+		EasyMock.expect(user.getEmail()).andReturn(userEmail).atLeastOnce();
+		EasyMock.expect(user.getDomain()).andReturn(domain).anyTimes();
+		return user;
+	}
+	
 	public static ObmDomain getDefaultObmDomain() {
 		ObmDomain obmDomain = new ObmDomain();
 		obmDomain.setName("test.tlse.lng");
@@ -66,6 +88,10 @@ public class ToolBox {
 	
 	public static Ical4jUser getIcal4jUser() {
 		ObmUser obmUser = getDefaultObmUser();
+		return getIcal4jUser(obmUser);
+	}
+	
+	public static Ical4jUser getIcal4jUser(ObmUser obmUser) {
 		return Ical4jUser.Factory.create().createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
 	}
 	

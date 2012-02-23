@@ -282,8 +282,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev, boolean notification) throws FindException {
 		if (ev.isInternalEvent()) {
-			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.delete(user, ev, notification, token);
+			eventChangeHandler.delete(ev, notification, token);
 		} else {
 			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED, notification);
 		}
@@ -356,7 +355,6 @@ public class CalendarBindingImpl implements ICalendar {
 				
 			} else {
 				
-				assignDelegationRightsOnAttendees(token, event);
 				if (before.isInternalEvent()) {
 					return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 				} else {
@@ -387,35 +385,25 @@ public class CalendarBindingImpl implements ICalendar {
 			boolean notification) throws ServerFault {
 		
 		try {
-			boolean hasImportantChanges = hasImportantChanges(before, event);
-
+			assignDelegationRightsOnAttendees(token, event);
 			applyParticipationStateModifications(before, event);
 			
 			Event after = calendarDao.modifyEventForcingSequence(
 					token, calendar, event, updateAttendees, event.getSequence(), true);
+			logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 
-			applyDelegationRightsOnAttendeesToEvent(token, after);
-			
-			if (after != null) {
-				logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
-			}
-
-            ObmUser user = userService.getUserFromAccessToken(token);
-            if (before.hasChangesOnEventAttributesExceptedEventException(after)) {
-            	eventChangeHandler.update(user, before, after, notification, hasImportantChanges, token);
-            } else if(after != null) {
-            	List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
-				for(Event exception : exceptionWithChanges) {
-					Event previousException = before.getEventInstanceWithRecurrenceId(exception.getRecurrenceId());
-					eventChangeHandler.update(user, previousException, exception, notification, hasImportantChanges, token);
-				}
-            }
-
+			assignDelegationRightsOnAttendees(token, after);
+            notify(token, notification, before, after);
+            
 			return after;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private void notify(AccessToken token, boolean notification, Event before, Event after) {
+		eventChangeHandler.update(before, after, notification, token);
 	}
 
 	private void applyParticipationStateModifications(Event before, Event event) {
@@ -427,11 +415,6 @@ public class CalendarBindingImpl implements ICalendar {
 				exception.changeParticipationState();
 			}
 		}
-	}
-
-	private boolean hasImportantChanges(Event before, Event after) {
-		boolean hasImportantChanges = before.getSequence() != after.getSequence();
-		return hasImportantChanges;
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
@@ -581,8 +564,7 @@ public class CalendarBindingImpl implements ICalendar {
 			event.changeParticipationState();
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getObmId());
-			ObmUser user = userService.getUserFromAccessToken(token);
-			eventChangeHandler.create(user, ev, notification, token);
+			eventChangeHandler.create(ev, notification, token);
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event["
 				+ ev.getTitle() + "] created");
 			return ev;

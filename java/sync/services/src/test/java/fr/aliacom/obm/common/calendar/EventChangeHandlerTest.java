@@ -33,7 +33,6 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static fr.aliacom.obm.ToolBox.getDefaultProducer;
 import static fr.aliacom.obm.ToolBox.getDefaultSettings;
 import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
@@ -55,8 +54,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.jms.JMSException;
-
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -74,10 +71,9 @@ import org.obm.sync.server.mailer.EventChangeMailer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.linagora.obm.sync.Producer;
 
-import fr.aliacom.obm.common.calendar.EventChangeHandler.AttendeeStateValue;
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.calendar.EventNotificationServiceImpl.AttendeeStateValue;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
@@ -102,42 +98,26 @@ public class EventChangeHandlerTest {
 	private static final Locale LOCALE = Locale.FRENCH;
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
 	
-	private static EventChangeHandler newEventChangeHandler(
+	private static EventNotificationService newEventChangeHandler(
 			EventChangeMailer mailer, SettingsService settingsService, UserService userService,
-			Producer producer, Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
+			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
 		
-		return new EventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper, calendarFactory);
+		return new EventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
 	}
 	
-	private static EventChangeHandler updateEventChangeHandler(EventChangeMailer mailer, Ical4jHelper ical4jHelper, 
-			ICalendarFactory calendarFactory) throws JMSException  {
+	private static EventNotificationService updateEventChangeHandler(EventChangeMailer mailer, Ical4jHelper ical4jHelper, 
+			ICalendarFactory calendarFactory, UserService userService)  {
 		
-		UserService userService = EasyMock.createMock(UserService.class);
 		SettingsService settingsService = getDefaultSettingsService();
-		Producer producer = getDefaultProducer();
-		producer.write(ICS_DATA_ADD);
-		producer.write(ICS_DATA_REMOVE);
-		producer.write(ICS_DATA_UPDATE);
-		EasyMock.replay(userService, settingsService);
-		return newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper, calendarFactory);
-	}
-	
-	private static AccessToken getMockAccessToken()
-	{
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setId(1);
-		obmDomain.setName("unitTest-domain");
-		AccessToken token = new AccessToken(2, "unitTest-origin");
-		token.setDomain(obmDomain);
-		token.setUserEmail("unitTest-email");
-		return token;
+		EasyMock.replay(settingsService);
+		return newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
 	}
 	
 	public static class CreateTests extends AbstractEventChangeHandlerTest {
 		
 		@Override
-		protected void processEvent(EventChangeHandler eventChangeHandler, Event event, ObmUser obmUser) {
-			eventChangeHandler.create(obmUser, event, true, getMockAccessToken());
+		protected void processEvent(EventNotificationService eventChangeHandler, Event event, ObmUser obmUser, AccessToken accessToken) {
+			eventChangeHandler.notifyCreatedEvent(event, accessToken);
 		}
 		
 		@Override
@@ -195,7 +175,7 @@ public class EventChangeHandlerTest {
 				Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
@@ -221,7 +201,7 @@ public class EventChangeHandlerTest {
 				Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), eq(event), eq(LOCALE), eq(TIMEZONE), anyObject(AccessToken.class));
 			expectLastCall().once();
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted)), 
@@ -239,7 +219,7 @@ public class EventChangeHandlerTest {
 		@Override
 		protected EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser obmUser) {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), EasyMock.anyObject(AccessToken.class));
@@ -257,7 +237,7 @@ public class EventChangeHandlerTest {
 		protected EventChangeMailer expectationManyAttendee(List<Attendee> needActionAttendees, List<Attendee> accpetedAttendees,
 				Event event, ObmUser obmUser) {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(accpetedAttendees), eq(event), eq(LOCALE), eq(TIMEZONE), EasyMock.anyObject(AccessToken.class));
 			expectLastCall().once();
@@ -284,8 +264,8 @@ public class EventChangeHandlerTest {
 	public static class DeleteTests extends AbstractEventChangeHandlerTest {
 		
 		@Override
-		protected void processEvent(EventChangeHandler eventChangeHandler, Event event, ObmUser obmUser) {
-			eventChangeHandler.delete(obmUser, event, true, getMockAccessToken());
+		protected void processEvent(EventNotificationService eventChangeHandler, Event event, ObmUser obmUser, AccessToken accessToken) {
+			eventChangeHandler.notifyDeletedEvent(event, accessToken);
 		}
 		
 		@Test
@@ -332,7 +312,7 @@ public class EventChangeHandlerTest {
 		protected EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), EasyMock.anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -344,7 +324,7 @@ public class EventChangeHandlerTest {
 				Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -368,7 +348,7 @@ public class EventChangeHandlerTest {
 				ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted, attendeeAccepted )), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -384,7 +364,7 @@ public class EventChangeHandlerTest {
 		protected EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -404,7 +384,7 @@ public class EventChangeHandlerTest {
 			atts.addAll(needActionAttendees);
 			atts.addAll(accpetedAttendees);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(atts), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -426,70 +406,87 @@ public class EventChangeHandlerTest {
 	public static class UpdateTests {
 
 		@Test
-		public void testDefaultEventNoChange() throws JMSException {
+		public void testDefaultEventNoChange() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+
 			Event event = new Event();
 			event.setDate(after());
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), event)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), event)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), event)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, event)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, event)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, event)).andReturn(ICS_DATA_UPDATE);
 			
 			HelperService helper = createMock(HelperService.class);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, helper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, event, event, true, false, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, helper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(event, event, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 
 		@Test
-		public void testDefaultEventDateChangeZeroUser() throws JMSException {
+		public void testDefaultEventDateChangeZeroUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Event event = new Event();
 			event.setDate(after());
 			Event eventAfter = new Event();
 			eventAfter.setDate(longAfter());
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), eventAfter)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), eventAfter)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), eventAfter)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, eventAfter)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, eventAfter)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, eventAfter)).andReturn(ICS_DATA_UPDATE);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, event, eventAfter, true, true, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(event, eventAfter, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventDateChangeOneNeedActionUser() throws JMSException {
+		public void testDefaultEventDateChangeOneNeedActionUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
+			previousEvent.setSequence(0);
+			
 			Event currentEvent = new Event();
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
-
+			currentEvent.setSequence(1);
+			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyNeedActionUpdateUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
@@ -497,32 +494,42 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, true, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventDateChangeOneAcceptedUser() throws JMSException {
+		public void testDefaultEventDateChangeOneAcceptedUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
+			previousEvent.setSequence(0);
+			
 			Event currentEvent = new Event();
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
+			currentEvent.setSequence(1);
+			
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedUpdateUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
@@ -531,71 +538,90 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, true, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventNoChangeOneNeedActionUser() throws JMSException {
+		public void testDefaultEventNoChangeOneNeedActionUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, previousEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, previousEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, previousEvent, true, false, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventNoChangeOneAcceptedUser() throws JMSException {
+		public void testDefaultEventNoChangeOneAcceptedUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), previousEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, previousEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, previousEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, previousEvent, true, false, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventAddOneNeedActionUser() throws JMSException {
+		public void testDefaultEventAddOneNeedActionUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.NEEDSACTION);
 			
@@ -607,12 +633,11 @@ public class EventChangeHandlerTest {
 			currentEvent.setDate(after());
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyNeedActionNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), 
@@ -620,19 +645,26 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, false, getMockAccessToken());
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
 		
 		@Test
-		public void testDefaultEventAddOneAcceptedUser() throws JMSException {
+		public void testDefaultEventAddOneAcceptedUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.ACCEPTED);
 			
@@ -644,45 +676,54 @@ public class EventChangeHandlerTest {
 			currentEvent.setDate(after());
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE), anyObject(AccessToken.class));
 			expectLastCall().once();
 
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 			
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, false, getMockAccessToken());
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+			
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
 
 		@Test
-		public void testDefaultEventDateChangeOneAcceptedUserWithCanWriteOnCalendar() throws JMSException {
+		public void testDefaultEventDateChangeOneAcceptedUserWithCanWriteOnCalendar() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			attendee.setCanWriteOnCalendar(true);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
+			previousEvent.setSequence(0);
+			
 			Event currentEvent = new Event();
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
-			ObmUser defaultObmUser = getDefaultObmUser();
+			currentEvent.setSequence(1);
+			
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(eq(defaultObmUser), compareCollections(ImmutableList.of(attendee)), 
@@ -691,18 +732,25 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
-			
-			replay(mailer, ical4jHelper, calendarFactory);
 
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, true, getMockAccessToken());
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
 
-		public void testUserIsNotEventOwnerAddOneAcceptedUser() throws JMSException {
+		public void testUserIsNotEventOwnerAddOneAcceptedUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", ParticipationState.ACCEPTED);
 
@@ -716,12 +764,11 @@ public class EventChangeHandlerTest {
 			currentEvent.addAttendee(attendee);
 			currentEvent.addAttendee(addedAttendee);
 			currentEvent.setOwnerEmail("attendee1@test");
-			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedNewUsers(eq(defaultObmUser), compareCollections(ImmutableList.of(addedAttendee)), eq(currentEvent), eq(LOCALE), eq(TIMEZONE), anyObject(AccessToken.class));
@@ -729,46 +776,59 @@ public class EventChangeHandlerTest {
 			expectLastCall().once();
 
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, false, getMockAccessToken());
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
 
 		@Test
-		public void testUserIsNotEventOwnerDefaultEventDateChangeOneAcceptedUser() throws JMSException {
+		public void testUserIsNotEventOwnerDefaultEventDateChangeOneAcceptedUser() {
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
 			Event previousEvent = new Event();
 			previousEvent.setDate(after());
 			previousEvent.addAttendee(attendee);
 			previousEvent.setOwnerEmail("attendee1@test");
+			previousEvent.setSequence(0);
+			
 			Event currentEvent = new Event();
 			currentEvent.setDate(longAfter());
 			currentEvent.addAttendee(attendee);
 			currentEvent.setOwnerEmail("attendee1@test");
-			ObmUser defaultObmUser = getDefaultObmUser();
+			currentEvent.setSequence(1);
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_REMOVE);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser(defaultObmUser), currentEvent)).andReturn(ICS_DATA_UPDATE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_ADD);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyOwnerUpdate(eq(defaultObmUser), eq(attendee), eq(previousEvent), eq(currentEvent), eq(LOCALE), eq(TIMEZONE), anyObject(AccessToken.class));
 
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(defaultObmUser.getEmail(), defaultObmUser.getDomain());
 			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
 			
-			replay(mailer, ical4jHelper, calendarFactory);
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+			
+			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+			
+			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventChangeHandler eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory);
-			eventChangeHandler.update(defaultObmUser, previousEvent, currentEvent, true, true, getMockAccessToken());
+			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
+			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
@@ -779,6 +839,9 @@ public class EventChangeHandlerTest {
 		
 		@Test
 		public void testParticipationChangeWithOwnerExpectingEmails() {
+			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
 			organizer.setOrganizer(true);
@@ -794,21 +857,22 @@ public class EventChangeHandlerTest {
 			attendeeUser.setEmail(attendee.getEmail());
 			attendeeUser.setDomain(getDefaultObmDomain());
 			
-			ObmUser organizerUser = new ObmUser();
-			attendeeUser.setEmail(attendee.getEmail());
-			attendeeUser.setDomain(getDefaultObmDomain());
-			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationReply(event, EventChangeHandlerTest.buildIcal4jUser(attendeeUser))).andReturn(ICS_DATA_REPLY);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationReply(event, ical4jUser)).andReturn(ICS_DATA_REPLY);
 			
 			mailer.notifyUpdateParticipationState(
 					eq(event), eq(organizer), eq(attendeeUser),
 					eq(ParticipationState.ACCEPTED), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
 			expectLastCall().once();
 			
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+			
 			UserService userService = EasyMock.createMock(UserService.class);
-			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
-			EasyMock.expectLastCall().andReturn(organizerUser).once();
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+
+			ObmUser organizerUser = new ObmUser();
+			EasyMock.expect(userService.getUserFromLogin(organizer.getEmail(), defaultObmUser.getDomain().getName()))
+				.andReturn(organizerUser).once();
 
 			UserSettings settings = getDefaultSettings();
 			EasyMock.expect(settings.expectParticipationEmailNotification()).andReturn(true).once();
@@ -818,22 +882,23 @@ public class EventChangeHandlerTest {
 			EasyMock.expectLastCall().andReturn(settings).once();
 			settingsService.getSettings(eq(attendeeUser));
 			EasyMock.expectLastCall().andReturn(settings).once();
-			Producer producer = getDefaultProducer();
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(attendeeUser.getEmail(), attendeeUser.getDomain());
-			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(attendeeUser)).andReturn(ical4jUser).anyTimes();
+			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser);
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
-			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper, calendarFactory);
-			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED, true, getMockAccessToken());
+			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
 		
 		@Test
 		public void testParticipationChangeWithExternalOrganizer() {
+			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
 			organizer.setOrganizer(true);
@@ -850,38 +915,43 @@ public class EventChangeHandlerTest {
 			attendeeUser.setDomain(getDefaultObmDomain());
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationReply(event, EventChangeHandlerTest.buildIcal4jUser(attendeeUser))).andReturn(ICS_DATA_REPLY);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationReply(event, ical4jUser)).andReturn(ICS_DATA_REPLY);
 			
 			mailer.notifyUpdateParticipationState(
 					eq(event), eq(organizer), eq(attendeeUser),
 					eq(ParticipationState.ACCEPTED), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
 			expectLastCall().once();
 			
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+
 			UserService userService = EasyMock.createMock(UserService.class);
-			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
-			EasyMock.expectLastCall().andReturn(null).once();
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+
+			EasyMock.expect(userService.getUserFromLogin(organizer.getEmail(), defaultObmUser.getDomain().getName()))
+				.andReturn(null).once();
 
 			UserSettings settings = getDefaultSettings();
 			
 			SettingsService settingsService = EasyMock.createMock(SettingsService.class);
 			settingsService.getSettings(eq(attendeeUser));
 			EasyMock.expectLastCall().andReturn(settings).once();
-			Producer producer = getDefaultProducer();
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(attendeeUser.getEmail(), attendeeUser.getDomain());
-			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(attendeeUser)).andReturn(ical4jUser).anyTimes();
+			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser);
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
-			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper, calendarFactory);
-			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED, true, getMockAccessToken());
+			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
 
 		@Test
 		public void testParticipationChangeWithOwnerNotExpectingEmails() {
+			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
 			organizer.setOrganizer(true);
@@ -901,7 +971,10 @@ public class EventChangeHandlerTest {
 			attendeeUser.setEmail(attendee.getEmail());
 			attendeeUser.setDomain(getDefaultObmDomain());
 			
+			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
+
 			UserService userService = EasyMock.createMock(UserService.class);
+			EasyMock.expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
 			userService.getUserFromLogin(organizer.getEmail(), attendeeUser.getDomain().getName());
 			EasyMock.expectLastCall().andReturn(organizerUser).once();
 
@@ -912,17 +985,16 @@ public class EventChangeHandlerTest {
 			settingsService.getSettings(eq(organizerUser));
 			EasyMock.expectLastCall().andReturn(settings).once();
 			
-			Producer producer = getDefaultProducer();
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
-			Ical4jUser ical4jUser = Ical4jUser.Factory.create().createIcal4jUser(attendeeUser.getEmail(), attendeeUser.getDomain());
-			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(attendeeUser)).andReturn(ical4jUser).anyTimes();
+			EasyMock.expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser);
+			
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, calendarFactory);
 			
-			EventChangeHandler handler = newEventChangeHandler(mailer, settingsService, userService, producer, ical4jHelper, calendarFactory);
-			handler.updateParticipationState(event, attendeeUser, ParticipationState.ACCEPTED, true, getMockAccessToken());
+			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			verify(userService, settingsService, settings, mailer);
 		}
 	}
@@ -940,8 +1012,8 @@ public class EventChangeHandlerTest {
 			Event previous = new Event();
 			Event current = new Event();
 
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(
-					null, null, null, null, null, null);
+			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+					null, null, null, null, null);
 
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
@@ -965,7 +1037,8 @@ public class EventChangeHandlerTest {
 			List<Attendee> currentAtts = createRequiredAttendees("user", "@testing.org", ParticipationState.NEEDSACTION, 1, 2);
 			Event previous = new Event();
 			Event current = new Event();
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null, null);
+			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+					null, null, null, null, null);
 
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
@@ -984,7 +1057,8 @@ public class EventChangeHandlerTest {
 		@Test
 		public void testComputeUpdateNotificationGroupsWhereAttendeesComeFrom() {
 			final String email = "myEmail";
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null, null);
+			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+					null, null, null, null, null);
 
 			Attendee attendee1 = new Attendee();
 			attendee1.setEmail(email);
@@ -1006,7 +1080,8 @@ public class EventChangeHandlerTest {
 		@Test
 		public void testComputeUpdateNotificationGroupsConcurrentModificationBug() {
 			final String email = "myEmail";
-			EventChangeHandler eventChangeHandler = new EventChangeHandler(null, null, null, null, null, null);
+			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+					null, null, null, null, null);
 
 			Attendee attendee1 = new Attendee();
 			attendee1.setEmail(email);
@@ -1029,10 +1104,6 @@ public class EventChangeHandlerTest {
 			Assert.assertSame(attendee2, actual.iterator().next());
 		}
 		
-	}
-	
-	private static Ical4jUser buildIcal4jUser(ObmUser obmUser) {
-		return Ical4jUser.Factory.create().createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
 	}
 	
 }
