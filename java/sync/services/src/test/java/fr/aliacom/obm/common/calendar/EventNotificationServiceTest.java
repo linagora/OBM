@@ -35,11 +35,11 @@ import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static fr.aliacom.obm.ToolBox.getDefaultSettings;
 import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
-import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.after;
-import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.compareCollections;
-import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendee;
-import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.createRequiredAttendees;
-import static fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools.longAfter;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.compareCollections;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendee;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendees;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.longAfter;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
@@ -82,13 +82,13 @@ import fr.aliacom.obm.utils.HelperService;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-	EventChangeHandlerTest.UpdateTests.class, 
-	EventChangeHandlerTest.CreateTests.class, 
-	EventChangeHandlerTest.DeleteTests.class, 
-	EventChangeHandlerTest.UpdateParticipationTests.class,
-	EventChangeHandlerTest.ComputeAttendeesDiffsTests.class})
+	EventNotificationServiceTest.UpdateTests.class, 
+	EventNotificationServiceTest.CreateTests.class, 
+	EventNotificationServiceTest.DeleteTests.class, 
+	EventNotificationServiceTest.UpdateParticipationTests.class,
+	EventNotificationServiceTest.ComputeAttendeesDiffsTests.class})
 
-public class EventChangeHandlerTest {
+public class EventNotificationServiceTest {
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
 	private static final String ICS_DATA_REMOVE = "ics data remove attendee";
@@ -98,26 +98,26 @@ public class EventChangeHandlerTest {
 	private static final Locale LOCALE = Locale.FRENCH;
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
 	
-	private static EventNotificationService newEventChangeHandler(
+	private static EventNotificationService newEventNotificationServiceImpl(
 			EventChangeMailer mailer, SettingsService settingsService, UserService userService,
 			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
 		
 		return new EventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
 	}
 	
-	private static EventNotificationService updateEventChangeHandler(EventChangeMailer mailer, Ical4jHelper ical4jHelper, 
+	private static EventNotificationService getEventNotificationServiceToNotifyUpdatedEvent(EventChangeMailer mailer, Ical4jHelper ical4jHelper, 
 			ICalendarFactory calendarFactory, UserService userService)  {
 		
 		SettingsService settingsService = getDefaultSettingsService();
 		EasyMock.replay(settingsService);
-		return newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+		return newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
 	}
 	
-	public static class CreateTests extends AbstractEventChangeHandlerTest {
+	public static class CreateTests extends AbstractEventNotificationServiceTest {
 		
 		@Override
-		protected void processEvent(EventNotificationService eventChangeHandler, Event event, ObmUser obmUser, AccessToken accessToken) {
-			eventChangeHandler.notifyCreatedEvent(event, accessToken);
+		protected void processEvent(EventNotificationService eventNotificationService, Event event, ObmUser obmUser, AccessToken accessToken) {
+			eventNotificationService.notifyCreatedEvent(event, accessToken);
 		}
 		
 		@Override
@@ -261,11 +261,11 @@ public class EventChangeHandlerTest {
 		}
 	}
 	
-	public static class DeleteTests extends AbstractEventChangeHandlerTest {
+	public static class DeleteTests extends AbstractEventNotificationServiceTest {
 		
 		@Override
-		protected void processEvent(EventNotificationService eventChangeHandler, Event event, ObmUser obmUser, AccessToken accessToken) {
-			eventChangeHandler.notifyDeletedEvent(event, accessToken);
+		protected void processEvent(EventNotificationService eventNotificationService, Event event, ObmUser obmUser, AccessToken accessToken) {
+			eventNotificationService.notifyDeletedEvent(event, accessToken);
 		}
 		
 		@Test
@@ -431,8 +431,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, helper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(event, event, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(event, event, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 
@@ -462,8 +462,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(event, eventAfter, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(event, eventAfter, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
@@ -503,8 +503,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
@@ -547,8 +547,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
@@ -580,8 +580,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
@@ -612,8 +612,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, previousEvent, accessToken);
 			verify(mailer, ical4jHelper);
 		}
 		
@@ -654,8 +654,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
@@ -696,8 +696,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 			
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
 			verify(mailer, ical4jHelper);
 		}
@@ -741,8 +741,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
@@ -785,8 +785,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
@@ -827,8 +827,8 @@ public class EventChangeHandlerTest {
 			
 			replay(mailer, ical4jHelper, calendarFactory, userService);
 
-			EventNotificationService eventChangeHandler = updateEventChangeHandler(mailer, ical4jHelper, calendarFactory, userService);
-			eventChangeHandler.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 
 			verify(mailer, ical4jHelper);
 		}
@@ -888,8 +888,8 @@ public class EventChangeHandlerTest {
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
-			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
+			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			eventNotificationService.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
@@ -941,8 +941,8 @@ public class EventChangeHandlerTest {
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
-			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
+			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			eventNotificationService.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
@@ -993,8 +993,8 @@ public class EventChangeHandlerTest {
 			
 			EasyMock.replay(userService, settingsService, settings, mailer, calendarFactory);
 			
-			EventNotificationService handler = newEventChangeHandler(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			handler.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
+			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
+			eventNotificationService.notifyUpdatedParticipationStateAttendees(event, attendeeUser, ParticipationState.ACCEPTED, accessToken);
 			verify(userService, settingsService, settings, mailer);
 		}
 	}
@@ -1012,13 +1012,13 @@ public class EventChangeHandlerTest {
 			Event previous = new Event();
 			Event current = new Event();
 
-			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
 					null, null, null, null, null);
 
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
 
-			Map<AttendeeStateValue, Set<Attendee>> groups = eventChangeHandler
+			Map<AttendeeStateValue, Set<Attendee>> groups = eventNotificationService
 					.computeUpdateNotificationGroups(previous, current);
 
 			Assert.assertTrue(groups.get(AttendeeStateValue.KEPT).isEmpty());
@@ -1037,14 +1037,14 @@ public class EventChangeHandlerTest {
 			List<Attendee> currentAtts = createRequiredAttendees("user", "@testing.org", ParticipationState.NEEDSACTION, 1, 2);
 			Event previous = new Event();
 			Event current = new Event();
-			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
 					null, null, null, null, null);
 
 			previous.setAttendees(previousAtts);
 			current.setAttendees(currentAtts);
 
 			Map<AttendeeStateValue, Set<Attendee>> groups =
-				eventChangeHandler.computeUpdateNotificationGroups(previous, current);
+				eventNotificationService.computeUpdateNotificationGroups(previous, current);
 
 			Assert.assertEquals(keptUserMail, groups.get(AttendeeStateValue.KEPT).iterator().next().getEmail());
 			Assert.assertEquals(removedUserMail, groups.get(AttendeeStateValue.REMOVED).iterator().next().getEmail());
@@ -1057,7 +1057,7 @@ public class EventChangeHandlerTest {
 		@Test
 		public void testComputeUpdateNotificationGroupsWhereAttendeesComeFrom() {
 			final String email = "myEmail";
-			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
 					null, null, null, null, null);
 
 			Attendee attendee1 = new Attendee();
@@ -1071,7 +1071,7 @@ public class EventChangeHandlerTest {
 			event2.setAttendees(ImmutableList.of(attendee2));
 
 			Map<AttendeeStateValue, Set<Attendee>> groups =
-					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
+					eventNotificationService.computeUpdateNotificationGroups(event1, event2);
 			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
 			Assert.assertSame(attendee2, actual.iterator().next());
@@ -1080,7 +1080,7 @@ public class EventChangeHandlerTest {
 		@Test
 		public void testComputeUpdateNotificationGroupsConcurrentModificationBug() {
 			final String email = "myEmail";
-			EventNotificationServiceImpl eventChangeHandler = new EventNotificationServiceImpl(
+			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
 					null, null, null, null, null);
 
 			Attendee attendee1 = new Attendee();
@@ -1098,7 +1098,7 @@ public class EventChangeHandlerTest {
 			event2.setAttendees(ImmutableList.of(attendee2, attendee3, attendee4));
 
 			Map<AttendeeStateValue, Set<Attendee>> groups =
-					eventChangeHandler.computeUpdateNotificationGroups(event1, event2);
+					eventNotificationService.computeUpdateNotificationGroups(event1, event2);
 			Set<Attendee> actual = groups.get(AttendeeStateValue.KEPT);
 
 			Assert.assertSame(attendee2, actual.iterator().next());

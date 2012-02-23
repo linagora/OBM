@@ -45,7 +45,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 
-public class EventChangeHandlerTestsTools {
+public class EventNotificationServiceTestTools {
 
 	public static <T, C extends Collection<T>> C compareCollections(C collection) {
 		return EasyMock.cmp(collection, new Comparator<C>() {

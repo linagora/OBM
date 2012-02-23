@@ -61,7 +61,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
-import fr.aliacom.obm.common.calendar.EventChangeHandlerTestsTools;
+import fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -109,7 +109,7 @@ public class ErrorMailerTest {
 			
 			MailService mailService = EasyMock.createMock(MailService.class);
 			mailService.sendMessage(
-					EventChangeHandlerTestsTools.compareCollections(expectedRecipients), 
+					EventNotificationServiceTestTools.compareCollections(expectedRecipients), 
 					EasyMock.capture(capturedMessage),
 					EasyMock.anyObject(AccessToken.class));
 			EasyMock.expectLastCall();
@@ -234,7 +234,7 @@ public class ErrorMailerTest {
 			
 			MailService mailService = EasyMock.createMock(MailService.class);
 			mailService.sendMessage(
-					EventChangeHandlerTestsTools.compareCollections(expectedRecipients), 
+					EventNotificationServiceTestTools.compareCollections(expectedRecipients), 
 					EasyMock.capture(capturedMessage),
 					EasyMock.anyObject(AccessToken.class));
 			EasyMock.expectLastCall();
