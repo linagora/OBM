@@ -85,9 +85,6 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 		if (!Objects.equal(o1.getDate(), o2.getDate())) {
 			return false;
 		}
-		if (!Objects.equal(o1.getDate(), o2.getDate())) {
-			return false;
-		}
 		if (!Objects.equal(o1.getRecurrenceId(), o1.getRecurrenceId())) {
 			return false;
 		}
