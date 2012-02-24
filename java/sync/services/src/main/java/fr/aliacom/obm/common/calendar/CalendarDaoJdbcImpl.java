@@ -330,7 +330,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		insertAttendees(editor, calendar, ev, con, ev.getAttendees(), useObmUser);
 
 		insertExceptions(editor, ev, con, id);
-		if (ev.getRecurrence() != null) {
+		if (ev.isRecurrent()) {
 			insertEventExceptions(editor, calendar, ev.getRecurrence()
 					.getEventExceptions(), con, id, useObmUser);
 		}
@@ -364,33 +364,31 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			List<Event> eventException, Connection con, EventObmId id, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault {
 		List<Event> newEvExcepts = new LinkedList<Event>();
-		if (eventException != null) {
-			Event created = null;
-			Map<EventObmId, Date> eventsEx = new HashMap<EventObmId, Date>();
+		Event created = null;
+		Map<EventObmId, Date> eventsEx = new HashMap<EventObmId, Date>();
 
-			for (Event evExcept : eventException) {
-				created = createEvent(con, editor, calendar, evExcept, useObmUser);
-				newEvExcepts.add(created);
-				eventsEx.put(created.getObmId(),
-						evExcept.getRecurrenceId());
+		for (Event evExcept : eventException) {
+			created = createEvent(con, editor, calendar, evExcept, useObmUser);
+			newEvExcepts.add(created);
+			eventsEx.put(created.getObmId(),
+					evExcept.getRecurrenceId());
+		}
+
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement("insert into EventException "
+					+ "(eventexception_parent_id, eventexception_child_id, eventexception_date, eventexception_usercreate) "
+					+ "values (?, ?, ?, " + editor.getObmId() + ")");
+
+			for (Entry<EventObmId, Date> entry: eventsEx.entrySet()) {
+				ps.setInt(1, id.getObmId());
+				ps.setInt(2, entry.getKey().getObmId());
+				ps.setTimestamp(3, new Timestamp(entry.getValue().getTime()));
+				ps.addBatch();
 			}
-
-			PreparedStatement ps = null;
-			try {
-				ps = con.prepareStatement("insert into EventException "
-						+ "(eventexception_parent_id, eventexception_child_id, eventexception_date, eventexception_usercreate) "
-						+ "values (?, ?, ?, " + editor.getObmId() + ")");
-
-				for (Entry<EventObmId, Date> entry: eventsEx.entrySet()) {
-					ps.setInt(1, id.getObmId());
-					ps.setInt(2, entry.getKey().getObmId());
-					ps.setTimestamp(3, new Timestamp(entry.getValue().getTime()));
-					ps.addBatch();
-				}
-				ps.executeBatch();
-			} finally {
-				obmHelper.cleanup(null, ps, null);
-			}
+			ps.executeBatch();
+		} finally {
+			obmHelper.cleanup(null, ps, null);
 		}
 		return newEvExcepts;
 	}
@@ -1647,7 +1645,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			removeAllException(con, ev);
 
 			insertExceptions(editor, ev, con, ev.getObmId());
-			if (ev.getRecurrence() != null) {
+			if (ev.isRecurrent()) {
 				insertEventExceptions(editor, calendar, ev.getRecurrence()
 						.getEventExceptions(), con, ev.getObmId(), useObmUser);
 			}

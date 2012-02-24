@@ -87,8 +87,8 @@ public class EventConverter {
 		
 		
 		mse.setAllDayEvent(e.isAllday());
-		mse.setRecurrence(getRecurrence(e.getRecurrence()));
-		mse.setExceptions(getException(bs, e.getRecurrence()));
+		mse.setRecurrence(getRecurrence(e));
+		mse.setExceptions(getException(bs, e));
 
 		if (e.getAlert() != null && e.getAlert() > 0) {
 			mse.setReminder(e.getAlert() / 60);
@@ -134,12 +134,13 @@ public class EventConverter {
 		return CalendarSensitivity.NORMAL;
 	}
 
-	private List<MSEvent> getException(BackendSession bs, EventRecurrence recurrence) {
+	private List<MSEvent> getException(BackendSession bs, Event event) {
 		List<MSEvent> ret = new LinkedList<MSEvent>();
-		if(recurrence == null){
+		if (!event.isRecurrent()) {
 			return ret;
 		}
 		
+		EventRecurrence recurrence = event.getRecurrence();
 		for (Date excp : recurrence.getExceptions()) {
 			MSEvent e = new MSEvent();
 			e.setDeleted(true);
@@ -268,11 +269,13 @@ public class EventConverter {
 		return sb.toString();
 	}
 
-	private Recurrence getRecurrence(EventRecurrence recurrence) {
-		if (recurrence == null || recurrence.getKind() == RecurrenceKind.none) {
+	private Recurrence getRecurrence(Event event) {
+		
+		if (!event.isRecurrent()) {
 			return null;
 		}
 
+		EventRecurrence recurrence = event.getRecurrence();
 		Recurrence r = new Recurrence();
 		switch (recurrence.getKind()) {
 		case daily:

@@ -32,8 +32,8 @@
 package org.obm.sync.solr;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,7 +153,7 @@ public class EventIndexer implements Runnable {
 		// withId is unused
 
 		f(sid, "is", (e.isAllday() ? "allday" : null),
-				(e.getRecurrence() != null ? "periodic" : null),
+				(e.isRecurrent() ? "periodic" : null),
 				(e.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
 				(e.getPrivacy() == 1 ? "private" : null));
 

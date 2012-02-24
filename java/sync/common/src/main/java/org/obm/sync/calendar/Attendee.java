@@ -34,6 +34,8 @@ package org.obm.sync.calendar;
 import java.util.List;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class Attendee {
 
@@ -47,6 +49,22 @@ public class Attendee {
 	private boolean obmUser;
 	private boolean canWriteOnCalendar;
 	
+	public Attendee() {
+		this.emailAlias = ImmutableList.of();
+	}
+
+	public Attendee(Attendee attendee) {
+		this.state = attendee.state;
+		this.email = attendee.email;
+		this.emailAlias = Lists.newArrayList(attendee.emailAlias);
+		this.required = attendee.required;
+		this.displayName = attendee.displayName;
+		this.percent = attendee.percent;
+		this.organizer = attendee.organizer;
+		this.obmUser = attendee.obmUser;
+		this.canWriteOnCalendar = attendee.canWriteOnCalendar;
+	}
+
 	public ParticipationState getState() {
 		return state;
 	}
@@ -151,5 +169,5 @@ public class Attendee {
 				add("state", getState()).
 				add("canWriteOnCalendar", isCanWriteOnCalendar()).toString();
 	}
-	
+
 }

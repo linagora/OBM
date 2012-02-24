@@ -31,13 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.ParticipationState;
 
+import com.google.common.collect.Lists;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -115,4 +119,19 @@ public class ToolBox {
 		return EasyMock.createMock(Producer.class);
 	}
 	
+	public static Attendee getFakeAttendee(String userEmail) {
+		Attendee att = new Attendee();
+		att.setEmail(userEmail);
+		return att;
+	}
+
+	public static List<Attendee> getFakeListOfAttendees() {
+		Attendee beriaAttendee = ToolBox.getFakeAttendee("beria");
+		beriaAttendee.setState(ParticipationState.NEEDSACTION);
+		Attendee hooverAttendee = ToolBox.getFakeAttendee("hoover");
+		hooverAttendee.setState(ParticipationState.NEEDSACTION);
+		Attendee mccarthyAttendee = ToolBox.getFakeAttendee("mccarthy");
+		mccarthyAttendee.setState(ParticipationState.NEEDSACTION);
+		return Lists.newArrayList(beriaAttendee, hooverAttendee, mccarthyAttendee);
+	}
 }

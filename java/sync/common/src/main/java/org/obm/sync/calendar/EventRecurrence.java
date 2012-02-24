@@ -32,26 +32,15 @@
 package org.obm.sync.calendar;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.obm.push.utils.collection.Sets;
-
-import com.google.common.base.Equivalence;
-import com.google.common.base.Equivalence.Wrapper;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Lists;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 public class EventRecurrence {
 
@@ -62,9 +51,14 @@ public class EventRecurrence {
 	private List<Date> exceptions;
 	private List<Event> eventExceptions;
 
+	public EventRecurrence(RecurrenceKind kind) {
+		this.exceptions = new LinkedList<Date>();
+		this.eventExceptions = new LinkedList<Event>();
+		this.kind = kind;
+	}
+
 	public EventRecurrence() {
-		exceptions = new LinkedList<Date>();
-		eventExceptions = new LinkedList<Event>();
+		this(RecurrenceKind.none);
 	}
 
 	public String getDays() {
@@ -107,16 +101,12 @@ public class EventRecurrence {
 		this.kind = kind;
 	}
 
-	public Date[] getExceptions() {
-		return exceptions.toArray(new Date[exceptions.size()]);
-	}
-
-	public List<Date> getListExceptions() {
+	public Iterable<Date> getExceptions() {
 		return exceptions;
 	}
 
-	public void setExceptions(Date[] exceptions) {
-		this.exceptions = Arrays.asList(exceptions);
+	public void setExceptions(Iterable<Date> exceptions) {
+		this.exceptions = Lists.newArrayList(exceptions);
 	}
 
 	public void addException(Date d) {
@@ -150,61 +140,36 @@ public class EventRecurrence {
 		eventRecurrence.setKind(this.kind);
 		return eventRecurrence;
 	}
-	
+
 	public boolean hasImportantChanges(EventRecurrence recurrence) {
-		boolean hasImportantChangesExceptedEventException = hasImportantChangesExceptedEventException(recurrence);
-		if(hasImportantChangesExceptedEventException) {
+		boolean hasImportantChangesExceptedEventException = this.hasImportantChangesExceptedEventException(recurrence);
+		if (hasImportantChangesExceptedEventException) {
 			return true;
 		}
-		
+		/* FIXME : write some more tests
 		if (recurrence != null && !(this.eventExceptions.size() == recurrence.eventExceptions.size())) {
 			return true;
 		}
 		
 		Collection<Event> difference = getExceptionsWithImportantChanges(recurrence);
-		return !difference.isEmpty();
-	}
-
-	public List<Event> getExceptionsWithImportantChanges(EventRecurrence recurrence) {
-		Set<Event> difference = Sets.difference(this.getEventExceptions(),
-				recurrence.getEventExceptions(),
-				new ComparatorUsingEventHasImportantChanges());
-		List<Event> exceptionsWithImportantChanges = Lists.newArrayList(difference);
-		return exceptionsWithImportantChanges;
+		return !difference.isEmpty();*/
+		return false;
 	}
 	
-	public boolean hasImportantChangesExceptedEventException(EventRecurrence recurrence) {
+	private boolean hasImportantChangesExceptedEventException(EventRecurrence recurrence) {
 		if (recurrence == null) {
 			return true;
 		}
 		if ( !(Objects.equal(this.end, recurrence.end)
 				&& Objects.equal(this.kind, recurrence.kind)
-				&& Objects.equal(this.frequence, recurrence.frequence)
-				&& (this.exceptions.size() == recurrence.exceptions.size())) ) {
+				&& Objects.equal(this.frequence, recurrence.frequence)) ) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	public List<Event> getEventExceptionWithChangesExceptedOnException(EventRecurrence recurrence) {
-		if (recurrence == null) {
-			return ImmutableList.copyOf(this.getEventExceptions());
-		}
-		Builder<Event> eventExceptionWithChanges = ImmutableList.builder();
-		
-		final AllEventAttributesExceptExceptionsEquivalence equivalence = new AllEventAttributesExceptExceptionsEquivalence();
-		Collection<Wrapper<Event>> recurrenceEquivalenceWrappers = transformToEquivalenceWrapper(recurrence, equivalence);
-		
-		for(Event exp : eventExceptions){
-			Wrapper<Event> r = equivalence.wrap(exp);
-			if(!recurrenceEquivalenceWrappers.contains(r)) {
-				eventExceptionWithChanges.add(exp);
-			}
-		}
-		return eventExceptionWithChanges.build();
-	}
-	
+	/*
 	private Collection<Wrapper<Event>> transformToEquivalenceWrapper(EventRecurrence recurrence, 
 			final AllEventAttributesExceptExceptionsEquivalence equivalence) {
 		return Collections2.transform(recurrence.getEventExceptions(), new Function<Event, Equivalence.Wrapper<Event>>() {
@@ -214,7 +179,7 @@ public class EventRecurrence {
 				return wrapper;
 			}
 		});
-	}
+	}*/
 
 	public Event getEventExceptionWithRecurrenceId(Date recurrenceId) {
 		for(Event event : this.eventExceptions){

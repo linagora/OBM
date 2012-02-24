@@ -130,6 +130,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -152,7 +153,7 @@ public class Ical4jHelper {
 		Calendar calendar = initCalendar();
 		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event);
 		calendar.getComponents().add(vEvent);
-		if (event.getRecurrence() != null) {
+		if (event.isRecurrent()) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
 				VEvent eventExt = buildIcsInvitationVEventException(ee);
 				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
@@ -587,7 +588,7 @@ public class Ical4jHelper {
 		Calendar calendar = initCalendar();
 		VToDo vTodo = getVToDo(event, iCal4jUser);
 		calendar.getComponents().add(vTodo);
-		if (event.getRecurrence() != null) {
+		if (event.isRecurrent()) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
 				VToDo todoExt = getVTodo(ee, event.getExtId(), iCal4jUser, event);
 				calendar.getComponents().add(todoExt);
@@ -600,7 +601,7 @@ public class Ical4jHelper {
 		Calendar calendar = initCalendar();
 		VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method);
 		calendar.getComponents().add(vEvent);
-		if (event.getRecurrence() != null) {
+		if (event.isRecurrent()) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
 				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee, method);
 				calendar.getComponents().add(eventExt);
@@ -972,7 +973,7 @@ public class Ical4jHelper {
 
 	/* package */ Recur getRecur(EventRecurrence eventRecurrence, Date eventDate) {
 		Recur recur = null;
-		if (eventRecurrence != null) {
+		if (eventRecurrence.isRecurrent()) {
 			boolean isMonthyByDay = false;
 			String frequency = "";
 			RecurrenceKind kindRecur = eventRecurrence.getKind();
@@ -1308,11 +1309,9 @@ public class Ical4jHelper {
 		return calendar;
 	}
 
-	/* package */ Set<Property> getExDate(Event event) {
+	@VisibleForTesting Set<Property> getExDate(Event event) {
 		Set<Property> ret = new HashSet<Property>();
-		if (event.getRecurrence() != null
-				&& event.getRecurrence().getExceptions() != null) {
-
+		if (event.isRecurrent()) {
 			for (Date d : event.getRecurrence().getExceptions()) {
 
 				boolean find = false;

@@ -169,12 +169,6 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			}
 		}
 
-		if (ev.getRecurrence() == null) {
-			EventRecurrence er = new EventRecurrence();
-			er.setKind(RecurrenceKind.none);
-			ev.setRecurrence(er);
-		}
-
 		Element rec = DOMUtils.createElement(e, "recurrence");
 		EventRecurrence r = ev.getRecurrence();
 		rec.setAttribute("kind", r.getKind().toString());

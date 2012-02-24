@@ -411,7 +411,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String inviteUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.getRecurrence() != null && !oldEvent.getRecurrence().getKind().name().equals("none")) {
+		if (oldEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateInvitationPlain.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateInvitationPlain.tpl", oldEvent, newEvent, locale, timezone);
@@ -419,7 +419,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String inviteUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.getRecurrence() != null && !oldEvent.getRecurrence().getKind().name().equals("none")) {
+		if (oldEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateInvitationHtml.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateInvitationHtml.tpl", oldEvent, newEvent, locale, timezone);
@@ -427,7 +427,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String notifyUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.getRecurrence() != null && !oldEvent.getRecurrence().getKind().name().equals("none")) {
+		if (oldEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateNoticePlain.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateNoticePlain.tpl", oldEvent, newEvent, locale, timezone);
@@ -435,7 +435,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String notifyUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.getRecurrence() != null && !oldEvent.getRecurrence().getKind().name().equals("none")) {
+		if (oldEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateNoticeHtml.tpl", oldEvent, newEvent, locale, timezone);		
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateNoticeHtml.tpl", oldEvent, newEvent, locale, timezone);

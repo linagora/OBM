@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -239,8 +240,7 @@ public class Ical4jHelperTest {
 		assertEquals(er.getFrequence(), 1);
 		er.setKind(RecurrenceKind.weekly);
 
-		Date[] ldt = er.getExceptions();
-		assertEquals(ldt.length, 2);
+		Assertions.assertThat(er.getExceptions()).hasSize(2);
 	}
 
 	@Test
@@ -417,7 +417,7 @@ public class Ical4jHelperTest {
 		assertEquals(1, er.getFrequence());
 		assertEquals("0111110", er.getDays());
 		assertEquals(RecurrenceKind.weekly, er.getKind());
-		assertEquals(1, er.getExceptions().length);
+		Assertions.assertThat(er.getExceptions()).hasSize(1);
 	}
 
 	
@@ -564,13 +564,14 @@ public class Ical4jHelperTest {
 
 		EventRecurrence er = new EventRecurrence();
 		er.setDays("1111111");
+		er.setKind(RecurrenceKind.daily);
 
 		Date[] except = new Date[2];
 		cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
 		except[0] = cal.getTime();
 		cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1);
 		except[1] = cal.getTime();
-		er.setExceptions(except);
+		er.setExceptions(Arrays.asList(except));
 		event.setRecurrence(er);
 
 		Set<Property> ret = getIcal4jHelper().getExDate(event);
@@ -741,9 +742,7 @@ public class Ical4jHelperTest {
 		assertEquals(er.getFrequence(), 1);
 		er.setKind(RecurrenceKind.weekly);
 
-		Date[] ldt = er.getExceptions();
-		assertEquals(ldt.length, 2);
-
+		Assertions.assertThat(er.getExceptions()).hasSize(2);
 	}
 
 	@Test

@@ -78,6 +78,7 @@ import org.obm.sync.services.ImportICalendarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -368,8 +369,9 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 	}
-	
-	private Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
+
+	@VisibleForTesting
+	protected Event loadCurrentEvent(AccessToken token, ObmUser calendarUser, Event event) throws EventNotFoundException, ServerFault {
 		if (event.getObmId() == null && event.getExtId() != null && event.getExtId().getExtId() != null) {
 			final Event currentEvent = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
 			if (currentEvent != null) {
@@ -406,11 +408,11 @@ public class CalendarBindingImpl implements ICalendar {
 		eventChangeHandler.update(before, after, notification, token);
 	}
 
-	private void applyParticipationStateModifications(Event before, Event event) {
+	@VisibleForTesting protected void applyParticipationStateModifications(Event before, Event event) {
 		if (event.hasImportantChangesExceptedEventException(before)) {
 		    event.changeParticipationState();
 		} else {
-			List<Event> exceptionWithChanges = event.getExceptionsWithImportantChanges(before);
+			List<Event> exceptionWithChanges = event.getEventExceptionsWithImportantChanges(before);
 			for (Event exception: exceptionWithChanges) {
 				exception.changeParticipationState();
 			}
@@ -447,20 +449,43 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification)
 			throws ServerFault, EventAlreadyExistException {
 
-		try {
-			if (event == null) {
-				logger.warn(LogUtils.prefix(token)
-						+ "creating NULL event, returning fake id 0");
-				throw new ServerFault(
-						"event creation without any data");
-			}
-			if (event.getObmId() != null) {
-				logger.error(LogUtils.prefix(token)
-						+ "event creation with an event coming from OBM");
-				throw new ServerFault(
-						"event creation with an event coming from OBM");
-			}
+		assertCanCreateEvent(token, calendar, event);
+		assignDelegationRightsOnAttendees(token, event);
+		Event ev = null;
+		if (event.isInternalEvent()) {
+			ev = createInternalEvent(token, calendar, event, notification);
+		} else {
+			ev = createExternalEvent(token, calendar, event, notification);
+		}
+		return ev.getObmId();
+	}
 
+	private void assertCanCreateEvent(AccessToken token, String calendar,
+			Event event) throws ServerFault, EventAlreadyExistException {
+		assertEventNotNull(token, event);
+		assertEventIsNew(token, calendar, event);
+		assertCanWriteOnCalendar(token, calendar);
+	}
+
+	private void assertCanWriteOnCalendar(AccessToken token, String calendar)
+			throws ServerFault {
+		if (!helperService.canWriteOnCalendar(token, calendar)) {
+			String message = "[" + token.getUserLogin() + "] Calendar : "
+					+ token.getUserLogin() + " cannot create event on "
+					+ calendar + "calendar : no write right";
+			logger.info(LogUtils.prefix(token) + message);
+			throw new ServerFault(message);
+		}
+	}
+
+	private void assertEventIsNew(AccessToken token, String calendar, Event event) throws ServerFault, EventAlreadyExistException {
+		if (event.getObmId() != null) {
+			logger.error(LogUtils.prefix(token)
+					+ "event creation with an event coming from OBM");
+			throw new ServerFault(
+					"event creation with an event coming from OBM");
+		}
+		try {
 			if (isEventExists(token, calendar, event)) {
 				final String message = String
 				.format("Calendar : duplicate with same extId found for event [%s, %s, %d, %s]",
@@ -470,26 +495,18 @@ public class CalendarBindingImpl implements ICalendar {
 				logger.info(LogUtils.prefix(token) + message);
 				throw new EventAlreadyExistException(message);
 			}
-
-			if (!helperService.canWriteOnCalendar(token, calendar)) {
-				String message = "[" + token.getUserLogin() + "] Calendar : "
-						+ token.getUserLogin() + " cannot create event on "
-						+ calendar + "calendar : no write right";
-				logger.info(LogUtils.prefix(token) + message);
-				throw new ServerFault(message);
-			}
-			
-			assignDelegationRightsOnAttendees(token, event);
-			Event ev = null;
-			if (event.isInternalEvent()) {
-				ev = createInternalEvent(token, calendar, event, notification);
-			} else {
-				ev = createExternalEvent(token, calendar, event, notification);
-			}
-			return ev.getObmId();
 		} catch (FindException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	private void assertEventNotNull(AccessToken token, Event event) throws ServerFault {
+		if (event == null) {
+			logger.warn(LogUtils.prefix(token)
+					+ "creating NULL event, returning fake id 0");
+			throw new ServerFault(
+					"event creation without any data");
 		}
 	}
 
@@ -559,7 +576,7 @@ public class CalendarBindingImpl implements ICalendar {
 		notifyOrganizerForExternalEvent(token, calendar, ev, calendarOwnerAsAttendee.getState(), notification);
 	}
 
-	private Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
+	@VisibleForTesting protected Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
 			event.changeParticipationState();
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
@@ -574,7 +591,8 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void assignDelegationRightsOnAttendees(AccessToken token, Event event) {
+	@VisibleForTesting
+	protected void assignDelegationRightsOnAttendees(AccessToken token, Event event) {
 		applyDelegationRightsOnAttendeesToEvent(token, event);
 		List<Event> eventsExceptions = event.getEventsExceptions();
 		for (Event eventException : eventsExceptions) {
@@ -1216,13 +1234,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
 		throws ImportICalendarException, ServerFault {
 
-		if (!helperService.canWriteOnCalendar(token, calendar)) {
-			String message = "[" + token.getUserLogin() + "] Calendar : "
-					+ token.getUserLogin() + " cannot create event on "
-					+ calendar + "calendar : no write right";
-			logger.info(LogUtils.prefix(token) + message);
-			throw new ServerFault(message);
-		}
+		assertCanWriteOnCalendar(token, calendar);
 		
 		final List<Event> events = parseICSEvent(token, ics);
 		int countEvent = 0;
@@ -1285,10 +1297,8 @@ public class CalendarBindingImpl implements ICalendar {
 	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
 		final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 		if (event.getExtId() != null && event.getExtId().getExtId() != null) {
-			final Event eventExist = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
-			if (eventExist != null) {
-				return true;
-			}
+			final Event findEventByExtId = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
+			return findEventByExtId != null;
 		}
 		return false;
 	}

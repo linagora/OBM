@@ -40,6 +40,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import junit.framework.Assert;
 
+import org.fest.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.utils.DOMUtils;
@@ -122,7 +123,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assert.assertEquals(ev.getDate(), ev.getRecurrence().getExceptions()[0]);
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 	}
 	
@@ -193,7 +194,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assert.assertEquals(ev.getDate(), ev.getRecurrence().getExceptions()[0]);
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 	}
 	
@@ -260,7 +261,7 @@ public class CalendarItemsParserTest {
 		Assert.assertNotNull(ev.getRecurrence());
 		Assert.assertEquals(RecurrenceKind.daily, ev.getRecurrence().getKind());
 		Assert.assertEquals(1, ev.getRecurrence().getFrequence());
-		Assert.assertEquals(ev.getDate(), ev.getRecurrence().getExceptions()[0]);
+		Assertions.assertThat(ev.getRecurrence().getExceptions()).containsOnly(ev.getDate());
 		Assert.assertNull(ev.getRecurrence().getEnd());
 		
 		Assert.assertEquals(1289988000000L,ev.getTimeCreate().getTime());
