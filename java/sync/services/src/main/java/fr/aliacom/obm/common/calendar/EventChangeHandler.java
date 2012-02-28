@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import java.util.Date;
 import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
@@ -68,6 +69,10 @@ public class EventChangeHandler {
 			for (Event exception: exceptionWithChanges) {
 				Event previousException = previous.getOccurrence(exception.getRecurrenceId());
 				update(notification, token, previousException, exception);
+			}
+			for (Date date : current.getNegativeExceptionsChanges(previous)) {
+				Event negativeException = current.getOccurrence(date);
+				delete(negativeException, notification, token);
 			}
 		}
 	}

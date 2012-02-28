@@ -43,6 +43,7 @@ import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class Event implements Indexed<Integer> {
@@ -535,6 +536,21 @@ public class Event implements Indexed<Integer> {
 		return occurrences;
 	}
 
+	public Collection<Date> getNegativeExceptionsChanges(Event event) {
+		Collection<Date> changes;
+		if (this.isRecurrent()) {
+			if (event != null) {
+				changes = this.recurrence.getNegativeExceptionsChanges(event.getRecurrence());
+			}
+			else {
+				changes = ImmutableSet.copyOf(this.recurrence.getExceptions());
+			}
+		}
+		else {
+			changes = ImmutableSet.of();
+		}
+		return changes;
+	}
 	
 	public boolean hasChangesExceptedEventException(Event event) {
 		if(event == null){

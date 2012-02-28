@@ -32,6 +32,7 @@
 package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.mockAccessToken;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -52,6 +53,7 @@ import net.fortuna.ical4j.data.ParserException;
 
 import org.easymock.EasyMock;
 import org.fest.assertions.Assertions;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.obm.icalendar.ICalendarFactory;
@@ -78,6 +80,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -295,7 +298,7 @@ public class CalendarBindingImplTest {
 	public void testImportEventInThePast() throws ImportICalendarException, ServerFault, IOException, ParserException, 
 		FindException, SQLException {
 		
-		Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+		Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String icsData = "icsData";
@@ -411,7 +414,7 @@ public class CalendarBindingImplTest {
 	public void testImportEventInTheFuture() throws ImportICalendarException, ServerFault, IOException, 
 		ParserException, FindException, SQLException {
 		
-		Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+		Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String icsData = "icsData";
@@ -1028,7 +1031,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	private Event testParseICS(EventExtId extId, Event eventFromDao) throws Exception {
-		Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+		Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "toto";
@@ -1453,4 +1456,62 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(mccarthy.getState(), ParticipationState.NEEDSACTION);
 	}
 
+	@Test
+	public void testNegativeExceptionChange() throws ServerFault, SQLException, FindException,
+			EventNotFoundException {
+		ObmUser user = ToolBox.getDefaultObmUser();
+
+		Attendee userAttendee = ToolBox.getFakeAttendee(user.getEmail());
+		userAttendee.setState(ParticipationState.ACCEPTED);
+		Attendee angletonAttendee = ToolBox.getFakeAttendee("james.jesus.angleton");
+		angletonAttendee.setState(ParticipationState.ACCEPTED);
+		Attendee dullesAttendee = ToolBox.getFakeAttendee("allen.dulles");
+		dullesAttendee.setState(ParticipationState.ACCEPTED);
+
+		int previousSequence = 0;
+		Date eventDate = after();
+		AccessToken token = ToolBox.mockAccessToken();
+		Event previousEvent = ToolBox.getFakeDailyRecurrentEvent(eventDate, previousSequence,
+				userAttendee, angletonAttendee, dullesAttendee);
+		previousEvent.setInternalEvent(true);
+
+		int currentSequence = previousSequence + 1;
+		Event currentEvent = ToolBox.getFakeDailyRecurrentEvent(eventDate, currentSequence,
+				userAttendee, angletonAttendee, dullesAttendee);
+		Date exceptionDate = new DateTime(eventDate).plusMonths(1).toDate();
+		currentEvent.addException(exceptionDate);
+		currentEvent.setInternalEvent(true);
+
+		UserService userService = createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromCalendar(user.getEmail(), "test.tlse.lng"))
+				.andReturn(user).atLeastOnce();
+
+		HelperService rightsHelper = createMock(HelperService.class);
+		expect(rightsHelper.canWriteOnCalendar(token, userAttendee.getEmail())).andReturn(true)
+				.atLeastOnce();
+		expect(rightsHelper.canWriteOnCalendar(token, angletonAttendee.getEmail())).andReturn(true)
+				.atLeastOnce();
+		expect(rightsHelper.canWriteOnCalendar(token, dullesAttendee.getEmail())).andReturn(true)
+				.atLeastOnce();
+
+		boolean notification = true;
+		EventChangeHandler eventChangeHandler = EasyMock.createMock(EventChangeHandler.class);
+		eventChangeHandler.update(previousEvent, currentEvent, notification, token);
+
+		boolean updateAttendees = true;
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.findEventByExtId(token, user, currentEvent.getExtId())).andReturn(
+				previousEvent).once();
+		expect(
+				calendarDao.modifyEventForcingSequence(token, user.getEmail(), currentEvent,
+						updateAttendees, currentEvent.getSequence(), true)).andReturn(currentEvent);
+
+		EasyMock.replay(token, eventChangeHandler, userService, rightsHelper, calendarDao);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, rightsHelper, null, null);
+		calendarService.modifyEvent(token, user.getEmail(), currentEvent, updateAttendees,
+				notification);
+	}
 }

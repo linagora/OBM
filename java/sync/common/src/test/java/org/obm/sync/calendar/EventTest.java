@@ -32,7 +32,9 @@
 package org.obm.sync.calendar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +43,8 @@ import org.fest.assertions.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
+
+import fr.aliacom.obm.ToolBox;
 
 public class EventTest {
 
@@ -576,6 +580,50 @@ public class EventTest {
 
 		EventRecurrence parentEventRecurrence = parent.getRecurrence();
 		Assertions.assertThat(parentEventRecurrence.getEventExceptions()).containsOnly(eventException);
+	}
+
+	@Test
+	public void testGetNegativeExceptionChangesWithNullEvent() {
+		Date exceptionDate = new Date();
+		Event ev1 = createEventWithNegativeExceptions(new Date(), 1, exceptionDate);
+		Event ev2 = null;
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
+		Assertions.assertThat(difference).containsOnly(exceptionDate);
+	}
+
+	@Test
+	public void testGetNegativeExceptionChangesWithNonRecurrentEvent() {
+		Event ev1 = createOneEvent(1);
+		Event ev2 = null;
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
+		Assertions.assertThat(difference).isEmpty();
+	}
+
+	@Test
+	public void testGetNegativeExceptionChangesWithIdenticalEvents() {
+		Date eventDate = new Date();
+		Date exceptionDate = new Date();
+		Event ev1 = createEventWithNegativeExceptions(eventDate, 1, exceptionDate);
+		Event ev2 = createEventWithNegativeExceptions(eventDate, 2, exceptionDate);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
+		Assertions.assertThat(difference).isEmpty();
+	}
+
+	@Test
+	public void testGetNegativeExceptionChangesWithDifferentEvents() {
+		Date eventDate = new Date();
+		Date exceptionDate1 = new DateTime(eventDate).plusDays(2).toDate();
+		Date exceptionDate2 = new DateTime(eventDate).plusMonths(1).toDate();
+		Event ev1 = createEventWithNegativeExceptions(eventDate, 1, exceptionDate1, exceptionDate2);
+		Event ev2 = createEventWithNegativeExceptions(eventDate, 2, exceptionDate1);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
+		Assertions.assertThat(difference).containsOnly(exceptionDate2);
+	}
+
+	private Event createEventWithNegativeExceptions(Date eventDate, int sequence, Date... negativeExceptions) {
+		Event event = ToolBox.getFakeDailyRecurrentEvent(eventDate, sequence);
+		event.getRecurrence().setExceptions(Arrays.asList(negativeExceptions));
+		return event;
 	}
 
 	private Event createOneEvent(int nbAttendees) {

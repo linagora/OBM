@@ -31,81 +31,38 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.ParticipationState;
 
-import com.google.common.collect.Lists;
 import com.linagora.obm.sync.Producer;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserSettings;
 
-public class ToolBox {
-
-	public static AccessToken mockAccessToken() {
-		ObmUser user = getDefaultObmUser();
-		return mockAccessToken(user.getLogin(), user.getDomain());
-	}
-	
-	public static AccessToken mockAccessToken(String login, ObmDomain domain) {
-		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
-		EasyMock.expect(accessToken.getDomain()).andReturn(domain).atLeastOnce();
-		EasyMock.expect(accessToken.getUserLogin()).andReturn(login).anyTimes();
-		EasyMock.expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
-		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
-		return accessToken;
-	}
-
-	public static ObmUser mockObmUser(String userEmail, ObmDomain domain) {
-		ObmUser user = EasyMock.createMock(ObmUser.class);
-		EasyMock.expect(user.getEmail()).andReturn(userEmail).atLeastOnce();
-		EasyMock.expect(user.getDomain()).andReturn(domain).anyTimes();
-		return user;
-	}
-	
-	public static ObmDomain getDefaultObmDomain() {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName("test.tlse.lng");
-		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		return obmDomain;
-	}
-	
-	public static ObmUser getDefaultObmUser(){
-		ObmDomain obmDomain = getDefaultObmDomain();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setFirstName("Obm");
-		obmUser.setLastName("User");
-		obmUser.setLogin("user");
-		obmUser.setEmail("user@test");
-		obmUser.setDomain(obmDomain);
-		return obmUser;
-	}
-	
+public class ServicesToolBox {
 	public static Ical4jUser getIcal4jUser() {
-		ObmUser obmUser = getDefaultObmUser();
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
 		return getIcal4jUser(obmUser);
 	}
-	
+
 	public static Ical4jUser getIcal4jUser(ObmUser obmUser) {
-		return Ical4jUser.Factory.create().createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
+		return Ical4jUser.Factory.create()
+				.createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
 	}
-	
+
 	public static UserSettings getDefaultSettings() {
 		UserSettings settings = EasyMock.createMock(UserSettings.class);
 		EasyMock.expect(settings.locale()).andReturn(Locale.FRENCH).anyTimes();
-		EasyMock.expect(settings.timezone()).andReturn(TimeZone.getTimeZone("Europe/Paris")).anyTimes();
+		EasyMock.expect(settings.timezone()).andReturn(TimeZone.getTimeZone("Europe/Paris"))
+				.anyTimes();
 		return settings;
 	}
-	
+
 	public static SettingsService getDefaultSettingsService() {
 		UserSettings defaultSettings = getDefaultSettings();
 		SettingsService service = EasyMock.createMock(SettingsService.class);
@@ -114,24 +71,9 @@ public class ToolBox {
 		EasyMock.replay(defaultSettings);
 		return service;
 	}
-	
+
 	public static Producer getDefaultProducer() {
 		return EasyMock.createMock(Producer.class);
 	}
-	
-	public static Attendee getFakeAttendee(String userEmail) {
-		Attendee att = new Attendee();
-		att.setEmail(userEmail);
-		return att;
-	}
 
-	public static List<Attendee> getFakeListOfAttendees() {
-		Attendee beriaAttendee = ToolBox.getFakeAttendee("beria");
-		beriaAttendee.setState(ParticipationState.NEEDSACTION);
-		Attendee hooverAttendee = ToolBox.getFakeAttendee("hoover");
-		hooverAttendee.setState(ParticipationState.NEEDSACTION);
-		Attendee mccarthyAttendee = ToolBox.getFakeAttendee("mccarthy");
-		mccarthyAttendee.setState(ParticipationState.NEEDSACTION);
-		return Lists.newArrayList(beriaAttendee, hooverAttendee, mccarthyAttendee);
-	}
 }

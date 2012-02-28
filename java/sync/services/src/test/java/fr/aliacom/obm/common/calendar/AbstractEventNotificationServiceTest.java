@@ -32,7 +32,7 @@
 package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
+import static fr.aliacom.obm.ServicesToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.before;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendee;

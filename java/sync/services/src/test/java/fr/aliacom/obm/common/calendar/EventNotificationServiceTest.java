@@ -33,8 +33,8 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static fr.aliacom.obm.ToolBox.getDefaultSettings;
-import static fr.aliacom.obm.ToolBox.getDefaultSettingsService;
+import static fr.aliacom.obm.ServicesToolBox.getDefaultSettings;
+import static fr.aliacom.obm.ServicesToolBox.getDefaultSettingsService;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendee;
@@ -72,6 +72,7 @@ import org.obm.sync.server.mailer.EventChangeMailer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.calendar.EventNotificationServiceImpl.AttendeeStateValue;
 import fr.aliacom.obm.common.setting.SettingsService;
@@ -175,7 +176,7 @@ public class EventNotificationServiceTest {
 				Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
@@ -201,7 +202,7 @@ public class EventNotificationServiceTest {
 				Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), eq(event), eq(LOCALE), eq(TIMEZONE), anyObject(AccessToken.class));
 			expectLastCall().once();
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted)), 
@@ -219,7 +220,7 @@ public class EventNotificationServiceTest {
 		@Override
 		protected EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser obmUser) {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(obmUser), event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyNeedActionNewUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), 
 					anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), EasyMock.anyObject(AccessToken.class));
@@ -237,7 +238,7 @@ public class EventNotificationServiceTest {
 		protected EventChangeMailer expectationManyAttendee(List<Attendee> needActionAttendees, List<Attendee> accpetedAttendees,
 				Event event, ObmUser obmUser) {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationRequest(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(obmUser), event);
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			mailer.notifyAcceptedNewUsers(eq(obmUser), compareCollections(accpetedAttendees), eq(event), eq(LOCALE), eq(TIMEZONE), EasyMock.anyObject(AccessToken.class));
 			expectLastCall().once();
@@ -312,7 +313,7 @@ public class EventNotificationServiceTest {
 		protected EventChangeMailer expectationAcceptedAttendees(Attendee attendeeAccepted, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeAccepted)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), EasyMock.anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -324,7 +325,7 @@ public class EventNotificationServiceTest {
 				Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNeedAction)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -348,7 +349,7 @@ public class EventNotificationServiceTest {
 				ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendeeNotAccepted, attendeeAccepted )), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -364,7 +365,7 @@ public class EventNotificationServiceTest {
 		protected EventChangeMailer expectationSameAttendeeTwice(Attendee attendee, Event event, ObmUser obmUser) {
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(ImmutableList.of(attendee)), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -384,7 +385,7 @@ public class EventNotificationServiceTest {
 			atts.addAll(needActionAttendees);
 			atts.addAll(accpetedAttendees);
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-			String ics = ical4jHelper.buildIcsInvitationCancel(ToolBox.getIcal4jUser(obmUser), event);
+			String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(obmUser), event);
 			mailer.notifyRemovedUsers(eq(obmUser), compareCollections(atts), anyObject(Event.class), eq(LOCALE), eq(TIMEZONE), eq(ics), anyObject(AccessToken.class));
 			expectLastCall().once();
 			replay(mailer);
@@ -400,14 +401,14 @@ public class EventNotificationServiceTest {
 			EasyMock.replay(mailer);
 			return mailer;
 		}
-		
+
 	}
 
 	public static class UpdateTests {
 
 		@Test
 		public void testDefaultEventNoChange() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 
 			Event event = new Event();
@@ -438,7 +439,7 @@ public class EventNotificationServiceTest {
 
 		@Test
 		public void testDefaultEventDateChangeZeroUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Event event = new Event();
@@ -469,7 +470,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventDateChangeOneNeedActionUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
@@ -511,7 +512,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventDateChangeOneAcceptedUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -555,7 +556,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventNoChangeOneNeedActionUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
@@ -587,7 +588,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventNoChangeOneAcceptedUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -619,7 +620,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventAddOneNeedActionUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
@@ -662,7 +663,7 @@ public class EventNotificationServiceTest {
 		
 		@Test
 		public void testDefaultEventAddOneAcceptedUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -704,7 +705,7 @@ public class EventNotificationServiceTest {
 
 		@Test
 		public void testDefaultEventDateChangeOneAcceptedUserWithCanWriteOnCalendar() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -748,7 +749,7 @@ public class EventNotificationServiceTest {
 		}
 
 		public void testUserIsNotEventOwnerAddOneAcceptedUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -793,7 +794,7 @@ public class EventNotificationServiceTest {
 
 		@Test
 		public void testUserIsNotEventOwnerDefaultEventDateChangeOneAcceptedUser() {
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.ACCEPTED);
@@ -840,7 +841,7 @@ public class EventNotificationServiceTest {
 		@Test
 		public void testParticipationChangeWithOwnerExpectingEmails() {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
@@ -897,7 +898,7 @@ public class EventNotificationServiceTest {
 		@Test
 		public void testParticipationChangeWithExternalOrganizer() {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
@@ -950,7 +951,7 @@ public class EventNotificationServiceTest {
 		@Test
 		public void testParticipationChangeWithOwnerNotExpectingEmails() {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-			Ical4jUser ical4jUser = ToolBox.getIcal4jUser();
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			
 			Attendee attendee = createRequiredAttendee("attendee1@test", ParticipationState.NEEDSACTION);
 			Attendee organizer = createRequiredAttendee("organizer@test", ParticipationState.ACCEPTED);
