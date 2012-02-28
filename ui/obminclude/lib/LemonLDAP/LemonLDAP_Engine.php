@@ -575,7 +575,7 @@ class LemonLDAP_Engine {
     $domain_id = null;
     if (!is_null($domain) && !$c_singleNameSpace)
     {
-      $this->_db->query('SELECT domain_id FROM domain WHERE domain_name = \''
+      $this->_db->query('SELECT domain_id FROM Domain WHERE domain_name = \''
           . addslashes($domain) . '\'');
       while ($this->_db->next_record() && is_null($domain_id))
       {
