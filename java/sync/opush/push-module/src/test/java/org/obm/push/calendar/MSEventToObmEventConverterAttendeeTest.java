@@ -44,7 +44,6 @@ import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.ParticipationRole;
@@ -66,7 +65,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 				.createUser(mailbox, mailbox, null);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttendeeAttributeNameOnly() throws ConversionException {
 		MSAttendee attendee = new MSAttendee();
 		attendee.setName("Any name");

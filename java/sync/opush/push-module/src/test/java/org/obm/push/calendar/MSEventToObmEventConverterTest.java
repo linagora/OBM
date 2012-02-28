@@ -51,7 +51,6 @@ import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -134,7 +133,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.isAllday()).isFalse();
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeAllDayFalseNeedStartTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
@@ -145,7 +144,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 	
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeAllDayNullNeedStartTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
@@ -449,7 +448,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(msEvent.getSubject());
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeSubjectEmpty() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -461,7 +460,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeSubjectNull() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -678,7 +677,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeStartTimeOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -688,7 +687,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeStartTimeNullOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
@@ -698,7 +697,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeEndTimeOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withEndTime(date("2004-12-11T11:15:10Z"))
@@ -708,7 +707,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeEndTimeNullOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withEndTime(null)
@@ -718,7 +717,7 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
-	@Test(expected=IllegalMSEventStateException.class)
+	@Test(expected=ConversionException.class)
 	public void testConvertAttributeEndTimeNullAndStartTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -919,7 +918,6 @@ public class MSEventToObmEventConverterTest {
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(true);
-		msEventException.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
 		msEventException.setSubject("Any Subject");
 		
 		MSEvent msEvent = new MSEventBuilder()
@@ -928,6 +926,7 @@ public class MSEventToObmEventConverterTest {
 				.withSubject("Any Subject")
 				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
 				.withExceptions(Lists.newArrayList(msEventException))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -947,7 +946,6 @@ public class MSEventToObmEventConverterTest {
 		msEventException.setEndTime(date("2004-12-12T11:15:10Z"));
 		msEventException.setExceptionStartTime(date("2004-10-11T11:15:10Z"));
 		msEventException.setDeleted(false);
-		msEventException.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
 		msEventException.setSubject("Any Subject");
 		
 		MSEvent msEvent = new MSEventBuilder()
@@ -956,6 +954,7 @@ public class MSEventToObmEventConverterTest {
 				.withSubject("Any Subject")
 				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
 				.withExceptions(Lists.newArrayList(msEventException))
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);

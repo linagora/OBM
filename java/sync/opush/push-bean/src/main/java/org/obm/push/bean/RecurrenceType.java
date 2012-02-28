@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import org.obm.push.exception.IllegalMSEventRecurrenceException;
+import org.obm.push.exception.ConversionException;
+
 
 public enum RecurrenceType {
 	DAILY(999), // 0
@@ -47,14 +48,14 @@ public enum RecurrenceType {
 		this.maxIntervalValue = maxIntervalValue;
 	}
 	
-	public void validIntervalOrException(Integer interval) throws IllegalMSEventRecurrenceException {
+	public void validIntervalOrException(Integer interval) throws ConversionException {
 		if (interval == null) {
-			throw new IllegalMSEventRecurrenceException("Recurrence.Interval is required");
+			throw new ConversionException("Recurrence.Interval is required");
 			
 		} else if (maxIntervalValue < interval) {
 			String msg = String.format("Recurrence.Interval is higher than accepted value. " +
 					"Type:%s MaxInterval:%d Interval:%d", name(), maxIntervalValue, interval);
-			throw new IllegalMSEventRecurrenceException(msg);
+			throw new ConversionException(msg);
 		}
 	}
 	

@@ -55,9 +55,6 @@ import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.IllegalMSEventExceptionStateException;
-import org.obm.push.exception.IllegalMSEventRecurrenceException;
-import org.obm.push.exception.IllegalMSEventStateException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventMeetingStatus;
@@ -93,7 +90,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	private Event convertMSEventToObmEvent(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) 
-			throws IllegalMSEventStateException {
+			throws ConversionException {
 
 		Event convertedEvent = new Event();
 		convertedEvent.setExtId(msEvent.getExtId());
@@ -111,7 +108,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	private void fillEventCommonProperties(User user, Event convertedEvent, Event eventFromDB, MSEventCommon msEvent, 
-			boolean isObmInternalEvent) throws IllegalMSEventStateException {
+			boolean isObmInternalEvent) throws ConversionException {
 		
 		assignOwner(user, convertedEvent, eventFromDB);
 		convertedEvent.setInternalEvent(isObmInternalEvent);
@@ -122,7 +119,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEvent msEvent, 
-			boolean isObmInternalEvent) throws IllegalMSEventStateException {
+			boolean isObmInternalEvent) throws ConversionException {
 		
 		fillEventCommonProperties(user, convertedEvent, eventFromDB, 
 				msEvent, isObmInternalEvent);
@@ -159,7 +156,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private void fillEventRecurrence(User user, Event eventFromDB, MSEvent msEvent, 
-			boolean isObmInternalEvent, Event convertedEvent) throws IllegalMSEventStateException {
+			boolean isObmInternalEvent, Event convertedEvent) throws ConversionException {
 		
 		if (msEvent.getRecurrence() != null) {
 			
@@ -171,7 +168,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private void fillEventException(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent, 
-			Event convertedEvent, EventRecurrence eventRecurrence) throws IllegalMSEventStateException {
+			Event convertedEvent, EventRecurrence eventRecurrence) throws ConversionException {
 		
 		if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
 		
@@ -192,7 +189,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
-			MSEventException msEventException, boolean isObmInternalEvent) throws IllegalMSEventStateException {
+			MSEventException msEventException, boolean isObmInternalEvent) throws ConversionException {
 		
 		Event convertedEvent = new Event();
 		fillEventExceptionProperties(user, convertedEvent, eventFromDB, parentEvent, msEventException, isObmInternalEvent);
@@ -204,7 +201,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	private void fillEventExceptionProperties(User user, Event convertedEvent, Event eventFromDB, Event parentEvent, 
-			MSEventException msEvent, boolean isObmInternalEvent) throws IllegalMSEventStateException {
+			MSEventException msEvent, boolean isObmInternalEvent) throws ConversionException {
 		
 		fillEventCommonProperties(user, convertedEvent, eventFromDB, 
 				msEvent, isObmInternalEvent);
@@ -345,18 +342,18 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return reminder;
 	}
 
-	private String convertSubjectToTitle(MSEventCommon msEvent) throws IllegalMSEventStateException {
+	private String convertSubjectToTitle(MSEventCommon msEvent) throws ConversionException {
 		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
 			return msEvent.getSubject();
 		} else {
-			throw new IllegalMSEventStateException("Subject is required");
+			throw new ConversionException("Subject is required");
 		}
 	}
 	
-	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) throws IllegalMSEventStateException {
+	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) throws ConversionException {
 		try {
 			return convertSubjectToTitle(msEvent);
-		} catch (IllegalMSEventStateException ex) {
+		} catch (ConversionException ex) {
 			if (!Strings.isNullOrEmpty(parentEvent.getTitle())) {
 				return parentEvent.getTitle();
 			} else {
@@ -365,11 +362,11 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private EventMeetingStatus convertMeetingStatus(MSEventCommon msEvent) throws IllegalMSEventExceptionStateException {
+	private EventMeetingStatus convertMeetingStatus(MSEventCommon msEvent) throws ConversionException {
 		if (msEvent.getMeetingStatus() != null) {
 			return convertMeetingStatus(msEvent.getMeetingStatus());
 		} else {
-			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.MeetingStatus is required");	
+			throw new ConversionException("Exceptions.Exception.MeetingStatus is required");	
 		}
 	}
 	
@@ -377,7 +374,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		EventMeetingStatus eventMeetingStatus;
 		try {
 			eventMeetingStatus = convertMeetingStatus(msEvent);
-		} catch (IllegalMSEventExceptionStateException e) {
+		} catch (ConversionException e) {
 			eventMeetingStatus = parentEvent.getMeetingStatus();
 		}
 		return eventMeetingStatus;
@@ -420,7 +417,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return dtStamp;
 	}
 
-	private EventRecurrence getRecurrence(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+	private EventRecurrence getRecurrence(MSEvent msEvent) throws ConversionException {
 		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
 		EventRecurrence convertedRecurrence = convertRecurrenceType(msEventRecurrence);
 		convertedRecurrence.setFrequence(convertRecurrenceInterval(msEventRecurrence));
@@ -428,7 +425,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return convertedRecurrence;
 	}
 
-	private EventRecurrence convertRecurrenceType(MSRecurrence msEventRecurrence) throws IllegalMSEventRecurrenceException {
+	private EventRecurrence convertRecurrenceType(MSRecurrence msEventRecurrence) throws ConversionException {
 		EventRecurrence convertedRecurrence = new EventRecurrence();
 		switch (msEventRecurrence.getType()) {
 		case DAILY:
@@ -444,7 +441,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		case WEEKLY:
 			convertedRecurrence.setKind(RecurrenceKind.weekly);
 			if (msEventRecurrence.getDayOfWeek() == null || msEventRecurrence.getDayOfWeek().isEmpty()) {
-				throw new IllegalMSEventRecurrenceException("Weekly recurrence need DayOfWeek attribute");
+				throw new ConversionException("Weekly recurrence need DayOfWeek attribute");
 			}
 			convertedRecurrence.setDays(RecurrenceDayOfWeekConverter.toRecurrenceDays(msEventRecurrence.getDayOfWeek()));
 			convertedRecurrence.setKind(RecurrenceKind.weekly);
@@ -459,12 +456,12 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return convertedRecurrence;
 	}
 	
-	private Date calculateNewRecurrenceEndDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+	private Date calculateNewRecurrenceEndDate(MSEvent msEvent) throws ConversionException {
 		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
 		boolean hasOccurences = msEventRecurrence.hasOccurences();
 
 		if (hasOccurences && msEventRecurrence.getUntil() != null) {
-			throw new IllegalMSEventRecurrenceException("Recurrence cannot has Until AND Occurences");
+			throw new ConversionException("Recurrence cannot has Until AND Occurences");
 		} else if (hasOccurences) {
 			moveRecurrentEventStartDate(msEvent);
 			return calculateRecurrenceEndDateByOccurences(msEventRecurrence, msEvent.getStartTime());
@@ -474,7 +471,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private Date calculateRecurrenceEndDateByOccurences(MSRecurrence msEventRecurrence, Date startDate)
-			throws IllegalMSEventRecurrenceException {
+			throws ConversionException {
 		
 		int multiplyField = findEndTimeMultiplyCalendarField(msEventRecurrence);
 		Calendar cal = eventCalendarInstance();
@@ -491,16 +488,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
         }
 	}
 	
-	private void moveRecurrentEventStartDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+	private void moveRecurrentEventStartDate(MSEvent msEvent) throws ConversionException {
 		if (msEvent.getRecurrence().getType() == RecurrenceType.YEARLY) {
 			moveRecurrentYearlyEventStartDate(msEvent);
 		}
 	}
 
-	private void moveRecurrentYearlyEventStartDate(MSEvent msEvent) throws IllegalMSEventRecurrenceException {
+	private void moveRecurrentYearlyEventStartDate(MSEvent msEvent) throws ConversionException {
 		MSRecurrence msEventRecurrence = msEvent.getRecurrence();
 		if (msEventRecurrence.getDayOfMonth() == null || msEventRecurrence.getMonthOfYear() == null) {
-			throw new IllegalMSEventRecurrenceException("Yearly recurrence need DayOfMonth and MonthOfYear attributes");
+			throw new ConversionException("Yearly recurrence need DayOfMonth and MonthOfYear attributes");
 		}
 		Calendar cal = eventCalendarInstance();
 		cal.setTimeInMillis(msEvent.getStartTime().getTime());
@@ -509,7 +506,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		msEvent.setStartTime(cal.getTime());
 	}
 
-	private int findEndTimeMultiplyCalendarField(MSRecurrence msEventRecurrence) throws IllegalMSEventRecurrenceException {
+	private int findEndTimeMultiplyCalendarField(MSRecurrence msEventRecurrence) throws ConversionException {
 		Preconditions.checkNotNull(msEventRecurrence.getType(), "Recurrence type should not be null");
 		
 		switch (msEventRecurrence.getType()) {
@@ -526,11 +523,11 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		case YEARLY_NDAY:
 			return Calendar.YEAR;
 		}
-		throw new IllegalMSEventRecurrenceException(String.format(
+		throw new ConversionException(String.format(
 				"The recurrence type cannot be found, value:{%s}", String.valueOf(msEventRecurrence.getType())));
 	}
 
-	private Integer convertRecurrenceInterval(MSRecurrence from) throws IllegalMSEventRecurrenceException {
+	private Integer convertRecurrenceInterval(MSRecurrence from) throws ConversionException {
 		Integer interval = from.getInterval();
 		from.getType().validIntervalOrException(interval);
 		return interval;
@@ -545,7 +542,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	private List<Attendee> getAttendees(Event eventFromDB, MSEvent msEvent) throws IllegalMSEventExceptionStateException {
+	private List<Attendee> getAttendees(Event eventFromDB, MSEvent msEvent) throws ConversionException {
 		List<Attendee> attendees = new LinkedList<Attendee>();
 		if ( msEvent.getAttendees().isEmpty() && 
 				(eventFromDB == null || eventFromDB.getAttendees().isEmpty()) ) {
@@ -597,9 +594,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return sequence;
 	}
 	
-	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee msAttendee) throws IllegalMSEventExceptionStateException {
+	private Attendee convertAttendee(Event eventFromDB, MSEvent msEvent, MSAttendee msAttendee) throws ConversionException {
 		if (Strings.isNullOrEmpty(Strings.emptyToNull(msAttendee.getEmail()))) {
-			throw new IllegalMSEventExceptionStateException("Attendees.Attendee.Email is required");
+			throw new ConversionException("Attendees.Attendee.Email is required");
 		}
 		
 		Attendee ret = new Attendee();
@@ -662,7 +659,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			try {
 				assertEventCategoriesValidity(msEvent);
 				return Iterables.getFirst(msEvent.getCategories(), null);
-			} catch (IllegalMSEventStateException e) {
+			} catch (ConversionException e) {
 				return null;
 			}
 		} else {
@@ -678,11 +675,11 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return category;
 	}
 
-	private void assertEventCategoriesValidity(MSEventCommon event) throws IllegalMSEventStateException {
+	private void assertEventCategoriesValidity(MSEventCommon event) throws ConversionException {
 		if (event.getCategories().size() > EVENT_CATEGORIES_MAX) {
 			String msg = String.format("Categories MUST NOT contain more than 300 elements, found:%d",
 					event.getCategories().size());
-			throw new IllegalMSEventStateException(msg);
+			throw new ConversionException(msg);
 		}
 	}
 
@@ -698,7 +695,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return Objects.firstNonNull(msEvent.getAllDayEvent(), false);
 	}
 
-	private int convertDuration(MSEventCommon data) throws IllegalMSEventStateException {
+	private int convertDuration(MSEventCommon data) throws ConversionException {
 		if (isAllDayEvent(data)) {
 			return EVENT_ALLDAY_DURATION_IN_MS;
 		} else {
@@ -706,18 +703,18 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 	
-	private int convertDurationAttributeByStartTime(MSEventCommon data) throws IllegalMSEventStateException {
+	private int convertDurationAttributeByStartTime(MSEventCommon data) throws ConversionException {
 		assertEventTimesValidity(data);
 		
 		int duration = (int) ((data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000);
 		return duration;
 	}
 	
-	private void assertEventTimesValidity(MSEventCommon event) throws IllegalMSEventStateException {
+	private void assertEventTimesValidity(MSEventCommon event) throws ConversionException {
 		if (!eventHasStartTime(event)) {
-			throw new IllegalMSEventStateException("StartTime is required");
+			throw new ConversionException("StartTime is required");
 		} else if (!isAllDayEvent(event) && !eventHasEndTime(event)) {
-			throw new IllegalMSEventStateException("If not AllDayEvent then EndTime is required");
+			throw new ConversionException("If not AllDayEvent then EndTime is required");
 		}
 	}
 
@@ -734,21 +731,21 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private void assertExceptionValidity(EventRecurrence recurrence, MSEventException exception)
-			throws IllegalMSEventExceptionStateException {
+			throws ConversionException {
 		assertExceptionDoesntExistInRecurrence(recurrence, exception);
 		assertExceptionStartTime(exception);
 	}
 
 	private void assertExceptionDoesntExistInRecurrence(EventRecurrence recurrence, MSEventException exception)
-			throws IllegalMSEventExceptionStateException {
+			throws ConversionException {
 		if (recurrence.hasAnyExceptionAtDate(exception.getExceptionStartTime())) {
-			throw new IllegalMSEventExceptionStateException("Try to add an already existing exception date");
+			throw new ConversionException("Try to add an already existing exception date");
 		}
 	}
 
-	private void assertExceptionStartTime(MSEventException exception) throws IllegalMSEventExceptionStateException {
+	private void assertExceptionStartTime(MSEventException exception) throws ConversionException {
 		if (exception.getExceptionStartTime() == null) {
-			throw new IllegalMSEventExceptionStateException("Exceptions.Exception.ExceptionStartTime is required");
+			throw new ConversionException("Exceptions.Exception.ExceptionStartTime is required");
 		}
 	}
 	
