@@ -49,7 +49,6 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
-import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
@@ -101,6 +100,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
 public class MailBackendImpl implements MailBackend {
@@ -616,8 +616,7 @@ public class MailBackendImpl implements MailBackend {
 
 				if ("QUOTED-PRINTABLE".equals(contentTransferEncoding)) {
 					out = new ByteArrayOutputStream();
-					InputStream in = new QuotedPrintableDecoderInputStream(
-							new ByteArrayInputStream(rawData));
+					InputStream in = new QPDecoderStream(new ByteArrayInputStream(rawData));
 					FileUtils.transfer(in, out, true);
 					rawData = out.toByteArray();
 				} else if ("BASE64".equals(contentTransferEncoding)) {

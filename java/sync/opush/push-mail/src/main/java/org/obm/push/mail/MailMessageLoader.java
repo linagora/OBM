@@ -52,7 +52,6 @@ import org.minig.imap.FlagsList;
 import org.minig.imap.StoreClient;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
-import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.mail.conversation.MailBody;
@@ -79,6 +78,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
+import com.sun.mail.util.QPDecoderStream;
 
 /**
  * Creates a {@link MailMessage} from a {@link MessageId}.
@@ -299,8 +299,7 @@ public class MailMessageLoader {
 		}
 		if ("QUOTED-PRINTABLE".equals(mp.getContentTransfertEncoding())) {
 			out = new ByteArrayOutputStream();
-			InputStream in = new QuotedPrintableDecoderInputStream(
-					new ByteArrayInputStream(rawData));
+			InputStream in = new QPDecoderStream(new ByteArrayInputStream(rawData));
 			FileUtils.transfer(in, out, true);
 			rawData = out.toByteArray();
 		} else if ("BASE64".equals(mp.getContentTransfertEncoding())) {

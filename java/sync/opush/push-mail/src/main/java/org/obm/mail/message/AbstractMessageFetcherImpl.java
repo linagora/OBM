@@ -44,10 +44,11 @@ import org.minig.imap.command.parser.HeadersParser;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeAddress;
 import org.minig.imap.mime.MimeMessage;
-import org.minig.mime.QuotedPrintableDecoderInputStream;
 import org.obm.mail.conversation.MailMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.mail.util.QPDecoderStream;
 
 
 public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
@@ -118,7 +119,7 @@ public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
 	protected InputStream decodeStream(IMimePart chosenPart, InputStream encodedStream) {
 		
 		if ("QUOTED-PRINTABLE".equals(chosenPart.getContentTransfertEncoding())) {
-			return new QuotedPrintableDecoderInputStream(encodedStream);
+			return new QPDecoderStream(encodedStream);
 		} else if ("BASE64".equals(chosenPart.getContentTransfertEncoding())) {
 			return new Base64InputStream(encodedStream);
 		}
