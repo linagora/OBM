@@ -53,7 +53,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	
 	private final static String EXTERNAL_URL_KEY = "external-url";
 	
-	private final static String LOCATOR_PORT = "8082";
+	private final static String LOCATOR_PORT = "8084";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
 	private final static String OBM_SYNC_PORT = "8080";
