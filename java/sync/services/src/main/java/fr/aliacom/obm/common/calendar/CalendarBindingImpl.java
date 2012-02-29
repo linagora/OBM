@@ -395,7 +395,7 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.info(LogUtils.prefix(token) + "Calendar : internal event[" + after.getTitle() + "] modified");
 
 			assignDelegationRightsOnAttendees(token, after);
-            notify(token, notification, before, after);
+            notifyOnUpdateEvent(token, notification, before, after);
             
 			return after;
 		} catch (Throwable e) {
@@ -404,7 +404,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private void notify(AccessToken token, boolean notification, Event before, Event after) {
+	private void notifyOnUpdateEvent(AccessToken token, boolean notification, Event before, Event after) {
 		eventChangeHandler.update(before, after, notification, token);
 	}
 
