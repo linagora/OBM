@@ -193,19 +193,21 @@ public class EventRecurrence {
 	public boolean isRecurrent() {
 		return (this.kind != RecurrenceKind.none);
 	}
-	
-	public void replaceDeclinedEventExceptionByException(String attendeeEmail) {
+
+	public void replaceUnattendedEventExceptionByException(String attendeeEmail) {
 		List<Event> eventExceptionsCopy = Lists.newArrayList(eventExceptions);
 		for (Event eexp : eventExceptions) {
 			Attendee attendee = eexp.findAttendeeFromEmail(attendeeEmail);
-			if (attendee != null && attendee.getState() == ParticipationState.DECLINED) {
+			boolean willAttend = attendee != null
+					&& attendee.getState() != ParticipationState.DECLINED;
+			if (!willAttend) {
 				exceptions.add(eexp.getRecurrenceId());
 				eventExceptionsCopy.remove(eexp);
 			}
 		}
 		eventExceptions = eventExceptionsCopy;
 	}
-	
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(days, end, frequence, kind, exceptions,

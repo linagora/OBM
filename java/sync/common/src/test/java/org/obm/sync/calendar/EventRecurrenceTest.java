@@ -187,31 +187,34 @@ public class EventRecurrenceTest {
 		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
 		
 		String attendeeWithDeclinedEventEmail = "email0@email.com";
-		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEventEmail);
+		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
 		
 		Assertions.assertThat(rec1.getEventExceptions()).containsExactly(e2);
 		Assertions.assertThat(rec1.getExceptions()).containsOnly(e1.getRecurrenceId());
 	}
-	
+
 	@Test
 	public void testDontReplaceDeclinedEventExceptionByException() {
 		EventRecurrence rec1 = getOneDailyEventRecurence();
-		
+
 		Event e1 = createEventException(1, 2);
 		Event e2 = createEventException(2, 3);
-		
+
 		Attendee firstAttendee = e1.getAttendees().get(0);
 		firstAttendee.setState(ParticipationState.DECLINED);
 		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
-		
-		EventRecurrence rec2 = rec1.clone();
-		
-		String attendeeWithDeclinedEventEmail = "email3@email.com";
-		rec1.replaceDeclinedEventExceptionByException(attendeeWithDeclinedEventEmail);
-		
+
+		EventRecurrence rec2 = getOneDailyEventRecurence();
+
+		rec2.addEventException(e2);
+		rec2.addException(e1.getDate());
+
+		String attendeeWithDeclinedEventEmail = "email2@email.com";
+		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
+
 		Assert.assertEquals(rec1, rec2);
 	}
-	
+
 	private EventRecurrence getOneDailyEventRecurence() {
 		EventRecurrence rec = new EventRecurrence();
 		rec.setKind(RecurrenceKind.daily);
