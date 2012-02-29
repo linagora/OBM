@@ -45,56 +45,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 public class EventRecurrenceTest {
-	
-	/*@Test
-	public void testGetEventExceptionWithAttributeChangesWithoutChanges() {
-		EventRecurrence rec1 = getOneDailyEventRecurence();
-		EventRecurrence rec2 = rec1.clone();
 		
-		Event e1 = createEventException(1, 2);
-		Event e2 = createEventException(2, 3);
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
-		rec2.setEventExceptions(Lists.newArrayList(e1, e2));
-		
-		List<Event> list = rec2.getEventExceptionWithChangesExceptedOnException(rec1);
-		Assert.assertTrue(list.isEmpty());
-	}
-	
-	@Test
-	public void testGetEventExceptionWithAttributeChangesWithoutEventChanges() {
-		EventRecurrence rec1 = getOneDailyEventRecurence();
-		EventRecurrence rec2 = rec1.clone();
-		
-		Event e1 = createEventException(1, 2);
-		Event e2 = createEventException(2, 3);
-		Event e3 = e2.clone();
-		e3.setTitle("Modif"+e3.getTitle());
-		
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
-		rec2.setEventExceptions(Lists.newArrayList(e1, e3));
-		
-		
-		List<Event> list = rec2.getEventExceptionWithChangesExceptedOnException(rec1);
-		Assert.assertEquals(1, list.size());
-	}
-	
-	@Test
-	public void testGetEventExceptionWithAttributeChangesWithNewEvent() {
-		EventRecurrence rec1 = getOneDailyEventRecurence();
-		EventRecurrence rec2 = rec1.clone();
-		
-		Event e1 = createEventException(1, 2);
-		Event e2 = createEventException(2, 3);
-		Event e3 =createEventException(3, 3);
-		
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
-		rec2.setEventExceptions(Lists.newArrayList(e1, e2, e3));
-		
-		
-		List<Event> list = rec2.getEventExceptionWithChangesExceptedOnException(rec1);
-		Assert.assertEquals(1, list.size());
-	}*/
-	
 	@Test
 	public void testGetEventExceptionWithRecurrenceIdWithoutExistedEventException() {
 		EventRecurrence rec1 = getOneDailyEventRecurence();

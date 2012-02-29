@@ -146,13 +146,7 @@ public class EventRecurrence {
 		if (hasImportantChangesExceptedEventException) {
 			return true;
 		}
-		/* FIXME : write some more tests
-		if (recurrence != null && !(this.eventExceptions.size() == recurrence.eventExceptions.size())) {
-			return true;
-		}
-		
-		Collection<Event> difference = getExceptionsWithImportantChanges(recurrence);
-		return !difference.isEmpty();*/
+
 		return false;
 	}
 	
@@ -169,18 +163,6 @@ public class EventRecurrence {
 		return false;
 	}
 	
-	/*
-	private Collection<Wrapper<Event>> transformToEquivalenceWrapper(EventRecurrence recurrence, 
-			final AllEventAttributesExceptExceptionsEquivalence equivalence) {
-		return Collections2.transform(recurrence.getEventExceptions(), new Function<Event, Equivalence.Wrapper<Event>>() {
-			@Override
-			public Equivalence.Wrapper<Event> apply(Event input) {
-				Wrapper<Event> wrapper = equivalence.wrap(input);
-				return wrapper;
-			}
-		});
-	}*/
-
 	public Event getEventExceptionWithRecurrenceId(Date recurrenceId) {
 		for(Event event : this.eventExceptions){
 			if(recurrenceId.equals(event.getRecurrenceId())) {
