@@ -577,7 +577,7 @@ public class Event implements Indexed<Integer> {
 		recurrence.addException(recurrenceId);
 	}
 	
-	public void changeParticipationState() {
+	public void applyParticipationStateModifications() {
 		changeAttendeesParticipationState();
         List<Event> eventsExceptions = getEventsExceptions();
         for (Event event: eventsExceptions) {
