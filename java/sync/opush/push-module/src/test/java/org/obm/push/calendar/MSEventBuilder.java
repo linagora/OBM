@@ -44,8 +44,6 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
-import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.EventObmId;
 
 public class MSEventBuilder {
 
@@ -80,16 +78,6 @@ public class MSEventBuilder {
 
 	public MSEventBuilder withSubject(String subject) {
 		this.msEvent.setSubject(subject);
-		return this;
-	}
-
-	public MSEventBuilder withObmId(EventObmId obmId) {
-		this.msEvent.setObmId(obmId);
-		return this;
-	}
-
-	public MSEventBuilder withExtId(EventExtId extId) {
-		this.msEvent.setExtId(extId);
 		return this;
 	}
 

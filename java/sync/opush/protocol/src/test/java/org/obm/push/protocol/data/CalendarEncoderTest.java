@@ -54,7 +54,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
-import org.obm.sync.calendar.EventObmId;
 import org.w3c.dom.Document;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -69,7 +68,6 @@ public class CalendarEncoderTest {
 
 	private MSEvent getFakeMSEvent() {
 		MSEvent event = new MSEvent();
-		event.setObmId(new EventObmId(10));
 		event.setSensitivity(CalendarSensitivity.NORMAL);
 		event.setBusyStatus(CalendarBusyStatus.FREE);
 		event.setAllDayEvent(false);

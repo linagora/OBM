@@ -93,8 +93,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			throws ConversionException {
 
 		Event convertedEvent = new Event();
-		convertedEvent.setExtId(msEvent.getExtId());
-		convertedEvent.setUid(msEvent.getObmId());
 		convertedEvent.setAttendees( getAttendees(eventFromDB, msEvent) );
 		convertedEvent.setTimezoneName(convertTimeZone(msEvent));
 		if (msEvent.getObmSequence() != null) {
@@ -180,8 +178,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 					Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
 							msEventException, isObmInternalEvent);
 
-					obmEvent.setExtId(msEvent.getExtId());
-					obmEvent.setUid(msEvent.getObmId());
 					eventRecurrence.addEventException(obmEvent);
 				}
 			}

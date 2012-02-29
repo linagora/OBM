@@ -3,14 +3,14 @@ package org.obm.push.store;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
-import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventExtId;
 
 public interface CalendarDao {
 	
-	void insertObmIdMSEventUidMapping(EventObmId eventObmId, MSEventUid msEventUid, Device device) throws DaoException;
+	void insertExtIdMSEventUidMapping(EventExtId eventExtId, MSEventUid msEventUid, Device device) throws DaoException;
 	
-	EventObmId getEventObmIdFor(MSEventUid msEventUid, Device device) throws DaoException;
+	EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException;
 	
-	MSEventUid getMsEventUidFor(EventObmId eventObmId, Device device) throws DaoException;
+	MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException;
 	
 }

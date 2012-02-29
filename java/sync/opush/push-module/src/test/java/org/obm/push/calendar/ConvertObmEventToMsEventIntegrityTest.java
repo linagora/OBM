@@ -150,7 +150,6 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msEvent.getDtStamp()).isEqualTo(date("2004-12-11T11:15:10Z"));
 		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-13T22:39:45Z"));
 		assertThat(msEvent.getExceptions()).isEmpty();
-		assertThat(msEvent.getExtId()).isEqualTo(new EventExtId("36cb5540-aa8c-4c89-9dfc-3dff56c68df2"));
 		assertThat(msEvent.getLocation()).isEqualTo("Lyon, France");
 		assertThat(msEvent.getMeetingStatus()).isEqualTo(CalendarMeetingStatus.IS_A_MEETING);
 		assertThat(msEvent.getObmSequence()).isEqualTo(1);

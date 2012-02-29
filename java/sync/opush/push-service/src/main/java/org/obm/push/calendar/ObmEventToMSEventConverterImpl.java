@@ -79,8 +79,6 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 		mse.setUid(uid);
 		mse.setRecurrence(getRecurrence(e));
 		mse.setExceptions(getException(e));
-		mse.setExtId(e.getExtId());
-		mse.setObmId(e.getObmId());
 		mse.setObmSequence(e.getSequence());
 		appendDtStamp(mse, e);
 		return mse;

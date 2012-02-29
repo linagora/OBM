@@ -21,6 +21,13 @@ UPDATE event SET event_privacy=0 WHERE event_privacy IS NULL;
 ALTER TABLE event ALTER event_privacy SET DEFAULT 0;
 ALTER TABLE event ALTER event_privacy SET NOT NULL;
 
+ALTER TABLE opush_event_mapping ADD COLUMN event_ext_id varchar(300);
+UPDATE opush_event_mapping SET event_ext_id = Event.event_ext_id FROM Event WHERE Event.event_id = opush_event_mapping.event_id;
+ALTER TABLE opush_event_mapping ALTER event_ext_id SET NOT NULL;
+ALTER TABLE opush_event_mapping DROP CONSTRAINT opush_event_mapping_device_id_key;
+ALTER TABLE opush_event_mapping DROP COLUMN event_id;
+ALTER TABLE opush_event_mapping ADD CONSTRAINT opush_event_mapping_device_id_event_ext_id_unique UNIQUE (device_id, event_ext_id);
+
 UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
 
 ALTER TABLE eventlink ADD COLUMN eventlink_comment VARCHAR(255);

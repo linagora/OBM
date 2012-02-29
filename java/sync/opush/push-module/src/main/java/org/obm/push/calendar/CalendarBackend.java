@@ -382,8 +382,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			throws ServerFault, EventAlreadyExistException, DaoException {
 		EventExtId eventExtId = generateExtId();
 		event.setExtId(eventExtId);
+		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEvent.getUid(), bs.getDevice());
 		EventObmId eventId = cc.createEvent(token, parseCalendarName(collectionPath), event, true);
-		eventService.trackEventObmIdMSEventUidTranslation(eventId, msEvent.getUid(), bs.getDevice());
 		return eventId;
 	}
 
@@ -448,11 +448,10 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		MSEvent event = invitation.getInvitation();
 		AccessToken at = login(bs);
 		try {
-			logger.info("handleMeetingResponse = {}", event.getObmId());
+			logger.info("handleMeetingResponse = {}", event.getUid());
 			Event obmEvent = createOrModifyInvitationEvent(bs, event, at);
-			event.setObmId(obmEvent.getObmId());
 			event.setObmSequence(obmEvent.getSequence());
-			return updateUserStatus(bs, event, status, calendarClient, at);
+			return updateUserStatus(bs, event, obmEvent, status, calendarClient, at);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
@@ -463,34 +462,34 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(BackendSession bs, MSEvent event, AccessToken at) 
-			throws UnexpectedObmSyncServerException, EventNotFoundException, ConversionException {
+			throws UnexpectedObmSyncServerException, EventNotFoundException, ConversionException, DaoException {
 		
 		try {
-			Event obmEvent = getEventFromExtId(bs, event, at);
 			
-			boolean isInternal = eventConverter.isInternalEvent(obmEvent, false);
-			Event newEvent = convertMSObjectToObmObject(bs, event, null, isInternal);
+			EventExtId extId = eventService.getEventExtIdFor(event.getUid(), bs.getDevice());
+			Event previousEvent = getEventFromExtId(bs, extId, at);
 			
-			if (obmEvent == null) {
-				
-				EventObmId id = null;
+			boolean isInternal = eventConverter.isInternalEvent(previousEvent, false);
+			Event newEvent = convertMSObjectToObmObject(bs, event, previousEvent, isInternal);
+			
+			if (previousEvent == null) {
 				try {
-					id = calendarClient.createEvent(at, bs.getUser().getLoginAtDomain(), newEvent, isInternal);
+					logger.info("createOrModifyInvitationEvent : create new event {}", newEvent.getObmId());
+					EventObmId id = calendarClient.createEvent(at, bs.getUser().getLoginAtDomain(), newEvent, isInternal);
+					return calendarClient.getEventFromId(at, bs.getUser().getLoginAtDomain(), id);
 				} catch (EventAlreadyExistException e) {
 					throw new UnexpectedObmSyncServerException("it's not possible because getEventFromExtId == null");
 				}
-				logger.info("createOrModifyInvitationEvent : create new event {}", event.getObmId());
-				return calendarClient.getEventFromId(at, bs.getUser().getLoginAtDomain(), id);
 				
 			} else {
 			
-				newEvent.setUid(obmEvent.getObmId());
-				newEvent.setSequence(obmEvent.getSequence());
-				if(!obmEvent.isInternalEvent()){
-					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
-					obmEvent = calendarClient.modifyEvent(at, bs.getUser().getLoginAtDomain(), newEvent, true, false);
+				newEvent.setUid(previousEvent.getObmId());
+				newEvent.setSequence(previousEvent.getSequence());
+				if (!previousEvent.isInternalEvent()) {
+					logger.info("createOrModifyInvitationEvent : update event {}", newEvent.getObmId());
+					previousEvent = calendarClient.modifyEvent(at, bs.getUser().getLoginAtDomain(), newEvent, true, false);
 				}
-				return obmEvent;
+				return previousEvent;
 			}	
 			
 		} catch (ServerFault fault) {
@@ -498,25 +497,26 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}		
 	}
 
-	private Event getEventFromExtId(BackendSession bs, MSEvent event, AccessToken at) 
+	private Event getEventFromExtId(BackendSession bs, EventExtId eventExtId, AccessToken at) 
 			throws ServerFault {
 		try {
-			return calendarClient.getEventFromExtId(at, bs.getUser().getLoginAtDomain(), event.getExtId());
+			return calendarClient.getEventFromExtId(at, bs.getUser().getLoginAtDomain(), eventExtId);
 		} catch (EventNotFoundException e) {
 			logger.info(e.getMessage());
 		}
 		return null;
 	}
-
-	private String updateUserStatus(BackendSession bs, MSEvent msEvent, AttendeeStatus status, ICalendar calCli,
+	
+	private String updateUserStatus(BackendSession bs, MSEvent msEvent, Event event, AttendeeStatus status, ICalendar calCli,
 			AccessToken at) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
-		logger.info("update user status[ {} in calendar ]", status.toString());
+		logger.info("update user status[ {} in calendar ]", status);
 		ParticipationState participationStatus = eventConverter.getParticipationState(null, status);
 		try {
-			calCli.changeParticipationState(at, bs.getUser().getLoginAtDomain(), msEvent.getExtId(), participationStatus, msEvent.getObmSequence(), true);
+			String calendar = bs.getUser().getLoginAtDomain();
+			calCli.changeParticipationState(at, calendar, event.getExtId(), participationStatus, msEvent.getObmSequence(), true);
 			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), getDefaultCalendarName(bs));
-			return getServerIdFor(collectionId, msEvent.getObmId());
+			return getServerIdFor(collectionId, event.getObmId());
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}

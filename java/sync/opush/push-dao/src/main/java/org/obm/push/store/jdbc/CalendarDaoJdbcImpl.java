@@ -11,7 +11,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.utils.JDBCUtils;
-import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventExtId;
 
 import com.google.inject.Inject;
 
@@ -23,18 +23,18 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 	}
 	
 	@Override
-	public EventObmId getEventObmIdFor(MSEventUid msEventUid, Device device) throws DaoException {
+	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException {
 		PreparedStatement ps = null;
 		Connection con = null;
 		ResultSet rs = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT event_id FROM opush_event_mapping WHERE event_uid=? AND device_id=?");
+			ps = con.prepareStatement("SELECT event_ext_id FROM opush_event_mapping WHERE event_uid=? AND device_id=?");
 			ps.setString(1, msEventUid.serializeToString());
 			ps.setInt(2, device.getDatabaseId());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return new EventObmId(rs.getInt(1));
+				return new EventExtId(rs.getString(1));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -45,15 +45,15 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 	}
 	
 	@Override
-	public MSEventUid getMsEventUidFor(EventObmId eventObmId, Device device)
+	public MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device)
 			throws DaoException {
 		PreparedStatement ps = null;
 		Connection con = null;
 		ResultSet rs = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT event_uid FROM opush_event_mapping WHERE event_id=? AND device_id=?");
-			ps.setInt(1, eventObmId.getIndex());
+			ps = con.prepareStatement("SELECT event_uid FROM opush_event_mapping WHERE event_ext_id=? AND device_id=?");
+			ps.setString(1, eventExtId.getExtId());
 			ps.setInt(2, device.getDatabaseId());
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -68,16 +68,16 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 	}
 	
 	@Override
-	public void insertObmIdMSEventUidMapping(EventObmId eventObmId,
+	public void insertExtIdMSEventUidMapping(EventExtId eventExtId,
 			MSEventUid msEventUid, Device device) throws DaoException {
 		
 		Connection con = null;
 		PreparedStatement ps = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_event_mapping (device_id, event_id, event_uid) VALUES (?, ?, ?)");
+			ps = con.prepareStatement("INSERT INTO opush_event_mapping (device_id, event_ext_id, event_uid) VALUES (?, ?, ?)");
 			ps.setInt(1, device.getDatabaseId());
-			ps.setInt(2, eventObmId.getIndex());
+			ps.setString(2, eventExtId.getExtId());
 			ps.setString(3, msEventUid.serializeToString());
 			ps.executeUpdate();
 		} catch (SQLException e) {

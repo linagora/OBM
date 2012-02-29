@@ -38,9 +38,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.EventObmId;
-
 import com.google.common.base.Objects;
 
 public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
@@ -61,8 +58,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	private final Set<MSAttendee> attendees;
 	private String organizerName;
 	private String organizerEmail;
-	private EventObmId obmId;
-	private EventExtId extId;
 	private MSEventUid uid;
 	private Date created;
 	private Date lastUpdate;
@@ -99,22 +94,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 
 	public void setOrganizerEmail(String organizerEmail) {
 		this.organizerEmail = organizerEmail;
-	}
-
-	public EventObmId getObmId() {
-		return obmId;
-	}
-
-	public void setObmId(EventObmId obmId) {
-		this.obmId = obmId;
-	}
-	
-	public EventExtId getExtId() {
-		return extId;
-	}
-	
-	public void setExtId(EventExtId extId) {
-		this.extId = extId;
 	}
 
 	public Set<MSAttendee> getAttendees() {
@@ -293,8 +272,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 			.add("organizerEmail", organizerEmail)
 			.add("location", location)
 			.add("subject", subject)
-			.add("obmId", obmId)
-			.add("extId", extId)
 			.add("description", description)
 			.add("dtStamp", dtStamp)
 			.add("endTime", endTime)
@@ -316,7 +293,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(attendees, organizerName, organizerEmail, location, 
-				subject, obmId, extId, description, dtStamp, 
+				subject, description, dtStamp, 
 				endTime, startTime, allDayEvent, busyStatus, sensitivity, meetingStatus, 
 				reminder, categories, recurrence, exceptions, timeZone, obmSequence, uid);
 	}
@@ -330,8 +307,6 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 				&& Objects.equal(this.organizerEmail, that.organizerEmail)
 				&& Objects.equal(this.location, that.location)
 				&& Objects.equal(this.subject, that.subject)
-				&& Objects.equal(this.obmId, that.obmId)
-				&& Objects.equal(this.extId, that.extId)
 				&& Objects.equal(this.description, that.description)
 				&& Objects.equal(this.dtStamp, that.dtStamp)
 				&& Objects.equal(this.endTime, that.endTime)
