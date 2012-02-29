@@ -338,7 +338,7 @@ public class MailBackendImpl implements MailBackend {
 				if (trash) {
 					String wasteBasketPath = getWasteBasketPath(bs);
 					Integer wasteBasketId = mappingService.getCollectionIdFor(bs.getDevice(), wasteBasketPath);
-					mailboxService.moveItem(bs, devDbId, collectionName, collectionId, wasteBasketPath, wasteBasketId, uid);
+					mailboxService.moveItem(bs, collectionName, wasteBasketPath, uid);
 					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
 					addMessageInCache(bs, devDbId, wasteBasketId, uid);
 				} else {
@@ -392,7 +392,7 @@ public class MailBackendImpl implements MailBackend {
 			final Integer srcFolderId = mappingService.getCollectionIdFor(bs.getDevice(), srcFolder);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(bs.getDevice(), dstFolder);
 			final Integer devDbId = bs.getDevice().getDatabaseId();
-			Long newUidMail = mailboxService.moveItem(bs, devDbId, srcFolder, srcFolderId, dstFolder, dstFolderId, currentMailUid);
+			Long newUidMail = mailboxService.moveItem(bs, srcFolder, dstFolder, currentMailUid);
 			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
 			addMessageInCache(bs, devDbId, dstFolderId, currentMailUid);
 			return dstFolderId + ":" + newUidMail;	

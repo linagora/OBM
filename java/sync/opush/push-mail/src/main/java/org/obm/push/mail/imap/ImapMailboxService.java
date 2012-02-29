@@ -336,8 +336,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
-			Long uid) throws DaoException, MailException {
+	public Long moveItem(BackendSession bs, String srcFolder, String dstFolder, Long uid) throws DaoException, MailException {
 		
 		StoreClient store = imapClientProvider.getImapClient(bs);
 		Collection<Long> newUid = null;
@@ -364,7 +363,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 		return newUid.iterator().next();
 	}
-
+	
 	@Override
 	public InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException {
 		return getMessageInputStream(bs, collectionName, uid);

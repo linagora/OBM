@@ -58,8 +58,7 @@ public interface MailboxService {
 
 	void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) throws MailException, DaoException;
 
-	Long moveItem(BackendSession bs, Integer devId, String srcFolder, Integer srcFolderId, String dstFolder, Integer dstFolderId, 
-			Long uid) throws MailException, DaoException;
+	Long moveItem(BackendSession bs, String srcFolder, String dstFolder, Long uid) throws MailException, DaoException;
 
 	InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException;
 
