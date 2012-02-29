@@ -17,7 +17,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
-public class JMSServiceImpl implements JMSService {
+public class MessageQueueServiceImpl implements MessageQueueService {
 
 	private final Ical4jHelper ical4jHelper;
 	private final UserService userService;
@@ -25,7 +25,7 @@ public class JMSServiceImpl implements JMSService {
 	private final Producer producer;
 
 	@Inject
-	private JMSServiceImpl(UserService userService, Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory,
+	private MessageQueueServiceImpl(UserService userService, Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory,
 			Producer producer) {
 		
 		this.userService = userService;

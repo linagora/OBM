@@ -44,11 +44,11 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class EventChangeHandler {
 
-	private final JMSService jmsService;
+	private final MessageQueueService jmsService;
 	private final EventNotificationService eventNotificationService;
 
 	@Inject
-	/* package */ EventChangeHandler(JMSService jmsService, EventNotificationService eventNotificationService) {
+	/* package */ EventChangeHandler(MessageQueueService jmsService, EventNotificationService eventNotificationService) {
 		this.jmsService = jmsService;
 		this.eventNotificationService = eventNotificationService;
 	}

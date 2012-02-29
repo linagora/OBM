@@ -3,7 +3,7 @@ package fr.aliacom.obm.common.calendar;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 
-public interface JMSService {
+public interface MessageQueueService {
 
 	void writeIcsInvitationRequest(AccessToken token, Event current);
 
