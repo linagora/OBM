@@ -38,6 +38,10 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.imap.command.IMAPCommand;
+import org.obm.push.mail.imap.command.UIDCopyMessage;
+
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
@@ -88,4 +92,24 @@ public class OpushImapFolder {
 		return folder.list(pattern);
 	}
 
+	public void open(int mode) throws MessagingException {
+		folder.open(mode);
+	}
+
+	public Message getMessageByUIDOrException(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		Message messageFound = folder.getMessageByUID(messageUid);
+
+		if (messageFound != null) {
+			return messageFound;
+		}
+		throw new ImapMessageNotFoundException("No message correspond to given UID, UID:" + String.valueOf(messageUid));
+	}
+
+	public <T> T doCommand(IMAPCommand<T> command) throws MessagingException {
+		return (T) folder.doCommand(command);
+	}
+	
+	public long copyMessageThenGetNewUID(String folderDst, long messageUid) throws MessagingException {
+		return doCommand(new UIDCopyMessage(folderDst, messageUid));
+	}
 }

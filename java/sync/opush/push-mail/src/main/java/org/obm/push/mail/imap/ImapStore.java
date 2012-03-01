@@ -47,6 +47,7 @@ import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
+import org.obm.push.mail.ImapMessageNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,5 +159,41 @@ public class ImapStore {
 			throw new FolderCreationException(e.getMessage(), e);
 		}
 	}
+
+	public long moveMessageUID(final String folderSrc, final String folderDst, final Long messageUid)
+			throws ImapCommandException, ImapMessageNotFoundException {
+		
+		try {
+			OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
+			Message messageToMove = sourceFolder.getMessageByUIDOrException(messageUid);
+			
+			long newUid = sourceFolder.copyMessageThenGetNewUID(folderDst, messageUid);
+			deleteMessage(messageToMove);
+			return newUid;
+		} catch (MessagingException e) {
+			String msg = String.format("IMAP command Move failed. user=%s, folderSource=%s, folderDestination=%s, messageUid=%d",
+					userId, folderSrc, folderDst, messageUid);
+			throw new ImapCommandException(msg, e);
+		}
+	}
+
+	private OpushImapFolder openFolder(String folderName, int mode) throws MessagingException {
+		OpushImapFolder opushImapFolder = getFolder(folderName);
+		opushImapFolder.open(mode);
+		return opushImapFolder;
+	}
 	
+	private OpushImapFolder getFolder(String folderName) throws MessagingException {
+		IMAPFolder folder = (IMAPFolder) store.getDefaultFolder().getFolder(folderName);
+		return new OpushImapFolder(folder);
+	}
+
+	private void deleteMessage(Message messageToDelete) throws ImapCommandException {
+		try {
+			messageToDelete.setFlag(Flags.Flag.DELETED, true);
+			messageToDelete.getFolder().expunge();
+		} catch (MessagingException e) {
+			throw new ImapCommandException(e.getMessage(), e);
+		}
+	}
 }

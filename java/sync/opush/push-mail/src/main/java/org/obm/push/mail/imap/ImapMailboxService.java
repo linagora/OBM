@@ -336,32 +336,28 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Long moveItem(BackendSession bs, String srcFolder, String dstFolder, Long uid) throws DaoException, MailException {
+	public Long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
+			throws DaoException, MailException, ImapMessageNotFoundException {
 		
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		Collection<Long> newUid = null;
+		ImapStore store = null;
 		try {
-			login(store);
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
+					new Object[] {bs.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
+			
 			String srcMailBox = parseMailBoxName(bs, srcFolder);
 			String dstMailBox = parseMailBoxName(bs, dstFolder);
 
-			store.select(srcMailBox);
-			List<Long> uids = Arrays.asList(uid);
-			newUid = store.uidCopy(uids, dstMailBox);
-			FlagsList fl = new FlagsList();
-			fl.add(Flag.DELETED);
-			logger.info("delete conv id = ", uid);
-			store.uidStore(uids, fl, true);
-			store.expunge();
-		} catch (IMAPException e) {
+			return store.moveMessageUID(srcMailBox, dstMailBox, uid);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
-		if (newUid == null || newUid.isEmpty()) {
-			return null;
-		}
-		return newUid.iterator().next();
 	}
 	
 	@Override

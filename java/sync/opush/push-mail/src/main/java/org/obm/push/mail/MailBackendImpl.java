@@ -351,6 +351,8 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 
@@ -401,6 +403,8 @@ public class MailBackendImpl implements MailBackend {
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
+		} catch (ImapMessageNotFoundException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
