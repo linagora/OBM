@@ -750,18 +750,18 @@ public class EventTest {
 	}
 	
 	@Test
-		public void testGetEventExceptionsWithImportantChangesWithRemovedExceptionalOccurrence() {
-			Event before = new Event();
-			DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
-			before.setDate(recurrenceStartDate.toDate());
-			before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-			
-			Event after = before.clone();
-			Date secondOccurrenceDate = recurrenceStartDate.plusDays(1).toDate();
-			
-			before.addEventException(before.getOccurrence(secondOccurrenceDate));
-			after.addException(secondOccurrenceDate);
-			
-			Assertions.assertThat(after.getEventExceptionsWithImportantChanges(before)).isEmpty();
-		}
+	public void testGetEventExceptionsWithImportantChangesWithRemovedExceptionalOccurrence() {
+		Event before = new Event();
+		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
+		before.setDate(recurrenceStartDate.toDate());
+		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
+
+		Event after = before.clone();
+		Date secondOccurrenceDate = recurrenceStartDate.plusDays(1).toDate();
+
+		before.addEventException(before.getOccurrence(secondOccurrenceDate));
+		after.addException(secondOccurrenceDate);
+
+		Assertions.assertThat(after.getEventExceptionsWithImportantChanges(before)).isEmpty();
+	}
 }
