@@ -410,11 +410,11 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@VisibleForTesting protected void applyParticipationStateModifications(Event before, Event event) {
 		if (event.hasImportantChangesExceptedEventException(before)) {
-		    event.applyParticipationStateModifications();
+		    event.updateParticipationState();
 		} else {
 			List<Event> exceptionWithChanges = event.getEventExceptionsWithImportantChanges(before);
 			for (Event exception: exceptionWithChanges) {
-				exception.applyParticipationStateModifications();
+				exception.updateParticipationState();
 			}
 		}
 	}
@@ -578,7 +578,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@VisibleForTesting protected Event createInternalEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault {
 		try{
-			event.applyParticipationStateModifications();
+			event.updateParticipationState();
 			Event ev = calendarDao.createEvent(token, calendar, event, true);
 			ev = calendarDao.findEventById(token, ev.getObmId());
 			eventChangeHandler.create(ev, notification, token);
