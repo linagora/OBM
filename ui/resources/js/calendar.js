@@ -2116,6 +2116,42 @@ Obm.CalendarCommentPopup = new Class({
 		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
 	}
 });
+Obm.CalendarAlarmPopup = new Class({
+	initialize: function() {
+		this.radios = $('calendarAlarmPopup').getElements('input[type=radio]');
+	},
+	compute: function(alert, uid, evtid) {  
+		console.log(alert,uid,evtid);
+		this.uid = uid;
+		this.evtid = evtid;
+		var radiochecked = this.radios.filter(function(radio){
+			if(radio.getProperty('value') == alert) return true;
+		});
+		console.log(radiochecked[0]);
+		if(radiochecked.length > 0) radiochecked[0].setProperty('checked', true);
+		this.show();
+	},
+	show: function() {
+		obm.popup.show('calendarAlarmPopup');
+	},
+	hide: function() {
+		obm.popup.hide('calendarAlarmPopup');
+	},
+	updateAlarm: function(){
+		var self = this;
+		var checked = this.radios.filter(function(radio){
+			return radio.getProperty('checked');
+		});
+		new Request.JSON({
+			url: obm.vars.consts.calendarUrl,
+			secure : false,
+			onComplete : function(){
+				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			}
+		}).post({ajax : 1, action : 'update_alert', calendar_id : this.evtid, user_id : this.uid, sel_alert : checked[0].value});
+	}
+});
+
 
 
 /******************************************************************************

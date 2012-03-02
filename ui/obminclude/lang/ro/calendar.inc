@@ -354,3 +354,6 @@ $l_refresh = "Actualizaţi";
 // comments 
 $l_comments = "Comments";
 $l_addedit_comment = "Add / Edit comment";
+// alert popup
+$l_add_alarm = "Add alert";
+$l_addedit_alarm = "Add / Edit alert";

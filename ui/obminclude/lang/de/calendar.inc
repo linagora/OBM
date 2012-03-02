@@ -371,4 +371,7 @@ $l_refresh = "Aktualisieren";
 
 // comments 
 $l_comments = "Kommentare";
-$l_addedit_comment = "Hinzufügen / Bearbeiten Kommentar";
+$l_addedit_comment = "Hinzufügen / Editieren Kommentar";
+// alert popup
+$l_add_alarm = "Hinzufügen alarm";
+$l_addedit_alarm = "Hinzufügen / Editieren Alarm";

@@ -3008,7 +3008,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_documents,$l_attach_documents,$l_title,$l_name;
   global $l_accepted, $l_needs_action, $l_declined;
   global $ico_add, $ico_delete, $ico_spinner;
-  global $l_comments;
+  global $l_comments, $l_edit, $l_add, $l_add_alarm;
 
   $id = $event_q->f('event_id');
   $is_exception = $event_q->f('event_is_exception');
@@ -3204,22 +3204,21 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         				&& (strcasecmp($owner_login, $GLOBALS['block_status_str']) == 0);
         if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw' && $block_status == false) {
           $user_alert = $ccalendar_alerts;
+	  $bell_alert_class = $bell_alert_onclick = $bell_alert_title ='';
           if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
             $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);
+            $bell_alert_class = 'bellalertexist';
+            $bell_alert_onclick = " onclick=\"obm.calendarAlarmPopup.compute($alerts[$u_id], $u_id, $id);\" ";
+            $bell_alert_title = " title=\"".$user_alert[$alerts[$u_id]]."\" ";
+          }else{
+            $bell_alert_class = 'bellalert';
+            $bell_alert_onclick ="onclick=\"obm.calendarAlarmPopup.compute(-1, $u_id, $id);\"";
+            $bell_alert_title = " title=\"$l_add_alarm\" ";
           }
           $$state = "checked=\"checked\"";
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
-          $urla = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_alert&calendar_id=$id&user_id=$u_id";
-          $sel_alert = '';
-          foreach ($user_alert as $alert_sec => $alert_label) {
-            if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
-            if($alerts[$u_id] == $alert_sec) {
-              $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
-            } else {
-              $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
-            }
-          }
-          $sel_alert = "<select name=\"sel_alert\" onchange=\"window.location='$urla&sel_alert='+this.options[this.selectedIndex].value\"><option value=\"$c_none\">$l_none</option>$sel_alert</select>";        
+	  
+	  $bell_alert_icon = "<a class=\"$bell_alert_class\" $bell_alert_onclick $bell_alert_title></a>";
 	  
 	// comment  display
 	$comment[$u_id] = get_comment_of_user($u_id, $id);
@@ -3240,7 +3239,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
           </td>
           <td style=\"$comment_style\"> <span>$user_comment_display</span> </td>
-          <td>$sel_alert</td>
+          <td style=\"text-align:center;\">$bell_alert_icon</td>
           </tr>";
           $user_comment_display = $$state = '';
         } else {
@@ -3294,6 +3293,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $dis_users_block ="
       <div class=\"detail infos\">
       ".dis_event_comment_popup()."
+      ".dis_event_alarm_popup()."
       <h1>$l_users</h1>
       <table class=\"spreadSheet\">
       <thead>
@@ -4303,6 +4303,50 @@ function dis_event_comment_popup() {
 	</div>    
 	<script type=\"text/javascript\">
 	obm.calendarCommentPopup = new Obm.CalendarCommentPopup();
+	</script>
+	";
+	return $block;
+}
+
+/**
+ * HTML for comment popup in the event consult view.
+ *  
+ * @access public
+ * @return HTML
+ */
+function dis_event_alarm_popup() {
+	$aler_radio_array = array( -1, 60, 300, 600, 900, 1800, 3600, 7200, 18000, 43200, 86400, 172800, 604800 );
+	foreach($aler_radio_array as $radiovalue){
+		$alert_label = Of_Date::secondToString($radiovalue);
+		if($radiovalue == -1){
+			$radio_button .= "<label style=\"display:inline;\"><input type=\"radio\" name=\"sel_alert\"
+			value=\"$radiovalue\">$GLOBALS[l_none]</label>";
+		}else{
+			if($radiovalue == 3600 || $radiovalue == 86400) $radio_button .= '<br/><br/>';
+			$radio_button .= "<label style=\"display:inline;\"><input type=\"radio\" name=\"sel_alert\"
+			value=\"$radiovalue\">$alert_label</label>";
+		}
+	}
+	$block = "
+	<div id=\"calendarAlarmPopup\" class=\"obmPopup\">
+		<h1>
+			<a href='#' id='popup_form_close' class='closeSticky' onclick='return false;'>
+				<img src='$GLOBALS[ico_popup_close]' alt='close' />
+			</a>
+			<span>$GLOBALS[l_addedit_alarm]</span>
+		</h1>
+		<div class=\"content\">
+			<form>
+				<span class=\"radioAlarm\">$radio_button </span>
+				<fieldset class=\"buttons\">
+					<a href='' onclick=\"obm.calendarAlarmPopup.updateAlarm(); return false;\" class=\"closeSticky\">$GLOBALS[l_validate]</a>
+					<a href='' id='popup_form_close' class='closeSticky' onclick='return false;'>$GLOBALS[l_cancel]</a>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<script type=\"text/javascript\">
+		obm.calendarAlarmPopup = new Obm.CalendarAlarmPopup();
 	</script>
 	";
 	return $block;

@@ -413,3 +413,6 @@ $l_obm_reserved_event_data_attachment_end = "// FIN PIECES JOINTES ";
 // comments 
 $l_comments = "Commentaires";
 $l_addedit_comment = "Ajouter / Modifier un commentaire";
+// alert popup
+$l_add_alarm = "Ajouter une alerte";
+$l_addedit_alarm = "Ajouter / Modifier alerte";

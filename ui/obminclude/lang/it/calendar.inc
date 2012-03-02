@@ -363,3 +363,6 @@ $l_refresh = "Aggiorna";
 // comments 
 $l_comments = "Commento";
 $l_addedit_comment = "Aggiungere / Modificare commento";
+// alert popup
+$l_add_alarm = "Aggiungi allarme";
+$l_addedit_alarm = "Aggiungi  / Modificare allarme";

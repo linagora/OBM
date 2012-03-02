@@ -1640,6 +1640,23 @@ form.button-to input {
 	width: 40em;
 	margin-bottom: 5px;
 }
+/* Alert Icon and Popup */
+.bellalert{
+       background:url('../images/bell_alert.png');
+       display:inline-block;
+       background-position:top left;
+       vertical-align:middle;
+       width:20px;
+       height:20px;
+}
+.bellalertexist{
+  background:url('../images/bell_alert.png');
+  display:inline-block;
+  background-position:bottom left;
+  vertical-align:middle;
+  width:20px;
+  height:20px;
+}
 
 .obmTip {
   z-index: 40000;

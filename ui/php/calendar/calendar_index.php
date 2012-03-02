@@ -738,20 +738,25 @@ if ($action == 'search') {
     $display['msg'] .= display_err_msg($err['msg']);
   }
 
-
 } elseif ($action == 'update_alert') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_calendar_event_alert_insert($params['calendar_id'], $params['user_id'],array($params['alert'] => 'dummy'));
   if ($retour) {
-    $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+     json_ok_msg("$l_event : $l_update_ok");
   } else {
-    $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+     json_ok_msg("$l_event : $err[msg]");
+     echo "({".$display['json']."})";
+     exit();
   }
   if (check_calendar_access($params['calendar_id'], 'read')) {
     $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    echo "({".$display['json']."})";
+    exit();
   } else {
-    $display['msg'] .= display_err_msg($err['msg']);
+    json_ok_msg("$l_event : $err[msg]");
   }
+  echo "({".$display['json']."})";
+  exit();
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
