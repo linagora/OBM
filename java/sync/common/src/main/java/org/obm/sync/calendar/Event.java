@@ -48,6 +48,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -582,20 +583,26 @@ public class Event implements Indexed<Integer> {
 		return occurrences;
 	}
 
-	public Collection<Date> getNegativeExceptionsChanges(Event event) {
-		Collection<Date> changes;
-		if (this.isRecurrent()) {
-			if (event != null) {
-				changes = this.recurrence.getNegativeExceptionsChanges(event.getRecurrence());
-			}
-			else {
-				changes = ImmutableSet.copyOf(this.recurrence.getExceptions());
-			}
+	public Collection<Date> getDeletedRecurringEvents(Event before) {
+		if (!isRecurrent()) {
+			return ImmutableSet.of();
 		}
-		else {
-			changes = ImmutableSet.of();
+		if (before == null) {
+			return ImmutableSet.copyOf(recurrence.getExceptions());
 		}
-		return changes;
+		Collection<Date> changes = recurrence.getNegativeExceptionsChanges(before.getRecurrence());
+		final Map<Date, Event> recurrenceIds = indexEventExceptionsByRecurrenceId(getDeletedEventExceptions(before));
+
+		return filterExceptionsFromDeletedEventExceptions(changes, recurrenceIds);
+	}
+
+	private Collection<Date> filterExceptionsFromDeletedEventExceptions(
+			Collection<Date> changes, final Map<Date, Event> recurrenceIds) {
+		return Collections2.filter(changes, new Predicate<Date>() {
+			@Override
+			public boolean apply(Date input) {
+				return !recurrenceIds.containsKey(input);
+		}});
 	}
 
 	public boolean hasChangesExceptedEventException(Event event) {

@@ -68,8 +68,7 @@ public class EventChangeHandler {
 			updateAddedEventExceptions(previous, current, notification, token);
 			updateModifiedEventExceptions(previous, current, notification, token);
 			updateDeletedEventExceptions(previous, current, notification, token);
-			updateNegativeExceptionsChanges(previous, current,
-					notification, token);
+			updateNegativeExceptionsChanges(previous, current, notification, token);
 		}
 	}
 
@@ -101,7 +100,7 @@ public class EventChangeHandler {
 
 	private void updateNegativeExceptionsChanges(Event previous,
 			Event current, boolean notification, AccessToken token) {
-		for (Date date : current.getNegativeExceptionsChanges(previous)) {
+		for (Date date : current.getDeletedRecurringEvents(previous)) {
 			Event negativeException = current.getOccurrence(date);
 			delete(negativeException, notification, token);
 		}
