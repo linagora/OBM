@@ -42,7 +42,9 @@ public class ReplyEmail extends SendEmail {
 	private Entity originTextPlainPart;
 	private Entity originTextHtmlPart;
 	
-	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail originMail, Message message) throws MimeException, NotQuotableEmailException {
+	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, 
+			MSEmail originMail, Message message) throws MimeException, NotQuotableEmailException {
+		
 		super(defaultFrom, message);
 		this.configuration = configuration;
 		this.mime4jUtils = mime4jUtils;
@@ -82,15 +84,25 @@ public class ReplyEmail extends SendEmail {
 		return message;
 	}
 
-	private Message quoteAndReplyMultipart(String originalEmail,
-			String originalEmailAsHtml)
-					throws NotQuotableEmailException {
+	private Message quoteAndReplyMultipart(String originalEmail, String originalEmailAsHtml) 
+			throws NotQuotableEmailException {
 
-		Multipart multipart = (Multipart)originalMessage.getBody();
+		Multipart multipart = getMultiPart();
 		TextBody quotedBodyText = quoteBodyText(originalEmail, multipart);
 		TextBody quotedBodyTextOverHtml = quoteBodyHtml(originalEmail, multipart, false);
-		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart, true);
+		TextBody quotedBodyHtmlOverHtml = quoteBodyHtml(originalEmailAsHtml, multipart, true);	
 		return buildSingleOrMultipartMessage(quotedBodyText, quotedBodyTextOverHtml, quotedBodyHtmlOverHtml);	
+	}
+
+	private Multipart getMultiPart() {
+		Multipart multipart = (Multipart)originalMessage.getBody();
+		if (mime4jUtils.isMessageMultipartMixed(originalMessage)) {
+			Multipart alternativeMultiPart = mime4jUtils.getAlternativeMultiPart(multipart);
+			if (alternativeMultiPart != null) {
+				return alternativeMultiPart;
+			}
+		}
+		return multipart;
 	}
 
 	private boolean nothingToQuote(String repliedEmail, String repliedEmailAsHtml) {
@@ -103,17 +115,28 @@ public class ReplyEmail extends SendEmail {
 		}
 
 		TextBody modifiedBodyHtmlPrefered = getPreferedHtmlPart(modifiedBodyHtmlOverText,modifiedBodyHtmlOverHtml); 
+		boolean isMultipartMixed = this.mime4jUtils.isMessageMultipartMixed(this.originalMessage);
 
-		if (modifiedBodyText != null && modifiedBodyHtmlPrefered != null) {
-			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, false);
-		} else if (this.mime4jUtils.isMessageMultipartMixed(this.originalMessage)) {
-			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, true);
+		if (modifiedBodyText != null && modifiedBodyHtmlPrefered != null || isMultipartMixed) {
+			return buildMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
 		} else {
-			if (modifiedBodyText != null) {
-				return createMessageWithBody(ContentTypeField.TYPE_TEXT_PLAIN, modifiedBodyText);
-			} else {
-				return createMessageWithBody("text/html", modifiedBodyHtmlPrefered);
-			}
+			return buildSingleMessage(modifiedBodyText, modifiedBodyHtmlPrefered);
+		}
+	}
+
+	private Message buildMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean isMultipartMixed) {
+		if (isMultipartMixed) {
+			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
+		} else {
+			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
+		}
+	}
+
+	private Message buildSingleMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) {
+		if (modifiedBodyText != null) {
+			return createMessageWithBody(ContentTypeField.TYPE_TEXT_PLAIN, modifiedBodyText);
+		} else {
+			return createMessageWithBody("text/html", modifiedBodyHtmlPrefered);
 		}
 	}
 
@@ -127,10 +150,10 @@ public class ReplyEmail extends SendEmail {
 	private Message createMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean createMixed) {
 		Multipart multipartReply = createMultipartMixedOrAlternative(createMixed);
 		
-		if (modifiedBodyText != null){
+		if (modifiedBodyText != null) {
 			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText,ContentTypeField.TYPE_TEXT_PLAIN));
 		}
-		if (modifiedBodyHtmlPrefered != null){
+		if (modifiedBodyHtmlPrefered != null) {
 			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered,"text/html"));
 		}
 		

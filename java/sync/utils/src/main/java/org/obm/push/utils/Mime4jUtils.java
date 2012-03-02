@@ -253,4 +253,14 @@ public class Mime4jUtils {
 		// been written to it.
 		return out.toStorage();
 	}
+	
+	public Multipart getAlternativeMultiPart(Multipart multipart) {
+		for (Entity entity: multipart.getBodyParts()) {
+			if (entity.getMimeType().equalsIgnoreCase(MimeContentType.MULTIPART_ALTERNATIVE.getContentType())) {
+				return (Multipart)entity.getBody();
+			}
+		}
+		return null;
+	}
+	
 }
