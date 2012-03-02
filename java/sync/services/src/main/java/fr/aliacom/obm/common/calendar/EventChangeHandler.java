@@ -65,15 +65,45 @@ public class EventChangeHandler {
 		if (current.hasChangesExceptedEventException(previous)) {
 			update(notification, token, previous, current);
 		} else {
-			List<Event> exceptionWithChanges = current.getEventExceptionsWithChanges(previous);
-			for (Event exception: exceptionWithChanges) {
-				Event previousException = previous.getOccurrence(exception.getRecurrenceId());
-				update(notification, token, previousException, exception);
-			}
-			for (Date date : current.getNegativeExceptionsChanges(previous)) {
-				Event negativeException = current.getOccurrence(date);
-				delete(negativeException, notification, token);
-			}
+			updateAddedEventExceptions(previous, current, notification, token);
+			updateModifiedEventExceptions(previous, current, notification, token);
+			updateDeletedEventExceptions(previous, current, notification, token);
+			updateNegativeExceptionsChanges(previous, current,
+					notification, token);
+		}
+	}
+
+	private void updateAddedEventExceptions(Event previous, Event current,
+			boolean notification, AccessToken token) {
+		List<Event> addedEventExceptions = current.getAddedEventExceptions(previous);
+		for (Event eventException: addedEventExceptions) {
+			Event previousException = previous.getOccurrence(eventException.getRecurrenceId());
+			update(notification, token, previousException, eventException);
+		}
+	}
+
+	private void updateModifiedEventExceptions(Event previous, Event current,
+			boolean notification, AccessToken token) {
+		List<Event> modifiedEventExceptions = current.getModifiedEventExceptions(previous);
+		for (Event eventException: modifiedEventExceptions) {
+			Event previousException = previous.getOccurrence(eventException.getRecurrenceId());
+			update(notification, token, previousException, eventException);
+		}
+	}
+
+	private void updateDeletedEventExceptions(Event previous, Event current,
+			boolean notification, AccessToken token) {
+		List<Event> deletedEventExceptions = current.getDeletedEventExceptions(previous);
+		for (Event eventException: deletedEventExceptions) {
+			delete(eventException, notification, token);
+		}
+	}
+
+	private void updateNegativeExceptionsChanges(Event previous,
+			Event current, boolean notification, AccessToken token) {
+		for (Date date : current.getNegativeExceptionsChanges(previous)) {
+			Event negativeException = current.getOccurrence(date);
+			delete(negativeException, notification, token);
 		}
 	}
 

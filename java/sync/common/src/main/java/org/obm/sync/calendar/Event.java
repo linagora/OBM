@@ -33,18 +33,23 @@ package org.obm.sync.calendar;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class Event implements Indexed<Integer> {
 
@@ -511,13 +516,54 @@ public class Event implements Indexed<Integer> {
 		return false;
 	}
 
-	public List<Event> getEventExceptionsWithChanges(Event before) {
-		HashSet<Event> ownOccurrences = generateOccurrencesMatchingEventExceptions(before.recurrence);
-		HashSet<Event> otherOccurrences = before.generateOccurrencesMatchingEventExceptions(this.recurrence);
-		Set<Event> differences = com.google.common.collect.Sets.difference(ownOccurrences, otherOccurrences);
-		return Lists.newArrayList(differences);
+	public List<Event> getDeletedEventExceptions(Event before) {
+		return before.getAddedEventExceptions(this);
 	}
-	
+
+	public List<Event> getAddedEventExceptions(Event before) {
+		List<Event> afterOccurrences = recurrence.getEventExceptions();
+		List<Event> beforeOccurrences = before.getEventsExceptions();
+		Set<Event> addedEventExceptions = Sets.difference(afterOccurrences, beforeOccurrences, new Comparator<Event>() {
+
+			@Override
+			public int compare(Event e1, Event e2) {
+				return e1.getRecurrenceId().compareTo(e2.getRecurrenceId());
+			}
+		});
+
+		return Lists.newArrayList(addedEventExceptions);
+	}
+
+	public List<Event> getModifiedEventExceptions(Event before) {
+		final Map<Date, Event> beforeOccurrencesByReccurrenceId = indexEventExceptionsByRecurrenceId(before.getEventsExceptions());
+		Collection<Event> modifiedOcurrences = listModifiedEventExceptions(beforeOccurrencesByReccurrenceId);
+		return Lists.newArrayList(modifiedOcurrences);
+	}
+
+	private Collection<Event> listModifiedEventExceptions(final Map<Date, Event> beforeOccurrencesByReccurrenceId) {
+		final AllEventAttributesExceptExceptionsEquivalence equiv = new AllEventAttributesExceptExceptionsEquivalence();
+		Collection<Event> modifiedOcurrences = com.google.common.collect.Collections2.filter(recurrence.getEventExceptions(), new Predicate<Event>() {
+
+			@Override
+			public boolean apply(Event afterEventException) {
+				Event beforeEventException = beforeOccurrencesByReccurrenceId.get(afterEventException.getRecurrenceId());
+				return beforeEventException != null && !equiv.doEquivalent(beforeEventException, afterEventException);
+			}
+		});
+		return modifiedOcurrences;
+	}
+
+	private Map<Date, Event> indexEventExceptionsByRecurrenceId(
+			List<Event> afterOccurrences) {
+		Map<Date, Event> afterOccurrencesByReccurrenceId = Maps.uniqueIndex(afterOccurrences, new Function<Event, Date>() {
+
+			@Override
+			public Date apply(Event input) {
+				return input.getRecurrenceId();
+		}});
+		return afterOccurrencesByReccurrenceId;
+	}
+
 	public List<Event> getEventExceptionsWithImportantChanges(Event before) {
 		Set<Event> ownOccurrences = generateOccurrencesMatchingEventExceptions(before.recurrence);
 		Set<Event> otherOccurrences = before.generateOccurrencesMatchingEventExceptions(this.recurrence);
@@ -551,7 +597,7 @@ public class Event implements Indexed<Integer> {
 		}
 		return changes;
 	}
-	
+
 	public boolean hasChangesExceptedEventException(Event event) {
 		if(event == null){
 			return true;
@@ -559,8 +605,8 @@ public class Event implements Indexed<Integer> {
 		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
 		return !comparator.doEquivalent(this, event);
 	}
-	
-	public Event getOccurrence(Date recurrenceId){
+
+	public Event getOccurrence(Date recurrenceId) {
 		Event occurrence = recurrence.getEventExceptionWithRecurrenceId(recurrenceId);
 		if (occurrence == null) {
 			occurrence = buildOccurrence(recurrenceId);

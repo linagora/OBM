@@ -796,7 +796,7 @@ public class EventTest {
 		
 		Assertions.assertThat(after.hasImportantChangesExceptedEventException(before)).isFalse();
 	}
-	
+
 	@Test
 	public void testGetEventExceptionsWithImportantChangesWithRemovedExceptionalOccurrence() {
 		Event before = new Event();
@@ -811,5 +811,185 @@ public class EventTest {
 		after.addException(secondOccurrenceDate);
 
 		Assertions.assertThat(after.getEventExceptionsWithImportantChanges(before)).isEmpty();
+	}
+
+	@Test
+	public void testGetDeletedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+
+		List<Event> deletedEventExceptions = after.getDeletedEventExceptions(before);
+		Assertions.assertThat(deletedEventExceptions ).containsOnly(eexp2);
+	}
+
+	@Test
+	public void testEmptyGetDeletedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		after.addEventException(eexp2.clone());
+
+		List<Event> deletedEventExceptions = after.getDeletedEventExceptions(before);
+		Assertions.assertThat(deletedEventExceptions ).isEmpty();
+	}
+
+	@Test
+	public void testGetAddedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		after.addEventException(eexp2.clone());
+
+		List<Event> addedEventExceptions = after.getAddedEventExceptions(before);
+		Assertions.assertThat(addedEventExceptions ).containsOnly(eexp2);
+	}
+
+	@Test
+	public void testEmptyGetAddedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		after.addEventException(eexp2.clone());
+
+		List<Event> addedEventExceptions = after.getAddedEventExceptions(before);
+		Assertions.assertThat(addedEventExceptions ).isEmpty();
+	}
+
+	@Test
+	public void testGetModifiedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		Event eexp3 = eexp2.clone();
+		eexp3.setDescription("a new description");
+		after.addEventException(eexp3);
+
+		List<Event> modifiedEventExceptions = after.getModifiedEventExceptions(before);
+		Assertions.assertThat(modifiedEventExceptions ).containsOnly(eexp3);
+	}
+
+	@Test
+	public void testDeletedAndAddedNotInGetModifiedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event deletedEventException = new Event();
+		deletedEventException.setUid(new EventObmId(3));
+		deletedEventException.setRecurrenceId(new Date(3));
+
+		Event addedEventException = new Event();
+		addedEventException.setUid(new EventObmId(4));
+		addedEventException.setRecurrenceId(new Date(4));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+		before.addEventException(deletedEventException);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		Event modifiedEventException = eexp2.clone();
+		modifiedEventException.setDescription("a new description");
+		after.addEventException(modifiedEventException);
+		after.addEventException(addedEventException.clone());
+
+		List<Event> modifiedEventExceptions = after.getModifiedEventExceptions(before);
+		Assertions.assertThat(modifiedEventExceptions ).containsOnly(modifiedEventException);
+	}
+
+	@Test
+	public void TestEmptyGetModifiedEventExceptions() {
+		Event eexp1 = new Event();
+		eexp1.setUid(new EventObmId(1));
+		eexp1.setRecurrenceId(new Date(1));
+
+		Event eexp2 = new Event();
+		eexp2.setUid(new EventObmId(2));
+		eexp2.setRecurrenceId(new Date(2));
+
+		Event before = new Event();
+		before.setRecurrence(new EventRecurrence());
+		before.addEventException(eexp1);
+		before.addEventException(eexp2);
+
+		Event after = new Event();
+		after.setRecurrence(new EventRecurrence());
+		after.addEventException(eexp1.clone());
+		after.addEventException(eexp2.clone());
+
+		List<Event> modifiedEventExceptions = after.getModifiedEventExceptions(before);
+		Assertions.assertThat(modifiedEventExceptions ).isEmpty();
 	}
 }
