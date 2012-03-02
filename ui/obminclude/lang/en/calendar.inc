@@ -537,3 +537,7 @@ $l_obm_reserved_event_data_attachment_begin = "// ATTACHED DOCUMENTS LIST (OBM R
 $l_obm_reserved_event_data_attachment_end = "// END ATTACHED DOCUMENTS LIST ";
 
 $l_event_add_organizer = "The organizer has been added as attendee.";
+
+// comments 
+$l_comments = "Comments";
+$l_addedit_comment = "Add / Edit comment";

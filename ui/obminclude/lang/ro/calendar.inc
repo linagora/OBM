@@ -350,3 +350,7 @@ $l_share_ok = "parts valabil";
 $l_mail_ok = "Email trimis";
 
 $l_refresh = "Actualizaţi";
+
+// comments 
+$l_comments = "Comments";
+$l_addedit_comment = "Add / Edit comment";

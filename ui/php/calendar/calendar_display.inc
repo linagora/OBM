@@ -3008,6 +3008,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_documents,$l_attach_documents,$l_title,$l_name;
   global $l_accepted, $l_needs_action, $l_declined;
   global $ico_add, $ico_delete, $ico_spinner;
+  global $l_comments;
 
   $id = $event_q->f('event_id');
   $is_exception = $event_q->f('event_is_exception');
@@ -3216,12 +3217,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $dis_user_list .= "
           <tr>
           <td>$label</td>
-          <td>$sel_alert</td>
           <td class=\"C\">
           <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span></label>
           <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
           <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
           </td>
+          <td></td>
+          <td>$sel_alert</td>
           </tr>";
           $$state = '';
         } else {
@@ -3252,6 +3254,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $dis_contact_list .= "
           <tr>
           <td>$label</td>
+          <td></td>
           <td class=\"C\">
           <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span></label>
           <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
@@ -3270,7 +3273,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       <table class=\"spreadSheet\">
       <thead>
       <tr>
-      <td>$l_users</td><td>$l_alerts</td><td>$l_state</td>
+      <td>$l_users</td><td>$l_state</td><td>$l_comments</td><td>$l_alerts</td>
       </tr>
       </thead>
       $dis_user_list
@@ -3337,7 +3340,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$url&rd_decision_event=ACCEPTED'\" />$l_accepted
           <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$url&rd_decision_event=NEEDS-ACTION'\" />$l_needs_action
           <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$url&rd_decision_event=DECLINED'\" />$l_declined
-          </td>
+          </td><td></td>
           </tr>";
           $$state = '';
         } else {
@@ -3363,7 +3366,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span>
-            </td></tr>";          
+            </td><td></td>
+            </tr>";          
         }
       }
       $dis_resource_block = "
@@ -3372,7 +3376,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <table class=\"spreadSheet\">
         <thead>
         <tr>
-        <td>$l_resources</td><td>$l_state</td>
+        <td>$l_resources</td><td>$l_state</td><td>$l_comments</td>
         </tr>
         </thead>
         $dis_resource_list

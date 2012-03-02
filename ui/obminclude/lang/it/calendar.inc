@@ -359,3 +359,7 @@ $l_share_ok = "quota valida";
 $l_mail_ok = "Messaggio inviato";
 
 $l_refresh = "Aggiorna";
+
+// comments 
+$l_comments = "Commento";
+$l_addedit_comment = "Aggiungere / Modificare commento";

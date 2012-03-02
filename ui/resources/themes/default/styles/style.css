@@ -604,7 +604,7 @@ fieldset.detail {
 
 .detail table {
   width: 95%;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .detail th {
@@ -1151,7 +1151,7 @@ input.datePicker {
 }
 
 .disabled {
-  color: #DDDDDD;
+  display:none;
 }
 
 /* ------------------------------------------------------------------------- */

@@ -369,3 +369,6 @@ $l_mail_ok = "E-Mail gesendet";
 
 $l_refresh = "Aktualisieren";
 
+// comments 
+$l_comments = "Kommentare";
+$l_addedit_comment = "Hinzufügen / Bearbeiten Kommentar";
