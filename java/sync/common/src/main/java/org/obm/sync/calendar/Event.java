@@ -583,7 +583,7 @@ public class Event implements Indexed<Integer> {
 		return occurrences;
 	}
 
-	public Collection<Date> getDeletedRecurringEvents(Event before) {
+	public Collection<Date> getNegativeExceptionsChanges(Event before) {
 		if (!isRecurrent()) {
 			return ImmutableSet.of();
 		}
@@ -593,10 +593,10 @@ public class Event implements Indexed<Integer> {
 		Collection<Date> changes = recurrence.getNegativeExceptionsChanges(before.getRecurrence());
 		final Map<Date, Event> recurrenceIds = indexEventExceptionsByRecurrenceId(getDeletedEventExceptions(before));
 
-		return filterExceptionsFromDeletedEventExceptions(changes, recurrenceIds);
+		return filterOutExceptionsFromDeletedEventExceptions(changes, recurrenceIds);
 	}
 
-	private Collection<Date> filterExceptionsFromDeletedEventExceptions(
+	private Collection<Date> filterOutExceptionsFromDeletedEventExceptions(
 			Collection<Date> changes, final Map<Date, Event> recurrenceIds) {
 		return Collections2.filter(changes, new Predicate<Date>() {
 			@Override

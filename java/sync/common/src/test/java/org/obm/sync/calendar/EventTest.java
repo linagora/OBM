@@ -583,40 +583,40 @@ public class EventTest {
 	}
 
 	@Test
-	public void testGetDeletedRecurringEventsWithNullEvent() {
+	public void testGetNegativeExceptionsChangesWithNullEvent() {
 		Date exceptionDate = new Date();
 		Event ev1 = createEventWithNegativeExceptions(new Date(), 1, exceptionDate);
 		Event ev2 = null;
-		Collection<Date> difference = ev1.getDeletedRecurringEvents(ev2);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
 		Assertions.assertThat(difference).containsOnly(exceptionDate);
 	}
 
 	@Test
-	public void testGetDeletedRecurringEventsWithNonRecurrentEvent() {
+	public void testGetNegativeExceptionsChangesWithNonRecurrentEvent() {
 		Event ev1 = createOneEvent(1);
 		Event ev2 = null;
-		Collection<Date> difference = ev1.getDeletedRecurringEvents(ev2);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
 		Assertions.assertThat(difference).isEmpty();
 	}
 
 	@Test
-	public void testGetDeletedRecurringEventsWithIdenticalEvents() {
+	public void testGetNegativeExceptionsChangesWithIdenticalEvents() {
 		Date eventDate = new Date();
 		Date exceptionDate = new Date();
 		Event ev1 = createEventWithNegativeExceptions(eventDate, 1, exceptionDate);
 		Event ev2 = createEventWithNegativeExceptions(eventDate, 2, exceptionDate);
-		Collection<Date> difference = ev1.getDeletedRecurringEvents(ev2);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
 		Assertions.assertThat(difference).isEmpty();
 	}
 
 	@Test
-	public void testGetDeletedRecurringEventsWithDifferentEvents() {
+	public void testGetNegativeExceptionsChangesWithDifferentEvents() {
 		Date eventDate = new Date();
 		Date exceptionDate1 = new DateTime(eventDate).plusDays(2).toDate();
 		Date exceptionDate2 = new DateTime(eventDate).plusMonths(1).toDate();
 		Event ev1 = createEventWithNegativeExceptions(eventDate, 1, exceptionDate1, exceptionDate2);
 		Event ev2 = createEventWithNegativeExceptions(eventDate, 2, exceptionDate1);
-		Collection<Date> difference = ev1.getDeletedRecurringEvents(ev2);
+		Collection<Date> difference = ev1.getNegativeExceptionsChanges(ev2);
 		Assertions.assertThat(difference).containsOnly(exceptionDate2);
 	}
 
@@ -994,7 +994,7 @@ public class EventTest {
 	}
 
 	@Test
-	public void testGetDeletedRecurringEventsDoesntContainDeletedEventExceptions() {
+	public void testGetNegativeExceptionsChangesDoesntContainDeletedEventExceptions() {
 		Event eexp1 = new Event();
 		eexp1.setUid(new EventObmId(1));
 		eexp1.setRecurrenceId(new Date(1));
@@ -1016,7 +1016,7 @@ public class EventTest {
 		Date addedException = new Date(1);
 		after.addException(addedException);
 
-		Collection<Date> deletedExceptions = after.getDeletedRecurringEvents(before);
+		Collection<Date> deletedExceptions = after.getNegativeExceptionsChanges(before);
 		Assertions.assertThat(deletedExceptions).containsOnly(addedException);
 	}
 }
