@@ -4309,7 +4309,7 @@ function dis_event_comment_popup() {
 }
 
 /**
- * HTML for comment popup in the event consult view.
+ * HTML for Alarm popup in the event consult view.
  *  
  * @access public
  * @return HTML
