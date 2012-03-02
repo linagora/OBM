@@ -671,6 +671,19 @@ if ($action == 'search') {
   echo "({".implode(',',$json)."})";    
   exit();
 
+} elseif ($action == 'update_comment') {
+///////////////////////////////////////////////////////////////////////////////
+	if( isset($params['comment']) ){
+		$retour = run_query_calendar_event_comment_insert($params['calendar_id'], $params['user_id'],$params['comment'],$params['type']);
+		if ($retour) {
+			json_ok_msg("$l_event : $l_update_ok");
+		} else {
+			json_ok_msg("$l_event : $err[msg]");
+		}
+	}
+  echo "({".$display['json']."})";
+  exit();
+
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
@@ -1789,7 +1802,12 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );  
-
+  // Update comment
+  $actions['calendar']['update_comment'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=update_comment",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
   // Waiting events
   $actions['calendar']['waiting_events'] = array (
     'Name'     => $l_header_waiting_events,

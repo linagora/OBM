@@ -2752,6 +2752,98 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
 
   return true;
 }
+/**
+ * Create Comment for an event 
+ * 
+ * @param $event_id 
+ * @param $user_id 
+ * @param string $comment
+ * @access public
+ * @return void
+ */
+function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $type) {
+	global $cdg_sql, $obm;
+	$event_id = sql_parse_id($event_id);
+	$ent_id = sql_parse_id($ent_id);
+	if($type == 'user'){
+		$entity_id = get_user_entity_id_for_comment_insert($ent_id, $event_id);
+	}else{
+		$entity_id = get_resource_entity_id_for_comment_insert($ent_id, $event_id);
+	}
+	$oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
+	$obm_q = new DB_OBM;
+	$query = "
+	UPDATE EventLink 
+	SET eventlink_comment ='".$comment."'
+	WHERE eventlink_event_id = $event_id
+	AND eventlink_entity_id = $entity_id
+	;";
+	
+	$obm_q->query($query);
+	$newEvent = OBM_EventFactory::getInstance()->getById($event_id);
+	//notify attendee
+	OBM_EventFactory::getInstance()->store($oldEvent, $newEvent);
+	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
+	return true;
+}
+function get_user_entity_id_for_comment_insert($user_id, $event_id){
+	global $cdg_sql, $obm;
+	$obm_q = new DB_OBM;
+	$query = "SELECT eventlink_entity_id 
+	FROM EventLink     
+	INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+	INNER JOIN UserObm u ON userentity_user_id = userobm_id 
+	WHERE eventlink_event_id = $event_id 
+	AND u.userobm_id = $user_id;
+	";
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return $obm_q->f('eventlink_entity_id');
+}
+ 
+function get_resource_entity_id_for_comment_insert($res_id, $event_id){
+	global $cdg_sql, $obm;
+	$obm_q = new DB_OBM;
+	$query = "SELECT eventlink_entity_id 
+	FROM EventLink     
+	INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id 
+	INNER JOIN Resource r ON resourceentity_resource_id = resource_id 
+	WHERE eventlink_event_id = $event_id 
+	AND r.resource_id= $res_id;
+	";
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return $obm_q->f('eventlink_entity_id');
+}
+
+function get_comment_of_user($user_id, $event_id){
+	global $cdg_sql, $obm;
+	$obm_q = new DB_OBM;
+	$query = "SELECT eventlink_comment
+	FROM EventLink     
+	INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+	INNER JOIN UserObm u ON userentity_user_id = userobm_id 
+	WHERE eventlink_event_id = $event_id 
+	AND u.userobm_id = $user_id;
+	";
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return $obm_q->f('eventlink_comment');
+}
+function get_comment_of_resource($res_id, $event_id){
+	global $cdg_sql, $obm;
+	$obm_q = new DB_OBM;
+	$query = "SELECT eventlink_comment 
+	FROM EventLink 
+	INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id 
+	INNER JOIN Resource r ON resourceentity_resource_id = resource_id 
+	WHERE eventlink_event_id = $event_id 
+	AND r.resource_id= $res_id;
+	";
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return $obm_q->f('eventlink_comment');
+}
 
 /**
  * Insert an event template

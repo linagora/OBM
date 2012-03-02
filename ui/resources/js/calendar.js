@@ -2085,6 +2085,38 @@ Obm.CalendarPopupManager = new Class({
 
 });
 
+// Popup Comment Alarm And Decision
+Obm.CalendarCommentPopup = new Class({
+	initialize: function() {
+		this.textarea = $('calendarCommentPopup').getElements('textarea');
+	},
+	compute: function(uid,evtid,comment,type) {
+		this.uid = uid;
+		this.evtid = evtid;
+		this.comment = comment;
+		this.type = type;
+		this.textarea.setProperty('placeholder', this.comment);
+		this.show();
+	},
+	show: function() {
+		obm.popup.show('calendarCommentPopup');
+	},
+	hide: function() {
+		obm.popup.hide('calendarCommentPopup');
+	},
+	updateComment: function(){
+		this.comment = this.textarea[0].value;
+		var self = this;
+		new Request.JSON({      
+			url: obm.vars.consts.calendarUrl,
+			secure : false,
+			onComplete : function(){
+				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			}
+		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
+	}
+});
+
 
 /******************************************************************************
  * Calendar Update and creation quick form

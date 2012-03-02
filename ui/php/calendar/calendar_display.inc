@@ -3192,7 +3192,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $is_organizer = $entity['is_organizer'];
         
         if ($is_organizer && $state == 'DECLINED') continue;
-        
+	$comment_style = 'text-align:justify;';
+	
         $ACCEPTED = '';
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
@@ -3219,6 +3220,17 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
             }
           }
           $sel_alert = "<select name=\"sel_alert\" onchange=\"window.location='$urla&sel_alert='+this.options[this.selectedIndex].value\"><option value=\"$c_none\">$l_none</option>$sel_alert</select>";        
+	  
+	// comment  display
+	$comment[$u_id] = get_comment_of_user($u_id, $id);
+	if($comment[$u_id] == '' ){
+		$comment_style = 'text-align:center;';
+		$user_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$GLOBALS[l_add_comment]...', 'user');\" title=\"$l_add\"></a>";
+	}else{
+		$user_comment = addslashes($comment[$u_id]);
+		$user_comment_display =  $user_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$comment[$u_id]', 'user');\" title=\"$l_edit\"></a>";
+         }
+	  
           $dis_user_list .= "
           <tr>
           <td>$label</td>
@@ -3227,20 +3239,27 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
           <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
           </td>
-          <td></td>
+          <td style=\"$comment_style\"> <span>$user_comment_display</span> </td>
           <td>$sel_alert</td>
           </tr>";
-          $$state = '';
+          $user_comment_display = $$state = '';
         } else {
           $ACCEPTED = 'class="disabled"';
           ${'NEEDS-ACTION'} = 'class="disabled"';
           $DECLINED = 'class="disabled"';
           $$state = '';
-          $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
-          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span></label>
-          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span></label>
-          <label><input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span></label>
-            </td></tr>";
+          $user_comment_display = get_comment_of_user($u_id, $id);         
+          $dis_user_list .= "
+          <tr>
+          <td>$label</td>
+          <td style=\"padding-left:5px;\">
+          <span $ACCEPTED> $l_accepted</span>    
+          <span ${'NEEDS-ACTION'}> $l_needs_action</span>
+          <span $DECLINED> $l_declined</span>
+          </td>
+          <td><span style=\"$comment_style\">$user_comment_display</span></td>
+          <td></td>
+          </tr>";
         }
       }
     }
@@ -3274,6 +3293,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   if ($dis_user_list != "") {
     $dis_users_block ="
       <div class=\"detail infos\">
+      ".dis_event_comment_popup()."
       <h1>$l_users</h1>
       <table class=\"spreadSheet\">
       <thead>
@@ -4256,6 +4276,37 @@ function dis_calendar_occurency_popup() {
   return $block;
 }
 
+/**
+ * HTML for comment popup in the event consult view.
+ *  
+ * @access public
+ * @return HTML
+ */
+function dis_event_comment_popup() {
+	$block = "
+	<div id=\"calendarCommentPopup\" class=\"obmPopup\">
+		<h1>
+			<a href='#' id='popup_form_close' class='closeSticky' onclick='return false;'>
+			<img src='$GLOBALS[ico_popup_close]' alt='close' />
+			</a>
+		<span>$GLOBALS[l_addedit_comment]</span>
+		</h1>
+		<div class=\"contentcomment\">
+			<form>
+				<textarea placeholder=\"\" style=\"width:90%;\"></textarea>
+				<fieldset class=\"buttons\">
+					<a href='' onclick=\"obm.calendarCommentPopup.updateComment(); return false;\" class=\"closeSticky\">$GLOBALS[l_validate]</a>
+					<a href='' id='popup_form_close' class='closeSticky' onclick='return false;'>$GLOBALS[l_cancel]</a>
+				</fieldset>
+			</form>
+		</div>
+	</div>    
+	<script type=\"text/javascript\">
+	obm.calendarCommentPopup = new Obm.CalendarCommentPopup();
+	</script>
+	";
+	return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
