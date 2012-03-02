@@ -72,6 +72,7 @@ import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
@@ -336,13 +337,15 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
-			throws DaoException, MailException, ImapMessageNotFoundException {
+	public long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
+			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		ImapStore store = null;
 		try {
 			store = imapClientProvider.getImapClientWithJM(bs);
 			store.login();
+			
+			assertMoveItemIsSupported(store);
 			
 			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
 					new Object[] {bs.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
@@ -351,6 +354,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			String dstMailBox = parseMailBoxName(bs, dstFolder);
 
 			return store.moveMessageUID(srcMailBox, dstMailBox, uid);
+		} catch (MessagingException e) {
+			throw new MailException(e);
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
 		} catch (NoImapClientAvailableException e) {
@@ -360,6 +365,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
+	private void assertMoveItemIsSupported(ImapStore store) throws UnsupportedBackendFunctionException, MessagingException {
+		if (!store.hasCapability(ImapCapability.UIDPLUS)) {
+			throw new UnsupportedBackendFunctionException("The IMAP server doesn't support UIDPLUS capability");
+		}
+	}
+
 	@Override
 	public InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException {
 		return getMessageInputStream(bs, collectionName, uid);

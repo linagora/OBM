@@ -49,6 +49,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
@@ -93,6 +94,15 @@ public class ImapMoveAPITest {
 	@After
 	public void tearDown() {
 		greenMail.stop();
+	}
+	
+	@Test(expected=UnsupportedBackendFunctionException.class)
+	public void testGreenmailServerDoesntImplementUIDPLUS() throws Exception {
+		Email sentEmail = sendEmailToInbox();
+
+		createFolders(DRAFT);
+		
+		mailboxService.moveItem(bs, INBOX, mailboxPath(DRAFT), sentEmail.getUid());
 	}
 	
 	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")

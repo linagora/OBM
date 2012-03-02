@@ -44,6 +44,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 
@@ -58,7 +59,8 @@ public interface MailboxService {
 
 	void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) throws MailException, DaoException;
 
-	Long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid) throws MailException, DaoException, ImapMessageNotFoundException;
+	long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
+			throws MailException, DaoException, ImapMessageNotFoundException, UnsupportedBackendFunctionException;
 
 	InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException;
 

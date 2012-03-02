@@ -38,6 +38,7 @@ import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -49,10 +50,11 @@ public interface IContentsImporter {
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException;
 
 	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ItemNotFoundException, UnsupportedBackendFunctionException;
 
 	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException;
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException;
 
 	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
 			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, CollectionPathException;

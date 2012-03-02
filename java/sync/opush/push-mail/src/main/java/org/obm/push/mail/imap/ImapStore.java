@@ -39,7 +39,6 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 
 import org.minig.imap.MailboxFolder;
@@ -52,13 +51,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
 
 public class ImapStore {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapStore.class);
 	
 	private final Session session;
-	private final Store store;
+	private final IMAPStore store;
 	
 	private final String password;
 	private final String userId;
@@ -66,7 +66,7 @@ public class ImapStore {
 	private final int port;
 
 	
-	public ImapStore(Session session, Store store, 
+	public ImapStore(Session session, IMAPStore store, 
 			String userId, String password, String host, int port) {
 		this.session = session;
 		this.store = store;
@@ -158,6 +158,10 @@ public class ImapStore {
 		} catch (MessagingException e) {
 			throw new FolderCreationException(e.getMessage(), e);
 		}
+	}
+
+	public boolean hasCapability(ImapCapability imapCapability) throws MessagingException {
+		return store.hasCapability(imapCapability.capability());
 	}
 
 	public long moveMessageUID(final String folderSrc, final String folderDst, final Long messageUid)

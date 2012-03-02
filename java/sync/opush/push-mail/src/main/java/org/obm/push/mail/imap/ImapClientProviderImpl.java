@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
-import javax.mail.Store;
 
 import org.minig.imap.IdleClient;
 import org.minig.imap.StoreClient;
@@ -48,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.sun.mail.imap.IMAPStore;
 
 public class ImapClientProviderImpl implements ImapClientProvider {
 
@@ -116,7 +116,7 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 			logger.debug("Creating storeClient with login {} : loginWithDomain = {}", 
 					new Object[]{login, loginWithDomain});
 
-			Store javaMailStore = defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
+			IMAPStore javaMailStore = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
 			return new ImapStore(defaultSession, javaMailStore,
 					login, bs.getPassword(), imapHost, imapPort);
 		} catch (NoSuchProviderException e) {

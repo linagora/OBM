@@ -66,6 +66,7 @@ import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.InvalidServerId;
@@ -181,6 +182,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (CollectionPathException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (ConversionException e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (UnsupportedBackendFunctionException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
@@ -330,7 +333,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
-		UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
@@ -362,7 +365,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * Handles modifications requested by mobile device
 	 */
 	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) throws CollectionNotFoundException, 
-		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		for (SyncCollectionChange change: collection.getChanges()) {
@@ -409,7 +412,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	
 	private void deleteServerItem(BackendSession bs, SyncCollection collection,
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		String serverId = change.getServerId();
 		contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), serverId, collection

@@ -41,6 +41,7 @@ import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -69,14 +70,16 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
-					throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException {
+					throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException,
+					ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		PIMBackend backend = backends.getBackend(type);
 		backend.delete(bs, collectionId, serverId, moveToTrash);
 	}
 
 	public String importMoveItem(BackendSession bs, PIMDataType type,
-			String srcFolder, String dstFolder, String messageId) throws CollectionNotFoundException, DaoException, ProcessingEmailException {
+			String srcFolder, String dstFolder, String messageId)
+					throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		PIMBackend backend = backends.getBackend(type);
 		return backend.move(bs, srcFolder, dstFolder, messageId);
 	}

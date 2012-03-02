@@ -48,6 +48,7 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -127,6 +128,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		} catch (ConversionException e) {
+			logger.error(e.getMessage(), e);
+			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
+		} catch (UnsupportedBackendFunctionException e) {
+			logger.error(e.getMessage(), e);
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		}
 	}
@@ -140,18 +145,18 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, ConversionException {
+			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
-			ItemChangeMeetingResponse meetingResponse = handleSingleResponse(bs, item);	
+			ItemChangeMeetingResponse meetingResponse = handleSingleResponse(bs, item);
 			meetingResponses.add(meetingResponse);
 		}
 		return new MeetingHandlerResponse(meetingResponses);
 	}
 
 	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs, MeetingResponse item) throws DaoException,
-			CollectionNotFoundException, ProcessingEmailException, ConversionException {
+			CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		MSEmail email = retrieveMailWithMeetingRequest(bs, item);
 	

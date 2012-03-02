@@ -45,6 +45,7 @@ import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -143,6 +144,8 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 				} catch (ProcessingEmailException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 				} catch (CollectionPathException e) {
+					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+				} catch (UnsupportedBackendFunctionException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 				}
 			}

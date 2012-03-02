@@ -69,6 +69,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -322,7 +323,7 @@ public class MailBackendImpl implements MailBackend {
 	@Override
 	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ItemNotFoundException, ProcessingEmailException {
+			UnexpectedObmSyncServerException, ItemNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		try {
 			boolean trash = Objects.firstNonNull(moveToTrash, true);
 			if (trash) {
@@ -386,7 +387,7 @@ public class MailBackendImpl implements MailBackend {
 
 	@Override
 	public String move(BackendSession bs, String srcFolder, String dstFolder, String messageId) 
-			throws CollectionNotFoundException, ProcessingEmailException {
+			throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		
 		try {
 			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
