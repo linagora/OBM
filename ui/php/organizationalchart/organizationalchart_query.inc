@@ -64,12 +64,12 @@ function run_query_organizationalchart_search($organizationalchart) {
   $multidomain = sql_multidomain("organizationalchart");
 
   if($name != "") {
-    $where .= " $and organizationalchart_name $like '$name%'";
+    $where .= " $and organizationalchart_name $like '".$obm_q->escape($name)."%'";
     $and = "AND";
   }
 
   if ($desc != "") {
-    $where .= " $and organizationalchart_description $like '%$desc%'";
+    $where .= " $and organizationalchart_description $like '%".$obm_q->escape($desc)."%'";
     $and = "AND ";
   }
 
@@ -86,7 +86,7 @@ function run_query_organizationalchart_search($organizationalchart) {
       LEFT JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
       LEFT JOIN UserEntity ON userentity_entity_id=ogrouplink_entity_id
       LEFT JOIN UserObm as u ON (u.userobm_id=userentity_user_id OR (u.userobm_id=of_usergroup_user_id AND u.userobm_archive = 0))";
-    $where .= " $and (userobm_lastname $like '$user%' OR userobm_firstname $like '$user%')";
+    $where .= " $and (userobm_lastname $like '".$obm_q->escape($user)."%' OR userobm_firstname $like '".$obm_q->escape($user)."%')";
   }
 
   if ($where == "") {
@@ -131,6 +131,7 @@ function run_query_organizationalchart_search($organizationalchart) {
 function run_query_organizationalchart_insert($organizationalchart) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
 
@@ -152,12 +153,11 @@ function run_query_organizationalchart_insert($organizationalchart) {
       NOW(),
       null,
       $uid,
-      '$name',
+      '".$obm_q->escape($name)."',
       '$archive',
-      '$desc')";
+      '".$obm_q->escape($desc)."')";
 
   display_debug_msg($query, $cdg_sql, "run_query_organizationalchart_insert()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $uid = sql_parse_id($obm['uid'], true);
   $id = $obm_q->lastid();
@@ -228,8 +228,8 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
             $ins_uid,
             $ins_organizationalchart_id,
             $parent_id,
-            '$name',
-            '$level')";
+            '".$obm_q->escape($name)."',
+            '".$obm_q->escape($level)."')";
 
         display_debug_msg($query, $cdg_sql, "run_query_organizational_chart_ogroup_insert($name)");
         $obm_q->query($query);
@@ -285,6 +285,7 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
 function run_query_organizationalchart_update($id, $organizationalchart) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
 
@@ -296,13 +297,12 @@ function run_query_organizationalchart_update($id, $organizationalchart) {
   $query = "UPDATE OrganizationalChart SET
     organizationalchart_timeupdate=NOW(),
     organizationalchart_userupdate=$uid,
-    organizationalchart_name='$name',
-    organizationalchart_description='$desc',
+    organizationalchart_name='".$obm_q->escape($name)."',
+    organizationalchart_description='".$obm_q->escape($desc)."',
     organizationalchart_archive=$archive
     WHERE organizationalchart_id $sid $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_organizationalchart_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Delete all entities
