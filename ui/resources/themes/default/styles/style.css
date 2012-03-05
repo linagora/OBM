@@ -1702,8 +1702,6 @@ form.button-to input {
 .decisionOptions textarea:focus{
   color:#000;
 }
-
-
 .obmTip {
   z-index: 40000;
 }

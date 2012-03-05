@@ -2179,7 +2179,7 @@ Obm.CalendarDecisionPopup = new Class({
 		obm.popup.hide('calendarDecisionPopup');
 	},
 	updateDecision: function(){
-		this.comment =this.textarea[0].value;
+		this.comment = this.textarea[0].value;
 		var self = this;
 		new Request.JSON({
 			url: obm.vars.consts.calendarUrl,
