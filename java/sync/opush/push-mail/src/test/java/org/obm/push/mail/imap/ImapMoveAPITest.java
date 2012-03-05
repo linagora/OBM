@@ -36,8 +36,8 @@ import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.MailboxFolder;
@@ -49,7 +49,6 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
-import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
@@ -96,16 +95,28 @@ public class ImapMoveAPITest {
 		greenMail.stop();
 	}
 	
-	@Test(expected=UnsupportedBackendFunctionException.class)
-	public void testGreenmailServerDoesntImplementUIDPLUS() throws Exception {
+	@Test
+	public void testGreenmailServerImplementUIDPLUS() throws Exception {
 		Email sentEmail = sendEmailToInbox();
 
 		createFolders(DRAFT);
-		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(DRAFT), sentEmail.getUid());
+
+		long testErrorUidValue = -1;
+		long movedEmailUid = testErrorUidValue;
+		try {
+			movedEmailUid = mailboxService.moveItem(bs, INBOX, mailboxPath(DRAFT), sentEmail.getUid());
+		} catch (Exception nonExpectedException) {
+			Assert.fail("Greenmail should implement UIDPLUS, so no exception is expected");
+		}
+
+		Set<Email> movedEmails = mailboxEmails(DRAFT);
+		Assertions.assertThat(movedEmails).hasSize(1);
+		Email movedEmail = Iterables.getOnlyElement(movedEmails);
+		Assertions.assertThat(movedEmail.getUid()).isNotEqualTo(testErrorUidValue).isEqualTo(movedEmailUid);
+		Assertions.assertThat(movedEmail.isAnswered()).isEqualTo(sentEmail.isAnswered());
+		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 	
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveFromInbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -124,7 +135,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveToSentbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -142,7 +152,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveToDraft() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -160,7 +169,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveToTrash() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -178,7 +186,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveToInbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -192,7 +199,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveFromSpecialMailbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -215,7 +221,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test(expected=MailException.class)
 	public void testMoveFromNonExistingMailbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -225,7 +230,6 @@ public class ImapMoveAPITest {
 		mailboxService.moveItem(bs, mailboxPath(fromNonExistingMailbox), INBOX, sentEmail.getUid());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test(expected=MailException.class)
 	public void testMoveToNonExistingMailbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -235,7 +239,6 @@ public class ImapMoveAPITest {
 		mailboxService.moveItem(bs, INBOX, mailboxPath(toNonExistingMailbox), sentEmail.getUid());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveToSubMailbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -254,7 +257,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test
 	public void testMoveFromAndToSubMailbox() throws Exception {
 		Email sentEmail = sendEmailToInbox();
@@ -277,7 +279,6 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Ignore("'Move' operation needs UIDPLUS capability, which is not supported by GreenMail")
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testMovingNonExistingEmailTriggersException() throws Exception {
 		Email sentEmail = sendEmailToInbox();
