@@ -110,6 +110,7 @@ public class Attendee {
 		this.organizer = attendee.organizer;
 		this.obmUser = attendee.obmUser;
 		this.canWriteOnCalendar = attendee.canWriteOnCalendar;
+		this.participationRole = attendee.participationRole;
 	}
 
 	public ParticipationState getState() {

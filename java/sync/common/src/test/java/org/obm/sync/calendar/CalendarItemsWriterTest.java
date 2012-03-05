@@ -50,9 +50,6 @@ import org.w3c.dom.Element;
 
 /**
  * Serializes calendar related items to XML
- * 
- * @author tom
- * 
  */
 public class CalendarItemsWriterTest extends AbstractItemsWriter {
 
@@ -177,7 +174,7 @@ private CalendarItemsWriter writer;
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/event.xsd", "event");
 		Element root = doc.getDocumentElement();
-		writer.appendEvent(root, ev);
+		writer.appendUpdatedEvent(root, ev);
 		
 		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 		"<event allDay=\"false\" isInternal=\"false\" sequence=\"6\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +

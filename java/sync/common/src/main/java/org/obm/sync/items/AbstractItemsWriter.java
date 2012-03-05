@@ -38,9 +38,6 @@ import org.w3c.dom.Element;
 
 /**
  * Serializes calendar related items to XML
- * 
- * @author tom
- * 
  */
 public abstract class AbstractItemsWriter {
 

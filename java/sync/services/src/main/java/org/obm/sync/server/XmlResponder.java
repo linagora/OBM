@@ -206,7 +206,7 @@ public class XmlResponder {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/event.xsd", "event");
 			Element root = doc.getDocumentElement();
-			ciw.appendEvent(root, ev);
+			ciw.appendUpdatedEvent(root, ev);
 			res = sendDom(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -292,7 +292,7 @@ public class XmlResponder {
 					"http://www.obm.org/xsd/sync/events.xsd", "events");
 			Element root = doc.getDocumentElement();
 			for (Event ev : evs) {
-				ciw.appendEvent(root, ev);
+				ciw.appendUpdatedEvent(root, ev);
 			}
 			res = sendDom(doc);
 		} catch (Exception ex) {

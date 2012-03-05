@@ -48,63 +48,89 @@ import org.w3c.dom.Element;
 
 /**
  * Serializes calendar related items to XML
- * 
- * @author tom
- * 
  */
 public class CalendarItemsWriter extends AbstractItemsWriter {
 
-	public Document writeChanges(EventChanges cc) {
+	public Document writeChanges(EventChanges eventChanges) {
 		Document doc = null;
 		try {
 			doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/calendar-changes.xsd",
 					"calendar-changes");
 			Element root = doc.getDocumentElement();
-			root
-					.setAttribute("lastSync", DateHelper.asString(cc
-							.getLastSync()));
+			root.setAttribute("lastSync", DateHelper.asString(eventChanges
+				.getLastSync()));
 
-			Element removed = DOMUtils.createElement(root, "removed");
-			EventObmId[] rmIds = cc.getRemoved();
-			EventExtId[] rmExtIds = cc.getRemovedExtIds();
-			for (int i = 0; i < rmIds.length; i++) {
-				Element e = DOMUtils.createElement(removed, "event");
-				e.setAttribute("id", rmIds[i].serializeToString());
-				e.setAttribute("extId", rmExtIds[i].serializeToString());
-			}
-
-			Element updated = DOMUtils.createElement(root, "updated");
-			for (Event ev : cc.getUpdated()) {
-				appendEvent(updated, ev);
-			}
-			Element participation = DOMUtils.createElement(root, "participationChanges");
-			for (ParticipationChanges changes : cc.getParticipationUpdated()) {
-				appendParticipationChanges(participation, changes);
-			}
+			writeRemovedEvents(eventChanges, root);
+			writeUpdatedEvents(eventChanges, root);
+			writeParticipationChanges(eventChanges, root);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 		return doc;
 	}
 
-	private void appendParticipationChanges(Element parent,	ParticipationChanges changes) {
+	private void writeRemovedEvents(EventChanges eventChanges, Element root) {
+		Element removed = DOMUtils.createElement(root, "removed");
+		EventObmId[] rmIds = eventChanges.getRemoved();
+		EventExtId[] rmExtIds = eventChanges.getRemovedExtIds();
+		for (int i = 0; i < rmIds.length; i++) {
+			appendRemovedEvent(removed, rmIds, rmExtIds, i);
+		}
+	}
+
+	private void writeUpdatedEvents(EventChanges eventChanges, Element root) {
+		Element updated = DOMUtils.createElement(root, "updated");
+		for (Event ev : eventChanges.getUpdated()) {
+			appendUpdatedEvent(updated, ev);
+		}
+	}
+
+	private void writeParticipationChanges(EventChanges eventChanges, Element root) {
+		Element participationChanges = DOMUtils.createElement(root, "participationChanges");
+		for (ParticipationChanges changes : eventChanges.getParticipationUpdated()) {
+			appendParticipationChange(participationChanges, changes);
+		}
+	}
+
+	public void appendUpdatedEvent(Element parent, Event event) {
+		appendEvent(parent, event, "event");
+	}
+
+	private void appendRemovedEvent(Element removed, EventObmId[] rmIds,
+			EventExtId[] rmExtIds, int i) {
+		Element e = DOMUtils.createElement(removed, "event");
+		e.setAttribute("id", rmIds[i].serializeToString());
+		e.setAttribute("extId", rmExtIds[i].serializeToString());
+	}
+
+	private void appendParticipationChange(Element parent,	ParticipationChanges participationChanges) {
 		Element participation = DOMUtils.createElement(parent, "participation");
+		setParticipationChangeAttributes(participationChanges, participation);
+		appendAttendeesForParticipationChange(participationChanges, participation);
+	}
+
+	private void setParticipationChangeAttributes(ParticipationChanges changes,
+			Element participation) {
 		participation.setAttribute("id", changes.getEventId().serializeToString());
 		participation.setAttribute("extId", changes.getEventExtId().serializeToString());
 		if (changes.getRecurrenceId() != null) {
 			participation.setAttribute("recurrenceId", changes.getRecurrenceId().serializeToString());
 		}
+	}
+
+	private void appendAttendeesForParticipationChange(ParticipationChanges changes,
+			Element participation) {
 		Element attendees = DOMUtils.createElement(participation, "attendees");
 		for (Attendee a: changes.getAttendees()) {
-			appendAttendeeForParticipation(attendees, a);
+			appendAttendeeForParticipationChange(attendees, a);
 		}
 	}
 
-	private void appendAttendeeForParticipation(Element attendees, Attendee a) {
+	private void appendAttendeeForParticipationChange(Element attendees, Attendee attendee) {
 		Element at = DOMUtils.createElement(attendees, "attendee");
-		at.setAttribute("email", a.getEmail());
-		ParticipationState status = a.getState();
+		at.setAttribute("email", attendee.getEmail());
+		ParticipationState status = attendee.getState();
 		at.setAttribute("state", (status != null ? status.toString() : ParticipationState.NEEDSACTION.toString()));
 		appendCommentFromParticipationFor(at, status);
 	}
@@ -117,70 +143,66 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public void appendEvent(Element parent, Event ev) {
-		appendEvent(parent, ev, "event");
-	}
-
-	private void appendEvent(Element parent, Event ev, String eventNodeName) {
+	private void appendEvent(Element parent, Event event, String eventNodeName) {
 		Element e = parent;
 		if (!eventNodeName.equals(parent.getNodeName())) {
 			e = DOMUtils.createElement(parent, eventNodeName);
 		}
-		e.setAttribute("type", ev.getType().toString());
-		e.setAttribute("allDay", "" + ev.isAllday());
-		EventObmId eventId = ev.getObmId();
+		e.setAttribute("type", event.getType().toString());
+		e.setAttribute("allDay", "" + event.isAllday());
+		EventObmId eventId = event.getObmId();
 		if (eventId != null) {
 			e.setAttribute("id", eventId.serializeToString());
 		}
-		e.setAttribute("sequence", String.valueOf(ev.getSequence()));
-		e.setAttribute("isInternal", ""+ev.isInternalEvent());
-		if (ev.getTimeUpdate() != null) {
+		e.setAttribute("sequence", String.valueOf(event.getSequence()));
+		e.setAttribute("isInternal", ""+event.isInternalEvent());
+		if (event.getTimeUpdate() != null) {
 			createIfNotNull(e, "timeupdate", ""
-					+ DateHelper.asString(ev.getTimeUpdate()));
+					+ DateHelper.asString(event.getTimeUpdate()));
 		}
-		if (ev.getTimeCreate() != null) {
+		if (event.getTimeCreate() != null) {
 			createIfNotNull(e, "timecreate", ""
-					+ DateHelper.asString(ev.getTimeCreate()));
+					+ DateHelper.asString(event.getTimeCreate()));
 		}
-		if (ev.getRecurrenceId() != null) {
-			createIfNotNull(e, "recurrenceId", DateHelper.asString(ev
+		if (event.getRecurrenceId() != null) {
+			createIfNotNull(e, "recurrenceId", DateHelper.asString(event
 					.getRecurrenceId()));
 		}
-		if (ev.getExtId() != null) {
-			createIfNotNull(e, "extId", ev.getExtId().serializeToString());
+		if (event.getExtId() != null) {
+			createIfNotNull(e, "extId", event.getExtId().serializeToString());
 		}
-		if(ev.getOpacity() == null){
-			ev.setOpacity(EventOpacity.OPAQUE);
+		if(event.getOpacity() == null){
+			event.setOpacity(EventOpacity.OPAQUE);
 		}
-		createIfNotNull(e, "opacity", ev.getOpacity().toString());
-		createIfNotNull(e, "title", ev.getTitle());
-		createIfNotNull(e, "description", ev.getDescription());
-		createIfNotNull(e, "owner", ev.getOwner());
-		createIfNotNull(e, "ownerEmail", ev.getOwnerEmail());
-		createIfNotNull(e, "tz", ev.getTimezoneName());
-		if (ev.getStartDate() != null) {
-			createIfNotNull(e, "date", DateHelper.asString(ev.getStartDate()));
+		createIfNotNull(e, "opacity", event.getOpacity().toString());
+		createIfNotNull(e, "title", event.getTitle());
+		createIfNotNull(e, "description", event.getDescription());
+		createIfNotNull(e, "owner", event.getOwner());
+		createIfNotNull(e, "ownerEmail", event.getOwnerEmail());
+		createIfNotNull(e, "tz", event.getTimezoneName());
+		if (event.getStartDate() != null) {
+			createIfNotNull(e, "date", DateHelper.asString(event.getStartDate()));
 		}
-		createIfNotNull(e, "duration", "" + ev.getDuration());
-		createIfNotNull(e, "category", ev.getCategory());
-		createIfNotNull(e, "location", ev.getLocation());
-		if (ev.getAlert() != null) {
-			createIfNotNull(e, "alert", String.valueOf(ev.getAlert()));
+		createIfNotNull(e, "duration", "" + event.getDuration());
+		createIfNotNull(e, "category", event.getCategory());
+		createIfNotNull(e, "location", event.getLocation());
+		if (event.getAlert() != null) {
+			createIfNotNull(e, "alert", "" + event.getAlert());
 		}
 
-		createIfNotNull(e, "priority", (ev.getPriority() != null ? ""
-				+ ev.getPriority() : "0"));
-		createIfNotNull(e, "privacy", String.valueOf(ev.getPrivacy().toSqlIntCode()));
+		createIfNotNull(e, "priority", (event.getPriority() != null ? ""
+				+ event.getPriority() : "0"));
+		createIfNotNull(e, "privacy", String.valueOf(event.getPrivacy().toSqlIntCode()));
 		Element atts = DOMUtils.createElement(e, "attendees");
-		List<Attendee> la = ev.getAttendees();
+		List<Attendee> la = event.getAttendees();
 		if (la != null) {
-			for (Attendee a : ev.getAttendees()) {
+			for (Attendee a : event.getAttendees()) {
 				appendAttendee(atts, a);
 			}
 		}
 
 		Element rec = DOMUtils.createElement(e, "recurrence");
-		EventRecurrence r = ev.getRecurrence();
+		EventRecurrence r = event.getRecurrence();
 		rec.setAttribute("kind", r.getKind().toString());
 		if (RecurrenceKind.none != r.getKind()) {
 			if (r.getEnd() != null) {
@@ -240,7 +262,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/event.xsd", "event");
 		Element root = doc.getDocumentElement();
-		appendEvent(root, event);
+		appendUpdatedEvent(root, event);
 		DOMUtils.serialize(doc, out);
 		return out.toString();
 	}
@@ -251,7 +273,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 				"http://www.obm.org/xsd/sync/events.xsd", "events");
 		Element root = doc.getDocumentElement();
 		for (Event event : events) {
-			appendEvent(root, event);
+			appendUpdatedEvent(root, event);
 		}
 		DOMUtils.serialize(doc, out);
 		return out.toString();
