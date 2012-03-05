@@ -79,6 +79,7 @@ function run_query_password($u_id) {
 function run_query_password_update($password, $uid, $usr_q) {
   global $cdg_sql, $cdg_exe, $cgp_use, $cmd_ldap_passwd, $password_encryption;
 
+  $usr_q = new DB_OBM;
   $login = $usr_q->f('userobm_login');
   $domain_id = $usr_q->f('userobm_domain_id');
   $samba_perms = $usr_q->f('userobm_samba_perms');
@@ -92,19 +93,17 @@ function run_query_password_update($password, $uid, $usr_q) {
   } else {
     $new_passwd_crypt = $new_pass;
   }
-  $new_passwd_crypt = addslashes($new_passwd_crypt);
-
+  
   $passwd_update = '';
 
   // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm SET
-    userobm_password='$new_passwd_crypt',
+    userobm_password='".$usr_q->escape($new_passwd_crypt)."',
     userobm_password_type='$password_encryption'
   WHERE userobm_id $uid ";
 
   display_debug_msg("DB_OBM : $query", $cdg_sql, 'run_query_password_update()');
   // Update database update
-  $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
   // Update 'P_UserObm' and system ONLY if the user already exist in
@@ -116,7 +115,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   if ($usr_q->f('nb_user') == 1 && $cgp_use['service']['ldap']) {
 
     $query = "UPDATE P_UserObm SET
-      userobm_password='$new_passwd_crypt',
+      userobm_password='".$usr_q->escape($new_passwd_crypt)."',
       userobm_password_type='$password_encryption'
     WHERE userobm_id $uid ";
 
