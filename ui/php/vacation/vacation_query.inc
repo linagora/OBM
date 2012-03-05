@@ -94,6 +94,7 @@ function update_vacation($params, $vac_q) {
 //
 function run_query_vacation_update($params, $u_id) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if (!$params['auto_enable']) {
     $params['vacation_datebegin'] = '0';
@@ -105,7 +106,7 @@ function run_query_vacation_update($params, $u_id) {
   $vacation_dateend = ($params['vacation_dateend'] ? "'$params[vacation_dateend]'" : 'null');  
 
   $enabled = sql_parse_int($params["enabled"]);
-  $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
+  $message_update = ", userobm_vacation_message='".$obm_q->escape($params["message"])."'";
   $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
   $time_end = $params["time_end"].":".$params["min_end"].":00";
   $message_update .= ", userobm_vacation_datebegin= $vacation_datebegin";
@@ -119,7 +120,6 @@ function run_query_vacation_update($params, $u_id) {
     WHERE userobm_id $u_id ";
     
   display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
-  $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
   $query = "UPDATE P_UserObm
