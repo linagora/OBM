@@ -49,28 +49,28 @@ applicable to the OBM software.
 function run_query_company_search($company) {
   global $cgp_user, $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
-  
+  $obm_q = new DB_OBM;
+
   $sql_order_dir = $company['sql_order_dir'];
   $sql_order_field = $company['sql_order_field'];
   
   $fuzzy = $company['fuzzy'];
   $archive = ( $company['archive']);
-  $name = sql_search_text_parse($company['name']);
-  $number = sql_search_text_parse($company['number']);
-  $phone = sql_search_text_parse($company['phone']);
-  $town = sql_search_text_parse($company['town']);
-  $ctry = $company['country'];
-  $type = ( $company['type']);
-  $act = ( $company['activity']);
-  $naf = ( $company['naf']);
-  $market = ( $company['market']);
-  $dsrc = ( $company['datasource']);
-  $zip = sql_search_text_parse($company['zip']);
+  $name = sql_search_text_parse($obm_q->escape($company['name']));
+  $number = sql_search_text_parse($obm_q->escape($company['number']));
+  $phone = sql_search_text_parse($obm_q->escape($company['phone']));
+  $town = sql_search_text_parse($obm_q->escape($company['town']));
+  $ctry = $obm_q->escape($company['country']);
+  $type = ( $obm_q->escape($company['type']));
+  $act = ( $obm_q->escape($company['activity']));
+  $naf = ( $obm_q->escape($company['naf']));
+  $market = ( $obm_q->escape($company['market']));
+  $dsrc = ( $obm_q->escape($company['datasource']));
+  $zip = sql_search_text_parse($obm_q->escape($company['zip']));
   $dateafter = of_isodate_convert($company['date_after'],true);
   $datebefore = of_isodate_convert($company['date_before'],true);
   $lang = get_lang();
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -335,7 +335,7 @@ function run_query_company_coords($id, $update=false) {
     // Remove the X-OBM mark
     array_pop($label);
     $label = implode('_',$label);
-    $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
+    $coords['phone'][] = array('label' => $obm_q->escape($label), 'number' => $obm_q->f('phone_number'));
   }
 
   // Email
@@ -351,7 +351,7 @@ function run_query_company_coords($id, $update=false) {
     // Remove the X-OBM mark
     array_pop($label);
     $label = implode('_',$label);
-    $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
+    $coords['email'][] = array('label' => $obm_q->escape($label), 'address' => $obm_q->f('email_address'));
   }
 
   // Website
@@ -367,7 +367,7 @@ function run_query_company_coords($id, $update=false) {
     // Remove the X-OBM mark
     array_pop($label);
     $label = implode('_',$label);
-    $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
+    $coords['website'][] = array('label' => $obm_q->escape($label), 'url' => $obm_q->f('website_url'));
   }
 
   // Address
@@ -393,8 +393,8 @@ function run_query_company_coords($id, $update=false) {
       $country = $obm_q->f('country_name');
     }
     $coords['address'][] = array(
-      'label' => $label, 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
-      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $country);
+      'label' => $obm_q->escape($label), 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
+      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $obm_q->escape($country));
   }
 
   return $coords;
@@ -410,6 +410,7 @@ function run_query_company_coords($id, $update=false) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_insert($company) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id( $obm['uid']);
   $domain_id = sql_parse_id( $obm['domain_id']);
@@ -471,21 +472,20 @@ function run_query_company_insert($company) {
     null,
     $uid,
     $dsrc,
-    '$number',
-    '$vat',
-    '$siret',
-    '$archive',
-    '$name',
-    '$aka',
-    '$sound',
+    '".$obm_q->escape($number)."',
+    '".$obm_q->escape($vat)."',
+    '".$obm_q->escape($siret)."',
+    '".$obm_q->escape($archive)."',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($aka)."',
+    '".$obm_q->escape($sound)."',
     $type,
     $act,
     $naf,
     $market,
-    '$comment')";
+    '".$obm_q->escape($comment)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_insert(1)');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_insert(2)');
@@ -547,18 +547,18 @@ function run_query_company_update($cid, $company) {
     company_timeupdate='". date('Y-m-d H:i:s') ."',
     company_userupdate=". $obm['uid'] .",
     company_datasource_id=$dsrc,
-    company_number='$number',
-    company_vat='$vat',
-    company_siret='$siret',
-    company_archive='$archive',
-    company_name='$name',
-    company_aka='$aka',
-    company_sound='$sound',
+    company_number='".$obm_q->escape($number)."',
+    company_vat='".$obm_q->escape($vat)."',
+    company_siret='".$obm_q->escape($siret)."',
+    company_archive='".$obm_q->escape($archive)."',
+    company_name='".$obm_q->escape($name)."',
+    company_aka='".$obm_q->escape($aka)."',
+    company_sound='".$obm_q->escape($sound)."',
     $upd_type
     $upd_act
     $upd_naf
     company_marketingmanager_id=$market,
-    company_comment='$comment'
+    company_comment='".$obm_q->escape($comment)."'
   WHERE company_id $cid_sql
     $multidomain";
 
@@ -620,6 +620,7 @@ function run_query_check_company($p_id, $name) {
     $where_id = "AND company_id $p_id"; 
   }
   $obm_q = new DB_OBM;
+  $name = $obm_q->escape($name);
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('company');
@@ -675,6 +676,7 @@ function run_query_companynafcode() {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_nafcode_insert($company) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $timecreate = date('Y-m-d H:i:s');
   $usercreate = sql_parse_id( $obm['uid']);
@@ -694,12 +696,11 @@ function run_query_company_nafcode_insert($company) {
       '$timecreate',
       $usercreate,
       $domain_id,
-      '$title',
-      '$code',
-      '$label')";
+      '".$obm_q->escape($title)."',
+      '".$obm_q->escape($code)."',
+      '".$obm_q->escape($label)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_nafcode_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -713,6 +714,7 @@ function run_query_company_nafcode_insert($company) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_nafcode_update($company) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $timeupdate = date('Y-m-d H:i:s');
   $userupdate = sql_parse_id( $obm['uid']);
@@ -723,16 +725,15 @@ function run_query_company_nafcode_update($company) {
   $multidomain = sql_multidomain('companynafcode');
 	
   $query = "UPDATE CompanyNafCode SET
-      companynafcode_code='$code',
-      companynafcode_label='$label',
+      companynafcode_code='".$obm_q->escape($code)."',
+      companynafcode_label='".$obm_q->escape($label)."',
       companynafcode_timeupdate='$timeupdate',
       companynafcode_userupdate=$userupdate,
-      companynafcode_title=$title
+      companynafcode_title=".$obm_q->escape($title)."
     WHERE
       companynafcode_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_nafcode_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -904,11 +905,11 @@ function check_company_data_form($cid, $company) {
 function run_query_company_ext_search($company) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $pattern = $company['pattern'];
   $obm_q = new DB_OBM;
+  $pattern = $obm_q->escape($company['pattern']);
   $multidomain = sql_multidomain('Company');
 
-  $limit = $company['limit'];
+  $limit = $obm_q->escape($company['limit']);
   if(isset($company['first_row'])) $first_row = $company['first_row'] - 1;
   else $first_row = 0;
 
