@@ -343,7 +343,7 @@ public class MailBackendImpl implements MailBackend {
 					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
 					addMessageInCache(bs, devDbId, wasteBasketId, uid);
 				} else {
-					mailboxService.delete(bs, devDbId, collectionName, collectionId, uid);
+					mailboxService.delete(bs, collectionName, uid);
 				}
 			}	
 		} catch (MailException e) {

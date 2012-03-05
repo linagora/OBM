@@ -316,7 +316,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	 
 	@Override
-	public void delete(BackendSession bs, Integer devId, String collectionPath, Integer collectionId, Long uid) 
+	public void delete(BackendSession bs, String collectionPath, long uid) 
 			throws DaoException, MailException {
 		
 		StoreClient store = imapClientProvider.getImapClient(bs);
