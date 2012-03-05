@@ -40,23 +40,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
 
 public class ImapMoveAPITest {
 
@@ -68,7 +66,8 @@ public class ImapMoveAPITest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
-	@Inject ImapMailboxService mailboxService;
+	@Inject MailboxService mailboxService;
+	@Inject PrivateMailboxService privateMailboxService;
 
 	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject GreenMail greenMail;
@@ -77,6 +76,7 @@ public class ImapMoveAPITest {
 	private BackendSession bs;
 
 	private Date beforeTest;
+	private ImapTestUtils testUtils;
 
 	@Before
 	public void setUp() {
@@ -88,6 +88,7 @@ public class ImapMoveAPITest {
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest);
 	}
 	
 	@After
@@ -97,19 +98,19 @@ public class ImapMoveAPITest {
 	
 	@Test
 	public void testGreenmailServerImplementUIDPLUS() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
-		createFolders(DRAFT);
+		testUtils.createFolders(DRAFT);
 
 		long testErrorUidValue = -1;
 		long movedEmailUid = testErrorUidValue;
 		try {
-			movedEmailUid = mailboxService.moveItem(bs, INBOX, mailboxPath(DRAFT), sentEmail.getUid());
+			movedEmailUid = mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(DRAFT), sentEmail.getUid());
 		} catch (Exception nonExpectedException) {
 			Assert.fail("Greenmail should implement UIDPLUS, so no exception is expected");
 		}
 
-		Set<Email> movedEmails = mailboxEmails(DRAFT);
+		Set<Email> movedEmails = testUtils.mailboxEmails(DRAFT);
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
 		Assertions.assertThat(movedEmail.getUid()).isNotEqualTo(testErrorUidValue).isEqualTo(movedEmailUid);
@@ -119,15 +120,15 @@ public class ImapMoveAPITest {
 	
 	@Test
 	public void testMoveFromInbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String toMailbox = "ANYBOX";
-		createFolders(toMailbox);
+		testUtils.createFolders(toMailbox);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(toMailbox), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(toMailbox), sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
-		Set<Email> movedEmails = mailboxEmails(toMailbox);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
+		Set<Email> movedEmails = testUtils.mailboxEmails(toMailbox);
 		Assertions.assertThat(inboxEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -137,14 +138,14 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveToSentbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
-		createFolders(SENTBOX);
+		testUtils.createFolders(SENTBOX);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(SENTBOX), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(SENTBOX), sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
-		Set<Email> movedEmails = mailboxEmails(SENTBOX);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
+		Set<Email> movedEmails = testUtils.mailboxEmails(SENTBOX);
 		Assertions.assertThat(inboxEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -154,14 +155,14 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveToDraft() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
-		createFolders(DRAFT);
+		testUtils.createFolders(DRAFT);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(DRAFT), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(DRAFT), sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
-		Set<Email> movedEmails = mailboxEmails(DRAFT);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
+		Set<Email> movedEmails = testUtils.mailboxEmails(DRAFT);
 		Assertions.assertThat(inboxEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -171,14 +172,14 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveToTrash() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
-		createFolders(TRASH);
+		testUtils.createFolders(TRASH);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(TRASH), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(TRASH), sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
-		Set<Email> movedEmails = mailboxEmails(TRASH);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
+		Set<Email> movedEmails = testUtils.mailboxEmails(TRASH);
 		Assertions.assertThat(inboxEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -188,11 +189,11 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveToInbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		mailboxService.moveItem(bs, INBOX, INBOX, sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(inboxEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(inboxEmails);
 		Assertions.assertThat(movedEmail.isAnswered()).isEqualTo(sentEmail.isAnswered());
@@ -201,19 +202,19 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveFromSpecialMailbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String fromMailbox = "SPECIALBOX";
 		String toMailbox = "ANYBOX";
-		createFolders(fromMailbox, toMailbox);
+		testUtils.createFolders(fromMailbox, toMailbox);
 
-		mailboxService.moveItem(bs, INBOX, mailboxPath(fromMailbox), sentEmail.getUid());
-		Email emailInSpecialbox = emailInMailbox(fromMailbox);
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(fromMailbox), sentEmail.getUid());
+		Email emailInSpecialbox = testUtils.emailInMailbox(fromMailbox);
 		
-		mailboxService.moveItem(bs, mailboxPath(fromMailbox), mailboxPath(toMailbox), emailInSpecialbox.getUid());
+		mailboxService.moveItem(bs, testUtils.mailboxPath(fromMailbox), testUtils.mailboxPath(toMailbox), emailInSpecialbox.getUid());
 
-		Set<Email> fromEmails = mailboxEmails(fromMailbox);
-		Set<Email> movedEmails = mailboxEmails(toMailbox);
+		Set<Email> fromEmails = testUtils.mailboxEmails(fromMailbox);
+		Set<Email> movedEmails = testUtils.mailboxEmails(toMailbox);
 		Assertions.assertThat(fromEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -223,33 +224,33 @@ public class ImapMoveAPITest {
 
 	@Test(expected=MailException.class)
 	public void testMoveFromNonExistingMailbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String fromNonExistingMailbox = "NONEXISTING_BOX";
 		
-		mailboxService.moveItem(bs, mailboxPath(fromNonExistingMailbox), INBOX, sentEmail.getUid());
+		mailboxService.moveItem(bs, testUtils.mailboxPath(fromNonExistingMailbox), INBOX, sentEmail.getUid());
 	}
 
 	@Test(expected=MailException.class)
 	public void testMoveToNonExistingMailbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String toNonExistingMailbox = "NONEXISTING_BOX";
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(toNonExistingMailbox), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(toNonExistingMailbox), sentEmail.getUid());
 	}
 
 	@Test
 	public void testMoveToSubMailbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String fromSubMailbox = "ANYMAILBOX.SUBMAILBOX";
-		createFolders(fromSubMailbox);
+		testUtils.createFolders(fromSubMailbox);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(fromSubMailbox), sentEmail.getUid());
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(fromSubMailbox), sentEmail.getUid());
 
-		Set<Email> inboxEmails = mailboxEmails(INBOX);
-		Set<Email> movedEmails = mailboxEmails(fromSubMailbox);
+		Set<Email> inboxEmails = testUtils.mailboxEmails(INBOX);
+		Set<Email> movedEmails = testUtils.mailboxEmails(fromSubMailbox);
 		Assertions.assertThat(inboxEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -259,19 +260,20 @@ public class ImapMoveAPITest {
 
 	@Test
 	public void testMoveFromAndToSubMailbox() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 
 		String fromSubMailbox = "ANYMAILBOX.SUBMAILBOX";
 		String toOtherSubMailbox = "ANYMAILBOX.SUBMAILBOX.SUBSUBMAILBOX";
-		createFolders(fromSubMailbox, toOtherSubMailbox);
+		testUtils.createFolders(fromSubMailbox, toOtherSubMailbox);
 
-		mailboxService.moveItem(bs, INBOX, mailboxPath(fromSubMailbox), sentEmail.getUid());
-		Email emailInSubMailbox = emailInMailbox(fromSubMailbox);
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(fromSubMailbox), sentEmail.getUid());
+		Email emailInSubMailbox = testUtils.emailInMailbox(fromSubMailbox);
 		
-		mailboxService.moveItem(bs, mailboxPath(fromSubMailbox), mailboxPath(toOtherSubMailbox), emailInSubMailbox.getUid());
+		mailboxService.moveItem(bs,
+				testUtils.mailboxPath(fromSubMailbox), testUtils.mailboxPath(toOtherSubMailbox), emailInSubMailbox.getUid());
 
-		Set<Email> fromEmails = mailboxEmails(fromSubMailbox);
-		Set<Email> movedEmails = mailboxEmails(toOtherSubMailbox);
+		Set<Email> fromEmails = testUtils.mailboxEmails(fromSubMailbox);
+		Set<Email> movedEmails = testUtils.mailboxEmails(toOtherSubMailbox);
 		Assertions.assertThat(fromEmails).isEmpty();
 		Assertions.assertThat(movedEmails).hasSize(1);
 		Email movedEmail = Iterables.getOnlyElement(movedEmails);
@@ -281,45 +283,13 @@ public class ImapMoveAPITest {
 
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testMovingNonExistingEmailTriggersException() throws Exception {
-		Email sentEmail = sendEmailToInbox();
+		Email sentEmail = testUtils.sendEmailToInbox();
 		Long nonExistingEmail = sentEmail.getUid() + 1;
 
 		String toMoveEmailMailbox = "ANYBOX";
-		createFolders(toMoveEmailMailbox);
+		testUtils.createFolders(toMoveEmailMailbox);
 		
-		mailboxService.moveItem(bs, INBOX, mailboxPath(toMoveEmailMailbox), nonExistingEmail);
-	}
-	
-	private Email sendEmailToInbox() throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		return emailInInbox();
-	}
-
-	private Email emailInInbox() throws MailException {
-		return emailInMailbox(INBOX);
-	}
-	
-	private Email emailInMailbox(String mailboxName) throws MailException {
-		Set<Email> emailsFromInbox = mailboxEmails(mailboxName);
-		return Iterables.getOnlyElement(emailsFromInbox);
-	}
-	
-	private Set<Email> mailboxEmails(String mailboxName) throws MailException {
-		return mailboxService.fetchEmails(bs, mailboxPath(mailboxName), beforeTest);
-	}
-
-	private void createFolders(String...folderNames) throws MailException {
-		for (String folderName : folderNames) {
-			mailboxService.createFolder(bs, folder(folderName));
-		}
-	}
-
-	private String mailboxPath(String mailboxName) {
-		return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, mailboxName);
-	}
-	
-	private MailboxFolder folder(String name) {
-		return new MailboxFolder(name);
+		mailboxService.moveItem(bs, INBOX, testUtils.mailboxPath(toMoveEmailMailbox), nonExistingEmail);
 	}
 
 }

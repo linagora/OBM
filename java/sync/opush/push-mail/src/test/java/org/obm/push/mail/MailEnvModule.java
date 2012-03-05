@@ -88,6 +88,7 @@ public class MailEnvModule extends AbstractModule {
 
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
 		bind(MailboxService.class).to(ImapMailboxService.class);
+		bind(PrivateMailboxService.class).to(ImapMailboxService.class);
 	}
 	
 }
