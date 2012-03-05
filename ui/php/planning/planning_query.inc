@@ -365,6 +365,7 @@ function separate_week_items($datebegin,$dateend)
 function run_query_plannedtask_insert($plannedtask) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $domain_id = $obm['domain_id'];
   $id = $plannedtask['id'];
   $project = $plannedtask['project']!=0?"'".$plannedtask['project']."'":'null';
@@ -407,14 +408,13 @@ function run_query_plannedtask_insert($plannedtask) {
     $project,
     $task,
     $overrun,
-    '$comment',
-    '$user',
+    '".$obm_q->escape($comment)."',
+    '".$obm_q->escape($user)."',
     '$datebegin',
     '$dateend',
     '$period')";
 
     display_debug_msg($query, $cdg_sql, 'run_query_plannedtask_insert');
-    $obm_q = new DB_OBM;
     $return = $obm_q->query($query);
     pt_assert($return,__FILE__,__LINE__,"run_query_plannedtask_insert");
   }
@@ -431,6 +431,7 @@ function run_query_plannedtask_insert($plannedtask) {
 function run_query_plannedtask_update($plannedtask) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $id = $plannedtask['id'];
   $project = $plannedtask['project']!=0?$plannedtask['project']:'null';
   $task = $plannedtask['task']!=0?$plannedtask['task']:'null';
@@ -449,15 +450,14 @@ function run_query_plannedtask_update($plannedtask) {
     plannedtask_project_id=$project,
     plannedtask_tasktype_id=$task,
     plannedtask_overrun=$overrun,
-    plannedtask_comment='$comment',
-    plannedtask_user_id='$user',
+    plannedtask_comment='".$obm_q->escape($comment)."',
+    plannedtask_user_id='".$obm_q->escape($user)."',
     plannedtask_datebegin='$datebegin',
     plannedtask_dateend='$dateend',
     plannedtask_period='$period'
   WHERE plannedtask_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_plannedtask_update()');
-  $obm_q = new DB_OBM;
   $return = $obm_q->query($query);
   pt_assert($return,__FILE__,__LINE__,"run_query_plannedtask_update");
 
@@ -625,6 +625,7 @@ function get_planning_groups($group_ids)
 function run_query_tasktypegroup_insert($params) {
   global $cdg_sql, $obm;
 	
+  $obm_q = new DB_OBM;
   $label = $params['label'];
   $code = $params['code'];
   $bgcolor = $params['bgcolor'];
@@ -643,13 +644,12 @@ function run_query_tasktypegroup_insert($params) {
     '".date('Y-m-d H:i:s')."',
     ".$obm['uid'].",
     $domain_id,
-    '$label',
-    '$code',
-    '$bgcolor',
-    '$fgcolor')";
+    '".$obm_q->escape($label)."',
+    '".$obm_q->escape($code)."',
+    '".$obm_q->escape($bgcolor)."',
+    '".$obm_q->escape($fgcolor)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -663,6 +663,7 @@ function run_query_tasktypegroup_insert($params) {
 function run_query_tasktypegroup_update($params) {
   global $obm, $cdg_sql;
   
+  $obm_q = new DB_OBM;
   $id = sql_parse_id($params['tasktypegroup'], true);
 
   $label = $params['tasktypegroup_label'];
@@ -672,17 +673,16 @@ function run_query_tasktypegroup_update($params) {
   $multidomain = sql_multidomain('tasktypegroup');
 
   $query = "UPDATE TaskTypeGroup SET
-    tasktypegroup_label='$label',
+    tasktypegroup_label='".$obm_q->escape($label)."',
     tasktypegroup_timeupdate='".date('Y-m-d H:i:s')."',
     tasktypegroup_userupdate='".$obm['uid']."',
-    tasktypegroup_code='$code',
-    tasktypegroup_bgcolor='$bgcolor',
-    tasktypegroup_fgcolor='$fgcolor'
+    tasktypegroup_code='".$obm_q->escape($code)."',
+    tasktypegroup_bgcolor='".$obm_q->escape($bgcolor)."',
+    tasktypegroup_fgcolor='".$obm_q->escape($fgcolor)."'
   WHERE tasktypegroup_id $id
     $multidomain";
   
   display_debug_msg($query, $cdg_sql, 'run_query_tasktypegroup_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
