@@ -331,7 +331,7 @@ function run_query_group_insert($group) {
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('group_delegation', $group['delegation']);
+  $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group['delegation']));
 
   $query = "INSERT INTO UGroup (
   group_timeupdate,
@@ -358,7 +358,7 @@ function run_query_group_insert($group) {
   $priv,
   $gid,
   '".$obm_q->escape($name)."'
-  ".$obm_q->escape($q_delegation[value]).",
+  $q_delegation[value],
   '".$obm_q->escape($desc)."',
   '".$obm_q->escape($email)."'
   )";
@@ -440,7 +440,7 @@ function run_query_group_update($group) {
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('group_delegation', $group['delegation']);
+  $q_delegation = of_delegation_query_update_clause('group_delegation', stripslashes($group['delegation']));
 
   $query = "UPDATE UGroup SET
     group_timeupdate=NOW(),
@@ -451,7 +451,7 @@ function run_query_group_update($group) {
     group_desc='".$obm_q->escape($desc)."',
     group_email='".$obm_q->escape($email)."',
     group_manager_id=$manager
-    $obm_q->escape($q_delegation)
+    $q_delegation
   WHERE group_id $id
     $multidomain";
 

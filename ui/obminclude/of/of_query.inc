@@ -984,10 +984,11 @@ function of_delegation_dis_block_update($value, $class) {
 function of_delegation_query_insert_clauses($field, $value) {
   global $obm, $cgp_use, $profiles;
 
+  $obm_query = new DB_OBM;
   $q = array();
   if ($cgp_use['property']['delegation']) {
     $q['field'] = ", $field";
-    $q['value'] = ", '$value'";
+    $q['value'] = ", '".$obm_query->escape($value)."'";
   }
 
   return $q;
@@ -1004,9 +1005,10 @@ function of_delegation_query_insert_clauses($field, $value) {
 function of_delegation_query_update_clause($field, $value) {
   global $obm, $cgp_use, $profiles;
 
+  $obm_query = new DB_OBM;
   $q = '';
   if ($cgp_use['property']['delegation']) {
-    $q = ", $field='$value'";
+    $q = ", $field='".$obm_query->escape($value)."'";
   }
 
   return $q;
