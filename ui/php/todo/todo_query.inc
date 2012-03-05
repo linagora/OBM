@@ -48,12 +48,13 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_search($params) {
   global $obm, $cdg_sql, $ctu_sql_limit, $c_all;
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $params['sql_order_dir'];
   $sql_order_field = $params['sql_order_field'];
 
   if ($params['text'] == '') $params['text'] = $params['title'];
-  $text = sql_search_text_parse($params['text']);
+  $text = sql_search_text_parse($obm_q->escape($params['text']));
   $priority = $params['priority'];
   $percent = $params['percent'];
   $date_field = ($params['date_field'] ? $params['date_field'] : 'date');
@@ -65,7 +66,6 @@ function run_query_todo_search($params) {
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'event_priority';
   $sql_order_dir = (strcmp($sql_order_dir,'') != 0) ? $sql_order_dir : 'desc';
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -269,9 +269,9 @@ function run_query_todo_insert($todo) {
         'VTODO',
         '$GLOBALS[c_origin_web]',
         $date,
-        '$priority',
-        '$title',
-        '$description',
+        '".$obm_q->escape($priority)."',
+        '".$obm_q->escape($title)."',
+        '".$obm_q->escape($description)."',
 	'none'
       )";
     display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
@@ -303,7 +303,7 @@ function run_query_todo_insert($todo) {
           ".of_entity_subquery('user', $user).",
           'ACCEPTED',
           'REQ',
-          '$percent')";
+          '".$obm_q->escape($percent)."')";
 	display_debug_msg($query, $cdg_sql, 'run_query_todo_insert(2)');
 	$retour = $obm_q->query($query);
       }
@@ -322,6 +322,7 @@ function run_query_todo_insert($todo) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_update($todo) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $todo_id = $todo['todo_id'];
   $t_id = sql_parse_id($todo['todo_id'], true);
@@ -343,14 +344,13 @@ function run_query_todo_update($todo) {
     event_timeupdate = NOW(),
     event_userupdate = $uid,
     event_date = '$date',
-    event_priority = '$priority',
-    event_title = '$title',
-    event_description = '$description'
+    event_priority = '".$obm_q->escape($priority)."',
+    event_title = '".$obm_q->escape($title)."',
+    event_description = '".$obm_q->escape($description)."'
   WHERE event_id $t_id
     AND event_type='VTODO' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_todo_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $user_ids = $todo['user_ids'];
@@ -389,7 +389,7 @@ function run_query_todo_update($todo) {
           ".of_entity_subquery('user', $u_id).",
           'ACCEPTED',
           'REQ',
-          '$percent')";
+          '".$obm_q->escape($percent)."')";
       display_debug_msg($query, $cdg_sql, 'run_query_todo_update_useradd()');
       $retour = $obm_q->query($query);
     }
