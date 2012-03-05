@@ -55,8 +55,6 @@ import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.icalendar.Ical4jHelper;
-import org.obm.icalendar.Ical4jUser;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
@@ -105,20 +103,16 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final ImapClientProvider imapClientProvider;
-	private final Ical4jHelper ical4jHelper;
-	private final Ical4jUser.Factory ical4jUserFactory;
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
-			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory, ImapMailBoxUtils imapMailBoxUtils) {
+			ImapMailBoxUtils imapMailBoxUtils) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
-		this.ical4jHelper = ical4jHelper;
-		this.ical4jUserFactory = ical4jUserFactory;
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
@@ -134,8 +128,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			login(store);
 			store.select(parseMailBoxName(bs, collectionName));
 			
-			final MailMessageLoader mailLoader = 
-					new MailMessageLoader(store, eventService, ical4jHelper, ical4jUserFactory);
+			final MailMessageLoader mailLoader = new MailMessageLoader(store, eventService);
 			for (final Long uid: uids) {
 				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
 				if (email != null) {

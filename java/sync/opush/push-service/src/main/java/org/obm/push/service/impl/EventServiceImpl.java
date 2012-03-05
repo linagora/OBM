@@ -31,18 +31,29 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service.impl;
 
+import java.io.IOException;
+import java.util.List;
+
+import net.fortuna.ical4j.data.ParserException;
+
 import org.apache.commons.codec.binary.Hex;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.calendar.EventConverter;
-import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
 import org.obm.push.store.CalendarDao;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.client.login.LoginService;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -54,12 +65,19 @@ public class EventServiceImpl implements EventService {
 
 	private final CalendarDao calendarDao;
 	private final EventConverter eventConverter;
-	
+	private final Ical4jHelper ical4jHelper;
+	private final Ical4jUser.Factory ical4jUserFactory;
+	private final LoginService loginService;
+
 	@Inject
-	private EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter) {
+	private EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter, 
+			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory, LoginService loginService) {
 		super();
 		this.calendarDao = calendarDao;
 		this.eventConverter = eventConverter;
+		this.ical4jHelper = ical4jHelper;
+		this.ical4jUserFactory = ical4jUserFactory;
+		this.loginService = loginService;
 	}
 
 	@Override
@@ -107,5 +125,35 @@ public class EventServiceImpl implements EventService {
 	public void trackEventExtIdMSEventUidTranslation(EventExtId eventExtId,
 			MSEventUid msEventUid, Device device) throws DaoException {
 		calendarDao.insertExtIdMSEventUidMapping(eventExtId, msEventUid, device);
+	}
+	
+	@Override
+	public MSEvent parseEventFromICalendar(BackendSession bs, String ics) throws EventParsingException, ConversionException {
+		
+		Credentials credentials = bs.getCredentials();
+		AccessToken accessToken = null;
+		try {
+			accessToken = loginService.authenticate(credentials.getUser().getLoginAtDomain(), credentials.getPassword());
+			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(bs.getUser().getEmail(), accessToken.getDomain());
+			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser);
+			
+			if (!obmEvents.isEmpty()) {
+				final Event icsEvent = obmEvents.get(0);
+				return convertEventToMSEvent(bs, icsEvent);
+			}
+			return null;
+		} catch (DaoException e) {
+			throw new EventParsingException(e);
+		} catch (AuthFault e) {
+			throw new EventParsingException(e);
+		} catch (IOException e) {
+			throw new EventParsingException(e);
+		} catch (ParserException e) {
+			throw new EventParsingException(e);
+		} finally {
+			if (accessToken != null) {
+				loginService.logout(accessToken);
+			}
+		}
 	}
 }

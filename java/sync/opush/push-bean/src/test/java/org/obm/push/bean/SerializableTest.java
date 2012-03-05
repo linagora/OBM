@@ -61,8 +61,6 @@ import org.obm.push.bean.User.Factory;
 
 import com.google.common.collect.ImmutableSet;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 public class SerializableTest {
 
 	private ObjectOutputStream objectOutputStream;
@@ -122,7 +120,7 @@ public class SerializableTest {
 	@Test
 	public void testCredentials() throws IOException {
 		User user = Factory.create().createUser("login@titi", "email", "displayName");
-		Credentials obj = new Credentials(user, "tata", new ObmDomain());
+		Credentials obj = new Credentials(user, "tata");
 		objectOutputStream.writeObject(obj);
 	}
 	

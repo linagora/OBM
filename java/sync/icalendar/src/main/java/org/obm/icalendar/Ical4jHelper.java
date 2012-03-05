@@ -140,6 +140,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 
@@ -260,64 +263,63 @@ public class Ical4jHelper {
 		return freeBusy;
 	}
 
-	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser) 
+	public List<Event> parseICS(String ics, Ical4jUser ical4jUser) 
 		throws IOException, ParserException {
 		
-		List<Event> ret = new LinkedList<Event>();
+		Calendar calendar = buildCalendar(ics);
+
+		if (calendar != null) {
+			return ImmutableList.copyOf(
+					Iterables.concat(
+							getEvents(calendar, ical4jUser),
+							getTodos(ical4jUser, calendar)));
+		}
+		return ImmutableList.<Event>of();
+	}
+
+	private Calendar buildCalendar(String ics) throws IOException, ParserException {
 		CalendarBuilder builder = new CalendarBuilder();
 		Calendar calendar = builder.build(new UnfoldingReader(new StringReader(ics), true));
-
-		if (calendar != null) {		
-			ComponentList comps = getComponents(calendar, Component.VEVENT);
-			Map<EventExtId, Event> mapEvents = 
-				getEvents(comps, Component.VEVENT, ical4jUser);
-			ret.addAll(mapEvents.values());
-
-			comps = getComponents(calendar, Component.VTODO);
-			Map<EventExtId, Event> mapTodo = 
-				getEvents(comps, Component.VTODO, ical4jUser);
-			ret.addAll(mapTodo.values());
-		}
-
-		return ret;
+		return calendar;
 	}
 
-	private Map<EventExtId, Event> getEvents(ComponentList cl,
-			String typeCalendar, Ical4jUser ical4jUser) {
-		Map<EventExtId, Event> mapEvents = new HashMap<EventExtId, Event>();
+
+	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser) throws IOException, ParserException {
+		Calendar calendar = buildCalendar(ics);
+		if (calendar != null) {
+			return ImmutableList.copyOf(getEvents(calendar, ical4jUser));
+		}
+		return ImmutableList.<Event>of();
+	}
+	
+	private Collection<Event> getTodos(Ical4jUser ical4jUser, Calendar calendar) {
+		List<Event> todos = Lists.newArrayList();
+		ComponentList comps = getComponents(calendar, Component.VTODO);
+		for (Object obj: comps) {
+			VToDo vTodo = (VToDo) obj;
+			Event event = convertVTodoToEvent(ical4jUser, vTodo);
+			todos.add(event);
+		}
+		return todos;
+	}
+
+	private Collection<Event> getEvents(Calendar calendar, Ical4jUser ical4jUser) {
+		Map<EventExtId, Event> mapEvents = Maps.newHashMap();
 		Multimap<EventExtId, Event> mapExceptionEvents = HashMultimap.create();
-
-		for (Object obj: cl) {
-			Component comp = (Component) obj;
-			if (comp != null) {
-
-				if (Component.VEVENT.equals(typeCalendar)) {
-					VEvent vEvent = (VEvent) comp;
-					Event event = convertVEventToEvent(ical4jUser, vEvent);
-					if(event.getRecurrenceId() == null) {
-						mapEvents.put(event.getExtId(), event);
-					} else {
-						mapExceptionEvents.put(event.getExtId(), event);
-					}
-
-				} else if (Component.VTODO.equals(typeCalendar)) {
-					VToDo vTodo = (VToDo) comp;
-					Event event = convertVTodoToEvent(ical4jUser, vTodo);
-					if(event.getRecurrenceId() == null) {
-						mapEvents.put(event.getExtId(), event);
-					} else {
-						mapExceptionEvents.put(event.getExtId(), event);
-					}
-				}
+		ComponentList comps = getComponents(calendar, Component.VEVENT);
+		for (Object obj: comps) {
+			VEvent vEvent = (VEvent) obj;
+			Event event = convertVEventToEvent(ical4jUser, vEvent);
+			if(event.getRecurrenceId() == null) {
+				mapEvents.put(event.getExtId(), event);
+			} else {
+				mapExceptionEvents.put(event.getExtId(), event);
 			}
 		}
-
-		addEventExceptionToDefinedParentEvent(mapEvents, mapExceptionEvents);
-
-		return mapEvents;
+		return addEventExceptionToDefinedParentEvent(mapEvents, mapExceptionEvents);
 	}
 
-	private void addEventExceptionToDefinedParentEvent(
+	private Collection<Event> addEventExceptionToDefinedParentEvent(
 			Map<EventExtId, Event> mapEvents,
 			Multimap<EventExtId, Event> mapExceptionEvents) {
 
@@ -334,6 +336,7 @@ public class Ical4jHelper {
 						eventsException);
 			}
 		}
+		return mapEvents.values();
 	}
 
 	private void addOrReplaceExceptions(EventRecurrence recurrenceTarget, Collection<Event> eventsToAdd) {

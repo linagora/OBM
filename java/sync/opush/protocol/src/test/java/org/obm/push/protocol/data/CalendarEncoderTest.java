@@ -56,8 +56,6 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 public class CalendarEncoderTest {
 	private CalendarEncoder encoder;
 
@@ -78,7 +76,7 @@ public class CalendarEncoderTest {
 
 	private BackendSession getFakeBackendSession() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		BackendSession bs = new BackendSession(new Credentials(user, "test", new ObmDomain()),
+		BackendSession bs = new BackendSession(new Credentials(user, "test"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
 		return bs;
 	}

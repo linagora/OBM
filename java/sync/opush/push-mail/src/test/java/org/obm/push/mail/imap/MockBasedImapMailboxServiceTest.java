@@ -63,7 +63,7 @@ public class MockBasedImapMailboxServiceTest {
 		String password = "password";
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class MockBasedImapMailboxServiceTest {
 		EasyMock.replay(emailConfiguration, smtpSender);
 		
 		ImapMailboxService emailManager = 
-				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null, null);
+				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null);
 
 		emailManager.sendEmail(bs,
 				new Address("test@test.fr"),

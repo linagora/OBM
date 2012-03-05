@@ -95,7 +95,7 @@ public class ImapStoreAPIMemoryTest {
 		greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
 		bs = new BackendSession(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, null);
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
 	}

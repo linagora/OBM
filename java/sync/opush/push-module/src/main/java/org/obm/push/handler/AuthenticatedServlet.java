@@ -73,7 +73,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 		User user = createUser(userId, accessToken);
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
-			return new Credentials(user, password, accessToken.getDomain());
+			return new Credentials(user, password);
 		} else {
 			throw new AuthFault("Login {"+ userId + "} failed, bad login or/and password.");
 		}

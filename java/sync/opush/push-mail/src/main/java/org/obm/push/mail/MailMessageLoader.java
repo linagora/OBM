@@ -42,8 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.fortuna.ical4j.data.ParserException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
@@ -52,8 +50,6 @@ import org.minig.imap.FlagsList;
 import org.minig.imap.StoreClient;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
-import org.obm.icalendar.Ical4jHelper;
-import org.obm.icalendar.Ical4jUser;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.conversation.MessageId;
@@ -71,10 +67,9 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MessageClass;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
+import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.utils.FileUtils;
-import org.obm.sync.calendar.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,16 +87,10 @@ public class MailMessageLoader {
 	private final List<String> htmlMimeSubtypePriority;
 	private final StoreClient storeClient;
 	private final EventService eventService;
-	private final Ical4jHelper ical4jHelper;
-	private final Ical4jUser.Factory ical4jUserFactory;
 	
-	public MailMessageLoader(StoreClient store, 
-			EventService eventService, Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory) {
-		
+	public MailMessageLoader(StoreClient store, EventService eventService) {
 		this.storeClient = store;
 		this.eventService = eventService;
-		this.ical4jHelper = ical4jHelper;
-		this.ical4jUserFactory = ical4jUserFactory;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain");
 	}
 
@@ -214,15 +203,8 @@ public class MailMessageLoader {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
 			try {
-				Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(bs.getUser().getEmail(), bs.getCredentials().getObmDomain());
-				List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser);
-				if (obmEvents.size() > 0) {
-					final Event icsEvent = obmEvents.get(0);
-					return eventService.convertEventToMSEvent(bs, icsEvent);
-				}
-			} catch (ParserException e) {
-				logger.error(e.getMessage(), e);
-			} catch (DaoException e) {
+				return eventService.parseEventFromICalendar(bs, ics);
+			} catch (EventParsingException e) {
 				logger.error(e.getMessage(), e);
 			}
 		}

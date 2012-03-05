@@ -892,7 +892,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
 		String calendar = getDefaultCalendarFromToken(token);
-		List<Event> events = ical4jHelper.parseICSEvent(fixedIcs, createIcal4jUserFrom(token));
+		List<Event> events = ical4jHelper.parseICS(fixedIcs, createIcal4jUserFrom(token));
 		for (Event event: events) {
 			try {
 				EventObmId id = getEventObmIdFromExtId(token, calendar, event.getExtId());
@@ -1305,7 +1305,7 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
 		try {
-			return ical4jHelper.parseICSEvent(icsToString, createIcal4jUserFrom(token));
+			return ical4jHelper.parseICS(icsToString, createIcal4jUserFrom(token));
 		} catch (IOException e) {
 			throw new ImportICalendarException(e);
 		} catch (ParserException e) {

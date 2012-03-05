@@ -987,7 +987,7 @@ public class CalendarBindingImplTest {
 	
 	private Ical4jHelper mockIcal4jHelper(Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
 		Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-		expect(ical4jHelper.parseICSEvent(icsData, ical4jUser)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
+		expect(ical4jHelper.parseICS(icsData, ical4jUser)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
 		return ical4jHelper;
 	}
 	

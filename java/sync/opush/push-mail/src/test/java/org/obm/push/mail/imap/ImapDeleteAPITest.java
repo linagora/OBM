@@ -86,7 +86,7 @@ public class ImapDeleteAPITest {
 	    greenMail.setUser(mailbox, password);
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, null);
 
 	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest);
 	    testUtils.createFolders(TRASH);

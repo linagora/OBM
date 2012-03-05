@@ -912,7 +912,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParserAttendee() throws IOException, ParserException {
 		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
-		List<Event> event = getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
+		List<Event> event = getIcal4jHelper().parseICS(ics, getDefaultObmUser());
 		assertEquals(event.size(), 1);
 	}
 
@@ -929,7 +929,7 @@ public class Ical4jHelperTest {
 	public void testParsingICSFileOf200kio() throws IOException, ParserException {
 		final String ics = IOUtils.toString(getStreamICS("bellemin-calendrierobm.ics"));
 		
-		final List<Event> events = getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
+		final List<Event> events = getIcal4jHelper().parseICS(ics, getDefaultObmUser());
 		for (final Event event: events) {
 			assertNotNull(event.getTitle());
 		}
@@ -942,7 +942,7 @@ public class Ical4jHelperTest {
 		
 		for (String icsFile: icsFiles) {
 			final String ics = IOUtils.toString(getStreamICS(icsFile));
-			getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());	
+			getIcal4jHelper().parseICS(ics, getDefaultObmUser());	
 		}
 		assertTrue(true);
 	}
@@ -1131,7 +1131,7 @@ public class Ical4jHelperTest {
 			ParserException {
 		InputStream stream = getStreamICS(icsFilename);
 		String ics = IOUtils.toString(stream);
-		return getIcal4jHelper().parseICSEvent(ics, getDefaultObmUser());
+		return getIcal4jHelper().parseICS(ics, getDefaultObmUser());
 	}
 	
 	@Test

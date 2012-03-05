@@ -46,15 +46,13 @@ import org.junit.Test;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.User;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Lists;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
@@ -70,7 +68,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
-		this.credentials = new Credentials(user, "password", new ObmDomain());
+		this.credentials = new Credentials(user, "password");
 	}
 	
 	@After

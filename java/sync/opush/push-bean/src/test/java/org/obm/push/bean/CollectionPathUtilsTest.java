@@ -47,7 +47,7 @@ public class CollectionPathUtilsTest {
 		String password = "password";
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
 	
 	@Test

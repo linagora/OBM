@@ -71,8 +71,6 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 public class EventConverterTest {
 
 	@Rule
@@ -165,7 +163,7 @@ public class EventConverterTest {
 		String displayName = "displayName";
 
 		Credentials credentials = new Credentials( 
-				Factory.create().createUser(loginAtDomain, email, displayName), "password", new ObmDomain());
+				Factory.create().createUser(loginAtDomain, email, displayName), "password");
 		BackendSession backendSession = buildBackendSession(credentials);
 		
 		IApplicationData data = getApplicationData("OBMFULL-2907.xml");
@@ -210,7 +208,7 @@ public class EventConverterTest {
 	
 	private BackendSession buildBackendSession(String userId) {
 		User user = Factory.create().createUser(userId, "email@domain", "displayName");
-		return buildBackendSession(new Credentials(user, "test", new ObmDomain()));
+		return buildBackendSession(new Credentials(user, "test"));
 	}
 	
 	private BackendSession buildBackendSession(Credentials credentials) {

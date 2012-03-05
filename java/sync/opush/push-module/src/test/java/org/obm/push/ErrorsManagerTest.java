@@ -23,7 +23,7 @@ public class ErrorsManagerTest {
 	@Test
 	public void testPrepareMessage() throws ParseException, FileNotFoundException, IOException {
 		User user = User.Factory.create().createUser("test@domain", "test@domain", "displayName");
-		BackendSession backendSession = new BackendSession(new Credentials(user, "password", null), null, null, null);
+		BackendSession backendSession = new BackendSession(new Credentials(user, "password"), null, null, null);
 		
 		Mime4jUtils mime4jUtils = new Mime4jUtils();
 		
