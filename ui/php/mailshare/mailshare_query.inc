@@ -68,20 +68,20 @@ function run_query_mailshare_search($mailshare) {
 
   $where = '(1=1)';
   if ($name != '') {
-    $where .= " AND mailshare_name $like '$name%'";
+    $where .= " AND mailshare_name $like '".$obm_q->escape($name)."%'";
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND mailshare_delegation $like '$delegation%'";
+    $where .= " AND mailshare_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($email != '') {
-    $where .= " AND mailshare_email $like '%$email%'";
+    $where .= " AND mailshare_email $like '%".$obm_q->escape($email)."%'";
   }
   if ($quota > 0) {
-    $where .= " AND mailshare_quota ='$quota'";
+    $where .= " AND mailshare_quota ='".$obm_q->escape($quota)."'";
   }
   if ($desc != '') {
-    $where .= " AND mailshare_description $like '%$desc%'";
+    $where .= " AND mailshare_description $like '%".$obm_q->escape($desc)."%'";
   }
   $whereq = "WHERE $where";
 
@@ -160,6 +160,7 @@ function run_query_mailshare_detail($id) {
 function run_query_mailshare_insert($mailshare) {
   global $cdg_sql, $obm;
 
+  $obm_q = new DB_OBM;
   $name = strtolower($mailshare['name']);
   $quota = $mailshare['quota'];
   $email = $mailshare['email'];
@@ -188,15 +189,14 @@ function run_query_mailshare_insert($mailshare) {
     NOW(),
     null,
     $obm[uid],
-    '$name'
+    '".$obm_q->escape($name)."'
     $q_delegation[value],
     $mail_server_id,
-    '$quota',
-    '$desc',
-    '$email')";
+    '".$obm_q->escape($quota)."',
+    '".$obm_q->escape($desc)."',
+    '".$obm_q->escape($email)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailshare_insert(1)');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
@@ -222,6 +222,7 @@ function run_query_mailshare_insert($mailshare) {
 function run_query_mailshare_update($mailshare) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $id = sql_parse_id($mailshare['mailshare_id'], true);
   $name = strtolower($mailshare['name']);
   $quota = $mailshare['quota'];
@@ -236,17 +237,16 @@ function run_query_mailshare_update($mailshare) {
   $query = "UPDATE MailShare set
     mailshare_timeupdate = NOW(),
     mailshare_userupdate = $obm[uid],
-    mailshare_name = '$name',
-    mailshare_quota = '$quota',
+    mailshare_name = '".$obm_q->escape($name)."',
+    mailshare_quota = '".$obm_q->escape($quota)."',
     mailshare_mail_server_id = $mail_server_id,
-    mailshare_description = '$desc',
-    mailshare_email = '$email'
+    mailshare_description = '".$obm_q->escape($desc)."',
+    mailshare_email = '".$obm_q->escape($email)."'
     $q_delegation
   WHERE mailshare_id $id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailshare_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -295,7 +295,7 @@ function run_query_mailshare_delete($p_id) {
     VALUES (
       $domain_id,
       $uid,
-      '$delegation',
+      '".$obm_q->escape($delegation)."',
       'MailShare',
       $p_id,
       NOW())";
@@ -400,17 +400,17 @@ function run_query_check_mailshare($id, $name, $desc) {
 
   // If name is short, we test equality, else similarity
   if (strlen($name) > 2) {
-    $wname = "mailshare_name $like '%$name%'";
+    $wname = "mailshare_name $like '%".$obm_q->escape($name)."%'";
   } else {
-    $wname = "mailshare_name = '$name'";
+    $wname = "mailshare_name = '".$obm_q->escape($name)."'";
   }
 
   // If desc is short, we test equality, else similarity
   if (trim($desc) != '') {
     if (strlen($desc) > 2) {
-      $wdesc = "mailshare_description $like '%$desc%'";
+      $wdesc = "mailshare_description $like '%".$obm_q->escape($desc)."%'";
     } else {
-      $wdesc = "mailshare_description = '$desc'";
+      $wdesc = "mailshare_description = '".$obm_q->escape($desc)."'";
     }
   }
   if ($wdesc != '') $wdesc = "OR $wdesc";

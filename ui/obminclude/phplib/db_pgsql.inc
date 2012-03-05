@@ -163,7 +163,13 @@ class DB_Sql {
     return pg_query($this->Link_ID, "commit");
   }
 
-
+  function escape($string) {
+  	if (get_magic_quotes_gpc())
+  	return $string;
+  	else
+  	return pg_escape_string($string);
+  }
+  
   /* public: sequence numbers */
   function nextid($seq_name) {
     $this->connect();
