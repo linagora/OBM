@@ -375,3 +375,12 @@ $l_addedit_comment = "Hinzufügen / Editieren Kommentar";
 // alert popup
 $l_add_alarm = "Hinzufügen alarm";
 $l_addedit_alarm = "Hinzufügen / Editieren Alarm";
+// decision popup
+$l_decision_ACCEPTED = "accepting";
+$l_decision_NEEDS_ACTIONS = "waiting";
+$l_decision_DECLINED = "declined";
+$l_decision_situation = "You choose to <b id=\"yourDecision\"></b> to the event: ";
+$l_decision_possibility = "You can comment your decision if you want.";
+$l_comment_decision = "Comment your decision";
+$l_without_comment = "Respond without comment";
+$l_with_comment = "Respond with comment";

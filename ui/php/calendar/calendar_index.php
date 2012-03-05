@@ -684,6 +684,53 @@ if ($action == 'search') {
   echo "({".$display['json']."})";
   exit();
 
+} elseif ($action == 'update_decision_and_comment') {
+	$retour = run_query_calendar_event_comment_insert($params['calendar_id'], $params['entity_id'],$params['comment'],$params['entity_kind']);
+	if ($retour) {
+		json_ok_msg("$l_event : $l_update_ok");
+	} else {
+		json_ok_msg("$l_event : $err[msg]");
+	}
+	if (empty($params['entity_id']) && $params['entity_kind'] == 'user') $params['entity_id'] = $obm['uid'];
+	//we want to send mails
+	$GLOBALS["send_notification_mail"] = true;
+	if (check_calendar_event_participation($params)) {
+		if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) json_ok_msg("$l_event : $l_conflicts");
+		$params['conflicts'] = $conflicts;
+		if (check_calendar_participation_decision($params)) {
+			$event_q = run_query_calendar_detail($params['calendar_id']);
+			if(($event_q->f('event_repeatkind')=='none') || $params['all'] == 1) {
+				$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
+				
+			} else {
+				$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event'], true);
+				
+			}
+			if ($retour) {
+				json_ok_msg("$l_event : $l_update_ok");
+			} else {
+				json_ok_msg("$l_event : $err[msg]");
+			}
+		} else {
+			json_ok_msg("$err[msg]");
+		}
+		if (check_calendar_access($params['calendar_id'], 'read')) {
+			echo "({".$display['json']."})";
+			exit();
+		} else {
+			json_ok_msg("$l_event : $err[msg]");
+		}
+	} else {
+		if (check_calendar_access($params['calendar_id'], 'read')) {
+			echo "({".$display['json']."})";
+			exit();  
+		} else {
+			json_ok_msg("$err[msg]");
+		}
+	}
+	echo "({".$display['json']."})";
+	exit();
+
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
@@ -1809,6 +1856,12 @@ function get_calendar_action() {
   );  
   // Update comment
   $actions['calendar']['update_comment'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=update_comment",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+    // Update comment
+  $actions['calendar']['update_decision_and_comment'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update_comment",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 

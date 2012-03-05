@@ -544,3 +544,12 @@ $l_addedit_comment = "Add / Edit comment";
 // alert popup
 $l_add_alarm = "Add alert";
 $l_addedit_alarm = "Add / Edit alert";
+// decision popup
+$l_decision_ACCEPTED = "accept";
+$l_decision_NEEDS_ACTIONS = "waiting";
+$l_decision_DECLINED = "refuse";
+$l_decision_situation = "You choose to <b id=\"yourDecision\"></b> the event: ";
+$l_decision_possibility = "You can comment your decision if you want.";
+$l_comment_decision = "Comment your decision";
+$l_without_comment = "Respond without comment";
+$l_with_comment = "Respond with comment";

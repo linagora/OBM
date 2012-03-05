@@ -196,6 +196,7 @@ $ico_allday_alt             = "$theme_path/ico_allday_alt.gif";
 $ico_extension_left         = "$theme_path/ico_calendar_extension_left.gif";
 $ico_extension_right        = "$theme_path/ico_calendar_extension_right.gif";
 // $ico_popup_close            = "$theme_path/ico_popup_close.gif";
+$ico_comment   = "$theme_path/ico_small_comment.png";
 $ico_popup_close            = "$theme_path/ico_close.gif";
 $popup_queue                = "$theme_path/popup_queue.gif";
 $ico_day_view               = "$theme_path/ico_calendar_day_view.gif";

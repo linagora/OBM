@@ -2151,9 +2151,45 @@ Obm.CalendarAlarmPopup = new Class({
 		}).post({ajax : 1, action : 'update_alert', calendar_id : this.evtid, user_id : this.uid, sel_alert : checked[0].value});
 	}
 });
-
-
-
+Obm.CalendarDecisionPopup = new Class({
+	initialize: function() {
+		this.textarea = $('calendarDecisionPopup').getElements('textarea');
+		this.yourDecision = $('calendarDecisionPopup').getElementById('yourDecision');
+		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
+	},
+	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang) {
+		this.uid = uid;
+		this.evtid = evtid;
+		this.decision = decision;
+		this.oldDecision = oldDecision;
+		this.choiceByLang = choiceByLang;
+		this.type = type;
+		this.comment = comment;
+		this.eventTitle = title;
+		this.textarea.setProperty('placeholder', this.comment);
+		this.yourDecision.appendText(this.choiceByLang);
+		this.eventTitlePlace.appendText(this.eventTitle);
+		this.show();
+	},
+	show: function() {
+		obm.popup.show('calendarDecisionPopup');
+	},
+	hide: function() {
+		this.decision = this.oldDecision = this.comment = '';
+		obm.popup.hide('calendarDecisionPopup');
+	},
+	updateDecision: function(){
+		this.comment =this.textarea[0].value;
+		var self = this;
+		new Request.JSON({
+			url: obm.vars.consts.calendarUrl,
+			secure : false,
+			onComplete : function(){
+				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			}
+		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
+	}
+});
 /******************************************************************************
  * Calendar Update and creation quick form
  ******************************************************************************/
