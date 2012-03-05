@@ -82,29 +82,28 @@ function run_query_mailforward_detail($u_id) {
 function run_query_mailforward_update($forward, $u_id) {
   global $cdg_sql;
 
+  $usr_q = new DB_OBM;
   $email_nomade = $forward["email_nomade"];
   $nomade_enable = sql_parse_int($forward["nomade_enable"]);
   $nomade_local_copy = sql_parse_int($forward["nomade_local_copy"]);  
   $u_id = sql_parse_id($u_id, true);
   // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm set
-    userobm_email_nomade    = '$email_nomade',
+    userobm_email_nomade    = '".$usr_q->escape($email_nomade)."',
     userobm_nomade_enable   = $nomade_enable,
     userobm_nomade_local_copy=$nomade_local_copy    
   WHERE userobm_id $u_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailforward_update()');
-  $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
   $query = "UPDATE P_UserObm set
-    userobm_email_nomade    = '$email_nomade',
+    userobm_email_nomade    = '".$usr_q->escape($email_nomade)."',
     userobm_nomade_enable   = $nomade_enable,
     userobm_nomade_local_copy=$nomade_local_copy    
   WHERE userobm_id $u_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailforward_update()');
-  $usr_q = new DB_OBM;
   $retour = $usr_q->query($query);
 
   return $retour;

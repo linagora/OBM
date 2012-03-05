@@ -1473,8 +1473,8 @@ function get_global_params($table='') {
         $params[$key] = trim($value);
       } else {
         // protection from xss vulnerabilities
-        //Simple and double quotes will be escaped in the query section of every modules
-        $params[$key] = trim(htmlspecialchars($value,ENT_NOQUOTES));
+        //TODO
+        $params[$key] = trim(strip_tags($value));
       }
     }
   }
