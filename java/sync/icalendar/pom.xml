@@ -18,15 +18,15 @@
 	<url>http://www.obm.org/</url>
 
 	<dependencies>
- 		<dependency>
-                        <groupId>com.google.inject</groupId>
-                        <artifactId>guice</artifactId>
-                </dependency>
-	 	<dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>utils</artifactId>
-                        <version>${obm.version}</version>
-                </dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>utils</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
@@ -36,17 +36,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                </dependency>
-		 <dependency>
-                       <groupId>org.mnode.ical4j</groupId>
-                       <artifactId>ical4j</artifactId>
-               </dependency>
 		<dependency>
-			<groupId>com.google.inject</groupId>
-			<artifactId>guice</artifactId>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

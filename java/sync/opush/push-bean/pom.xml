@@ -26,31 +26,26 @@
 			<artifactId>utils</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>configuration</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
-                        <groupId>commons-lang</groupId>
-                        <artifactId>commons-lang</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                </dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>utils</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
