@@ -173,13 +173,14 @@ function run_query_campaign_target_delete ($campaign_id, $target_ids) {
  */
 function run_query_campaign_update ($params, $col_names_to_update) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $id = $params['campaign_id'];
 
   $old_obm_q = run_query_campaign_detail($id);
 
   foreach (array('name', 'objective', 'comment') as $e) {
-    $col[$e] = "'" . sql_search_text_parse($params[$e]) . "'";
+    $col[$e] = "'" . sql_search_text_parse($obm_q->escape($params[$e])) . "'";
   }
 
   foreach (array('manager_id', 'parent') as $e) {
@@ -217,8 +218,6 @@ function run_query_campaign_update ($params, $col_names_to_update) {
   $query = join(', ', $mquery). ", campaign_userupdate = '$obm[uid]',
     campaign_timeupdate = now()";
 
-  $obm_q = new DB_OBM;
-
   if (!empty($mquery)) {
     $query = "UPDATE Campaign SET $query
       WHERE campaign_id = '$id'
@@ -253,7 +252,7 @@ function run_query_campaign_update ($params, $col_names_to_update) {
     }
 
     if ($new_status != $new_obm_q->f('campaign_status')) {
-      $query = "UPDATE Campaign SET campaign_status = '$new_status' WHERE campaign_id = '$id'";
+      $query = "UPDATE Campaign SET campaign_status = '".$obm_q->escape($new_status)."' WHERE campaign_id = '$id'";
       $obm_q->query($query);
       display_debug_msg($query, $cdg_sql, "run_query_campaign_update(update status)");
     }
@@ -284,7 +283,7 @@ function run_query_campaign_search ($params, $criterias) {
   $col = array();
 
   foreach (array('name', 'refer_url', 'type', 'objective', 'comment') as $e) {
-    $$e = "LIKE '%" . sql_search_text_parse($params[$e]) . '%\'';
+    $$e = "LIKE '%" . sql_search_text_parse($obm_q->escape($params[$e])) . '%\'';
   }
 
   $start_date = " = '".of_isodate_convert($params['start_date'],true). "'";
@@ -377,7 +376,7 @@ function run_query_campaign_insert ($params, $col_names_to_update) {
     VALUES (
       $obm[domain_id],
       '$obm[uid]',
-      '$status',
+      '".$obm_q->escape($status)."',
       0)";
 
   display_debug_msg($query, $cdg_sql, "run_query_campaign_insert()");
@@ -606,14 +605,14 @@ function check_compare_convert_to_value ($str) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_campaign_get_type_by_ext($ext) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $multidomain = sql_multidomain("documentmimetype");
 
   $query = "SELECT *
     FROM DocumentMimeType
-    WHERE documentmimetype_extension ='$ext'
+    WHERE documentmimetype_extension ='".$obm_q->escape($ext)."'
     $multidomain";
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, "run_query_campaign_get_type_by_ext()");
   if ($obm_q->nf() > 0) {
@@ -744,7 +743,7 @@ function run_query_campaign_import_sent_emails () {
       VALUES (
         '$campaign_id',
         '$entity_id',
-        '$status')";
+        '".$obm_q->escape($status)."')";
 
 
     display_debug_msg($query, $GLOBALS['cdg_sql'], "run_query_campaign_import_sent_emails(insert mailtarget)");
