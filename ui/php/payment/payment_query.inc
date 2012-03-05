@@ -75,15 +75,15 @@ function run_query_payment_search($payment) {
   $where = '1=1';
   $and = 'AND';
   if ($comment != '') {
-    $where .= " $and payment_comment $like '%$comment%'";
+    $where .= " $and payment_comment $like '%".$obm_q->escape($comment)."%'";
     $and = 'AND';
   }
   if ($number) {
-    $where .= " $and payment_number $like '%$number%'";
+    $where .= " $and payment_number $like '%".$obm_q->escape($number)."%'";
     $and = 'AND';
   }
   if ($amount) {
-    $where .= " $and payment_amount = $amount";
+    $where .= " $and payment_amount = $obm_q->escape($amount)";
     $and = 'AND';
   }
   if ($date_after) {
@@ -105,11 +105,11 @@ function run_query_payment_search($payment) {
     $and = 'AND';
   }
   if (($account != '') && ($account != "$c_all")) {
-    $where .= " $and payment_account_id ='$account'";
+    $where .= " $and payment_account_id ='".$obm_q->escape($account)."'";
     $and = 'AND';
   }
   if ($company != '') {
-    $where .= " $and company_name $like '$company%'";
+    $where .= " $and company_name $like '".$obm_q->escape($company)."%'";
     $and = 'AND';
   }
   if ($company_id != '') {
@@ -228,6 +228,7 @@ function run_query_payment_detail($p_id) {
 function run_query_payment_insert($params) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = $obm['uid'];
   $domain_id = sql_parse_id($obm['domain_id']);
 
@@ -270,16 +271,15 @@ function run_query_payment_insert($params) {
     '$uid',
     $company_id,
     $account_id,
-    '$kind',
-    '$amount',
+    '".$obm_q->escape($kind)."',
+    '".$obm_q->escape($amount)."',
     $date,
-    '$inout',
-    '$number',
+    '".$obm_q->escape($inout)."',
+    '".$obm_q->escape($number)."',
     '$checked',
-    '$comment')";
+    '".$obm_q->escape($comment)."')";
   
   display_debug_msg($query, $cdg_sql, 'run_query_payment_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $datep = ($params['date'] ? "='".of_isodate_convert($params['date'])."'" : 'is null');
@@ -298,7 +298,7 @@ function run_query_payment_insert($params) {
     ) VALUES (
       '$invoice_id',
       '$id',
-      '$amount_invoice',
+      '".$obm_q->escape($amount_invoice)."',
       NOW(),
       '$uid')";
 
@@ -319,6 +319,7 @@ function run_query_payment_insert($params) {
 function run_query_payment_update($pid, $params) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $uid = $obm['uid'];
 
   $company_id = $params['company_new_id'];
@@ -342,17 +343,16 @@ function run_query_payment_update($pid, $params) {
     payment_company_id=$company_id,
     payment_account_id=$account_id,
     payment_paymentkind_id=$kind,
-    payment_amount='$amount',
+    payment_amount='".$obm_q->escape($amount)."',
     payment_date=$date,
-    payment_inout='$inout',
-    payment_number='$number',
+    payment_inout='".$obm_q->escape($inout)."',
+    payment_number='".$obm_q->escape($number)."',
     payment_checked='$checked',
-    payment_comment='$comment'
+    payment_comment='".$obm_q->escape($comment)."'
   WHERE payment_id='$pid'
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_payment_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -577,10 +577,9 @@ function run_query_payment_invoice_insert($params) {
       NOW(),
       null,
       '$uid',
-      '$amount')";
+      '".$obm_q->escape($amount)."')";
 
       display_debug_msg($query, $cdg_sql,'run_query_payment_invoice_insert(3)');
-      $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
 
       $cpt_ins++;
@@ -630,7 +629,7 @@ function run_query_payment_invoice_update($pid, $params) {
       $query = "UPDATE PaymentInvoice SET
       paymentinvoice_timeupdate = NOW(),
       paymentinvoice_userupdate = '$uid',
-      paymentinvoice_amount = '$amount'
+      paymentinvoice_amount = '".$obm_q->escape($amount)."'
     WHERE
       paymentinvoice_payment_id='$pid'
       AND paymentinvoice_invoice_id='$i_id'";
@@ -891,16 +890,17 @@ function check_payment_kind($params) {
  * @param array $params
  */
 function run_query_payment_kind_update($params) {
+  $obm_q = new DB_OBM;
   $id = $params['kind'];
   $label = $params['kind_label'];
   $short_label = $params['kind_short_label'];
   
   $k_id = sql_parse_id($id, true);
   $domain_id = sql_multidomain('paymentkind');
-  $query = "UPDATE PaymentKind SET paymentkind_label='$label', paymentkind_shortlabel='$short_label'
+  $query = "UPDATE PaymentKind SET paymentkind_label='".$obm_q->escape($label)."', paymentkind_shortlabel='".$obm_q->escape($short_label)."'
   			WHERE paymentkind_id $k_id $domain_id";
   
-  $obm_q = new DB_OBM;
+  
   
   return $obm_q->query($query);
 }
@@ -912,16 +912,16 @@ function run_query_payment_kind_update($params) {
  * @param unknown_type $params
  */
 function run_query_payment_kind_insert($params) {
+  $obm_q = new DB_OBM;
   $label = $params['kind_label'];
   $short_label = $params['kind_short_label'];
   
   $domain_id = (isset($_SESSION['obm']['domain_id']) ? $_SESSION['obm']['domain_id'] : 'NULL');
   
   $query = "INSERT INTO PaymentKind (paymentkind_shortlabel, paymentkind_label, paymentkind_domain_id)
-  			VALUES ('$short_label', '$label', $domain_id)";
+  			VALUES ('".$obm_q->escape($short_label)."', '".$obm_q->escape($label)."', $domain_id)";
   			
-  $obm_q = new DB_OBM;
-  
+    
   return $obm_q->query($query);
 }
 
