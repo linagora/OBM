@@ -111,31 +111,31 @@ function run_query_people_search($people) {
     
   } else {
     if (trim($status) != '') {
-      $where_userobm .= " AND userobm_status = '$status'";
+      $where_userobm .= " AND userobm_status = '".$obm_q->escape($status)."'";
     }
   }
 
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
      // UserObm
-     $where_userobm .= " AND userobm_lastname #LIKE '$lname%'";
+     $where_userobm .= " AND userobm_lastname #LIKE '".$obm_q->escape($lname)."%'";
      // Contact
-     $where_contact .= " AND (contact_lastname #LIKE '$lname%' or contact_aka #LIKE '$lname%')";
+     $where_contact .= " AND (contact_lastname #LIKE '".$obm_q->escape($lname)."%' or contact_aka #LIKE '".$obm_q->escape($lname)."%')";
   }
 
   // If a firstname indication has been specified, get it
   if (trim($fname) != '') {
      // UserObm
-     $where_userobm .= " AND userobm_firstname #LIKE '$fname%'";
+     $where_userobm .= " AND userobm_firstname #LIKE '".$obm_q->escape($fname)."%'";
      // Contact
-     $where_contact .= " AND contact_firstname #LIKE '$fname%'";
+     $where_contact .= " AND contact_firstname #LIKE '".$obm_q->escape($fname)."%'";
   }
 
   // If an email indication has been specified, get it
   if (trim($email) != '') {
     list($left,$right) = split('@',$email);
     if ($right === null){
-      $left = $left.'%';
+      $left = $obm_q->escape($left).'%';
       $right = $left;
       $condition = 'OR';
     } else {
@@ -144,7 +144,7 @@ function run_query_people_search($people) {
     if (!$left) {
       $left = '%';
     }
-    $right = $right.'%';
+    $right = $obm_q->escape($right).'%';
     $where_userobm .= " AND
       userobm_email != '' AND (
           ( userobm_email #LIKE '$left@$right' OR userobm_email #LIKE '$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right' )
@@ -154,67 +154,67 @@ function run_query_people_search($people) {
           ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' ))
         ) ";
     // Contact
-    $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '$email%'))";
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '".$obm_q->escape($email)."%'))";
   }
 
   // If a phone number indication has been specified, get it
   if (trim($phone) != '') {
     // UserObm
-    $where_userobm .= " AND (userobm_phone #LIKE '%$phone%'
-      OR userobm_phone2 #LIKE '%$phone%'
-      OR userobm_mobile #LIKE '%$phone%'
-      OR userobm_fax #LIKE '%$phone%'
-      OR userobm_fax2 #LIKE '%$phone%')";
+    $where_userobm .= " AND (userobm_phone #LIKE '%".$obm_q->escape($phone)."%'
+      OR userobm_phone2 #LIKE '%".$obm_q->escape($phone)."%'
+      OR userobm_mobile #LIKE '%".$obm_q->escape($phone)."%'
+      OR userobm_fax #LIKE '%".$obm_q->escape($phone)."%'
+      OR userobm_fax2 #LIKE '%".$obm_q->escape($phone)."%')";
     // Contact
-    $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%'))";
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '".$obm_q->escape($phone)."%'))";
   }
 
   // If an address indication has been specified, get it
   if (trim($address) != '') {
     // UserObm
-    $where_userobm .= " AND (userobm_address1 #LIKE '%$address%'
-      OR userobm_address2 #LIKE '%$address%'
-      OR userobm_address3 #LIKE '%$address%')";
+    $where_userobm .= " AND (userobm_address1 #LIKE '%".$obm_q->escape($address)."%'
+      OR userobm_address2 #LIKE '%".$obm_q->escape($address)."%'
+      OR userobm_address3 #LIKE '%".$obm_q->escape($address)."%')";
   }
 
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
-     $where_userobm .= " AND userobm_description #LIKE '%$desc%'";
+     $where_userobm .= " AND userobm_description #LIKE '%".$obm_q->escape($desc)."%'";
   }
 
   // If a direction indication has been specified get it
   if (trim($direction) != '') {
-    $where_userobm .= " AND userobm_direction #LIKE '%$direction%'";
+    $where_userobm .= " AND userobm_direction #LIKE '%".$obm_q->escape($direction)."%'";
   }
 
   // If a service indication has been specified get it
   if (trim($service) != '') {
-    $where_userobm .= " AND userobm_service #LIKE '%$service%'";
+    $where_userobm .= " AND userobm_service #LIKE '%".$obm_q->escape($service)."%'";
   }
 
   // If a service indication has been specified get it
   if (trim($company) != '') {
-    $where_userobm .= " AND userobm_company #LIKE '%$company%'";
+    $where_userobm .= " AND userobm_company #LIKE '%".$obm_q->escape($company)."%'";
   }
 
   // If a town indication has been specified get it
   if (trim($town) != '') {
-    $where_userobm .= " AND userobm_town #LIKE '%$town%'";
+    $where_userobm .= " AND userobm_town #LIKE '%".$obm_q->escape($town)."%'";
   }
 
   // If a zipcode indication has been specified get it
   if (trim($zipcode) != '') {
-    $where_userobm .= " AND userobm_zipcode = $zipcode";
+    $where_userobm .= " AND userobm_zipcode #LIKE '%".$obm_q->escape($zipcode)."%'";
   }
 
   // If a cedex indication has been specified get it
   if (trim($cedex) != '') {
-    $where_userobm .= " AND userobm_expresspostal = $cedex";
+    $where_userobm .= " AND userobm_expresspostal #LIKE '%".$obm_q->escape($cedex)."%'";
   }
 
   // If a cedex indication has been specified get it
   if (trim($delegation) != '') {
-    $where_userobm .= " AND userobm_delegation #LIKE '$delegation%'";
+    $where_userobm .= " AND userobm_delegation #LIKE '".$obm_q->escape($delegation)."%'";
   }
 
   // User defined data
@@ -367,8 +367,8 @@ function run_query_people_ext_search($people) {
   $patterns = explode(' ', $pattern);
 
   foreach ($patterns as $pattern) {
-    $userpattern .= "AND (userobm_lastname $like '$pattern%' OR userobm_firstname $like '$pattern%' OR userobm_email $like  '%$pattern%' )";
-    $contactpattern .= "AND (contact_lastname $like '$pattern%' OR contact_firstname $like '$pattern%' OR contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'))";
+    $userpattern .= "AND (userobm_lastname $like '".$obm_q->escape($pattern)."%' OR userobm_firstname $like '".$obm_q->escape($pattern)."%' OR userobm_email $like  '%".$obm_q->escape($pattern)."%' )";
+    $contactpattern .= "AND (contact_lastname $like '".$obm_q->escape($pattern)."%' OR contact_firstname $like '".$obm_q->escape($pattern)."%' OR contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '".$obm_q->escape($pattern)."%'))";
   }
 
   $query_userobm = "SELECT 
@@ -574,30 +574,30 @@ function run_query_people_insert($people){
        NOW(),
        $uid,
        $uid,
-       '$delegation',
+       '".$obm_q->escape($delegation)."',
        $login,
        $archive,
-       '$kind',
-       '$lname',
-       '$fname',
-       '$status',
-       '$title',
-       '$company',
-       '$direction',
-       '$service',
-       '$ad1',
-       '$ad2',
-       '$ad3',
-       '$zip',
-       '$town',
-       '$cdx',
-       '$ctry',
-       '$phone',
-       '$phone2',
-       '$mobile',
-       '$fax',
-       '$fax2',
-       '$desc',
+       '".$obm_q->escape($kind)."',
+       '".$obm_q->escape($lname)."',
+       '".$obm_q->escape($fname)."',
+       '".$obm_q->escape($status)."',
+       '".$obm_q->escape($title)."',
+       '".$obm_q->escape($company)."',
+       '".$obm_q->escape($direction)."',
+       '".$obm_q->escape($service)."',
+       '".$obm_q->escape($ad1)."',
+       '".$obm_q->escape($ad2)."',
+       '".$obm_q->escape($ad3)."',
+       '".$obm_q->escape($zip)."',
+       '".$obm_q->escape($town)."',
+       '".$obm_q->escape($cdx)."',
+       '".$obm_q->escape($ctry)."',
+       '".$obm_q->escape($phone)."',
+       '".$obm_q->escape($phone2)."',
+       '".$obm_q->escape($mobile)."',
+       '".$obm_q->escape($fax)."',
+       '".$obm_q->escape($fax2)."',
+       '".$obm_q->escape($desc)."',
        '$user_uid'
       )
     ";
@@ -672,25 +672,25 @@ function run_query_people_update($p_id, $people) {
     userobm_timeupdate='". date('Y-m-d H:i:s')."',
     userobm_userupdate=$obm[uid],
     $user_update_q
-    userobm_kind='$kind',
-    userobm_lastname='$lname',
-    userobm_firstname='$fname',
-    userobm_title='$title',
-    userobm_phone='$phone',
-    userobm_phone2='$phone2',
-    userobm_mobile='$mobile',
-    userobm_fax='$fax',
-    userobm_fax2='$fax2',
-    userobm_company = '$company',
-    userobm_direction = '$direction',
-    userobm_service = '$service',
-    userobm_address1 = '$ad1',
-    userobm_address2 = '$ad2',
-    userobm_address3 = '$ad3',
-    userobm_zipcode = '$zip',
-    userobm_town = '$town',
-    userobm_expresspostal = '$cdx',
-    userobm_description='$desc'
+    userobm_kind='".$obm_q->escape($kind)."',
+    userobm_lastname='".$obm_q->escape($lname)."',
+    userobm_firstname='".$obm_q->escape($fname)."',
+    userobm_title='".$obm_q->escape($title)."',
+    userobm_phone='".$obm_q->escape($phone)."',
+    userobm_phone2='".$obm_q->escape($phone2)."',
+    userobm_mobile='".$obm_q->escape($mobile)."',
+    userobm_fax='".$obm_q->escape($fax)."',
+    userobm_fax2='".$obm_q->escape($fax2)."',
+    userobm_company = '".$obm_q->escape($company)."',
+    userobm_direction = '".$obm_q->escape($direction)."',
+    userobm_service = '".$obm_q->escape($service)."',
+    userobm_address1 = '".$obm_q->escape($ad1)."',
+    userobm_address2 = '".$obm_q->escape($ad2)."',
+    userobm_address3 = '".$obm_q->escape($ad3)."',
+    userobm_zipcode = '".$obm_q->escape($zip)."',
+    userobm_town = '".$obm_q->escape($town)."',
+    userobm_expresspostal = '".$obm_q->escape($cdx)."',
+    userobm_description='".$obm_q->escape($desc)."'
     WHERE userobm_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_people_update()');
@@ -837,7 +837,7 @@ function run_query_user_check_user($p_id, $user) {
 
   $query = "SELECT distinct userobm_id, userobm_login
     FROM UserObm
-    WHERE userobm_login $like '$login%'
+    WHERE userobm_login $like '".$obm_q->escape($login)."%'
     $where_user $where_multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
@@ -854,6 +854,7 @@ function run_query_user_check_user($p_id, $user) {
 function run_query_people_search_wait($user){
   global $obm;
 
+  $obm_q = new DB_OBM;
   $status = 'INIT';
   $archive = 1;
   $delegation = $obm['delegation_target'];
@@ -863,13 +864,12 @@ function run_query_people_search_wait($user){
 
   $where = "userobm_status = '$status' 
     AND userobm_archive = $archive
-    AND userobm_delegation LIKE '$delegation%'";
+    AND userobm_delegation LIKE '".$obm_q->escape($delegation)."%'";
   
   $query = "SELECT userobm_id, userobm_firstname, userobm_lastname, 'user' AS type 
     FROM UserObm
     WHERE $where";
 
-  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
   $obm_q->query($query);
 
