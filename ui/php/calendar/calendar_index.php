@@ -689,7 +689,7 @@ if ($action == 'search') {
 	if ($retour) {
 		json_ok_msg("$l_event : $l_update_ok");
 	} else {
-		json_ok_msg("$l_event : $err[msg]");
+		json_error_msg("$l_event : $err[msg]");
 		echo "({".$display['json']."})";
 		exit();
 	}

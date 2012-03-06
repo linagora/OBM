@@ -1604,11 +1604,11 @@ form.button-to input {
   background-image: url(../images/ico_very_big_time.png);
   background-repeat: no-repeat;
   background-position: 10px 10px;  
-	padding-left: 116px;
-	padding-right: 10px;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	min-height: 100px;
+  padding-left: 116px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-height: 100px;
   height:auto!important;
   height:100px;
   width: 40em;
@@ -1616,7 +1616,7 @@ form.button-to input {
 }
 
 .obmPopup .content .buttons input{
-	width: 20em;
+  width: 20em;
 }
 
 /* Comment Icon and Popup */
@@ -1662,17 +1662,17 @@ form.button-to input {
   background-image: url(../images/ico_very_big_comment.png);
   background-repeat: no-repeat;
   background-position: 10px 10px;  
-       padding-left: 116px;
-       padding-right: 10px;
-       padding-top: 10px;
-       padding-bottom: 10px;
-       min-height: 100px;
-       width: 40em;
-       margin-bottom: 5px;
+  padding-left: 116px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-height: 100px;
+  width: 40em;
+  margin-bottom: 5px;
 }
 .obmPopup hr{
-       width:100%;
-       color:#3F7C8E;
+  width:100%;
+  color:#3F7C8E;
 }
 #calendarDecisionPopup{
   height:auto;

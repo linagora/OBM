@@ -3228,16 +3228,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 		$user_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$GLOBALS[l_add_comment]...', 'user');\" title=\"$l_add\"></a>";
 	}else{
 		$user_comment = addslashes($comment[$u_id]);
-		$user_comment_display =  $user_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$comment[$u_id]', 'user');\" title=\"$l_edit\"></a>";
+		$user_comment_display =  $comment[$u_id]." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
          }
 	  
           $dis_user_list .= "
           <tr>
           <td>$label</td>
           <td>
-          <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'ACCEPTED', '$saved_checked', 'user', '$comment[$u_id]', '$title', '$l_decision_ACCEPTED' )\" /><span> $l_accepted</span></label>
-          <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'NEEDS-ACTION', '$saved_checked', 'user', '$comment[$u_id]', '$title', '$l_decision_NEEDS_ACTIONS' )\" /><span> $l_needs_action</span>
-          <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"DECLINED\" onclick=\"obm.compute($u_id, $id, 'DECLINED', '$saved_checked', 'user', '$comment[$u_id]', '$title',  '$l_decision_DECLINED'  )\" /><span> $l_declined</span></label>
+          <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'ACCEPTED', '$saved_checked', 'user', '$user_comment', '$title', '$l_decision_ACCEPTED' )\" /><span> $l_accepted</span></label>
+          <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'NEEDS-ACTION', '$saved_checked', 'user', '$user_comment', '$title', '$l_decision_NEEDS_ACTIONS' )\" /><span> $l_needs_action</span>
+          <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"DECLINED\" onclick=\"obm.compute($u_id, $id, 'DECLINED', '$saved_checked', 'user', '$user_comment', '$title',  '$l_decision_DECLINED'  )\" /><span> $l_declined</span></label>
           </td>
           <td style=\"$comment_style\"> <span>$user_comment_display</span> </td>
           <td style=\"text-align:center;\">$bell_alert_icon</td>
