@@ -2,6 +2,13 @@ UPDATE ObmInfo SET obminfo_value = '2.4.1-pre' WHERE obminfo_name = 'db_version'
 
 DROP TABLE IF EXISTS opush_invitation_mapping;
 
+CREATE OR REPLACE FUNCTION UUID()
+  RETURNS uuid AS
+$BODY$
+ SELECT CAST(md5(current_database()|| user ||current_timestamp ||random()) as uuid)
+$BODY$
+  LANGUAGE 'sql' VOLATILE;
+
 ALTER TABLE domain ADD COLUMN domain_uuid char(36);
 UPDATE domain SET domain_uuid=UUID() WHERE domain_uuid IS NULL;
 ALTER TABLE domain ALTER domain_uuid SET NOT NULL;
