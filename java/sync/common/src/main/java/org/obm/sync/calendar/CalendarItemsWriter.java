@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  */
 public class CalendarItemsWriter extends AbstractItemsWriter {
 
-	public Document writeChanges(EventChanges eventChanges) {
+	public Document getXMLDocumentFrom(EventChanges eventChanges) {
 		Document doc = null;
 		try {
 			doc = DOMUtils.createDoc(

@@ -101,7 +101,7 @@ private CalendarItemsWriter writer;
 	}
 
 	@Test
-	public void testWriteChangesWithNoChange() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromWithNoChange() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -112,12 +112,12 @@ private CalendarItemsWriter writer;
 				+ "<participationChanges/>"
 				+ "</calendar-changes>";
 
-		Document resultDocument = writer.writeChanges(eventChanges);
+		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testWriteChangesWithRemovedElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromWithRemovedElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -135,12 +135,12 @@ private CalendarItemsWriter writer;
 				+ "<participationChanges/>"
 				+ "</calendar-changes>";
 
-		Document resultDocument = writer.writeChanges(eventChanges);
+		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 	
 	@Test
-	public void testWriteChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromWithUpdatedElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -207,13 +207,13 @@ private CalendarItemsWriter writer;
 				+ "<participationChanges/>"
 				+ "</calendar-changes>";
 
-		Document resultDocument = writer.writeChanges(eventChanges);
+		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
 		String serialize = DOMUtils.serialize(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, serialize);
 	}
 
 	@Test
-	public void testWriteChangesWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -240,7 +240,7 @@ private CalendarItemsWriter writer;
 				+ "</participationChanges>"
 				+ "</calendar-changes>";
 
-		Document resultDocument = writer.writeChanges(eventChanges);
+		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 

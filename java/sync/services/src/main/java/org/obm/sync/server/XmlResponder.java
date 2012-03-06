@@ -212,7 +212,7 @@ public class XmlResponder {
 	}
 
 	public String sendCalendarChanges(EventChanges cc) {
-		return sendDom(ciw.writeChanges(cc));
+		return sendDom(ciw.getXMLDocumentFrom(cc));
 	}
 
 	public String sendCalendarInformations(CalendarInfo[] lc) {
