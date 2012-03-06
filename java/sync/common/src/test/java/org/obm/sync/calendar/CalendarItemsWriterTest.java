@@ -31,22 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import junit.framework.Assert;
-
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.items.AbstractItemsWriter;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.sync.items.EventChanges;
+import org.obm.sync.items.ParticipationChanges;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import com.google.common.collect.Lists;
 
 /**
  * Serializes calendar related items to XML
@@ -61,7 +65,42 @@ private CalendarItemsWriter writer;
 	}
 	
 	@Test
-	public void testGetEventString() throws TransformerException {
+	public void testGetEventString() throws TransformerException, SAXException, IOException {
+		Event ev = getFakeEvent();
+
+		String resultXML = writer.getEventString(ev);
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
+				+ "<exceptions>"
+				+ "<exception>1295258400000</exception>"
+				+ "<exception>1292580000000</exception>"
+				+ "</exceptions><eventExceptions/>"
+				+ "</recurrence>"
+				+ "</event>";
+
+		XMLAssert.assertXMLEqual(expectedXML, resultXML);
+	}
+
+	private Event getFakeEvent() {
 		Event ev = new Event();
 		ev.setInternalEvent(true);
 		Calendar cal = new GregorianCalendar();
@@ -69,10 +108,8 @@ private CalendarItemsWriter writer;
 		ev.setStartDate(cal.getTime());
 		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
 		ev.setTimeUpdate(cal.getTime());
-		
 		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
 		ev.setTimeCreate(cal.getTime());
-		
 		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
 		ev.setTitle("fake rdv");
 		ev.setOwner("john@do.fr");
@@ -103,108 +140,179 @@ private CalendarItemsWriter writer;
 		er.setEnd(null);
 		ev.setRecurrence(er);
 		ev.setSequence(3);
+		return ev;
+	}
 
-		
-		String eventS = writer.getEventString(ev);
-		
-		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
-		"<timeupdate>1292580000000</timeupdate>" +
-		"<timecreate>1289988000000</timecreate>"+
-		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
-		"<opacity>OPAQUE</opacity>" +
-		"<title>fake rdv</title>" +
-		"<owner>john@do.fr</owner>" +
-		"<tz>Europe/Paris</tz>" +
-		"<date>1295258400000</date>" +
-		"<duration>3600</duration>" +
-		"<location>tlse</location>" +
-		"<alert>60</alert>" +
-		"<priority>0</priority>" +
-		"<privacy>0</privacy>" +
-		"<attendees>" +
-		"<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
-		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
-		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
-		"<exceptions>" +
-		"<exception>1295258400000</exception>" +
-		"<exception>1292580000000</exception>" +
-		"</exceptions><eventExceptions/>" +
-		"</recurrence>" +
-		"</event>";
-		Assert.assertEquals(xmlExpected, eventS);
+	@Test
+	public void testWriteChangesWithNoChange() throws SAXException, IOException, TransformerException {
+		EventChanges eventChanges = new EventChanges();
+		eventChanges.setLastSync(new Date(1330957589525L));
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<calendar-changes lastSync=\"1330957589525\" xmlns=\"http://www.obm.org/xsd/sync/calendar-changes.xsd\">"
+				+ "<removed/>"
+				+ "<updated/>"
+				+ "<participationChanges/>"
+				+ "</calendar-changes>";
+
+		Document resultDocument = writer.writeChanges(eventChanges);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
+	}
+
+	@Test
+	public void testWriteChangesWithRemovedElements() throws SAXException, IOException, TransformerException {
+		EventChanges eventChanges = new EventChanges();
+		eventChanges.setLastSync(new Date(1330957589525L));
+
+		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("123"));
+		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("456"));
+		eventChanges.setDeletions(Lists.newArrayList(deletedEvent1, deletedEvent2));
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<calendar-changes lastSync=\"1330957589525\" xmlns=\"http://www.obm.org/xsd/sync/calendar-changes.xsd\">"
+				+ "<removed>" 
+				+ "<event extId=\"123\" id=\"1\"/>"
+				+ "<event extId=\"456\" id=\"2\"/>" 
+				+ "</removed>"
+				+ "<updated/>"
+				+ "<participationChanges/>"
+				+ "</calendar-changes>";
+
+		Document resultDocument = writer.writeChanges(eventChanges);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
 	}
 	
 	@Test
-	public void appendEvent() throws TransformerException {
-		Event ev = new Event();
-		Calendar cal = new GregorianCalendar();
-		cal.setTimeInMillis(1295258400000L);
-		ev.setStartDate(cal.getTime());
-		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
-		ev.setTitle("fake rdv");
-		ev.setOwner("john@do.fr");
-		ev.setDuration(3600);
-		ev.setLocation("tlse");
-		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		la.add(at);
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setState(ParticipationState.ACCEPTED);
-		at.setParticipationRole(ParticipationRole.OPT);
-		la.add(at);
-		ev.setAttendees(la);
-		ev.setAlert(60);
-		EventRecurrence er = new EventRecurrence();
-		er.setKind(RecurrenceKind.daily);
-		er.setFrequence(1);
-		er.addException(ev.getStartDate());
-		cal.add(Calendar.MONTH, 1);
-		er.addException(cal.getTime());
-		er.setEnd(null);
-		ev.setRecurrence(er);
-		ev.setSequence(6);
-		
-		Document doc = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/event.xsd", "event");
-		Element root = doc.getDocumentElement();
-		writer.appendUpdatedEvent(root, ev);
-		
-		String xmlExpected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<event allDay=\"false\" isInternal=\"false\" sequence=\"6\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
-		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
-		"<opacity>OPAQUE</opacity>" +
-		"<title>fake rdv</title>" +
-		"<owner>john@do.fr</owner>" +
-		"<tz>Europe/Paris</tz>" +
-		"<date>1295258400000</date>" +
-		"<duration>3600</duration>" +
-		"<location>tlse</location>" +
-		"<alert>60</alert>" +
-		"<priority>0</priority>" +
-		"<privacy>0</privacy>" +
-		"<attendees>" +
-		"<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"false\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>" +
-		"<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>" +
-		"</attendees><recurrence days=\"\" freq=\"1\" kind=\"daily\">" +
-		"<exceptions>" +
-		"<exception>1295258400000</exception>" +
-		"<exception>1297936800000</exception>" +
-		"</exceptions><eventExceptions/>" +
-		"</recurrence>" +
-		"</event>";
-		
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DOMUtils.serialize(doc, out);
-		
-		Assert.assertEquals(xmlExpected, out.toString());
-		
+	public void testWriteChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
+		EventChanges eventChanges = new EventChanges();
+		eventChanges.setLastSync(new Date(1330957589525L));
+
+		Event updatedEvent = getFakeEvent();
+		Event eventException = updatedEvent.getOccurrence(updatedEvent.getStartDate());
+		updatedEvent.addEventException(eventException);
+
+		Event[] updated = {updatedEvent};
+		eventChanges.setUpdated(updated);
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<calendar-changes lastSync=\"1330957589525\" xmlns=\"http://www.obm.org/xsd/sync/calendar-changes.xsd\">"
+				+ "<removed/>"
+				+ "<updated>"
+				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
+				+ "<exceptions>"
+				+ "<exception>1295258400000</exception>"
+				+ "<exception>1292580000000</exception>"
+				+ "</exceptions>"
+				+ "<eventExceptions>"
+				+ "<eventException allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<recurrenceId>1295258400000</recurrenceId>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence kind=\"none\"/>"
+				+ "</eventException>"
+				+ "</eventExceptions>"
+				+ "</recurrence>"
+				+ "</event>"
+				+ "</updated>"
+				+ "<participationChanges/>"
+				+ "</calendar-changes>";
+
+		Document resultDocument = writer.writeChanges(eventChanges);
+		String serialize = DOMUtils.serialise(resultDocument);
+		XMLAssert.assertXMLEqual(expectedXML, serialize);
 	}
 
+	@Test
+	public void testWriteChangesWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
+		EventChanges eventChanges = new EventChanges();
+		eventChanges.setLastSync(new Date(1330957589525L));
+
+		ParticipationChanges[] participationUpdated = getFakeListOfParticipationChanges();
+		eventChanges.setParticipationUpdated(participationUpdated);
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<calendar-changes lastSync=\"1330957589525\" xmlns=\"http://www.obm.org/xsd/sync/calendar-changes.xsd\">"
+				+ "<removed/>"
+				+ "<updated/>"
+				+ "<participationChanges>"
+				+ "<participation extId=\"123\" id=\"1\">"
+				+ "<attendees>"
+				+ "<attendee email=\"john@doe\" state=\"ACCEPTED\"/>"
+				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\"/>"
+				+ "</attendees>"
+				+ "</participation>"
+				+ "<participation extId=\"456\" id=\"2\" recurrenceId=\"789\">"
+				+ "<attendees>"
+				+ "<attendee email=\"john@doe\" state=\"ACCEPTED\"/>"
+				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\"/>"
+				+ "</attendees>"
+				+ "</participation>"
+				+ "</participationChanges>"
+				+ "</calendar-changes>";
+
+		Document resultDocument = writer.writeChanges(eventChanges);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
+	}
+
+	private ParticipationChanges[] getFakeListOfParticipationChanges() {
+		ParticipationChanges participationChanges1 = new ParticipationChanges();
+		participationChanges1.setEventExtId(new EventExtId("123"));
+		participationChanges1.setEventId(new EventObmId(1));
+		List<Attendee> attendees = getFakeListOfAttendee();
+		participationChanges1.setAttendees(attendees);
+
+		ParticipationChanges participationChanges2 = new ParticipationChanges();
+		participationChanges2.setEventExtId(new EventExtId("456"));
+		participationChanges2.setEventId(new EventObmId(2));
+		participationChanges2.setRecurrenceId(new RecurrenceId("789"));
+		participationChanges2.setAttendees(attendees);
+
+		ParticipationChanges[] participationUpdated = {participationChanges1, participationChanges2};
+		return participationUpdated;
+	}
+
+	private List<Attendee> getFakeListOfAttendee() {
+		Attendee john = new Attendee();
+		john.setEmail("john@doe");
+		john.setState(ParticipationState.ACCEPTED);
+		Attendee jane = new Attendee();
+		jane.setEmail("jane@doe");
+		jane.setState(ParticipationState.NEEDSACTION);
+
+		List<Attendee> attendees = Lists.newArrayList(john, jane);
+		return attendees;
+	}
 }
