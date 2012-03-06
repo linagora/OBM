@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
+
 /**
  * Serializes calendar related items to XML
  */
@@ -44,7 +46,7 @@ public abstract class AbstractItemsWriter {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected void createIfNotNull(Element e, String nodeName, String value) {
-		if (value != null && value.length() > 0) {
+		if (!Strings.isNullOrEmpty(value)) {
 			DOMUtils.createElementAndText(e, nodeName, value);
 		}
 	}

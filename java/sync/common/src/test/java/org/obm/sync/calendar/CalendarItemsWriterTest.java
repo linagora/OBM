@@ -100,49 +100,6 @@ private CalendarItemsWriter writer;
 		XMLAssert.assertXMLEqual(expectedXML, resultXML);
 	}
 
-	private Event getFakeEvent() {
-		Event ev = new Event();
-		ev.setInternalEvent(true);
-		Calendar cal = new GregorianCalendar();
-		cal.setTimeInMillis(1295258400000L);
-		ev.setStartDate(cal.getTime());
-		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
-		ev.setTimeUpdate(cal.getTime());
-		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
-		ev.setTimeCreate(cal.getTime());
-		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
-		ev.setTitle("fake rdv");
-		ev.setOwner("john@do.fr");
-		ev.setDuration(3600);
-		ev.setLocation("tlse");
-		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
-		la.add(at);
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setState(ParticipationState.ACCEPTED);
-		at.setParticipationRole(ParticipationRole.OPT);
-		la.add(at);
-		ev.setAttendees(la);
-		ev.setAlert(60);
-		EventRecurrence er = new EventRecurrence();
-		er.setKind(RecurrenceKind.daily);
-		er.setFrequence(1);
-		er.addException(ev.getStartDate());
-		cal.add(Calendar.MONTH, 1);
-		er.addException(cal.getTime());
-		er.setEnd(null);
-		ev.setRecurrence(er);
-		ev.setSequence(3);
-		return ev;
-	}
-
 	@Test
 	public void testWriteChangesWithNoChange() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
@@ -251,7 +208,7 @@ private CalendarItemsWriter writer;
 				+ "</calendar-changes>";
 
 		Document resultDocument = writer.writeChanges(eventChanges);
-		String serialize = DOMUtils.serialise(resultDocument);
+		String serialize = DOMUtils.serialize(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, serialize);
 	}
 
@@ -284,7 +241,50 @@ private CalendarItemsWriter writer;
 				+ "</calendar-changes>";
 
 		Document resultDocument = writer.writeChanges(eventChanges);
-		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	private Event getFakeEvent() {
+		Event ev = new Event();
+		ev.setInternalEvent(true);
+		Calendar cal = new GregorianCalendar();
+		cal.setTimeInMillis(1295258400000L);
+		ev.setStartDate(cal.getTime());
+		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+		ev.setTimeUpdate(cal.getTime());
+		cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+		ev.setTimeCreate(cal.getTime());
+		ev.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262149"));
+		ev.setTitle("fake rdv");
+		ev.setOwner("john@do.fr");
+		ev.setDuration(3600);
+		ev.setLocation("tlse");
+		List<Attendee> la = new LinkedList<Attendee>();
+		Attendee at = new Attendee();
+		at.setDisplayName("John Do");
+		at.setEmail("john@do.fr");
+		at.setState(ParticipationState.NEEDSACTION);
+		at.setParticipationRole(ParticipationRole.CHAIR);
+		at.setOrganizer(true);
+		la.add(at);
+		at = new Attendee();
+		at.setDisplayName("noIn TheDatabase");
+		at.setEmail("notin@mydb.com");
+		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipationRole(ParticipationRole.OPT);
+		la.add(at);
+		ev.setAttendees(la);
+		ev.setAlert(60);
+		EventRecurrence er = new EventRecurrence();
+		er.setKind(RecurrenceKind.daily);
+		er.setFrequence(1);
+		er.addException(ev.getStartDate());
+		cal.add(Calendar.MONTH, 1);
+		er.addException(cal.getTime());
+		er.setEnd(null);
+		ev.setRecurrence(er);
+		ev.setSequence(3);
+		return ev;
 	}
 
 	private ParticipationChanges[] getFakeListOfParticipationChanges() {

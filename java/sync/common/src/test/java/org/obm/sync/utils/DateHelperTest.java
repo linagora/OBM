@@ -35,12 +35,13 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DateHelperTest extends TestCase{
 
 	@Test
-	public void testHelper() {
+	public void testDateHelper() {
 		Date d = new Date();
 		String s = DateHelper.asString(d);
 		Date parsed = DateHelper.asDate(s);
@@ -49,5 +50,9 @@ public class DateHelperTest extends TestCase{
 		assertEquals(d, parsed);
 		assertEquals(s, reUtc);
 	}
-
+	
+	@Test
+	public void testNullDateAsString() {
+		Assert.assertNull(DateHelper.asString(null));
+	}
 }

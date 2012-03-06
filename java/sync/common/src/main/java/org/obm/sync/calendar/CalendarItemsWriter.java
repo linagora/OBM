@@ -81,7 +81,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	private void writeUpdatedEvents(EventChanges eventChanges, Element root) {
 		Element updated = DOMUtils.createElement(root, "updated");
 		for (Event ev : eventChanges.getUpdated()) {
-			appendUpdatedEvent(updated, ev);
+			Element event = DOMUtils.createElement(updated, "event");
+			appendUpdatedEvent(event, ev);
 		}
 	}
 
@@ -93,7 +94,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	}
 
 	public void appendUpdatedEvent(Element parent, Event event) {
-		appendEvent(parent, event, "event");
+		appendEvent(parent, event);
 	}
 
 	private void appendRemovedEvent(Element removed, EventObmId[] rmIds,
@@ -142,104 +143,102 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	private void appendEvent(Element parent, Event event, String eventNodeName) {
-		Element e = parent;
-		if (!eventNodeName.equals(parent.getNodeName())) {
-			e = DOMUtils.createElement(parent, eventNodeName);
-		}
-		e.setAttribute("type", event.getType().toString());
-		e.setAttribute("allDay", "" + event.isAllday());
+	private void appendEvent(Element parent, Event event) {
+		parent.setAttribute("type", event.getType().toString());
+		parent.setAttribute("allDay", String.valueOf(event.isAllday()));
 		EventObmId eventId = event.getObmId();
 		if (eventId != null) {
-			e.setAttribute("id", eventId.serializeToString());
+			parent.setAttribute("id", eventId.serializeToString());
 		}
-		e.setAttribute("sequence", String.valueOf(event.getSequence()));
-		e.setAttribute("isInternal", ""+event.isInternalEvent());
-		if (event.getTimeUpdate() != null) {
-			createIfNotNull(e, "timeupdate", ""
-					+ DateHelper.asString(event.getTimeUpdate()));
-		}
-		if (event.getTimeCreate() != null) {
-			createIfNotNull(e, "timecreate", ""
-					+ DateHelper.asString(event.getTimeCreate()));
-		}
-		if (event.getRecurrenceId() != null) {
-			createIfNotNull(e, "recurrenceId", DateHelper.asString(event
-					.getRecurrenceId()));
-		}
-		if (event.getExtId() != null) {
-			createIfNotNull(e, "extId", event.getExtId().serializeToString());
-		}
+		parent.setAttribute("sequence", String.valueOf(event.getSequence()));
+		parent.setAttribute("isInternal", String.valueOf(event.isInternalEvent()));
+		createIfNotNull(parent, "timeupdate", DateHelper.asString(event.getTimeUpdate()));
+		createIfNotNull(parent, "timecreate", DateHelper.asString(event.getTimeCreate()));
+		createIfNotNull(parent, "recurrenceId", DateHelper.asString(event.getRecurrenceId()));
+		createIfNotNull(parent, "extId", event.getExtId().serializeToString());
 		if(event.getOpacity() == null){
 			event.setOpacity(EventOpacity.OPAQUE);
 		}
-		createIfNotNull(e, "opacity", event.getOpacity().toString());
-		createIfNotNull(e, "title", event.getTitle());
-		createIfNotNull(e, "description", event.getDescription());
-		createIfNotNull(e, "owner", event.getOwner());
-		createIfNotNull(e, "ownerEmail", event.getOwnerEmail());
-		createIfNotNull(e, "tz", event.getTimezoneName());
-		if (event.getStartDate() != null) {
-			createIfNotNull(e, "date", DateHelper.asString(event.getStartDate()));
-		}
-		createIfNotNull(e, "duration", "" + event.getDuration());
-		createIfNotNull(e, "category", event.getCategory());
-		createIfNotNull(e, "location", event.getLocation());
-		if (event.getAlert() != null) {
-			createIfNotNull(e, "alert", "" + event.getAlert());
-		}
+		createIfNotNull(parent, "opacity", event.getOpacity().toString());
+		createIfNotNull(parent, "title", event.getTitle());
+		createIfNotNull(parent, "description", event.getDescription());
+		createIfNotNull(parent, "owner", event.getOwner());
+		createIfNotNull(parent, "ownerEmail", event.getOwnerEmail());
+		createIfNotNull(parent, "tz", event.getTimezoneName());
+		createIfNotNull(parent, "date", DateHelper.asString(event.getStartDate()));
+		createIfNotNull(parent, "duration", String.valueOf(event.getDuration()));
+		createIfNotNull(parent, "category", event.getCategory());
+		createIfNotNull(parent, "location", event.getLocation());
+		createIfNotNull(parent, "alert", String.valueOf(event.getAlert()));
+		createIfNotNull(parent, "priority", (event.getPriority() != null ? String.valueOf(event.getPriority()) : "0"));
+		createIfNotNull(parent, "privacy", String.valueOf(event.getPrivacy().toSqlIntCode()));
 
-		createIfNotNull(e, "priority", (event.getPriority() != null ? ""
-				+ event.getPriority() : "0"));
-		createIfNotNull(e, "privacy", String.valueOf(event.getPrivacy().toSqlIntCode()));
-		Element atts = DOMUtils.createElement(e, "attendees");
-		List<Attendee> la = event.getAttendees();
-		if (la != null) {
-			for (Attendee a : event.getAttendees()) {
-				appendAttendee(atts, a);
-			}
-		}
+		appendAttendeesToEventXml(parent, event);
+		appendRecurrenceToEventXml(parent, event);
+	}
 
-		Element rec = DOMUtils.createElement(e, "recurrence");
-		EventRecurrence r = event.getRecurrence();
-		rec.setAttribute("kind", r.getKind().toString());
-		if (RecurrenceKind.none != r.getKind()) {
-			if (r.getEnd() != null) {
-				rec.setAttribute("end", DateHelper.asString(r.getEnd()));
-			}
-			if (r.getKind() == RecurrenceKind.weekly
-					|| r.getKind() == RecurrenceKind.daily) {
-				rec.setAttribute("days", new RecurrenceDaysSerializer().serialize(r.getDays()));
-				if (r.getFrequence() == 0) {
-					r.setFrequence(1);
-				}
-			}
-
-			rec.setAttribute("freq", "" + r.getFrequence());
-			Element exc = DOMUtils.createElement(rec, "exceptions");
-			for (Date ex : r.getExceptions()) {
-				DOMUtils.createElementAndText(exc, "exception", DateHelper
-						.asString(ex));
-			}
-
-			Element eventExp = DOMUtils.createElement(rec, "eventExceptions");
-			for (Event ex : r.getEventExceptions()) {
-				appendEvent(eventExp, ex, "eventException");
-			}
+	private void appendAttendeesToEventXml(Element parent, Event event) {
+		Element attendees = DOMUtils.createElement(parent, "attendees");
+		for (Attendee attendee : event.getAttendees()) {
+			appendAttendee(attendees, attendee);
 		}
 	}
 
-	private Element appendAttendee(Element atts, Attendee a) {
-		Element at = DOMUtils.createElement(atts, "attendee");
-		at.setAttribute("displayName", a.getDisplayName());
-		at.setAttribute("isOrganizer", ""+a.isOrganizer());
-		at.setAttribute("email", a.getEmail());
-		at.setAttribute("state", (a.getState() != null ? a.getState()
+	private Element appendAttendee(Element attendees, Attendee attendee) {
+		Element attendeeElement = DOMUtils.createElement(attendees, "attendee");
+		attendeeElement.setAttribute("displayName", attendee.getDisplayName());
+		attendeeElement.setAttribute("isOrganizer", String.valueOf(attendee.isOrganizer()));
+		attendeeElement.setAttribute("email", attendee.getEmail());
+		attendeeElement.setAttribute("state", (attendee.getState() != null ? attendee.getState()
 				.toString() : ParticipationState.NEEDSACTION.toString()));
-		at.setAttribute("required", (a.getParticipationRole() != null ? a.getParticipationRole()
-				.toString() : ParticipationRole.OPT.toString()));
-		at.setAttribute("percent", "" + a.getPercent());
-		return at;
+		attendeeElement.setAttribute("required", attendee.getParticipationRole() != null ? attendee.getParticipationRole()
+						.toString() : ParticipationRole.OPT.toString());
+
+		attendeeElement.setAttribute("percent", String.valueOf(attendee.getPercent()));
+		return attendeeElement;
+	}
+
+	private void appendRecurrenceToEventXml(Element parent, Event event) {
+		Element recurrence = DOMUtils.createElement(parent, "recurrence");
+		EventRecurrence eventRecurrence = event.getRecurrence();
+		recurrence.setAttribute("kind", eventRecurrence.getKind().toString());
+		if (event.isRecurrent()) {
+			appendRecurrenceRuleToRecurrenceElement(recurrence, eventRecurrence);
+			appendNegativeExceptionsToRecurrenceElement(recurrence, eventRecurrence);
+			appendEventExceptionsToRecurrenceElement(recurrence, eventRecurrence);
+		}
+	}
+
+	private void appendRecurrenceRuleToRecurrenceElement(Element recurrence,
+			EventRecurrence eventRecurrence) {
+		if (eventRecurrence.getEnd() != null) {
+			recurrence.setAttribute("end", DateHelper.asString(eventRecurrence.getEnd()));
+		}
+		if (eventRecurrence.getKind() == RecurrenceKind.weekly
+				|| eventRecurrence.getKind() == RecurrenceKind.daily) {
+			recurrence.setAttribute("days", new RecurrenceDaysSerializer().serialize(eventRecurrence.getDays()));
+			if (eventRecurrence.getFrequence() == 0) {
+				eventRecurrence.setFrequence(1);
+			}
+		}
+		recurrence.setAttribute("freq", String.valueOf(eventRecurrence.getFrequence()));
+	}
+
+	private void appendEventExceptionsToRecurrenceElement(Element recurrence,
+			EventRecurrence eventRecurrence) {
+		Element eventExceptions = DOMUtils.createElement(recurrence, "eventExceptions");
+		for (Event ex : eventRecurrence.getEventExceptions()) {
+			Element eventException = DOMUtils.createElement(eventExceptions, "eventException");
+			appendEvent(eventException, ex);
+		}
+	}
+
+	private void appendNegativeExceptionsToRecurrenceElement(
+			Element recurrence, EventRecurrence eventRecurrence) {
+		Element exceptions = DOMUtils.createElement(recurrence, "exceptions");
+		for (Date exception : eventRecurrence.getExceptions()) {
+			DOMUtils.createElementAndText(exceptions, "exception", DateHelper.asString(exception));
+		}
 	}
 
 	public void appendInfo(Element root, CalendarInfo ci) {
@@ -269,7 +268,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 				"http://www.obm.org/xsd/sync/events.xsd", "events");
 		Element root = doc.getDocumentElement();
 		for (Event event : events) {
-			appendUpdatedEvent(root, event);
+			Element eventElement = DOMUtils.createElement(root, "event");
+			appendUpdatedEvent(eventElement, event);
 		}
 		return DOMUtils.serialize(doc);
 	}

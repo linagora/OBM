@@ -41,7 +41,7 @@ public class DateHelper {
 	private static final Logger logger = LoggerFactory.getLogger(DateHelper.class);
 
 	public static final String asString(Date d) {
-		return String.valueOf(d.getTime());
+		return (d != null ? String.valueOf(d.getTime()) : null);
 	}
 
 	public static final Date asDate(String s) {
