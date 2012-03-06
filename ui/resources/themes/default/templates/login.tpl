@@ -22,6 +22,18 @@
         margin-bottom:0;
         width: 100%;
       }
+      .captcha{
+        position:relative;
+        margin-left:22%;
+      }
+      .captcha th{
+        font-style: italic;
+        vertical-align:top; 
+        font-weight:normal;
+      }
+      .captcha td{
+        padding-left:2%;
+      }
     </style>
   </head>
   <body>
@@ -49,6 +61,7 @@
         </tr>        
         </table>
       </fieldset>
+      $captcha_formadd
       <fieldset class="buttons">
         <input type="submit" value="$l_validate" />
       </fieldset>

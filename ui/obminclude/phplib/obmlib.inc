@@ -26,6 +26,7 @@ require_once("$obminclude/phplib/ct_sql.inc");
 require_once("$obminclude/of/of_query.inc");
 require_once("$obminclude/of/of_session.inc");
 require_once("$obminclude/of/of_display.inc");
+require_once("$obminclude/lib/captcha/recaptchalib.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM Classes                                                               //
@@ -171,9 +172,22 @@ class OBM_Challenge_Auth extends Auth {
   }
   
   function auth_validatelogin() {
-    global $obm, $params;
+    global $obm, $params, $conf_recaptcha_privatekey;
     global $c_default_domain, $c_singleNameSpace, $l_error;
-      
+    
+    // reCaptcha Activation to login
+    if (recaptcha_activation() == true){
+      if ($_POST["recaptcha_response_field"]) {
+        $resp = recaptcha_check_answer ($conf_recaptcha_privatekey,
+                                        $_SERVER["REMOTE_ADDR"],
+                                        $_POST["recaptcha_challenge_field"],
+                                        $_POST["recaptcha_response_field"]);
+        if ($resp->is_valid) {} else { return false; }
+      } else { 
+        return false;
+      }
+    }
+    
     if(isset($params['auth_ticket'])) {
       $udata = $this->check_ticket_auth($params['auth_ticket']);
       if(!$udata) {

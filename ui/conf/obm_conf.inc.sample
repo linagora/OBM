@@ -322,5 +322,9 @@ $cgp_show['module']['log'] = false;
 //$l_documentcategory1 = 'Doc cat1';
 //$cgp_user['user']['category']['documentcategory1'] = array('mode'=>'mono');
 
+// reCAPTCHA 
+$conf_recaptcha = false;
+$conf_recaptcha_publickey = ""
+$conf_recaptcha_privatekey = "";
 
 </script>

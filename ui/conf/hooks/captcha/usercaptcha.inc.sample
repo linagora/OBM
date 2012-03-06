@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2012 Linagora
 
@@ -29,77 +29,24 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : global.inc                                                   //
-//     - Desc : Global common OBM include file                               //
-// 1999-01-24 Pierre Baudracco                                               //
+// OBM - File : usecaptcha.inc                                               //
+//     - Desc : use reCaptcha on server OBM                                 //
+//              configuration Sample file                                    //
+// 2012-01-19 Kornobis Jeremie                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$
-///////////////////////////////////////////////////////////////////////////////
- 
-global $set_lang_default, $set_theme_default, $c_singleNameSpace, $conf_recaptcha_publickey;
 
-$login_javascript_footer = "
-<script type=\"text/javascript\">
-  if (document.forms.loginform.login.value == '') {
-    document.forms.loginform.login.focus();
-  } else {
-    document.forms.loginform.password.focus();
-  }
-</script>
-";
+// Function to add user rules like white list,
+// you can modify - adding test : False = Disable reCAPTCHA
 
-
-$theme_file = "resources/themes/$set_theme_default/theme.inc";
-include_once($theme_file);
-
-$lang_file = "obminclude/lang/$set_lang_default/login.inc";
-include_once($lang_file);
-
-$captcha_file = "lib/captcha/recaptchalib.php";
-require_once($captcha_file);
-
-$conf_login_page = "$path/../conf/themes/login.html";
-if (file_exists($conf_login_page)) {
-  $lp = $conf_login_page;
-} else {
-  $lp = $login_template;
+function hook_userRules_recaptcha(){
+	$ip = $_SERVER["REMOTE_ADDR"];
+	// White-List IP array where reCAPTCHA is Disabled
+	$whitelist = array ('***.***.***.***', '***.***.***.***');
+	if(in_array($ip, $whitelist)){ 
+		return false;
+	}else{
+		return true;
+	}    
 }
-
-if(!$c_singleNameSpace) {
-  $domain_id = isset($_REQUEST['sel_domain_id'])?$_REQUEST['sel_domain_id']:$c_default_domain;
-  $sel_domain = of_domain_dis_select($domain_id);
-  $domain = $l_domain;
-}
-
-if (isset($params['login'])) {
-  $error = $l_error;
-}
-
-$login_action = '';
-
-$login = isset($params['login']) ? $params['login'] : '';
-
-//  reCaptcha  //
-$recaptcha_formadd = '';
-if (recaptcha_activation() == true){
-  $recaptcha_error = null;
-  $recaptcha = recaptcha_get_html($conf_recaptcha_publickey, $recaptcha_error);
-  $captcha_formadd = '
-    <table class="captcha">
-      <tr>
-        <th><label for="captcha">reCAPTCHA</label></th>
-        <td>'.$recaptcha.'</td>
-      </tr> 
-    </table>
-  ';
-}
-
-
-$template = get_template($lp);
-eval ("\$template = \"$template\";");
-echo $template;
-
-</script>
+?>
