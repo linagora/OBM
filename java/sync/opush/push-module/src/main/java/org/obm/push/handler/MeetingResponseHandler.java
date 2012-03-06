@@ -163,27 +163,44 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		ItemChangeMeetingResponse meetingResponse = new ItemChangeMeetingResponse();
 		
 		if (email != null) {
-			meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
-			try {
-				AttendeeStatus userResponse = item.getUserResponse();
-				String calId = calendarBackend.handleMeetingResponse(bs, email,	userResponse);
-				contentsImporter.importMessageDeletion(bs, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
-				if (!AttendeeStatus.DECLINE.equals(userResponse)) {
-					meetingResponse.setCalId(calId);
-				}
-			} catch (ItemNotFoundException e) {
-				logger.error(e.getMessage(), e);
-				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-			} catch (UnexpectedObmSyncServerException e) {
-				logger.error(e.getMessage(), e);
-				meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-			}
+			handle(meetingResponse, bs, email, item.getUserResponse());
+			deleteInvitationEmail(bs, item);
 		} else {
 			meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		}
 		
 		meetingResponse.setReqId(item.getReqId());
 		return meetingResponse;
+	}
+
+	private void handle(ItemChangeMeetingResponse meetingResponse, BackendSession bs, MSEmail email,
+			AttendeeStatus userResponse) throws CollectionNotFoundException, DaoException {
+		
+		meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
+		try {
+			String calId = calendarBackend.handleMeetingResponse(bs, email,	userResponse);
+			if (!AttendeeStatus.DECLINE.equals(userResponse)) {
+				meetingResponse.setCalId(calId);
+			}
+		} catch (ItemNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+		} catch (UnexpectedObmSyncServerException e) {
+			logger.error(e.getMessage(), e);
+			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+		}		
+	}
+
+	private void deleteInvitationEmail(BackendSession bs, MeetingResponse item)
+			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException {
+
+		try {
+			contentsImporter.importMessageDeletion(bs, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
+		} catch (ItemNotFoundException e) {
+			logger.warn(e.getMessage(), e);
+		} catch (UnexpectedObmSyncServerException e) {
+			logger.warn(e.getMessage(), e);
+		}		
 	}
 	
 	private MSEmail retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
