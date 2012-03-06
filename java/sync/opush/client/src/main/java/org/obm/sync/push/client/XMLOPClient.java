@@ -28,7 +28,7 @@ public class XMLOPClient extends OPClient {
 
 	private RequestEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {
 		try {
-			String xmlData = DOMUtils.serialise(doc);
+			String xmlData = DOMUtils.serialize(doc);
 			return new ByteArrayRequestEntity(xmlData.getBytes("UTF8"), "text/xml");
 		} catch (TransformerException e) {
 			throw new TransformerException("Cannot serialize data to xml", e);

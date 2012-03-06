@@ -156,7 +156,7 @@ private CalendarItemsWriter writer;
 				+ "</calendar-changes>";
 
 		Document resultDocument = writer.writeChanges(eventChanges);
-		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
@@ -179,7 +179,7 @@ private CalendarItemsWriter writer;
 				+ "</calendar-changes>";
 
 		Document resultDocument = writer.writeChanges(eventChanges);
-		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialise(resultDocument));
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 	
 	@Test

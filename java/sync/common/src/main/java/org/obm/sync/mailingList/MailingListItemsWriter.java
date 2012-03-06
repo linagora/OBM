@@ -31,11 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.mailingList;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import javax.xml.transform.TransformerException;
+
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.items.AbstractItemsWriter;
-import org.obm.sync.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -64,14 +65,14 @@ public class MailingListItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getMailingListsAsString(MailingList... mailingList) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String out = "";
 		try {
 			Document doc = getMailingListsAsXML(mailingList);
-			DOMUtils.serialize(doc, out);
-		} catch (Exception ex) {
+			out = DOMUtils.serialize(doc);
+		} catch (TransformerException ex) {
 			logger.error(ex.getMessage(), ex);
 		}
-		return out.toString();
+		return out;
 	}
 
 	public Document getMailingListEmailsAsXML(List<MLEmail> emails) {
@@ -89,14 +90,14 @@ public class MailingListItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getMailingListEmailsAsString(List<MLEmail> emails) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String out = "";
 		try {
 			Document doc = getMailingListEmailsAsXML(emails);
-			DOMUtils.serialize(doc, out);
-		} catch (Exception ex) {
+			out = DOMUtils.serialize(doc);
+		} catch (TransformerException ex) {
 			logger.error(ex.getMessage(), ex);
 		}
-		return out.toString();
+		return out;
 	}
 	
 	private void appendMailingList(Element root, MailingList mailingList) {

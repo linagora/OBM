@@ -40,7 +40,7 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.sync.items.AbstractItemsParser;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

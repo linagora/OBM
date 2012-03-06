@@ -32,7 +32,7 @@
 package org.obm.sync.setting;
 
 import org.obm.sync.items.AbstractItemsWriter;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -36,9 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.io.StringReader;
-import java.util.concurrent.Semaphore;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,6 +63,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
@@ -79,31 +79,69 @@ public final class DOMUtils {
 	
 	private static TransformerFactory fac;
 	private static DocumentBuilderFactory dbf;
-	private static DocumentBuilder builder;
-	private static Semaphore builderLock;
+	private static ThreadLocal<DocumentBuilder> builder = new ThreadLocal<DocumentBuilder>();
 
 	static {
 		fac = TransformerFactory.newInstance();
 		dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setValidating(false);
-		try {
-			builder = dbf.newDocumentBuilder();
-			builderLock = new Semaphore(1);
-		} catch (ParserConfigurationException e) {
-		}
 	}
 
-	private static final void lock() {
-		try {
-			builderLock.acquire();
-		} catch (InterruptedException e) {
+	private static DocumentBuilder builder() {
+		DocumentBuilder documentBuilder = builder.get();
+		if (documentBuilder == null) {
+			try {
+				documentBuilder = dbf.newDocumentBuilder();
+			} catch (ParserConfigurationException e) {
+				logger.error(e.getMessage(), e);
+			}
+			builder.set(documentBuilder);
 		}
+		return documentBuilder;
 	}
 
-	private static final void unlock() {
-		builderLock.release();
+	public static String getElementTextInChildren(Element root,
+			String elementName) {
+		NodeList list = root.getChildNodes();
+		for (int i = 0; i < list.getLength(); i++) {
+			if (list.item(i).getNodeType() == Node.TEXT_NODE) {
+				continue;
+			}
+			Element e = (Element) list.item(i);
+			if (e.getTagName().equals(elementName)) {
+				return getElementText((Element) list.item(i));
+			}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("No element named '" + elementName + "' under '" //$NON-NLS-1$ //$NON-NLS-2$
+					+ root.getNodeName() + "'"); //$NON-NLS-1$
+		}
+		return null;
 	}
+
+	/**
+	 * Renvoie une élément qui doit être unique dans le document.
+	 * 
+	 * @param root
+	 * @param elementName
+	 * @return
+	 */
+	public static Element getUniqueElementInChildren(Element root,
+			String elementName) {
+
+		NodeList list = root.getChildNodes();
+		for (int i = 0; i < list.getLength(); i++) {
+			if (list.item(i).getNodeType() == Node.TEXT_NODE) {
+				continue;
+			}
+			Element e = (Element) list.item(i);
+			if (e.getTagName().equals(elementName)) {
+				return (Element) list.item(i);
+			}
+		}
+		return null;
+	}	
 
 	public static String getElementText(Element root, String elementName) {
 		NodeList list = root.getElementsByTagName(elementName);
@@ -280,7 +318,7 @@ public final class DOMUtils {
 		return buffer.toString();
 	}
 	
-	public static void serialise(Document doc, OutputStream out, boolean pretty)
+	public static void serialize(Document doc, OutputStream out, boolean pretty)
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();
 		if (pretty) {
@@ -293,58 +331,35 @@ public final class DOMUtils {
 		tf.transform(input, output);
 	}
 
-	public static void serialise(Document doc, OutputStream out)
+	public static void serialize(Document doc, OutputStream out)
 			throws TransformerException {
-		serialise(doc, out, false);
+		serialize(doc, out, false);
 	}
 
-	public static String serialise(Document doc)
+	public static String serialize(Document doc)
 			throws TransformerException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		serialise(doc, byteArrayOutputStream, false);
+		serialize(doc, byteArrayOutputStream, false);
 		return new String(byteArrayOutputStream.toByteArray());
 	}
 	
 	public static void logDom(Document doc) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		serialise(doc, out, true);
+		serialize(doc, out, true);
 		logger.info(out.toString());
 	}
 
 	public static Document parse(String xmlContent) throws SAXException, IOException {
-		lock();
-		Document ret = null;
-		try {
-			ret = builder.parse(new InputSource(new StringReader(xmlContent)));
-		} finally {
-			unlock();
-		}
-		return ret;
-		
+		return builder().parse(new InputSource(new StringReader(xmlContent)));
 	}
 	
-	public static Document parse(InputStream is) throws SAXException,
-			IOException, FactoryConfigurationError {
-		lock();
-		Document ret = null;
-		try {
-			ret = builder.parse(is);
-		} finally {
-			unlock();
-		}
-		return ret;
+	public static Document parse(InputStream inputStream) throws SAXException, IOException {
+		return builder().parse(inputStream);
 	}
 
-	public static Document parse(File f) throws SAXException,
+	public static Document parse(File file) throws SAXException,
 			IOException, FactoryConfigurationError {
-		lock();
-		Document ret = null;
-		try {
-			ret = builder.parse(f);
-		} finally {
-			unlock();
-		}
-		return ret;
+		return builder().parse(file);
 	}
 
 	public static DocumentFragment parseHtmlAsFragment(final InputSource source) throws SAXException, IOException {
@@ -362,15 +377,9 @@ public final class DOMUtils {
 
 	public static Document createDoc(String namespace, String rootElement)
 			throws FactoryConfigurationError {
-		lock();
-		DOMImplementation di = builder.getDOMImplementation();
-		Document ret = null;
-		try {
-			ret = di.createDocument(namespace, rootElement, null);
-		} finally {
-			unlock();
-		}
-		return ret;
+		DOMImplementation di = builder().getDOMImplementation();
+		Document document = di.createDocument(namespace, rootElement, null);
+		return document;
 	}
 
 	public static void saxParse(InputStream is, DefaultHandler handler)

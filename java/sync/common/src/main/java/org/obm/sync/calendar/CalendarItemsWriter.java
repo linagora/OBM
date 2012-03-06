@@ -31,17 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
-import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -258,25 +257,21 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getEventString(Event event) throws TransformerException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/event.xsd", "event");
 		Element root = doc.getDocumentElement();
 		appendUpdatedEvent(root, event);
-		DOMUtils.serialize(doc, out);
-		return out.toString();
+		return DOMUtils.serialize(doc);
 	}
 
 	public String getListEventString(List<Event> events) throws TransformerException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/events.xsd", "events");
 		Element root = doc.getDocumentElement();
 		for (Event event : events) {
 			appendUpdatedEvent(root, event);
 		}
-		DOMUtils.serialize(doc, out);
-		return out.toString();
+		return DOMUtils.serialize(doc);
 	}
 
 	public void appendCategory(Element root, Category c) {
@@ -338,18 +333,18 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getFreeBusyRequestString(FreeBusyRequest fbr) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String out = "";
 		try {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/freeBusyRequest.xsd",
 					"freeBusyRequest");
 			Element root = doc.getDocumentElement();
 			appendFreeBusyRequest(root, fbr);
-			DOMUtils.serialize(doc, out);
-		} catch (Exception e) {
+			out = DOMUtils.serialize(doc);
+		} catch (TransformerException e) {
 			logger.error("Error writing freebusy as string", e);
 		}
-		return out.toString();
+		return out;
 	}
 
 	public void appendFreeBusy(Element e, FreeBusy freeBusy) {
@@ -379,16 +374,16 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getFreeBusyString(FreeBusy fb) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String out = "";
 		try {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/freeBusy.xsd", "freeBusy");
 			Element root = doc.getDocumentElement();
 			appendFreeBusy(root, fb);
-			DOMUtils.serialize(doc, out);
-		} catch (Exception e) {
+			out = DOMUtils.serialize(doc);
+		} catch (TransformerException e) {
 			logger.error("Error writing freebusy as string", e);
 		}
-		return out.toString();
+		return out;
 	}
 }

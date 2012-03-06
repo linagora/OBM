@@ -53,7 +53,7 @@ public class DOMUtilsTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		root.setTextContent(expectedString);
-		DOMUtils.serialise(reply, out);
+		DOMUtils.serialize(reply, out);
 		
 		Assert.assertThat(new String(out.toByteArray(), "UTF-8"), 
 				StringContains.containsString(expectedString));

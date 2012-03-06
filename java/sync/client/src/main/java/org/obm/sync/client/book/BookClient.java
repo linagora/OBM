@@ -53,7 +53,7 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 

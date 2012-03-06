@@ -225,14 +225,14 @@ public class PingHandlerTest {
 
 	private void checkNoChangeResponse(Document response)
 			throws TransformerException {
-		Assertions.assertThat(DOMUtils.serialise(response))
+		Assertions.assertThat(DOMUtils.serialize(response))
 			.isEqualTo(
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 					"<Ping><Status>1</Status><Folders/></Ping>");
 	}
 	
 	private void checkHasChangeResponse(Document response) throws TransformerException {
-		Assertions.assertThat(DOMUtils.serialise(response))
+		Assertions.assertThat(DOMUtils.serialize(response))
 			.isEqualTo(
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><Ping>" +
 					"<Status>2</Status>" +

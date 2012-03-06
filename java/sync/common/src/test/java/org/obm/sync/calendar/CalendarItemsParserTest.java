@@ -44,7 +44,7 @@ import junit.framework.Assert;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

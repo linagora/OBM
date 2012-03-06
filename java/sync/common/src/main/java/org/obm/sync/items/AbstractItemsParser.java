@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.obm.sync.base.KeyList;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

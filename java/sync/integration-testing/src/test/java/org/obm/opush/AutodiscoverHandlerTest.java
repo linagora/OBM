@@ -61,7 +61,7 @@ public class AutodiscoverHandlerTest {
 	}
 
 	private void checkAutodiscoverResponse(Document response, String externalUrl, String culture) throws TransformerException {
-		Assertions.assertThat(DOMUtils.serialise(response)).
+		Assertions.assertThat(DOMUtils.serialize(response)).
 		isEqualTo( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Autodiscover>" +
 				"<Response>" +

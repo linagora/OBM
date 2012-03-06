@@ -93,7 +93,7 @@ public class CalendarEncoderTest {
 		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
 				event, getFakeSyncCollection(), true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		DOMUtils.serialise(doc, outputStream);
+		DOMUtils.serialize(doc, outputStream);
 		String actual = new String(outputStream.toByteArray());
 		
 		StringBuilder expected = new StringBuilder();
@@ -127,7 +127,7 @@ public class CalendarEncoderTest {
 		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
 				event, getFakeSyncCollection(), true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		DOMUtils.serialise(doc, outputStream);
+		DOMUtils.serialize(doc, outputStream);
 		String actual = new String(outputStream.toByteArray());
 		
 		StringBuilder expected = new StringBuilder();

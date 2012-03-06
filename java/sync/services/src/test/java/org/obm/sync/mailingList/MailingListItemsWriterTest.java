@@ -31,16 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.mailingList;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import org.obm.sync.utils.DOMUtils;
-import org.w3c.dom.Document;
-
 import junit.framework.TestCase;
+
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 
 public class MailingListItemsWriterTest extends TestCase {
 
@@ -84,9 +83,8 @@ public class MailingListItemsWriterTest extends TestCase {
 		try {
 			Document xml = writer.getMailingListsAsXML(getTestMailingList());
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			DOMUtils.serialize(xml, out);
-			assertEquals(getTestMailingString(), out.toString());
+			String out = DOMUtils.serialize(xml);
+			assertEquals(getTestMailingString(), out);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -136,10 +134,9 @@ public class MailingListItemsWriterTest extends TestCase {
 			sb.append("</mailingListEmails>");
 
 			Document xml = writer.getMailingListEmailsAsXML(emails);
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			DOMUtils.serialize(xml, out);
-			assertEquals(sb.toString(), out.toString());
+			String out = DOMUtils.serialize(xml);
+			assertEquals(sb.toString(), out);
 		} catch (TransformerException e1) {
 			fail(e1.getMessage());
 		}

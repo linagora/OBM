@@ -63,7 +63,7 @@ import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.ICalendar;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 

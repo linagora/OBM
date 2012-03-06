@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.base.Category;
@@ -63,7 +63,6 @@ import org.obm.sync.mailingList.MailingListItemsWriter;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.SettingItemsWriter;
 import org.obm.sync.setting.VacationSettings;
-import org.obm.sync.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -143,9 +142,7 @@ public class XmlResponder {
 			DOMUtils.serialize(doc, resp.getOutputStream());
 
 			DOMUtils.logDom(doc);
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			DOMUtils.serialize(doc, out);
-			res = out.toString();
+			res = DOMUtils.serialize(doc);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

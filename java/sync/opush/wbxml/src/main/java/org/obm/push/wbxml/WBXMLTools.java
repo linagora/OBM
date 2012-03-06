@@ -128,7 +128,7 @@ public class WBXMLTools {
 		WbxmlEncoder encoder = new WbxmlEncoder(defaultNamespace);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			DOMUtils.serialise(doc, out);
+			DOMUtils.serialize(doc, out);
 			StringReader stringReader = new StringReader(new String(out.toByteArray(), "UTF-8"));
 			InputSource is = new InputSource(stringReader);
 			out = new ByteArrayOutputStream();

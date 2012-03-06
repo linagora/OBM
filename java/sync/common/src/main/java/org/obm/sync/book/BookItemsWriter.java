@@ -31,16 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.transform.TransformerException;
+
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
-import org.obm.sync.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -201,17 +202,17 @@ public class BookItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getContactAsString(Contact contact) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String out = "";
 		try {
 			Document doc = DOMUtils.createDoc(
 					"http://www.obm.org/xsd/sync/contact.xsd", "contact");
 			Element root = doc.getDocumentElement();
 			appendContact(root, contact);
-			DOMUtils.serialize(doc, out);
-		} catch (Exception ex) {
+			out = DOMUtils.serialize(doc);
+		} catch (TransformerException ex) {
 			logger.error(ex.getMessage(), ex);
 		}
-		return out.toString();
+		return out;
 	}
 
 	private void createFolderChanges(FolderChanges fc, Element root) {

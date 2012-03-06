@@ -36,7 +36,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 public class MailingListItemsParserTest extends TestCase {

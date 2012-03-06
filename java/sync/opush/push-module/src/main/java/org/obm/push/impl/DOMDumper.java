@@ -104,7 +104,7 @@ public class DOMDumper {
 	
 	private void log(Logger logger, Document doc) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DOMUtils.serialise(doc, out, true);
+		DOMUtils.serialize(doc, out, true);
 		logger.info(out.toString());
 	}
 	

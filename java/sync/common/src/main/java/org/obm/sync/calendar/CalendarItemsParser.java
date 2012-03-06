@@ -39,7 +39,7 @@ import java.util.List;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

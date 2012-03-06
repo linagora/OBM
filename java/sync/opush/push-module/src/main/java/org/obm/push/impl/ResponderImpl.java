@@ -115,7 +115,7 @@ public class ResponderImpl implements Responder {
 		domDumper.dumpXml(doc);
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			DOMUtils.serialise(doc, out);
+			DOMUtils.serialize(doc, out);
 			byte[] ret = out.toByteArray();
 			writeData(ret, "text/xml");	
 		} catch (TransformerException e) {

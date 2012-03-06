@@ -7,7 +7,7 @@ import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

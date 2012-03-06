@@ -64,7 +64,7 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.ParametersSource;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.ImportICalendarException;
-import org.obm.sync.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

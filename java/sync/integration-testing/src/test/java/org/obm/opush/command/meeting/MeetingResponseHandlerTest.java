@@ -256,19 +256,19 @@ public class MeetingResponseHandlerTest {
 	}
 
 	private void assertMeetingResponseIsSuccess(Document response) throws TransformerException {
-		String responseAsText = DOMUtils.serialise(response);
+		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandSuccess();
 		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void assertMeetingResponseIsFailure(Document response) throws TransformerException {
-		String responseAsText = DOMUtils.serialise(response);
+		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandFailure();
 		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void assertMeetingResponseIsInvalidRequest(Document response) throws TransformerException {
-		String responseAsText = DOMUtils.serialise(response);
+		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandInvalidRequest();
 		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
@@ -373,7 +373,7 @@ public class MeetingResponseHandlerTest {
 		
 		MeetingHandlerResponse response = new MeetingHandlerResponse(Lists.newArrayList(itemChangeMeetingResponse));
 		Document encodeResponses = protocol.encodeResponses(response);
-		return DOMUtils.serialise(encodeResponses);
+		return DOMUtils.serialize(encodeResponses);
 	}
 
 	private Document buildMeetingAcceptedResponse()
