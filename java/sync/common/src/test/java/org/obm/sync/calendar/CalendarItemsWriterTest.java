@@ -63,45 +63,9 @@ private CalendarItemsWriter writer;
 	public void initCalendarWriter(){
 		writer = new CalendarItemsWriter();
 	}
-	
-	@Test
-	public void testGetEventString() throws TransformerException, SAXException, IOException {
-		Event ev = getFakeEvent();
-
-		String resultXML = writer.getEventString(ev);
-
-		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">"
-				+ "<timeupdate>1292580000000</timeupdate>"
-				+ "<timecreate>1289988000000</timecreate>"
-				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
-				+ "<opacity>OPAQUE</opacity>"
-				+ "<title>fake rdv</title>"
-				+ "<owner>john@do.fr</owner>"
-				+ "<tz>Europe/Paris</tz>"
-				+ "<date>1295258400000</date>"
-				+ "<duration>3600</duration>"
-				+ "<location>tlse</location>"
-				+ "<alert>60</alert>"
-				+ "<priority>0</priority>"
-				+ "<privacy>0</privacy>"
-				+ "<attendees>"
-				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
-				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
-				+ "</attendees>"
-				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
-				+ "<exceptions>"
-				+ "<exception>1295258400000</exception>"
-				+ "<exception>1292580000000</exception>"
-				+ "</exceptions><eventExceptions/>"
-				+ "</recurrence>"
-				+ "</event>";
-
-		XMLAssert.assertXMLEqual(expectedXML, resultXML);
-	}
 
 	@Test
-	public void testGetXMLDocumentFromWithNoChange() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromEventChangesWithNoChange() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -117,7 +81,7 @@ private CalendarItemsWriter writer;
 	}
 
 	@Test
-	public void testGetXMLDocumentFromWithRemovedElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromEventChangesWithRemovedElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -140,7 +104,7 @@ private CalendarItemsWriter writer;
 	}
 	
 	@Test
-	public void testGetXMLDocumentFromWithUpdatedElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromEventChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -213,7 +177,7 @@ private CalendarItemsWriter writer;
 	}
 
 	@Test
-	public void testGetXMLDocumentFromWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
+	public void testGetXMLDocumentFromEventChangesWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
@@ -241,6 +205,105 @@ private CalendarItemsWriter writer;
 				+ "</calendar-changes>";
 
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testGetXMLDocumentFromEvent() throws SAXException, IOException, TransformerException {
+		Event event = getFakeEvent();
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
+				+ "<exceptions>"
+				+ "<exception>1295258400000</exception>"
+				+ "<exception>1292580000000</exception>"
+				+ "</exceptions><eventExceptions/>"
+				+ "</recurrence>"
+				+ "</event>";
+
+		Document resultDocument = writer.getXMLDocumentFrom(event);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testGetXMLDocumentFromListOfEvent() throws SAXException, IOException, TransformerException {
+		Event event = getFakeEvent();
+		Event eventClone = event.clone();
+		List<Event> events = Lists.newArrayList(event, eventClone);
+
+		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<events xmlns=\"http://www.obm.org/xsd/sync/events.xsd\">"
+				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
+				+ "<exceptions>"
+				+ "<exception>1295258400000</exception>"
+				+ "<exception>1292580000000</exception>"
+				+ "</exceptions><eventExceptions/>"
+				+ "</recurrence>"
+				+ "</event>"
+				+ "<event allDay=\"false\" isInternal=\"true\" sequence=\"3\" type=\"VEVENT\">"
+				+ "<timeupdate>1292580000000</timeupdate>"
+				+ "<timecreate>1289988000000</timecreate>"
+				+ "<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>"
+				+ "<opacity>OPAQUE</opacity>"
+				+ "<title>fake rdv</title>"
+				+ "<owner>john@do.fr</owner>"
+				+ "<tz>Europe/Paris</tz>"
+				+ "<date>1295258400000</date>"
+				+ "<duration>3600</duration>"
+				+ "<location>tlse</location>"
+				+ "<alert>60</alert>"
+				+ "<priority>0</priority>"
+				+ "<privacy>0</privacy>"
+				+ "<attendees>"
+				+ "<attendee displayName=\"John Do\" email=\"john@do.fr\" isOrganizer=\"true\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee displayName=\"noIn TheDatabase\" email=\"notin@mydb.com\" isOrganizer=\"false\" percent=\"0\" required=\"OPT\" state=\"ACCEPTED\"/>"
+				+ "</attendees>"
+				+ "<recurrence days=\"\" freq=\"1\" kind=\"daily\">"
+				+ "<exceptions>"
+				+ "<exception>1295258400000</exception>"
+				+ "<exception>1292580000000</exception>"
+				+ "</exceptions><eventExceptions/>"
+				+ "</recurrence>"
+				+ "</event>"
+				+ "</events>";
+
+		Document resultDocument = writer.getXMLDocumentFrom(events);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 

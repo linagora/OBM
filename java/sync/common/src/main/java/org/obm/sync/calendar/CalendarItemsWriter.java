@@ -93,7 +93,25 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public void appendUpdatedEvent(Element parent, Event event) {
+	public Document getXMLDocumentFrom(Event event) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/event.xsd", "event");
+		Element root = doc.getDocumentElement();
+		appendUpdatedEvent(root, event);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(List<Event> events) {
+		Document doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/events.xsd", "events");
+		Element root = doc.getDocumentElement();
+		for (Event event : events) {
+			Element eventElement = DOMUtils.createElement(root, "event");
+			appendUpdatedEvent(eventElement, event);
+		}
+		return doc;
+	}
+
+	private void appendUpdatedEvent(Element parent, Event event) {
 		appendEvent(parent, event);
 	}
 
@@ -256,22 +274,11 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	}
 
 	public String getEventString(Event event) throws TransformerException {
-		Document doc = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/event.xsd", "event");
-		Element root = doc.getDocumentElement();
-		appendUpdatedEvent(root, event);
-		return DOMUtils.serialize(doc);
+		return DOMUtils.serialize(getXMLDocumentFrom(event));
 	}
 
 	public String getListEventString(List<Event> events) throws TransformerException {
-		Document doc = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/events.xsd", "events");
-		Element root = doc.getDocumentElement();
-		for (Event event : events) {
-			Element eventElement = DOMUtils.createElement(root, "event");
-			appendUpdatedEvent(eventElement, event);
-		}
-		return DOMUtils.serialize(doc);
+		return DOMUtils.serialize(getXMLDocumentFrom(events));
 	}
 
 	public void appendCategory(Element root, Category c) {

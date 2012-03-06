@@ -197,22 +197,12 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendEvent(Event ev) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/event.xsd", "event");
-			Element root = doc.getDocumentElement();
-			ciw.appendUpdatedEvent(root, ev);
-			res = sendDom(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+	public String sendEvent(Event event) {
+		return sendDom(ciw.getXMLDocumentFrom(event));
 	}
 
-	public String sendCalendarChanges(EventChanges cc) {
-		return sendDom(ciw.getXMLDocumentFrom(cc));
+	public String sendCalendarChanges(EventChanges eventChanges) {
+		return sendDom(ciw.getXMLDocumentFrom(eventChanges));
 	}
 
 	public String sendCalendarInformations(CalendarInfo[] lc) {
@@ -282,21 +272,8 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendListEvent(List<Event> evs) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/events.xsd", "events");
-			Element root = doc.getDocumentElement();
-			for (Event ev : evs) {
-				Element eventElement = DOMUtils.createElement(root, "event");
-				ciw.appendUpdatedEvent(eventElement, ev);
-			}
-			res = sendDom(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+	public String sendListEvent(List<Event> events) {
+		return sendDom(ciw.getXMLDocumentFrom(events));
 	}
 
 	public String sendListEventTimeUpdate(List<EventTimeUpdate> evs) {
