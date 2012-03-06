@@ -40,6 +40,9 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
+import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
@@ -68,6 +71,14 @@ public class ImapTestUtils {
 	public Email sendEmailToInbox() throws MailException {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		return emailInInbox();
+	}
+
+	public Email sendEmailToMailbox(String mailbox)
+			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
+		
+		Email sentEmail = sendEmailToInbox();
+		mailboxService.moveItem(bs, EmailConfiguration.IMAP_INBOX_NAME, mailboxPath(mailbox), sentEmail.getUid());
+		return emailInMailbox(mailbox);
 	}
 
 	public Email emailInInbox() throws MailException {
