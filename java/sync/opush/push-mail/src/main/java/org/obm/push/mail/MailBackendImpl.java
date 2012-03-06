@@ -353,7 +353,7 @@ public class MailBackendImpl implements MailBackend {
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
-			throw new ProcessingEmailException(e);
+			throw new ItemNotFoundException(e);
 		}
 	}
 

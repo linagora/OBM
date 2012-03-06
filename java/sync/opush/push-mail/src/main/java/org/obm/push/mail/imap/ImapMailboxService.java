@@ -34,7 +34,6 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -317,22 +316,25 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	 
 	@Override
 	public void delete(BackendSession bs, String collectionPath, long uid) 
-			throws DaoException, MailException {
-		
-		StoreClient store = imapClientProvider.getImapClient(bs);
+			throws MailException, ImapMessageNotFoundException {
+
+		ImapStore store = null;
 		try {
-			login(store);
-			String mailBoxName = parseMailBoxName(bs, collectionPath);
-			store.select(mailBoxName);
-			FlagsList fl = new FlagsList();
-			fl.add(Flag.DELETED);
-			logger.info("delete conv id = ", uid);
-			store.uidStore(Arrays.asList(uid), fl, true);
-			store.expunge();
-		} catch (IMAPException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			String mailboxName = parseMailBoxName(bs, collectionPath);
+			store.deleteMessage(mailboxName, uid);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
 	}
 

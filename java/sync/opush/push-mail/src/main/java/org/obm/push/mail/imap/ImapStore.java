@@ -172,7 +172,7 @@ public class ImapStore {
 			Message messageToMove = sourceFolder.getMessageByUIDOrException(messageUid);
 			
 			long newUid = sourceFolder.copyMessageThenGetNewUID(folderDst, messageUid);
-			deleteMessage(messageToMove);
+			sourceFolder.deleteMessage(messageToMove);
 			return newUid;
 		} catch (MessagingException e) {
 			String msg = String.format("IMAP command Move failed. user=%s, folderSource=%s, folderDestination=%s, messageUid=%d",
@@ -192,12 +192,9 @@ public class ImapStore {
 		return new OpushImapFolder(folder);
 	}
 
-	private void deleteMessage(Message messageToDelete) throws ImapCommandException {
-		try {
-			messageToDelete.setFlag(Flags.Flag.DELETED, true);
-			messageToDelete.getFolder().expunge();
-		} catch (MessagingException e) {
-			throw new ImapCommandException(e.getMessage(), e);
-		}
+	public void deleteMessage(String folderSrc, long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
+		Message messageToDelete = sourceFolder.getMessageByUIDOrException(messageUid);
+		sourceFolder.deleteMessage(messageToDelete);
 	}
 }

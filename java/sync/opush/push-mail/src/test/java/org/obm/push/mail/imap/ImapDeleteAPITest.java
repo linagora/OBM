@@ -34,8 +34,6 @@ package org.obm.push.mail.imap;
 import java.util.Date;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -47,6 +45,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
@@ -179,53 +178,28 @@ public class ImapDeleteAPITest {
 		Assertions.assertThat(mailboxEmailsAfter).doesNotContain(anEmailFromMailbox);
 	}
 
-	@Test
-	public void testDeleteNonExistingEmailDoesNothing() throws Exception {
+	@Test(expected=ImapMessageNotFoundException.class)
+	public void testDeleteNonExistingEmailTriggersAnException() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		long nonExistingEmailUid = sentEmail.getUid() + 1;
 
-		try {
-			mailboxService.delete(bs, INBOX, nonExistingEmailUid);
-		} catch (Exception nonExpectedException) {
-			Assert.fail("Delete command on non-existing email does nothing");
-		}
-		
-		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
-		Assertions.assertThat(mailboxEmailsAfter).hasSize(1);
+		mailboxService.delete(bs, INBOX, nonExistingEmailUid);
 	}
 
-	@Test
-	public void testDeleteExistingEmailInNonExistingFolderDoesNothing() throws Exception {
+	@Test(expected=ImapMessageNotFoundException.class)
+	public void testDeleteExistingEmailInNonExistingFolderTriggersAnException() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		String otherFolder = "ANYFOLDER";
 		testUtils.createFolders(otherFolder);
-		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		
 		mailboxService.delete(bs, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
-		
-		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
-		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
-		Assertions.assertThat(mailboxEmailsAfter).hasSize(1);
 	}
 
-	@Test
-	public void testDeleteAttemptedTwiceOnSameEmailDoesntTouchOthersEmails() throws Exception {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-
-		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
-		Email anEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);
+	@Test(expected=ImapMessageNotFoundException.class)
+	public void testDeleteAttemptedTwiceOnSameEmailTriggersAnException() throws Exception {
+		Email sentEmail = testUtils.sendEmailToInbox();
 		
-		try {
-			mailboxService.delete(bs, INBOX, anEmailFromMailbox.getUid());
-			mailboxService.delete(bs, INBOX, anEmailFromMailbox.getUid());
-		} catch (Exception nonExpectedException) {
-			Assert.fail("Delete command on non-existing email does nothing");
-		}
-		
-		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
-		Assertions.assertThat(mailboxEmailsAfter).hasSize(2);
-		Assertions.assertThat(mailboxEmailsAfter).doesNotContain(anEmailFromMailbox);
+		mailboxService.delete(bs, INBOX, sentEmail.getUid());
+		mailboxService.delete(bs, INBOX, sentEmail.getUid());
 	}
 }

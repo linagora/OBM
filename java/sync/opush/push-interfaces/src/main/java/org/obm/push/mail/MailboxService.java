@@ -57,7 +57,7 @@ public interface MailboxService {
 
 	String parseMailBoxName(BackendSession bs, String collectionName) throws MailException;
 
-	void delete(BackendSession bs, String collectionPath, long uid) throws MailException, DaoException;
+	void delete(BackendSession bs, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
 
 	long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
 			throws MailException, DaoException, ImapMessageNotFoundException, UnsupportedBackendFunctionException;

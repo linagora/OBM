@@ -76,6 +76,11 @@ public class OpushImapFolder {
 		return (IMAPMessage) folder.getMessageByUID(uid);
 	}
 
+	public void deleteMessage(Message messageToDelete) throws MessagingException {
+		folder.setFlags(new Message[]{messageToDelete}, new Flags(Flags.Flag.DELETED), true);
+		expunge();
+	}
+
 	public void expunge() throws MessagingException {
 		folder.expunge();
 	}
