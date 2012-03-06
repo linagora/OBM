@@ -418,7 +418,7 @@ $l_add_alarm = "Ajouter une alerte";
 $l_addedit_alarm = "Ajouter / Modifier alerte";
 // decision popup
 $l_decision_ACCEPTED = "d\'accepter";
-$l_decision_NEEDS_ACTIONS = "de mettre en Attente";
+$l_decision_NEEDS_ACTIONS = "de mettre en attente";
 $l_decision_DECLINED = "de décliner";
 $l_decision_situation = "Vous avez choisi <b id=\"yourDecision\"></b> l'événement";
 $l_decision_possibility = "Vous pouvez commenter votre décision si vous le souhaitez.";

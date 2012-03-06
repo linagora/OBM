@@ -548,7 +548,7 @@ $l_addedit_alarm = "Add / Edit alert";
 $l_decision_ACCEPTED = "accept";
 $l_decision_NEEDS_ACTIONS = "wait";
 $l_decision_DECLINED = "decline";
-$l_decision_situation = "You chose to <b id=\"yourDecision\"> the event : ";
+$l_decision_situation = "You chose to <b id=\"yourDecision\"></b> the event : ";
 $l_decision_possibility = "You can comment your decision if you want.";
 $l_comment_decision = "Comment your decision";
 $l_without_comment = "Respond without comment";

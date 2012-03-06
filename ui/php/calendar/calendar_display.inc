@@ -3354,13 +3354,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $entity) {
         $label = '';
-
+	$resource_comment = get_comment_of_resource($r_id, $id);
         $label .= $entity['label'];
         $state = $entity['state'];
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
-	  $resource_comment = get_comment_of_resource($r_id, $id);
+	  
 	  if($resource_comment != ''){
 		$comment_style = 'text-align:justify;';
 		$resource_comment_display = $resource_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$resource_comment', 'resource');\"  title=\"$l_edit\"></a>";
@@ -3402,7 +3402,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span>
-            </td><td></td>
+            </td><td>$resource_comment</td>
             </tr>";          
         }
       }
