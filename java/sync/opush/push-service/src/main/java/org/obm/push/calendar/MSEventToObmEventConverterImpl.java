@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
@@ -51,7 +52,6 @@ import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
-import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;

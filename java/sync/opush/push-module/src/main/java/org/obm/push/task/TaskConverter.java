@@ -35,13 +35,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
-import org.obm.push.bean.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;

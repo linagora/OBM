@@ -29,11 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push;
 
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 
