@@ -29,35 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.opush.command.meeting;
 
-import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.push.backend.MailMonitoringBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.ImapClientProviderImpl;
-import org.obm.push.mail.imap.ImapMailboxService;
-import org.obm.push.mail.imap.ImapMonitoringImpl;
-import org.obm.push.mail.smtp.SmtpProvider;
-import org.obm.push.mail.smtp.SmtpProviderImpl;
+import org.easymock.EasyMock;
+import org.obm.opush.env.AbstractOpushEnv;
+import org.obm.opush.env.AbstractOverrideModule;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.mail.MailBackend;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
-public class OpushMailModule extends AbstractModule {
-
+public class MeetingResponseHandlerTestModule extends AbstractOpushEnv {
+	
+	public MeetingResponseHandlerTestModule() {
+		super();
+	}
+	
 	@Override
-	protected void configure() {
-		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
-		bind(MailboxService.class).to(ImapMailboxService.class);
-		bind(MailBackend.class).to(MailBackendImpl.class);
-		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
-		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
-		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
-		Multibinder<PIMBackend> pimBackends = 
-				Multibinder.newSetBinder(binder(), PIMBackend.class);
-		pimBackends.addBinding().to(MailBackend.class);
+	protected Module overrideModule() throws Exception {
+		Module overrideModule = super.overrideModule();
+
+		Module mailBackend = bindMailBackendModule();
+		
+		return Modules.combine(overrideModule, mailBackend);
 	}
 
+	private Module bindMailBackendModule() {
+		AbstractOverrideModule mailBackend = new AbstractOverrideModule() {
+
+			@Override
+			protected void configureImpl() {
+				bindWithMock(MailBackend.class);
+				EasyMock.expect(getMock(MailBackend.class).getPIMDataType()).andReturn(PIMDataType.EMAIL);
+			}
+		};
+		getMockMap().addMap(mailBackend.getMockMap());
+		return mailBackend;
+	}
 }
