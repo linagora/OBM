@@ -192,13 +192,13 @@ private CalendarItemsWriter writer;
 				+ "<participation extId=\"123\" id=\"1\">"
 				+ "<attendees>"
 				+ "<attendee email=\"john@doe\" state=\"ACCEPTED\"/>"
-				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\" comment=\"this is a new comment\"/>"
 				+ "</attendees>"
 				+ "</participation>"
 				+ "<participation extId=\"456\" id=\"2\" recurrenceId=\"789\">"
 				+ "<attendees>"
 				+ "<attendee email=\"john@doe\" state=\"ACCEPTED\"/>"
-				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\"/>"
+				+ "<attendee email=\"jane@doe\" state=\"NEEDS-ACTION\" comment=\"this is a new comment\"/>"
 				+ "</attendees>"
 				+ "</participation>"
 				+ "</participationChanges>"
@@ -374,6 +374,7 @@ private CalendarItemsWriter writer;
 		Attendee jane = new Attendee();
 		jane.setEmail("jane@doe");
 		jane.setState(ParticipationState.NEEDSACTION);
+		jane.getState().setComment(new Comment("this is a new comment"));
 
 		List<Attendee> attendees = Lists.newArrayList(john, jane);
 		return attendees;
