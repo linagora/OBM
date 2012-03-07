@@ -2110,8 +2110,13 @@ Obm.CalendarCommentPopup = new Class({
 		new Request.JSON({      
 			url: obm.vars.consts.calendarUrl,
 			secure : false,
-			onComplete : function(){
-				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			onSuccess : function(message){
+				if(message.error == 0){
+					showMessage('ok', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+				}else{
+					showMessage('error', message.message);
+				}
 			}
 		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
 	}
@@ -2145,8 +2150,13 @@ Obm.CalendarAlarmPopup = new Class({
 		new Request.JSON({
 			url: obm.vars.consts.calendarUrl,
 			secure : false,
-			onComplete : function(){
-				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			onSuccess : function(message){
+				if(message.error == 0){
+					showMessage('ok', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+				}else{
+					showMessage('error', message.message);
+				}
 			}
 		}).post({ajax : 1, action : 'update_alert', calendar_id : this.evtid, user_id : this.uid, sel_alert : checked[0].value});
 	}
@@ -2184,8 +2194,13 @@ Obm.CalendarDecisionPopup = new Class({
 		new Request.JSON({
 			url: obm.vars.consts.calendarUrl,
 			secure : false,
-			onComplete : function(){
-				window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+			onSuccess : function(message){
+				if(message.error == 0){
+					showMessage('ok', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+				}else{
+					showMessage('error', message.message);
+				}
 			}
 		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
 	}

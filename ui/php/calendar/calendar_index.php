@@ -678,16 +678,15 @@ if ($action == 'search') {
 		if ($retour) {
 			json_ok_msg("$l_event : $l_update_ok");
 		} else {
-			json_ok_msg("$l_event : $err[msg]");
+			json_error_msg("$l_event : $err[msg]");
 		}
 	}
-  echo "({".$display['json']."})";
-  exit();
+	echo "({".$display['json']."})";
+	exit();
 
 } elseif ($action == 'update_decision_and_comment') {
 	$retour = run_query_calendar_event_comment_insert($params['calendar_id'], $params['entity_id'],$params['comment'],$params['entity_kind']);
 	if ($retour) {
-		json_ok_msg("$l_event : $l_update_ok");
 	} else {
 		json_error_msg("$l_event : $err[msg]");
 		echo "({".$display['json']."})";
