@@ -283,7 +283,7 @@ function run_query_host_insert($host) {
     '".$obm_q->escape($host_uid)."',
     '".$obm_q->escape($host_gid)."',
     '".$obm_q->escape($name)."'
-    ".$obm_q->escape($q_delegation[value]).",
+    $q_delegation[value],
     '".$obm_q->escape($ip)."',
     '".$obm_q->escape($fqdn)."',
     '".$obm_q->escape($desc)."'
@@ -377,7 +377,7 @@ function run_query_host_update($host) {
   $multidomain = sql_multidomain('host');
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('host_delegation', ($obm_q->escape($host['delegation'])));
+  $q_delegation = of_delegation_query_update_clause('host_delegation', ($host['delegation']));
 
   $query = "UPDATE Host SET
     host_timeupdate=NOW(),
