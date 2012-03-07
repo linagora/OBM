@@ -46,13 +46,14 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_search($params) {
   global $cdg_sql, $c_all, $c_null, $c_undef, $ctu_sql_limit, $cgp_archive_only;
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $params['sql_order_dir'];
   $sql_order_field = $params['sql_order_field'];
 
-  $text = sql_search_text_parse($params['text']);
+  $text = sql_search_text_parse($obm_q->escape($params['text']));
   $company_id = $params['company_id'];
-  $company = sql_search_text_parse($params['company']);
+  $company = sql_search_text_parse($obm_q->escape($params['company']));
   $date_after = of_isodate_convert($params['date_after'],true);
   $date_before = of_isodate_convert($params['date_before'],true);
   $date_field = $params['date_field'] ? $params['date_field'] : 'date';
@@ -61,9 +62,8 @@ function run_query_lead_search($params) {
   $status = $params['status'];
   $manager = $params['manager'];
   $archive = $params['archive'];
-  $delegation = sql_search_text_parse($params['delegation']);
+  $delegation = sql_search_text_parse($obm_q->escape($params['delegation']));
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -277,6 +277,7 @@ function run_query_lead_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_insert($params) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
 	
@@ -348,17 +349,16 @@ function run_query_lead_insert($params) {
     $manager_id,
     $company_id,
     $contact_id,
-    '$privacy',
-    '$priority',
-    '$name',
+    '".$obm_q->escape($privacy)."',
+    '".$obm_q->escape($priority)."',
+    '".$obm_q->escape($name)."',
     $date,
     $datealarm,
-    '$archive',
-    '$todo',
-    '$comment')";
+    '".$obm_q->escape($archive)."',
+    '".$obm_q->escape($todo)."',
+    '".$obm_q->escape($comment)."')";
   
   display_debug_msg($query, $cdg_sql, 'run_query_lead_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   $id = $obm_q->lastid();
@@ -376,6 +376,7 @@ function run_query_lead_insert($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_update($pid, $params) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
   $pid = sql_parse_id($pid, true);
@@ -422,19 +423,18 @@ function run_query_lead_update($pid, $params) {
     lead_manager_id=$manager_id,
     lead_company_id=$company_id,
     lead_contact_id=$contact_id,
-    lead_priority='$priority',
-    lead_name='$name',
+    lead_priority='".$obm_q->escape($priority)."',
+    lead_name='".$obm_q->escape($name)."',
     lead_date=$date,
     lead_datealarm=$datealarm,
-    lead_todo='$todo',
-    lead_archive='$archive',
-    lead_privacy='$privacy',
-    lead_comment='$comment'
+    lead_todo='".$obm_q->escape($todo)."',
+    lead_archive='".$obm_q->escape($archive)."',
+    lead_privacy='".$obm_q->escape($privacy)."',
+    lead_comment='".$obm_q->escape($comment)."'
   WHERE lead_id $pid 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
