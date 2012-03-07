@@ -204,12 +204,12 @@ function run_query_people_search($people) {
 
   // If a zipcode indication has been specified get it
   if (trim($zipcode) != '') {
-    $where_userobm .= " AND userobm_zipcode #LIKE '%".$obm_q->escape($zipcode)."%'";
+    $where_userobm .= " AND userobm_zipcode = '".$obm_q->escape($zipcode)."'";
   }
 
   // If a cedex indication has been specified get it
   if (trim($cedex) != '') {
-    $where_userobm .= " AND userobm_expresspostal #LIKE '%".$obm_q->escape($cedex)."%'";
+    $where_userobm .= " AND userobm_expresspostal = '".$obm_q->escape($cedex)."'";
   }
 
   // If a cedex indication has been specified get it
