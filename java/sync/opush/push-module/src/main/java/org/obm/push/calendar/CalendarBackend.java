@@ -67,6 +67,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -226,7 +227,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		Preconditions.checkNotNull(userEmail, "User has no email address");
 		
 		List<ItemChange> additions = addOrUpdateEventFilter(changes.getUpdated(), userEmail, collectionId, bs);
-		List<ItemChange> deletions = removeEventFilter(changes.getUpdated(), changes.getRemoved(), userEmail, collectionId);
+		List<ItemChange> deletions = removeEventFilter(changes.getUpdated(), changes.getDeletedEvents(), userEmail, collectionId);
 		Date syncDate = changes.getLastSync();
 		
 		return new DataDelta(additions, deletions, syncDate);
@@ -246,7 +247,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return items;
 	}
 	
-	private List<ItemChange> removeEventFilter(Event[] events, EventObmId[] eventsIdRemoved, 
+	private List<ItemChange> removeEventFilter(Event[] events, DeletedEvent[] eventsRemoved,
 			String userEmail, Integer collectionId) {
 		
 		List<ItemChange> deletions = Lists.newArrayList();
@@ -256,8 +257,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			}			
 		}
 		
-		for (final EventObmId eventIdRemove : eventsIdRemoved) {
-			deletions.add(getItemChange(collectionId, eventIdRemove));
+		for (final DeletedEvent eventRemove : eventsRemoved) {
+			deletions.add(getItemChange(collectionId, eventRemove.getId()));
 		}
 		return deletions;
 	}

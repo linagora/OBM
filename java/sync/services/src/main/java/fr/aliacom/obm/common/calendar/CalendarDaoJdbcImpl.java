@@ -1114,7 +1114,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(conComp, null, null);
 		}
 		ret.setUpdated(changedEvent.toArray(new Event[0]));
-		ret.setDeletions(findDeletedEvents(calendarUser, lastSync, typeFilter,
+		ret.setDeletedEvents(findDeletedEvents(calendarUser, lastSync, typeFilter,
 				declined));
 		
 		return ret;

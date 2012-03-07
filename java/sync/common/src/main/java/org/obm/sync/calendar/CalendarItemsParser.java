@@ -70,7 +70,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 					new EventObmId(e.getAttribute("id")), 
 					new EventExtId(e.getAttribute("extId"))));
 		}
-		changes.setDeletions(removedIds);
+		changes.setDeletedEvents(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("event");
 		List<Event> updatedEvents = new ArrayList<Event>(upd.getLength() + 1);

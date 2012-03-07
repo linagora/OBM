@@ -71,10 +71,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 
 	private void writeRemovedEvents(EventChanges eventChanges, Element root) {
 		Element removed = DOMUtils.createElement(root, "removed");
-		EventObmId[] rmIds = eventChanges.getRemoved();
-		EventExtId[] rmExtIds = eventChanges.getRemovedExtIds();
-		for (int i = 0; i < rmIds.length; i++) {
-			appendRemovedEvent(removed, rmIds, rmExtIds, i);
+		for(DeletedEvent deletedEvent: eventChanges.getDeletedEvents()) {
+			appendRemovedEvent(removed, deletedEvent);
 		}
 	}
 
@@ -115,11 +113,10 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		appendEvent(parent, event);
 	}
 
-	private void appendRemovedEvent(Element removed, EventObmId[] rmIds,
-			EventExtId[] rmExtIds, int i) {
+	private void appendRemovedEvent(Element removed, DeletedEvent deletedEvent) {
 		Element e = DOMUtils.createElement(removed, "event");
-		e.setAttribute("id", rmIds[i].serializeToString());
-		e.setAttribute("extId", rmExtIds[i].serializeToString());
+		e.setAttribute("id", deletedEvent.getId().serializeToString());
+		e.setAttribute("extId", deletedEvent.getExtId().serializeToString());
 	}
 
 	private void appendParticipationChange(Element parent,	ParticipationChanges participationChanges) {

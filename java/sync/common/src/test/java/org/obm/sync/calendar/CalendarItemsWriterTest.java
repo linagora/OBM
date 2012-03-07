@@ -87,7 +87,7 @@ private CalendarItemsWriter writer;
 
 		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("123"));
 		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("456"));
-		eventChanges.setDeletions(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		eventChanges.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
 
 		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 				+ "<calendar-changes lastSync=\"1330957589525\" xmlns=\"http://www.obm.org/xsd/sync/calendar-changes.xsd\">"

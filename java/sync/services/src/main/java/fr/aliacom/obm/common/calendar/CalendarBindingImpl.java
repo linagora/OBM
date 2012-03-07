@@ -710,7 +710,7 @@ public class CalendarBindingImpl implements ICalendar {
 					lastSync, syncRange, type, onEventDate);
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
 					+ calendar + ") => " + ret.getUpdated().length + " upd, "
-					+ ret.getRemoved().length + " rmed.");
+					+ ret.getDeletedEvents().length + " rmed.");
 			return ret;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
