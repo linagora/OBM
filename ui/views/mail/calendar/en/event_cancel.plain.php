@@ -36,5 +36,16 @@ This email was automatically sent by OBM
 APPOINTMENT DELETED !
 ------------------------------------------------------------------
 
-The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.
+This appointment has been deleted:
+
+From              : <?php echo $start; ?>
+
+to              : <?php echo $end; ?>
+
+Subject           : <?php echo $title; ?>
+
+Location            : <?php echo $location; ?>
+
+Organized by   : <?php echo $organizer; ?>
+
+Created by        : <?php echo $creator; ?>
