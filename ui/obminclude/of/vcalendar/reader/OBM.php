@@ -46,11 +46,18 @@ class Vcalendar_Reader_OBM {
   var $weekDays = array( 'sunday' => 'su', 'monday' => 'mo', 'tuesday' => 'tu', 'wednesday' => 'we', 'thursday' => 'th' , 'friday' => 'fr', 'saturday' => 'sa');
 
   var $eventSets = array();
+
+  var $recurrenceId;
   
   // 'status' enables filtering of event upon user participation
-  function Vcalendar_Reader_OBM($entities, $ids = array(), $startTime = NULL, $endTime = NULL, $status = NULL) {
+  // recurrenceId is yet another fugly hack to let us serialize a negative exception, it contains the date of the exception
+  function Vcalendar_Reader_OBM($entities, $ids = array(), $startTime = NULL, $endTime = NULL, $status = NULL, $recurrenceId = NULL) {
     $this->db = new DB_OBM;
     $this->entities = $entities;
+    if (count($ids) > 1 && $occurrenceDate != null) {
+        throw new Exception("Can't have more than one id with the occurrenceDate parameter");
+    }
+    $this->recurrenceId = $recurrenceId;
     if(!empty($ids)) {
       $this->readSet($ids);
     } else {
@@ -166,7 +173,7 @@ class Vcalendar_Reader_OBM {
      }
     }
     /* this only adds exceptions that have been deleted. Those that have been changed have their own ics*/
-    if(count($this->vevents) > 0) {
+    if(count($this->vevents) > 0 && $this->recurrenceId == null) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents),NULL,NULL,TRUE);
       while($exceptions->next_record()) {
         $date = new Of_Date($exceptions->f('eventexception_date'), "GMT");
@@ -205,7 +212,12 @@ class Vcalendar_Reader_OBM {
     $last_modified->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('last-modified', $last_modified);
 
-    $dtstart = $this->parseDate($data['event_date']);
+    if ($this->recurrenceId == null) {
+      $dtstart = $this->parseDate($data['event_date']);
+    }
+    else {
+      $dtstart = $this->recurrenceId;
+    }
     $dtstart->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('dtstart', $dtstart);
     $vevent->set('duration', $data['event_duration']);
@@ -230,6 +242,9 @@ class Vcalendar_Reader_OBM {
         $recurrence_id->setOriginalTimeZone($data['event_timezone']);
         $vevent->set('recurrence-id', $recurrence_id);
     }
+    elseif ($this->recurrenceId != null) {
+        $vevent->set('recurrence-id', $this->recurrenceId);
+    }
 
     if(!empty($this->alerts[$data['event_id']])) {
       foreach($this->alerts[$data['event_id']] as $alert) {
@@ -242,7 +257,7 @@ class Vcalendar_Reader_OBM {
       }
     }
     $vevent->set('uid', $data['event_ext_id']);
-    if(!is_null($data['event_repeatkind']) && $data['event_repeatkind'] != 'none') {
+    if(!is_null($data['event_repeatkind']) && $data['event_repeatkind'] != 'none' && $this->recurrenceId == null) {
       $vevent->set('rrule',$this->parseRrule($data));
     }
     $this->document->vcalendar->appendChild($vevent);

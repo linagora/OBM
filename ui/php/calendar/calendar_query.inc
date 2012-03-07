@@ -2424,7 +2424,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
 
   $obm_q = new DB_OBM;
 
-  if (is_object($event_q)) {
+  $isMovedException = is_object($event_q);
+  if ($isMovedException) {
     if ($event_q->f('event_privacy')!=1) $privacy = 0; else $privacy = 1; 
     $repeat_kind = $event_q->f('event_repeatkind');
     $repeat_days = $event_q->f('event_repeatdays');
@@ -2563,6 +2564,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $idsToIndex = array($id, $exception_id);
   } else {
     $newEvent = OBM_EventFactory::getInstance()->getById($id);
+    $newEvent->negative_recurrence_id = $olddatebegin;
     $idsToIndex = array($id);
   }
   
@@ -2571,10 +2573,15 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   	$GLOBALS['send_notification_mail'] = $calendar['send_mail'];
   	// Notify Observers and ensure that email content points to the old event
   	// begin and end date.
-  	$oldEvent->set("date_begin",$olddatebegin);
-  	$oldEvent->date_end = clone $oldEvent->date_begin;
-  	$oldEvent->date_end->addSecond($event_duration);
-  	OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+    if ($isMovedException) {
+        $oldEvent->set("date_begin",$olddatebegin);
+        $oldEvent->date_end = clone $oldEvent->date_begin;
+        $oldEvent->date_end->addSecond($event_duration);
+        OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+    }
+    else {
+        OBM_EventFactory::getInstance()->delete($newEvent);
+    }
   }
   
   // SOLR

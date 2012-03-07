@@ -75,6 +75,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $sequence;
   private $ics_files = array();
   private $creator;
+  private $negative_recurrence_id;
 
 
   /**
@@ -91,6 +92,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     $this->resource = array();
     $this->contact = array();
     $this->date_exception = array();
+    $this->negative_recurrence_id = null;
   }
 
   /**
@@ -276,7 +278,9 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
     include_once('obminclude/of/vcalendar/writer/ICS.php');
     include_once('obminclude/of/vcalendar/reader/OBM.php');
     
-    $reader = new Vcalendar_Reader_OBM(array('user' => array($userId => 'dummy')), array($event->id));
+    $recurrenceId = $event->negative_recurrence_id;
+
+    $reader = new Vcalendar_Reader_OBM(array('user' => array($userId => 'dummy')), array($event->id), null, null, null, $recurrenceId);
     $document = $reader->getDocument($method, $include_attachments);
     $writer = new Vcalendar_Writer_ICS();  
     $writer->writeDocument($document);
