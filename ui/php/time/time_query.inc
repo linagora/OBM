@@ -444,10 +444,11 @@ function run_query_time_get_task($id) {
 function run_query_time_insert($task) {
   global $obm, $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $valid_date = run_query_time_valid_search($task);
   $day = $task['day'];
   $ttype = $task['tasktype'];
-  $projecttask = ($task['projecttask'] == 0) ? 'null' : $task['projecttask'];
+  $projecttask = ($task['projecttask'] == 0) ? 'null' : $obm_q->escape($task['projecttask']);
   $time = $task['time'];
   $label = $task['label'];
   $user_id = $task['user_id'];
@@ -456,6 +457,7 @@ function run_query_time_insert($task) {
     // for navigators wich doesn't support HTML 4 => <option disabled>
     if (is_array($day)) {
       foreach ($day as $key => $value) {
+    $obm_q = new DB_OBM;
 	$query = "
        INSERT INTO TimeTask (
          timetask_timeupdate,
@@ -475,18 +477,18 @@ function run_query_time_insert($task) {
          null,
          '$obm[uid]',
          '$user_id',
-         '$key',
+         '".$obm_q->escape($key)."',
          $projecttask,
          '$time',
-         '$ttype',
-         '$label',
+         '".$obm_q->escape($ttype)."',
+         '".$obm_q->escape($label)."',
          0)";
 
 	display_debug_msg($query, $cdg_sql, 'run_query_time_insert');
-	$obm_q = new DB_OBM;
 	$obm_q->query($query);  
       }
     } else {
+      $obm_q = new DB_OBM;
       $query = "
        INSERT INTO TimeTask (
          timetask_timeupdate,
@@ -509,12 +511,11 @@ function run_query_time_insert($task) {
          '$date',
          $projecttask,
          '$time',
-         '$ttype',
-         '$label',
+         '".$obm_q->escape($ttype)."',
+         '".$obm_q->escape($label)."',
          0)";
 
        display_debug_msg($query, $cdg_sql, 'run_query_time_insert');
-       $obm_q = new DB_OBM;
        $obm_q->query($query);  
     }
   }
@@ -530,9 +531,10 @@ function run_query_time_insert($task) {
 function run_query_time_update($task) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
   $id = $task['task_id'];
   $ttype = $task['tasktype'];
-  $projecttask = sql_parse_id($task['projecttask']);
+  $projecttask = sql_parse_id($obm_q->escape($task['projecttask']));
   $time = $task['time'];
   $label = $task['label'];
   $day = $task['day'];
@@ -540,14 +542,13 @@ function run_query_time_update($task) {
   $query = "
   UPDATE TimeTask SET
     timetask_date='$day',
-    timetask_tasktype_id='$ttype',
+    timetask_tasktype_id='".$obm_q->escape($ttype)."',
     timetask_length='$time',
-    timetask_label='$label',
+    timetask_label='".$obm_q->escape($label)."',
     timetask_projecttask_id = $projecttask
   WHERE timetask_id='$id'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_update');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 

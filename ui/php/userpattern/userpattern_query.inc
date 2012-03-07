@@ -78,7 +78,7 @@ function run_query_userpattern_search($userpattern) {
   }
 
   if ($title != "") {
-    $where[]= "title $like '%$title%'";
+    $where[]= "title $like '%".$obm_q->escape($title)."%'";
   }
 
   if (!empty($where))

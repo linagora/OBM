@@ -56,7 +56,7 @@ function run_query_validate($ticket) {
 
   $obm_q = new DB_OBM;
   $query = "SELECT domain_name, userobm_password, userobm_login FROM UserObm LEFT JOIN Domain ON userobm_domain_id = domain_id
-    WHERE userobm_login = '$fdata[login]' AND domain_name = '$fdata[domain]'";
+    WHERE userobm_login = '".$obm_q->escape($fdata[login])."' AND domain_name = '$fdata[domain]'";
   $obm_q->query($query);
   if($obm_q->next_record()) {
     $login = $obm_q->f('userobm_login');
