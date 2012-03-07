@@ -57,13 +57,16 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	private final IErrorsManager errorManager;
 	protected final MailProtocol mailProtocol;
 
+	private final Logger mailDataLogger;
+
 	protected abstract void doTheJob(MailRequest mailRequest, BackendSession bs) 
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 	
-	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol) {
+	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol, Logger mailDataLogger) {
 		this.mailBackend = mailBackend;
 		this.errorManager = errorManager;
 		this.mailProtocol = mailProtocol;
+		this.mailDataLogger = mailDataLogger;
 	}
 
 	@Override
@@ -71,8 +74,8 @@ public abstract class MailRequestHandler implements IRequestHandler {
 		MailRequest mailRequest = null;
 		try {
 			mailRequest = mailProtocol.getRequest(request);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Mail content:\n" + new String(mailRequest.getMailContent()));
+			if (mailDataLogger.isInfoEnabled()) {
+				mailDataLogger.info("Mail content : \n" + new String(mailRequest.getMailContent()));
 			}
 			doTheJob(mailRequest, bs);
 

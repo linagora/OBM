@@ -31,23 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MailProtocol;
 import org.obm.push.protocol.bean.MailRequest;
+import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class SendMailHandler extends MailRequestHandler {
 
 	@Inject
-	protected SendMailHandler(MailBackend mailBackend,
-			IErrorsManager errorManager, MailProtocol mailProtocol) {
-		super(mailBackend, errorManager, mailProtocol);
+	protected SendMailHandler(MailBackend mailBackend, IErrorsManager errorManager, 
+			MailProtocol mailProtocol, @Named(LoggerModule.MAIL_DATA)Logger mailDataLogger) {
+		
+		super(mailBackend, errorManager, mailProtocol, mailDataLogger);
 	}
 
 	@Override

@@ -42,6 +42,7 @@ public class LoggerModule extends AbstractModule {
 	public static final String AUTH = "AUTHENTICATION";
 	public static final String TRIMMED_REQUEST = "REQUEST.TRIMMED";
 	public static final String FULL_REQUEST = "REQUEST.FULL";
+	public static final String MAIL_DATA = "MAIL.DATA";
 	
 	@Override
 	protected void configure() {
@@ -49,6 +50,7 @@ public class LoggerModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(AUTH)).toInstance(LoggerFactory.getLogger(AUTH));
 		bind(Logger.class).annotatedWith(Names.named(TRIMMED_REQUEST)).toInstance(LoggerFactory.getLogger(TRIMMED_REQUEST));
 		bind(Logger.class).annotatedWith(Names.named(FULL_REQUEST)).toInstance(LoggerFactory.getLogger(FULL_REQUEST));
+		bind(Logger.class).annotatedWith(Names.named(MAIL_DATA)).toInstance(LoggerFactory.getLogger(MAIL_DATA));
 	}
 	
 }
