@@ -45,12 +45,13 @@ applicable to the OBM software.
 function run_query_invoice_search ($invoice) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only;
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $invoice['sql_order_dir'];
   $sql_order_field = $invoice['sql_order_field'];
 
-  $label = sql_search_text_parse($invoice['label']);
-  $number = sql_search_text_parse($invoice['number']);
+  $label = sql_search_text_parse($obm_q->escape($invoice['label']));
+  $number = sql_search_text_parse($obm_q->escape($invoice['number']));
   $ht = $invoice['amount_ht'];
   $ttc = $invoice['amount_ttc'];
   $status = $invoice['status'];
@@ -60,15 +61,14 @@ function run_query_invoice_search ($invoice) {
   $date_before = of_isodate_convert($invoice['date_before'],true);
   $inout = $invoice['inout'];
   $credit_memo = $invoice['credit_memo'];
-  $company = sql_search_text_parse($invoice['company']);
+  $company = sql_search_text_parse($obm_q->escape($invoice['company']));
   $archive = $invoice['archive'];
   $comp_id = $invoice['company_id'];
   $deal_id = $invoice['deal_id'];
   $project_new_id = $invoice['project_id'];
   $region = $invoice['region'];
-  $delegation = sql_search_text_parse($invoice['delegation']);
+  $delegation = sql_search_text_parse($obm_q->escape($invoice['delegation']));
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -277,6 +277,7 @@ function run_query_invoice_detail($p_invoice_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_insert($invoice) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
@@ -341,21 +342,20 @@ function run_query_invoice_insert($invoice) {
      $comp_id,
      $deal_id,
      $project_new_id,
-     '$number',
-     '$label',
-     '$ht', 
-     '$ttc',
+     '".$obm_q->escape($number)."',
+     '".$obm_q->escape($label)."',
+     '".$obm_q->escape($ht)."', 
+     '".$obm_q->escape($ttc)."',
      $status,
-     '$comment',
+     '".$obm_q->escape($comment)."',
      $date,
      $expiration_date,
      $payment_date,
-     '$inout',
-     '$credit_memo',
+     '".$obm_q->escape($inout)."',
+     '".$obm_q->escape($credit_memo)."',
      $arch)"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_insert()');
-  $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
   $id = $obm_q->lastid();
   $entity_id = of_entity_insert($GLOBALS['module'], $id);  
@@ -369,6 +369,7 @@ function run_query_invoice_insert($invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_update($invoice) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
 
@@ -411,22 +412,21 @@ function run_query_invoice_update($invoice) {
       invoice_company_id=$comp_id,
       invoice_deal_id=$deal_id,
       invoice_project_id=$project_new_id,
-      invoice_number='$number',
-      invoice_label='$label',
-      invoice_amount_ht='$ht',
-      invoice_amount_ttc='$ttc',
+      invoice_number='".$obm_q->escape($number)."',
+      invoice_label='".$obm_q->escape($label)."',
+      invoice_amount_ht='".$obm_q->escape($ht)."',
+      invoice_amount_ttc='".$obm_q->escape($ttc)."',
       invoice_status_id=$status,
-      invoice_comment='$comment',
+      invoice_comment='".$obm_q->escape($comment)."',
       invoice_date=$date,
       invoice_expiration_date=$expiration_date,
       invoice_payment_date=$payment_date,
-      invoice_inout='$inout',
-      invoice_credit_memo='$credit_memo',
-      invoice_archive='$arch'
+      invoice_inout='".$obm_q->escape($inout)."',
+      invoice_credit_memo='".$obm_q->escape($credit_memo)."',
+      invoice_archive='".$obm_q->escape($arch)."'
     WHERE invoice_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -625,6 +625,7 @@ function run_query_invoice_deal_get_inout($p_deal_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_invoice_nb_having_number ($number, $id='') {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if ($id != '') {
     $id = sql_parse_id($id, true, true);
@@ -635,10 +636,9 @@ function get_invoice_nb_having_number ($number, $id='') {
 
   $query = "SELECT invoice_id
     FROM Invoice
-    WHERE invoice_number = '$number'
+    WHERE invoice_number = '".$obm_q->escape($number)."'
       $where_id $multidomain";
 
-  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   $nb = $obm_q->num_rows();
@@ -678,7 +678,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     foreach ($date_ranges as $range) {
       $d1 = $range[0];
       $d2 = $range[1];
-      $w_date .= " $or ($target_date >= '$d1' AND $target_date <= '$d2')";
+      $w_date .= " $or ($target_date >= '".$obm_q->escape($d1)."' AND $target_date <= '".$obm_q->escape($d2)."')";
       $or = 'OR';
     }
   }
@@ -691,7 +691,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
 
   // Delegation filter
   if (trim($delegation) != '') {
-    $where_delegation = " AND userobm_delegation $like '$delegation%'";
+    $where_delegation = " AND userobm_delegation $like '".$obm_q->escape($delegation)."%'";
     $join_user = "LEFT JOIN UserObm ON invoice_usercreate=userobm_id";
   }
 
@@ -714,7 +714,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     $w_st .= ' AND (';
     $or = '';
     foreach ($status as $s_id=>$s_label) {
-      $w_st .= "$or invoice_status_id='$s_id'";
+      $w_st .= "$or invoice_status_id='".$obm_q->escape($s_id)."'";
       $or = ' OR';
     }
     $w_st .= ')';
@@ -1051,8 +1051,8 @@ function get_invoice_export_infos($id, $account) {
     LEFT JOIN Contact   ON contact_id      = deal_contact2_id
     LEFT JOIN ContactEntity on contactentity_contact_id=deal_contact2_id
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
-    WHERE     invoice_id = ' . $id . '
-    AND       account_id = ' . $account . '
+    WHERE     invoice_id = ' . $obm_q->escape($id) . '
+    AND       account_id = ' . $obm_q->escape($account) . '
     AND       deal_id    = invoice_deal_id';
 
     $obm_q->query($query);
@@ -1095,7 +1095,7 @@ function get_invoice_export_reminder_infos($id) {
     LEFT JOIN Contact   ON contact_id      = deal_contact2_id
     LEFT JOIN ContactEntity on contactentity_contact_id=deal_contact2_id
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id 
-    WHERE     invoice_id = ' . $id . '';
+    WHERE     invoice_id = ' . $obm_q->escape($id) . '';
 	
     $obm_q->query($query);
     $obm_q->next_record();
@@ -1140,7 +1140,7 @@ function reminder_by_company($company_id) {
         and contact_company_id = company_id
 	and invoice_status_id = 1
 	and DATEDIFF(current_date,invoice_expiration_date) > 15
-	and company_id ='.$company_id.'
+	and company_id ='.$obm_q->escape($company_id).'
 	order by invoice_expiration_date desc';
 	
     $obm_q->query($query);
