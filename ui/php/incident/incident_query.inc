@@ -49,15 +49,16 @@ applicable to the OBM software.
 function run_query_incident_search($incident) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $incident['sql_order_dir'];
   $sql_order_field = $incident['sql_order_field'];
 
-  $text = sql_search_text_parse($incident['text']);
-  $lincident = sql_search_text_parse($incident['lincident']);
-  $lcontract = sql_search_text_parse($incident['lcontract']);
-  $i_id = sql_search_text_parse($incident['incident_id']);
-  $company = sql_search_text_parse($incident['company']);
+  $text = sql_search_text_parse($obm_q->escape($incident['text']));
+  $lincident = sql_search_text_parse($obm_q->escape($incident['lincident']));
+  $lcontract = sql_search_text_parse($obm_q->escape($incident['lcontract']));
+  $i_id = sql_search_text_parse($obm_q->escape($incident['incident_id']));
+  $company = sql_search_text_parse($obm_q->escape($incident['company']));
   $priority = $incident['priority'];
   $status = $incident['status'];
   $resolutiontype = $incident['resolutiontype'];
@@ -67,10 +68,9 @@ function run_query_incident_search($incident) {
   $dateafter = of_isodate_convert($incident['date_after'],true);
   $datebefore = of_isodate_convert($incident['date_before'],true);
   $archive = $incident['archive'];
-  $reference = sql_search_text_parse($incident['reference']);
+  $reference = sql_search_text_parse($obm_q->escape($incident['reference']));
   $multidomain = sql_multidomain('incident');
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -290,6 +290,7 @@ function run_query_incident_detail($id) {
 function run_query_incident_insert($incident) {
   global $cdg_sql, $cgp_host, $obm;
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
+  $obm_q = new DB_OBM;
 
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
@@ -344,22 +345,21 @@ function run_query_incident_insert($incident) {
       NOW(),
       null,
       $uid,
-      '$lincident',
-      '$reference',
+      '".$obm_q->escape($lincident)."',
+      '".$obm_q->escape($reference)."',
       $contract_id,
-      '$call_date',
+      '".$obm_q->escape($call_date)."',
       $priority,
       $status,
       $reso,
-      '$comment',
+      '".$obm_q->escape($comment)."',
       $logger,
       $owner,
-      '$add_duration',
+      '".$obm_q->escape($add_duration)."',
       $archive,
-      '$solu')";
+      '".$obm_q->escape($solu)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_incident_insert()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   $i_id = $obm_q->lastid(); 
@@ -397,6 +397,7 @@ function run_query_incident_insert($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_id($incident) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $contract_id = $incident['contract_new_id'];
   if ($contract_id < 1) {
@@ -417,17 +418,16 @@ function run_query_incident_id($incident) {
   $query = "SELECT MAX(incident_id) as incident_id
     FROM Incident
     WHERE incident_contract_id $contract_id 
-    AND incident_label = '$lincident'
+    AND incident_label = '".$obm_q->escape($lincident)."'
     AND incident_owner $owner
     AND incident_logger $logger
-    AND incident_date='$call_date'
+    AND incident_date='".$obm_q->escape($call_date)."'
     AND incident_priority_id $pri
     AND incident_status_id $status
     AND incident_archive=$archive
     $multidomain";
 
   display_debug_msg($query, $cdg_sql,'run_query_incident_id()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -478,6 +478,7 @@ function run_query_incident_update($incident) {
   global $obm, $cdg_sql, $cincident_status,$l_mail_incident_affected_subject;
   global $l_mail_incident_closed_subject, $cmail_incident,$cgp_host;
   global $l_mail_incident_closed_content, $l_mail_incident_affected_content;
+  $inc_q = new DB_OBM;
 
   $contract_id = $incident['contract_new_id'];
   if ($contract_id < 1) {
@@ -523,20 +524,19 @@ function run_query_incident_update($incident) {
       incident_userupdate=$obm[uid],
       incident_logger=$logger,
       incident_owner=$owner,
-      incident_label='$lincident',
-      incident_reference='$reference',
-      incident_date='$call_date', 
+      incident_label='".$inc_q->escape($lincident)."',
+      incident_reference='".$inc_q->escape($reference)."',
+      incident_date='".$inc_q->escape($call_date)."', 
       incident_priority_id=$priority,
       incident_status_id=$status,
       incident_resolutiontype_id=$reso,
-      incident_resolution = '$solu',
-      incident_duration = '$duration',
-      incident_comment='$comment',
+      incident_resolution = '".$inc_q->escape($solu)."',
+      incident_duration = '".$inc_q->escape($duration)."',
+      incident_comment='".$inc_q->escape($comment)."',
       incident_archive=$archive,
       incident_contract_id=$contract_id
       WHERE incident_id $id $multidomain";
 
-  $inc_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_incident_update()');
   $ret = $inc_q->query($query);  
 
