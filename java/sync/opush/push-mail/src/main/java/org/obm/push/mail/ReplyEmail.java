@@ -118,17 +118,9 @@ public class ReplyEmail extends SendEmail {
 		boolean isMultipartMixed = this.mime4jUtils.isMessageMultipartMixed(this.originalMessage);
 
 		if (modifiedBodyText != null && modifiedBodyHtmlPrefered != null || isMultipartMixed) {
-			return buildMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
+			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
 		} else {
 			return buildSingleMessage(modifiedBodyText, modifiedBodyHtmlPrefered);
-		}
-	}
-
-	private Message buildMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean isMultipartMixed) {
-		if (isMultipartMixed) {
-			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
-		} else {
-			return createMultipartMessage(modifiedBodyText, modifiedBodyHtmlPrefered, isMultipartMixed);
 		}
 	}
 

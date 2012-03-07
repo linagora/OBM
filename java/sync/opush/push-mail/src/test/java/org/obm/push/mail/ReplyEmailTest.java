@@ -78,7 +78,23 @@ public class ReplyEmailTest {
 		String messageAsString = mime4jUtils.toString(body);
 		Assertions.assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
 	}
+	
+	@Test
+	public void testReplyTextToTextWithAttachment() throws IOException, MimeException, NotQuotableEmailException {
+		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Message reply = loadMimeMessage(getClass(), "MAIL-WITH-ATTACHMENT.eml");
 
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply);
+		Message message = replyEmail.getMimeMessage();
+		Assertions.assertThat(message.isMultipart()).isTrue();
+		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
+		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		Multipart multipart = (Multipart) message.getBody();
+		Entity textPlainPart = mime4jUtils.getFirstTextPlainPart(multipart);
+		String messageAsString = mime4jUtils.toString(textPlainPart.getBody());
+		Assertions.assertThat(messageAsString).contains("C'est le message ;-)").contains("\n> origin").contains("\n> Cordialement");
+	}
+	
 	@Test
 	public void testReplyTextToTextFormated() throws IOException, MimeException, NotQuotableEmailException {
 		String replyText = "\nresponse text\r\r\rEnvoyé à partir de mon SuperPhone\n\n\n";
