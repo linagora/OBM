@@ -47,17 +47,17 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_search($list) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+  $obm_q = new DB_OBM;
   
   $sql_order_dir = $list['sql_order_dir'];
   $sql_order_field = $list['sql_order_field'];
   
-  $name = sql_search_text_parse($list['name']);
-  $email = sql_search_text_parse($list['email']);
-  $contact = sql_search_text_parse($list['contact']);
+  $name = sql_search_text_parse($obm_q->escape($list['name']));
+  $email = sql_search_text_parse($obm_q->escape($list['email']));
+  $contact = sql_search_text_parse($obm_q->escape($list['contact']));
   $market = $list['marketing_manager'];
   $contact_id = $list['contact_id'];
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -193,6 +193,7 @@ function list_add_slashes_array(&$item, $key) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_insert($list) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $priv = sql_parse_int($list['privacy']);
   $name = $list['name'];
@@ -234,19 +235,18 @@ function run_query_list_insert($list) {
     '" . date('Y-m-d H:i:s') ."',
     null,
     " . $obm['uid'] . ",
-    '$priv',
-    '$name',
-    '$subject',
-    '$email',
+    '".$obm_q->escape($priv)."',
+    '".$obm_q->escape($name)."',
+    '".$obm_q->escape($subject)."',
+    '".$obm_q->escape($email)."',
     $mailing_ok,
-    '$mode',
+    '".$obm_q->escape($mode)."',
     $contact_arch,
     $info_pub,
-    '$list_query',
-    '$list_critery')";
+    '".$obm_q->escape($list_query)."',
+    '".$obm_q->escape($list_critery)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_list_insert()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $id = $obm_q->lastid();
   // Handle list duplication
@@ -283,6 +283,7 @@ function run_query_list_insert($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_list_id($list) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $name = $list['name'];
   $subject = $list['subject'];
@@ -292,14 +293,13 @@ function get_list_id($list) {
 	
   $query = "SELECT list_id
     FROM List
-    WHERE list_name='$name'
-      AND list_subject='$subject'
-      AND list_email='$email'
-      AND list_query='$list_query'
+    WHERE list_name='".$obm_q->escape($name)."'
+      AND list_subject='".$obm_q->escape($subject)."'
+      AND list_email='".$obm_q->escape($email)."'
+      AND list_query='".$obm_q->escape($list_query)."'
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_list_id()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
@@ -316,6 +316,7 @@ function get_list_id($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_update($list) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $id = sql_parse_id($list['list_id'], true);
   $priv = sql_parse_int($list['privacy']);
@@ -323,7 +324,7 @@ function run_query_list_update($list) {
   $subject = $list['subject'];
   $email = $list['email'];
   $mode = $list['mode'];
-  $list_query = addslashes($list['query']);
+  $list_query = $list['query'];
   $mailing_ok = sql_parse_int($list['mailing_ok']);
   $contact_arch = sql_parse_int($list['contact_archive']);
   $info_pub = sql_parse_int($list['info_pub']);
@@ -332,7 +333,7 @@ function run_query_list_update($list) {
     if (is_array($ss_criteria)) {
       array_walk($ss_criteria, 'list_strip_slashes_array');
     }
-    $list_critery = addslashes(serialize($ss_criteria));
+    $list_critery = serialize($ss_criteria);
   }
   $multidomain = sql_multidomain('list');
   
@@ -340,20 +341,19 @@ function run_query_list_update($list) {
     list_timeupdate='". date('Y-m-d H:i:s')."',
     list_userupdate=".$obm['uid'].",
     list_privacy=$priv,
-    list_name='$name',
-    list_subject='$subject',
-    list_email='$email',
+    list_name='".$obm_q->escape($name)."',
+    list_subject='".$obm_q->escape($subject)."',
+    list_email='".$obm_q->escape($email)."',
     list_mailing_ok=$mailing_ok,
     list_contact_archive=$contact_arch,
-    list_mode='$mode',
+    list_mode='".$obm_q->escape($mode)."',
     list_info_publication=$info_pub,
-    list_query='$list_query',
-    list_structure='$list_critery'
+    list_query='".$obm_q->escape($list_query)."',
+    list_structure='".$obm_q->escape($list_critery)."'
   WHERE list_id $id 
      $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_list_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -367,6 +367,7 @@ function run_query_list_update($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_update_sql($id) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $multidomain = sql_multidomain('list');
 
@@ -379,18 +380,17 @@ function run_query_list_update_sql($id) {
   $list_q->next_record();
 
   $dynlist = make_list_query_from_db($list_q);
-  $list_query = addslashes($dynlist['query']);
+  $list_query = $dynlist['query'];
 
   if ($list_query != '') {
 
     $query = "UPDATE List SET
       list_timeupdate='". date('Y-m-d H:i:s')."',
       list_userupdate=".$obm['uid'].",
-      list_query='$list_query'
+      list_query='".$obm_q->escape($list_query)."'
     WHERE list_id $id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_list_update_sql(2)');
-    $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   }
 
@@ -673,6 +673,7 @@ function run_query_list_update_static_nb($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_list_name_exists($name, $id='') {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if ($id != '') {
     $id = sql_parse_id($id, true, true);
@@ -683,12 +684,11 @@ function get_list_name_exists($name, $id='') {
 
   $query = "SELECT list_id, list_name
     FROM List
-    WHERE list_name='$name'
+    WHERE list_name='".$obm_q->escape($name)."'
       $where_id
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_list_name_exists()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -725,9 +725,9 @@ function run_query_list_check_list($id, $name, $subject) {
 
   // If subject is short, we test equality, else similarity
   if (strlen($subject)  > 2) {
-    $wsubject = "list_subject $like '%$subject%'";
+    $wsubject = "list_subject $like '%".$obm_q->escape($subject)."%'";
   } else {
-    $wsubject = "list_subject = '$subject'";
+    $wsubject = "list_subject = '".$obm_q->escape($subject)."'";
   }
 
   $query = "SELECT distinct list_id, list_name, list_subject
@@ -751,14 +751,14 @@ function run_query_list_check_list($id, $name, $subject) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_update_num_rows($id, $nb) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if ($nb == '') {
     $nb = '0';
   }
   $id = sql_parse_id($id, true);
-  $query = "UPDATE List SET list_query_nb='$nb' WHERE list_id $id";
+  $query = "UPDATE List SET list_query_nb='".$obm_q->escape($nb)."' WHERE list_id $id";
   display_debug_msg($query, $cdg_sql, 'run_query_list_update_num_rows()');
-  $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
   return $ret;
