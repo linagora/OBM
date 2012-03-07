@@ -66,7 +66,7 @@ function run_query_resourcegroup_search($group) {
   $multidomain = sql_multidomain("rgroup");
   $desc = sql_search_text_parse($group['desc']);
 	
-  $where = "rgroup_name $like '$name%' $multidomain";
+  $where = "rgroup_name $like '".$obm_q->escape($name)."%' $multidomain";
 
   if ($privacy == $c_public) {
     $where .= " AND rgroup_privacy = 0";
@@ -75,19 +75,19 @@ function run_query_resourcegroup_search($group) {
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND rgroup_delegation $like '$delegation%'";
+    $where .= " AND rgroup_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($resource != '') {
     $join_resource = "
       LEFT JOIN ResourceGroup as D ON rgroup_id=D.ResourceGroup_rgroup_id
       LEFT JOIN Resource as C ON D.resourcegroup_resource_id=C.resource_id";
-    $where .= " and C.resource_name $like '$resource%'";
+    $where .= " and C.resource_name $like '".$obm_q->escape($resource)."%'";
   }
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("rgroup");
   
   if (trim($desc) != '') {
-    $where .= " AND rgroup_desc $like '%$desc%'";
+    $where .= " AND rgroup_desc $like '%".$obm_q->escape($desc)."%'";
   }
   
   $whereq = "where $where";
@@ -161,7 +161,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       count(*) as resultscount
     FROM RGroup
     WHERE 
-      rgroup_name #LIKE '$pattern%'
+      rgroup_name #LIKE '".$obm_q->escape($pattern)."%'
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
  ";
@@ -220,11 +220,11 @@ function run_query_resourcegroup_search_possible_children($group) {
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("rgroup");
   if ($resource != '') {
-    $where .= " and C.resource_name $like '$resource%'";
+    $where .= " and C.resource_name $like '".$obm_q->escape($resource)."%'";
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND rgroup_delegation $like '$delegation%'";
+    $where .= " AND rgroup_delegation $like '".$obm_q->escape($delegation)."%'";
   }  
   while (list ($key, $g_id) = each($parents)) {
     $g_id = sql_parse_id($g_id, true, true);
@@ -241,7 +241,7 @@ function run_query_resourcegroup_search_possible_children($group) {
       LEFT JOIN Resource as C ON ResourceGroup.resourcegroup_resource_id=C.resource_id
       LEFT JOIN UserObm as A ON RGroup.rgroup_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON RGroup.rgroup_userupdate=B.userobm_id
-    WHERE rgroup_name $like '$name%'
+    WHERE rgroup_name $like '".$obm_q->escape($name)."%'
       AND rgroup_id $id 
       $where $multidomain";
 
@@ -299,6 +299,7 @@ function run_query_resourcegroup_detail($id) {
 function run_query_resourcegroup_insert($group) {
   global $cdg_sql, $ctype_resource, $obm;
 
+  $obm_q = new DB_OBM;
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = sql_parse_int($group["privacy"]);
@@ -322,13 +323,12 @@ function run_query_resourcegroup_insert($group) {
     $obm[uid],
     $domain_id,
     $priv,
-    '$name'
+    '".$obm_q->escape($name)."'
     $q_delegation[value],
-    '$desc'
+    '".$obm_q->escape($desc)."'
   )";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_insert()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   
   $g_id = $obm_q->lastid();
@@ -348,6 +348,7 @@ function run_query_resourcegroup_insert($group) {
 function run_query_resourcegroup_id($group) {
   global $cdg_sql, $ctype_resource;
 
+  $obm_q = new DB_OBM;
   $name = $group["name"];
   $desc = $group["desc"];
   $multidomain = sql_multidomain("rgroup");
@@ -355,11 +356,10 @@ function run_query_resourcegroup_id($group) {
   $query = "SELECT rgroup_id
     FROM RGroup
     WHERE
-      rgroup_name='$name'
-      AND rgroup_desc='$desc' $multidomain";
+      rgroup_name='".$obm_q->escape($name)."'
+      AND rgroup_desc='".$obm_q->escape($desc)."' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_id()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -381,6 +381,7 @@ function run_query_resourcegroup_id($group) {
 function run_query_resourcegroup_update($group) {
   global $obm, $cdg_sql, $ctype_resource;
 
+  $obm_q = new DB_OBM;
   $id = sql_parse_id($group["resourcegroup_id"], true);
   $name = $group["name"];
   $desc = $group["desc"];
@@ -393,13 +394,12 @@ function run_query_resourcegroup_update($group) {
     rgroup_timeupdate=NOW(),
     rgroup_userupdate=$obm[uid],
     rgroup_privacy=$priv,
-    rgroup_name='$name',
-    rgroup_desc='$desc'
+    rgroup_name='".$obm_q->escape($name)."',
+    rgroup_desc='".$obm_q->escape($desc)."'
     $q_delegation
   WHERE rgroup_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_update()");
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -732,6 +732,7 @@ function get_resourcegroup_nb_resource($id) {
 function get_resourcegroup_name_exists($name, $id="") {
   global $cdg_sql, $obm, $ctype_resource;
 
+  $obm_q = new DB_OBM;
   if ($id != "") {
     $id = sql_parse_id($id, true, true);
     $where_id = "AND rgroup_id $id ";
@@ -741,12 +742,11 @@ function get_resourcegroup_name_exists($name, $id="") {
 
   $query = "SELECT rgroup_id, rgroup_name
     FROM RGroup
-    WHERE rgroup_name='$name'
+    WHERE rgroup_name='".$obm_q->escape($name)."'
       AND (rgroup_privacy=0 OR rgroup_usercreate=$obm[uid])
       $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_resourcegroup_name_exists()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -778,17 +778,17 @@ function run_query_resourcegroup_check($id, $name, $desc) {
 
   // If name is short, we test equality, else similarity
   if (strlen($name) > 2) {
-    $wname = "rgroup_name $like '%$name%'";
+    $wname = "rgroup_name $like '%".$obm_q->escape($name)."%'";
   } else {
-    $wname = "rgroup_name = '$name'";
+    $wname = "rgroup_name = '".$obm_q->escape($name)."'";
   }
 
   // If desc is short, we test equality, else similarity
   if (trim($desc) != "") {
     if (strlen($desc) > 2) {
-      $wdesc = "rgroup_desc $like '%$desc%'";
+      $wdesc = "rgroup_desc $like '%".$obm_q->escape($desc)."%'";
     } else {
-      $wdesc = "rgroup_desc = '$desc'";
+      $wdesc = "rgroup_desc = '".$obm_q->escape($desc)."'";
     }
   }
   if ($wdesc != "") $wdesc = "OR $wdesc";
