@@ -48,14 +48,15 @@ applicable to the OBM software.
  */
 function run_query_host_search($host) {
   global $cdg_sql, $ctu_sql_limit;
-  
+  $obm_q = new DB_OBM;
+
   $sql_order_dir = $host['sql_order_dir'];
   $sql_order_field = $host['sql_order_field'];
   $multidomain = sql_multidomain('host');
 
-  $name = sql_search_text_parse($host['name']);
-  $delegation = sql_search_text_parse($host['delegation']);
-  $ip = sql_search_text_parse($host['ip']);
+  $name = sql_search_text_parse($obm_q->escape($host['name']));
+  $delegation = sql_search_text_parse($obm_q->escape($host['delegation']));
+  $ip = sql_search_text_parse($obm_q->escape($host['ip']));
   $samba = $host['samba'];
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
@@ -66,7 +67,6 @@ function run_query_host_search($host) {
   $imap = $host['imap'];
   $backup_ftp = $host['backup_ftp'];
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -231,6 +231,7 @@ function run_query_host_detail($id) {
  */
 function run_query_host_insert($host) {
   global $obm, $cdg_sql, $cg_gid_host;
+  $obm_q = new DB_OBM;
 
   $domain_id = $obm['domain_id'];
   $name = $host['name'];
@@ -279,17 +280,16 @@ function run_query_host_insert($host) {
     null,
     $obm[uid],
     $domain_id,
-    '$host_uid',
-    '$host_gid',
-    '$name'
-    $q_delegation[value],
-    '$ip',
-    '$fqdn',
-    '$desc'
+    '".$obm_q->escape($host_uid)."',
+    '".$obm_q->escape($host_gid)."',
+    '".$obm_q->escape($name)."'
+    ".$obm_q->escape($q_delegation[value]).",
+    '".$obm_q->escape($ip)."',
+    '".$obm_q->escape($fqdn)."',
+    '".$obm_q->escape($desc)."'
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_host_insert(1)');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Mise a jour du lien user s'il a ete précisé
@@ -358,6 +358,7 @@ function run_query_host_insert($host) {
  */
 function run_query_host_update($host) {
   global $obm, $cdg_sql, $cmd_update_ftp_entity;
+  $obm_q = new DB_OBM;
 
   $id = sql_parse_id($host['host_id'], true);
   $name = $host['name'];
@@ -376,20 +377,19 @@ function run_query_host_update($host) {
   $multidomain = sql_multidomain('host');
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('host_delegation', ($host['delegation']));
+  $q_delegation = of_delegation_query_update_clause('host_delegation', ($obm_q->escape($host['delegation'])));
 
   $query = "UPDATE Host SET
     host_timeupdate=NOW(),
     host_userupdate=$obm[uid],
-    host_name='$name',
-    host_ip='$ip',
-    host_fqdn='$fqdn',
-    host_description='$desc'
+    host_name='".$obm_q->escape($name)."',
+    host_ip='".$obm_q->escape($ip)."',
+    host_fqdn='".$obm_q->escape($fqdn)."',
+    host_description='".$obm_q->escape($desc)."'
     $q_delegation
   WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_host_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Mise a jour du lien user s'il a ete précisé
@@ -495,6 +495,7 @@ function run_query_host_update($host) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_host_delete($p_id) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   // Delete the Host
   $multidomain = sql_multidomain('host');
@@ -502,7 +503,6 @@ function run_query_host_delete($p_id) {
   $sel_id = sql_parse_id($p_id, true);
   $query = "DELETE FROM Host WHERE host_id $sel_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If this host exists in Prod table, Insert it in Deleted table
@@ -534,7 +534,7 @@ function run_query_host_delete($p_id) {
     VALUES (
       $domain_id,
       $uid,
-      '$delegation',
+      '".$obm_q->escape($delegation)."',
       'Host',
       $ins_id,
       NOW())";
@@ -608,13 +608,14 @@ function get_host_info($id) {
 
 function get_host_delegations($ip) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
+
   $multidomain = sql_multidomain('host');
   $query = "SELECT host_delegation 
     FROM Host
-    WHERE host_ip='$ip' $multidomain";
+    WHERE host_ip='".$obm_q->escape($ip)."' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_name_exists()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $delegations = array();
   while ($obm_q->next_record()) {
@@ -633,6 +634,7 @@ function get_host_delegations($ip) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_host_name_exists($name, $id='') {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   if ($id != '') {
     $id = sql_parse_id($id, true, true);
@@ -642,10 +644,9 @@ function get_host_name_exists($name, $id='') {
   $multidomain = sql_multidomain('host');
   $query = "SELECT host_id, host_name
     FROM Host
-    WHERE $where_id host_name='$name' $multidomain";
+    WHERE $where_id host_name='".$obm_q->escape($name)."' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_name_exists()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -678,17 +679,17 @@ function run_query_check_host($id, $name, $desc) {
 
   // If name is short, we test equality, else similarity
   if (strlen($name) > 2) {
-    $wname = "host_name like '%$name%'";
+    $wname = "host_name like '%".$obm_q->escape($name)."%'";
   } else {
-    $wname = "host_name = '$name'";
+    $wname = "host_name = '".$obm_q->escape($name)."'";
   }
 
   // If desc is short, we test equality, else similarity
   if (trim($desc) != '') {
     if (strlen($desc) > 2) {
-      $wdesc = "host_description like '%$desc%'";
+      $wdesc = "host_description like '%".$obm_q->escape($desc)."%'";
     } else {
-      $wdesc = "host_description = '$desc'";
+      $wdesc = "host_description = '".$obm_q->escape($desc)."'";
     }
   }
   if ($wdesc != '') $wdesc = "OR $wdesc";
@@ -717,6 +718,7 @@ function run_query_check_host($id, $name, $desc) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_can_delete($id) {
   global $cdg_sql, $err;
+  $obm_q = new DB_OBM;  
 
   $delete_ok = true;
   $query = "
@@ -724,7 +726,6 @@ function check_host_can_delete($id) {
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
     WHERE serviceproperty_service = 'mail' AND serviceproperty_property IN ('imap', 'smtp_in', 'smtp_out')
     AND serviceproperty_value = '$id'";
-  $obm_q = new DB_OBM;  
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
   $obm_q->next_record();
@@ -737,8 +738,7 @@ function check_host_can_delete($id) {
     SELECT count(*) as count FROM ServiceProperty 
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
     WHERE serviceproperty_service = 'sync' AND serviceproperty_property IN ('obm_sync')
-    AND serviceproperty_value = '$id'";
-  $obm_q = new DB_OBM;  
+    AND serviceproperty_value = '".$obm_q->escape($id)."'";
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
   $obm_q->next_record();
