@@ -163,7 +163,7 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileModule 
         (profilemodule_domain_id, profilemodule_profile_id, profilemodule_module_name, profilemodule_right)
         VALUES 
-        (#INT($domain_id), #INT($id), '$module', #INT($right))
+        (#INT($domain_id), #INT($id), '".$obm_q->escape($module)."', #INT($right))
         ";
         $obm_q->query($query);
     }
@@ -177,7 +177,7 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileSection 
         (profilesection_domain_id, profilesection_profile_id, profilesection_section_name, profilesection_show)
         VALUES 
-        (#INT($domain_id), #INT($id), '$section', $show)
+        (#INT($domain_id), #INT($id), '".$obm_q->escape($section)."', $show)
         ";
         $obm_q->query($query);
     }
@@ -196,7 +196,7 @@ function run_query_profile_replace_dataset($params) {
       $query = "INSERT INTO ProfileProperty
         (profileproperty_profile_id, profileproperty_name, profileproperty_value)
         VALUES 
-        (#INT($id), '$property', '$value')
+        (#INT($id), '".$obm_q->escape($property)."', '".$obm_q->escape($value)."')
         ";
         $obm_q->query($query);      
     }
@@ -233,7 +233,7 @@ function run_query_profile_insert ($params) {
     #INT($uid),
     #INT($uid),
     #INT($domain_id),
-    '$params[name]'
+    '".$obm_q->escape($params[name])."'
   )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_profile_insert(1)');
@@ -382,7 +382,7 @@ function run_query_profilemodule_insert ($profile_id, $module_name, $right_value
   $query = "INSERT INTO ProfileModule (profilemodule_module_name,
     profilemodule_domain_id,
     profilemodule_profile_id,
-    profilemodule_right) VALUES ('$module_name',
+    profilemodule_right) VALUES ('".$obm_q->escape($module_name)."',
     #INT($domain_id),
     #INT($profile_id),
     #INT($right_value)
@@ -406,7 +406,7 @@ function run_query_profilemodule_update ($profile_id, $module_name, $right_value
   $obm_q = new DB_OBM;
 
   $query = "UPDATE ProfileModule SET profilemodule_right = #INT($right_value)
-    WHERE profilemodule_module_name = '$module_name'
+    WHERE profilemodule_module_name = '".$obm_q->escape($module_name)."'
     AND profilemodule_profile_id = #INT($profile_id)
     $profilemodule_multidomain";
 
@@ -459,7 +459,7 @@ function run_query_profilesection_insert ($profile_id, $section_name, $show_valu
   $query = "INSERT INTO ProfileSection (profilesection_section_name,
     profilesection_domain_id,
     profilesection_profile_id,
-    profilesection_show) VALUES ('$section_name',
+    profilesection_show) VALUES ('".$obm_q->escape($section_name)."',
     #INT($domain_id),
     #INT($profile_id),
     $show_value
@@ -730,7 +730,7 @@ function internal_profile_select ($params, $displayed_debug_msg = 'internal_prof
   if (!empty($params['profile_id']))
     $where .= " AND profile_id = #INT($params[profile_id])";
   if (!empty($params['name']))
-    $where .= " AND profile_name #LIKE '$params[name]%'";
+    $where .= " AND profile_name #LIKE '".$obm_q->escape($params[name])."%'";
 
   $query = "SELECT 
     profile_id,
