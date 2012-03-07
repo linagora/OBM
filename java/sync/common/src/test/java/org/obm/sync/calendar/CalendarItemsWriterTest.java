@@ -112,7 +112,7 @@ private CalendarItemsWriter writer;
 		Event eventException = updatedEvent.getOccurrence(updatedEvent.getStartDate());
 		updatedEvent.addEventException(eventException);
 
-		Event[] updated = {updatedEvent};
+		List<Event> updated = Lists.newArrayList(updatedEvent);
 		eventChanges.setUpdated(updated);
 
 		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -181,7 +181,7 @@ private CalendarItemsWriter writer;
 		EventChanges eventChanges = new EventChanges();
 		eventChanges.setLastSync(new Date(1330957589525L));
 
-		ParticipationChanges[] participationUpdated = getFakeListOfParticipationChanges();
+		List<ParticipationChanges> participationUpdated = getFakeListOfParticipationChanges();
 		eventChanges.setParticipationUpdated(participationUpdated);
 
 		String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -350,7 +350,7 @@ private CalendarItemsWriter writer;
 		return ev;
 	}
 
-	private ParticipationChanges[] getFakeListOfParticipationChanges() {
+	private List<ParticipationChanges> getFakeListOfParticipationChanges() {
 		ParticipationChanges participationChanges1 = new ParticipationChanges();
 		participationChanges1.setEventExtId(new EventExtId("123"));
 		participationChanges1.setEventId(new EventObmId(1));
@@ -363,7 +363,7 @@ private CalendarItemsWriter writer;
 		participationChanges2.setRecurrenceId(new RecurrenceId("789"));
 		participationChanges2.setAttendees(attendees);
 
-		ParticipationChanges[] participationUpdated = {participationChanges1, participationChanges2};
+		List<ParticipationChanges> participationUpdated = Lists.newArrayList(participationChanges1, participationChanges2);
 		return participationUpdated;
 	}
 

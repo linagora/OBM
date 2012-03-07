@@ -651,10 +651,10 @@ public class CalendarBindingImpl implements ICalendar {
 			
 		}
 		changes.setParticipationUpdated(eventsToParticipationUpdateArray(participationChanged));
-		changes.setUpdated(updated.toArray(new Event[0]));
+		changes.setUpdated(updated);
 	}
 
-	private ParticipationChanges[] eventsToParticipationUpdateArray(List<Event> participationChanged) {
+	private List<ParticipationChanges> eventsToParticipationUpdateArray(List<Event> participationChanged) {
 		return Lists.transform(participationChanged, new Function<Event, ParticipationChanges>() {
 			@Override
 			public ParticipationChanges apply(Event event) {
@@ -668,7 +668,7 @@ public class CalendarBindingImpl implements ICalendar {
 				participationChanges.setEventId(event.getObmId());
 				return participationChanges;
 			}
-		}).toArray(new ParticipationChanges[0]);
+		});
 	}
 
 	private String getRecurrenceIdToIcalFormat(Date recurrenceId) {
@@ -709,8 +709,8 @@ public class CalendarBindingImpl implements ICalendar {
 			EventChanges ret = calendarDao.getSync(token, calendarUser,
 					lastSync, syncRange, type, onEventDate);
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
-					+ calendar + ") => " + ret.getUpdated().length + " upd, "
-					+ ret.getDeletedEvents().length + " rmed.");
+					+ calendar + ") => " + ret.getUpdated().size() + " upd, "
+					+ ret.getDeletedEvents().size() + " rmed.");
 			return ret;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);

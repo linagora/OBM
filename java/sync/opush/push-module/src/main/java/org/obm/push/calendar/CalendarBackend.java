@@ -203,7 +203,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				changes = calendarClient.getSync(token, calendar, state.getLastSync());
 			}
 			
-			logger.info("Event changes [ {} ]", changes.getUpdated().length);
+			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 		
 			DataDelta delta = 
@@ -233,7 +233,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return new DataDelta(additions, deletions, syncDate);
 	}
 
-	private List<ItemChange> addOrUpdateEventFilter(Event[] events, String userEmail, 
+	private List<ItemChange> addOrUpdateEventFilter(List<Event> events, String userEmail,
 			Integer collectionId, BackendSession bs) throws DaoException, ConversionException {
 		
 		List<ItemChange> items = Lists.newArrayList();
@@ -247,7 +247,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return items;
 	}
 	
-	private List<ItemChange> removeEventFilter(Event[] events, DeletedEvent[] eventsRemoved,
+	private List<ItemChange> removeEventFilter(List<Event> events, List<DeletedEvent> eventsRemoved,
 			String userEmail, Integer collectionId) {
 		
 		List<ItemChange> deletions = Lists.newArrayList();

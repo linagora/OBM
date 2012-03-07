@@ -79,8 +79,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			Event ev = parseEvent(e);
 			updatedEvents.add(ev);
 		}
-		changes.setUpdated(updatedEvents
-				.toArray(new Event[updatedEvents.size()]));
+		changes.setUpdated(updatedEvents);
 
 		return changes;
 	}

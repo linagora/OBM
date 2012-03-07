@@ -1134,8 +1134,8 @@ public class CalendarBindingImplTest {
 		
 		EventChanges sortedChanges = mockGetSyncWithSortedChanges(calendar, userName, lastSync, daoChanges);
 		
-		ParticipationChanges[] participationUpdated = sortedChanges.getParticipationUpdated();
-		Assert.assertEquals(participationUpdated[0].getRecurrenceId().serializeToString(), "20120127T160000Z");
+		List<ParticipationChanges> participationUpdated = sortedChanges.getParticipationUpdated();
+		Assert.assertEquals(participationUpdated.get(0).getRecurrenceId().serializeToString(), "20120127T160000Z");
 	}
 	
 	@Test
@@ -1147,7 +1147,7 @@ public class CalendarBindingImplTest {
 		
 		EventChanges sortedChanges = mockGetSyncWithSortedChanges(calendar, userName, lastSync, daoChanges);
 		
-		Event[] updatedEvents = sortedChanges.getUpdated();
+		List<Event> updatedEvents = sortedChanges.getUpdated();
 		
 		List<Event> updatedRecurrentEvents = Lists.newArrayList(
 				getFakeEvent(RecurrenceKind.daily),
@@ -1189,17 +1189,17 @@ public class CalendarBindingImplTest {
 		EventChanges newEventChanges = new EventChanges();
 		Event updatedEvent = getFakeEvent(recurrenceKind);
 
-		newEventChanges.setUpdated(new Event[]{updatedEvent});
+		newEventChanges.setUpdated(Lists.newArrayList(updatedEvent));
 		return newEventChanges;
 	}
 
 	private EventChanges getFakeAllRecurrentEventChanges() {
 		EventChanges newRecurrentEventChanges = new EventChanges();
-		Event[] changedRecurrentEvents = { getFakeEvent(RecurrenceKind.daily),
+		List<Event> changedRecurrentEvents = Lists.newArrayList(getFakeEvent(RecurrenceKind.daily),
 				getFakeEvent(RecurrenceKind.monthlybydate),
 				getFakeEvent(RecurrenceKind.monthlybyday),
 				getFakeEvent(RecurrenceKind.weekly),
-				getFakeEvent(RecurrenceKind.yearly) };
+				getFakeEvent(RecurrenceKind.yearly));
 
 		newRecurrentEventChanges.setUpdated(changedRecurrentEvents);
 		return newRecurrentEventChanges;

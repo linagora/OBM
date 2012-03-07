@@ -37,32 +37,34 @@ import java.util.List;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 
+import com.google.common.collect.Lists;
+
 public class EventChanges {
 
-	private DeletedEvent[] deletedEvents;
-	private Event[] updatedEvents;
-	private ParticipationChanges[] participationUpdated;
+	private List<DeletedEvent> deletedEvents;
+	private List<Event> updatedEvents;
+	private List<ParticipationChanges> participationUpdated;
 	private Date lastSync;
 
 	public EventChanges() {
-		deletedEvents = new DeletedEvent[0];
-		updatedEvents = new Event[0];
-		participationUpdated = new ParticipationChanges[0];
+		deletedEvents = Lists.newArrayList();
+		updatedEvents = Lists.newArrayList();
+		participationUpdated = Lists.newArrayList();
 	}
 
-	public DeletedEvent[] getDeletedEvents() {
+	public List<DeletedEvent> getDeletedEvents() {
 		return deletedEvents;
 	}
 
 	public void setDeletedEvents(List<DeletedEvent> deleted) {
-		this.deletedEvents = deleted.toArray(new DeletedEvent[0]);
+		this.deletedEvents = deleted;
 	}
 
-	public Event[] getUpdated() {
+	public List<Event> getUpdated() {
 		return updatedEvents;
 	}
 
-	public void setUpdated(Event[] updated) {
+	public void setUpdated(List<Event> updated) {
 		this.updatedEvents = updated;
 	}
 
@@ -74,11 +76,11 @@ public class EventChanges {
 		this.lastSync = lastSync;
 	}
 
-	public ParticipationChanges[] getParticipationUpdated() {
+	public List<ParticipationChanges> getParticipationUpdated() {
 		return participationUpdated;
 	}
 	
-	public void setParticipationUpdated(ParticipationChanges[] participationUpdated) {
+	public void setParticipationUpdated(List<ParticipationChanges> participationUpdated) {
 		this.participationUpdated = participationUpdated;
 	}
 	
