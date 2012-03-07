@@ -2766,9 +2766,9 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	$event_id = sql_parse_id($event_id);
 	$ent_id = sql_parse_id($ent_id);
 	if($type == 'user'){
-		$entity_id = get_user_entity_id_for_comment_insert($ent_id, $event_id);
+		$entity_id = get_user_entity_id_for_comment_insert($ent_id);
 	}else{
-		$entity_id = get_resource_entity_id_for_comment_insert($ent_id, $event_id);
+		$entity_id = get_resource_entity_id_for_comment_insert($ent_id);
 	}
 	$oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
 	$obm_q = new DB_OBM;
@@ -2778,71 +2778,40 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	WHERE eventlink_event_id = $event_id
 	AND eventlink_entity_id = $entity_id
 	;";
-	
-	$obm_q->query($query);
-	$newEvent = OBM_EventFactory::getInstance()->getById($event_id);
-	//notify attendee
-	OBM_EventFactory::getInstance()->store($oldEvent, $newEvent);
-	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
-	return true;
+	if ( $obm_q->query($query) ){
+		$newEvent = OBM_EventFactory::getInstance()->getById($event_id);
+		//notify attendee
+		OBM_EventFactory::getInstance()->store($oldEvent, $newEvent);
+		display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
+		return true;
+	}else{
+		return false;
+	}
 }
-function get_user_entity_id_for_comment_insert($user_id, $event_id){
+function get_user_entity_id_for_comment_insert($user_id){
 	global $cdg_sql, $obm;
 	$obm_q = new DB_OBM;
-	$query = "SELECT eventlink_entity_id 
-	FROM EventLink     
-	INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-	INNER JOIN UserObm u ON userentity_user_id = userobm_id 
-	WHERE eventlink_event_id = $event_id 
-	AND u.userobm_id = $user_id;
-	";
-	$obm_q->query($query);
-	$obm_q->next_record();
-	return $obm_q->f('eventlink_entity_id');
+	
+	$query = "SELECT userentity_entity_id from UserEntity where userentity_user_id = $user_id;";
+	if ( $obm_q->query($query) ){
+		$obm_q->next_record();
+		return $obm_q->f('eventlink_entity_id');
+	}else{
+		return false;
+	}
 }
  
-function get_resource_entity_id_for_comment_insert($res_id, $event_id){
+function get_resource_entity_id_for_comment_insert($res_id){
 	global $cdg_sql, $obm;
 	$obm_q = new DB_OBM;
-	$query = "SELECT eventlink_entity_id 
-	FROM EventLink     
-	INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id 
-	INNER JOIN Resource r ON resourceentity_resource_id = resource_id 
-	WHERE eventlink_event_id = $event_id 
-	AND r.resource_id= $res_id;
-	";
-	$obm_q->query($query);
-	$obm_q->next_record();
-	return $obm_q->f('eventlink_entity_id');
-}
-
-function get_comment_of_user($user_id, $event_id){
-	global $cdg_sql, $obm;
-	$obm_q = new DB_OBM;
-	$query = "SELECT eventlink_comment
-	FROM EventLink     
-	INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-	INNER JOIN UserObm u ON userentity_user_id = userobm_id 
-	WHERE eventlink_event_id = $event_id 
-	AND u.userobm_id = $user_id;
-	";
-	$obm_q->query($query);
-	$obm_q->next_record();
-	return $obm_q->f('eventlink_comment');
-}
-function get_comment_of_resource($res_id, $event_id){
-	global $cdg_sql, $obm;
-	$obm_q = new DB_OBM;
-	$query = "SELECT eventlink_comment 
-	FROM EventLink 
-	INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id 
-	INNER JOIN Resource r ON resourceentity_resource_id = resource_id 
-	WHERE eventlink_event_id = $event_id 
-	AND r.resource_id= $res_id;
-	";
-	$obm_q->query($query);
-	$obm_q->next_record();
-	return $obm_q->f('eventlink_comment');
+	
+	$query = "SELECT resourceentity_entity_id  from ResourceEntity where resourceentity_resource_id = $res_id;";
+	if ( $obm_q->query($query) ){
+		$obm_q->next_record();
+		return $obm_q->f('resourceentity_entity_id');
+	}else{
+		return false;
+	}
 }
 
 /**
@@ -3958,6 +3927,7 @@ function get_calendar_event_entity($calendar_id) {
     'user' as eventlink_entity,
     userentity_user_id as eventlink_entity_id,
     eventlink_state as state,
+    eventlink_comment as comment,
     eventlink_is_organizer as is_organizer
     FROM EventLink
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
@@ -3972,12 +3942,13 @@ function get_calendar_event_entity($calendar_id) {
   while ($u_q->next_record()) {
     $entity = $u_q->f('eventlink_entity');
     $entity_id = $u_q->f('eventlink_entity_id');
+    $comment = $u_q->f('comment');
     $state = $u_q->f('state');
     $is_organizer = ($u_q->f('is_organizer') == 1);
     $label = $u_q->f('userobm_lastname'). ' ' .$u_q->f('userobm_firstname');
     $entities[$entity]['ids'][] = $entity_id;
     $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
-      'state' => $state, 'is_organizer' => $is_organizer);
+      'state' => $state, 'is_organizer' => $is_organizer, 'comment' => $comment);
   }
 
   $multidomain = sql_multidomain('resource');
@@ -3986,7 +3957,8 @@ function get_calendar_event_entity($calendar_id) {
     resource_name,
     'resource' as eventlink_entity,
     resourceentity_resource_id as eventlink_entity_id,
-    eventlink_state as state
+    eventlink_state as state,
+    eventlink_comment as comment
     FROM EventLink
     INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     INNER JOIN Resource ON resourceentity_resource_id = resource_id
@@ -4001,10 +3973,11 @@ function get_calendar_event_entity($calendar_id) {
     $entity = $r_q->f('eventlink_entity');
     $entity_id = $r_q->f('eventlink_entity_id');
     $state = $r_q->f('state');
+    $comment = $r_q->f('comment');
     $label = $r_q->f('resource_name');
     $entities[$entity]['ids'][] = $entity_id;
     $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
-      'state' => $state);
+      'state' => $state, 'comment' => $comment);
   }
 
   $multidomain = sql_multidomain('contact');
@@ -4015,6 +3988,7 @@ function get_calendar_event_entity($calendar_id) {
     'contact' as eventlink_entity,
     contactentity_contact_id as eventlink_entity_id,
     eventlink_state as state,
+    eventlink_comment as comment,
     eventlink_is_organizer as is_organizer
     FROM EventLink
     INNER JOIN ContactEntity ON contactentity_entity_id = eventlink_entity_id
@@ -4030,11 +4004,12 @@ function get_calendar_event_entity($calendar_id) {
     $entity = $u_q->f('eventlink_entity');
     $entity_id = $u_q->f('eventlink_entity_id');
     $state = $u_q->f('state');
+    $comment = $r_q->f('comment');
     $is_organizer = ($u_q->f('is_organizer') == 1);
     $label = $u_q->f('contact_lastname'). ' ' .$u_q->f('contact_firstname');
     $entities[$entity]['ids'][] = $entity_id;
     $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
-      'state' => $state, 'is_organizer' => $is_organizer);
+      'state' => $state, 'is_organizer' => $is_organizer,'comment' => $comment);
   }
   
   $multidomain = sql_multidomain('document');

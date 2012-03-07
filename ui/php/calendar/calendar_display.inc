@@ -3191,6 +3191,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $label = $entity['label'];
         $state = $entity['state'];
         $is_organizer = $entity['is_organizer'];
+	$comment = $entity['comment'];
         
         if ($is_organizer && $state == 'DECLINED') continue;
 	$comment_style = 'text-align:justify;';
@@ -3222,13 +3223,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 	  $bell_alert_icon = "<a class=\"$bell_alert_class\" $bell_alert_onclick $bell_alert_title></a>";
 	  
 	// comment  display
-	$comment[$u_id] = get_comment_of_user($u_id, $id);
-	if($comment[$u_id] == '' ){
+	if($comment == '' ){
 		$comment_style = 'text-align:center;';
 		$user_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$GLOBALS[l_add_comment]...', 'user');\" title=\"$l_add\"></a>";
 	}else{
-		$user_comment = addslashes($comment[$u_id]);
-		$user_comment_display =  $comment[$u_id]." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
+		$user_comment = addslashes($comment);
+		$user_comment_display =  $user_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
          }
 	  $saved_checked = $state;
           $dis_user_list .= "
@@ -3247,8 +3247,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $ACCEPTED = 'class="disabled"';
           ${'NEEDS-ACTION'} = 'class="disabled"';
           $DECLINED = 'class="disabled"';
-          $$state = '';
-          $user_comment_display = get_comment_of_user($u_id, $id);         
+          $$state = '';  
           $dis_user_list .= "
           <tr>
           <td>$label</td>
@@ -3257,7 +3256,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <span ${'NEEDS-ACTION'}> $l_needs_action</span>
           <span $DECLINED> $l_declined</span>
           </td>
-          <td><span style=\"$comment_style\">$user_comment_display</span></td>
+          <td><span style=\"$comment_style\">$comment</span></td>
           <td></td>
           </tr>";
         }
@@ -3354,9 +3353,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $entity) {
         $label = '';
-	$resource_comment = get_comment_of_resource($r_id, $id);
         $label .= $entity['label'];
         $state = $entity['state'];
+	$resource_comment = $entity['comment'];
+	
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
@@ -5557,14 +5557,8 @@ function html_calendar_waiting_events($obm_wait) {
     $time_end = $end->getHour();
     $min_end = $end->getMinute();
     
-    if($current_entity_entity == 'user'){
-      $current_entity_comment = get_comment_of_user($current_entity, $obm_wait->f('event_id'));
-      if($current_entity_comment == '') $current_entity_comment = "$GLOBALS[l_add_comment]...";
-    }else{
-      $current_entity_comment = get_comment_of_resource($current_entity, $obm_wait->f('event_id'));
-      if($current_entity_comment == '') $current_entity_comment = "$GLOBALS[l_add_comment]...";
-    }
-    
+    $current_entity_comment = "$GLOBALS[l_add_comment]...";
+
     $block .= "
     <tr style=\"text-align:center;\">
      <td style=\"text-align:left;\">
