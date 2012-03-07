@@ -81,11 +81,12 @@ function get_report_user_service() {
 function get_report_mail_admin($params) {
   global $obm, $cgd_sql, $cmail_report;
 
+  $obm_q = new DB_OBM();
   $where = 'userobm_perms = \'admin\' AND userobm_email IS NOT NULL AND userobm_email != \' \'';
 
   if(isset($params['report_delegation']) && $params['report_delegation'] != '') {
     $delegation_target = $params['report_delegation'];
-    $where .= " AND userobm_delegation_target = '$delegation_target'";
+    $where .= " AND userobm_delegation_target = '".$obm_q->escape($delegation_target)."'";
   }
   
   if(isset($obm['domain_id']) && $obm['domain_id'] != '') {
@@ -95,7 +96,7 @@ function get_report_mail_admin($params) {
 
   if(isset($params['service']) && $params['service'] != '') {
     $service = $params['service'];
-    $where .= " AND userobm_service = '$service'";
+    $where .= " AND userobm_service = '".$obm_q->escape($service)."'";
   }
 
   $query = "
@@ -106,7 +107,6 @@ function get_report_mail_admin($params) {
   
   display_debug_msg($query, $cdg_sql, 'get_report_mail()');
 
-  $obm_q = new DB_OBM();
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
