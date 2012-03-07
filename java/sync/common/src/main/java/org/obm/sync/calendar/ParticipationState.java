@@ -43,6 +43,10 @@ public enum ParticipationState {
 
 	private Comment comment;
 
+	private ParticipationState() {
+		comment = new Comment();
+	}
+
 	public Comment getComment() {
 		return comment;
 	}
@@ -52,7 +56,7 @@ public enum ParticipationState {
 	}
 
 	public boolean hasDefinedComment() {
-		return (comment != null && !comment.serializeToString().isEmpty());
+		return comment.getComment() != null;
 	}
 
 	public Object getJdbcObject(ObmDbType type) throws SQLException {

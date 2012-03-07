@@ -158,30 +158,6 @@ public class Ical4jHelperTest {
 		}
 	}
 
-	private static class StringDoesntContainsIcsProperty extends TypeSafeMatcher<String> {
-
-		private final String propertyName;
-		private final String propertyValue;
-
-
-		public StringDoesntContainsIcsProperty(String propertyName, String propertyValue) {
-			this.propertyName = propertyName;
-			this.propertyValue = propertyValue;
-
-		}
-
-		@Override
-		public void describeTo(Description description) {
-			description.appendText("check that given string doesn't contains the ics property named" + propertyName + " with the value "+propertyValue);
-		}
-
-		@Override
-		public boolean matchesSafely(String item) {
-			String field = propertyName+":"+propertyValue+"\r\n";
-			return !item.contains(field);
-		}
-	}
-
 	@BeforeClass
 	public static void setUpOnce() {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
@@ -1103,10 +1079,6 @@ public class Ical4jHelperTest {
 		Assert.assertThat(ics, new StringContainsIcsProperty(propertyName, propertyValue));
 	}
 
-	private void checkDoesntContainIcsProperty(String ics, String propertyName, String propertyValue) {
-		Assert.assertThat(ics, new StringDoesntContainsIcsProperty(propertyName, propertyValue));
-	}
-
 	@Test
 	public void testXObmDomainUUIDInInvitation() {
 		Event event = buildEvent();
@@ -1140,33 +1112,18 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testEmptyCommentNotAppendedInICS() {
+	public void testNullCommentNotAppendedToICS() {
 		Event event = buildEvent();
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
 		ParticipationState status = attendeeReply.getState();
-		status.setComment(new Comment(""));
+		status.setComment(new Comment(null));
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 		AccessToken token = new AccessToken(0, "OBM");
 
 		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
 
-		checkDoesntContainIcsProperty(icsReply, "COMMENT", status.getComment().serializeToString());
-	}
-
-	@Test
-	public void testNullCommentNotAppendedInICS() {
-		Event event = buildEvent();
-
-		final Attendee attendeeReply = event.getAttendees().get(2);
-		ParticipationState status = attendeeReply.getState();
-		status.setComment(null);
-		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
-		AccessToken token = new AccessToken(0, "OBM");
-
-		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
-
-		checkDoesntContainIcsProperty(icsReply, "COMMENT", "");
+		Assertions.assertThat(icsReply).doesNotContain("COMMENT");
 	}
 
 	private void checkStringLengthLessThan(String ics, int length) {

@@ -860,13 +860,8 @@ public class Ical4jHelper {
 		ParticipationState status = attendee.getState();
 		org.obm.sync.calendar.Comment comment = status.getComment();
 
-		String replyComment = "";
-		if (comment != null) {
-			replyComment = comment.serializeToString();
-		}
-
-		if (!isEmpty(replyComment)) {
-			prop.add(new Comment(replyComment));
+		if (status.hasDefinedComment()) {
+			prop.add(new Comment(comment.serializeToString()));
 		}
 	}
 

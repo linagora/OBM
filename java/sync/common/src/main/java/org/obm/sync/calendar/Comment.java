@@ -34,14 +34,17 @@ package org.obm.sync.calendar;
 import java.io.Serializable;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 
 public class Comment implements Serializable {
 
 	private final String comment;
 
+	public Comment() {
+		comment = null;
+	}
+
 	public Comment(String comment) {
-		this.comment = Strings.nullToEmpty(comment);
+		this.comment = comment;
 	}
 
 	public String getComment() {
