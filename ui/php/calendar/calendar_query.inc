@@ -2789,31 +2789,27 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	}
 }
 function get_user_entity_id_for_comment_insert($user_id){
-	global $cdg_sql, $obm;
-	$obm_q = new DB_OBM;
-	
-	$query = "SELECT userentity_entity_id from UserEntity where userentity_user_id = $user_id;";
-	if ( $obm_q->query($query) ){
-		$obm_q->next_record();
-		return $obm_q->f('eventlink_entity_id');
-	}else{
-		return false;
-	}
+    global $cdg_sql, $obm;
+    $obm_q = new DB_OBM;
+    $query = "SELECT userentity_entity_id from UserEntity where userentity_user_id = $user_id;";
+    if ( $obm_q->query($query) ){
+        $obm_q->next_record();
+        return $obm_q->f('userentity_entity_id');
+    }else{
+        return false;
+    }
 }
- 
 function get_resource_entity_id_for_comment_insert($res_id){
-	global $cdg_sql, $obm;
-	$obm_q = new DB_OBM;
-	
-	$query = "SELECT resourceentity_entity_id  from ResourceEntity where resourceentity_resource_id = $res_id;";
-	if ( $obm_q->query($query) ){
-		$obm_q->next_record();
-		return $obm_q->f('resourceentity_entity_id');
-	}else{
-		return false;
-	}
+    global $cdg_sql, $obm;
+    $obm_q = new DB_OBM;
+    $query = "SELECT resourceentity_entity_id  from ResourceEntity where resourceentity_resource_id = $res_id;";
+    if ( $obm_q->query($query) ){
+        $obm_q->next_record();
+        return $obm_q->f('resourceentity_entity_id');
+    }else{
+        return false;
+    }
 }
-
 /**
  * Insert an event template
  * 

@@ -673,60 +673,33 @@ if ($action == 'search') {
 
 } elseif ($action == 'update_comment') {
 ///////////////////////////////////////////////////////////////////////////////
-	if( isset($params['comment']) ){
-		$retour = run_query_calendar_event_comment_insert($params['calendar_id'], $params['user_id'],$params['comment'],$params['type']);
-		if ($retour) {
-			json_ok_msg("$l_event : $l_update_ok");
-		} else {
-			json_error_msg("$l_event : $err[msg]");
-		}
-	}
-	echo "({".$display['json']."})";
-	exit();
+  if( isset($params['comment']) ){
+    $comment_inserted = run_query_calendar_event_comment_insert($params['calendar_id'],
+      $params['user_id'],$params['comment'],$params['type']);
+    if ($comment_inserted) {
+      json_ok_msg("$l_event : $l_update_ok");
+    } else {
+      json_error_msg("$l_event : $err[msg]");
+    }
+  }
+  echo "({".$display['json']."})";
+  exit();
 
 } elseif ($action == 'update_decision_and_comment') {
-	$retour = run_query_calendar_event_comment_insert($params['calendar_id'], $params['entity_id'],$params['comment'],$params['entity_kind']);
-	if ($retour) {
-	} else {
-		json_error_msg("$l_event : $err[msg]");
-		echo "({".$display['json']."})";
-		exit();
-	}
-	if (empty($params['entity_id']) && $params['entity_kind'] == 'user') $params['entity_id'] = $obm['uid'];
-	//we want to send mails
-	$GLOBALS["send_notification_mail"] = true;
-	if (check_calendar_event_participation($params)) {
-		if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)){
-			json_error_msg("$l_event : $l_conflicts");
-			echo "({".$display['json']."})";
-			exit();
-		}
-		$params['conflicts'] = $conflicts;
-		if (check_calendar_participation_decision($params)) {
-			$event_q = run_query_calendar_detail($params['calendar_id']);
-			if(($event_q->f('event_repeatkind')=='none') || $params['all'] == 1) {
-				$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
-			} else {
-				$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event'], true);
-			}
-		} else {
-			json_error_msg("$err[msg]");
-			echo "({".$display['json']."})";
-			exit();
-		}
-	}
-	if ($retour) {
-		if (check_calendar_access($params['calendar_id'], 'read')) {
-			json_ok_msg("$l_event : $l_update_ok");
-		} else {
-			json_error_msg("$err[msg]");
-		}
-	} else {
-		json_error_msg("$l_event : $err[msg]");
-	}
-	echo "({".$display['json']."})";
-	exit();
-	
+  try {
+    $comment_and_decision_updated = update_decision_and_comment($params, $obm['uid']);
+    if ($comment_and_decision_updated) {
+      json_ok_msg("$l_event : $l_update_ok");
+    }
+  }
+  catch (ConflictException $ex) {
+    json_error_msg("$l_event : $l_conflicts");
+  }
+  catch (Exception $ex) {
+    json_error_msg("$l_event : $err[msg]");
+  }
+  echo "({".$display['json']."})";
+  exit();  
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
@@ -2320,4 +2293,45 @@ function add_upload_error_message_other()
 	return $result;
 }
 
+function update_decision_and_comment($params, $user_id) {
+  $calendar_id = $params['calendar_id'];
+  $entity_id = $params['entity_id'];
+  $comment = $params['comment'];
+  $entity_kind = $params['entity_kind'];
+  $decision_event = $params['decision_event'];
+
+  $comment_inserted = run_query_calendar_event_comment_insert($calendar_id,
+    $entity_id, $comment, $entity_kind);
+  if (!$comment_inserted) {
+    throw new DBUpdateException("Can't insert comment");
+  }
+  $owner_id = empty($entity_id) && $entity_kind == 'user' ? $user_id : $entity_id;
+  if (!check_calendar_event_participation($params)) {
+    return false;
+  }
+  if (!$params['force']) {
+    $conflicts = check_calendar_decision_conflict($params);
+    if ($conflicts) {
+      throw new ConflictException();
+    }
+  }
+  $params['conflicts'] = false;
+  if (!check_calendar_participation_decision($params)) {
+    throw new AccessException();
+  }
+  $event_q = run_query_calendar_detail($calendar_id);
+  $isRecurrent = $event_q->f('event_repeatkind')!='none' && $params['all'] != 1;
+  $GLOBALS["send_notification_mail"] = true;
+  if (!run_query_calendar_update_occurrence_state($calendar_id, $entity_kind, $owner_id, $decision_event,
+          $isRecurrent)) {
+    throw new DBUpdateException();
+  }
+  return true;
+}
+
+class DBUpdateException extends Exception {}
+
+class ConflictException extends Exception {}
+
+class AccessException extends Exception {}
 ?>
