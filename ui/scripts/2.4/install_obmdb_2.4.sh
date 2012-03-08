@@ -19,6 +19,8 @@ get_val db
 DB=$VALUE
 get_val lang
 OBM_LANG=$VALUE
+get_val host
+H=$VALUE
 
 echo "*** Parameters used"
 echo "database type  = $DBTYPE"
@@ -26,6 +28,7 @@ echo "database = $DB"
 echo "database user = $U"
 echo "database password = $P"
 echo "install lang = $OBM_LANG"
+echo "database host = $H"
 
 
 
@@ -35,7 +38,7 @@ echo "*** Document repository creation"
 ./install_document_2.4.sh
 
 if [ -z $installation_type ] || [ $installation_type != 'filldata' ]; then
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "full"
+  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} ${H} "full"
 else
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "filldata"
+  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} ${H} "filldata"
 fi

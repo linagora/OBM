@@ -1,7 +1,7 @@
 #!/bin/bash
 
-test $# -eq 5 || {
-    echo "usage: $0 db user password lang installationtype"
+test $# -eq 6 || {
+    echo "usage: $0 db user password lang host installationtype"
     exit 1
 }
 
@@ -9,32 +9,32 @@ db=$1
 user=$2
 pw=$3
 obm_lang=$4
-host=localhost
-obm_installation_type=$5
+host=$5
+obm_installation_type=$6
 
 export PGPASSWORD=$pw
 
 if [ $obm_installation_type = "full" ]; then
   echo "  Delete old database"
-  su - postgres -c "dropdb ${db}"
+  su - postgres -c "dropdb -h$host ${db}"
   
   
-  su - postgres -c "dropuser ${user}"
+  su - postgres -c "dropuser -h$host ${user}"
   
   echo "Creating role '${user}' (pw: ${pw}) & db '${db}' (lang: ${obm_lang})..."
-  su - postgres -c "createuser --createdb --no-superuser --no-createrole --login ${user}"
+  su - postgres -c "createuser -h$host --createdb --no-superuser --no-createrole --login ${user}"
   
-  su - postgres -c "psql template1 <<EOF
+  su - postgres -c "psql -h$host template1 <<EOF
 ALTER USER ${user} WITH PASSWORD '${pw}'
 \q
 EOF"
   
   echo "  Create new $DB database"
   
-  su - postgres -c "createdb -O ${user} --encoding=UTF-8 ${db}"
+  su - postgres -c "createdb -h$host -O ${user} --encoding=UTF-8 ${db}"
 fi
 
-su - postgres -c "psql ${db} <<EOF
+su - postgres -c "psql -h$host ${db} <<EOF
 CREATE LANGUAGE plpgsql;
 ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
