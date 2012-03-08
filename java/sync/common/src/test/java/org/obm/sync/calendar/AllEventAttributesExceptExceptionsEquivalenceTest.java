@@ -40,6 +40,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 	
 	private Event getMockBeforeTimeUpdateEvent(){
@@ -144,7 +146,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getMockBeforeSequenceEvent();
 		Event e2 = getMockAfterSequenceEvent();
 		e2.setAlert(e1.getAlert() + 10);
-boolean result = comparator.equivalent(e1, e2);
+		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
 	}
@@ -155,7 +157,7 @@ boolean result = comparator.equivalent(e1, e2);
 		Event e1 = getMockBeforeSequenceEvent();
 		Event e2 = getMockAfterSequenceEvent();
 		e2.setAlert(e1.getAlert() - 10);
-boolean result = comparator.equivalent(e1, e2);
+		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
 	}
@@ -177,7 +179,24 @@ boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
 	}
-	
+
+	@Test
+	public void testCompareAttendeesInDifferentOrder() {
+		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();
+		Event e1 = getMockBeforeSequenceEvent();
+		Event e2 = getMockBeforeSequenceEvent();
+
+		List<Attendee> e1Attendees = e1.getAttendees();
+		LinkedList<Attendee> newE2Attendees = Lists.newLinkedList();
+		newE2Attendees.add(e1Attendees.get(1));
+		newE2Attendees.add(e1Attendees.get(0));
+
+		e2.setAttendees(newE2Attendees);
+		boolean result = comparator.equivalent(e1, e2);
+
+		Assert.assertFalse(result);
+	}
+
 	@Test
 	public void testCompareDeleteAttendees(){
 		AllEventAttributesExceptExceptionsEquivalence comparator = new AllEventAttributesExceptExceptionsEquivalence();

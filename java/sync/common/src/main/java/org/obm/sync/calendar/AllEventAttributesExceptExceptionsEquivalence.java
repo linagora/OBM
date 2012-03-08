@@ -31,8 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.util.List;
+
 import com.google.common.base.Equivalence;
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
 
 public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<Event> {
@@ -49,7 +52,7 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 		if (!Objects.equal(o1.getAlert(), o2.getAlert())) {
 			return false;
 		}
-		if (!Objects.equal(o1.getAttendees(), o2.getAttendees())) {
+		if (!sameItemsIgnoringOrder(o1.getAttendees(), o2.getAttendees())) {
 			return false;
 		}
 		if (!Objects.equal(o1.getCategory(), o2.getCategory())) {
@@ -132,6 +135,10 @@ public class AllEventAttributesExceptExceptionsEquivalence extends Equivalence<E
 			return true;
 		}
 		return false;
+	}
+
+	private boolean sameItemsIgnoringOrder(List<?> l1, List<?> l2) {
+		return Objects.equal(Sets.newHashSet(l1), Sets.newHashSet(l2));
 	}
 
 	@Override
