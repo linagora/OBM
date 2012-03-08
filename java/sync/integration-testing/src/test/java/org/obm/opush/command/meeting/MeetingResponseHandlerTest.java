@@ -60,6 +60,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
@@ -70,6 +71,9 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.protocol.MeetingProtocol;
+import org.obm.push.protocol.bean.MeetingHandlerResponse;
+import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -80,6 +84,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
@@ -92,6 +97,7 @@ public class MeetingResponseHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject MeetingProtocol protocol;
 
 	private int meetingCollectionId;
 	private int meetingItemId;
@@ -343,35 +349,31 @@ public class MeetingResponseHandlerTest {
 		expect(collectionDao.getCalendarChangedCollections(dateFirstSyncFromASSpecs)).andReturn(noChangeCollections).anyTimes();
 	}
 
-	private String buildMeetingResponseCommandSuccess() {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<MeetingResponse>" +
-					"<Result>" +
-						"<Status>1</Status>" +
-						"<CalId>" + serverId(meetingCollectionId, meetingItemId) + "</CalId>" +
-						"<ReqId>" + serverId(invitationCollectionId, invitationItemId) + "</ReqId>" +
-					"</Result>" +
-				"</MeetingResponse>";
+	private String buildMeetingResponseCommandSuccess() throws TransformerException {
+		return buildResponse(MeetingResponseStatus.SUCCESS, serverId(meetingCollectionId, meetingItemId));
 	}
 
-	private String buildMeetingResponseCommandInvalidRequest() {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<MeetingResponse>" +
-					"<Result>" +
-						"<Status>2</Status>" + // MS-ASCMD 2.2.1.9.2.4 : 2 is Invalid Request
-						"<ReqId>" + serverId(invitationCollectionId, invitationItemId) + "</ReqId>" +
-					"</Result>" +
-				"</MeetingResponse>";
+	private String buildMeetingResponseCommandInvalidRequest() throws TransformerException {
+		return buildResponse(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 	}
 
-	private String buildMeetingResponseCommandFailure() {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<MeetingResponse>" +
-					"<Result>" +
-						"<Status>4</Status>" + // MS-ASCMD 2.2.1.9.2.4 : 4 is SERVER_ERROR
-						"<ReqId>" + serverId(invitationCollectionId, invitationItemId) + "</ReqId>" +
-					"</Result>" +
-				"</MeetingResponse>";
+	private String buildMeetingResponseCommandFailure() throws TransformerException {
+		return buildResponse(MeetingResponseStatus.SERVER_ERROR);
+	}
+	
+	private String buildResponse(MeetingResponseStatus status) throws TransformerException {
+		return buildResponse(status, null);
+	}
+		
+	private String buildResponse(MeetingResponseStatus status, String calId) throws TransformerException {
+		ItemChangeMeetingResponse itemChangeMeetingResponse = new ItemChangeMeetingResponse();
+		itemChangeMeetingResponse.setReqId(serverId(invitationCollectionId, invitationItemId));
+		itemChangeMeetingResponse.setCalId(calId);
+		itemChangeMeetingResponse.setStatus(status);
+		
+		MeetingHandlerResponse response = new MeetingHandlerResponse(Lists.newArrayList(itemChangeMeetingResponse));
+		Document encodeResponses = protocol.encodeResponses(response);
+		return DOMUtils.serialise(encodeResponses);
 	}
 
 	private Document buildMeetingAcceptedResponse()
