@@ -1,16 +1,19 @@
 #!/bin/bash
 
-test $# -eq 6 || {
-    echo "usage: $0 db user password lang installationtype host"
+if [ $# -ne 5 && $# -ne 6 ]; then
+    echo "usage: $0 db user password lang installationtype [host]"
     exit 1
-}
+fi
 
 db=$1
 user=$2
 pw=$3
 obm_lang=$4
+host=localhost
 obm_installation_type=$5
-host=$6
+if [ $# -eq 6]; then 
+    host=$6
+fi
 
 export PGPASSWORD=$pw
 
