@@ -34,7 +34,10 @@ package org.obm.sync.push.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -43,6 +46,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.utils.FileUtils;
+import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
@@ -61,8 +65,8 @@ public abstract class OPClient {
 	protected ProtocolVersion protocolVersion;
 	protected AccountInfos ai;
 
-	public abstract Document postXml(String namespace, Document doc, 
-			String cmd, String policyKey, boolean multipart) throws Exception;
+	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
+			throws TransformerException, WBXmlException, IOException, HttpStatusException;
 	
 	protected OPClient(String loginAtDomain, String password, String devId,
 			String devType, String userAgent, String url) {
@@ -118,7 +122,7 @@ public abstract class OPClient {
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)
-			throws Exception {
+			throws TransformerException, WBXmlException, IOException, HttpStatusException {
 		return postXml(namespace, doc, cmd, null, false);
 	}
 

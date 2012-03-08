@@ -1,16 +1,21 @@
 package org.obm.sync.push.client;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 
 public class XMLOPClient extends OPClient {
@@ -21,12 +26,12 @@ public class XMLOPClient extends OPClient {
 		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
 	}
 
-	private RequestEntity getRequestEntity(Document doc) throws Exception {
+	private RequestEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {
 		try {
 			String xmlData = DOMUtils.serialise(doc);
 			return new ByteArrayRequestEntity(xmlData.getBytes("UTF8"), "text/xml");
 		} catch (TransformerException e) {
-			throw new Exception("Cannot serialize data to xml", e);
+			throw new TransformerException("Cannot serialize data to xml", e);
 		}
 	}
 
@@ -35,7 +40,9 @@ public class XMLOPClient extends OPClient {
 	}
 
 	@Override
-	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart) throws Exception {
+	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
+			throws TransformerException, HttpException, IOException, HttpStatusException {
+		
 		DOMUtils.logDom(doc);
 		
 		RequestEntity requestEntity = getRequestEntity(doc);
@@ -58,13 +65,17 @@ public class XMLOPClient extends OPClient {
 				logger.error("head[" + h.getName() + "] => " + h.getValue());
 			}
 			if (ret != HttpStatus.SC_OK) {
-				throw new Exception("method failed:\n" + pm.getStatusLine() + "\n" + pm.getResponseBodyAsString());
+				throw new HttpStatusException(ret, "method failed:\n" + pm.getStatusLine() + "\n" + pm.getResponseBodyAsString());
 			} else {
 				InputStream in = pm.getResponseBodyAsStream();
 				Document docResponse = DOMUtils.parse(in);
 				DOMUtils.logDom(docResponse);
 				return docResponse;
 			}
+		} catch (SAXException e) {
+			throw new TransformerException(e);
+		} catch (FactoryConfigurationError e) {
+			throw new TransformerException(e);
 		} finally {
 			pm.releaseConnection();
 		}

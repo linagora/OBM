@@ -4,8 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
+
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpStatus;
@@ -15,6 +18,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
 
@@ -29,14 +33,14 @@ public class WBXMLOPClient extends OPClient {
 		this.wbxmlTools = wbxmlTools;
 	}
 
-	private ByteArrayRequestEntity getRequestEntity(String namespace, Document doc) throws Exception {
+	private ByteArrayRequestEntity getRequestEntity(String namespace, Document doc) throws WBXmlException, IOException {
 		byte[] wbxml = wbxmlTools.toWbxml(namespace, doc);
 		return new ByteArrayRequestEntity(wbxml, "application/vnd.ms-sync.wbxml");
 	}
 
 	@Override
-	public Document postXml(String namespace, Document doc, String cmd,
-			String policyKey, boolean multipart) throws Exception {
+	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
+			throws TransformerException, WBXmlException, IOException, HttpStatusException {
 
 		DOMUtils.logDom(doc);
 
@@ -76,6 +80,7 @@ public class WBXMLOPClient extends OPClient {
 			if (ret != HttpStatus.SC_OK) {
 				logger.error("method failed:\n" + pm.getStatusLine()
 						+ "\n" + pm.getResponseBodyAsString());
+				throw new HttpStatusException(ret);
 			} else {
 				InputStream is = pm.getResponseBodyAsStream();
 				File localCopy = File.createTempFile("pushresp_", ".bin");

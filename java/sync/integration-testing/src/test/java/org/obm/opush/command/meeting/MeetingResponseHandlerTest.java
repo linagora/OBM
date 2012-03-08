@@ -44,6 +44,7 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -71,6 +72,8 @@ import org.obm.push.mail.MailBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.HttpStatusException;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -128,6 +131,20 @@ public class MeetingResponseHandlerTest {
 	}
 
 	@Test
+	public void testRuntimeExceptionInInvitationEmailDeletionTriggersHttpServerErrorStatus() throws Exception {
+		prepareMockForEmailDeletionError(new RuntimeException());
+		opushServer.start();
+		
+		int expectedHttpStatus = -1;
+		try {
+			postMeetingAcceptedResponse();
+		} catch (HttpStatusException e) {
+			expectedHttpStatus = e.getStatusCode();
+		}
+		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
 	public void testItemNotFoundInMeetingResponseHandlingMakeFailTheCommand() throws Exception {
 		prepareMockForMeetingResponseHandlingError(new ItemNotFoundException());
 		opushServer.start();
@@ -147,7 +164,23 @@ public class MeetingResponseHandlerTest {
 		assertMeetingResponseIsFailure(serverResponse);
 	}
 
-	private Document postMeetingAcceptedResponse() throws Exception {
+	@Test
+	public void testRuntimeExceptionInMeetingResponseHandlingTriggersHttpServerErrorStatus() throws Exception {
+		prepareMockForMeetingResponseHandlingError(new RuntimeException());
+		opushServer.start();
+		
+		int expectedHttpStatus = -1;
+		try {
+			postMeetingAcceptedResponse();
+		} catch (HttpStatusException e) {
+			expectedHttpStatus = e.getStatusCode();
+		}
+		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	private Document postMeetingAcceptedResponse()
+			throws TransformerException, WBXmlException, IOException, HttpStatusException, SAXException  {
+		
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		Document document = buildMeetingAcceptedResponse();
 
