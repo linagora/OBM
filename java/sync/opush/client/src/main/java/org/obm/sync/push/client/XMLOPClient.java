@@ -41,7 +41,7 @@ public class XMLOPClient extends OPClient {
 
 	@Override
 	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
-			throws TransformerException, HttpException, IOException, HttpStatusException {
+			throws TransformerException, HttpException, IOException, HttpRequestException {
 		
 		DOMUtils.logDom(doc);
 		
@@ -65,7 +65,7 @@ public class XMLOPClient extends OPClient {
 				logger.error("head[" + h.getName() + "] => " + h.getValue());
 			}
 			if (ret != HttpStatus.SC_OK) {
-				throw new HttpStatusException(ret, "method failed:\n" + pm.getStatusLine() + "\n" + pm.getResponseBodyAsString());
+				throw new HttpRequestException(ret, "method failed:\n" + pm.getStatusLine() + "\n" + pm.getResponseBodyAsString());
 			} else {
 				InputStream in = pm.getResponseBodyAsStream();
 				Document docResponse = DOMUtils.parse(in);

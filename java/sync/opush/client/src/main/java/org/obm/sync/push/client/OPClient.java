@@ -66,7 +66,7 @@ public abstract class OPClient {
 	protected AccountInfos ai;
 
 	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
-			throws TransformerException, WBXmlException, IOException, HttpStatusException;
+			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
 	protected OPClient(String loginAtDomain, String password, String devId,
 			String devType, String userAgent, String url) {
@@ -122,7 +122,7 @@ public abstract class OPClient {
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)
-			throws TransformerException, WBXmlException, IOException, HttpStatusException {
+			throws TransformerException, WBXmlException, IOException, HttpRequestException {
 		return postXml(namespace, doc, cmd, null, false);
 	}
 

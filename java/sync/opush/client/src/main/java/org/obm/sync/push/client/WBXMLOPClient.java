@@ -40,7 +40,7 @@ public class WBXMLOPClient extends OPClient {
 
 	@Override
 	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
-			throws TransformerException, WBXmlException, IOException, HttpStatusException {
+			throws TransformerException, WBXmlException, IOException, HttpRequestException {
 
 		DOMUtils.logDom(doc);
 
@@ -80,7 +80,7 @@ public class WBXMLOPClient extends OPClient {
 			if (ret != HttpStatus.SC_OK) {
 				logger.error("method failed:\n" + pm.getStatusLine()
 						+ "\n" + pm.getResponseBodyAsString());
-				throw new HttpStatusException(ret);
+				throw new HttpRequestException(ret);
 			} else {
 				InputStream is = pm.getResponseBodyAsStream();
 				File localCopy = File.createTempFile("pushresp_", ".bin");

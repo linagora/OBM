@@ -65,6 +65,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -73,7 +74,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXmlException;
-import org.obm.sync.push.client.HttpStatusException;
+import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -121,8 +122,48 @@ public class MeetingResponseHandlerTest {
 	}
 
 	@Test
-	public void testServerExceptionInInvitationEmailDeletionDoesNotMakeFailTheCommand() throws Exception {
+	public void testServerExceptionInInvitationEmailDeletionDoesNotMakeTheCommandFail() throws Exception {
 		prepareMockForEmailDeletionError(new UnexpectedObmSyncServerException());
+		opushServer.start();
+		
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsSuccess(serverResponse);
+	}
+
+	@Test
+	public void testEmailExceptionInInvitationEmailDeletionDoesNotMakeTheCommandFail() throws Exception {
+		prepareMockForEmailDeletionError(new ProcessingEmailException());
+		opushServer.start();
+		
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsSuccess(serverResponse);
+	}
+
+	@Test
+	public void testCollectionExceptionInInvitationEmailDeletionDoesNotMakeTheCommandFail() throws Exception {
+		prepareMockForEmailDeletionError(new CollectionNotFoundException());
+		opushServer.start();
+		
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsSuccess(serverResponse);
+	}
+
+	@Test
+	public void testUnsupportedExceptionInInvitationEmailDeletionDoesNotMakeTheCommandFail() throws Exception {
+		prepareMockForEmailDeletionError(new UnsupportedBackendFunctionException("No message"));
+		opushServer.start();
+		
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsSuccess(serverResponse);
+	}
+
+	@Test
+	public void testDaoExceptionInInvitationEmailDeletionDoesNotMakeTheCommandFail() throws Exception {
+		prepareMockForEmailDeletionError(new DaoException("No message"));
 		opushServer.start();
 		
 		Document serverResponse = postMeetingAcceptedResponse();
@@ -138,14 +179,14 @@ public class MeetingResponseHandlerTest {
 		int expectedHttpStatus = -1;
 		try {
 			postMeetingAcceptedResponse();
-		} catch (HttpStatusException e) {
+		} catch (HttpRequestException e) {
 			expectedHttpStatus = e.getStatusCode();
 		}
 		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	@Test
-	public void testItemNotFoundInMeetingResponseHandlingMakeFailTheCommand() throws Exception {
+	public void testItemNotFoundInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
 		prepareMockForMeetingResponseHandlingError(new ItemNotFoundException());
 		opushServer.start();
 
@@ -155,8 +196,28 @@ public class MeetingResponseHandlerTest {
 	}
 
 	@Test
-	public void testServerExceptionInMeetingResponseHandlingMakeFailTheCommand() throws Exception {
+	public void testServerExceptionInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
 		prepareMockForMeetingResponseHandlingError(new UnexpectedObmSyncServerException());
+		opushServer.start();
+
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsFailure(serverResponse);
+	}
+
+	@Test
+	public void testCollectionExceptionInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
+		prepareMockForMeetingResponseHandlingError(new CollectionNotFoundException());
+		opushServer.start();
+
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsInvalidRequest(serverResponse);
+	}
+
+	@Test
+	public void testDaoExceptionInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
+		prepareMockForMeetingResponseHandlingError(new DaoException("No message"));
 		opushServer.start();
 
 		Document serverResponse = postMeetingAcceptedResponse();
@@ -172,14 +233,14 @@ public class MeetingResponseHandlerTest {
 		int expectedHttpStatus = -1;
 		try {
 			postMeetingAcceptedResponse();
-		} catch (HttpStatusException e) {
+		} catch (HttpRequestException e) {
 			expectedHttpStatus = e.getStatusCode();
 		}
 		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	private Document postMeetingAcceptedResponse()
-			throws TransformerException, WBXmlException, IOException, HttpStatusException, SAXException  {
+			throws TransformerException, WBXmlException, IOException, HttpRequestException, SAXException  {
 		
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
 		Document document = buildMeetingAcceptedResponse();
@@ -190,14 +251,20 @@ public class MeetingResponseHandlerTest {
 
 	private void assertMeetingResponseIsSuccess(Document response) throws TransformerException {
 		String responseAsText = DOMUtils.serialise(response);
-		String responseExpected = buildMeetingResponseCommandSuccess();
-		Assertions.assertThat(responseAsText).isEqualTo(responseExpected);
+		String expectedResponse = buildMeetingResponseCommandSuccess();
+		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void assertMeetingResponseIsFailure(Document response) throws TransformerException {
 		String responseAsText = DOMUtils.serialise(response);
-		String responseExpected = buildMeetingResponseCommandFailure();
-		Assertions.assertThat(responseAsText).isEqualTo(responseExpected);
+		String expectedResponse = buildMeetingResponseCommandFailure();
+		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
+	}
+
+	private void assertMeetingResponseIsInvalidRequest(Document response) throws TransformerException {
+		String responseAsText = DOMUtils.serialise(response);
+		String expectedResponse = buildMeetingResponseCommandInvalidRequest();
+		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void prepareMockForEmailDeletionError(Exception triggeredException) throws Exception {
@@ -282,6 +349,16 @@ public class MeetingResponseHandlerTest {
 					"<Result>" +
 						"<Status>1</Status>" +
 						"<CalId>" + serverId(meetingCollectionId, meetingItemId) + "</CalId>" +
+						"<ReqId>" + serverId(invitationCollectionId, invitationItemId) + "</ReqId>" +
+					"</Result>" +
+				"</MeetingResponse>";
+	}
+
+	private String buildMeetingResponseCommandInvalidRequest() {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<MeetingResponse>" +
+					"<Result>" +
+						"<Status>2</Status>" + // MS-ASCMD 2.2.1.9.2.4 : 2 is Invalid Request
 						"<ReqId>" + serverId(invitationCollectionId, invitationItemId) + "</ReqId>" +
 					"</Result>" +
 				"</MeetingResponse>";

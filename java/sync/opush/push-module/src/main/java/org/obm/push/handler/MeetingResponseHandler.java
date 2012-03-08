@@ -119,18 +119,12 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			
 		} catch (NoDocumentException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST);
-		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		} catch (ProcessingEmailException e) {
 			logger.error(e.getMessage(), e);
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		} catch (ConversionException e) {
-			logger.error(e.getMessage(), e);
-			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
-		} catch (UnsupportedBackendFunctionException e) {
 			logger.error(e.getMessage(), e);
 			sendErrorResponse(responder, MeetingResponseStatus.SERVER_ERROR);
 		}
@@ -145,7 +139,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
-			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
+			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
@@ -155,8 +149,8 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		return new MeetingHandlerResponse(meetingResponses);
 	}
 
-	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs, MeetingResponse item) throws DaoException,
-			CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
+	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs, MeetingResponse item) 
+			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
 		
 		MSEmail email = retrieveMailWithMeetingRequest(bs, item);
 	
@@ -174,7 +168,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 
 	private void handle(ItemChangeMeetingResponse meetingResponse, BackendSession bs, MSEmail email,
-			AttendeeStatus userResponse) throws CollectionNotFoundException, DaoException {
+			AttendeeStatus userResponse) throws ConversionException {
 		
 		meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
 		try {
@@ -188,11 +182,16 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		} catch (UnexpectedObmSyncServerException e) {
 			logger.error(e.getMessage(), e);
 			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		}		
 	}
 
-	private void deleteInvitationEmail(BackendSession bs, MeetingResponse item)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException {
+	private void deleteInvitationEmail(BackendSession bs, MeetingResponse item) {
 
 		try {
 			contentsImporter.importMessageDeletion(bs, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
@@ -200,7 +199,15 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			logger.warn(e.getMessage(), e);
 		} catch (UnexpectedObmSyncServerException e) {
 			logger.warn(e.getMessage(), e);
-		}		
+		} catch (ProcessingEmailException e) {
+			logger.warn(e.getMessage(), e);
+		} catch (DaoException e) {
+			logger.warn(e.getMessage(), e);
+		} catch (CollectionNotFoundException e) {
+			logger.warn(e.getMessage(), e);
+		} catch (UnsupportedBackendFunctionException e) {
+			logger.warn(e.getMessage(), e);
+		}
 	}
 	
 	private MSEmail retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)

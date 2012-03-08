@@ -31,16 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
-public class HttpStatusException extends Exception {
+public class HttpRequestException extends Exception {
 
 	private final int statusCode;
 
-	public HttpStatusException(int statusCode) {
+	public HttpRequestException(int statusCode) {
 		super();
 		this.statusCode = statusCode;
 	}
 	
-	public HttpStatusException(int statusCode, String message) {
+	public HttpRequestException(int statusCode, String message) {
 		super(message);
 		this.statusCode = statusCode;
 	}
