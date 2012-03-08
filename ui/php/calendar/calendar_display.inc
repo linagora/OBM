@@ -3207,7 +3207,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw' && $block_status == false) {
           $user_alert = $ccalendar_alerts;
 	  $bell_alert_class = $bell_alert_onclick = $bell_alert_title ='';
-          if($alerts[$u_id] && !($user_alert[$alerts[$u_id]])) {
+          if($alerts[$u_id] > 0 && !($user_alert[$alerts[$u_id]])) {
             $user_alert[$alerts[$u_id]] = Of_Date::secondToString($alerts[$u_id]);
             $bell_alert_class = 'bellalertexist';
             $bell_alert_onclick = " onclick=\"obm.calendarAlarmPopup.compute($alerts[$u_id], $u_id, $id);\" ";
