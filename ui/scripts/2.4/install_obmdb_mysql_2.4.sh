@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test $# -eq 6 || {
-    echo "usage: $0 db user password lang host installationtype"
+    echo "usage: $0 db user password lang installationtype host"
     exit 1
 }
 
@@ -9,8 +9,8 @@ db=$1
 user=$2
 pw=$3
 obm_lang=$4
-host=$5
-obm_installation_type=$6
+obm_installation_type=$5
+host=$6
 
 if [ $obm_installation_type = "full" ]; then
 
