@@ -1031,7 +1031,8 @@ function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 
     eventlink_entity_id,
     eventlink_required,
     eventlink_state,
-    eventlink_is_organizer)
+    eventlink_is_organizer,
+    eventlink_comment)
     VALUES (
       NOW(),
     $uid,
@@ -1039,7 +1040,8 @@ function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 
     ".of_entity_subquery($entity, $entity_id).",
     'REQ',
     '$state',
-    $is_organizer)";
+    $is_organizer,
+    '')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_entity_event()');
   $obm_q = new DB_OBM;
@@ -2781,7 +2783,7 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	if ( $obm_q->query($query) ){
 		$newEvent = OBM_EventFactory::getInstance()->getById($event_id);
 		//notify attendee
-		OBM_EventFactory::getInstance()->store($oldEvent, $newEvent);
+		OBM_EventFactory::getInstance()->store($newEvent, $oldEvent);
 		display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
 		return true;
 	}else{
@@ -4000,7 +4002,7 @@ function get_calendar_event_entity($calendar_id) {
     $entity = $u_q->f('eventlink_entity');
     $entity_id = $u_q->f('eventlink_entity_id');
     $state = $u_q->f('state');
-    $comment = $r_q->f('comment');
+    $comment = $u_q->f('comment');
     $is_organizer = ($u_q->f('is_organizer') == 1);
     $label = $u_q->f('contact_lastname'). ' ' .$u_q->f('contact_firstname');
     $entities[$entity]['ids'][] = $entity_id;
@@ -4315,6 +4317,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     event_timezone,
     event_opacity,
     eventlink_state,
+    eventlink_comment,
     eventcategory1_label,
     event_date,
     event_duration,
@@ -4492,6 +4495,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     event_timezone,
     event_opacity,
     eventlink_state,
+    eventlink_comment,
     event_repeatdays,
     eventtag_color AS event_color,
     eventtag_label as tag,
@@ -4621,6 +4625,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     userentity_user_id as eventlink_entity_id,
     'user' as eventlink_entity,
     eventlink_is_organizer,
+    eventlink_comment,
     ".DB_OBM::CONCAT(array("userobm_lastname", "' '", "userobm_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
@@ -4636,6 +4641,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     resourceentity_resource_id as eventlink_entity_id,
     'resource' as eventlink_entity,
     eventlink_is_organizer,
+    eventlink_comment,
     resource_name as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id
@@ -4651,6 +4657,7 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     contactentity_contact_id as eventlink_entity_id,
     'contact' as eventlink_entity,
     eventlink_is_organizer,
+    eventlink_comment,
     ".DB_OBM::CONCAT(array("contact_lastname", "' '", "contact_firstname"))." as eventlink_label
     FROM Event
     INNER JOIN EventLink ON eventlink_event_id = event_id

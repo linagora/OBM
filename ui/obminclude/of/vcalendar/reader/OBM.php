@@ -164,6 +164,7 @@ class Vcalendar_Reader_OBM {
 
        if ( $attendees->f('eventlink_entity_id') == $userId ) {
          $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
+         $this->addComment($attendees);
          break;
        }
       }
@@ -277,6 +278,13 @@ class Vcalendar_Reader_OBM {
        $vevent->set('attendee', $this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
    }
   }
+  function addComment($attendees) {
+   if ($attendees->f('eventlink_comment')){
+      foreach($this->vevents as $vevent){
+        $vevent->set('comment', $attendees->f('eventlink_comment'));
+      }
+    }
+  }
   
   function addDocument(&$vevent, $document_id) {
     $vevent->set('attach', $GLOBALS['cgp_host'].'calendar/calendar_render.php?action=download_document&externalToken='.get_calendar_entity_share($document_id, 'document', 'private').'&document_id='.$document_id);
@@ -305,7 +313,7 @@ class Vcalendar_Reader_OBM {
   }
 
   function parseAttendee($id, $entity, $state) {
-    return array('entity' => $entity, 'id' => $id, 'state' => $state);;
+    return array('entity' => $entity, 'id' => $id, 'state' => $state);
   }
   
   function parseRrule($data) {

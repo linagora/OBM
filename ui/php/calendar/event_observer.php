@@ -350,12 +350,14 @@ class OBM_EventAttendee {
   private $kind;
   private $state;
   private $label;
+  private $comment;
   private $id;
 
-  public function __construct($id, $state, $label) {
+  public function __construct($id, $state, $label, $comment) {
     $this->id = $id + 0;
     $this->state = $state;
     $this->label = $label;
+    $this->comment = $comment;
   }
 
   /**
@@ -503,8 +505,8 @@ class OBM_EventFactory extends OBM_ASubject {
     $event->title = $this->db->f('event_title');
     $event->uid = $this->db->f('event_ext_id');
     $event->sequence = $this->db->f('event_sequence');
-    $event->owner = new OBM_EventAttendee($this->db->f('owner_id'), null, $this->db->f('owner_firstname').' '.$this->db->f('owner_lastname')) ;
-    $event->creator = new OBM_EventAttendee($this->db->f('creator_id'), null, $this->db->f('creator_firstname').' '.$this->db->f('creator_lastname')) ;
+    $event->owner = new OBM_EventAttendee($this->db->f('owner_id'), null, $this->db->f('owner_firstname').' '.$this->db->f('owner_lastname'), '') ;
+    $event->creator = new OBM_EventAttendee($this->db->f('creator_id'), null, $this->db->f('creator_firstname').' '.$this->db->f('creator_lastname'), '') ;
     $event->opacity = $this->db->f('event_opacity');
     $event->location = $this->db->f('event_location');
     $event->category1 = $this->db->f('event_category1_id');
@@ -546,30 +548,30 @@ class OBM_EventFactory extends OBM_ASubject {
 
   private function getEventUsers($id) {
     $users = array();
-    $query = 'SELECT userobm_id, eventlink_state, userobm_lastname, userobm_firstname FROM UserObm INNER JOIN UserEntity ON userobm_id = userentity_user_id INNER JOIN EventLink ON eventlink_entity_id = userentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $query = 'SELECT userobm_id, eventlink_state, userobm_lastname, userobm_firstname, eventlink_comment FROM UserObm INNER JOIN UserEntity ON userobm_id = userentity_user_id INNER JOIN EventLink ON eventlink_entity_id = userentity_entity_id WHERE eventlink_event_id = '.$id.'';
     $this->db->query($query);
     while($this->db->next_record()) {
-      $users[] = new OBM_EventAttendee($this->db->f('userobm_id'), $this->db->f('eventlink_state'), $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname'));
+      $users[] = new OBM_EventAttendee($this->db->f('userobm_id'), $this->db->f('eventlink_state'), $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname'), $this->db->f('eventlink_comment'));
     }
     return $users;
   }
 
   private function getEventResources($id) {
     $resource = array();
-    $query = 'SELECT resource_id, eventlink_state, resource_name FROM Resource INNER JOIN ResourceEntity ON resource_id = resourceentity_resource_id INNER JOIN EventLink ON eventlink_entity_id = resourceentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $query = 'SELECT resource_id, eventlink_state, resource_name, eventlink_comment FROM Resource INNER JOIN ResourceEntity ON resource_id = resourceentity_resource_id INNER JOIN EventLink ON eventlink_entity_id = resourceentity_entity_id WHERE eventlink_event_id = '.$id.'';
     $this->db->query($query);
     while($this->db->next_record()) {
-      $resource[] = new OBM_EventAttendee($this->db->f('resource_id'), $this->db->f('eventlink_state'), $this->db->f('resource_name'));
+      $resource[] = new OBM_EventAttendee($this->db->f('resource_id'), $this->db->f('eventlink_state'), $this->db->f('resource_name'), $this->db->f('eventlink_comment'));
     }
     return $resource;
   }
 
   private function getEventContacts($id) {
     $contact = array();
-    $query = 'SELECT contact_id, eventlink_state, contact_lastname, contact_firstname FROM Contact INNER JOIN ContactEntity ON contact_id = contactentity_contact_id INNER JOIN EventLink ON eventlink_entity_id = contactentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $query = 'SELECT contact_id, eventlink_state, contact_lastname, contact_firstname, eventlink_comment FROM Contact INNER JOIN ContactEntity ON contact_id = contactentity_contact_id INNER JOIN EventLink ON eventlink_entity_id = contactentity_entity_id WHERE eventlink_event_id = '.$id.'';
     $this->db->query($query);
     while($this->db->next_record()) {
-      $contact[] = new OBM_EventAttendee($this->db->f('contact_id'), $this->db->f('eventlink_state'), $this->db->f('contact_firstname').' '.$this->db->f('contact_lastname'));
+      $contact[] = new OBM_EventAttendee($this->db->f('contact_id'), $this->db->f('eventlink_state'), $this->db->f('contact_firstname').' '.$this->db->f('contact_lastname'), $this->db->f('eventlink_comment'));
     }
     return $contact;
   }
@@ -705,7 +707,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
     $att['user'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpState')); 
     $newState = array_intersect($new->resource, $old->resource);
     $oldState = array_intersect($old->resource, $new->resource);
-    $att['resource'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpState')); 
+    $att['resource'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpState'));
     return $att;
   }
 
@@ -724,7 +726,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
     if ( !$GLOBALS["send_notification_mail"] ) {
         return ;
     }
-
+    
     if(!$this->mustBeSent($old, $new))
       return false;
 

@@ -674,6 +674,7 @@ if ($action == 'search') {
 } elseif ($action == 'update_comment') {
 ///////////////////////////////////////////////////////////////////////////////
   if( isset($params['comment']) ){
+    $GLOBALS["send_notification_mail"] = true;
     $comment_inserted = run_query_calendar_event_comment_insert($params['calendar_id'],
       $params['user_id'],$params['comment'],$params['type']);
     if ($comment_inserted) {
