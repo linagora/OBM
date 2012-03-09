@@ -11,7 +11,7 @@ public class JavaExternalProcess extends ExternalProcess {
 			System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 	
 	public JavaExternalProcess(Class<?> mainClass, Config config) {
-		super(JAVA_PATH, config.processTimeout, config.processStartTimeNeeded);
+		super(JAVA_PATH, config.processTimeToLive, config.processStartTimeNeeded);
 		setHeapMaxSize(config);
 		setDebugMode(config);
 		setClasspath();
@@ -53,15 +53,15 @@ public class JavaExternalProcess extends ExternalProcess {
 		public final boolean debug;
 		public final boolean useConfigHeapSize;
 		public final long heapMaxSizeInByte;
-		public final int processTimeout;
+		public final int processTimeToLive;
 		public final int processStartTimeNeeded;
 		
 		public Config(boolean debug, boolean useConfigHeapSize, long heapMaxSizeInByte, 
-				int processTimeout, int processStartTimeNeeded) {
+				int processTimeToLive, int processStartTimeNeeded) {
 			this.debug = debug;
 			this.useConfigHeapSize = useConfigHeapSize;
 			this.heapMaxSizeInByte = heapMaxSizeInByte;
-			this.processTimeout = processTimeout;
+			this.processTimeToLive = processTimeToLive;
 			this.processStartTimeNeeded = processStartTimeNeeded;
 		}
 	}

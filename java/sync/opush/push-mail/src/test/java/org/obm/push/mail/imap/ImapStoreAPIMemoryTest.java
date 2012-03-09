@@ -45,7 +45,6 @@ import javax.mail.util.SharedFileInputStream;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -116,14 +115,12 @@ public class ImapStoreAPIMemoryTest {
 		return thisHeapSizeInByte * 2;
 	}
 
-	@Ignore("This test can fails actually, it will be restored with OBMFULL-3316")
 	@Test(expected=OutOfMemoryError.class)
 	public void testBigMailTriggerOutOfMemory() throws Exception {
 		File data = generateBigEmail(maxHeapSize);
 		ByteStreams.toByteArray(new FileInputStream(data));
 	}
 
-	@Ignore("This test can fails actually, it will be restored with OBMFULL-3316")
 	@Test
 	public void testStoreInInboxMoreThanMemorySize() throws Exception {
 		Date before = new Date();
@@ -134,7 +131,6 @@ public class ImapStoreAPIMemoryTest {
 		Assertions.assertThat(emails).hasSize(1);
 	}
 
-	@Ignore("This test can fails actually, it will be restored with OBMFULL-3316")
 	@Test
 	public void testStoreInInboxMoreThanMemorySizeStream() throws Exception {
 		Date before = new Date();
@@ -145,7 +141,6 @@ public class ImapStoreAPIMemoryTest {
 		Assertions.assertThat(emails).hasSize(1);
 	}
 	
-	@Ignore("This test can fails actually, it will be restored with OBMFULL-3316")
 	@Test
 	public void testFetchMailStream() throws Exception {
 		long size = getTwiceThisHeapSize();

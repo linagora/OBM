@@ -23,7 +23,7 @@ public class RandomGeneratedInputStream extends InputStream {
 	public int read() throws IOException {
 		cpt += 1;
 		if (cpt < length) {
-			long modulo = length % NUMBER_CHARACTERS_PER_LINE;
+			long modulo = cpt % NUMBER_CHARACTERS_PER_LINE;
 			if (modulo == CRLF_FIRST_PART_END_LINE) {
 				return '\r';
 			} else if (modulo == CRLF_SECOND_PART_END_LINE) {

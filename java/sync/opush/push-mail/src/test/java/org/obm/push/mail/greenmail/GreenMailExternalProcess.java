@@ -54,7 +54,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 
 	public static final boolean DEFAULT_HEAP_INCONFIG = false;
 	public static final int DEFAULT_HEAP_MAXSIZE = 0;
-	public static final int DEFAULT_TIMEOUT = 10 * 1000;
+	public static final int DEFAULT_PROCESS_TTL = 300 * 1000;
 	public static final int DEFAULT_STARTTIME = 1*1000;
 	
 	public GreenMailExternalProcess(String mailbox, String password) {
@@ -64,7 +64,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 	public GreenMailExternalProcess(String mailbox, String password,
 			boolean useDefaultHeapSize, long heapMaxSizeInByte) {
 		super(GreenMailStandalone.class, new Config(
-				false, useDefaultHeapSize, heapMaxSizeInByte, DEFAULT_TIMEOUT, DEFAULT_STARTTIME));
+				false, useDefaultHeapSize, heapMaxSizeInByte, DEFAULT_PROCESS_TTL, DEFAULT_STARTTIME));
 		setArguments(mailbox, password);
 	}
 	
