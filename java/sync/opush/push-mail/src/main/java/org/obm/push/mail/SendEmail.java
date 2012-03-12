@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
@@ -51,6 +50,8 @@ import org.obm.push.bean.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
@@ -69,6 +70,7 @@ public class SendEmail {
 	private boolean invitation;
 
 	public SendEmail(String defaultFrom, Message message) throws MimeException {
+		Preconditions.checkNotNull(Strings.emptyToNull(defaultFrom));
 		this.from = defaultFrom;
 		this.originalMessage = message;
 		
@@ -125,23 +127,15 @@ public class SendEmail {
 
 	private Field filterField(Field field) throws MimeException {
 		if (field.getName().equalsIgnoreCase("From")) {
+			Field newFrom = createFromField();
 			hasFromField = true;
-			if (StringUtils.isNotBlank(field.getBody())) {
-				Field newFrom = createFromField();
-				if (newFrom != null) {
-					return newFrom;
-				}
-			}
+			return newFrom;
 		}
-		
 		return null;
 	}
 
 	private Field createFromField() throws MimeException {
-		if (this.from != null && from.contains("@")) {
-			return DefaultFieldParser.parse("From: " + this.from);
-		}
-		return null;
+		return DefaultFieldParser.parse("From: " + this.from);
 	}
 
 	private Iterable<Address> convertAddressListToRistretoAddresses(AddressList addressList) {
