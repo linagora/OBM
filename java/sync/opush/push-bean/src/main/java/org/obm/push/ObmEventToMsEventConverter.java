@@ -111,7 +111,7 @@ public class ObmEventToMsEventConverter {
 			c.add(Calendar.SECOND, duration);
 			return c.getTime();
 		}
-		throw new IllegalArgumentException("Duration must to be positive value");
+		throw new IllegalArgumentException("Duration must be a positive value");
 	}
 	
 	private List<String> category(Event e) {
