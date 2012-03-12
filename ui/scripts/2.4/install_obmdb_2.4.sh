@@ -10,25 +10,25 @@ source `dirname $0`/obm-sh.lib
 
 
 get_val dbtype
-DBTYPE=`echo $VALUE | tr A-Z a-z`
+DB_TYPE=`echo $VALUE | tr A-Z a-z`
 get_val user
-U=$VALUE
+DB_USER=$VALUE
 get_val password
-P=$VALUE
+DB_PASSWD=$VALUE
 get_val db
-DB=$VALUE
+DB_NAME=$VALUE
 get_val lang
 OBM_LANG=$VALUE
 get_val host
-H=$VALUE
+DB_HOST=$VALUE
 
 echo "*** Parameters used"
-echo "database type  = $DBTYPE"
-echo "database = $DB"
-echo "database user = $U"
-echo "database password = $P"
+echo "database type  = $DB_TYPE"
+echo "database = $DB_NAME"
+echo "database user = $DB_USER"
+echo "database password = $DB_PASSWD"
 echo "install lang = $OBM_LANG"
-echo "database host = $H"
+echo "database host = $DB_HOST"
 
 
 
@@ -38,7 +38,7 @@ echo "*** Document repository creation"
 ./install_document_2.4.sh
 
 if [ -z $installation_type ] || [ $installation_type != 'filldata' ]; then
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "full" ${H}
+  ./install_obmdb_${DB_TYPE}_2.4.sh ${DB_NAME} ${DB_USER} ${DB_PASSWD} ${OBM_LANG} "full" ${DB_HOST}
 else
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "filldata" ${H}
+  ./install_obmdb_${DB_TYPE}_2.4.sh ${DB_NAME} ${DB_USER} ${DB_PASSWD} ${OBM_LANG} "filldata" ${DB_HOST}
 fi
