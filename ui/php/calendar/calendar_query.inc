@@ -2763,7 +2763,7 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
  * @access public
  * @return void
  */
-function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $type) {
+function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $type, $notify = false ) {
 	global $cdg_sql, $obm;
 	$event_id = sql_parse_id($event_id);
 	$ent_id = sql_parse_id($ent_id);
@@ -2781,10 +2781,7 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	AND eventlink_entity_id = $entity_id
 	;";
 	if ( $obm_q->query($query) ){
-		$newEvent = OBM_EventFactory::getInstance()->getById($event_id);
-		//notify attendee
-		OBM_EventFactory::getInstance()->store($newEvent, $oldEvent);
-		display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
+		if($notify == true) send_mail_when_comment($event_id,$oldEvent);
 		return true;
 	}else{
 		return false;
@@ -2811,6 +2808,13 @@ function get_resource_entity_id_for_comment_insert($res_id){
     }else{
         return false;
     }
+}
+function send_mail_when_comment($event_id, $oldEvent){
+  $GLOBALS["send_notification_mail"] = true;
+  $newEvent = OBM_EventFactory::getInstance()->getById($event_id);
+  //notify attendee
+  OBM_EventFactory::getInstance()->store($newEvent, $oldEvent);
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_comment_insert(0)');
 }
 /**
  * Insert an event template

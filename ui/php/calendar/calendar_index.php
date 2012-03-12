@@ -676,7 +676,7 @@ if ($action == 'search') {
   if( isset($params['comment']) ){
     $GLOBALS["send_notification_mail"] = true;
     $comment_inserted = run_query_calendar_event_comment_insert($params['calendar_id'],
-      $params['user_id'],$params['comment'],$params['type']);
+      $params['user_id'],$params['comment'],$params['type'], true);
     if ($comment_inserted) {
       json_ok_msg("$l_event : $l_update_ok");
     } else {
@@ -2302,7 +2302,7 @@ function update_decision_and_comment($params, $user_id) {
   $decision_event = $params['decision_event'];
 
   $comment_inserted = run_query_calendar_event_comment_insert($calendar_id,
-    $entity_id, $comment, $entity_kind);
+    $entity_id, $comment, $entity_kind, false);
   if (!$comment_inserted) {
     throw new DBUpdateException("Can't insert comment");
   }

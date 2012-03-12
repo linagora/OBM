@@ -449,6 +449,12 @@ class OBM_EventAttendee {
     if($attendee1->id < $attendee2->id) return -1;
     return strcmp($attendee1->state, $attendee2->state);
   }
+  
+  public static function cmpComment($attendee1, $attendee2) {
+    if($attendee1->id > $attendee2->id) return 1;
+    if($attendee1->id < $attendee2->id) return -1;
+    return strcmp($attendee1->comment, $attendee2->comment);
+  }
 }
 
 
@@ -666,7 +672,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       $this->send($old, $new, $attendees);
     } else {
       $attendees = self::diffAttendees($old, $new);
-      $attendeesState = self::diffAttendeesState($old, $new);
+      $attendeesState = self::diffAttendeesDecisionOrComment($old, $new);
       $this->send($old, $new, $attendees, $attendeesState);
     }
   }
@@ -689,7 +695,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
     $attendees['current']['contact'] = array_intersect($new->contact, $old->contact);
     $attendees['old']['user'] = array_diff($old->user, $new->user);
     $attendees['old']['resource'] = array_diff($old->resource, $new->resource);
-    $attendees['old']['contact'] = array_diff($old->contact, $new->contact);      
+    $attendees['old']['contact'] = array_diff($old->contact, $new->contact); 
     return $attendees;
   }
 
@@ -710,7 +716,43 @@ class OBM_EventMailObserver implements  OBM_IObserver {
     $att['resource'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpState'));
     return $att;
   }
-
+  
+  /**
+   * Perform attendee state diff between old and new OBM_Event  
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  public static function diffAttendeesComment($old, $new) {
+    $newState = array_intersect($new->user, $old->user);
+    $oldState = array_intersect($old->user, $new->user);
+    $attendesComment['user'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpComment')); 
+    $newState = array_intersect($new->resource, $old->resource);
+    $oldState = array_intersect($old->resource, $new->resource);
+    $attendesComment['resource'] = array_udiff($newState, $oldState, array('OBM_EventAttendee', 'cmpComment'));
+    return $attendesComment;
+  }
+   /**
+   * Perform attendee state or comment diff between old and new OBM_Event  
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  public static function diffAttendeesDecisionOrComment($old, $new) {
+    $attendeesDecision = self::diffAttendeesState($old, $new);
+    if($attendeesDecision['user'] == null && $attendeesDecision['resource'] == null){
+      $attendeesComment = self::diffAttendeesComment($old, $new);
+      if($attendeesComment['user'] != null || $attendeesComment['resource'] != null){
+        return $attendeesComment;
+      }
+    }
+    return $attendeesDecision;
+  }
+  
 
   /**
    * Send notification 
@@ -740,7 +782,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
         }
       }
     }
-    
+    //var_dump($attendeesState);
     if ($attendeesState != null && !$new->shouldIncrementSequence($old) ) {
       foreach($attendeesState['user'] as $ustate) {
         $this->sendEventStateUpdateMail($new, $ustate, $attendeesState);
