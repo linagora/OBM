@@ -115,11 +115,11 @@ public class ObmEventToMsEventConverter {
 	}
 	
 	private List<String> category(Event e) {
+		List<String> categories = Lists.newArrayList();
 		if (e.getCategory() != null) {
-			return Lists.newArrayList(e.getCategory());
-		} else {
-			return null;
+			categories.add(e.getCategory());
 		}
+		return categories;
 	}
 
 	private Integer reminder(Event e) {
