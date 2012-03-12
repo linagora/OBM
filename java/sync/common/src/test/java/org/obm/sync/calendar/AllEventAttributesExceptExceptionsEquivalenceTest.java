@@ -194,7 +194,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		e2.setAttendees(newE2Attendees);
 		boolean result = comparator.equivalent(e1, e2);
 
-		Assert.assertFalse(result);
+		Assert.assertTrue(result);
 	}
 
 	@Test
