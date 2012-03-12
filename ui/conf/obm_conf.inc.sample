@@ -327,4 +327,7 @@ $conf_recaptcha = false;
 $conf_recaptcha_publickey = ""
 $conf_recaptcha_privatekey = "";
 
+// Prevent public Agenda or Email sharing
+$prevent_public_agenda_sharing_by_url = false;
+$prevent_public_agenda_sharing_by_email = false;
 </script>
