@@ -41,6 +41,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.obm.configuration.EmailConfiguration;
+import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
@@ -48,6 +50,7 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 
 import com.google.inject.Inject;
@@ -59,6 +62,9 @@ public class ExternalGreenMailTest {
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject MailboxService mailboxService;
+	@Inject EmailConfiguration emailConfiguration;
+	@Inject LocatorService locatorService;
+
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
@@ -66,13 +72,15 @@ public class ExternalGreenMailTest {
 	private ClosableProcess greenMailProcess;
 
 	@Before
-	public void setUp() throws ExternalProcessException {
-	    mailbox = "to@localhost.com";
-	    password = "password";
-	    greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
-	    bs = new BackendSession(
+	public void setUp() throws ExternalProcessException, InterruptedException {
+		mailbox = "to@localhost.com";
+		password = "password";
+		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
+		bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
 	}
 	
 	@After

@@ -3,12 +3,14 @@ package org.obm.push.mail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 
 import javax.mail.FolderClosedException;
+import javax.net.SocketFactory;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -24,6 +26,8 @@ import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
+import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.MSAttachement;
@@ -206,5 +210,23 @@ public class MailTestsUtils {
 
 	public static Address addr(String addr) {
 		return new Address(addr);
+	}
+	
+	public static void waitForGreenmailAvailability(String imapHost, int imapPort) throws InterruptedException {
+		SocketFactory socketFactory = SocketFactory.getDefault();
+		DateTime end = new DateTime().plusSeconds(30);
+		
+		while (true) {
+			try {
+				Socket socket = socketFactory.createSocket(imapHost, imapPort);
+				socket.close();
+				return;
+			} catch (IOException e) {
+				if (new DateTime().isAfter(end)) {
+					Assert.fail("greenmail is not reachable");
+				}
+				Thread.sleep(50);
+			}
+		}
 	}
 }

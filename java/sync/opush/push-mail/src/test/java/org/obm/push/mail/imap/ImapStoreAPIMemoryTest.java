@@ -49,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
@@ -56,6 +57,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
+import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -72,6 +74,7 @@ public class ImapStoreAPIMemoryTest {
 
 	@Inject ImapMailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
+	@Inject LocatorService locatorService;
 	
 	private String mailbox;
 	private String password;
@@ -85,14 +88,16 @@ public class ImapStoreAPIMemoryTest {
 
 	
 	@Before
-	public void setUp() throws ExternalProcessException {
-	    mailbox = "to@localhost.com";
-	    password = "password";
-	    maxHeapSize = getTwiceThisHeapSize();
-	    greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
-	    bs = new BackendSession(
+	public void setUp() throws ExternalProcessException, InterruptedException {
+		mailbox = "to@localhost.com";
+		password = "password";
+		maxHeapSize = getTwiceThisHeapSize();
+		greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
+		bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password, null), null, null, null);
+		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
 	}
 
 	@After
