@@ -5516,6 +5516,9 @@ function html_calendar_waiting_events($obm_wait) {
       $block .= "
       <h1>$type : $current_label</h1>
       ".dis_event_decision_popup()."
+      <script type=\"text/javascript\"> 
+      obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
+      </script>
       <table class=\"spreadSheet\">
       <thead>
        <tr>
