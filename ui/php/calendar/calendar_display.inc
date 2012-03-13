@@ -3295,6 +3295,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       ".dis_event_comment_popup()."
       ".dis_event_alarm_popup()."
       ".dis_event_decision_popup()."
+      <script type=\"text/javascript\"> 
+      obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
+      </script>
       <h1>$l_users</h1>
       <table class=\"spreadSheet\">
       <thead>
