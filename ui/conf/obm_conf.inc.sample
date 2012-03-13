@@ -324,7 +324,7 @@ $cgp_show['module']['log'] = false;
 
 // reCAPTCHA 
 $conf_recaptcha = false;
-$conf_recaptcha_publickey = ""
+$conf_recaptcha_publickey = "";
 $conf_recaptcha_privatekey = "";
 
 // Prevent public Agenda or Email sharing
