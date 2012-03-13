@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,12 +56,13 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
@@ -96,6 +98,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -450,7 +453,8 @@ public class MailBackendImpl implements MailBackend {
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message);
+				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message,
+						ImmutableMap.<String, MSAttachementData>of());
 				send(bs, replyEmail, saveInSent);
 				mailboxService.setAnsweredFlag(bs, collectionPath, uid);
 			} else {
@@ -487,12 +491,17 @@ public class MailBackendImpl implements MailBackend {
 			uids.add(uid);
 
 			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionIdInt, collectionName, uids);
-
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
 				MSEmail originMail = mail.get(0);
+				
+				Map<String, MSAttachementData> originalMailAttachments = new HashMap<String, MSAttachementData>();
+				if (!mime4jUtils.isAttachmentsExist(message)) {
+					loadAttachments(originalMailAttachments, bs, originMail);
+				}
+				
 				ForwardEmail forwardEmail = 
-						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message);
+						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message, originalMailAttachments);
 				send(bs, forwardEmail, saveInSent);
 				try{
 					mailboxService.setAnsweredFlag(bs, collectionName, uid);
@@ -519,6 +528,21 @@ public class MailBackendImpl implements MailBackend {
 		} catch (AuthFault e) {
 			throw new ProcessingEmailException(e);
 		} 
+	}
+
+	private void loadAttachments(Map<String, MSAttachementData> attachments, 
+			BackendSession bs, MSEmail originMail) throws ProcessingEmailException {
+		
+		for (MSAttachement msAttachement: originMail.getAttachements()) {
+			try {
+				MSAttachementData msAttachementData = getAttachment(bs, msAttachement.getFileReference());
+				attachments.put(msAttachement.getDisplayName(), msAttachementData);
+			} catch (AttachementNotFoundException e) {
+				throw new ProcessingEmailException(e);
+			} catch (CollectionNotFoundException e) {
+				throw new ProcessingEmailException(e);
+			} 
+		}
 	}
 
 	private AccessToken login(BackendSession session) throws AuthFault {

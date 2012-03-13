@@ -34,7 +34,6 @@ package org.obm.push.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -105,6 +104,12 @@ public class Mime4jUtils {
 		return bodyPart;
 	}
 	
+	public BodyPart bodyToBodyPart(Body body, String mimeType, Map<String, String> parameters) {
+		BodyPart bodyPart = new BodyPart();
+		bodyPart.setBody(body, mimeType, parameters);
+		return bodyPart;
+	}
+	
 	public int getAttachmentCount(Multipart multi){
 		int attachments = 0;
 		for (Entity part: multi.getBodyParts()) {
@@ -114,7 +119,19 @@ public class Mime4jUtils {
 		}
 		return attachments;
 	}
+	
+	public boolean isAttachmentsExist(Multipart multi){
+		int attachmentCount = getAttachmentCount(multi);
+		if (attachmentCount > 0) {
+			return true;
+		}
+		return false;
+	}
 
+	public boolean isAttachmentsExist(Message message) {
+		return isAttachmentsExist((Multipart) message.getBody());
+	}
+	
 	private boolean isAttachmentEntity(Entity part) {
 		return "attachment".equalsIgnoreCase(part.getDispositionType());
 	}
@@ -177,8 +194,7 @@ public class Mime4jUtils {
 	}
 
 	public void attach(Multipart multipart, InputStream in,
-			String fileName, String mimeType) throws FileNotFoundException,
-			IOException {
+			String fileName, String mimeType) throws IOException {
 		StorageBodyFactory bodyFactory = new StorageBodyFactory();
 		BodyPart attach = createBinaryPart(bodyFactory, in, mimeType, fileName);
 		multipart.addBodyPart(attach);

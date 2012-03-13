@@ -36,6 +36,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.transform.TransformerException;
 
@@ -47,8 +48,10 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.message.BasicBodyFactory;
+import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.obm.configuration.ConfigurationService;
+import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.exception.NotQuotableEmailException;
@@ -72,13 +75,16 @@ public class ReplyEmail extends SendEmail {
 	private final ConfigurationService configuration;
 	private Entity originTextPlainPart;
 	private Entity originTextHtmlPart;
+
+	private final Map<String, MSAttachementData> originalMailAttachments;
 	
-	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, 
-			MSEmail originMail, Message message) throws MimeException, NotQuotableEmailException {
+	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail originMail, 
+			Message message, Map<String, MSAttachementData> originalMailAttachments) throws MimeException, NotQuotableEmailException {
 		
 		super(defaultFrom, message);
 		this.configuration = configuration;
 		this.mime4jUtils = mime4jUtils;
+		this.originalMailAttachments = originalMailAttachments;
 		setNewMessage(quoteAndAppendRepliedMail(originMail));
 	}
 
@@ -92,7 +98,9 @@ public class ReplyEmail extends SendEmail {
 		setMessage(newMessage);
 	}
 	
-	private Message quoteAndAppendRepliedMail(MSEmail originMail) throws NotQuotableEmailException {
+	private Message quoteAndAppendRepliedMail(MSEmail originMail) 
+			throws NotQuotableEmailException, MimeException {
+		
 		String originalEmail = originMail.getBody().getValue(MSEmailBodyType.PlainText);
 		String originalEmailAsHtml = originMail.getBody().getValue(MSEmailBodyType.HTML);
 
@@ -116,7 +124,7 @@ public class ReplyEmail extends SendEmail {
 	}
 
 	private Message quoteAndReplyMultipart(String originalEmail, String originalEmailAsHtml) 
-			throws NotQuotableEmailException {
+			throws NotQuotableEmailException, MimeException {
 
 		Multipart multipart = getMultiPart();
 		TextBody quotedBodyText = quoteBodyText(originalEmail, multipart);
@@ -140,7 +148,9 @@ public class ReplyEmail extends SendEmail {
 		return repliedEmail == null && repliedEmailAsHtml == null;
 	}
 
-	private Message buildSingleOrMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlOverText, TextBody modifiedBodyHtmlOverHtml ) throws NotQuotableEmailException {
+	private Message buildSingleOrMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlOverText, TextBody modifiedBodyHtmlOverHtml ) 
+			throws NotQuotableEmailException, MimeException {
+		
 		if (modifiedBodyText == null && modifiedBodyHtmlOverText == null && modifiedBodyHtmlOverHtml == null) {
 			throw new NotQuotableEmailException("No parts are quotable");
 		}
@@ -170,31 +180,76 @@ public class ReplyEmail extends SendEmail {
 		return newMessage;
 	}
 
-	private Message createMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean createMixed) {
-		Multipart multipartReply = createMultipartMixedOrAlternative(createMixed);
+	private Message createMultipartMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered, boolean createMixed) 
+			throws MimeException {
 		
-		if (modifiedBodyText != null) {
-			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText,ContentTypeField.TYPE_TEXT_PLAIN));
-		}
-		if (modifiedBodyHtmlPrefered != null) {
-			multipartReply.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered,"text/html"));
-		}
-		
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+		final Multipart multipart = createMultipartMixedOrAlternative(createMixed);
+		addBodyPart(multipart, modifiedBodyText, modifiedBodyHtmlPrefered);
+
+		Multipart newMultipart = createNewMultipartWithAttachment(multipart);
+		String mimeType = "multipart/" + newMultipart.getSubType();
+
 		MessageImpl newMessage = mime4jUtils.createMessage();
-		newMessage.setBody(multipartReply, originalMessage.getMimeType(), params);
+		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+		newMessage.setBody(newMultipart, mimeType, params);
 		return newMessage;
 	}
 
-	private Multipart createMultipartMixedOrAlternative(boolean createMixed) {
-		Multipart multipartReply;
-		if (createMixed) {
-			multipartReply = this.mime4jUtils.createMultipartMixed();
-			copyOriginalMessagePartsToMultipartMessage(multipartReply);
+	private Multipart createNewMultipartWithAttachment(final Multipart multipart) throws MimeException {
+		boolean alreadyAttachmentsExist = alreadyAttachmentsInMessageFromPda();
+		if (alreadyAttachmentsExist || originalMailAttachments.isEmpty()) {
+			return multipart;
 		} else {
-			multipartReply = this.mime4jUtils.createMultipartAlternative();
+			if (multipart.getSubType().equals("mixed")) {
+				copyOriginalMessageAttachmentsToMultipartMessage(multipart);
+				return multipart;
+			} else {
+				Map<String, String> contentTypeHeaderMultipartParams = 
+						mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+				
+				Multipart mixedMultipart = this.mime4jUtils.createMultipartMixed();
+				String mimeType = "multipart/" + multipart.getSubType();
+				BodyPart bodyPart = this.mime4jUtils.bodyToBodyPart(multipart, mimeType, contentTypeHeaderMultipartParams);
+				mixedMultipart.addBodyPart(bodyPart);
+				copyOriginalMessageAttachmentsToMultipartMessage(mixedMultipart);
+				return mixedMultipart;
+			}
 		}
-		return multipartReply;
+	}
+
+	private boolean alreadyAttachmentsInMessageFromPda() {
+		return mime4jUtils.isAttachmentsExist(getMimeMessage());
+	}
+
+	private Multipart createMultipartMixedOrAlternative(boolean createMixed) {
+		Multipart multipart;
+		if (createMixed) {
+			multipart = this.mime4jUtils.createMultipartMixed();
+			copyOriginalMessagePartsToMultipartMessage(multipart);
+		} else {
+			multipart = this.mime4jUtils.createMultipartAlternative();
+		}
+		return multipart;
+	}
+
+	private void addBodyPart(Multipart multipart, TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) {
+		if (modifiedBodyText != null) {
+			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText, ContentTypeField.TYPE_TEXT_PLAIN));
+		}
+		if (modifiedBodyHtmlPrefered != null) {
+			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered, "text/html"));
+		}
+	}
+
+	private void copyOriginalMessageAttachmentsToMultipartMessage(Multipart multipart) throws MimeException {
+		for (Entry<String, MSAttachementData> att: originalMailAttachments.entrySet()) {
+			MSAttachementData value = att.getValue();
+			try {
+				mime4jUtils.attach(multipart, value.getFile(), att.getKey(), value.getContentType());
+			} catch (IOException e) {
+				throw new MimeException(e);
+			}
+		}
 	}
 
 	private void copyOriginalMessagePartsToMultipartMessage(Multipart multipart) {
