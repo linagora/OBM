@@ -50,6 +50,7 @@ organisateur    : <?php echo $organizer; ?>
 
 créé par        : <?php echo $creator; ?>
 
+Commentaire     : <?php echo $resourceComment; ?>.
 
 :: Pour accepter/refuser la réservation : 
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

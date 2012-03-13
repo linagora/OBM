@@ -45,6 +45,11 @@ was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?
 </td>
     </tr>
     <tr>
+      <td colspan="2">
+        Comment : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
+    <tr>
         <td style="text-align:right;" colspan="2">
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">To accept or refuse this update</a>
         </td>

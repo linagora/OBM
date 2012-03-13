@@ -59,6 +59,11 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">Créé par</td><td><?php echo $creator; ?></td>
     </tr>
     <tr>
+      <td colspan="2">
+        Commentaire : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;" colspan="2">
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accepter/refuser la réservation</a>
         </td>

@@ -58,4 +58,9 @@ applicable to the OBM software.
     <tr>
         <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
     </tr>
+    <tr>
+      <td colspan="2">
+        Commentaire : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
 </table>

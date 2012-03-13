@@ -40,4 +40,9 @@ applicable to the OBM software.
     <tr>
         <td colspan="2">The resource reservation <?php echo $target; ?> initially scheduled from <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>), was cancelled.</td>
     </tr>
+    <tr>
+      <td colspan="2">
+        Comment : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
 </table>

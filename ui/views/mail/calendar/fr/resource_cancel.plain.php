@@ -49,3 +49,5 @@ lieu            : <?php echo $location; ?>
 organisateur    : <?php echo $organizer; ?>
 
 créé par        : <?php echo $creator; ?>
+
+Commentaire     : <?php echo $resourceComment; ?>.

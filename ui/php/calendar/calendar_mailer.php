@@ -355,6 +355,7 @@ class CalendarMailer extends OBM_Mailer {
     }
     $list_attendees = implode(', ', $list_attendees).$suffix;
 
+    
     return array(
       'host'               => $GLOBALS['cgp_host'],
       $prefix.'id'         => $event->id,
@@ -371,7 +372,8 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'creator'    => $event->creator->label,
       $prefix.'target'     => $target->label,
       $prefix.'targetState'=> __($target->state),
-      $prefix.'attendees'  => $list_attendees
+      $prefix.'attendees'  => $list_attendees,
+      $prefix.'resourceComment'  => $target->comment
     );
   }
   

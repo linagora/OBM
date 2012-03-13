@@ -52,6 +52,7 @@ organizer    : <?php echo $organizer; ?>
 
 created by   : <?php echo $creator; ?>
 
+Comment : <?php echo $resourceComment; ?>.
 
 :: To accept or refuse this reservation :
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

@@ -64,6 +64,11 @@ A new resource reservation was scheduled
         <td style="text-align:right;">Created by</td><td><?php echo $creator; ?></td>
     </tr>
     <tr>
+      <td colspan="2">
+        Comment : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
+    <tr>
         <td style="text-align:right;" colspan="2">
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">To accept or refuse this reservation</a>
         </td>

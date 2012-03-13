@@ -42,5 +42,9 @@ applicable to the OBM software.
 L'administrateur de la ressource <?php echo $target; ?> a <?php echo $targetState; ?> sa participation pour l'événement <?php echo $title; ?> prévu du <?php echo $start; ?> au <?php echo $end; ?>.
       </td>
     </tr>
-
+    <tr>
+      <td colspan="2">
+        Commentaire : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
 </table>

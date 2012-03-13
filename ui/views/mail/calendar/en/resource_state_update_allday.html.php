@@ -42,5 +42,9 @@ applicable to the OBM software.
 <?php echo $target; ?> owner has changed its state to <?php echo $targetState; ?> for the appointment <?php echo $title; ?> scheduled the full-day on <?php echo $startDate; ?>.
       </td>
     </tr>
-
+    <tr>
+      <td colspan="2">
+        Comment : <?php echo $resourceComment; ?>.
+      </td>
+    </tr>
 </table>
