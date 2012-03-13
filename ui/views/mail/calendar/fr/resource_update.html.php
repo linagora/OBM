@@ -61,7 +61,7 @@ a été modifié :</td>
     </tr>
     <tr>
       <td colspan="2">
-        Commentaire : <?php echo $resourceComment; ?>.
+        Commentaire : <?php echo $targetComment; ?>.
       </td>
     </tr>
     <tr>

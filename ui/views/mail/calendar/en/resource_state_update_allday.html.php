@@ -44,7 +44,7 @@ applicable to the OBM software.
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $resourceComment; ?>.
+        Comment : <?php echo $targetComment; ?>.
       </td>
     </tr>
 </table>

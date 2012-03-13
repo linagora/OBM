@@ -44,7 +44,7 @@ L'administrateur de la ressource <?php echo $target; ?> a <?php echo $targetStat
     </tr>
     <tr>
       <td colspan="2">
-        Commentaire : <?php echo $resourceComment; ?>.
+        Commentaire : <?php echo $targetComment; ?>.
       </td>
     </tr>
 </table>

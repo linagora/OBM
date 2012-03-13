@@ -46,7 +46,7 @@ was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $resourceComment; ?>.
+        Comment : <?php echo $targetComment; ?>.
       </td>
     </tr>
     <tr>

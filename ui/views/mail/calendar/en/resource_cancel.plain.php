@@ -38,4 +38,4 @@ RESOURCE RESERVATION CANCELLED !
 
 The resource reservation <?php echo $target; ?> initially scheduled from <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>), was cancelled.
 
-Comment : <?php echo $resourceComment; ?>.
+Comment : <?php echo $targetComment; ?>.

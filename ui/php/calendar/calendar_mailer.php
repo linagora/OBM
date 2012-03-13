@@ -373,7 +373,7 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'target'     => $target->label,
       $prefix.'targetState'=> __($target->state),
       $prefix.'attendees'  => $list_attendees,
-      $prefix.'resourceComment'  => $target->comment
+      $prefix.'targetComment'  => $target->comment
     );
   }
   

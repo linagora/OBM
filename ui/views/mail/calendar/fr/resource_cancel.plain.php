@@ -50,4 +50,4 @@ organisateur    : <?php echo $organizer; ?>
 
 créé par        : <?php echo $creator; ?>
 
-Commentaire     : <?php echo $resourceComment; ?>.
+Commentaire     : <?php echo $targetComment; ?>.

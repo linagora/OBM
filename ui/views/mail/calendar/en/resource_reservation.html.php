@@ -65,7 +65,7 @@ A new resource reservation was scheduled
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $resourceComment; ?>.
+        Comment : <?php echo $targetComment; ?>.
       </td>
     </tr>
     <tr>
