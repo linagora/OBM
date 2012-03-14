@@ -91,7 +91,7 @@ public class ForwardEmailTest {
 		Message mimeMessage = forwardEmail.getMimeMessage();
 		String messageAsString = mime4jUtils.toString(mimeMessage.getBody());
 		
-		String mixedMultipartBoundary = getMixedMultipartBoundary(messageAsString);
+		String mixedMultipartBoundary = getMixedMultipartBoundary(messageAsString, "Content-Type: multipart/alternative;");
 		String mixedMultipartAttachmentBoundary = getMixedMultipartAttachmentBoundary(messageAsString);
 		
 		Assertions.assertThat(messageAsString).isNotNull();
@@ -102,13 +102,41 @@ public class ForwardEmailTest {
 			contains("application/octet-stream");
 		Assertions.assertThat(mixedMultipartBoundary).isEqualTo(mixedMultipartAttachmentBoundary);
 	}
-
-	private String getMixedMultipartBoundary(String messageAsString) {
-		int startMultipartAlternativeIndex = messageAsString.indexOf("Content-Type: multipart/alternative;");
+	
+	@Test
+	public void testForwardSampleBodyMessageWithAddingOriginalMailAttachments() throws MimeException, IOException, NotQuotableEmailException {
+		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		Message message = loadMimeMessage("plainText.eml");
+		
+		String text = "It\'s my attachment";
+		InputStream is = new ByteArrayInputStream(text.getBytes("UTF-8"));
+		
+		MSAttachementData msAttachementData = new MSAttachementData("application/octet-stream", is);
+		Map<String, MSAttachementData> ms = new HashMap<String, MSAttachementData>();
+		ms.put("file.txt", msAttachementData);
+		
+		ForwardEmail forwardEmail = 
+				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, ms);
+		
+		Message mimeMessage = forwardEmail.getMimeMessage();
+		String messageAsString = mime4jUtils.toString(mimeMessage.getBody());
+		
+		String mixedMultipartBoundary = getMixedMultipartBoundary(messageAsString, "Content-Type: text/plain");
+		String mixedMultipartAttachmentBoundary = getMixedMultipartAttachmentBoundary(messageAsString);
+		
+		Assertions.assertThat(messageAsString).isNotNull();
+		Assertions.assertThat(messageAsString).
+			contains("Content-Type: text/plain").
+			contains("application/octet-stream");
+		Assertions.assertThat(mixedMultipartBoundary).isEqualTo(mixedMultipartAttachmentBoundary);
+	}
+		
+	private String getMixedMultipartBoundary(String messageAsString, String str) {
+		int startMultipartAlternativeIndex = messageAsString.indexOf(str);
 		String mixedMultipartBoundary = messageAsString.substring(0, startMultipartAlternativeIndex);
 		return mixedMultipartBoundary;
 	}
-
+	
 	private String getMixedMultipartAttachmentBoundary(String messageAsString) {
 		int startAttachmentIndex = messageAsString.indexOf("Content-Type: application/octet-stream");
 		String messageBeforeAttachment = messageAsString.substring(0, startAttachmentIndex);
@@ -116,5 +144,5 @@ public class ForwardEmailTest {
 		String mixedMultipartAttachmentBoundary = messageBeforeAttachment.substring(endMultipartAlternativeIndex);
 		return mixedMultipartAttachmentBoundary;
 	}
-		
+	
 }

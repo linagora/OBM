@@ -164,7 +164,7 @@ public class ReplyEmail extends SendEmail {
 		}
 	}
 
-	private Message buildSingleMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) {
+	private Message buildSingleMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) throws MimeException {
 		if (modifiedBodyText != null) {
 			return createMessageWithBody(Mime4jUtils.TYPE_TEXT_PLAIN, modifiedBodyText);
 		} else {
@@ -172,10 +172,21 @@ public class ReplyEmail extends SendEmail {
 		}
 	}
 
-	private Message createMessageWithBody(String mimeType, TextBody modifiedBodyText) {
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(configuration.getDefaultEncoding());
+	private Message createMessageWithBody(String mimeType, TextBody modifiedBodyText) throws MimeException {
 		MessageImpl newMessage = mime4jUtils.createMessage();
-		newMessage.setBody(modifiedBodyText, mimeType, params);
+
+		boolean alreadyAttachmentsExist = outgoingMessageContainsAttachments();
+		if (alreadyAttachmentsExist || originalMailAttachments.isEmpty()) {
+			Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(configuration.getDefaultEncoding());
+			newMessage.setBody(modifiedBodyText, mimeType, params);
+		} else {
+			Multipart mixedMultipart = this.mime4jUtils.createMultipartMixed();
+			BodyPart bodyPart = this.mime4jUtils.bodyToBodyPart(modifiedBodyText, mimeType);
+			mixedMultipart.addBodyPart(bodyPart);
+			copyOriginalMessageAttachmentsToMultipartMessage(mixedMultipart);
+			newMessage.setBody(mixedMultipart, Mime4jUtils.TYPE_MULTIPART_MIXED, 
+					mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding()));
+		}
 		return newMessage;
 	}
 
@@ -195,7 +206,7 @@ public class ReplyEmail extends SendEmail {
 	}
 
 	private Multipart createNewMultipartWithAttachment(final Multipart multipart) throws MimeException {
-		boolean alreadyAttachmentsExist = alreadyAttachmentsInMessageFromPda();
+		boolean alreadyAttachmentsExist = outgoingMessageContainsAttachments();
 		if (alreadyAttachmentsExist || originalMailAttachments.isEmpty()) {
 			return multipart;
 		} else {
@@ -216,7 +227,7 @@ public class ReplyEmail extends SendEmail {
 		}
 	}
 
-	private boolean alreadyAttachmentsInMessageFromPda() {
+	private boolean outgoingMessageContainsAttachments() {
 		return mime4jUtils.isAttachmentsExist(getMimeMessage());
 	}
 

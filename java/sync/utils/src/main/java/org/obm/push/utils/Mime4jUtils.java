@@ -72,6 +72,7 @@ public class Mime4jUtils {
 	public final static String TYPE_TEXT_PLAIN = "text/plain";
 	public final static String TYPE_MULTIPART_PREFIX = "multipart/";
 	public final static String SUBTYPE_MULTIPART_MIXED = "mixed";
+	public final static String TYPE_MULTIPART_MIXED = "multipart/mixed";
 	
 	private MessageBuilder messageBuilder;
 	private MessageWriter messageWriter;
