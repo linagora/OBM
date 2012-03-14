@@ -46,7 +46,6 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
@@ -167,9 +166,9 @@ public class ReplyEmail extends SendEmail {
 
 	private Message buildSingleMessage(TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) {
 		if (modifiedBodyText != null) {
-			return createMessageWithBody(ContentTypeField.TYPE_TEXT_PLAIN, modifiedBodyText);
+			return createMessageWithBody(Mime4jUtils.TYPE_TEXT_PLAIN, modifiedBodyText);
 		} else {
-			return createMessageWithBody("text/html", modifiedBodyHtmlPrefered);
+			return createMessageWithBody(Mime4jUtils.TYPE_TEXT_HTML, modifiedBodyHtmlPrefered);
 		}
 	}
 
@@ -187,7 +186,7 @@ public class ReplyEmail extends SendEmail {
 		addBodyPart(multipart, modifiedBodyText, modifiedBodyHtmlPrefered);
 
 		Multipart newMultipart = createNewMultipartWithAttachment(multipart);
-		String mimeType = "multipart/" + newMultipart.getSubType();
+		String mimeType = Mime4jUtils.TYPE_MULTIPART_PREFIX + newMultipart.getSubType();
 
 		MessageImpl newMessage = mime4jUtils.createMessage();
 		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
@@ -200,7 +199,7 @@ public class ReplyEmail extends SendEmail {
 		if (alreadyAttachmentsExist || originalMailAttachments.isEmpty()) {
 			return multipart;
 		} else {
-			if (multipart.getSubType().equals("mixed")) {
+			if (multipart.getSubType().equals(Mime4jUtils.SUBTYPE_MULTIPART_MIXED)) {
 				copyOriginalMessageAttachmentsToMultipartMessage(multipart);
 				return multipart;
 			} else {
@@ -208,7 +207,7 @@ public class ReplyEmail extends SendEmail {
 						mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
 				
 				Multipart mixedMultipart = this.mime4jUtils.createMultipartMixed();
-				String mimeType = "multipart/" + multipart.getSubType();
+				String mimeType = Mime4jUtils.TYPE_MULTIPART_PREFIX + multipart.getSubType();
 				BodyPart bodyPart = this.mime4jUtils.bodyToBodyPart(multipart, mimeType, contentTypeHeaderMultipartParams);
 				mixedMultipart.addBodyPart(bodyPart);
 				copyOriginalMessageAttachmentsToMultipartMessage(mixedMultipart);
@@ -234,10 +233,10 @@ public class ReplyEmail extends SendEmail {
 
 	private void addBodyPart(Multipart multipart, TextBody modifiedBodyText, TextBody modifiedBodyHtmlPrefered) {
 		if (modifiedBodyText != null) {
-			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText, ContentTypeField.TYPE_TEXT_PLAIN));
+			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyText, Mime4jUtils.TYPE_TEXT_PLAIN));
 		}
 		if (modifiedBodyHtmlPrefered != null) {
-			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered, "text/html"));
+			multipart.addBodyPart(this.mime4jUtils.bodyToBodyPart(modifiedBodyHtmlPrefered, Mime4jUtils.TYPE_TEXT_HTML));
 		}
 	}
 

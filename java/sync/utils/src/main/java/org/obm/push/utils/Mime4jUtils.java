@@ -68,6 +68,11 @@ import com.google.common.collect.Maps;
 
 public class Mime4jUtils {
 
+	public final static String TYPE_TEXT_HTML = "text/html";
+	public final static String TYPE_TEXT_PLAIN = "text/plain";
+	public final static String TYPE_MULTIPART_PREFIX = "multipart/";
+	public final static String SUBTYPE_MULTIPART_MIXED = "mixed";
+	
 	private MessageBuilder messageBuilder;
 	private MessageWriter messageWriter;
 
@@ -129,7 +134,12 @@ public class Mime4jUtils {
 	}
 
 	public boolean isAttachmentsExist(Message message) {
-		return isAttachmentsExist((Multipart) message.getBody());
+		try {
+			Multipart body = (Multipart) message.getBody();
+			return isAttachmentsExist(body);
+		} catch (ClassCastException ex) {
+			return false;
+		}
 	}
 	
 	private boolean isAttachmentEntity(Entity part) {
