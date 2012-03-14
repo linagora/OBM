@@ -34,27 +34,30 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 public class LocatorCacheTest {
 
+	private String loginAtDomain;
+
+	@Before
+	public void setUp() {
+		loginAtDomain = "test@test.obm.lng";
+	}
+	
 	@Test
 	public void testGetServiceLocation() throws LocatorClientException {
 		String serviceSlashProperty = "obm-sync";
-		String loginAtDomain = "test@test.obm.lng";
 		String returnValue = "127.0.0.1";
 
-		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
-		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
-		
-		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
-		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(TimeUnit.MINUTES);
-		
-		EasyMock.expect(locatorClientImpl.getServiceLocation(serviceSlashProperty, loginAtDomain)).andReturn(returnValue);
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(30, TimeUnit.MINUTES);
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValues(serviceSlashProperty, returnValue);
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
@@ -69,16 +72,10 @@ public class LocatorCacheTest {
 	@Test(expected=LocatorClientException.class)
 	public void testGetServiceLocationReturnNullValue() throws LocatorClientException {
 		String service = "obm-sync";
-		String loginAtDomain = "test@test.obm.lng";
 		String returnNullValue = null;
 
-		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
-		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
-		
-		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
-		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(TimeUnit.MINUTES);
-		
-		EasyMock.expect(locatorClientImpl.getServiceLocation(service, loginAtDomain)).andReturn(returnNullValue);
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(30, TimeUnit.MINUTES);
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValues(service, returnNullValue);
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
@@ -90,19 +87,31 @@ public class LocatorCacheTest {
 		Assert.assertTrue(false);
 	}
 	
+	@Test(expected=UncheckedExecutionException.class)
+	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
+		String obmSyncService = "obm-sync";
+
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(3, TimeUnit.SECONDS);
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValuesThenException(
+				obmSyncService, new LocatorClientException("No message"), "first value");
+		
+		EasyMock.replay(configurationService, locatorClientImpl);
+		
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
+		locatorCache.getServiceLocation(obmSyncService, loginAtDomain); // load value
+		locatorCache.getServiceLocation(obmSyncService, loginAtDomain); // get value from cache
+		Thread.sleep(5000);
+		locatorCache.getServiceLocation(obmSyncService, loginAtDomain); // exception is thrown
+	}
+	
 	@Test
 	public void testGetServiceLocationWithNullParameters() throws LocatorClientException {
+		loginAtDomain = null;
 		String service = null;
-		String loginAtDomain = null;
 		String returnValue = "return value";
 
-		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
-		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
-		
-		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
-		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(TimeUnit.MINUTES);
-		
-		EasyMock.expect(locatorClientImpl.getServiceLocation(service, loginAtDomain)).andReturn(returnValue);
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(30, TimeUnit.MINUTES);
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValues(service, returnValue);
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
@@ -116,20 +125,14 @@ public class LocatorCacheTest {
 	
 	@Test
 	public void testSeveralGetServiceLocationCall() throws LocatorClientException {
-		String loginAtDomain = "test@test.obm.lng";
-
 		String obmSyncService = "obm-sync";
 		String returnObmSyncValue = "localhost obm-sync";
 
 		String opushService = "opush";
 		String returnOpushValue = "localhost opush";
 
-		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(30, TimeUnit.MINUTES);
 		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
-		
-		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(30);
-		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(TimeUnit.MINUTES);
-		
 		EasyMock.expect(locatorClientImpl.getServiceLocation(obmSyncService, loginAtDomain)).andReturn(returnObmSyncValue);
 		EasyMock.expect(locatorClientImpl.getServiceLocation(opushService, loginAtDomain)).andReturn(returnOpushValue);
 		
@@ -149,36 +152,84 @@ public class LocatorCacheTest {
 	}
 	
 	@Test
-	public void testSeveralGetServiceLocationCallWithExpiredCache() throws LocatorClientException, InterruptedException {
-		String loginAtDomain = "test@test.obm.lng";
-
+	public void testCacheExpireWithRegularKeys() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
-		String firstReturnObmSyncValue = "first localhost obm-sync";
-		String secondReturnObmSyncValue = "second localhost obm-sync";
+		
+		assertCacheExpireWithServiceKey(obmSyncService); 
+	}
 
-		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationServiceImpl.class);
-		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
+	@Test
+	public void testCacheExpireWithNullLoginAtDomainKey() throws LocatorClientException, InterruptedException {
+		loginAtDomain = null;
+		String serviceKey = "obm-sync";
 		
-		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(3);
-		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(TimeUnit.SECONDS);
+		assertCacheExpireWithServiceKey(serviceKey); 
+	}
+	
+	@Test
+	public void testCacheExpireWithNullServiceKey() throws LocatorClientException, InterruptedException {
+		String nullServiceKey = null;
 		
-		EasyMock.expect(locatorClientImpl.getServiceLocation(obmSyncService, loginAtDomain)).andReturn(firstReturnObmSyncValue);
-		EasyMock.expect(locatorClientImpl.getServiceLocation(obmSyncService, loginAtDomain)).andReturn(secondReturnObmSyncValue);
+		assertCacheExpireWithServiceKey(nullServiceKey); 
+	}
+	
+	@Test
+	public void testCacheExpireWithNullKeys() throws LocatorClientException, InterruptedException {
+		loginAtDomain = null;
+		String nullServiceKey = null;
+		
+		assertCacheExpireWithServiceKey(nullServiceKey);
+	}
+	
+	private void assertCacheExpireWithServiceKey(String serviceKey) throws InterruptedException {
+		String firstServiceValue = "first localhost obm-sync";
+		String secondServiceValue = "second localhost obm-sync";
+
+		assertCacheExpireWithServiceKey(serviceKey, firstServiceValue, secondServiceValue);
+	}
+
+	private void assertCacheExpireWithServiceKey(String serviceKey, String firstServiceValue, String secondServiceValue)
+			throws InterruptedException {
+		
+		ConfigurationService configurationService = mockLocatorCacheWithExpiration(3, TimeUnit.SECONDS);
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValues(
+				serviceKey, firstServiceValue, secondServiceValue);
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
 		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
-		String obmSyncValue = locatorCache.getServiceLocation(obmSyncService, loginAtDomain);
-		String obmSyncValueCache = locatorCache.getServiceLocation(obmSyncService, loginAtDomain);
+		String firstValue = locatorCache.getServiceLocation(serviceKey, loginAtDomain);
+		String firstValueCache = locatorCache.getServiceLocation(serviceKey, loginAtDomain);
 		Thread.sleep(5000);
-		String obmSyncValueNew = locatorCache.getServiceLocation(obmSyncService, loginAtDomain);
+		String refreshedValue = locatorCache.getServiceLocation(serviceKey, loginAtDomain);
 		
 		EasyMock.verify(configurationService, locatorClientImpl);
 		
-		Assert.assertEquals(firstReturnObmSyncValue, obmSyncValue);
-		Assert.assertEquals(firstReturnObmSyncValue, obmSyncValueCache);
-		Assert.assertEquals(secondReturnObmSyncValue, obmSyncValueNew); 
-		
+		Assert.assertEquals(firstServiceValue, firstValue);
+		Assert.assertEquals(firstServiceValue, firstValueCache);
+		Assert.assertEquals(secondServiceValue, refreshedValue);
 	}
-	
+
+	private LocatorClientImpl mockLocatorServiceGivenVariousValues(String serviceKey, String... orderedReturnedValues) {
+		LocatorClientImpl locatorClientImpl = EasyMock.createStrictMock(LocatorClientImpl.class);
+		for (String returnedValue : orderedReturnedValues) {
+			EasyMock.expect(locatorClientImpl.getServiceLocation(serviceKey, loginAtDomain)).andReturn(returnedValue);
+		}
+		return locatorClientImpl;
+	}
+
+	private LocatorClientImpl mockLocatorServiceGivenVariousValuesThenException(
+			String serviceKey, Throwable exception, String... orderedReturnedValues) {
+		
+		LocatorClientImpl locatorClientImpl = mockLocatorServiceGivenVariousValues(serviceKey, orderedReturnedValues);
+		EasyMock.expect(locatorClientImpl.getServiceLocation(serviceKey, loginAtDomain)).andThrow(exception);
+		return locatorClientImpl;
+	}
+
+	private ConfigurationService mockLocatorCacheWithExpiration(int expiration, TimeUnit unit) {
+		ConfigurationService configurationService = EasyMock.createStrictMock(ConfigurationService.class);
+		EasyMock.expect(configurationService.getLocatorCacheTimeout()).andReturn(expiration);
+		EasyMock.expect(configurationService.getLocatorCacheTimeUnit()).andReturn(unit);
+		return configurationService;
+	}
 }
