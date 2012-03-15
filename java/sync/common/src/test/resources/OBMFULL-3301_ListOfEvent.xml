@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events xmlns="http://www.obm.org/xsd/sync/events.xsd">
+	<event allDay="false" isInternal="true" sequence="3" type="VEVENT">
+		<timeupdate>1292580000000</timeupdate>
+		<timecreate>1289988000000</timecreate>
+		<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>
+		<opacity>OPAQUE</opacity>
+		<title>fake rdv</title>
+		<owner>john@do.fr</owner>
+		<tz>Europe/Paris</tz>
+		<date>1295258400000</date>
+		<duration>3600</duration>
+		<location>tlse</location>
+		<alert>60</alert>
+		<priority>0</priority>
+		<privacy>0</privacy>
+		<attendees>
+		<attendee displayName="John Do" email="john@do.fr" isOrganizer="true" percent="0" required="CHAIR" state="NEEDS-ACTION"/>
+		<attendee displayName="noIn TheDatabase" email="notin@mydb.com" isOrganizer="false" percent="0" required="OPT" state="ACCEPTED"/>
+		</attendees>
+		<recurrence days="" freq="1" kind="daily">
+		<exceptions>
+		<exception>1295258400000</exception>
+		<exception>1292580000000</exception>
+		</exceptions><eventExceptions/>
+		</recurrence>
+	</event>
+	<event allDay="false" isInternal="true" sequence="3" type="VEVENT">
+		<timeupdate>1292580000000</timeupdate>
+		<timecreate>1289988000000</timecreate>
+		<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>
+		<opacity>OPAQUE</opacity>
+		<title>fake rdv</title>
+		<owner>john@do.fr</owner>
+		<tz>Europe/Paris</tz>
+		<date>1295258400000</date>
+		<duration>3600</duration>
+		<location>tlse</location>
+		<alert>60</alert>
+		<priority>0</priority>
+		<privacy>0</privacy>
+		<attendees>
+		<attendee displayName="John Do" email="john@do.fr" isOrganizer="true" percent="0" required="CHAIR" state="NEEDS-ACTION"/>
+		<attendee displayName="noIn TheDatabase" email="notin@mydb.com" isOrganizer="false" percent="0" required="OPT" state="ACCEPTED"/>
+		</attendees>
+		<recurrence days="" freq="1" kind="daily">
+		<exceptions>
+		<exception>1295258400000</exception>
+		<exception>1292580000000</exception>
+		</exceptions><eventExceptions/>
+		</recurrence>
+	</event>
+</events>

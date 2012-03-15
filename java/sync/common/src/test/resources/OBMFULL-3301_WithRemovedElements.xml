@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<calendar-changes lastSync="1330953989000" xmlns="http://www.obm.org/xsd/sync/calendar-changes.xsd">
+	<removed>
+		<event extId="123" id="1"/>
+		<event extId="456" id="2"/>
+	</removed>
+	<updated/>
+	<participationChanges/>
+</calendar-changes>
