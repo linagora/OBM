@@ -306,7 +306,6 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(answeredEmail.isAnswered()).isTrue();
 	}
 
-	@Ignore("GreeeMail BUG")
 	@Test
 	public void testStoreInInbox() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
@@ -318,7 +317,6 @@ public class ImapMailboxServiceTest {
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 
-	@Ignore("GreeeMail BUG")
 	@Test
 	public void testStoreInInboxStream() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
