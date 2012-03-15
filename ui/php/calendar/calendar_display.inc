@@ -8127,7 +8127,7 @@ function html_share_calendar($id,$name) {
             </tr>";
   }
   $block .="
-          <tr>
+          <tr style=\"$tr_display_css\">
             <th>
               $GLOBALS[l_share_calendar_public]
               <div class=\"sharedesc\">
