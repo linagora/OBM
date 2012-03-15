@@ -428,10 +428,22 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}	
 	
-	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent) throws MailException, IOException {
+	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
-		mailContent.reset();
-		storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
+		if (mailContent != null) {
+			storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
+		} else {
+			throw new MailException("The mail that user try to store in sent box is null.");
+		}
+	}
+
+	private void resetInputStream(InputStream mailContent) throws IOException {
+		try {
+			mailContent.reset();
+		} catch (IOException e) {
+			mailContent.mark(0);
+			mailContent.reset();
+		}
 	}
 	
 	private void closeStream(InputStream mimeMail) {
@@ -524,6 +536,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
 			try {
 				store.login();
+				resetInputStream(mailContent);
 				Message message = store.createMessage(mailContent);
 				message.setFlag(Flags.Flag.SEEN, isRead);
 				store.appendMessage(folderName, message);
@@ -532,6 +545,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			} catch (LocatorClientException e) {
 				throw new MailException(e.getMessage(), e);
 			} catch (MessagingException e) {
+				throw new MailException(e.getMessage(), e);
+			} catch (IOException e) {
 				throw new MailException(e.getMessage(), e);
 			} finally {
 				logout(store);

@@ -331,24 +331,51 @@ public class ImapMailboxServiceTest {
 	}
 
 	@Test
-	public void testStoreInSentbox() throws MailException, IOException {
+	public void testStoreInSentBox() throws MailException {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(bs, newFolder);
-		
+
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 		mailboxService.storeInSent(bs, inputStream);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs,
 				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
-	
-	@Test
-	public void testStoreInSentboxAfterToConsumeIt() throws MailException, IOException {
-		MailboxFolder newFolder = folder("SeNt");
+
+	@Test(expected=MailException.class)
+	public void testStoreInSentBoxWithNullInputStream() throws MailException {
+		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(bs, newFolder);
-		
+
+		InputStream inputStream = null;
+		mailboxService.storeInSent(bs, inputStream);
+	}
+
+	@Test
+	public void testStoreInSentBoxWithNoDirectlyResetableInputStream() throws MailException {
+		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
+		mailboxService.createFolder(bs, newFolder);
+
+		InputStream emailData = getInputStreamFromFile("plainText.eml");
+		boolean isResetable = true;
+		try {
+			emailData.reset();
+		} catch (IOException e1) {
+			isResetable = false;
+		}
+
+		mailboxService.storeInSent(bs, emailData);
+		Assertions.assertThat(isResetable).isFalse();
+	}
+
+	@Test
+	public void testStoreInSentBoxAfterToConsumeIt() throws MailException, IOException {
+		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
+		mailboxService.createFolder(bs, newFolder);
+
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 		consumeInputStream(inputStream);
 
@@ -357,6 +384,7 @@ public class ImapMailboxServiceTest {
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
 				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 	
@@ -373,4 +401,9 @@ public class ImapMailboxServiceTest {
 	private MailboxFolder inbox() {
 		return folder("INBOX");
 	}
+
+	private InputStream getInputStreamFromFile(String name) {
+		return ClassLoader.getSystemResourceAsStream("eml/" + name);
+	}
+
 }
