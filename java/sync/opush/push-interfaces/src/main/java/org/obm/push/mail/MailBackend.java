@@ -17,14 +17,14 @@ public interface MailBackend extends PIMBackend {
 
 	List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException;
 
-	void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent)
+	void sendEmail(BackendSession bs, byte[] mailContent, boolean saveInSent)
 			throws ProcessingEmailException;
 
-	void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)
+	void replyEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 
 	void forwardEmail(BackendSession bs, byte[] mailContent,
-			Boolean saveInSent, String collectionId, String serverId)
+			boolean saveInSent, String collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException;
 
 	MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId)

@@ -336,7 +336,7 @@ public class ImapMailboxServiceTest {
 		mailboxService.createFolder(bs, newFolder);
 		
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
-		mailboxService.storeInSent(bs, inputStream, true);
+		mailboxService.storeInSent(bs, inputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
 				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
@@ -352,7 +352,7 @@ public class ImapMailboxServiceTest {
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 		consumeInputStream(inputStream);
 
-		mailboxService.storeInSent(bs, inputStream, true);
+		mailboxService.storeInSent(bs, inputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
 				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);

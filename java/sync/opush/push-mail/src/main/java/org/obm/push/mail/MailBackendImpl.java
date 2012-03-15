@@ -415,7 +415,7 @@ public class MailBackendImpl implements MailBackend {
 
 
 	@Override
-	public void sendEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent) throws ProcessingEmailException {
+	public void sendEmail(BackendSession bs, byte[] mailContent, boolean saveInSent) throws ProcessingEmailException {
 		try {
 			Message message = mime4jUtils.parseMessage(mailContent);
 			SendEmail sendEmail = new SendEmail(getUserEmail(bs), message);
@@ -432,7 +432,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void replyEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, Integer collectionId, String serverId)
+	public void replyEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException {
 		
 		try {
@@ -480,7 +480,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void forwardEmail(BackendSession bs, byte[] mailContent, Boolean saveInSent, String collectionId, String serverId) 
+	public void forwardEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, String collectionId, String serverId) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
@@ -561,7 +561,7 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private void send(BackendSession bs, SendEmail sendEmail, Boolean saveInSent) throws ProcessingEmailException {
+	private void send(BackendSession bs, SendEmail sendEmail, boolean saveInSent) throws ProcessingEmailException {
 		try {
 			boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
 

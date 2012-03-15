@@ -402,7 +402,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	@Override
 	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
-			Boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
+			boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
 		
 		InputStream streamMail = null;
 		try {
@@ -410,7 +410,11 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			streamMail.mark(streamMail.available());
 			
 			smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
-			storeInSent(bs, streamMail, saveInSent);
+			if (saveInSent) {	
+				storeInSent(bs, streamMail);
+			} else {
+				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
+			}
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
@@ -424,16 +428,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}	
 	
-	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent, boolean storeInSentbox) 
-			throws MailException, IOException {
-
-		if (storeInSentbox) {
-			logger.info("Store mail in folder[SentBox]");
-			mailContent.reset();
-			storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
-		} else {
-			logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
-		}
+	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent) throws MailException, IOException {
+		logger.info("Store mail in folder[SentBox]");
+		mailContent.reset();
+		storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
 	}
 	
 	private void closeStream(InputStream mimeMail) {
