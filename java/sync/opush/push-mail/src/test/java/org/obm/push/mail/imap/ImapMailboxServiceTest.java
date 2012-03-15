@@ -34,6 +34,7 @@ package org.obm.push.mail.imap;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
@@ -44,7 +45,6 @@ import javax.mail.Flags;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.MailboxFolder;
@@ -53,8 +53,10 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
@@ -326,6 +328,42 @@ public class ImapMailboxServiceTest {
 		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+	}
+
+	@Test
+	public void testStoreInSentbox() throws MailException, IOException {
+		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
+		mailboxService.createFolder(bs, newFolder);
+		
+		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		mailboxService.storeInSent(bs, inputStream, true);
+
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+	}
+	
+	@Test
+	public void testStoreInSentboxAfterToConsumeIt() throws MailException, IOException {
+		MailboxFolder newFolder = folder("SeNt");
+		mailboxService.createFolder(bs, newFolder);
+		
+		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		consumeInputStream(inputStream);
+
+		mailboxService.storeInSent(bs, inputStream, true);
+
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
+				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+	}
+	
+	private void consumeInputStream(InputStream inputStream) throws IOException {
+		while (inputStream.read() != -1) {
+			// consume Inputstream
+		}		
 	}
 
 	private MailboxFolder folder(String name) {

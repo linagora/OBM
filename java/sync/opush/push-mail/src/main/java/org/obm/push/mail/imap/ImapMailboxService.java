@@ -58,10 +58,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
@@ -84,6 +82,7 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -294,7 +293,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		if (collectionName.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
-		
+
 		int slash = collectionName.lastIndexOf("email\\");
 		final String boxName = collectionName.substring(slash + "email\\".length());
 		final MailboxFolders lr = listAllFolders(bs);
@@ -411,19 +410,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			streamMail.mark(streamMail.available());
 			
 			smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
-			
-			if (saveInSent) {
-				streamMail.reset();
-				boolean isMailStoredInSent = storeInSent(bs, streamMail);
-				if (isMailStoredInSent) {
-					logger.info("The mail is stored in the 'sent' folder.");
-				} else {
-					logger.error("The mail can't be stored in the 'sent' folder.");
-				}
-			} else {
-				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
-			}
-			
+			storeInSent(bs, streamMail, saveInSent);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
@@ -435,8 +422,19 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		} finally {
 			closeStream(streamMail);
 		}
-		
 	}	
+	
+	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent, boolean storeInSentbox) 
+			throws MailException, IOException {
+
+		if (storeInSentbox) {
+			logger.info("Store mail in folder[SentBox]");
+			mailContent.reset();
+			storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
+		} else {
+			logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
+		}
+	}
 	
 	private void closeStream(InputStream mimeMail) {
 		if (mimeMail != null) {
@@ -518,13 +516,19 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	@Override
 	public void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
+		storeInFolder(bs, mailContent, isRead, EmailConfiguration.IMAP_INBOX_NAME);
+	}
+	
+	private void storeInFolder(BackendSession bs, InputStream mailContent, boolean isRead, String folderName) 
+			throws MailException {
+		
 		try {
 			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
 			try {
 				store.login();
 				Message message = store.createMessage(mailContent);
 				message.setFlag(Flags.Flag.SEEN, isRead);
-				store.appendMessage(EmailConfiguration.IMAP_INBOX_NAME, message);
+				store.appendMessage(folderName, message);
 			} catch (ImapCommandException e) {
 				throw new MailException(e.getMessage(), e);
 			} catch (LocatorClientException e) {
@@ -549,61 +553,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			logger.warn(e.getMessage(), e);
 		}
 	}
-
-	/**
-	 * Store the mail in the Sent folder storeInSent reset the mimeMail will be
-	 * if storeInSent read it
-	 * 
-	 * @param bs the BackendSession
-	 * @param mail the mail that will be stored
-	 * @return the imap uid of the mail
-	 * @throws StoreEmailException
-	 * @throws MailException 
-	 */
-	private boolean storeInSent(BackendSession bs, InputStream mail) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			String sentBoxPath = CollectionPathUtils.buildCollectionPath(
-					bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-			String sentFolderName = parseMailBoxName(bs, sentBoxPath);
-			return storeMail(store, sentFolderName,true, mail, true);
-		} catch (IMAPException e) {
-			throw new MailException("Error during store mail in Sent folder", e);
-		} finally {
-			store.logout();
-		}
-	}
-
-	/**
-	 * 
-	 * @param store
-	 *            the StoreClient
-	 * @param folderName
-	 *            the folder name where the mail will be stored
-	 * @param isRead
-	 *            if true the message will be stored with SEEN Flag
-	 * @param reset
-	 *            if true mailContent will be reseted
-	 * @return storeMail response status
-	 */
-	private boolean storeMail(StoreClient store, String folderName,
-			boolean isRead, InputStream mailContent, boolean reset) {
-		boolean ret = false;
-		if (folderName != null) {
-			if (reset && mailContent.markSupported()) {
-				mailContent.mark(0);
-			}
-			FlagsList fl = new FlagsList();
-			if(isRead){
-				fl.add(Flag.SEEN);
-			}
-			ret = store.append(folderName, mailContent, fl);
-			store.expunge();
-		}
-		return ret;
-	}
-
+	
 	@Override
 	public boolean getLoginWithDomain() {
 		return loginWithDomain;
