@@ -45,7 +45,6 @@ import org.obm.push.mail.imap.command.UIDCopyMessage;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.protocol.IMAPProtocol;
 
 public class OpushImapFolder {
@@ -70,10 +69,6 @@ public class OpushImapFolder {
 	
 	public void appendMessage(Message message) throws MessagingException {
 		folder.appendMessages(new Message[]{message});
-	}
-
-	public IMAPMessage getMessageByUID(int uid) throws MessagingException {
-		return (IMAPMessage) folder.getMessageByUID(uid);
 	}
 
 	public void deleteMessage(Message messageToDelete) throws MessagingException {
@@ -101,7 +96,7 @@ public class OpushImapFolder {
 		folder.open(mode);
 	}
 
-	public Message getMessageByUIDOrException(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+	public Message getMessageByUID(long messageUid) throws MessagingException, ImapMessageNotFoundException {
 		Message messageFound = folder.getMessageByUID(messageUid);
 
 		if (messageFound != null) {

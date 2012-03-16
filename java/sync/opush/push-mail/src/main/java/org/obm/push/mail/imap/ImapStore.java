@@ -169,7 +169,7 @@ public class ImapStore {
 		
 		try {
 			OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
-			Message messageToMove = sourceFolder.getMessageByUIDOrException(messageUid);
+			Message messageToMove = sourceFolder.getMessageByUID(messageUid);
 			
 			long newUid = sourceFolder.copyMessageThenGetNewUID(folderDst, messageUid);
 			sourceFolder.deleteMessage(messageToMove);
@@ -194,7 +194,7 @@ public class ImapStore {
 
 	public void deleteMessage(String folderSrc, long messageUid) throws MessagingException, ImapMessageNotFoundException {
 		OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
-		Message messageToDelete = sourceFolder.getMessageByUIDOrException(messageUid);
+		Message messageToDelete = sourceFolder.getMessageByUID(messageUid);
 		sourceFolder.deleteMessage(messageToDelete);
 	}
 }

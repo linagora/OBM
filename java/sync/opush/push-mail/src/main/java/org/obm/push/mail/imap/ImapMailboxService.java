@@ -89,7 +89,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
@@ -239,12 +238,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		String mailBoxName = parseMailBoxName(bs, collectionName);
 		try {
 			OpushImapFolder folder = store.select(mailBoxName);
-			IMAPMessage message = folder.getMessageByUID(Ints.checkedCast(uid));
-			if (message != null) {
-				return message;
-			} else {
-				throw new ImapMessageNotFoundException("Mail with UID {" + uid + "} not found in {" + folder.getFullName() + "}");
-			}
+			return (IMAPMessage) folder.getMessageByUID(uid);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
