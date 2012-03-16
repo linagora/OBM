@@ -46,6 +46,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
+import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -54,6 +55,7 @@ import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
+import org.minig.imap.UIDEnvelope;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
@@ -624,5 +626,29 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			store.logout();
 		}
 	}
-
+	
+	@VisibleForTesting UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException {
+		ImapStore store = null;
+		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			String mailboxName = parseMailBoxName(bs, collectionPath);
+			IMAPMessage message = (IMAPMessage) store.fetchEnvelope(mailboxName, uid);
+			Envelope envelope = imapMailBoxUtils.buildEnvelopeFromMessage(message);
+			return new UIDEnvelope(uid, envelope);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
+	}
 }

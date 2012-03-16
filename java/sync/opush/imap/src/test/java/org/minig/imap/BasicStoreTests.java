@@ -287,7 +287,7 @@ public class BasicStoreTests extends LoggedTestCase {
 		String[] headers = new String[] { "x-priority" };
 
 		Collection<Long> uids = sc.uidSearch(sq);
-		Collection<Envelope> e = sc.uidFetchEnvelope(uids);
+		Collection<UIDEnvelope> e = sc.uidFetchEnvelope(uids);
 		assertNotNull(e);
 		assertEquals(uids.size(), e.size());
 		Collection<IMAPHeaders> h = sc.uidFetchHeaders(uids, headers);
@@ -301,7 +301,7 @@ public class BasicStoreTests extends LoggedTestCase {
 		Collection<Long> firstTwo = Arrays.asList(it.next(), it.next());
 
 		for (int i = 0; i < COUNT; i++) {
-			Collection<Envelope> h = sc.uidFetchEnvelope(firstTwo);
+			Collection<UIDEnvelope> h = sc.uidFetchEnvelope(firstTwo);
 			assertNotNull(h);
 		}
 	}
@@ -311,14 +311,14 @@ public class BasicStoreTests extends LoggedTestCase {
 		Collection<Long> one = Arrays.asList(280l);
 
 		long nstime = System.nanoTime();
-		Collection<Envelope> h = sc.uidFetchEnvelope(one);
+		Collection<UIDEnvelope> h = sc.uidFetchEnvelope(one);
 		nstime = System.nanoTime() - nstime;
 		assertEquals(one.size(), h.size());
 
-		for (Envelope e : h) {
-			assertNotNull(e.getSubject());
-			assertNotNull(e.getSubject());
-			assertNotNull(e.getFrom().getDisplayName());
+		for (UIDEnvelope e : h) {
+			assertNotNull(e.getEnvelope().getSubject());
+			assertNotNull(e.getEnvelope().getSubject());
+			assertNotNull(e.getEnvelope().getFrom().getDisplayName());
 		}
 
 	}
@@ -330,7 +330,7 @@ public class BasicStoreTests extends LoggedTestCase {
 
 		for (long l : uids) {
 			try {
-				Collection<Envelope> h = sc.uidFetchEnvelope(Arrays.asList(l));
+				Collection<UIDEnvelope> h = sc.uidFetchEnvelope(Arrays.asList(l));
 				assertEquals(1, h.size());
 			} catch (Throwable t) {
 				fail(t.getMessage());

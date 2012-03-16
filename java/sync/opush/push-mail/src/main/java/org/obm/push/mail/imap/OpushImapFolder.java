@@ -33,6 +33,7 @@ package org.obm.push.mail.imap;
 
 import java.util.Date;
 
+import javax.mail.FetchProfile;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -111,5 +112,17 @@ public class OpushImapFolder {
 	
 	public long copyMessageThenGetNewUID(String folderDst, long messageUid) throws MessagingException {
 		return doCommand(new UIDCopyMessage(folderDst, messageUid));
+	}
+	
+	public Message fetch(long messageUid, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException {
+		Message message = getMessageByUID(messageUid);
+		folder.fetch(new Message[]{message}, fetchProfile);
+		return message;
+	}
+	
+	public Message fetchEnvelope(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		FetchProfile fetchProfile = new FetchProfile();
+		fetchProfile.add(FetchProfile.Item.ENVELOPE);
+		return fetch(messageUid, fetchProfile);
 	}
 }

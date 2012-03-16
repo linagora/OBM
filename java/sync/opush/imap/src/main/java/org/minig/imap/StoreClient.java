@@ -173,7 +173,7 @@ public class StoreClient {
 		return cs.uidFetchHeaders(uids, headers);
 	}
 
-	public Collection<Envelope> uidFetchEnvelope(Collection<Long> uids) {
+	public Collection<UIDEnvelope> uidFetchEnvelope(Collection<Long> uids) {
 		return cs.uidFetchEnvelope(uids);
 	}
 

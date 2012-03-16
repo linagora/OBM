@@ -44,7 +44,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.minig.imap.Address;
-import org.minig.imap.Envelope;
+import org.minig.imap.UIDEnvelope;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.StoreClient;
@@ -99,7 +99,7 @@ public class MailMessageLoader {
 		try {
 			
 			final List<Long> messageIdAsList = Arrays.asList(messageId);
-			final Collection<Envelope> envelopes = storeClient.uidFetchEnvelope(messageIdAsList);
+			final Collection<UIDEnvelope> envelopes = storeClient.uidFetchEnvelope(messageIdAsList);
 			if (envelopes.size() != 1 || envelopes.iterator().next() == null) {
 				return null;
 			}
@@ -113,7 +113,7 @@ public class MailMessageLoader {
 				msEmail = convertMailMessageToMSEmail(message, bs, mimeMessage.getUid(), collectionId, messageId);
 				setMsEmailFlags(msEmail, messageIdAsList);
 				fetchMimeData(msEmail, messageId);
-				msEmail.setSmtpId(envelopes.iterator().next().getMessageId());
+				msEmail.setSmtpId(envelopes.iterator().next().getEnvelope().getMessageId());
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);

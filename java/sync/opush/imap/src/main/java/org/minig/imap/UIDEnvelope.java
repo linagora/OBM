@@ -31,31 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import com.google.common.base.Objects;
 
-import com.google.common.collect.ImmutableList;
+public class UIDEnvelope {
 
-public class BeansTest {
+	private final long uid;
+	private final Envelope envelope;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public UIDEnvelope(long uid, Envelope envelope) {
+		this.uid = uid;
+		this.envelope = envelope;
+	}
+
+	public long getUid() {
+		return uid;
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public Envelope getEnvelope() {
+		return envelope;
 	}
 	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(uid, envelope);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof UIDEnvelope) {
+			UIDEnvelope that = (UIDEnvelope) object;
+			return Objects.equal(this.uid, that.uid)
+				&& Objects.equal(this.envelope, that.envelope);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("envelope", envelope)
+			.toString();
+	}
+
 }

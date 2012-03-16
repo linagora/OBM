@@ -197,4 +197,15 @@ public class ImapStore {
 		Message messageToDelete = sourceFolder.getMessageByUID(messageUid);
 		sourceFolder.deleteMessage(messageToDelete);
 	}
+	
+	public Message fetchEnvelope(String folderSrc, long messageUid) throws ImapCommandException, ImapMessageNotFoundException {
+		try {
+			OpushImapFolder opushImapFolder = select(folderSrc);
+			return opushImapFolder.fetchEnvelope(messageUid);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command fetch envelope failed. user=%s, folder=%s", userId, folderSrc);
+			throw new ImapCommandException(msg, e);
+		}
+	}
 }

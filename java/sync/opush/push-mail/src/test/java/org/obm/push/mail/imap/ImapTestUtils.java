@@ -90,7 +90,7 @@ public class ImapTestUtils {
 	
 	public Email emailInMailbox(String mailboxName) throws MailException {
 		Set<Email> emailsFromInbox = mailboxEmails(mailboxName);
-		return Iterables.getOnlyElement(emailsFromInbox);
+		return Iterables.getLast(emailsFromInbox);
 	}
 	
 	public Set<Email> mailboxEmails(String mailboxName) throws MailException {

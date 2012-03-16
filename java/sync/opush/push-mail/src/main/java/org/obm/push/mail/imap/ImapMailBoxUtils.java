@@ -35,15 +35,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.mail.Flags;
+import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 
+import org.minig.imap.Address;
+import org.minig.imap.Envelope;
 import org.obm.push.bean.Email;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
+import com.sun.mail.imap.IMAPMessage;
 
 @Singleton
 public class ImapMailBoxUtils {
@@ -76,4 +83,33 @@ public class ImapMailBoxUtils {
 		});
 		return listOfEmails;
 	}
+	
+	public Envelope buildEnvelopeFromMessage(IMAPMessage message) throws MessagingException {
+		int msgno = message.getMessageNumber();
+		Date sentDate = message.getSentDate();
+		String subject = message.getSubject();
+		String messageID = message.getMessageID();
+		List<Address> to = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.TO));
+		List<Address> cc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.CC));
+		List<Address> bcc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.BCC));
+		Address from = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getFrom()) );
+		return Envelope.createBuilder().messageNumber(msgno).
+				date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
+				messageID(messageID).inReplyTo(message.getInReplyTo()).build();
+	}
+	
+	private List<Address> buildAddressListFromJavaMailAddress(javax.mail.Address[] addresses) {
+		List<Address> buildAddresses = new ArrayList<Address>();
+		if (addresses != null) {
+			for (javax.mail.Address address: addresses) {
+				buildAddresses.add( buildAddressFromJavaMailAddress(address) );
+			}
+		}
+		return buildAddresses;
+	}
+	
+	private Address buildAddressFromJavaMailAddress(javax.mail.Address address) {
+		return new Address(address.toString());
+	}
+	
 }

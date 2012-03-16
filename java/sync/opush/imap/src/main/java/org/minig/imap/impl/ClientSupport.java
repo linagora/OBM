@@ -47,7 +47,7 @@ import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.minig.imap.Envelope;
+import org.minig.imap.UIDEnvelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
@@ -278,7 +278,7 @@ public class ClientSupport {
 		return run(new UIDFetchHeadersCommand(uids, headers));
 	}
 
-	public Collection<Envelope> uidFetchEnvelope(Collection<Long> uids) {
+	public Collection<UIDEnvelope> uidFetchEnvelope(Collection<Long> uids) {
 		return run(new UIDFetchEnvelopeCommand(uids));
 	}
 

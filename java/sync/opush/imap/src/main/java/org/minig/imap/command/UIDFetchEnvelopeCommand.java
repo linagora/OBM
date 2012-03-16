@@ -44,6 +44,7 @@ import java.util.List;
 import org.minig.imap.Address;
 import org.minig.imap.EncodedWord;
 import org.minig.imap.Envelope;
+import org.minig.imap.UIDEnvelope;
 import org.minig.imap.impl.DateParser;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
@@ -55,7 +56,7 @@ import org.minig.imap.mime.impl.ParenListParser.TokenType;
  * @author tom
  * 
  */
-public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
+public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
 	private Collection<Long> uids;
 
@@ -88,7 +89,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 		}
 		
 		if (isOK) {
-			List<Envelope> tmp = new ArrayList<Envelope>(uids.size());
+			List<UIDEnvelope> tmp = new ArrayList<UIDEnvelope>(uids.size());
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; it.hasNext() && i < uids.size();) {
 				IMAPResponse r = it.next();
@@ -117,10 +118,9 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 
 				try {
 					Envelope envelope = parseEnvelope(envelData.substring(0, envelData.length() - 1).getBytes());
-					envelope.setUid(uid);
 					logger.info("uid: " + uid + " env.from: "
 								+ envelope.getFrom());
-					tmp.add(envelope);
+					tmp.add( new UIDEnvelope(uid, envelope) );
 				} catch (Throwable t) {
 					logger.error("fail parsing envelope for message UID " + uid, t);
 					data = Collections.emptyList();
@@ -221,7 +221,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<Envelope>> {
 		} else {
 			address = new Address();
 		}
-		return new Envelope(d, subject, to, cc, bcc, address, mid, inReplyTo);
+		return Envelope.createBuilder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(address).
+				messageID(mid).inReplyTo(inReplyTo).build();
 	}
 
 	private List<Address> parseList(byte[] token, ParenListParser parser) {

@@ -34,105 +34,178 @@ package org.minig.imap;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+
 public class Envelope {
 
-	public Envelope(Date data, String subject, List<Address> to,
-			List<Address> cc, List<Address> bcc, Address from,
-			String messageId, String inReplyTo) {
+	public static class Builder {
+		private int msgno;
+		private Date date;
+		private String subject;
+		private List<Address> to;
+		private List<Address> cc;
+		private List<Address> bcc;
+		private Address from;
+		private String messageId;
+		private String inReplyTo;
+		
+		private Builder() {
+			this.msgno = -1;
+			this.to = Lists.<Address>newArrayList();
+			this.bcc = Lists.<Address>newArrayList();
+			this.cc = Lists.<Address>newArrayList();
+		}
+		
+		public Builder messageNumber(int msgno) {
+			this.msgno = msgno;
+			return this;
+		}
+		
+		public Builder date(Date date) {
+			this.date = date;
+			return this;
+		}
+		
+		public Builder subject(String subject) {
+			this.subject = subject;
+			return this;
+		}
+		
+		public Builder to(List<Address> to) {
+			this.to = to;
+			return this;
+		}
+		
+		public Builder cc(List<Address> cc) {
+			this.cc = cc;
+			return this;
+		}
+		
+		public Builder bcc(List<Address> bcc) {
+			this.bcc = bcc;
+			return this;
+		}
+		
+		public Builder from(Address from) {
+			this.from = from;
+			return this;
+		}
+		
+		public Builder messageID(String messageId) {
+			this.messageId = messageId;
+			return this;
+		}
+		
+		public Builder inReplyTo(String inReplyTo) {
+			if ("NIL".equals(inReplyTo)) {
+				this.inReplyTo = null;
+			} else {
+				this.inReplyTo = inReplyTo;
+			}
+			return this;
+		}
+		
+		public Envelope build() {
+			return new Envelope(this.msgno, this.date, this.subject, this.messageId,  
+					this.from, this.to, this.cc, this.bcc, this.inReplyTo);
+		}
+	}
+	
+	private final int msgno;
+	private final Date date;
+	private final String subject;
+	private final String messageId;
+	private final Address from;
+	private final List<Address> to;
+	private final List<Address> cc;
+	private final List<Address> bcc;
+	private final String inReplyTo;
+
+	private Envelope(int msgno, Date date, String subject, String messageId, 
+			Address from, List<Address> to, List<Address> cc, List<Address> bcc, String inReplyTo) {
+		
 		super();
-		this.date = data;
+		this.msgno = msgno;
+		this.date = date;
 		this.subject = subject;
+		this.messageId = messageId;
+		this.from = from;
 		this.to = to;
 		this.cc = cc;
 		this.bcc = bcc;
-		this.from = from;
-		this.messageId = messageId;
-		setInReplyTo(inReplyTo);
+		this.inReplyTo = inReplyTo;
 	}
 
-	private long uid;
-	private Date date;
-	private String subject;
-	private List<Address> to;
-	private List<Address> cc;
-	private List<Address> bcc;
-	private Address from;
-	private String messageId;
-	private String inReplyTo;
-
+	public static Builder createBuilder() {
+        return new Builder();
+	}
+	
+	public int getMsgno() {
+		return msgno;
+	}
+	
 	public Date getDate() {
 		return date;
-	}
-
-	public void setDate(Date data) {
-		this.date = data;
 	}
 
 	public String getSubject() {
 		return subject;
 	}
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
 	public List<Address> getTo() {
 		return to;
-	}
-
-	public void setTo(List<Address> to) {
-		this.to = to;
 	}
 
 	public List<Address> getCc() {
 		return cc;
 	}
 
-	public void setCc(List<Address> cc) {
-		this.cc = cc;
-	}
-
 	public Address getFrom() {
 		return from;
-	}
-
-	public void setFrom(Address from) {
-		this.from = from;
-	}
-
-	public long getUid() {
-		return uid;
-	}
-
-	public void setUid(long uid) {
-		this.uid = uid;
 	}
 
 	public String getMessageId() {
 		return messageId;
 	}
 
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
-	}
-
 	public String getInReplyTo() {
 		return inReplyTo;
-	}
-
-	public void setInReplyTo(String inReplyTo) {
-		this.inReplyTo = inReplyTo;
-		if ("NIL".equals(inReplyTo)) {
-			this.inReplyTo = null;
-		}
 	}
 
 	public List<Address> getBcc() {
 		return bcc;
 	}
 
-	public void setBcc(List<Address> bcc) {
-		this.bcc = bcc;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(msgno, date, subject, to, cc, bcc, from, messageId, inReplyTo);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Envelope) {
+			Envelope that = (Envelope) object;
+				return Objects.equal(this.msgno, that.msgno)
+				&& Objects.equal(this.date, that.date)
+				&& Objects.equal(this.subject, that.subject)
+				&& Objects.equal(this.to, that.to)
+				&& Objects.equal(this.cc, that.cc)
+				&& Objects.equal(this.bcc, that.bcc)
+				&& Objects.equal(this.from, that.from)
+				&& Objects.equal(this.messageId, that.messageId)
+				&& Objects.equal(this.inReplyTo, that.inReplyTo);
+		}
+		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("msgno", msgno)
+			.add("date", date)
+			.add("subject", subject)
+			.add("from", from)
+			.toString();
+	}
 }
