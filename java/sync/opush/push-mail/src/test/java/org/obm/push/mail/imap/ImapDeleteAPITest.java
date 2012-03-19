@@ -104,7 +104,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		
-		mailboxService.delete(bs, INBOX, sentEmail.getUid());
+		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -172,7 +172,7 @@ public class ImapDeleteAPITest {
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		Email anEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);
 		
-		mailboxService.delete(bs, INBOX, anEmailFromMailbox.getUid());
+		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), anEmailFromMailbox.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(3);
@@ -185,7 +185,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		long nonExistingEmailUid = sentEmail.getUid() + 1;
 
-		mailboxService.delete(bs, INBOX, nonExistingEmailUid);
+		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), nonExistingEmailUid);
 	}
 
 	@Test(expected=ImapMessageNotFoundException.class)
@@ -200,8 +200,9 @@ public class ImapDeleteAPITest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testDeleteAttemptedTwiceOnSameEmailTriggersAnException() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
+		String inboxPath = testUtils.mailboxPath(INBOX);
 		
-		mailboxService.delete(bs, INBOX, sentEmail.getUid());
-		mailboxService.delete(bs, INBOX, sentEmail.getUid());
+		mailboxService.delete(bs, inboxPath, sentEmail.getUid());
+		mailboxService.delete(bs, inboxPath, sentEmail.getUid());
 	}
 }

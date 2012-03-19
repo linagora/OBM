@@ -50,4 +50,11 @@ public interface EmailConfiguration {
 	int imapTimeout();
 
 	int getImapFetchBlockSize();
+
+	String imapMailboxDraft();
+
+	String imapMailboxSent();
+	
+	String imapMailboxTrash();
+
 }

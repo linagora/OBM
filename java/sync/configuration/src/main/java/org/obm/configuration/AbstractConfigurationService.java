@@ -38,6 +38,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
+
 public abstract class AbstractConfigurationService {
 	
 	protected Properties props;
@@ -67,6 +69,10 @@ public abstract class AbstractConfigurationService {
 	
 	protected String getStringValue(String prop) {
 		return props.getProperty(prop);
+	}
+	
+	protected String getStringValue(String prop, String defaultValue) {
+		return Objects.firstNonNull(getStringValue(prop), defaultValue);
 	}
 
 	protected boolean getBooleanValue(String prop) {

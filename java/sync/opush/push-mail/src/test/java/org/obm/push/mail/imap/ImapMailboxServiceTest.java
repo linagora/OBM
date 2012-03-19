@@ -56,7 +56,6 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
@@ -76,6 +75,7 @@ public class ImapMailboxServiceTest {
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject ImapMailboxService mailboxService;
+	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
@@ -83,10 +83,12 @@ public class ImapMailboxServiceTest {
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
-
+	private ImapTestUtils testUtils;
+	private Date beforeTest;
 
 	@Before
 	public void setUp() {
+		beforeTest = new Date();
 	    greenMail.start();
 	    mailbox = "to@localhost.com";
 	    password = "password";
@@ -94,6 +96,7 @@ public class ImapMailboxServiceTest {
 	    bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
+	    testUtils = new ImapTestUtils(mailboxService, mailboxService, bs, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -132,7 +135,7 @@ public class ImapMailboxServiceTest {
 		Date before = new Date();
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailboxPath(IMAP_INBOX_NAME), before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
 	}
 	
@@ -229,31 +232,33 @@ public class ImapMailboxServiceTest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testExpunge() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
 		
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		long uid = Iterables.getOnlyElement(emails).getUid();
 
-		mailboxService.updateMailFlag(bs, mailBox, uid, Flags.Flag.DELETED, true);
-		mailboxService.expunge(bs,  mailBox);
-		mailboxService.getMessage(bs, mailBox, uid);
+		mailboxService.updateMailFlag(bs, mailBoxPath, uid, Flags.Flag.DELETED, true);
+		mailboxService.expunge(bs,  mailBoxPath);
+		mailboxService.getMessage(bs, mailBoxPath, uid);
 	}
 	
 	@Test
 	public void testUpdateMailFlag() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
 		
-		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(bs, mailBox, date));
+		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(bs, mailBoxPath, date));
 		
-		mailboxService.updateMailFlag(bs, mailBox, email.getUid(), Flags.Flag.SEEN, true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		mailboxService.updateMailFlag(bs, mailBoxPath, email.getUid(), Flags.Flag.SEEN, true);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		
 		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
 	}
@@ -261,22 +266,23 @@ public class ImapMailboxServiceTest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testUpdateMailFlagWithBadUID() throws Exception {
 		long mailUIDNotExist = 1l;
-		mailboxService.updateMailFlag(bs, EmailConfiguration.IMAP_INBOX_NAME, mailUIDNotExist, Flags.Flag.SEEN, true);
+		mailboxService.updateMailFlag(bs, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, Flags.Flag.SEEN, true);
 	}
 	
 	@Test
 	public void testUpdateReadMailFlag() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 		
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		
 		Email emailNotRead = Iterables.getOnlyElement(emails);
-		mailboxService.updateReadFlag(bs, mailBox, emailNotRead.getUid(), true);
+		mailboxService.updateReadFlag(bs, mailBoxPath, emailNotRead.getUid(), true);
 		
-		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(bs, mailBox, date);
+		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		Email emailHasRead = Iterables.getOnlyElement(emailsAfterToReadMail);
 		
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
@@ -289,16 +295,17 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testSetAnsweredFlag() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = testUtils.mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 		
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBox, date);
+		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		
 		Email email = Iterables.getOnlyElement(emails);
-		mailboxService.setAnsweredFlag(bs, mailBox, email.getUid());
+		mailboxService.setAnsweredFlag(bs, mailBoxPath, email.getUid());
 		
-		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(bs, mailBox, date);
+		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(bs, mailBoxPath, date);
 		Email answeredEmail = Iterables.getOnlyElement(emailsAfterToSetAnsweredFlag);
 		
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
@@ -314,7 +321,7 @@ public class ImapMailboxServiceTest {
 
 		mailboxService.storeInInbox(bs, tinyInputStream, true);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -325,7 +332,7 @@ public class ImapMailboxServiceTest {
 
 		mailboxService.storeInInbox(bs, tinyInputStream, 4, true);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, IMAP_INBOX_NAME, 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -393,7 +400,7 @@ public class ImapMailboxServiceTest {
 	}
 
 	private String mailboxPath(String boxName) {
-		return new CollectionPathHelper().buildCollectionPath(bs, PIMDataType.EMAIL, boxName);
+		return testUtils.mailboxPath(boxName);
 	}
 
 	private MailboxFolder folder(String name) {

@@ -176,7 +176,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	private String getWasteBasketPath(BackendSession bs) {
-		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "Trash");
+		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_TRASH_NAME);
 	}
 
 	private MailChanges getSync(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 

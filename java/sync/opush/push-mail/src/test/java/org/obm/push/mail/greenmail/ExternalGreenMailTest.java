@@ -45,8 +45,10 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
@@ -65,6 +67,7 @@ public class ExternalGreenMailTest {
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
 
+	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
@@ -114,6 +117,7 @@ public class ExternalGreenMailTest {
 
 	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		return mailboxService.fetchEmails(bs, IMAP_INBOX_NAME, before);
+		String inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		return mailboxService.fetchEmails(bs, inboxPath, before);
 	}
 }

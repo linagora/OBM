@@ -50,6 +50,10 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	private static final String BACKEND_IMAP_TIMEOUT_VALUE = "imap.timeoutInMs";
 	private static final String BACKEND_MESSAGE_MAX_SIZE = "message.maxSize";
 	
+	private static final String BACKEND_IMAP_DRAFTS_PATH = "imap.mailbox.draft";
+	private static final String BACKEND_IMAP_SENT_PATH = "imap.mailbox.sent";
+	private static final String BACKEND_IMAP_TRASH_PATH = "imap.mailbox.trash";
+	
 	@Inject
 	private EmailConfigurationImpl() {
 		super(BACKEND_CONF_FILE);
@@ -88,5 +92,20 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	@Override
 	public int getImapFetchBlockSize() {
 		return IMAP_FETCH_BLOCK_SIZE;
+	}
+
+	@Override
+	public String imapMailboxDraft() {
+		return getStringValue(BACKEND_IMAP_DRAFTS_PATH, IMAP_DRAFTS_NAME);
+	}
+
+	@Override
+	public String imapMailboxSent() {
+		return getStringValue(BACKEND_IMAP_SENT_PATH, IMAP_SENT_NAME);
+	}
+
+	@Override
+	public String imapMailboxTrash() {
+		return getStringValue(BACKEND_IMAP_TRASH_PATH, IMAP_TRASH_NAME);
 	}
 }

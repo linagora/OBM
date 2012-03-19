@@ -79,7 +79,8 @@ public class ImapTestUtils {
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		Email sentEmail = sendEmailToInbox();
-		mailboxService.moveItem(bs, EmailConfiguration.IMAP_INBOX_NAME, mailboxPath(mailbox), sentEmail.getUid());
+		String inboxPath = mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		mailboxService.moveItem(bs, inboxPath, mailboxPath(mailbox), sentEmail.getUid());
 		return emailInMailbox(mailbox);
 	}
 

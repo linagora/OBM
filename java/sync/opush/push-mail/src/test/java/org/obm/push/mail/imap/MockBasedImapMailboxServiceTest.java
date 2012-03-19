@@ -32,25 +32,34 @@
 package org.obm.push.mail.imap;
 
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
+
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
+
+import javax.mail.Folder;
+import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.easymock.EasyMock;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.imap.ImapMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class MockBasedImapMailboxServiceTest {
@@ -79,10 +88,10 @@ public class MockBasedImapMailboxServiceTest {
 				EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class));
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.replay(emailConfiguration, smtpSender);
+		EasyMock.replay(smtpSender);
 		
 		ImapMailboxService emailManager = 
-				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null);
+				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null);
 
 		emailManager.sendEmail(bs,
 				new Address("test@test.fr"),
@@ -94,10 +103,103 @@ public class MockBasedImapMailboxServiceTest {
 		EasyMock.verify(emailConfiguration, smtpSender);
 	}
 
+ 	@Test
+	public void testParseSpecificINBOXCase() throws Exception {
+		String userINBOXFolder = "INBOX";
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
+		
+		ImapMailboxService emailManager = new ImapMailboxService(
+				emailConfiguration, null, null, null, null, collectionPathHelper);
+
+		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(userINBOXFolder));
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
+	}
+
+	@Test
+	public void testParseSpecificINBOXCaseIsntCaseSensitive() throws Exception {
+		String userINBOXFolder = "InBoX";
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
+
+		ImapMailboxService emailManager = new ImapMailboxService(
+				emailConfiguration, null, null, null, null, collectionPathHelper);
+
+		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(userINBOXFolder));
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
+	}
+
+	@Test
+	public void testParseINBOXWithOtherFolderEndingByINBOX() throws Exception {
+		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
+
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(folderEndingByINBOX);
+		ImapClientProvider imapClientProvider = newImapClientProviderMock(folderEndingByINBOX);
+		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
+
+		ImapMailboxService emailManager = new ImapMailboxService(
+				emailConfiguration, null, null, imapClientProvider, null, collectionPathHelper);
+
+		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(folderEndingByINBOX));
+		Assertions.assertThat(parsedMailbox).isEqualTo(folderEndingByINBOX);
+	}
+
+	private ImapClientProvider newImapClientProviderMock(String...allUserFolders) throws Exception {
+		OpushImapFolder imapFolder = newImapFolderMock(allUserFolders);
+		ImapStore imapStore = newImapStoreMock(imapFolder);
+		ImapClientProvider imapClientProvider = EasyMock.createMock(ImapClientProvider.class);
+		EasyMock.expect(imapClientProvider.getImapClientWithJM(bs)).andReturn(imapStore);
+		
+		EasyMock.replay(imapFolder, imapStore, imapClientProvider);
+		return imapClientProvider;
+	}
+
+	private ImapStore newImapStoreMock(OpushImapFolder imapFolder) throws Exception {
+		ImapStore imapStore = EasyMock.createMock(ImapStore.class);
+		EasyMock.expect(imapStore.getDefaultFolder()).andReturn(imapFolder);
+		imapStore.login();
+		EasyMock.expectLastCall();
+		imapStore.logout();
+		EasyMock.expectLastCall();
+		return imapStore;
+	}
+
+	private OpushImapFolder newImapFolderMock(String... allUserFolders) throws MessagingException {
+		List<Folder> expectedFolders = Lists.newArrayList();
+		for (String userFolder : allUserFolders) {
+			expectedFolders.add(folder(userFolder));
+		}
+		OpushImapFolder imapFolder = EasyMock.createMock(OpushImapFolder.class);
+		EasyMock.expect(imapFolder.list("*")).andReturn(expectedFolders.toArray(new Folder[expectedFolders.size()]));
+		return imapFolder;
+	}
+
+	private Folder folder(String userFolder) throws MessagingException {
+		Folder folder = EasyMock.createMock(Folder.class);
+		EasyMock.expect(folder.getName()).andReturn(userFolder);
+		EasyMock.expect(folder.getFullName()).andReturn(userFolder);
+		EasyMock.expect(folder.getSeparator()).andReturn('/');
+		EasyMock.replay(folder);
+		return folder;
+	}
+	
 	private EmailConfiguration newEmailConfigurationMock() {
 		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
 		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();
 		EasyMock.expect(emailConfiguration.activateTls()).andReturn(false).once();
+		EasyMock.replay(emailConfiguration);
 		return emailConfiguration;
+	}
+	
+	private CollectionPathHelper mockCollectionPathHelperExtractFolder(String expectedFolder) throws CollectionPathException {
+		CollectionPathHelper helper = EasyMock.createMock(CollectionPathHelper.class);
+		EasyMock.expect(helper.extractImapFolder(bs, collectionPath(expectedFolder), PIMDataType.EMAIL))
+			.andReturn(expectedFolder).anyTimes();
+		EasyMock.replay(helper);
+		return helper;
+	}
+
+	private String collectionPath(String expectedFolder) {
+		return "obm:\\\\user@domain\\email\\" + expectedFolder;
 	}
 }

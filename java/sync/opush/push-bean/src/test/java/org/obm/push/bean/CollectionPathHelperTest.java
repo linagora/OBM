@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class CollectionPathHelperTest {
 	
 	@Before
 	public void setUp() {
-		collectionPathHelper = new CollectionPathHelper();
+		collectionPathHelper = new CollectionPathHelper(mockEmailConfiguration());
 		String mailbox = "user@domain";
 		String password = "password";
 	    bs = new BackendSession(
@@ -52,6 +53,13 @@ public class CollectionPathHelperTest {
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
 	
+	private EmailConfiguration mockEmailConfiguration() {
+		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
+		EasyMock.expect(emailConfiguration.imapMailboxSent()).andReturn(EmailConfiguration.IMAP_SENT_NAME);
+		EasyMock.replay(emailConfiguration);
+		return emailConfiguration;
+	}
+
 	@Test
 	public void testParseImapFolderEmailINBOX() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX";

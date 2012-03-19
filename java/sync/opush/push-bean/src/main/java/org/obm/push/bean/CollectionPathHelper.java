@@ -31,10 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.CollectionPathException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
@@ -52,6 +55,13 @@ public class CollectionPathHelper {
 
 	private static final char BACKSLASH = '\\';
 	private static final String PROTOCOL = "obm:" + BACKSLASH + BACKSLASH;
+
+	private final EmailConfiguration emailConfiguration;
+	
+	@Inject
+	@VisibleForTesting CollectionPathHelper(EmailConfiguration emailConfiguration) {
+		this.emailConfiguration = emailConfiguration;
+	}
 	
 	public PIMDataType recognizePIMDataType(BackendSession bs, String collectionPath) 
 			throws CollectionPathException {
@@ -128,10 +138,21 @@ public class CollectionPathHelper {
 		}
 		int imapFolderEndIndex = collectionPath.indexOf(BACKSLASH, imapFolderStartIndex);
 		if (imapFolderEndIndex == -1) {
-			return collectionPath.substring(imapFolderStartIndex);
+			return handleSpecificFolder(collectionPath.substring(imapFolderStartIndex));
 		} else {
 			return collectionPath.substring(imapFolderStartIndex, imapFolderEndIndex);
 		}
+	}
+
+	private String handleSpecificFolder(String folder) {
+		if (folder.equals(EmailConfiguration.IMAP_DRAFTS_NAME)) {
+			return emailConfiguration.imapMailboxDraft();
+		} else if (folder.equals(EmailConfiguration.IMAP_SENT_NAME)) {
+			return emailConfiguration.imapMailboxSent();
+		} else if (folder.equals(EmailConfiguration.IMAP_TRASH_NAME)) {
+			return emailConfiguration.imapMailboxTrash();
+		}
+		return folder;
 	}
 
 	private StringBuilder getUserPathByCollection(BackendSession bs, PIMDataType collectionType) {

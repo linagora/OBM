@@ -70,5 +70,17 @@ public class TestEmailConfiguration implements EmailConfiguration {
 	public int getImapFetchBlockSize() {
 		return 1 << 20;
 	}
+
+	public String imapMailboxDraft() {
+		return IMAP_DRAFTS_NAME;
+	}
+
+	public String imapMailboxSent() {
+		return IMAP_SENT_NAME;
+	}
+
+	public String imapMailboxTrash() {
+		return IMAP_TRASH_NAME;
+	}
 	
 }

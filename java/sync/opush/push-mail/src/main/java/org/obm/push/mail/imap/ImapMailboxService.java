@@ -58,8 +58,11 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
@@ -103,16 +106,18 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	private final boolean loginWithDomain;
 	private final ImapClientProvider imapClientProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
+	private final CollectionPathHelper collectionPathHelper;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
-			ImapMailBoxUtils imapMailBoxUtils) {
+			ImapMailBoxUtils imapMailBoxUtils, CollectionPathHelper collectionPathHelper) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
+		this.collectionPathHelper = collectionPathHelper;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
@@ -289,20 +294,27 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	
 	@Override
 	public String parseMailBoxName(BackendSession bs, String collectionName) throws MailException {
-		// parse obm:\\adrien@test.tlse.lng\email\INBOX\Sent
-		if (collectionName.toLowerCase().endsWith(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase())) {
-			return EmailConfiguration.IMAP_INBOX_NAME;
-		}
-
-		int slash = collectionName.lastIndexOf("email\\");
-		final String boxName = collectionName.substring(slash + "email\\".length());
-		final MailboxFolders lr = listAllFolders(bs);
-		for (final MailboxFolder i: lr) {
-			if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
-				return i.getName();
+		try {
+			String boxName = collectionPathHelper.extractImapFolder(bs, collectionName, PIMDataType.EMAIL);
+			
+			if (isINBOXSpecificCase(boxName)) {
+				return EmailConfiguration.IMAP_INBOX_NAME;
 			}
+			
+			final MailboxFolders lr = listAllFolders(bs);
+			for (final MailboxFolder i: lr) {
+				if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
+					return i.getName();
+				}
+			}
+			throw new MailException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
+		} catch (CollectionPathException e){
+			throw new MailException(e);
 		}
-		throw new MailException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
+	}
+
+	private boolean isINBOXSpecificCase(String boxName) {
+		return boxName.toLowerCase().equals(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase());
 	}
 
 	 
@@ -431,7 +443,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
-			storeInFolder(bs, mailContent, true, EmailConfiguration.IMAP_SENT_NAME);
+			String sentboxPath = 
+					collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+			storeInFolder(bs, mailContent, true, sentboxPath);
 		} else {
 			throw new MailException("The mail that user try to store in sent box is null.");
 		}
@@ -526,10 +540,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	@Override
 	public void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
-		storeInFolder(bs, mailContent, isRead, EmailConfiguration.IMAP_INBOX_NAME);
+		String inboxPath = 
+				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		storeInFolder(bs, mailContent, isRead, inboxPath);
 	}
 	
-	private void storeInFolder(BackendSession bs, InputStream mailContent, boolean isRead, String folderName) 
+	private void storeInFolder(BackendSession bs, InputStream mailContent, boolean isRead, String collectionPath) 
 			throws MailException {
 		
 		try {
@@ -539,6 +555,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 				resetInputStream(mailContent);
 				Message message = store.createMessage(mailContent);
 				message.setFlag(Flags.Flag.SEEN, isRead);
+				String folderName = parseMailBoxName(bs, collectionPath);
 				store.appendMessage(folderName, message);
 			} catch (ImapCommandException e) {
 				throw new MailException(e.getMessage(), e);
