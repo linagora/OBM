@@ -38,12 +38,14 @@ License:        AGPLv3
 
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
-Requires:	    perl(:MODULE_COMPAT_%{perl_module_compat})
+%{?perl_module_compat:Requires: perl(:MODULE_COMPAT_%{perl_module_compat})}
+%{!?perl_module_compat:Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))}
 Requires:       perl-LDAP
 Requires:       perl-Net-CIDR
 Requires:       perl-Net-Server
 Requires:       perl-Class-Singleton
 Requires:       perl-Digest-SHA
+Requires:       perl(Time::HiRes)
 
 %description    -n perl-ObmSatellite
 This package contains the library used by obm-satellite to interact with Cyrus

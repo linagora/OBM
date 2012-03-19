@@ -105,9 +105,9 @@ sed -i -e "s|^user = .*|user = ${OBM_DBUSER}|"  ${NEWFILE}
 sed -i -e "s|^password = .*|password = \"${OBM_PASSWD}\"|" ${NEWFILE}
 
 # main
-sed -i -e "s|^external-url = obm|external-url = $EXTERNALURL|" ${NEWFILE}
-sed -i -e "s|^external-protocol = http|external-protocol = $EXTERNALPROTOCOL|" ${NEWFILE}
-sed -i -e "s|^ldapServer = ldap://localhost|ldapServer = ldap://$OBM_LDAPSERVER|" ${NEWFILE}
+sed -i -e "s|^external-url =.*|external-url = $EXTERNALURL|" ${NEWFILE}
+sed -i -e "s|^external-protocol =.*|external-protocol = $EXTERNALPROTOCOL|" ${NEWFILE}
+sed -i -e "s|^ldapServer =.*|ldapServer = ldap://$OBM_LDAPSERVER|" ${NEWFILE}
 sed -i -e "s|^obm-ldap =.*|obm-ldap = $LDAP_MODULE|" ${NEWFILE}
 sed -i -e "s|^obm-mail =.*|obm-mail = $MAIL_MODULE|" ${NEWFILE}
 sed -i -e "s|^obm-samba =.*|obm-samba = $SAMBA_MODULE|" ${NEWFILE}

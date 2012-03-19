@@ -38,7 +38,7 @@ echo "=============== OBM-CORE main configuration ================"
 
 . $OBMCONF
 # DB
-echo "Set doucment_root (OBM) setting"
+echo "Set document_root (OBM) setting"
 sed -i -e 's#^\$cdocument_root.*#\$cdocument_root = "/var/lib/obm/documents";#' ${OBM_INC}
 echo "Set default_pat"
 sed -i -e "s#^\$default_path.*#\$default_path = '/';#" ${OBM_INC}

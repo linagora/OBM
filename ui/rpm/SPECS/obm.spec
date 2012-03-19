@@ -117,11 +117,17 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 Summary:	PostgreSQL backend for OBM
 Group:		Development/Tools
 
+Requires:       postgresql-server >= 8.3
 Requires:       %{name}-core = %{version}-%{release}
 Requires:       %{name}-config = %{version}-%{release}
-Requires:       %{name}-PostgreSQL-virtual
+Requires:       obm-locator
 Conflicts:      %{name}-MySQL
 Provides:       %{name}-DataBase = %{version}-%{release}
+#Introduced in 2.4.0
+Provides:       %{name}-PostgreSQL91 = %{version}-%{release}
+Obsoletes:      %{name}-PostgreSQL91 < %{version}
+Provides:       %{name}-PostgreSQL83 = %{version}-%{release}
+Obsoletes:      %{name}-PostgreSQL83 < %{version}
 
 %description	PostgreSQL
 This package contains PostgreSQL schemas and configuration
@@ -132,50 +138,12 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-%package	PostgreSQL91
-Summary:	PostgreSQL 9.1 common files for OBM
-Group:		Development/Tools
-
-Requires:       %{name}-core = %{version}-%{release}
-Requires:       %{name}-config = %{version}-%{release}
-Requires:       postgresql91-server
-Conflicts:      %{name}-PostgreSQL83
-Provides:       %{name}-PostgreSQL-virtual
-
-%description	PostgreSQL91
-This package contains PostgreSQL 9.1 schemas and configuration
-files for %{name} package. Support for PostgreSQL 9.1 is experimental, use at your own risk.
-
-OBM is a global groupware, messaging and CRM application. It is intended to
-be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
-simple contact database. OBM also features integration with PDAs, smartphones,
-Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-%package	PostgreSQL83
-Summary:	PostgreSQL (8.3+) common files for OBM
-Group:		Development/Tools
-
-Requires:	%{name}-core = %{version}-%{release}
-Requires:	%{name}-config = %{version}-%{release}
-Requires:	postgresql-server >= 8.3
-Conflicts:      %{name}-PostgreSQL91
-Provides:       %{name}-PostgreSQL-virtual
-
-%description	PostgreSQL83
-This package contains PostgreSQL (8.3+) schemas and configuration
-file for %{name} package.
-
-OBM is a global groupware, messaging and CRM application. It is intended to
-be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
-simple contact database. OBM also features integration with PDAs, smartphones,
-Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package        ui
 Summary:        web interface configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
-Requires:	obm-locator
 Requires: 	php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring
 Requires(pre):  httpd
 
@@ -216,7 +184,8 @@ License:        GPL+ or Artistic
 
 BuildARch:      noarch
 BuildRequires:	perl(ExtUtils::MakeMaker)
-Requires:	perl(:MODULE_COMPAT_%{perl_module_compat})
+%{?perl_module_compat:Requires: perl(:MODULE_COMPAT_%{perl_module_compat})}
+%{!?perl_module_compat:Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))}
 Requires:	perl-Class-Singleton
 Requires:       perl-Digest-SHA
 
@@ -407,10 +376,12 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}-services
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 #chmod g+s $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
 cp -apR auto/testObmSatellite.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
+cp -apR auto/cyrusGetQuotaUse.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/updateCyrusAcl.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/update.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/updateSieve.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/changePasswd.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
+cp -apR auto/ldapContacts.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR scripts/2.3/update-2.2-2.3.ldap.pl $RPM_BUILD_ROOT%{_datadir}/obm-services/updates
 install -p -m 640 doc/conf/logrotate.obm-services.sample $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/obm-services
 
@@ -449,9 +420,9 @@ find $RPM_BUILD_ROOT -name '.cvsignore' -exec rm -rf {} ';'
 rm -rf $RPM_BUILD_ROOT
 
 %post		-n %{name}-ui
-sed -i -e "s/^# chkconfig: - 85 15$/# chkconfig: 2345 85 15/" /etc/init.d/httpd
-chkconfig --del httpd
-chkconfig --add httpd
+if [ $1 -eq 1 ] ; then
+  chkconfig httpd on &>/dev/null
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -510,14 +481,10 @@ chkconfig --add httpd
 %{_bindir}/%{name}-sysusers
 %{_bindir}/pgadmin.lib
 %dir %{_sysconfdir}/%{name}
+%ghost %{_sysconfdir}/%{name}/%{name}-rpm.conf
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}_conf.ini
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}_conf.inc
-%verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}-rpm.conf
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/automateLdapMapping.xml
-
-%files		-n %{name}-PostgreSQL91
-
-%files		-n %{name}-PostgreSQL83
 
 %files		-n %{name}-MySQL
 %defattr(-,root,root,-)

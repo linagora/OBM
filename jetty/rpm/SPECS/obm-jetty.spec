@@ -5,14 +5,14 @@ Summary: configuration for Jetty for Open Business Management
 Vendor: obm.org
 URL: http://www.obm.org
 Group: Development/Tools
-License: GPLv2
+License: GPLv2+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: jetty.xml.sample
 Source1: jetty-logging.xml.sample
 
+BuildArch: noarch
+Requires(post): jetty6
 
-BuildArch:      noarch
-Requires: jetty6
 
 %description
 It allows Jetty Server to start after its install and changes the port.
@@ -33,17 +33,17 @@ install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.x
 %{_docdir}/obm-jetty/jetty-logging.xml.sample
 
 %post
-/etc/init.d/jetty6 stop > /dev/null 2>&1 || :
-if [ -e /etc/jetty6/jetty.xml ] && [ `diff /usr/share/doc/obm-jetty/jetty.xml.sample /etc/jetty6/jetty.xml` -ne 0 ]; then
-	cp /etc/jetty6/jetty.xml /etc/jetty6/jetty.xml.orig
+service jetty6 stop > /dev/null 2>&1 || :
+if [ -e %{_sysconfdir}/jetty6/jetty.xml ] && [ `diff %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty6/jetty.xml` -ne 0 ]; then
+	cp %{_sysconfdir}/jetty6/jetty.xml %{_sysconfdir}/jetty6/jetty.xml.orig
 fi
-cp /usr/share/doc/obm-jetty/jetty.xml.sample /etc/jetty6/jetty.xml
+cp %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty6/jetty.xml
 
-if [ -e /etc/jetty6/jetty-logging.xml ] && [ `diff /usr/share/doc/obm-jetty/jetty-logging.xml.sample /etc/jetty6/jetty-logging.xml` ]; then
-	cp /etc/jetty6/jetty-logging.xml /etc/jetty6/jetty-logging.xml.orig
+if [ -e %{_sysconfdir}/jetty6/jetty-logging.xml ] && [ `diff %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty6/jetty-logging.xml` ]; then
+	cp %{_sysconfdir}/jetty6/jetty-logging.xml %{_sysconfdir}/jetty6/jetty-logging.xml.orig
 fi
-cp /usr/share/doc/obm-jetty/jetty-logging.xml.sample /etc/jetty6/jetty-logging.xml
-if [ `grep -F /etc/jetty6/jetty-logging.xml /etc/jetty6/jetty-logging.xml` -ne 0 ]; then
-    echo /etc/jetty6/jetty-logging.xml >> /etc/jetty6/jetty-logging.xml
+cp %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty6/jetty-logging.xml
+if [ `grep -F %{_sysconfdir}/jetty6/jetty-logging.xml %{_sysconfdir}/jetty6/jetty-logging.xml` -ne 0 ]; then
+    echo %{_sysconfdir}/jetty6/jetty-logging.xml >> %{_sysconfdir}/jetty6/jetty-logging.xml
 fi
-/etc/init.d/jetty6 start > /dev/null 2>&1 || :
+service jetty6 start > /dev/null 2>&1 || :

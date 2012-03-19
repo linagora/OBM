@@ -27,6 +27,10 @@ if [ -e ${OBMCONF} ]; then
 	source ${OBMCONF}
 fi
 
+if [ -e /etc/sysconfig/selinux ] ; then
+	source /etc/sysconfig/selinux
+fi
+
 HORT_NAME=`/bin/hostname`
 FULL_NAME=`/bin/hostname -f`
 OBM_EXTERNALURL=`cat /etc/obm/obm_conf.ini | grep ^external-url | cut -d" " -f 3`
@@ -39,8 +43,32 @@ function gencertif ()
 
 }
 
+function checkcertselinux ()
+{
+	if [ x$SELINUX = x"enforcing" -o x$SELINUX = x"permissive" ] ; then
+		echo "$0 (Warn): SELinux support is experimental !"
+		if [ -e /usr/sbin/semanage -a -e /sbin/restorecon ] ; then
+			HASOBMSECONTEXT=`semanage fcontext -l |grep -e /var/lib/obm-ca/cacert.pem | wc -l`
+			if [ x$HASOBMSECONTEXT = x0 ] ; then
+				echo "Modifying context for /etc/obm/certs/*.pem and /var/lib/obm-ca/cacert.pem"
+			        semanage fcontext -a -t cert_t '/etc/obm/certs(/.*)?'
+			        semanage fcontext -a -t cert_t '/var/lib/obm-ca/cacert.pem'
+			fi
+			[ -f /var/lib/obmca/cacert.pem ] && /sbin/restorecon /var/lib/obmca/cacert.pem
+			[ -L /etc/obm/certs/obm_cert.pem ] && /sbin/restorecon /etc/obm/certs/*.pem
+			echo "DONE"
+		else
+			echo "$0 (Err): SELinux enabled but /usr/sbin/semanage or /sbin/restorecon are not available"
+			echo "Please disable SELinux or run as root:"
+			echo "# yum install policycoreutils-python"
+			exit 1
+		fi
+	fi
+}
+
 echo "Generate Certificate for this host (${OBM_EXTERNALURL})"
 gencertif
+checkcertselinux
 
 echo "============ End of OBM cert configuration  ============"
 echo

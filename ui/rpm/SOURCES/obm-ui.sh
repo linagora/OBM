@@ -36,14 +36,15 @@ FIC_CONF_OBM_INC="${REP_ETC_OBM}/obm_conf.inc"
 echo "================= OBM UI  configuration =================="
 echo 
 
-# Test de l'existance du fichier de conf obm-rpm.conf
+# Test de l'existence du fichier de conf obm-rpm.conf
 if [ -s $FIC_RPM_CONF ]; then
         source $FIC_RPM_CONF
 else
-        echo "$0 (Err):Le fichier $FIC_RPM_CONF n'exite pas ou est vide"
+        echo "$0 (Err): the file $FIC_RPM_CONF doesn't exist or is empty"
+        exit 1
 fi
 
-echo -e "Chose type of authentication: (database/ldap) [database] \c "
+echo -e "Choose the type of authentication: (database/ldap) [database] \c "
 read authentication
 if [ "x${authentication}" == "x" ]; then
 	authentication="database"
@@ -77,8 +78,8 @@ if [ ${authentication} == "ldap" ];then
 fi
 
 if [ -e $FIC_HTTPD_OBM ]; then
-	echo "The $FIC_HTTPD_OBM file already exist"
-	echo -e "Do you want replace it? (y)es,(n)o ?\c"
+	echo "The $FIC_HTTPD_OBM file already exists"
+	echo -e "Do you want to replace it? (y)es,(n)o ?\c"
 	read replace_httpd_conf
 	if [ "x$replace_httpd_conf" == "xy" ]; then
 		cp $FIC_HTTPD_OBM ${FIC_HTTPD_OBM}.old
@@ -94,13 +95,14 @@ if [ -e $FIC_HTTPD_OBM ]; then
                 #sed -i -e '/## Rewrite SLL/ , /## End Rewrite SLL/ s/#//' ${FIC_HTTPD_CONF}
                 #sed -i -e "s/^NameVirtualHost \*:80/NameVirtualHost *:443/" ${FIC_HTTPD_CONF}
                 #sed -i -e "s/^<VirtualHost \*:80>/<VirtualHost *:443>/" ${FIC_HTTPD_CONF}
-                echo "Activation Tomcat proxy"
-                echo -e "what is ip adress of OBM-TOMCAT server (obm-sync, funambol) ?\c"
+                echo "Activation of the Tomcat proxy"
+                echo -e "what is the IP adress of the OBM-TOMCAT server (obm-sync, funambol) ?\c"
                 read tomcat_server
                 sed -i -e "s%#obm#%%" ${FIC_HTTPD_OBM}
                 sed -i -e "s%_TOMCAT_SERVER_%${tomcat_server}%" ${FIC_HTTPD_OBM}
-                echo "Activation opush proxy"
-                echo -e "what is ip adress of OPUSH server ?\c"
+                echo "Activation of the opush proxy"
+
+                echo -e "what is the IP adress of the OPUSH server ?\c"
                 read opush_server
                 sed -i -e "s%#opush#%%" ${FIC_HTTPD_OBM}
                 sed -i -e "s%_OPUSH_SERVER_%${opush_server}%" ${FIC_HTTPD_OBM}
@@ -108,8 +110,8 @@ if [ -e $FIC_HTTPD_OBM ]; then
 		/etc/init.d/httpd restart
 	fi
 else
-	echo "Une erreur est survenu lors de l'installation"
-	echo "car le fichier $FIC_HTTPD_OBM n'existe pas"
+	echo "$0 (Err): the file $FIC_HTTPD_OBM doesn't exist."
+	exit 1
 fi
 
 echo

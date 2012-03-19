@@ -28,6 +28,7 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %define _lib                   lib
 %define _libdir                %{_exec_prefix}/%{_lib}
+%define __jar_repack %{nil}
 
 %package -n opush
 Summary: Active Sync server for Open Business Management

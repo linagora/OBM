@@ -47,8 +47,8 @@ cp -a debian/obm-tomcat/var $RPM_BUILD_ROOT%{_localstatedir}
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/obm-tomcat-trigger
 # init obm-tomcat
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d
-cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/obm-tomcat
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
+cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_initrddir}/obm-tomcat
 
 %files -n obm-tomcat
 %defattr(-,root,root,-)
@@ -56,7 +56,7 @@ cp -a %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/obm-tomcat
 %{_datadir}/tomcat
 %{_localstatedir}/lib/obm-tomcat
 %{_localstatedir}/log/obm-tomcat
-%{_sysconfdir}/rc.d/init.d/obm-tomcat
+%{_initrddir}/obm-tomcat
 %{_sysconfdir}/obm-tomcat
 %{_bindir}/obm-tomcat-trigger
 
@@ -73,9 +73,8 @@ fi
 
 %postun -n obm-tomcat
 if [ "$1" = "0" ]; then
-  /etc/init.d/obm-tomcat stop
+  service obm-tomcat stop
   chkconfig --del obm-tomcat
-  rm -f /etc/init.d/obm-tomcat
 fi
 
 %changelog

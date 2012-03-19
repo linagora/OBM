@@ -53,6 +53,7 @@ _COMMENT_moduleload      back_bdb
 # You can put no limit for authenticated user - see below
 # Default 500
 sizelimit unlimited
+timelimit unlimited
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
@@ -91,7 +92,7 @@ rootdn          "uid=ldapadmin,ou=sysusers,dc=local"
 rootpw          {SSHA}K29nVEh+rsnr6dcDCr/sWVp+BNtby795
 
 # Where the database file are physically stored for database #1
-directory       "/var/lib/ldap"
+directory       /var/lib/ldap
 
 # BEGIN DBD file environment setings
 # Modify this options need to recover DB_CONFIG file and BDB file environment
@@ -177,13 +178,12 @@ lastmod         on
 
 # BEGIN Common ACLs
 # Allow obmSatellite athenticated requests without response limits
-limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited
+limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited time.hard=unlimited
 
 # ACL sample to limit access on entries in relation to 'hiddenUser'
 # attribute
 # This ACL can be tuned to get more flexibility (see 'man slapd.access')
 access to filter=(hiddenUser=TRUE)
-    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by dn="uid=obmsatellite,ou=sysusers,dc=local" read
     by anonymous auth
     by self write
@@ -206,7 +206,6 @@ access to dn.sub="ou=sysusers,dc=local" attrs=userPassword,shadowLastChange
 
 # BEGIN without SAMBA ACLs
 access to attrs=userPassword,shadowLastChange
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by anonymous auth
     by self write
     by * none
@@ -222,13 +221,11 @@ access to attrs=userPassword,shadowLastChange
 # want SASL (and possible other things) to work 
 # happily.
 access to dn.base=""
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
 	by * read
 
 # The admin dn has full write access, everyone else
 # can read everything.
 access to *
-	by dn="uid=ldapadmin,ou=sysusers,dc=local" write
     by * read
 
 ## For Netscape Roaming support, each user gets a roaming
@@ -248,23 +245,19 @@ access to *
 #access to attrs=userPassword,shadowLastChange
 #    by anonymous auth
 #    by self write
-#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
 #    by dn="uid=samba,ou=sysusers,dc=local" write
 #    by * none
 #
 #access to dn.base=""
-#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
 #    by * read
 #
 #access to attrs=sambaLMPassword,sambaNTPassword,sambaPwdLastSet,sambaPwdMustChange,sambaPwdCanChange,sambaPasswordHistory
-#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
 #    by dn="uid=samba,ou=sysusers,dc=local" write
 #    by anonymous auth
 #    by self write
 #    by * none
 #
 #access to *
-#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
 #    by dn="uid=samba,ou=sysusers,dc=local" write
 #    by * read
 #

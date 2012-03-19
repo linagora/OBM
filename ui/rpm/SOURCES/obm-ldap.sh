@@ -30,17 +30,49 @@
 
 echo -e "================= OBM LDAP configuration ==================\n"
 
-slapd_doc=`rpm -qa |grep obm-ldap | cut -d"-" -f1-3`
+slapd_doc=`rpm -q obm-ldap --qf %{NAME}-%{VERSION}`
 OBMCONF="/etc/obm/obm-rpm.conf"
 REP_ETC_LDAP="/etc/openldap"
 REP_DOC="/usr/share/doc"
 REP_LIB_LDAP="/var/lib/ldap"
-CMD_INIT_LDAP="/etc/init.d/ldap"
+if [ -f /etc/init.d/ldap ] ; then
+ CMD_INIT_LDAP="/etc/init.d/ldap"
+ CMD_BOOT_LDAP="chkconfig ldap on"
+else
+ CMD_INIT_LDAP="service slapd"
+ CMD_BOOT_LDAP="chkconfig slapd on"
+fi
 PID_FILE_LDAP="/var/run/openldap/slapd.pid"
 
 if [ -e ${OBMCONF} ]; then
 	source ${OBMCONF}
 fi
+
+#Checks that the needed components are available on the running host
+case $OBM_DBTYPE in
+  PGSQL)
+    if [ ! -e /usr/bin/psql ] ; then
+      echo "$0 (Err) Please run: yum install postgresql"
+      exit 1
+    fi
+    ;;
+
+  MYSQL)
+    if [ ! -e /usr/bin/mysql ] ; then
+      echo "$0 (Err) Please run: yum install mysql"
+      exit 1
+    fi
+    ;;
+
+  *)
+    echo "$0 (Err) OBM_DBTYPE missconfigured"
+    exit 1
+    ;;
+
+esac
+
+
+
 
 export PGPASSWORD="${OBM_PASSWD}";
 
@@ -48,9 +80,14 @@ if [ -f ${PID_FILE_LDAP} ];then
 	${CMD_INIT_LDAP} stop
 fi
 
+# We used to have that file anyway
+if [ ! -e ${REP_ETC_LDAP}/slapd.conf ] ; then
+        touch ${REP_ETC_LDAP}/slapd.conf
+fi
+
 if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
-	echo -e "The slapd.conf fil alradey exist\n"
-	echo -e "Do you want replace it? (y)es, (n)o [n] \c "
+	echo -e "The slapd.conf file already exists\n"
+	echo -e "Do you want to replace it? (y)es, (n)o [n] \c "
 	read replace_slapd_conf
 	if [ "x$replace_slapd_conf" == "xy" ];then
 		if [ ! -f "${REP_ETC_LDAP}/slapd.conf.orig" ]; then
@@ -63,8 +100,8 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 		sed -i -e "s|_COMMENT_|#|" "${REP_ETC_LDAP}/slapd.conf"
 
 		# Configuration ldap pour samba
-		if [ ${SAMBA_MODULE} == 'true' ]; then
-			# On comment les indexes sans samba
+		if [ x${SAMBA_MODULE} == x'true' ]; then
+			# On commente les index sans samba
 			sed -i -e "s/^\(index.*cn,sn,uid.*pres,sub,eq\)$/#\1/" \
 						${REP_ETC_LDAP}/slapd.conf
 			sed -i -e "s/^\(index.*objectClass.*eq\)$/#\1/" \
@@ -90,12 +127,12 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 		fi
 
 		# Activation pour synrepl
-		echo -e "o Do you want active syncrepl for this LDAP? (y)es, (n)o: [n] \c "
+		echo -e "o Do you want to activate syncrepl for this LDAP? (y)es, (n)o: [n] \c "
 		read active_syncrepl
 		if [ "x${active_syncrepl}" == "xy" ]; then
 			# Activation du module suncprov
-			#sed -i -e "s/^#\(moduleload.*syncprov\)$/\1/" \
-			#			${REP_ETC_LDAP}/slapd.conf
+			sed -i -e "s/^#\(moduleload.*syncprov\)$/\1/" \
+						${REP_ETC_LDAP}/slapd.conf
 			sed -i -e "s/^#\(index.*entryCSN,entryUUID.*eq\)$/\1/" \
 						${REP_ETC_LDAP}/slapd.conf
 			sed -i -e "s/^#\(overlay.*syncprov\)$/\1/" \
@@ -104,7 +141,7 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 						${REP_ETC_LDAP}/slapd.conf
 			sed -i -e "s/^#\(syncprov-sessionlog.*100\)$/\1/" \
 						${REP_ETC_LDAP}/slapd.conf
-			echo -e "o Enter the dn use to syncrepl process (for ACLs) [uid=syncrepl,ou=sysusers,dc=local] \c "
+			echo -e "o Enter the dn used by the syncrepl process (for ACLs) [uid=syncrepl,ou=sysusers,dc=local] \c "
 			read sync_user
 			if [ "x$sync_user" = "x" ] ;then
 				sync_user="uid=syncrepl,ou=sysusers,dc=local"
@@ -116,25 +153,30 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 		fi
 		# Mise à jour du mdp rootdn
 		if [ ${OBM_DBTYPE} == "MYSQL" ]; then
-			MDP_BD=`mysql -u obm -pobm obm -NB -e \
+			MDP_BD=`mysql -u ${OBM_DBUSER} -p${OBM_PASSWD} ${OBM_DBNAME} -NB -e \
 				"SELECT usersystem_password 
 				FROM UserSystem 
 				WHERE usersystem_login = 'ldapadmin'"`
 
 		elif [ ${OBM_DBTYPE} == "PGSQL" ]; then
-			MDP_BD=`psql -t -U ${OBM_DBUSER} ${OBM_DBNAME} -c \
+			MDP_BD=`psql -t -U ${OBM_DBUSER} ${OBM_DBNAME} -h ${OBM_HOST} -c \
 				"SELECT usersystem_password 
 				FROM usersystem 
 				WHERE usersystem_login = 'ldapadmin'"`
 		fi 
+		if [ -z "$MDP_BD" ] ; then
+			echo "$0 (Err): Access denied to DB ${OBM_HOST}"
+			exit 1
+		fi
 		MDP_LDAP=`slappasswd -h {SSHA} -s ${MDP_BD}`
 		sed -i -e "s~^rootpw.*$~rootpw ${MDP_LDAP}~" ${REP_ETC_LDAP}/slapd.conf
 		# Activation SSL/TLS 
-		echo -e "o Do you want active SSL/TLS in LDAP ? (y)es,(n)o [n] \c "
+		echo -e "o Do you want to activate SSL/TLS in LDAP ? (y)es,(n)o [n] \c "
 		read active_ssl
 		if [ "x$active_ssl" = "xy" ]; then
 			sed -i -e '/## BEGIN TLS/ , /## End TLS/ s/^#\(.*\)$/\1/' ${REP_ETC_LDAP}/slapd.conf	
-			echo -e "o Do you want force use of ssl/tls ? (y)es,n()o [n] \c "
+			sed -i -e 's/SLAPD_LDAPS=.*/SLAPD_LDAPS=yes/' /etc/sysconfig/ldap
+			echo -e "o Do you want to force usage of ssl/tls ? (y)es,n()o [n] \c "
 			read force_tls
 			if [ "x$force_tls" = "xy" ] ;then
 				sed -i -e "/# BEGIN TLS/ a\security tls=1"  ${REP_ETC_LDAP}/slapd.conf
@@ -147,18 +189,45 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 	fi
 fi
 
-cp -r ${REP_LIB_LDAP} ${REP_LIB_LDAP}.backup 
+#Backup and Remove the previous ldap config and content
+cp -r ${REP_LIB_LDAP} ${REP_LIB_LDAP}.backup
 rm -rf ${REP_LIB_LDAP}/*
+if [ -d ${REP_ETC_LDAP}/slapd.d ] ; then
+        cp -apr ${REP_ETC_LDAP}/slapd.d ${REP_ETC_LDAP}/slapd.d.backup
+        rm -rf ${REP_ETC_LDAP}/slapd.d/*
+	/sbin/runuser -f -m -s /bin/sh -c "slaptest -f ${REP_ETC_LDAP}/slapd.conf -F ${REP_ETC_LDAP}/slapd.d &>/dev/null" -- ldap
+fi
+
+
+
+# Verify which version of syslog is used
+if [ -d /etc/rsyslog.d ] ; then
+	SYSLOG_CONF=/etc/rsyslog.d/40-obm-ldap.conf
+	SYSLOG_SRV="service rsyslog"
+	[ ! -e $SYSLOG_CONF ] && touch $SYSLOG_CONF
+elif [ -e /etc/rsyslog.conf ] ; then
+	SYSLOG_CONF=/etc/rsyslog.conf
+	SYSLOG_SRV="service rsyslog"
+elif [ -e /etc/syslog.conf ] ; then
+	SYSLOG_CONF=/etc/syslog.conf
+	SYSLOG_SRV="/etc/init.d/syslog"
+fi
+
 
 # Configuration syslog pour ldap
-SYSLOG=`grep -c local4.* /etc/syslog.conf`
-if [ ${SYSLOG} -ne 1 ]; then
-	echo "# config ldap log (modified by obm-ldap)" >> /etc/syslog.conf
-	echo "local4.*	/var/log/ldap.log" >> /etc/syslog.conf
-	/etc/init.d/syslog restart
+HAS_OBM_SYSLOG=`grep -c local4.* ${SYSLOG_CONF}`
+if [ ${HAS_OBM_SYSLOG} -ne 1 ]; then
+	echo "# config ldap log (modified by obm-ldap)" >> ${SYSLOG_CONF}
+	echo "local4.*	/var/log/ldap.log" >> ${SYSLOG_CONF}
+	$SYSLOG_SRV restart
 fi
 
 ${CMD_INIT_LDAP} start
+
+# Activate ldap by default unless we are on a cluster
+if [ ! -z $OBM_CLUSTER ] ; then
+    ${CMD_BOOT_LDAP}
+fi
 
 unset PGPASSWORD
 
