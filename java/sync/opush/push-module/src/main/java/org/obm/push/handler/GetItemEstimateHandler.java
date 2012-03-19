@@ -39,7 +39,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
@@ -73,19 +73,22 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final GetItemEstimateProtocol protocol;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected GetItemEstimateHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
-			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools, DOMDumper domDumper,
+			CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.protocol = protocol;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -136,7 +139,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			try {
 				syncCollection.setCollectionPath(collectionPath);
-				syncCollection.setDataType( CollectionPathUtils.recognizePIMDataType(bs, collectionPath) );
+				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(bs, collectionPath) );
 			
 				String syncKey = syncCollection.getSyncKey();
 				SyncState state = stMachine.getSyncState(syncKey);

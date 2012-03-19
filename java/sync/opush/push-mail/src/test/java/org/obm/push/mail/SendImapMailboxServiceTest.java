@@ -40,7 +40,7 @@ import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -55,8 +55,9 @@ public class SendImapMailboxServiceTest {
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject ImapMailboxService mailboxService;
-	
+
 	@Inject GreenMail greenMail;
+	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
@@ -83,7 +84,7 @@ public class SendImapMailboxServiceTest {
 		mailboxService.createFolder(bs, folder("Sent"));
 
 		String userSentFolder = 
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
 		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
@@ -93,7 +94,7 @@ public class SendImapMailboxServiceTest {
 		mailboxService.createFolder(bs, folder("SeNt"));
 
 		String userSentFolder = 
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
 		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo("SeNt");
 	}
@@ -105,7 +106,7 @@ public class SendImapMailboxServiceTest {
 		mailboxService.createFolder(bs, folder("AnotherSentfolder"));
 
 		String userSentFolder = 
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
 		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
@@ -117,7 +118,7 @@ public class SendImapMailboxServiceTest {
 		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
 
 		String userSentFolder = 
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
 		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}

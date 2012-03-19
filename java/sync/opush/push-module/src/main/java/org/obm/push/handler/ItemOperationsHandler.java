@@ -40,7 +40,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSAttachementData;
@@ -88,20 +88,22 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	private static final String NAMESPACE = "ItemOperations";
 	private final ItemOperationsProtocol protocol;
 	private final MailBackend mailBackend;
-	
+	private final CollectionPathHelper collectionPathHelper;
+
 	@Inject
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol protocol,
 			CollectionDao collectionDao, WBXMLTools wbxmlTools,
-			MailBackend mailBackend, DOMDumper domDumper) {
+			MailBackend mailBackend, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.protocol = protocol;
 		this.mailBackend = mailBackend;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 	
 	@Override
@@ -220,7 +222,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		fetchResult.setServerId(serverId);
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {

@@ -566,7 +566,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			logger.warn(e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public boolean getLoginWithDomain() {
 		return loginWithDomain;

@@ -53,7 +53,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
@@ -338,8 +338,7 @@ public class ImapMailboxServiceTest {
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 		mailboxService.storeInSent(bs, inputStream);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs,
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
@@ -381,8 +380,7 @@ public class ImapMailboxServiceTest {
 
 		mailboxService.storeInSent(bs, inputStream);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, 
-				CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
@@ -392,6 +390,10 @@ public class ImapMailboxServiceTest {
 		while (inputStream.read() != -1) {
 			// consume Inputstream
 		}		
+	}
+
+	private String mailboxPath(String boxName) {
+		return new CollectionPathHelper().buildCollectionPath(bs, PIMDataType.EMAIL, boxName);
 	}
 
 	private MailboxFolder folder(String name) {

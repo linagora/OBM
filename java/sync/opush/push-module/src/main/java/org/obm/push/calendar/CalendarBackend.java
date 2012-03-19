@@ -41,7 +41,7 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -90,17 +90,19 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final EventConverter eventConverter;
 	private final EventService eventService;
 	private final ICalendar calendarClient;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	private CalendarBackend(MappingService mappingService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EventConverter eventConverter, 
 			EventService eventService,
-			LoginService login) {
+			LoginService login, CollectionPathHelper collectionPathHelper) {
 		super(mappingService, login);
 		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	private String getDefaultCalendarName(BackendSession bs) {
@@ -131,7 +133,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			String domain = bs.getUser().getDomain();
 			for (CalendarInfo ci : cals) {
 				ItemChange ic = new ItemChange();
-				String col = CollectionPathUtils.buildCollectionPath(
+				String col = collectionPathHelper.buildCollectionPath(
 						bs, PIMDataType.CALENDAR, ci.getUid() + domain);
 				Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), col);
 				ic.setServerId(mappingService.collectionIdToString(collectionId));

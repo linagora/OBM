@@ -39,7 +39,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
@@ -74,17 +74,20 @@ import com.google.inject.Singleton;
 public class MoveItemsHandler extends WbxmlRequestHandler {
 
 	private final MoveItemsProtocol moveItemsProtocol;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter, 
 			StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper,
+			CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.moveItemsProtocol = moveItemsProtocol;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	// <?xml version="1.0" encoding="UTF-8"?>
@@ -132,7 +135,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
 			if (statusForItem.status == null) {
 				try {
-					PIMDataType dataClass =  CollectionPathUtils.recognizePIMDataType(bs, statusForItem.srcCollection);
+					PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(bs, statusForItem.srcCollection);
 					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);

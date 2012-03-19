@@ -37,7 +37,7 @@ import java.util.Map;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
@@ -74,11 +74,14 @@ public class SyncDecoder {
 	private final SyncedCollectionDao syncedCollectionStoreService;
 	private final Map<PIMDataType, IDataDecoder> decoders;
 
+	private final CollectionPathHelper collectionPathHelper;
+
 	@Inject
 	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
-			CollectionDao collectionDao) {
+			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper) {
 		this.collectionDao = collectionDao;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
+		this.collectionPathHelper = collectionPathHelper;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
 				.put(PIMDataType.CONTACTS, new ContactDecoder())
 				.put(PIMDataType.CALENDAR, new CalendarDecoder())
@@ -140,7 +143,7 @@ public class SyncDecoder {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
 			collection.setDataType(dataType);
 			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
 			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));

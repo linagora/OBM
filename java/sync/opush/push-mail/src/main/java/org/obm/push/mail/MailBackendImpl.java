@@ -56,8 +56,8 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -118,16 +118,16 @@ public class MailBackendImpl implements MailBackend {
 	private final LoginService login;
 	private final MappingService mappingService;
 	private final EmailDao emailDao;
-
 	private final EmailSync emailSync;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
-			MappingService mappingService)  {
-		
+			MappingService mappingService, CollectionPathHelper collectionPathHelper)  {
+
 		this.mailboxService = mailboxService;
 		this.emailDao = emailDao;
 		this.emailSync = emailSync;
@@ -136,6 +136,7 @@ public class MailBackendImpl implements MailBackend {
 		this.calendarClient = calendarClient;
 		this.login = login;
 		this.mappingService = mappingService;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -160,7 +161,7 @@ public class MailBackendImpl implements MailBackend {
 		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " " + imapFolder);
 		ic.setItemType(type);
 
-		String imapPath = CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, imapFolder);
+		String imapPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, imapFolder);
 		String serverId;
 		try {
 			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), imapPath);
@@ -175,7 +176,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	private String getWasteBasketPath(BackendSession bs) {
-		return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, "Trash");
+		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "Trash");
 	}
 
 	private MailChanges getSync(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 

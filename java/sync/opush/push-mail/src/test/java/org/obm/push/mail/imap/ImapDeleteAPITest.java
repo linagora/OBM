@@ -42,6 +42,7 @@ import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
@@ -68,7 +69,8 @@ public class ImapDeleteAPITest {
 
 	@Inject MailboxService mailboxService;
 	@Inject PrivateMailboxService privateMailboxService;
-
+	@Inject CollectionPathHelper collectionPathHelper;
+	
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
@@ -88,7 +90,7 @@ public class ImapDeleteAPITest {
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 
-	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest);
+	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
 	    testUtils.createFolders(TRASH);
 	}
 	

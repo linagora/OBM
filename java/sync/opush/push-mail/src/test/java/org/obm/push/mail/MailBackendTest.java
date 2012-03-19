@@ -87,7 +87,7 @@ public class MailBackendTest {
 				
 		MailBackend mailBackend = new MailBackendImpl(
 				emailManager, calendarClient, null, null, 
-				login, new Mime4jUtils(), mockOpushConfigurationService(), null);
+				login, new Mime4jUtils(), mockOpushConfigurationService(), null, null);
 
 		EasyMock.replay(emailManager, calendarClient, backendSession, login);
 

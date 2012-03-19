@@ -37,7 +37,7 @@ import java.util.Set;
 import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
@@ -57,15 +57,17 @@ public class ImapTestUtils {
 	private final String mailbox;
 	private final Date beforeTest;
 	private final PrivateMailboxService privateMailboxService;
+	private final CollectionPathHelper collectionPathHelper;
 
 	public ImapTestUtils(MailboxService mailboxService, PrivateMailboxService privateMailboxService,
-			BackendSession bs, String mailbox, Date beforeTest) {
+			BackendSession bs, String mailbox, Date beforeTest, CollectionPathHelper collectionPathHelper) {
 		
 		this.mailboxService = mailboxService;
 		this.privateMailboxService = privateMailboxService;
 		this.bs = bs;
 		this.mailbox = mailbox;
 		this.beforeTest = beforeTest;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 	
 	public Email sendEmailToInbox() throws MailException {
@@ -101,7 +103,7 @@ public class ImapTestUtils {
 	}
 
 	public String mailboxPath(String mailboxName) {
-		return CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, mailboxName);
+		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, mailboxName);
 	}
 	
 	public MailboxFolder folder(String name) {

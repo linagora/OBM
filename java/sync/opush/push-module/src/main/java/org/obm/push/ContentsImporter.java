@@ -34,7 +34,7 @@ package org.obm.push;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionPathException;
@@ -54,10 +54,12 @@ import com.google.inject.Singleton;
 public class ContentsImporter implements IContentsImporter {
 
 	private final Backends backends;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
-	private ContentsImporter(Backends backends) {
+	private ContentsImporter(Backends backends, CollectionPathHelper collectionPathHelper) {
 		this.backends = backends;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public class ContentsImporter implements IContentsImporter {
 			throws CollectionNotFoundException, NotAllowedException, DaoException, 
 			ProcessingEmailException, CollectionPathException {
 
-		PIMDataType dataType = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
+		PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
 		PIMBackend backend = backends.getBackend(dataType);
 		backend.emptyFolderContent(bs, collectionPath, deleteSubFolder);
 	}

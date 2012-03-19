@@ -40,7 +40,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
@@ -78,6 +78,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final PingProtocol protocol;
 	private final HearbeatDao hearbeatDao;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
@@ -85,7 +86,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
 			CollectionDao collectionDao, HearbeatDao hearbeatDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
@@ -93,6 +94,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
 		this.hearbeatDao = hearbeatDao;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -161,7 +163,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		for (SyncCollection collection: syncCollections) {
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
-			collection.setDataType(CollectionPathUtils.recognizePIMDataType(bs, collectionPath));
+			collection.setDataType(collectionPathHelper.recognizePIMDataType(bs, collectionPath));
 			SyncState lastKnownState = stMachine.lastKnownState(bs.getDevice(), collection.getCollectionId());
 			collection.setSyncState(lastKnownState);
 		}

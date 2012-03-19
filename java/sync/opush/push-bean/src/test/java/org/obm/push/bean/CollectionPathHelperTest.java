@@ -37,12 +37,14 @@ import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.CollectionPathException;
 
-public class CollectionPathUtilsTest {
+public class CollectionPathHelperTest {
 
 	private BackendSession bs;
+	private CollectionPathHelper collectionPathHelper;
 	
 	@Before
 	public void setUp() {
+		collectionPathHelper = new CollectionPathHelper();
 		String mailbox = "user@domain";
 		String password = "password";
 	    bs = new BackendSession(
@@ -53,89 +55,89 @@ public class CollectionPathUtilsTest {
 	@Test
 	public void testParseImapFolderEmailINBOX() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("INBOX");
 	}
 	
 	@Test
 	public void testParseImapFolderEmailSent()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Sent";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("Sent");
 	}
 	
 	@Test
 	public void testParseImapFolderCalendar()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\calendar\\user@domain";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.CALENDAR);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.CALENDAR);
 		Assertions.assertThat(parsedFolder).isEqualTo("user@domain");
 	}
 
 	@Test
 	public void testParseImapFolderTasks()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\tasks\\test";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.TASKS);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.TASKS);
 		Assertions.assertThat(parsedFolder).isEqualTo("test");
 	}
 	
 	@Test
 	public void testParseImapFolderContacts()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\contacts";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.CONTACTS);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.CONTACTS);
 		Assertions.assertThat(parsedFolder).isEqualTo("contacts");
 	}
 
 	@Test
 	public void testParseImapFolderTwoLevel()  throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX\\test";
-		String parsedFolder = CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("INBOX");
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testParseImapFolderWhenBadUserId() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user\\email\\INBOX";
-		CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+		collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
 	}
 	
 	@Test(expected=CollectionPathException.class)
 	public void testParseImapFolderWhenBadType() throws CollectionPathException {
 		String collectionPath = "obm:\\user@domain\\email\\INBOX";
-		CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.TASKS);
+		collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.TASKS);
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testParseImapFolderWhenBadProtocol() throws CollectionPathException {
 		String collectionPath = "obm:\\user@domain\\email\\INBOX";
-		CollectionPathUtils.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
+		collectionPathHelper.extractImapFolder(bs, collectionPath, PIMDataType.EMAIL);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testParseImapFolderWhenNullSession() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX";
-		CollectionPathUtils.extractImapFolder(null, collectionPath, PIMDataType.EMAIL);
+		collectionPathHelper.extractImapFolder(null, collectionPath, PIMDataType.EMAIL);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testParseImapFolderWhenNullPath() throws CollectionPathException {
-		CollectionPathUtils.extractImapFolder(bs, null, PIMDataType.EMAIL);
+		collectionPathHelper.extractImapFolder(bs, null, PIMDataType.EMAIL);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testParseImapFolderWhenEmptyPath() throws CollectionPathException {
-		CollectionPathUtils.extractImapFolder(bs, "", PIMDataType.EMAIL);
+		collectionPathHelper.extractImapFolder(bs, "", PIMDataType.EMAIL);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testParseImapFolderWhenNullDataType() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX";
-		CollectionPathUtils.extractImapFolder(bs, collectionPath, null);
+		collectionPathHelper.extractImapFolder(bs, collectionPath, null);
 	}
 	
 	@Test
 	public void testBuildCollectionPathINBOX() {
 		String collectionPathExpected = "obm:\\\\user@domain\\email\\INBOX";
-		String parsedFolder = CollectionPathUtils.buildCollectionPath(
+		String parsedFolder = collectionPathHelper.buildCollectionPath(
 				bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
 	}
@@ -143,7 +145,7 @@ public class CollectionPathUtilsTest {
 	@Test
 	public void testBuildCollectionPathSent() {
 		String collectionPathExpected = "obm:\\\\user@domain\\email\\Sent";
-		String parsedFolder = CollectionPathUtils.buildCollectionPath(
+		String parsedFolder = collectionPathHelper.buildCollectionPath(
 				bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
 		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
 	}
@@ -151,7 +153,7 @@ public class CollectionPathUtilsTest {
 	@Test
 	public void testBuildCollectionPathWithSubFolder() {
 		String collectionPathExpected = "obm:\\\\user@domain\\email\\INBOX\\Shared";
-		String parsedFolder = CollectionPathUtils.buildCollectionPath(
+		String parsedFolder = collectionPathHelper.buildCollectionPath(
 				bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME + "\\Shared");
 		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
 	}
@@ -159,86 +161,75 @@ public class CollectionPathUtilsTest {
 	@Test
 	public void testBuildDefaultCollectionPath() {
 		String collectionPathExpected = "obm:\\\\user@domain\\contacts";
-		String parsedFolder = CollectionPathUtils.buildDefaultCollectionPath(bs, PIMDataType.CONTACTS);
+		String parsedFolder = collectionPathHelper.buildDefaultCollectionPath(bs, PIMDataType.CONTACTS);
 		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testBuildDefaultCollectionPathWhenNullSession() {
-		CollectionPathUtils.buildDefaultCollectionPath(null, PIMDataType.CONTACTS);
+		collectionPathHelper.buildDefaultCollectionPath(null, PIMDataType.CONTACTS);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testBuildDefaultCollectionPathWhenNullDataType() {
-		CollectionPathUtils.buildDefaultCollectionPath(bs, null);
+		collectionPathHelper.buildDefaultCollectionPath(bs, null);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testBuildCollectionPathWhenNullSession() {
-		CollectionPathUtils.buildCollectionPath(null, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		collectionPathHelper.buildCollectionPath(null, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testBuildCollectionPathWhenNullDataType() {
-		CollectionPathUtils.buildCollectionPath(bs, null, EmailConfiguration.IMAP_INBOX_NAME);
-	}
-
-	@Test(expected=NullPointerException.class)
-	public void testBuildCollectionPathWhenNullPath() {
-		String folderName = null;
-		CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, folderName);
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testBuildCollectionPathWhenEmptyPath() {
-		CollectionPathUtils.buildCollectionPath(bs, PIMDataType.EMAIL, "");
+		collectionPathHelper.buildCollectionPath(bs, null, EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeSubFolder() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\anydata");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\anydata");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeCalendar() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\calendar\\user@domain");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\calendar\\user@domain");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CALENDAR);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeEmail() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\INBOX");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\INBOX");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeContacts() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
 	}
 	
 	@Test
 	public void testRecognizePIMDataTypeCollectedContacts() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts\\collected_contacts");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts\\collected_contacts");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeTasks() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user@domain\\tasks\\user@domain");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\tasks\\user@domain");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.TASKS);
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testRecognizePIMDataTypeWhenNoDomain() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\\\user\\mydata");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user\\mydata");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testRecognizePIMDataTypeWhenBadProtocol() throws CollectionPathException {
-		PIMDataType type = CollectionPathUtils.recognizePIMDataType(bs, "obm:\\user@domain\\email");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\user@domain\\email");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 }

@@ -51,7 +51,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.CollectionPathUtils;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
@@ -125,6 +125,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
+	private final CollectionPathHelper collectionPathHelper;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -135,7 +136,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -144,6 +145,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocol = SyncProtocol;
 		this.itemTrackingDao = itemTrackingDao;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -202,7 +204,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		for (SyncCollection sc: sync.getCollections()) {
 			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
-			PIMDataType dataClass = CollectionPathUtils.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
 			if (dataClass == PIMDataType.EMAIL) {
 				backend.startEmailMonitoring(bs, sc.getCollectionId());
 				break;

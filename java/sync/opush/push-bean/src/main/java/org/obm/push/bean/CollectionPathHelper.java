@@ -35,6 +35,7 @@ import org.obm.push.exception.CollectionPathException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.inject.Singleton;
 
 /**
  *
@@ -46,13 +47,15 @@ import com.google.common.base.Strings;
  *  obm:\\login@domain\contacts\collected_contacts
  * 
  */
-public class CollectionPathUtils {
+@Singleton
+public class CollectionPathHelper {
 
 	private static final char BACKSLASH = '\\';
 	private static final String PROTOCOL = "obm:" + BACKSLASH + BACKSLASH;
-
-	public static PIMDataType recognizePIMDataType(BackendSession bs, String collectionPath) 
+	
+	public PIMDataType recognizePIMDataType(BackendSession bs, String collectionPath) 
 			throws CollectionPathException {
+		
 		Preconditions.checkNotNull(Strings.emptyToNull(collectionPath));
 		
 		String userPath = getUserPath(bs).toString();
@@ -71,32 +74,18 @@ public class CollectionPathUtils {
 		throw new CollectionPathException(msg);
 	}
 
-
-	private static boolean pathStartWithTypedUserPath(String pathToVerify,
-			String userPath, PIMDataType dataType) {
+	private boolean pathStartWithTypedUserPath(String pathToVerify, String userPath, PIMDataType dataType) {
 		return pathToVerify.startsWith(userPathWithDataType(userPath, dataType));
 	}
 
-
-	private static String userPathWithDataType(String userPath, PIMDataType pimDataType) {
+	private String userPathWithDataType(String userPath, PIMDataType pimDataType) {
 		return userPath.concat(pimDataType.asCollectionPathValue());
 	}
 	
-	public static String buildCollectionPath(BackendSession bs, 
-			PIMDataType collectionType, String imapFolder) {
+	public String buildCollectionPath(BackendSession bs, PIMDataType collectionType, String...imapFolders) {
 		Preconditions.checkNotNull(bs);
 		Preconditions.checkNotNull(collectionType);
-		Preconditions.checkNotNull(Strings.emptyToNull(imapFolder));
-		
-		StringBuilder userPath = getUserPathByCollection(bs, collectionType);
-		userPath.append(BACKSLASH);
-		userPath.append(imapFolder);
-		return userPath.toString();
-	}
-	
-	public static String buildCollectionPath(BackendSession bs, PIMDataType collectionType, String...imapFolders) {
 		Preconditions.checkNotNull(bs);
-		Preconditions.checkNotNull(collectionType);
 		
 		StringBuilder userPath = getUserPathByCollection(bs, collectionType);
 		for (String folder: imapFolders) {
@@ -106,14 +95,15 @@ public class CollectionPathUtils {
 		return userPath.toString();
 	}
 	
-	public static String buildDefaultCollectionPath(BackendSession bs, PIMDataType collectionType) {
+	public String buildDefaultCollectionPath(BackendSession bs, PIMDataType collectionType) {
 		Preconditions.checkNotNull(bs);
 		Preconditions.checkNotNull(collectionType);
 		return getUserPathByCollection(bs, collectionType).toString();
 	}
 
-	public static String extractImapFolder(BackendSession bs,
-			String collectionPath, PIMDataType collectionType) throws CollectionPathException {
+	public String extractImapFolder(BackendSession bs, String collectionPath, PIMDataType collectionType)
+			throws CollectionPathException {
+		
 		Preconditions.checkNotNull(bs);
 		Preconditions.checkNotNull(collectionType);
 		Preconditions.checkNotNull(Strings.emptyToNull(collectionPath));
@@ -130,7 +120,7 @@ public class CollectionPathUtils {
 		}
 	}
 
-	private static String extractFirstImapFolder(BackendSession bs, String collectionPath, String userPath) {
+	private String extractFirstImapFolder(BackendSession bs, String collectionPath, String userPath) {
 		int backslashLength = 1;
 		int imapFolderStartIndex = userPath.length() + backslashLength;
 		if (imapFolderStartIndex > collectionPath.length()) {
@@ -144,13 +134,13 @@ public class CollectionPathUtils {
 		}
 	}
 
-	private static StringBuilder getUserPathByCollection(BackendSession bs, PIMDataType collectionType) {
+	private StringBuilder getUserPathByCollection(BackendSession bs, PIMDataType collectionType) {
 		StringBuilder userPath = getUserPath(bs);
 		userPath.append(collectionType.asCollectionPathValue());
 		return userPath;
 	}
 	
-	private static StringBuilder getUserPath(BackendSession bs) {
+	private StringBuilder getUserPath(BackendSession bs) {
 		StringBuilder userPath = new StringBuilder();
 		userPath.append(PROTOCOL);
 		userPath.append(bs.getUser().getLoginAtDomain());
