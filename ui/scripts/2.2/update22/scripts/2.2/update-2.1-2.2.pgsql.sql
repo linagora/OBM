@@ -1355,8 +1355,8 @@ SELECT
   'REQ',
   todo_percent
 FROM Todo
-LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
-LEFT JOIN UserEntity on todo_user=userentity_user_id;
+JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
+JOIN UserEntity on todo_user=userentity_user_id;
 
 --  _______________________________________________________
 -- |Migrating Address  information from Contact and Company|
