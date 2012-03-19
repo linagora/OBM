@@ -73,7 +73,6 @@ public class Credentials implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("user", user)
-			.add("password", password)
 			.toString();
 	}
 	
