@@ -272,20 +272,28 @@ public class CalendarBindingImpl implements ICalendar {
 		notifyOnRemoveEvent(token, calendar, removed, notification);
 	}
 
-	private Event cancelEventByExtId(AccessToken token, ObmUser calendar, Event event, boolean notification) throws SQLException, FindException {
+	private Event cancelEventByExtId(AccessToken token, ObmUser obmUser, Event event, boolean notification) throws SQLException, FindException {
 		EventExtId extId = event.getExtId();
-		Event removed = calendarDao.removeEventByExtId(token, calendar, extId, event.getSequence() + 1);
+		Event removed = calendarDao.removeEventByExtId(token, obmUser, extId, event.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-		notifyOnRemoveEvent(token, calendar.getEmail(), removed, notification);
+		String obmUserEmail = obmUser.getEmail();
+		changeCalendarOwnerParticipationState(obmUserEmail, removed, ParticipationState.DECLINED);
+		notifyOnRemoveEvent(token, obmUserEmail, removed, notification);
 		return removed;
 	}
 
-	
-	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event ev, boolean notification) throws FindException {
-		if (ev.isInternalEvent()) {
-			eventChangeHandler.delete(ev, notification, token);
+	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event event, boolean notification) throws FindException {
+		if (event.isInternalEvent()) {
+			eventChangeHandler.delete(event, notification, token);
 		} else {
-			notifyOrganizerForExternalEvent(token, calendar, ev, ParticipationState.DECLINED, notification);
+			notifyOrganizerForExternalEvent(token, calendar, event, ParticipationState.DECLINED, notification);
+		}
+	}
+
+	private void changeCalendarOwnerParticipationState(String ownerEmail, Event event, ParticipationState participationState) {
+		Attendee calendarOwnerAsAttendee = event.findAttendeeFromEmail(ownerEmail);
+		if (calendarOwnerAsAttendee != null) {
+			calendarOwnerAsAttendee.setState(participationState);
 		}
 	}
 

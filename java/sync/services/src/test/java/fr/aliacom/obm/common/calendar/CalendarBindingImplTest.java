@@ -1514,4 +1514,50 @@ public class CalendarBindingImplTest {
 		calendarService.modifyEvent(token, user.getEmail(), currentEvent, updateAttendees,
 				notification);
 	}
+
+	@Test
+	public void testRemoveEventByExtIdIsDeclined() throws FindException, ServerFault, SQLException {
+		String calendar = "user@test";
+		ObmUser user = ToolBox.getDefaultObmUser();
+		AccessToken token = ToolBox.mockAccessToken();
+
+		Event daoEvent = new Event();
+		daoEvent.setInternalEvent(false);
+
+		Attendee attendee = new Attendee();
+		attendee.setState(ParticipationState.ACCEPTED);
+		attendee.setEmail(user.getEmail());
+		daoEvent.addAttendee(attendee);
+		daoEvent.setOwner(calendar);
+
+		UserService userService = createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromCalendar(user.getEmail(), "test.tlse.lng"))
+				.andReturn(user).atLeastOnce();
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.findEventByExtId(token, user, daoEvent.getExtId())).andReturn(
+				daoEvent).once();
+
+		HelperService rightsHelper = createMock(HelperService.class);
+		expect(rightsHelper.canWriteOnCalendar(token, user.getEmail())).andReturn(true)
+				.once();
+
+		EasyMock.expect(userService.getUserFromLogin(daoEvent.getOwner(), "test.tlse.lng"))
+		.andReturn(user).once();
+
+		expect(calendarDao.removeEventByExtId(token, user, daoEvent.getExtId(), 1)).andReturn(
+				daoEvent).once();
+
+		EventChangeHandler eventChangeHandler = EasyMock.createMock(EventChangeHandler.class);
+		eventChangeHandler.updateParticipationState(daoEvent, user, ParticipationState.DECLINED, true, token);
+
+		EasyMock.replay(token, userService, rightsHelper, calendarDao,eventChangeHandler);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
+				userService, calendarDao, null, rightsHelper, null, null);
+		Event removedEvent = calendarService.removeEventByExtId(token, calendar, daoEvent.getExtId(), 0, true);
+
+		Attendee calendarOwnerAsAttendee = removedEvent.findAttendeeFromEmail(attendee.getEmail());
+		Assertions.assertThat(calendarOwnerAsAttendee.getState()).isEqualTo(ParticipationState.DECLINED);
+	}
 }
