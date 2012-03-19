@@ -205,9 +205,9 @@ CREATE TABLE `_contactgroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
----
+--
 -- Diplay Prefs
----
+--
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'group_contact', 'group_contact_lastname', 1, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'group_contact', 'group_contact_firstname', 2, 1);
