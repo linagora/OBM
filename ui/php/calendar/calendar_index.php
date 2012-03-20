@@ -986,7 +986,8 @@ if ($action == 'search') {
     $display['detail'] = dis_calendar_templates_list($templates_q);
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = dis_calendar_template_form('update_template', $params, '', array(), $current_view);
+    list($template_q, $entity_ids) = run_query_calendar_get_template($params['template_id']);
+    $display['detail'] = dis_calendar_template_form('update_template', $params, $template_q, $entity_ids, $current_view);
   }
   
 } elseif ($action == 'list_templates')  {
