@@ -1296,12 +1296,17 @@ public class Ical4jHelper {
 				//rfc5545 : 3.2.12, if PART-STAT is missing, default is NEEDS-ACTION
 				att.setState(ParticipationState.NEEDSACTION);
 			}
-			if (!emails.containsKey(att.getEmail())) {
+			if (att.getEmail() != null && 
+					!attendeeAlreadyExist(emails, att)) {
 				emails.put(att.getEmail(), att);
 			}
 		}
 		appendOrganizer(emails, vEvent);
 		event.addAttendees(new ArrayList<Attendee>(emails.values()));
+	}
+
+	private boolean attendeeAlreadyExist(Map<String, Attendee> emails, Attendee att) {
+		return emails.containsKey(att.getEmail());
 	}
 
 	private void appendOrganizer(Map<String, Attendee> emails,

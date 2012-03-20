@@ -44,22 +44,22 @@ public class Attendee {
 			attendee = new Attendee();
 		}
 		
-		public Builder withParticipationState(ParticipationState state) {
+		public Builder participationState(ParticipationState state) {
 			attendee.state = state;
 			return this;
 		}
 		
-		public Builder withEmail(String email) {
+		public Builder email(String email) {
 			attendee.email = email;
 			return this;
 		}
 		
-		public Builder withParticipationRole(ParticipationRole role) {
+		public Builder participationRole(ParticipationRole role) {
 			attendee.participationRole = role;
 			return this;
 		}
 		
-		public Builder withDisplayName(String name) {
+		public Builder displayName(String name) {
 			attendee.displayName = name;
 			return this;
 		}

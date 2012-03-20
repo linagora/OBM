@@ -1215,4 +1215,15 @@ public class Ical4jHelperTest {
 
 		Assertions.assertThat(events).isEmpty();
 	}
+	
+	@Test
+	public void testParseICSWithQuotesIllegalCharacter() throws IOException, ParserException {
+		String icsFilename = "OBMFULL-3355.ics";
+		List<Event> events = testIcsParsing(icsFilename);
+		
+		Assertions.assertThat(events.size()).isEqualTo(1);
+		Assertions.assertThat(events.get(0).getAttendees()).containsOnly(
+				new Attendee.Builder().email("usera@obm.lng.org").build(), 
+				new Attendee.Builder().email("userc@obm.lng.org").build());
+	}
 }

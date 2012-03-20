@@ -110,15 +110,15 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		event.setType(EventType.VEVENT);
 		event.setUid(new EventObmId(121));
 		event.addAttendees(Arrays.asList(
-				new Attendee.Builder().withEmail("jaures@sfio.fr")
-					.withDisplayName("Jean Jaures")
-					.withParticipationState(ParticipationState.ACCEPTED)
-					.withParticipationRole(ParticipationRole.REQ)
+				new Attendee.Builder().email("jaures@sfio.fr")
+					.displayName("Jean Jaures")
+					.participationState(ParticipationState.ACCEPTED)
+					.participationRole(ParticipationRole.REQ)
 					.asOrganizer().build(),
-				new Attendee.Builder().withEmail("blum@sfio.fr")
-					.withDisplayName("Léon Blum")
-					.withParticipationState(ParticipationState.NEEDSACTION)
-					.withParticipationRole(ParticipationRole.OPT)
+				new Attendee.Builder().email("blum@sfio.fr")
+					.displayName("Léon Blum")
+					.participationState(ParticipationState.NEEDSACTION)
+					.participationRole(ParticipationRole.OPT)
 					.asAttendee().build()));
 		return event;
 	}
@@ -310,10 +310,10 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		eventRecurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday));
 		
 		Event secondOccurence = new Event();
-		secondOccurence.addAttendee(new Attendee.Builder().withEmail("jaures@sfio.fr")
-				.withDisplayName("Jean Jaures")
-				.withParticipationState(ParticipationState.DECLINED)
-				.withParticipationRole(ParticipationRole.REQ).build());
+		secondOccurence.addAttendee(new Attendee.Builder().email("jaures@sfio.fr")
+				.displayName("Jean Jaures")
+				.participationState(ParticipationState.DECLINED)
+				.participationRole(ParticipationRole.REQ).build());
 		secondOccurence.setDuration(event.getDuration());
 		secondOccurence.setRecurrenceId(date("2004-12-20T21:39:45Z"));
 		secondOccurence.setStartDate(date("2004-12-21T21:39:45Z"));
