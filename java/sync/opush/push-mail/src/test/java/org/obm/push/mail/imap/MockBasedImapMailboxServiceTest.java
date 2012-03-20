@@ -193,7 +193,7 @@ public class MockBasedImapMailboxServiceTest {
 	
 	private CollectionPathHelper mockCollectionPathHelperExtractFolder(String expectedFolder) throws CollectionPathException {
 		CollectionPathHelper helper = EasyMock.createMock(CollectionPathHelper.class);
-		EasyMock.expect(helper.extractImapFolder(bs, collectionPath(expectedFolder), PIMDataType.EMAIL))
+		EasyMock.expect(helper.extractFolder(bs, collectionPath(expectedFolder), PIMDataType.EMAIL))
 			.andReturn(expectedFolder).anyTimes();
 		EasyMock.replay(helper);
 		return helper;

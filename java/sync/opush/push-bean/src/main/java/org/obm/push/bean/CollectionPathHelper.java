@@ -111,7 +111,7 @@ public class CollectionPathHelper {
 		return getUserPathByCollection(bs, collectionType).toString();
 	}
 
-	public String extractImapFolder(BackendSession bs, String collectionPath, PIMDataType collectionType)
+	public String extractFolder(BackendSession bs, String collectionPath, PIMDataType collectionType)
 			throws CollectionPathException {
 		
 		Preconditions.checkNotNull(bs);
@@ -121,7 +121,7 @@ public class CollectionPathHelper {
 		String userPath = getUserPathByCollection(bs, collectionType).toString();
 		
 		if (collectionPath.startsWith(userPath)) {
-			return extractFirstImapFolder(bs, collectionPath, userPath);
+			return extractFolder(bs, collectionPath, userPath);
 		} else {
 			String msg = String.format( 
 					"The collection path given doesn't start with the user path. collection:{%s} user:{%s} ",
@@ -130,18 +130,14 @@ public class CollectionPathHelper {
 		}
 	}
 
-	private String extractFirstImapFolder(BackendSession bs, String collectionPath, String userPath) {
+	private String extractFolder(BackendSession bs, String collectionPath, String userPath) {
 		int backslashLength = 1;
 		int imapFolderStartIndex = userPath.length() + backslashLength;
 		if (imapFolderStartIndex > collectionPath.length()) {
 			imapFolderStartIndex = getUserPath(bs).length();
 		}
-		int imapFolderEndIndex = collectionPath.indexOf(BACKSLASH, imapFolderStartIndex);
-		if (imapFolderEndIndex == -1) {
-			return handleSpecificFolder(collectionPath.substring(imapFolderStartIndex));
-		} else {
-			return collectionPath.substring(imapFolderStartIndex, imapFolderEndIndex);
-		}
+		String folders = collectionPath.substring(imapFolderStartIndex);
+		return handleSpecificFolder(folders);
 	}
 
 	private String handleSpecificFolder(String folder) {

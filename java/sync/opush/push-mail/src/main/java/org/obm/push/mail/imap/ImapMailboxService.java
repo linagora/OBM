@@ -295,7 +295,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	@Override
 	public String parseMailBoxName(BackendSession bs, String collectionName) throws MailException {
 		try {
-			String boxName = collectionPathHelper.extractImapFolder(bs, collectionName, PIMDataType.EMAIL);
+			String boxName = collectionPathHelper.extractFolder(bs, collectionName, PIMDataType.EMAIL);
 			
 			if (isINBOXSpecificCase(boxName)) {
 				return EmailConfiguration.IMAP_INBOX_NAME;
