@@ -50,5 +50,11 @@ public abstract class AbstractItemsWriter {
 			DOMUtils.createElementAndText(e, nodeName, value);
 		}
 	}
+	
+	protected void createIfNotNull(Element e, String nodeName, Integer value) {
+		if (value != null) {
+			DOMUtils.createElementAndText(e, nodeName, String.valueOf(value));
+		}
+	}
 
 }

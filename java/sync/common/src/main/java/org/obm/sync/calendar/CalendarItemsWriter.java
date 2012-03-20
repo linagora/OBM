@@ -184,7 +184,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(parent, "duration", String.valueOf(event.getDuration()));
 		createIfNotNull(parent, "category", event.getCategory());
 		createIfNotNull(parent, "location", event.getLocation());
-		createIfNotNull(parent, "alert", String.valueOf(event.getAlert()));
+		createIfNotNull(parent, "alert", event.getAlert());
 		createIfNotNull(parent, "priority", (event.getPriority() != null ? String.valueOf(event.getPriority()) : "0"));
 		createIfNotNull(parent, "privacy", String.valueOf(event.getPrivacy().toSqlIntCode()));
 
