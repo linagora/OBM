@@ -234,7 +234,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidSearch() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		assertNotNull(uids);
@@ -251,7 +251,7 @@ public class BasicStoreTests extends LoggedTestCase {
 				"To", "Cc", "Bcc", "X-Mailer", "User-Agent", "Message-ID" };
 
 		sc.select("INBOX");
-		Collection<Long> uids = sc.uidSearch(new SearchQuery());
+		Collection<Long> uids = sc.uidSearch(SearchQuery.MATCH_ALL);
 		Iterator<Long> iterator = uids.iterator();
 		Collection<Long> firstTwo = Arrays.asList(iterator.next(), iterator.next());
 
@@ -262,7 +262,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchHeaders() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		String[] headers = new String[] { "date", "from", "subject" };
@@ -282,7 +282,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchHeadersSpeed() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		String[] headers = new String[] { "x-priority" };
 
@@ -296,7 +296,7 @@ public class BasicStoreTests extends LoggedTestCase {
 
 	public void testUidFetchEnvelopePerf() {
 		sc.select("INBOX");
-		Collection<Long> uids = sc.uidSearch(new SearchQuery());
+		Collection<Long> uids = sc.uidSearch(SearchQuery.MATCH_ALL);
 		Iterator<Long> it = uids.iterator();
 		Collection<Long> firstTwo = Arrays.asList(it.next(), it.next());
 
@@ -324,7 +324,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchEnvelopeReliable() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -339,7 +339,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchFlags() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -358,7 +358,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidCopy() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -373,7 +373,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidStore() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -416,7 +416,7 @@ public class BasicStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchPart() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		long uid = uids.iterator().next();

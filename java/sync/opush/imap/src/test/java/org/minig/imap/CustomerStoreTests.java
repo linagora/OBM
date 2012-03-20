@@ -61,7 +61,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidSearch() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		assertNotNull(uids);
@@ -69,7 +69,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchHeaders() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		String[] headers = new String[] { "date", "from", "subject",
@@ -82,7 +82,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchHeadersOneByOne() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		String[] headers = new String[] { "date", "from", "subject",
@@ -100,7 +100,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetches() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -126,7 +126,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchFlags() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -145,7 +145,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidCopy() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 
@@ -167,7 +167,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 	}
 
 	public void testUidFetchPart() {
-		SearchQuery sq = new SearchQuery();
+		SearchQuery sq = SearchQuery.MATCH_ALL;
 		sc.select("INBOX");
 		Collection<Long> uids = sc.uidSearch(sq);
 		long uid = uids.iterator().next();

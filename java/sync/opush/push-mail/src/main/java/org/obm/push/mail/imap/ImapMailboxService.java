@@ -149,6 +149,20 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
+	public Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException {
+		final StoreClient store = imapClientProvider.getImapClient(bs);
+		try {
+			login(store);
+			store.select(parseMailBoxName(bs, collectionName));
+			return store.uidSearch(sq);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
+		}
+	}
+	
+	@Override
 	public MailboxFolders listAllFolders(BackendSession bs) throws MailException {
 		ImapStore store = null;
 		try {
@@ -492,7 +506,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			String mailBoxName = parseMailBoxName(bs, collectionPath);
 			store.select(mailBoxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
-			Collection<Long> uids = store.uidSearch(new SearchQuery());
+			Collection<Long> uids = store.uidSearch(SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
 			store.uidStore(uids, fl, true);
@@ -617,7 +631,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		try {
 			login(store);
 			store.select( parseMailBoxName(bs, collectionName) );
-			Collection<Long> uids = store.uidSearch(new SearchQuery(null, windows));
+			SearchQuery query = new SearchQuery.Builder().after(windows).build();
+			Collection<Long> uids = store.uidSearch(query);
 			Collection<FastFetch> mails = store.uidFetchFast(uids);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {

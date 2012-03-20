@@ -36,17 +36,34 @@ import java.util.Date;
 
 public class SearchQuery {
 
-	public SearchQuery() {
-		this(null, null);
+	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
+	
+	public static class Builder {
+		private Date before;
+		private Date after;
+		
+		public Builder before(Date before) {
+			this.before = before;
+			return this;
+		}
+		
+		public Builder after(Date after) {
+			this.after = after;
+			return this;
+		}
+		
+		public SearchQuery build() {
+			return new SearchQuery(before, after);
+		}
 	}
-
+	
 	/**
 	 * 
 	 * @param after
 	 *            Messages whose internal date (disregarding time and timezone)
 	 *            is within or later than the specified date.
 	 */
-	public SearchQuery(Date before, Date after) {
+	private SearchQuery(Date before, Date after) {
 		this.after = after;
 		this.before = before;
 	}
