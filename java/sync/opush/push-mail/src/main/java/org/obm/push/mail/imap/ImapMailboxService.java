@@ -150,15 +150,24 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	@Override
 	public Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException {
-		final StoreClient store = imapClientProvider.getImapClient(bs);
+		ImapStore store = null; 
 		try {
-			login(store);
-			store.select(parseMailBoxName(bs, collectionName));
-			return store.uidSearch(sq);
-		} catch (IMAPException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			OpushImapFolder folder = store.select(parseMailBoxName(bs, collectionName));
+			return folder.uidSearch(sq);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
 	}
 	

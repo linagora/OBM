@@ -31,18 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.search.AndTerm;
+import javax.mail.search.ComparisonTerm;
+import javax.mail.search.FlagTerm;
+import javax.mail.search.NotTerm;
+import javax.mail.search.ReceivedDateTerm;
+import javax.mail.search.SearchException;
+import javax.mail.search.SearchTerm;
 
+import org.minig.imap.SearchQuery;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
@@ -124,5 +136,64 @@ public class OpushImapFolder {
 		FetchProfile fetchProfile = new FetchProfile();
 		fetchProfile.add(FetchProfile.Item.ENVELOPE);
 		return fetch(messageUid, fetchProfile);
+	}
+	
+	public Collection<Long> uidSearch(SearchQuery query) throws MessagingException {
+		final SearchTerm searchTerm = toSearchTerm(query);
+		return (Collection<Long>) folder.doCommand(new ProtocolCommand() {
+			@Override
+			public Object doCommand(IMAPProtocol protocol)
+					throws ProtocolException {
+				try {
+					int[] array = protocol.search(searchTerm);
+					List<Long> result = Lists.newArrayList();
+					for (int i: array) {
+						result.add(Long.valueOf(i));
+					}
+					return result;
+				} catch (SearchException e) {
+					throw new ProtocolException(e.getMessage(), e);
+				}
+			}
+		});
+	}
+	
+	@VisibleForTesting SearchTerm toSearchTerm(SearchQuery query) {
+		SearchTerm dateSearchTerm = toDateSearchTerm(query);
+		if (dateSearchTerm != null) {
+			return new AndTerm(buildNotDeleted(), dateSearchTerm);
+		} else {
+			return buildNotDeleted();
+		}
+	}
+
+	private SearchTerm toDateSearchTerm(SearchQuery query) {
+		Date before = query.getBefore();
+		Date after = query.getAfter();
+		if (after != null) {
+			if (before != null) {
+				return new AndTerm(buildBeforeTerm(before), buildAfterTerm(after));
+			} else {
+				return buildAfterTerm(after);
+			}
+		} else {
+			if (before != null) {
+				return buildBeforeTerm(before);
+			} else {
+				return null;
+			}
+		}
+	}
+
+	private NotTerm buildAfterTerm(Date after) {
+		return new NotTerm(buildBeforeTerm(after));
+	}
+
+	private ReceivedDateTerm buildBeforeTerm(Date before) {
+		return new ReceivedDateTerm(ComparisonTerm.LT, before);
+	}
+	
+	private SearchTerm buildNotDeleted() {
+		return new NotTerm(new FlagTerm(new Flags(Flags.Flag.DELETED), true));
 	}
 }
