@@ -138,9 +138,9 @@ sub _generateFlatMap {
     my $self = shift;
     my( $map, $domainList ) = @_;
 
-    my $ldapFilter = $self->{'description'}->{$map}->{'ldap_filter'};
-    my $ldapAttrsLeft = $self->{'description'}->{$map}->{'ldap_attibute_left'};
-    my $ldapAttrsRight = $self->{'description'}->{$map}->{'ldap_attibute_right'};
+    my $ldapFilter = $self->{'description'}->{$map}->{'ldapFilter'};
+    my $ldapAttrsLeft = $self->{'description'}->{$map}->{'ldapAttributePostfixKey'};
+    my $ldapAttrsRight = $self->{'description'}->{$map}->{'ldapAttributePostfixValue'};
     my $ldapAttrs;
     push( @{$ldapAttrs}, @{$ldapAttrsLeft} ) if ref($ldapAttrsLeft) eq 'ARRAY';
     push( @{$ldapAttrs}, @{$ldapAttrsRight} ) if ref($ldapAttrsRight) eq 'ARRAY';
