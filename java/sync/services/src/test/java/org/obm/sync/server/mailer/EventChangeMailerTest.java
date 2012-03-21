@@ -81,6 +81,7 @@ import com.google.common.collect.ImmutableList;
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -89,7 +90,7 @@ import freemarker.template.Template;
 @SuiteClasses({EventChangeMailerTest.AcceptedCreation.class, EventChangeMailerTest.NeedActionCreation.class, EventChangeMailerTest.NeedActionCreationRecurrentEvent.class, 
 	EventChangeMailerTest.AcceptedCreationRecurrentEvent.class, EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.CancelationRecurrentEvent.class,
 	EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class,
-	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class, EventChangeMailerTest.AcceptedParticipationStateChangeEvent.class})
+	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class, EventChangeMailerTest.AcceptedParticipationStateChangeEvent.class, EventChangeMailerTest.ParticipationStateChangeEventWithNullComment.class})
 
 public class EventChangeMailerTest {
 
@@ -1306,4 +1307,26 @@ public class EventChangeMailerTest {
 
 	}
 
+	public static class ParticipationStateChangeEventWithNullComment {
+
+		@Test
+		public void testBuildUpdateParticipationStateDatamodel() {
+			Event event = new Event();
+			event.setStartDate(new Date());
+			ObmUser obmUser = new ObmUser();
+			ParticipationState status = ParticipationState.ACCEPTED;
+			status.setComment(new Comment(null));
+
+			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
+			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
+			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
+					ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+
+			EasyMock.replay(constantService);
+
+			EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null);
+
+			eventChangeMailer.buildUpdateParticipationStateDatamodel(event, obmUser, status, Locale.FRENCH);
+		}
+	}
 }

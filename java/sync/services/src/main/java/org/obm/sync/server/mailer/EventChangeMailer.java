@@ -55,6 +55,7 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -678,12 +679,12 @@ public class EventChangeMailer extends AbstractMailer {
 		return datamodel;
 	}
 	
-	private Builder<Object, Object> buildUpdateParticipationStateDatamodel(
+	@VisibleForTesting Builder<Object, Object> buildUpdateParticipationStateDatamodel(
 			Event event, final ObmUser attendeeUpdated, ParticipationState status, Locale locale) {
-				Builder<Object, Object> datamodel = ImmutableMap.builder()
+		Builder<Object, Object> datamodel = ImmutableMap.builder()
 			.put("user", attendeeUpdated.getDisplayName())
 			.put("participationState", participationState(status, locale))
-			.put("comment", status.getComment().serializeToString())
+			.put("comment", Strings.nullToEmpty(status.getComment().serializeToString()))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
 			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
 		return datamodel;
