@@ -49,18 +49,18 @@ class OverQuotaDocumentException extends Exception {}
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_search($document) {
   global $c_all, $cdg_sql, $obm, $ctu_sql_limit, $cdoc_kind_dir;
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $document["sql_order_dir"];
   $sql_order_field = $document["sql_order_field"];
 
-  $title = sql_search_text_parse($document["title"]);
-  $author = sql_search_text_parse($document["author"]);
+  $title = sql_search_text_parse($obm_q->escape($document["title"]));
+  $author = sql_search_text_parse($obm_q->escape($document["author"]));
   $mime = $document["mime"];
-  $name = sql_search_text_parse($document["name"]);
+  $name = sql_search_text_parse($obm_q->escape($document["name"]));
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];  
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
@@ -243,6 +243,7 @@ function run_query_document_insert(&$document) {
   global $cdg_sql, $c_auto, $obm;
   global $err, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -358,6 +359,7 @@ function run_query_document_insert(&$document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_id($document) {
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $title = $document["title"];
   $author = $document["author"];
@@ -369,15 +371,14 @@ function run_query_document_id($document) {
   $query = "SELECT MAX(document_id) as document_id
     FROM Document
     WHERE 
-      document_title='$title'
-      AND document_author='$author'
-      AND document_name='$name'
-      AND document_path='$path'
-      AND document_size='$size'
+      document_title='".$obm_q->escape($title)."'
+      AND document_author='".$obm_q->escape($author)."'
+      AND document_name='".$obm_q->escape($name)."'
+      AND document_path='".$obm_q->escape($path)."'
+      AND document_size='".$obm_q->escape($size)."'
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_id()");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -400,6 +401,7 @@ function run_query_document_update(&$document) {
   global $obm, $cdg_sql, $c_auto;
   global $err, $l_delete_file_error, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = $obm["uid"];
@@ -444,7 +446,7 @@ function run_query_document_update(&$document) {
     document_title='".$obm_q->escape($title)."',
     document_kind=$kind,
     document_author='".$obm_q->escape($author)."',
-    document_privacy='$privacy'
+    document_privacy='".$obm_q->escape($privacy)."'
     $query_file
   WHERE document_id $id 
     $multidomain";
@@ -724,6 +726,7 @@ function get_document_linked_events($document_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_dir_document_nb($dpath, $kind) {
   global $cdg_sql, $cdoc_kind_dir, $c_all;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("document");
@@ -883,6 +886,7 @@ function check_document_data_form($cid, $document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_mime_insert($document) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $timecreate = date("Y-m-d H:i:s");
@@ -924,6 +928,7 @@ function run_query_document_mime_insert($document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_mime_update($document) {
   global $obm, $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $timeupdate = date("Y-m-d H:i:s");
@@ -1025,6 +1030,7 @@ function run_query_document_mime_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_insert_dir($document) {
   global $cdg_sql, $cdoc_kind_dir, $obm;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -1077,6 +1083,7 @@ function run_query_document_insert_dir($document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_update_dir($document) {
   global $cdg_sql, $obm, $cdoc_kind_dir;
+  $obm_q = new DB_OBM;
 
   $obm_q = new DB_OBM;
   $uid = sql_parse_id($obm["uid"]);
@@ -1099,7 +1106,7 @@ function run_query_document_update_dir($document) {
   $obm_q->query($query);
   $query = "SELECT *
     FROM Document 
-    WHERE document_path like '$old_path/%'
+    WHERE document_path like '".$obm_q->escape($old_path)."/%'
       $multidomain" ;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, "run_query_document_update_dir(2)");
@@ -1202,12 +1209,12 @@ function check_document_user_quota($size, $u_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_user_quota($u_id) {
   global $cdg_sql;
-  
+  $obm_q = new DB_OBM;
+
   $query = "SELECT SUM(document_size) AS sum_size FROM Document WHERE 
-  document_usercreate = '$u_id' AND 
+  document_usercreate = '".$obm_q->escape($u_id)."' AND 
   document_privacy = 1";
   display_debug_msg($query, $cdg_sql, 'run_query_document_user_quota()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q->f('sum_size');
