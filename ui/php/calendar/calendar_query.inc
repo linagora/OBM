@@ -7329,7 +7329,7 @@ function run_query_get_recurring_event_id_from_ext_id($ext_id, $obm_user_id) {
 function get_userid_from_mail($mail){
 	list($left,$right) = split('@',$mail);
 	
-	$query = "SELECT userobm_id FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE userobm_email #LIKE '$left' AND domain_name #LIKE '$right' ";
+	$query = "SELECT userobm_id FROM UserObm INNER JOIN Domain ON userobm_domain_id = domain_id WHERE userobm_email #LIKE '$left' AND ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_label #LIKE '$right' )";
 	
 	$obm_q = new DB_OBM;
 	$obm_q->query($query);
