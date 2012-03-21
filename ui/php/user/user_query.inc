@@ -2331,14 +2331,15 @@ function run_query_user_delete_profile($user_id)  {
   $query = "DELETE FROM Entity 
     WHERE entity_id IN (
       SELECT evententity_entity_id FROM EventEntity 
-      LEFT JOIN EventLink ON evententity_event_id = eventlink_event_id
-      WHERE evententity_event_id IS NULL)";
+      JOIN Event ON event_id = evententity_event_id
+      LEFT JOIN EventLink ON event_id = eventlink_event_id
+      WHERE event_owner $user_id AND evententity_event_id IS NULL)";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
   // Remove all Events that have non attendees !
   $query = "DELETE FROM Event
-     WHERE event_id NOT IN (SELECT eventlink_event_id FROM EventLink)"; 
+     WHERE event_id IN (SELECT event_id FROM Event LEFT JOIN EventLink ON event_id = eventlink_event_id WHERE eventlink_event_id IS NULL AND event_owner $user_id)"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 }
