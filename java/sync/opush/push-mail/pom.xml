@@ -85,9 +85,9 @@
 			<artifactId>mail</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.icegreen</groupId>
+			<groupId>greenmail</groupId>
 			<artifactId>greenmail</artifactId>
-			<version>1.3.2-mbaechler-2</version>
+			<version>1.3.1b-mbaechler-4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

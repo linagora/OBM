@@ -34,6 +34,8 @@ package org.obm.push.mail.imap;
 import java.util.Date;
 import java.util.Set;
 
+import javax.mail.internet.MimeMessage;
+
 import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.BackendSession;
@@ -48,6 +50,8 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.common.collect.Iterables;
+import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.user.UserException;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
 public class ImapTestUtils {
@@ -72,6 +76,11 @@ public class ImapTestUtils {
 	
 	public Email sendEmailToInbox() throws MailException {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		return emailInInbox();
+	}
+	
+	public Email deliverToUserInbox(GreenMailUser user, MimeMessage message, Date internalDate) throws MailException, UserException {
+		user.deliver(message, internalDate);
 		return emailInInbox();
 	}
 
