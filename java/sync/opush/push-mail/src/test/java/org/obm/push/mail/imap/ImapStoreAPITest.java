@@ -164,7 +164,7 @@ public class ImapStoreAPITest {
 
 	@Test(expected=MailException.class)
 	public void testStoreInInboxRollbackWhenStreamFail() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
 			mailboxService.storeInInbox(bs, failingEmailStream, true);
@@ -178,7 +178,7 @@ public class ImapStoreAPITest {
 
 	@Test(expected=MailException.class)
 	public void testStoreInInboxRollbackWhenStreamFailStream() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
 			mailboxService.storeInInbox(bs, failingEmailStream, 100, true);
@@ -191,7 +191,7 @@ public class ImapStoreAPITest {
 	
 	@Test
 	public void testStoreInInboxReadStatusTrue() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
 		mailboxService.storeInInbox(bs, emailData, true);
 		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
@@ -201,7 +201,7 @@ public class ImapStoreAPITest {
 
 	@Test
 	public void testStoreInInboxReadStatusTrueStream() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
 		mailboxService.storeInInbox(bs, emailData, 279, true);
 		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
@@ -211,7 +211,7 @@ public class ImapStoreAPITest {
 	
 	@Test
 	public void testStoreInInboxReadStatusFalse() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
 		mailboxService.storeInInbox(bs, emailData, false);
 		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
@@ -221,7 +221,7 @@ public class ImapStoreAPITest {
 
 	@Test
 	public void testStoreInInboxReadStatusFalseStream() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
 		mailboxService.storeInInbox(bs, emailData, 279, false);
 		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);

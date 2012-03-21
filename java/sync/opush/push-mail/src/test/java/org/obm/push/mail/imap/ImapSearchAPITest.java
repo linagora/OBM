@@ -39,6 +39,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeMessage;
 
 import org.fest.assertions.api.Assertions;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,9 +50,9 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
+import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 
@@ -98,6 +99,22 @@ public class ImapSearchAPITest {
 		greenMail.stop();
 	}
 	
+	@Test(expected=MailException.class)
+	public void testSearchWrongMailbox() throws Exception {
+		try {
+			privateMailboxService.uidSearch(bs, testUtils.mailboxPath("wrong"), SearchQuery.MATCH_ALL);	
+		} catch (MailException e) {
+			Assertions.assertThat(e).hasMessageContaining("Cannot find IMAP folder");
+			throw e;
+		}
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testSearchNullQuery() throws Exception {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		privateMailboxService.uidSearch(bs, inbox, null);	
+	}
+	
 	@Test
 	public void testSearchWithMatchAllQuery() throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
@@ -109,19 +126,83 @@ public class ImapSearchAPITest {
 	public void testSearchOneMailWithMatchAllQuery() throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		MimeMessage message = buildSimpleMessage();
-		Email email = testUtils.deliverToUserInbox(greenMailUser, message, new Date());
+		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, SearchQuery.MATCH_ALL);
-		Assertions.assertThat(result).containsOnly(email.getIndex());
+		Assertions.assertThat(result).containsOnly(1L);
 	}
 	
 	@Test
 	public void testSearchTwoMailsWithMatchAllQuery() throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		MimeMessage message = buildSimpleMessage();
-		Email email1 = testUtils.deliverToUserInbox(greenMailUser, message, new Date());
-		Email email2 = testUtils.deliverToUserInbox(greenMailUser, message, new Date());
+		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
+		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, SearchQuery.MATCH_ALL);
-		Assertions.assertThat(result).containsOnly(email1.getIndex(), email2.getIndex());
+		Assertions.assertThat(result).containsOnly(1L, 2L);
+	}
+	
+	@Test
+	public void testSearchSinceOneDayWindowInTwoMails() throws Exception {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		MimeMessage message = buildSimpleMessage();
+		Date lastWeek = new DateTime(beforeTest).minusWeeks(1).toDate();
+		Date yesterday = new DateTime(beforeTest).minusDays(1).toDate();
+		
+		testUtils.deliverToUserInbox(greenMailUser, message, beforeTest);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
+		
+		SearchQuery query = new SearchQuery.Builder().after(yesterday).build();
+		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Assertions.assertThat(result).containsOnly(1L);
+	}
+
+	@Test
+	public void testSearchBeforeOneDayWindowInTwoMails() throws Exception {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		MimeMessage message = buildSimpleMessage();
+		Date lastWeek = new DateTime(beforeTest).minusWeeks(1).toDate();
+		Date yesterday = new DateTime(beforeTest).minusDays(1).toDate();
+		
+		testUtils.deliverToUserInbox(greenMailUser, message, beforeTest);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
+		
+		SearchQuery query = new SearchQuery.Builder().before(yesterday).build();
+		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Assertions.assertThat(result).containsOnly(2L);
+	}
+
+	@Test
+	public void testSearchComplexWindow() throws Exception {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		MimeMessage message = buildSimpleMessage();
+		Date lastMonth = new DateTime(beforeTest).minusMonths(1).toDate();
+		Date lastWeek = new DateTime(beforeTest).minusWeeks(1).toDate();
+		Date yesterday = new DateTime(beforeTest).minusDays(1).toDate();
+		
+		testUtils.deliverToUserInbox(greenMailUser, message, beforeTest);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastMonth);
+		
+		SearchQuery query = new SearchQuery.Builder().after(lastWeek).before(yesterday).build();
+		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Assertions.assertThat(result).containsOnly(2L);
+	}
+
+	@Test
+	public void testSearchVoidRangeWindow() throws Exception {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		MimeMessage message = buildSimpleMessage();
+		Date lastMonth = new DateTime(beforeTest).minusMonths(1).toDate();
+		Date lastWeek = new DateTime(beforeTest).minusWeeks(1).toDate();
+		Date yesterday = new DateTime(beforeTest).minusDays(1).toDate();
+		
+		testUtils.deliverToUserInbox(greenMailUser, message, beforeTest);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
+		testUtils.deliverToUserInbox(greenMailUser, message, lastMonth);
+		
+		SearchQuery query = new SearchQuery.Builder().after(yesterday).before(lastWeek).build();
+		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Assertions.assertThat(result).isEmpty();
 	}
 	
 	private MimeMessage buildSimpleMessage() throws AddressException, MessagingException {
