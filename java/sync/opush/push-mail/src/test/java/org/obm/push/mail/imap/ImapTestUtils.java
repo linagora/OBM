@@ -88,7 +88,7 @@ public class ImapTestUtils {
 	public void deliverToUserInbox(GreenMailUser user, MimeMessage message, Date internalDate) throws UserException {
 		user.deliver(message, internalDate);
 	}
-
+	
 	public Email sendEmailToMailbox(String mailbox)
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		

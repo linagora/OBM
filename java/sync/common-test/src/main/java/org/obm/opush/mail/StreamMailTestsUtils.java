@@ -17,5 +17,5 @@ public class StreamMailTestsUtils {
 	public static ByteArrayInputStream newInputStreamFromString(String content) {
 		return new ByteArrayInputStream(new String(content).getBytes(Charsets.UTF_8));
 	}
-	
+
 }

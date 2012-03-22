@@ -76,18 +76,18 @@ public class ImapStoreAPITest {
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
-	private String inboxPath; 
+	private String inboxPath;
 
 	@Before
 	public void setUp() {
-	    greenMail.start();
-	    mailbox = "to@localhost.com";
-	    password = "password";
-	    greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
-				new Credentials(User.Factory.create()
+		greenMail.start();
+		mailbox = "to@localhost.com";
+		password = "password";
+		greenMail.setUser(mailbox, password);
+		bs = new BackendSession(
+    				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 	}
 	
 	@After
@@ -239,7 +239,7 @@ public class ImapStoreAPITest {
 
 	@Test(expected=MailException.class)
 	public void testStoreInInboxRollbackWhenGivenMessageSizeIsShorter() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		int emailGivenSize = 20;
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
 
@@ -266,7 +266,7 @@ public class ImapStoreAPITest {
 
 	@Test(expected=MailException.class)
 	public void testStoreInInboxRollbackWhenGivenMessageSizeIsLonger() throws Exception {
-		Date before = new Date();
+		Date before = new Date(0);
 		int emailGivenSize = 60;
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
 
