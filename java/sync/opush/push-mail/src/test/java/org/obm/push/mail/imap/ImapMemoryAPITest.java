@@ -47,9 +47,12 @@ import javax.mail.util.SharedFileInputStream;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.minig.imap.IMAPException;
+import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -71,7 +74,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
-public class ImapStoreAPIMemoryTest {
+public class ImapMemoryAPITest {
 	
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
@@ -79,6 +82,7 @@ public class ImapStoreAPIMemoryTest {
 	@Inject ImapMailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
+	@Inject ImapClientProvider clientProvider;
 
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
@@ -89,8 +93,8 @@ public class ImapStoreAPIMemoryTest {
 	
 	private ClosableProcess greenMailProcess;
 	
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
 
 
 	
@@ -105,7 +109,7 @@ public class ImapStoreAPIMemoryTest {
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
-	    inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 	}
 
 	@After
@@ -113,14 +117,13 @@ public class ImapStoreAPIMemoryTest {
 		greenMailProcess.closeProcess();
 	}
 	
-	private File generateBigEmail(long maxHeapSize) throws IOException,
-			FileNotFoundException {
+	private File generateBigEmail(long maxHeapSize) throws IOException, FileNotFoundException {
 		File data = folder.newFile("test-data");
-	    FileOutputStream fileOutputStream = new FileOutputStream(data);
-	    ByteStreams.copy(StreamMailTestsUtils.getHeaders(), fileOutputStream);
-	    ByteStreams.copy(new RandomGeneratedInputStream(maxHeapSize), fileOutputStream);
-	    fileOutputStream.close();
-	    return data;
+		FileOutputStream fileOutputStream = new FileOutputStream(data);
+		ByteStreams.copy(StreamMailTestsUtils.getHeaders(), fileOutputStream);
+		ByteStreams.copy(new RandomGeneratedInputStream(maxHeapSize), fileOutputStream);
+		fileOutputStream.close();
+		return data;
 	}
 	
 	private long getTwiceThisHeapSize() {
@@ -162,5 +165,29 @@ public class ImapStoreAPIMemoryTest {
 		InputStream stream = mailboxService.fetchMailStream(bs, inboxPath, 1L);
 		Assertions.assertThat(stream).hasContentEqualTo(new RandomGeneratedInputStream(size));
 	}
+
+	@Ignore("OutOfMemoryError is triggered but caught in a thread of Apache Mina API")
+	@Test(expected=OutOfMemoryError.class)
+	public void testFetchPartMoreThanMemorySize() throws Exception {
+		long size = getTwiceThisHeapSize();
+		File data = generateBigEmail(size);
+		final InputStream heavyInputStream = new SharedFileInputStream(data);
+		mailboxService.storeInInbox(bs, heavyInputStream, true);
+
+		InputStream fetchPart = uidFetchPart(1, "1");
+		
+		Assertions.assertThat(fetchPart).hasContentEqualTo(new RandomGeneratedInputStream(size));
+	}
+
+	private InputStream uidFetchPart(long uid, String partToFetch) throws IMAPException {
+		StoreClient client = loggedClient();
+		client.select("inbox");
+		return client.uidFetchPart(uid, partToFetch);
+	}
 	
+	private StoreClient loggedClient() throws IMAPException {
+		StoreClient client = clientProvider.getImapClient(bs);
+		client.login(false);
+		return client;
+	}
 }
