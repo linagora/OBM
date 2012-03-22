@@ -1106,7 +1106,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					touchDateForFakeExDates);
 
 			if (!changedEvent.isEmpty()) {
-				replaceDeclinedEventExceptionByException(token, changedEvent);
+				replaceDeclinedEventExceptionByException(calendarUser, changedEvent);
 			}
 		} catch (SQLException e) {
 			logger.error("error loading attendees, alerts, exceptions, eventException", e);
@@ -1140,11 +1140,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void replaceDeclinedEventExceptionByException(AccessToken token,
+	private void replaceDeclinedEventExceptionByException(ObmUser calendarUser,
 			List<Event> changedEvent) {
 		for(Event event: changedEvent) {
 			if(event.isRecurrent()) {
-				event.getRecurrence().replaceUnattendedEventExceptionByException(token.getUserEmail());
+				event.getRecurrence().replaceUnattendedEventExceptionByException(calendarUser.getEmail());
 			}
 		}
 	}
