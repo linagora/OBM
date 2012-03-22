@@ -2840,6 +2840,8 @@ function send_mail_when_comment($event_id, $oldEvent){
  */
 function run_query_calendar_create_or_update_event_template(&$calendar) {
   global $cdg_sql, $obm;
+  $obm_q = new DB_OBM;
+
   // Insert "others attendees" as private contacts
   if ($calendar['others_attendees'] != "") {
     $others_attendees = run_query_insert_others_attendees($calendar);
@@ -3029,7 +3031,6 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
 
   }
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   if (isset($calendar['template_id'])) {
     $id = $calendar['template_id'];
@@ -3048,13 +3049,13 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
  */
 function run_query_check_exists_template_by_name($templateName){
   global $cdg_sql;
+  $obm_q = new DB_OBM;
 
   $query = "SELECT eventtemplate_id 
             FROM EventTemplate
             WHERE eventtemplate_name = '".$obm_q->escape($templateName)."'";
   display_debug_msg($query, $cdg_sql, 'run_query_check_exists_template_by_name()');
   
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return ($obm_q->num_rows() > 0);
 }
