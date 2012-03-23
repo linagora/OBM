@@ -32,15 +32,74 @@
 package org.minig.imap;
 
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Set;
+
+import com.google.common.base.Objects;
 
 public class FastFetch {
 
+	public static class Builder {
+		private long uid;
+		private Date internalDate;
+		private Set<Flag> flags;
+		
+		public Builder() {
+			flags = EnumSet.noneOf(Flag.class);
+		}
+		
+		public Builder uid(long uid) {
+			this.uid = uid;
+			return this;
+		}
+		
+		public Builder internalDate(Date date) {
+			this.internalDate = date;
+			return this;
+		}
+		
+		public Builder seen() {
+			flags.add(Flag.SEEN);
+			return this;
+		}
+		
+		public Builder answered() {
+			flags.add(Flag.ANSWERED);
+			return this;
+		}
+		
+		public Builder draft() {
+			flags.add(Flag.DRAFT);
+			return this;
+		}
+		
+		public Builder deleted() {
+			flags.add(Flag.DELETED);
+			return this;
+		}
+		
+		public Builder flagged() {
+			flags.add(Flag.FLAGGED);
+			return this;
+		}
+		
+		public FastFetch build() {
+			return new FastFetch(uid, internalDate, flags);
+		}
+
+		public void flags(Set<Flag> flags) {
+			if (!this.flags.isEmpty()) {
+				throw new IllegalStateException("Flags can't be set because the builder already has some");
+			}
+			this.flags = flags;
+		}
+	}
+	
 	private final long uid;
 	private final Date internalDate;
 	private final Set<Flag> flags;
 	
-	public FastFetch(long uid, Date internalDate, Set<Flag> flags){
+	private FastFetch(long uid, Date internalDate, Set<Flag> flags){
 		this.uid = uid;
 		this.internalDate = internalDate;
 		this.flags = flags;
@@ -64,6 +123,31 @@ public class FastFetch {
 	
 	public boolean isAnswered() {
 		return flags != null && flags.contains(Flag.ANSWERED);
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(uid, internalDate, flags);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof FastFetch) {
+			FastFetch that = (FastFetch) object;
+			return Objects.equal(this.uid, that.uid)
+				&& Objects.equal(this.internalDate, that.internalDate)
+				&& Objects.equal(this.flags, that.flags);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("internalDate", internalDate)
+			.add("flags", flags)
+			.toString();
 	}
 	
 }

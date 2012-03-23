@@ -54,6 +54,7 @@ public class BeansTest {
 					.add(MailboxFolder.class)
 					.add(MailboxFolders.class)
 					.add(Envelope.class)
+					.add(FastFetch.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

@@ -54,8 +54,6 @@ import com.google.common.collect.ImmutableSet.Builder;
 /**
  * FAST
  *        Macro equivalent to: (FLAGS INTERNALDATE RFC822.SIZE)
- * @author adrienp
- *
  */
 public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 
@@ -97,6 +95,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		if (isOK) {
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; it.hasNext() && i < uids.size(); ) {
+				org.minig.imap.FastFetch.Builder builder = new FastFetch.Builder();
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH (")) {
@@ -104,13 +103,14 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 					continue;
 				}
 				
-				long uid = getUid(payload);
+				builder.uid(getUid(payload));
 				Date internalDate = getInternalDate(payload);
 				if (internalDate == null) {
 					logger.error("Failed to get internaldate in fetch response: {}", payload);
 				}
-				Set<Flag> flags = getFlags(payload);
-				buildSet.add(new FastFetch(uid, internalDate, flags));
+				builder.internalDate(internalDate);
+				builder.flags(getFlags(payload));
+				buildSet.add(builder.build());
 			}
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
