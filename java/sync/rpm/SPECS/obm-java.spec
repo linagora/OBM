@@ -115,7 +115,6 @@ install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
 
 # install opush
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
-#mkdir -p $RPM_BUILD_ROOT/srv/jetty6/webapps/opush
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/opush
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/opush
 cp opush/config-sample/sync_perms.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
@@ -125,18 +124,15 @@ cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
 cd opush
 WEB_INF=`find push/target -name WEB-INF `
 cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
-#cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/opush
 cd -
 
 # install obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/obm-locator
-#mkdir -p $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 # copie du web-inf
 WEB_INF=`find obm-locator/target -name WEB-INF `
 cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/obm-locator
-#cp -r ${WEB_INF} $RPM_BUILD_ROOT/srv/jetty6/webapps/obm-locator
 
 # common libs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/jetty/lib
@@ -157,7 +153,6 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %files -n opush
 %defattr(-,root,root,-)
 %{_datadir}/jetty/webapps/opush
-#/srv/jetty6/webapps/opush
 %{_localstatedir}/log/opush
 %config(noreplace) %{_sysconfdir}/opush/sync_perms.ini
 %config(noreplace) %{_sysconfdir}/opush/ldap_conf.ini
@@ -166,7 +161,6 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %files -n obm-locator
 %defattr(-,root,root,-)
 %{_datadir}/jetty/webapps/obm-locator
-#/srv/jetty6/webapps/obm-locator
 %{_localstatedir}/log/obm-locator
 
 %files -n obm-tomcat-common-libs
