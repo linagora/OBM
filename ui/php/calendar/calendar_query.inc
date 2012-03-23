@@ -2776,7 +2776,7 @@ function run_query_calendar_event_comment_insert($event_id, $ent_id, $comment, $
 	$obm_q = new DB_OBM;
 	$query = "
 	UPDATE EventLink 
-	SET eventlink_comment ='".$comment."'
+	SET eventlink_comment ='".$obm_q->escape($comment)."'
 	WHERE eventlink_event_id = $event_id
 	AND eventlink_entity_id = $entity_id
 	;";

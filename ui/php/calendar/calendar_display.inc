@@ -3228,7 +3228,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 		$user_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$GLOBALS[l_add_comment]...', 'user');\" title=\"$l_add\"></a>";
 	}else{
 		$user_comment = addslashes($comment);
-		$user_comment_display =  $user_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
+		$user_comment_display =  $comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
          }
 	  $saved_checked = $state;
           $dis_user_list .= "
@@ -3277,11 +3277,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           $dis_contact_list .= "
           <tr>
           <td>$label</td>
-          <td></td>
           <td class=\"C\">
-          <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_accepted</span></label>
-          <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_needs_action</span></label>
-          <label><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_declined</span></label>
+          <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /> <span>$l_accepted</span></label>
+          <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /> <span>$l_needs_action</span></label>
+          <label><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /> <span>$l_declined</span></label>
           </td>
           </tr>";
           $$state = '';
@@ -3358,15 +3357,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $label = '';
         $label .= $entity['label'];
         $state = $entity['state'];
-	$resource_comment = $entity['comment'];
-	
+        
+        $comment = $entity['comment'];
+        $resource_comment = addslashes($comment);
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
 	  
 	  if($resource_comment != ''){
 		$comment_style = 'text-align:justify;';
-		$resource_comment_display = $resource_comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$resource_comment', 'resource');\"  title=\"$l_edit\"></a>";
+		$resource_comment_display = $comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$resource_comment', 'resource');\"  title=\"$l_edit\"></a>";
          }else{
            $comment_style = 'text-align:center;';
            $resource_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$GLOBALS[l_add_comment]...', 'resource');\" title=\"$l_add\"></a>";
