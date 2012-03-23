@@ -54,7 +54,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.ThrowingInputStream;
 
@@ -252,32 +251,4 @@ public class ImapStoreAPITest {
 		}
 	}
 
-	@Test(expected=MailException.class)
-	public void testStoreInInboxThrowExceptionWhenGivenMessageSizeIsLonger() throws MailException {
-		int emailGivenSize = 60;
-		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
-		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
-		} catch (MailException e) {
-			MailTestsUtils.assertThatIsJavaSocketTimeoutException(e);
-			throw e;
-		}
-	}
-
-	@Test(expected=MailException.class)
-	public void testStoreInInboxRollbackWhenGivenMessageSizeIsLonger() throws Exception {
-		Date before = new Date(0);
-		int emailGivenSize = 60;
-		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
-
-		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
-		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
-			Assertions.assertThat(emails).isNotNull().hasSize(0);
-			throw e;
-		}
-	}
-
-	
 }

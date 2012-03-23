@@ -33,12 +33,10 @@ package org.obm.push.mail.imap;
 
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.mail.Flags;
 
@@ -60,10 +58,8 @@ import org.obm.push.bean.User;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -102,32 +98,6 @@ public class ImapMailboxServiceTest {
 	@After
 	public void tearDown() {
 		greenMail.stop();
-	}
-
-	@Test(expected=MailException.class)
-	public void testTimeout() throws MailException {
-		int emailGivenSize = 20;
-		byte[] emailSmallerThanExpectedSize = new String("0123456789").getBytes();
-		InputStream emailStream = new ByteArrayInputStream(emailSmallerThanExpectedSize);
-		
-		Stopwatch stopWatch = new Stopwatch().start();
-		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
-		} catch (MailException e) {
-			int acceptedTimeoutDeltaInMs = 500;
-			assertTimeoutIsInAcceptedDelta(stopWatch, acceptedTimeoutDeltaInMs);
-			MailTestsUtils.assertThatIsJavaSocketTimeoutException(e);
-			throw e;
-		}
-	}
-
-	private void assertTimeoutIsInAcceptedDelta(Stopwatch stopWatch, int acceptedDeltaInMs) {
-		stopWatch.stop();
-		int expectedTimeout = emailConfig.imapTimeout();
-		long ourTimeout = stopWatch.elapsedTime(TimeUnit.MILLISECONDS);
-		Assertions.assertThat(ourTimeout)
-			.isGreaterThan(expectedTimeout)
-			.isLessThan(expectedTimeout + acceptedDeltaInMs);
 	}
 
 	@Test

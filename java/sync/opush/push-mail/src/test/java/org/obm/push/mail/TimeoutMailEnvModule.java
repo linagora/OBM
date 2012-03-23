@@ -33,60 +33,36 @@ package org.obm.push.mail;
 
 import org.obm.configuration.EmailConfiguration;
 
-public class TestEmailConfiguration implements EmailConfiguration {
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
+import com.icegreen.greenmail.util.ServerSetupTest;
 
-	private final int imapPort;
-	private int imapTimeout;
+public class TimeoutMailEnvModule extends AbstractModule {
 
-	public TestEmailConfiguration(int imapPort) {
-		this.imapPort = imapPort;
-		this.imapTimeout = 3600000; // one hour
+	@Override
+	protected void configure() {
+		int imapTimeoutInSecond = 3;
+		MailEnvModule mailEnvModule = new MailEnvModule();
+		ImapTimeoutModule imapTimeoutModule = new ImapTimeoutModule(imapTimeoutInSecond);
+		
+		Module timeoutMailEnvModule = Modules.override(mailEnvModule).with(imapTimeoutModule);
+		timeoutMailEnvModule.configure(binder());
 	}
 	
-	@Override
-	public boolean activateTls() {
-		return false;
-	}
+	public static class ImapTimeoutModule extends AbstractModule {
+		
+		private final int imapTimeoutInSecond;
 
-	@Override
-	public boolean loginWithDomain() {
-		return true;
+		public ImapTimeoutModule(int imapTimeoutInSecond) {
+			this.imapTimeoutInSecond = imapTimeoutInSecond;
+		}
+		
+		@Override
+		protected void configure() {
+			TestEmailConfiguration testConfiguration = new TestEmailConfiguration(ServerSetupTest.IMAP.getPort());
+			testConfiguration.setImapTimeoutInSecond(imapTimeoutInSecond);
+			bind(EmailConfiguration.class).toInstance(testConfiguration);
+		}
 	}
-
-	@Override
-	public int getMessageMaxSize() {
-		return 1024;
-	}
-
-	@Override
-	public int imapPort() {
-		return imapPort;
-	}
-
-	@Override
-	public int imapTimeout() {
-		return imapTimeout;
-	}
-
-	@Override
-	public int getImapFetchBlockSize() {
-		return 1 << 20;
-	}
-
-	public String imapMailboxDraft() {
-		return IMAP_DRAFTS_NAME;
-	}
-
-	public String imapMailboxSent() {
-		return IMAP_SENT_NAME;
-	}
-
-	public String imapMailboxTrash() {
-		return IMAP_TRASH_NAME;
-	}
-
-	public void setImapTimeoutInSecond(int timeout) {
-		imapTimeout = timeout * 1000;
-	}
-	
 }
