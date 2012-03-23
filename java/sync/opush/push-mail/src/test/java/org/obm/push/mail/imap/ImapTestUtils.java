@@ -85,9 +85,8 @@ public class ImapTestUtils {
 		return emailInInbox();
 	}
 	
-	public Email deliverToUserInbox(GreenMailUser user, MimeMessage message, Date internalDate) throws MailException, UserException {
+	public void deliverToUserInbox(GreenMailUser user, MimeMessage message, Date internalDate) throws UserException {
 		user.deliver(message, internalDate);
-		return emailInInbox();
 	}
 
 	public Email sendEmailToMailbox(String mailbox)

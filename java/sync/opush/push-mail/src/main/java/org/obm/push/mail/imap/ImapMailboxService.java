@@ -675,4 +675,18 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			closeQuietly(store);
 		}
 	}
+	
+	@Override
+	public Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, List<Long> uids) throws MailException {
+		StoreClient store = imapClientProvider.getImapClient(bs);
+		try {
+			login(store);
+			store.select(parseMailBoxName(bs, collectionPath));
+			return store.uidFetchFast(uids);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
+		}
+	}
 }

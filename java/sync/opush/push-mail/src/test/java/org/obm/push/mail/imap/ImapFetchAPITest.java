@@ -32,7 +32,12 @@
 package org.obm.push.mail.imap;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.MimeMessage;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -41,6 +46,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
+import org.minig.imap.FastFetch;
 import org.minig.imap.UIDEnvelope;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
@@ -56,9 +62,14 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.PrivateMailboxService;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.user.UserException;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
 public class ImapFetchAPITest {
 
@@ -78,6 +89,7 @@ public class ImapFetchAPITest {
 	private BackendSession bs;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
+	private GreenMailUser greenMailUser;
 	
 	@Before
 	public void setUp() {
@@ -85,7 +97,7 @@ public class ImapFetchAPITest {
 		this.greenMail.start();
 		this.mailbox = "to@localhost.com";
 	    this.password = "password";
-	    this.greenMail.setUser(mailbox, password);
+	    this.greenMailUser = this.greenMail.setUser(mailbox, password);
 	    this.bs = new BackendSession(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
@@ -138,6 +150,53 @@ public class ImapFetchAPITest {
 		Assertions.assertThat(uidEnvelope).isNotNull();
 		Assertions.assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
 		Assertions.assertThat(uidEnvelope.getEnvelope().getMsgno()).isEqualTo(2);
+	}
+	
+	@Test
+	public void testFetchFastNoUid() throws MailException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of());
+		Assertions.assertThat(result).isEmpty();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testFetchFastNullUids() throws MailException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		privateMailboxService.fetchFast(bs, inbox, null);
+	}
+
+	@Test
+	public void testFetchFastOneMessage() throws MailException, AddressException, MessagingException, UserException {
+		Date internalDate = new Date(1234);
+		Date truncatedInternalDate = new Date(1000);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).build());
+	}
+	
+	@Test
+	public void testFetchFastDuplicateMessage() throws MailException, AddressException, MessagingException, UserException {
+		Date internalDate = new Date(1234);
+		Date truncatedInternalDate = new Date(1000);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L, 1L));
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).build());
+	}
+	
+	@Test
+	public void testFetchFastAnsweredMessage() throws MailException, AddressException, MessagingException, UserException, ImapMessageNotFoundException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Date internalDate = new Date(1234);
+		Date truncatedInternalDate = new Date(1000);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		mailboxService.setAnsweredFlag(bs, inbox, 1);
+		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().build());
 	}
 	
 }

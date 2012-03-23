@@ -32,7 +32,9 @@
 package org.obm.push.mail;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.minig.imap.FastFetch;
 import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
@@ -46,4 +48,6 @@ public interface PrivateMailboxService {
 	OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException;
 	
 	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
+
+	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, List<Long> uids) throws MailException;
 }
