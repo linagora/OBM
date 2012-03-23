@@ -491,17 +491,30 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
+	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress)
+			throws MailException {
+		
+		ImapStore store = null;
 		try {
-			login(store);
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
 			String mailBoxName = parseMailBoxName(bs, collectionName);
-			store.select(mailBoxName);
-			return store.uidFetchPart(mailUid, mimePartAddress);
-		} catch (IMAPException e) {
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidFetchPart(mailUid, mimePartAddress);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
 	}
 

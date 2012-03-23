@@ -144,15 +144,19 @@ public class OpushImapFolder {
 	}
 
 	public InputStream uidFetchMessage(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		return peekAtMessageStream(messageUid);
+	}
+
+	public InputStream uidFetchPart(long messageUid, String mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
+		return peekAtMessageStream(messageUid, mimePartAddress);
+	}
+
+	private InputStream peekAtMessageStream(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		return peekAtMessageStream(messageUid, null);
+	}
+
+	private InputStream peekAtMessageStream(long messageUid, String mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
 		IMAPMessage messageToFetch = getMessageByUID(messageUid);
-		return peekMessageStream(messageToFetch);
-	}
-
-	private InputStream peekMessageStream(IMAPMessage messageToFetch) {
-		return peekMessageStream(messageToFetch, null);
-	}
-
-	private InputStream peekMessageStream(IMAPMessage messageToFetch, String mimePartAddress) {
 		int noMaxByteCount = -1;
 		boolean usePeek = true;
 		return new IMAPInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);

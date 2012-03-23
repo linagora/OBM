@@ -39,12 +39,10 @@ import java.util.Date;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.minig.imap.IMAPException;
-import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
@@ -55,13 +53,14 @@ import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapTestUtils;
+import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@Ignore("Unable to compare streams yet, an unexpected char is sent by our imap implementation")
 public class UIDFetchPartTest {
 
 	@Rule
@@ -254,22 +253,21 @@ public class UIDFetchPartTest {
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousFilePart() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
-		
 
 		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2.2");
 		
 		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-2.txt"));
 	}
 
-	private InputStream uidFetchPart(long uid, String partToFetch) throws IMAPException {
-		StoreClient client = loggedClient();
-		client.select("inbox");
-		return client.uidFetchPart(uid, partToFetch);
+	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
+		ImapStore client = loggedClient();
+		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return folder.uidFetchPart(uid, partToFetch);
 	}
 	
-	private StoreClient loggedClient() throws IMAPException {
-		StoreClient client = clientProvider.getImapClient(bs);
-		client.login(false);
+	private ImapStore loggedClient() throws Exception {
+		ImapStore client = clientProvider.getImapClientWithJM(bs);
+		client.login();
 		return client;
 	}
 }

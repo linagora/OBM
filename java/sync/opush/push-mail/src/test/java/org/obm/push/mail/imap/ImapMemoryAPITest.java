@@ -51,8 +51,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.minig.imap.IMAPException;
-import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -166,28 +164,27 @@ public class ImapMemoryAPITest {
 		Assertions.assertThat(stream).hasContentEqualTo(new RandomGeneratedInputStream(size));
 	}
 
-	@Ignore("OutOfMemoryError is triggered but caught in a thread of Apache Mina API")
-	@Test(expected=OutOfMemoryError.class)
+	@Ignore("This test is too long to be executed during the development phase")
+	@Test
 	public void testFetchPartMoreThanMemorySize() throws Exception {
-		long size = getTwiceThisHeapSize();
-		File data = generateBigEmail(size);
+		File data = generateBigEmail(maxHeapSize);
 		final InputStream heavyInputStream = new SharedFileInputStream(data);
 		mailboxService.storeInInbox(bs, heavyInputStream, true);
 
 		InputStream fetchPart = uidFetchPart(1, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(new RandomGeneratedInputStream(size));
+		Assertions.assertThat(fetchPart).hasContentEqualTo(new RandomGeneratedInputStream(maxHeapSize));
 	}
 
-	private InputStream uidFetchPart(long uid, String partToFetch) throws IMAPException {
-		StoreClient client = loggedClient();
-		client.select("inbox");
-		return client.uidFetchPart(uid, partToFetch);
+	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
+		ImapStore client = loggedClient();
+		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return folder.uidFetchPart(uid, partToFetch);
 	}
 	
-	private StoreClient loggedClient() throws IMAPException {
-		StoreClient client = clientProvider.getImapClient(bs);
-		client.login(false);
+	private ImapStore loggedClient() throws Exception {
+		ImapStore client = clientProvider.getImapClientWithJM(bs);
+		client.login();
 		return client;
 	}
 }
