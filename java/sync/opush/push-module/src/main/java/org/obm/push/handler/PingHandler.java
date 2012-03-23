@@ -163,7 +163,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		for (SyncCollection collection: syncCollections) {
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
-			collection.setDataType(collectionPathHelper.recognizePIMDataType(bs, collectionPath));
+			collection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath));
 			SyncState lastKnownState = stMachine.lastKnownState(bs.getDevice(), collection.getCollectionId());
 			collection.setSyncState(lastKnownState);
 		}

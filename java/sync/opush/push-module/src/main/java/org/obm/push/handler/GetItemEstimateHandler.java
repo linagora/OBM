@@ -139,7 +139,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			try {
 				syncCollection.setCollectionPath(collectionPath);
-				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(bs, collectionPath) );
+				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
 			
 				String syncKey = syncCollection.getSyncKey();
 				SyncState state = stMachine.getSyncState(syncKey);

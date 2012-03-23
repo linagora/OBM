@@ -222,7 +222,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		fetchResult.setServerId(serverId);
 		try {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(bs, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {

@@ -195,49 +195,49 @@ public class CollectionPathHelperTest {
 
 	@Test
 	public void testRecognizePIMDataTypeSubFolder() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\anydata");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\email\\anydata");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeCalendar() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\calendar\\user@domain");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\calendar\\user@domain");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CALENDAR);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeEmail() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\email\\INBOX");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\email\\INBOX");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeContacts() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\contacts");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
 	}
 	
 	@Test
 	public void testRecognizePIMDataTypeCollectedContacts() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\contacts\\collected_contacts");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\contacts\\collected_contacts");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.CONTACTS);
 	}
 
 	@Test
 	public void testRecognizePIMDataTypeTasks() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user@domain\\tasks\\user@domain");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user@domain\\tasks\\user@domain");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.TASKS);
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testRecognizePIMDataTypeWhenNoDomain() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\\\user\\mydata");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\\\user\\mydata");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test(expected=CollectionPathException.class)
 	public void testRecognizePIMDataTypeWhenBadProtocol() throws CollectionPathException {
-		PIMDataType type = collectionPathHelper.recognizePIMDataType(bs, "obm:\\user@domain\\email");
+		PIMDataType type = collectionPathHelper.recognizePIMDataType("obm:\\user@domain\\email");
 		Assertions.assertThat(type).isEqualTo(PIMDataType.EMAIL);
 	}
 }

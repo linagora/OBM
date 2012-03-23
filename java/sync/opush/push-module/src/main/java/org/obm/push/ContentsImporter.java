@@ -91,7 +91,7 @@ public class ContentsImporter implements IContentsImporter {
 			throws CollectionNotFoundException, NotAllowedException, DaoException, 
 			ProcessingEmailException, CollectionPathException {
 
-		PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
+		PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 		PIMBackend backend = backends.getBackend(dataType);
 		backend.emptyFolderContent(bs, collectionPath, deleteSubFolder);
 	}

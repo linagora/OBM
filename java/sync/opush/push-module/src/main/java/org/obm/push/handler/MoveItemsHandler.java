@@ -135,7 +135,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
 			if (statusForItem.status == null) {
 				try {
-					PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(bs, statusForItem.srcCollection);
+					PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(statusForItem.srcCollection);
 					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);

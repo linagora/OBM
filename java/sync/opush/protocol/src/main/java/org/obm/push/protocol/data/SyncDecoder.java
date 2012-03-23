@@ -143,7 +143,7 @@ public class SyncDecoder {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			collection.setDataType(dataType);
 			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
 			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));

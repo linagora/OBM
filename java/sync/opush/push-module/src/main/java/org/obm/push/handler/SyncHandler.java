@@ -204,7 +204,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		for (SyncCollection sc: sync.getCollections()) {
 			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
 			sc.setCollectionPath(collectionPath);
-			PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(bs, collectionPath);
+			PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(collectionPath);
 			if (dataClass == PIMDataType.EMAIL) {
 				backend.startEmailMonitoring(bs, sc.getCollectionId());
 				break;

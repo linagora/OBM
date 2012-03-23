@@ -63,12 +63,12 @@ public class CollectionPathHelper {
 		this.emailConfiguration = emailConfiguration;
 	}
 	
-	public PIMDataType recognizePIMDataType(BackendSession bs, String collectionPath) 
+	public PIMDataType recognizePIMDataType(String collectionPath) 
 			throws CollectionPathException {
 		
 		Preconditions.checkNotNull(Strings.emptyToNull(collectionPath));
 		
-		String userPath = getUserPath(bs).toString();
+		String userPath = getUserPath(collectionPath).toString();
 		if (pathStartWithTypedUserPath(collectionPath, userPath, PIMDataType.EMAIL)) {
 			return PIMDataType.EMAIL;
 		} else if (pathStartWithTypedUserPath(collectionPath, userPath, PIMDataType.CALENDAR)) {
@@ -158,11 +158,22 @@ public class CollectionPathHelper {
 	}
 	
 	private StringBuilder getUserPath(BackendSession bs) {
+		return buildUserPath(bs.getUser().getLoginAtDomain());
+	}
+	
+	private StringBuilder getUserPath(String collectionPath) {
+		String collectionPathWihtoutProtocol = collectionPath.substring(PROTOCOL.length());
+		int userPathIndex = collectionPathWihtoutProtocol.indexOf(BACKSLASH);
+		
+		String user = collectionPath.substring(PROTOCOL.length(), userPathIndex + PROTOCOL.length());
+		return buildUserPath(user);
+	}
+	
+	private StringBuilder buildUserPath(String user) {
 		StringBuilder userPath = new StringBuilder();
 		userPath.append(PROTOCOL);
-		userPath.append(bs.getUser().getLoginAtDomain());
+		userPath.append(user);
 		userPath.append(BACKSLASH);
 		return userPath;
 	}
-
 }
