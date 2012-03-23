@@ -657,7 +657,11 @@ function run_query_calendar_waiting_events() {
     INNER JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
     event_type='VEVENT'
-    AND ( (event_repeatkind='none' AND event_date >= NOW()) OR ( event_repeatkind <> 'none' AND  (event_endrepeat IS NULL OR event_endrepeat >= NOW())))
+    AND ( (event_repeatkind='none' AND event_date >= NOW() )
+          OR (event_repeatkind <> 'none'
+             AND (event_endrepeat IS NULL OR event_endrepeat >= NOW())
+             ) 
+        )
     AND eventlink_state = 'NEEDS-ACTION'
     $multidomain
     AND ( 1=0
@@ -699,7 +703,11 @@ function run_query_calendar_waiting_events() {
       WHERE
       event_type='VEVENT'
       AND eventlink_state = 'NEEDS-ACTION'
-      AND ( (event_repeatkind='none' AND event_date >= NOW()) OR ( event_repeatkind <> 'none' AND  (event_endrepeat IS NULL OR event_endrepeat >= NOW())))
+      AND ( (event_repeatkind='none' AND event_date >= NOW() )
+          OR (event_repeatkind <> 'none'
+             AND (event_endrepeat IS NULL OR event_endrepeat >= NOW())
+             ) 
+          )
       $multidomain
       AND (resourceentity_resource_id IN (".implode(",", $writable_res)."))";
   }
@@ -727,7 +735,11 @@ function get_json_waiting_events($id) {
     WHERE
     event_type='VEVENT'
     AND eventlink_state = 'NEEDS-ACTION'
-    AND ( (event_repeatkind='none' AND event_date >= NOW()) OR ( event_repeatkind <> 'none' AND  (event_endrepeat IS NULL OR event_endrepeat >= NOW())))
+    AND ( (event_repeatkind='none' AND event_date >= NOW() )
+        OR (event_repeatkind <> 'none'
+           AND (event_endrepeat IS NULL OR event_endrepeat >= NOW())
+           ) 
+        )
     AND userentity_user_id = $id
     ";
 
