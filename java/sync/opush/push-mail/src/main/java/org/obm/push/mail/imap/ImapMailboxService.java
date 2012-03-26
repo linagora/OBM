@@ -654,14 +654,13 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	
 	@VisibleForTesting UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException {
 		ImapStore store = null;
+		IMAPMessage message = null;
 		try {
 			store = imapClientProvider.getImapClientWithJM(bs);
 			store.login();
 			
 			String mailboxName = parseMailBoxName(bs, collectionPath);
-			IMAPMessage message = (IMAPMessage) store.fetchEnvelope(mailboxName, uid);
-			Envelope envelope = imapMailBoxUtils.buildEnvelopeFromMessage(message);
-			return new UIDEnvelope(uid, envelope);
+			message = (IMAPMessage) store.fetchEnvelope(mailboxName, uid);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (NoImapClientAvailableException e) {
@@ -670,11 +669,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
 		}
+		
+		Envelope envelope = imapMailBoxUtils.buildEnvelopeFromMessage(message);
+		return new UIDEnvelope(uid, envelope);
 	}
 	
 	@Override
@@ -700,6 +700,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		} finally {
 			closeQuietly(store);
 		}
+		
 		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);
 	}
 }

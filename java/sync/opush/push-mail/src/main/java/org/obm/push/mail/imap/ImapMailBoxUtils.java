@@ -91,18 +91,23 @@ public class ImapMailBoxUtils {
 		return listOfEmails;
 	}
 	
-	public Envelope buildEnvelopeFromMessage(IMAPMessage message) throws MessagingException {
-		int msgno = message.getMessageNumber();
-		Date sentDate = message.getSentDate();
-		String subject = message.getSubject();
-		String messageID = message.getMessageID();
-		List<Address> to = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.TO));
-		List<Address> cc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.CC));
-		List<Address> bcc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.BCC));
-		Address from = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getFrom()) );
-		return Envelope.createBuilder().messageNumber(msgno).
-				date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
-				messageID(messageID).inReplyTo(message.getInReplyTo()).build();
+	public Envelope buildEnvelopeFromMessage(IMAPMessage message) throws MailException {
+		try {
+			int msgno = message.getMessageNumber();
+			Date sentDate = message.getSentDate();
+			String subject = message.getSubject();
+			String messageID = message.getMessageID();
+			List<Address> to = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.TO));
+			List<Address> cc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.CC));
+			List<Address> bcc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.BCC));
+			Address from = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getFrom()) );
+			
+			return Envelope.createBuilder().messageNumber(msgno).
+					date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
+					messageID(messageID).inReplyTo(message.getInReplyTo()).build();
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		}
 	}
 	
 	private List<Address> buildAddressListFromJavaMailAddress(javax.mail.Address[] addresses) {
