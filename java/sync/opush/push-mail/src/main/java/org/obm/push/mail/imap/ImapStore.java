@@ -32,7 +32,9 @@
 package org.obm.push.mail.imap;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -51,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
 public class ImapStore {
@@ -205,6 +208,17 @@ public class ImapStore {
 		} catch (MessagingException e) {
 			String msg = String.format(
 					"IMAP command fetch envelope failed. user=%s, folder=%s", userId, folderSrc);
+			throw new ImapCommandException(msg, e);
+		}
+	}
+
+	public Map<Long, IMAPMessage> fetchFast(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException {
+		try {
+			OpushImapFolder opushImapFolder = select(folderSrc);
+			return opushImapFolder.fetchFast(uids);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command fetch fast failed. user=%s, folder=%s", userId, folderSrc);
 			throw new ImapCommandException(msg, e);
 		}
 	}

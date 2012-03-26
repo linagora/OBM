@@ -169,22 +169,26 @@ public class ImapFetchAPITest {
 	public void testFetchFastOneMessage() throws MailException, AddressException, MessagingException, UserException {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		String messageContent = "message content";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).build());
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
+				size(messageContent.length()).build());
 	}
 	
 	@Test
 	public void testFetchFastDuplicateMessage() throws MailException, AddressException, MessagingException, UserException {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		String messageContent = "message content";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L, 1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).build());
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
+				size(messageContent.length()).build());
 	}
 	
 	@Test
@@ -192,11 +196,12 @@ public class ImapFetchAPITest {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", "message content", ServerSetup.SMTP);
+		String messageContent = "message content";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setAnsweredFlag(bs, inbox, 1);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().build());
+		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().
+				size(messageContent.length()).build());
 	}
-	
 }

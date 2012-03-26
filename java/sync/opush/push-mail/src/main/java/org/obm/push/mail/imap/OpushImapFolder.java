@@ -34,7 +34,9 @@ package org.obm.push.mail.imap;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
@@ -112,11 +114,11 @@ public class OpushImapFolder {
 		folder.open(mode);
 	}
 
-	public Message getMessageByUID(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+	public IMAPMessage getMessageByUID(long messageUid) throws MessagingException, ImapMessageNotFoundException {
 		Message messageFound = folder.getMessageByUID(messageUid);
 
 		if (messageFound != null) {
-			return messageFound;
+			return (IMAPMessage) messageFound;
 		}
 		throw new ImapMessageNotFoundException("No message correspond to given UID, UID:" + String.valueOf(messageUid));
 	}
@@ -129,8 +131,8 @@ public class OpushImapFolder {
 		return doCommand(new UIDCopyMessage(folderDst, messageUid));
 	}
 	
-	public Message fetch(long messageUid, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException {
-		Message message = getMessageByUID(messageUid);
+	public IMAPMessage fetch(long messageUid, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException {
+		IMAPMessage message = getMessageByUID(messageUid);
 		folder.fetch(new Message[]{message}, fetchProfile);
 		return message;
 	}
@@ -142,7 +144,7 @@ public class OpushImapFolder {
 	}
 
 	public InputStream uidFetchMessage(long messageUid) throws MessagingException, ImapMessageNotFoundException {
-		IMAPMessage messageToFetch = (IMAPMessage) getMessageByUID(messageUid);
+		IMAPMessage messageToFetch = getMessageByUID(messageUid);
 		return peekMessageStream(messageToFetch);
 	}
 
@@ -154,6 +156,24 @@ public class OpushImapFolder {
 		int noMaxByteCount = -1;
 		boolean usePeek = true;
 		return new IMAPInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+	}
+	
+	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {
+		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
+		FetchProfile fetchFastProfile = getFetchFastProfile();
+		for (long uid: uids) {
+			IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
+			imapMessages.put(uid, imapMessage);
+		}
+		return imapMessages;
+	}
+
+	private FetchProfile getFetchFastProfile() {
+		FetchProfile fetchProfile = new FetchProfile();
+		fetchProfile.add(FetchProfile.Item.ENVELOPE);
+		fetchProfile.add(FetchProfile.Item.FLAGS);
+		fetchProfile.add(IMAPFolder.FetchProfileItem.SIZE);
+		return fetchProfile;
 	}
 	
 	public Collection<Long> uidSearch(SearchQuery query) throws MessagingException {

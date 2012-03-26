@@ -36,7 +36,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.mail.Flags;
 import javax.mail.Message.RecipientType;
@@ -44,7 +48,10 @@ import javax.mail.MessagingException;
 
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
+import org.minig.imap.FastFetch;
+import org.minig.imap.Flag;
 import org.obm.push.bean.Email;
+import org.obm.push.mail.MailException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -111,5 +118,36 @@ public class ImapMailBoxUtils {
 	private Address buildAddressFromJavaMailAddress(javax.mail.Address address) {
 		return new Address(address.toString());
 	}
-	
+
+	public Collection<FastFetch> buildFastFetchFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) throws MailException {
+		Collection<FastFetch> fastFetchCollection = new ArrayList<FastFetch>();
+		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
+			FastFetch fastFetch = buildFastFetch(entry.getKey(), entry.getValue());
+			fastFetchCollection.add(fastFetch);
+		}
+		return fastFetchCollection;
+	}
+
+	private FastFetch buildFastFetch(long uid, IMAPMessage imapMessage) throws MailException {
+		try {
+			Set<Flag> buildFlagToIMAPMessageFlags = buildFlagToIMAPMessageFlags(imapMessage.getFlags());
+			Date receivedDate = imapMessage.getReceivedDate();
+			int size = imapMessage.getSize();
+			
+			FastFetch.Builder builder = new FastFetch.Builder();
+			builder.uid(uid).internalDate(receivedDate).flags(buildFlagToIMAPMessageFlags).size(size);
+			return builder.build();
+		} catch (MessagingException ex) {
+			throw new MailException(ex);
+		}
+	}
+
+	private Set<Flag> buildFlagToIMAPMessageFlags(Flags imapMessageFlags) {
+		Set<Flag> flags = new HashSet<Flag>();
+		for (javax.mail.Flags.Flag flag: imapMessageFlags.getSystemFlags()) {
+			flags.add(
+					Flag.toFlag( ImapMailBoxUtils.flags.get(flag) ));
+		}
+		return flags;
+	}
 }

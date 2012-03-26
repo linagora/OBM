@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.mail.Flags;
@@ -263,7 +264,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		String mailBoxName = parseMailBoxName(bs, collectionName);
 		try {
 			OpushImapFolder folder = store.select(mailBoxName);
-			return (IMAPMessage) folder.getMessageByUID(uid);
+			return folder.getMessageByUID(uid);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
@@ -678,15 +679,27 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	
 	@Override
 	public Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, List<Long> uids) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
+		ImapStore store = null;
+		Map<Long, IMAPMessage> imapMessages = null;
 		try {
-			login(store);
-			store.select(parseMailBoxName(bs, collectionPath));
-			return store.uidFetchFast(uids);
-		} catch (IMAPException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			String mailboxName = parseMailBoxName(bs, collectionPath);
+			imapMessages = store.fetchFast(mailboxName, uids);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
+		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);
 	}
 }
