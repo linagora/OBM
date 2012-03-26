@@ -29,12 +29,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.mail.imap;
 
-public class ImapLogoutException extends RuntimeException {
+import java.io.InputStream;
+import java.util.Set;
+
+import org.obm.sync.stream.ListenableInputStream;
+import org.obm.sync.tag.InputStreamListener;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
+
+public class ImapStoreManagerImpl implements InputStreamListener, ImapStoreManager {
+
+	private final Set<InputStream> streams;
+	private ManagedLifecycleImapStore imapStore;
+	private boolean closeRequired;
 	
-	public ImapLogoutException(String message, Throwable cause) {
-		super(message, cause);
+	@VisibleForTesting ImapStoreManagerImpl() {
+		this.closeRequired = false;
+		this.streams = Sets.newHashSet();
+	}
+	
+	public synchronized InputStream bindTo(InputStream stream) {
+		ListenableInputStream listenableInputStream = new ListenableInputStream(stream, this);
+		streams.add(listenableInputStream);
+		return listenableInputStream;
+	}
+	
+	@Override
+	public synchronized void onClose(InputStream source) {
+		streams.remove(source);
+		closeIfNeeded();
+	}
+	
+	private void closeIfNeeded() {
+		if (streams.isEmpty() && closeRequired) {
+			imapStore.close();
+		}
+	}
+
+	@Override
+	public void closeWhenDone() {
+		closeRequired = true;
+		closeIfNeeded();
+	}
+
+	@Override
+	public void setImapStore(ManagedLifecycleImapStore imapStore) {
+		this.imapStore = imapStore;
+	}
+
+	@VisibleForTesting void setCloseRequired(boolean closeRequired) {
+		this.closeRequired = closeRequired;
+	}
+
+	@VisibleForTesting ManagedLifecycleImapStore getImapStore() {
+		return imapStore;
+	}
+
+	@VisibleForTesting Set<InputStream> getStreams() {
+		return streams;
+	}
+
+	@VisibleForTesting boolean isCloseRequired() {
+		return closeRequired;
 	}
 	
 }

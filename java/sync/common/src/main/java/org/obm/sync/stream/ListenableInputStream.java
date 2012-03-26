@@ -29,12 +29,27 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.sync.stream;
 
-public class ImapLogoutException extends RuntimeException {
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.obm.sync.tag.InputStreamListener;
+
+public class ListenableInputStream extends FilterInputStream {
+
+	private final InputStreamListener listener;
+
+	public ListenableInputStream(InputStream stream, InputStreamListener inputStreamListener) {
+		super(stream);
+		this.listener = inputStreamListener;
+	}
 	
-	public ImapLogoutException(String message, Throwable cause) {
-		super(message, cause);
+	@Override
+	public void close() throws IOException {
+		super.close();
+		listener.onClose(this);
 	}
 	
 }

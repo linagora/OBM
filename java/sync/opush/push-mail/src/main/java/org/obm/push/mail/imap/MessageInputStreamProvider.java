@@ -29,12 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.mail.imap;
 
-public class ImapLogoutException extends RuntimeException {
+import java.io.InputStream;
+
+import com.sun.mail.imap.IMAPMessage;
+
+public interface MessageInputStreamProvider {
 	
-	public ImapLogoutException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	InputStream createMessageInputStream(IMAPMessage messageToFetch, String mimePartAddress, int noMaxByteCount, boolean usePeek); 
 	
 }

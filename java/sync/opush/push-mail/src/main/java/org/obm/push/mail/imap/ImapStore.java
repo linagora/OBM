@@ -33,193 +33,51 @@ package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 import javax.mail.Flags;
-import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.minig.imap.MailboxFolder;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPStore;
 
-public class ImapStore {
+public interface ImapStore {
 
-	private static final Logger logger = LoggerFactory.getLogger(ImapStore.class);
+	String getUserId();
 	
-	private final Session session;
-	private final IMAPStore store;
+	void login() throws ImapLoginException;
+	void logout();
+	boolean isConnected();
+
+	Message createMessage(InputStream messageContent) throws MessagingException;
+
+	Message createStreamedMessage(InputStream messageContent, int mailSize);
+
+	void appendMessageStream(String folderName, StreamedLiteral streamedLiteral, Flags flags) throws ImapCommandException;
 	
-	private final String password;
-	private final String userId;
-	private final String host;
-	private final int port;
-
+	void appendMessage(String folderName, Message message) throws ImapCommandException;
 	
-	public ImapStore(Session session, IMAPStore store, 
-			String userId, String password, String host, int port) {
-		this.session = session;
-		this.store = store;
-		this.userId = userId;
-		this.password = password;
-		this.host = host;
-		this.port = port;
-	}
+	void deleteMessage(String folderSrc, long messageUid) throws MessagingException, ImapMessageNotFoundException;
 
-	public Message createMessage(InputStream messageContent) throws MessagingException {
-		return new MimeMessage(session, messageContent);
-	}
+	OpushImapFolder select(String folderName) throws ImapCommandException;
 
-	public Message createStreamedMessage(InputStream messageContent, int mailSize) {
-		return new StreamMimeMessage(session, messageContent, mailSize, new Date());
-	}
+	OpushImapFolder getDefaultFolder() throws MessagingException;
 
-	public String getUserId() {
-		return userId;
-	}
+	OpushImapFolder create(MailboxFolder folder, int type) throws FolderCreationException;
 
-	public void login() throws ImapLoginException {
-		logger.debug("attempt imap login to {}:{} for user : {}",
-				new Object[]{host, port, userId});
-		
-		try {
-			store.connect(host, port, userId, password);
-		} catch (MessagingException e) {
-			throw new ImapLoginException("attempt imap login failed", e);
-		}
-	}
+	boolean hasCapability(ImapCapability imapCapability) throws MessagingException;
 
-	public void logout() throws ImapLogoutException {
-		try {
-			store.close();
-		} catch (MessagingException e) {
-			throw new ImapLogoutException("Logout failed for user: " + userId, e);
-		}
-	}
+	long moveMessageUID(final String folderSrc, final String folderDst, final Long messageUid)
+			throws ImapCommandException, ImapMessageNotFoundException;
 
-	public void appendMessageStream(String folderName, StreamedLiteral streamedLiteral, Flags flags) 
-			throws ImapCommandException {
-		try {
-			OpushImapFolder folder = select(folderName);
-			folder.appendMessageStream(streamedLiteral, flags, null);
-		} catch (MessagingException e) {
-			String msg = String.format(
-					"IMAP command APPEND failed. user=%s, folder=%s", userId, folderName);
-			throw new ImapCommandException(msg, e);
-		}
-	}
+	Message fetchEnvelope(String folderSrc, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;
 	
-	public void appendMessage(String folderName, Message message) 
-			throws ImapCommandException {
-		try {
-			OpushImapFolder folder = select(folderName);
-			folder.appendMessage(message);
-		} catch (MessagingException e) {
-			String msg = String.format(
-					"IMAP command APPEND failed. user=%s, folder=%s", userId, folderName);
-			throw new ImapCommandException(msg, e);
-		}
-	}
+	Map<Long, IMAPMessage> fetchFast(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException;
 
-	public OpushImapFolder select(String folderName) throws ImapCommandException {
-		try {
-			IMAPFolder folder = (IMAPFolder) store.getDefaultFolder().getFolder(folderName);
-			folder.open(Folder.READ_WRITE);
-			return new OpushImapFolder(folder);
-		} catch (MessagingException e) {
-			String msg = String.format(
-					"IMAP command getFolder failed. user=%s, folder=%s", userId, folderName);
-			throw new ImapCommandException(msg, e);
-		}
-	}
-
-	public OpushImapFolder getDefaultFolder() throws MessagingException {
-		IMAPFolder defaultFolder = (IMAPFolder) store.getDefaultFolder();
-		return new OpushImapFolder(defaultFolder);
-	}
-
-	public OpushImapFolder create(MailboxFolder folder, int type) throws FolderCreationException {
-		try {
-			IMAPFolder imapFolder = (IMAPFolder) store.getDefaultFolder().getFolder(folder.getName());
-			if (imapFolder.create(type)) {
-				return new OpushImapFolder(imapFolder);
-			}
-			throw new FolderCreationException("Folder {" + folder.getName() + "} not created.");
-		} catch (MessagingException e) {
-			throw new FolderCreationException(e.getMessage(), e);
-		}
-	}
-
-	public boolean hasCapability(ImapCapability imapCapability) throws MessagingException {
-		return store.hasCapability(imapCapability.capability());
-	}
-
-	public long moveMessageUID(final String folderSrc, final String folderDst, final Long messageUid)
-			throws ImapCommandException, ImapMessageNotFoundException {
-		
-		try {
-			OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
-			Message messageToMove = sourceFolder.getMessageByUID(messageUid);
-			
-			long newUid = sourceFolder.copyMessageThenGetNewUID(folderDst, messageUid);
-			sourceFolder.deleteMessage(messageToMove);
-			return newUid;
-		} catch (MessagingException e) {
-			String msg = String.format("IMAP command Move failed. user=%s, folderSource=%s, folderDestination=%s, messageUid=%d",
-					userId, folderSrc, folderDst, messageUid);
-			throw new ImapCommandException(msg, e);
-		}
-	}
-
-	private OpushImapFolder openFolder(String folderName, int mode) throws MessagingException {
-		OpushImapFolder opushImapFolder = getFolder(folderName);
-		opushImapFolder.open(mode);
-		return opushImapFolder;
-	}
-	
-	private OpushImapFolder getFolder(String folderName) throws MessagingException {
-		IMAPFolder folder = (IMAPFolder) store.getDefaultFolder().getFolder(folderName);
-		return new OpushImapFolder(folder);
-	}
-
-	public void deleteMessage(String folderSrc, long messageUid) throws MessagingException, ImapMessageNotFoundException {
-		OpushImapFolder sourceFolder = openFolder(folderSrc, Folder.READ_WRITE);
-		Message messageToDelete = sourceFolder.getMessageByUID(messageUid);
-		sourceFolder.deleteMessage(messageToDelete);
-	}
-	
-	public Message fetchEnvelope(String folderSrc, long messageUid) throws ImapCommandException, ImapMessageNotFoundException {
-		try {
-			OpushImapFolder opushImapFolder = select(folderSrc);
-			return opushImapFolder.fetchEnvelope(messageUid);
-		} catch (MessagingException e) {
-			String msg = String.format(
-					"IMAP command fetch envelope failed. user=%s, folder=%s", userId, folderSrc);
-			throw new ImapCommandException(msg, e);
-		}
-	}
-
-	public Map<Long, IMAPMessage> fetchFast(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException {
-		try {
-			OpushImapFolder opushImapFolder = select(folderSrc);
-			return opushImapFolder.fetchFast(uids);
-		} catch (MessagingException e) {
-			String msg = String.format(
-					"IMAP command fetch fast failed. user=%s, folder=%s", userId, folderSrc);
-			throw new ImapCommandException(msg, e);
-		}
-	}
 }

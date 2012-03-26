@@ -54,14 +54,18 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
 	
 	private final LocatorService locatorService;
+	private final ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory;
 	private final boolean loginWithDomain;
 	private final int imapPort;
 	private final Session defaultSession;
 
+
+
 	@Inject
-	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, 
-			LocatorService locatorService) {
+	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, LocatorService locatorService,
+			ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory) {
 		this.locatorService = locatorService;
+		this.managedLifecycleImapStoreFactory = managedLifecycleImapStoreFactory;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.imapPort = emailConfiguration.imapPort();
 		
@@ -117,8 +121,8 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 					new Object[]{login, loginWithDomain});
 
 			IMAPStore javaMailStore = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
-			return new ImapStore(defaultSession, javaMailStore,
-					login, bs.getPassword(), imapHost, imapPort);
+			return managedLifecycleImapStoreFactory.create(
+					defaultSession, javaMailStore, login, bs.getPassword(), imapHost, imapPort);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);

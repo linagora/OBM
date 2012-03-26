@@ -48,6 +48,7 @@ import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
@@ -257,6 +258,16 @@ public class UIDFetchPartTest {
 		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2.2");
 		
 		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-2.txt"));
+	}
+	
+	@Test
+	public void testUidFetchPartFindAttachment() throws Exception {
+		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		
+		InputStream attachment = mailboxService.findAttachment(bs, inbox, sentEmail.getUid(), "3");
+		
+		Assertions.assertThat(attachment).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
 	}
 
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {

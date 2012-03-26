@@ -81,14 +81,14 @@ public class OpushImapFolderTest {
 	
 	@Test
 	public void matchAllToSearchTerm() {
-		OpushImapFolder folder = new OpushImapFolder(null);
+		OpushImapFolder folder = new OpushImapFolder(null, null);
 		SearchTerm searchTerm = folder.toSearchTerm(SearchQuery.MATCH_ALL);
 		assertNotDeletedTerm(searchTerm);
 	}
 
 	@Test
 	public void afterToSearchTerm() {
-		OpushImapFolder folder = new OpushImapFolder(null);
+		OpushImapFolder folder = new OpushImapFolder(null, null);
 		Date date = new Date();
 		SearchQuery query = new SearchQuery.Builder().after(date).build();
 		
@@ -101,7 +101,7 @@ public class OpushImapFolderTest {
 
 	@Test
 	public void beforeToSearchTerm() {
-		OpushImapFolder folder = new OpushImapFolder(null);
+		OpushImapFolder folder = new OpushImapFolder(null, null);
 		Date date = new Date();
 		SearchQuery query = new SearchQuery.Builder().before(date).build();
 		
@@ -115,7 +115,7 @@ public class OpushImapFolderTest {
 	
 	@Test
 	public void beforeAndAfterToSearchTerm() {
-		OpushImapFolder folder = new OpushImapFolder(null);
+		OpushImapFolder folder = new OpushImapFolder(null, null);
 		Date now = DateUtils.getCurrentDate();
 		Date tommorow = DateUtils.getOneDayLater(now);
 		

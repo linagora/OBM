@@ -563,7 +563,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			} catch (LocatorClientException e) {
 				throw new MailException(e.getMessage(), e);
 			} finally {
-				logout(store);
+				closeQuietly(store);
 			}
 		} catch (NoImapClientAvailableException e) {
 			throw new MailException(e.getMessage(), e);
@@ -599,22 +599,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			} catch (IOException e) {
 				throw new MailException(e.getMessage(), e);
 			} finally {
-				logout(store);
+				closeQuietly(store);
 			}
 		} catch (NoImapClientAvailableException e) {
 			throw new MailException(e.getMessage(), e);
 		}
 
-	}
-
-	private void logout(ImapStore store) {
-		try {
-			if (store != null) {
-				store.logout();
-			}
-		} catch (ImapLogoutException e) {
-			logger.warn(e.getMessage(), e);
-		}
 	}
 
 	@Override

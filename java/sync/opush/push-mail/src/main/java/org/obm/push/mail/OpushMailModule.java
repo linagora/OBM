@@ -39,6 +39,10 @@ import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.ImapClientProviderImpl;
 import org.obm.push.mail.imap.ImapMailboxService;
 import org.obm.push.mail.imap.ImapMonitoringImpl;
+import org.obm.push.mail.imap.ImapStoreManager;
+import org.obm.push.mail.imap.ImapStoreManagerImpl;
+import org.obm.push.mail.imap.MessageInputStreamProvider;
+import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 
@@ -52,6 +56,8 @@ public class OpushMailModule extends AbstractModule {
 		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
+		bind(ImapStoreManager.class).to(ImapStoreManagerImpl.class);
+		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		bind(SmtpProvider.class).to(SmtpProviderImpl.class);

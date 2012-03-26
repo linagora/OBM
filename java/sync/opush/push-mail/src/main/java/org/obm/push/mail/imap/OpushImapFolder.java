@@ -61,15 +61,16 @@ import com.google.common.collect.Lists;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.protocol.IMAPProtocol;
 
 public class OpushImapFolder {
 
+	private final MessageInputStreamProvider imapResourceProvider;
 	private final IMAPFolder folder;
 
-	public OpushImapFolder(IMAPFolder folder) {
+	public OpushImapFolder(MessageInputStreamProvider imapResourceProvider, IMAPFolder folder) {
+		this.imapResourceProvider = imapResourceProvider;
 		this.folder = folder;
 	}
 
@@ -156,10 +157,14 @@ public class OpushImapFolder {
 	}
 
 	private InputStream peekAtMessageStream(long messageUid, String mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
-		IMAPMessage messageToFetch = getMessageByUID(messageUid);
 		int noMaxByteCount = -1;
 		boolean usePeek = true;
-		return new IMAPInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+		IMAPMessage messageToFetch = getMessageByUID(messageUid);
+		return imapResourceProvider.createMessageInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+	}
+
+	public InputStream getMessageInputStream(long messageUID) throws MessagingException, ImapMessageNotFoundException {
+		return peekAtMessageStream(messageUID, null);
 	}
 	
 	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {
