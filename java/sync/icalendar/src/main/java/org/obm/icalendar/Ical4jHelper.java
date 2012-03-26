@@ -133,6 +133,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,6 +142,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -165,7 +167,11 @@ public class Ical4jHelper {
 			.put(RecurrenceDay.Thursday, WeekDay.TH).put(RecurrenceDay.Friday, WeekDay.FR)
 			.put(RecurrenceDay.Saturday, WeekDay.SA).build();
 	private static final BiMap<WeekDay, RecurrenceDay> WEEK_DAY_TO_RECURRENCE_DAY = RECURRENCE_DAY_TO_WEEK_DAY.inverse();
-	
+	private static final Map<RecurrenceKind, String> RECURRENCEKIND_TO_RECUR = new ImmutableMap.Builder<RecurrenceKind, String>()
+			.put(RecurrenceKind.daily, Recur.DAILY).put(RecurrenceKind.weekly, Recur.WEEKLY)
+			.put(RecurrenceKind.monthlybydate, Recur.MONTHLY).put(RecurrenceKind.monthlybyday, Recur.MONTHLY)
+			.put(RecurrenceKind.yearly, Recur.YEARLY).put(RecurrenceKind.yearlybyday, Recur.YEARLY).build();
+
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
 		Calendar calendar = initCalendar();
 		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event, token);
@@ -1037,60 +1043,52 @@ public class Ical4jHelper {
 		return ret;
 	}
 
-	/* package */ Recur getRecur(EventRecurrence eventRecurrence, Date eventDate) {
+	@VisibleForTesting Recur getRecur(EventRecurrence eventRecurrence, Date eventStartDate) {
 		Recur recur = null;
 		if (eventRecurrence.isRecurrent()) {
-			boolean isMonthyByDay = false;
-			String frequency = "";
-			RecurrenceKind kindRecur = eventRecurrence.getKind();
-			if (RecurrenceKind.daily.equals(kindRecur)) {
-				frequency = Recur.DAILY;
-			} else if (RecurrenceKind.weekly.equals(kindRecur)) {
-				frequency = Recur.WEEKLY;
-			} else if (RecurrenceKind.monthlybydate.equals(kindRecur)) {
-				frequency = Recur.MONTHLY;
-			} else if (RecurrenceKind.monthlybyday.equals(kindRecur)) {
-				frequency = Recur.MONTHLY;
-				isMonthyByDay = true;
+			RecurrenceKind recurrenceKind = eventRecurrence.getKind();
 
-			} else if (RecurrenceKind.yearly.equals(kindRecur)) {
-				frequency = Recur.YEARLY;
-			} else if (RecurrenceKind.none.equals(kindRecur)) {
-				frequency = "";
+			if (!RECURRENCEKIND_TO_RECUR.containsKey(recurrenceKind)) {
+				throw new IllegalRecurrenceKindException(recurrenceKind);
 			}
 
-			if (!"".equals(frequency)) {
-				if (eventRecurrence.getEnd() == null) {
-					recur = new Recur(frequency, null);
-				} else {
-					GregorianCalendar cal = new GregorianCalendar();
-					cal.setTime(eventRecurrence.getEnd());
-					cal.set(GregorianCalendar.SECOND, 0);
-					cal.set(GregorianCalendar.MINUTE, 0);
-					cal.set(GregorianCalendar.HOUR, 0);
-					cal.set(GregorianCalendar.DAY_OF_MONTH, cal.get(GregorianCalendar.DAY_OF_MONTH) + 1);
-					recur = new Recur(frequency, new DateTime(cal.getTime()));
-				}
+			String recurFrequency = RECURRENCEKIND_TO_RECUR.get(recurrenceKind);
 
-				if (isMonthyByDay) {
-					GregorianCalendar cal = new GregorianCalendar();
-					cal.setTime(eventDate);
-					recur.getDayList().add(WeekDay.getMonthlyOffset(cal));
-				}
-
-				recur.setInterval(eventRecurrence.getFrequence());
-
-				Set<WeekDay> listDay = getListDay(eventRecurrence);
-
-				for (WeekDay wd : listDay) {
-					recur.getDayList().add(wd);
-				}
+			recur = getRecurFrom(eventRecurrence, recurFrequency);
+			if (RecurrenceKind.monthlybyday.equals(recurrenceKind)) {
+				addMonthlyOffsetToRecurDayList(eventStartDate, recur);
 			}
+			recur.setInterval(eventRecurrence.getFrequence());
+			setRecurDayList(eventRecurrence, recur);
 		}
 		return recur;
 	}
 
-	/* package */ Set<WeekDay> getListDay(EventRecurrence eventRecurrence) {
+	private void addMonthlyOffsetToRecurDayList(Date eventStartDate, Recur recur) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(eventStartDate);
+		recur.getDayList().add(WeekDay.getMonthlyOffset(cal));
+	}
+
+	private void setRecurDayList(EventRecurrence eventRecurrence, Recur recur) {
+		Set<WeekDay> listDay = getListDay(eventRecurrence);
+		for (WeekDay weekDay : listDay) {
+			recur.getDayList().add(weekDay);
+		}
+	}
+
+	private Recur getRecurFrom(EventRecurrence eventRecurrence, String frequency) {
+		if (eventRecurrence.getEnd() == null) {
+			return new Recur(frequency, null);
+		} else {
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.setTime(eventRecurrence.getEnd());
+			cal.set(GregorianCalendar.SECOND, 0);
+			return new Recur(frequency, new DateTime(cal.getTime()));
+		}
+	}
+
+	@VisibleForTesting Set<WeekDay> getListDay(EventRecurrence eventRecurrence) {
 		Set<WeekDay> listDay = new HashSet<WeekDay>();
 		RecurrenceDays recurrenceDays = eventRecurrence.getDays();
 		for (RecurrenceDay recurrenceDay : recurrenceDays) {

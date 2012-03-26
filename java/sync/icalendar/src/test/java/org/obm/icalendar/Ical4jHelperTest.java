@@ -82,6 +82,7 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.hamcrest.Description;
 import org.junit.Assert;
@@ -105,6 +106,7 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.Comment;
+import org.obm.sync.exception.IllegalRecurrenceKindException;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -217,6 +219,17 @@ public class Ical4jHelperTest {
 		assertNotSame("", ics);
 	}
 
+	@Test(expected = IllegalRecurrenceKindException.class)
+	public void testGetRecurWithIllegalRecurrenceKind() {
+		EventRecurrence eventRecurrence = EasyMock.createMock(EventRecurrence.class);
+
+		EasyMock.expect(eventRecurrence.isRecurrent()).andReturn(true).once();
+		EasyMock.expect(eventRecurrence.getKind()).andReturn(null).once();
+
+		EasyMock.replay(eventRecurrence);
+		getIcal4jHelper().getRecur(eventRecurrence, new Date());
+	}
+
 	@Test
 	public void testGetRecur() {
 		Calendar cal = getCalendarPrecisionOfSecond();
@@ -224,34 +237,68 @@ public class Ical4jHelperTest {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 
-		Event event1 = new Event();
+		Event event = new Event();
 
-		EventRecurrence er = new EventRecurrence();
-		er.setKind(RecurrenceKind.weekly);
-		er.setFrequence(1);
-		er.addException(cal.getTime());
-		cal.add(Calendar.MONTH, 1);
-		er.addException(cal.getTime());
-
-		er.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Tuesday, RecurrenceDay.Wednesday,
+		EventRecurrence eventRecurrence = new EventRecurrence();
+		eventRecurrence.setKind(RecurrenceKind.weekly);
+		eventRecurrence.setFrequence(1);
+		eventRecurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday,
+				RecurrenceDay.Tuesday, RecurrenceDay.Wednesday,
 				RecurrenceDay.Thursday, RecurrenceDay.Friday));
-		er.setEnd(null);
-		event1.setRecurrence(er);
+		eventRecurrence.setEnd(null);
+		event.setRecurrence(eventRecurrence);
 
-		Recur recur = getIcal4jHelper().getRecur(event1.getRecurrence(),
-				event1.getStartDate());
-		assertTrue(recur.getDayList().contains(WeekDay.MO));
-		assertTrue(recur.getDayList().contains(WeekDay.TU));
-		assertTrue(recur.getDayList().contains(WeekDay.WE));
-		assertTrue(recur.getDayList().contains(WeekDay.TH));
-		assertTrue(recur.getDayList().contains(WeekDay.FR));
+		Recur recur = getIcal4jHelper().getRecur(event.getRecurrence(), event.getStartDate());
 
-		assertNull(er.getEnd());
+		Assertions.assertThat(recur.getDayList()).containsOnly(WeekDay.MO,
+				WeekDay.TU, WeekDay.WE, WeekDay.TH, WeekDay.FR);
+		Assertions.assertThat(recur.getInterval()).isEqualTo(eventRecurrence.getFrequence());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.WEEKLY);
+		Assertions.assertThat(recur.getUntil()).isNull();
+	}
 
-		assertEquals(er.getFrequence(), 1);
-		er.setKind(RecurrenceKind.weekly);
+	@Test
+	public void testGetRecurOnNotRecurrentEvent() {
+		EventRecurrence eventRecurrence = new EventRecurrence();
+		Recur recur = getIcal4jHelper().getRecur(eventRecurrence, new Date());
+		Assertions.assertThat(recur).isNull();
+	}
 
-		Assertions.assertThat(er.getExceptions()).hasSize(2);
+	@Test
+	public void testGetDailyRecur() {
+		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.daily, new Date());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.DAILY);
+	}
+
+	@Test
+	public void testGetMonthlyByDayRecur() {
+		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.monthlybyday, new Date());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
+		Assertions.assertThat(recur.getDayList()).contains(WeekDay.getMonthlyOffset(new GregorianCalendar()));
+	}
+
+	@Test
+	public void testGetMonthlyByDateRecur() {
+		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.monthlybydate, new Date());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
+	}
+
+	@Test
+	public void testGetYearlyRecur() {
+		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.yearly, new Date());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
+	}
+
+	@Test
+	public void testGetYearlyByDayRecur() {
+		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.yearlybyday, new Date());
+		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
+	}
+
+	private Recur getFakeRecurByRecurrenceKind(RecurrenceKind recurrenceKind, Date date) {
+		EventRecurrence eventRecurrence = new EventRecurrence(recurrenceKind);
+		Recur recur = getIcal4jHelper().getRecur(eventRecurrence, date);
+		return recur;
 	}
 
 	@Test
@@ -1148,9 +1195,31 @@ public class Ical4jHelperTest {
         Assert.assertTrue(icsRequest.contains(XOBMORIGIN));
         Assert.assertTrue(icsCancel.contains(XOBMORIGIN));
         Assert.assertTrue(icsReply.contains(XOBMORIGIN));    
-    }    
-	
-	
+    }
+
+	@Test
+	public void testInvitationIcsHasCorrectEndingRecurrenceDate() {
+		Event event = new Event();
+		event.setStartDate(new Date());
+		event.setExtId(new EventExtId("123"));
+		EventRecurrence eventRecurrence = new EventRecurrence();
+		eventRecurrence.setKind(RecurrenceKind.daily);
+		eventRecurrence.setEnd(DateUtils.date("2012-03-30T11:00:00Z"));
+		Attendee attendee = new Attendee();
+		attendee.setEmail("foo@fr");
+
+		event.addAttendee(attendee);
+		event.setRecurrence(eventRecurrence);
+
+		AccessToken token = new AccessToken(0, "OBM");
+		Ical4jUser obmUser = buildObmUser(attendee);
+
+		String icsRequest = getIcal4jHelper().buildIcsInvitationRequest(obmUser, event, token);
+
+		String UNTIL = "UNTIL=20120330T110000Z";
+		Assertions.assertThat(icsRequest).contains(UNTIL);
+	}
+
 	@Test
 	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2891.ics";
