@@ -43,6 +43,7 @@ public class FastFetch {
 		private long uid;
 		private Date internalDate;
 		private Set<Flag> flags;
+		private Integer size;
 		
 		public Builder() {
 			flags = EnumSet.noneOf(Flag.class);
@@ -83,26 +84,34 @@ public class FastFetch {
 			return this;
 		}
 		
+		public Builder size(Integer size) {
+			this.size = size;
+			return this;
+		}
+		
 		public FastFetch build() {
-			return new FastFetch(uid, internalDate, flags);
+			return new FastFetch(uid, internalDate, flags, size);
 		}
 
-		public void flags(Set<Flag> flags) {
+		public Builder flags(Set<Flag> flags) {
 			if (!this.flags.isEmpty()) {
 				throw new IllegalStateException("Flags can't be set because the builder already has some");
 			}
 			this.flags = flags;
+			return this;
 		}
 	}
 	
 	private final long uid;
 	private final Date internalDate;
 	private final Set<Flag> flags;
+	private final Integer size;
 	
-	private FastFetch(long uid, Date internalDate, Set<Flag> flags){
+	private FastFetch(long uid, Date internalDate, Set<Flag> flags, Integer size){
 		this.uid = uid;
 		this.internalDate = internalDate;
 		this.flags = flags;
+		this.size = size;
 	}
 
 	public long getUid() {
@@ -125,9 +134,13 @@ public class FastFetch {
 		return flags != null && flags.contains(Flag.ANSWERED);
 	}
 
+	public Integer getSize() {
+		return size;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(uid, internalDate, flags);
+		return Objects.hashCode(uid, internalDate, flags, size);
 	}
 	
 	@Override
@@ -136,7 +149,8 @@ public class FastFetch {
 			FastFetch that = (FastFetch) object;
 			return Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.internalDate, that.internalDate)
-				&& Objects.equal(this.flags, that.flags);
+				&& Objects.equal(this.flags, that.flags)
+				&& Objects.equal(this.size, that.size);
 		}
 		return false;
 	}
@@ -147,7 +161,7 @@ public class FastFetch {
 			.add("uid", uid)
 			.add("internalDate", internalDate)
 			.add("flags", flags)
+			.add("size", size)
 			.toString();
 	}
-	
 }
