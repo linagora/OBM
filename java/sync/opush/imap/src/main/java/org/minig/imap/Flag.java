@@ -32,23 +32,35 @@
 
 package org.minig.imap;
 
-public enum Flag {
-	SEEN, DRAFT, DELETED, FLAGGED, ANSWERED;
+import java.util.HashMap;
+import java.util.Map;
 
-	public String toString() {
-		switch (this) {
-		case SEEN:
-			return "\\Seen";
-		case DRAFT:
-			return "\\Draft";
-		case DELETED:
-			return "\\Deleted";
-		case FLAGGED:
-			return "\\Flagged";
-		case ANSWERED:
-			return "\\Answered";
-		default:
-			return "";
+public enum Flag {
+
+	SEEN("Seen"), 
+	DRAFT("Draft"), 
+	DELETED("Deleted"), 
+	FLAGGED("Flagged"), 
+	ANSWERED("Answered");
+
+	private final String flag;
+	
+	private final static Map<String, Flag> flags = new HashMap<String, Flag>();
+	static {
+		for (Flag flag: Flag.values()) {
+			flags.put(flag.flag.toLowerCase(), flag);
 		}
+	}
+
+	private Flag(String flag) {
+		this.flag = flag;
+	}
+	
+	public String asCommandValue() {
+		return "\\" + flag;
+	}
+	
+	public static Flag toFlag(String flag) {
+		return flags.get(flag.toLowerCase());
 	}
 }

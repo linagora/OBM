@@ -37,14 +37,9 @@ import java.util.Iterator;
 
 public class FlagsList extends HashSet<Flag> {
 
-	private long uid;
+	public FlagsList() {}
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8557645090248136216L;
-
-	public String toString() {
+	public String asCommandValue() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 
@@ -53,19 +48,10 @@ public class FlagsList extends HashSet<Flag> {
 			if (i > 0) {
 				sb.append(' ');
 			}
-			sb.append(it.next().toString());
+			sb.append(it.next().asCommandValue());
 		}
 
 		sb.append(")");
 		return sb.toString();
 	}
-
-	public long getUid() {
-		return uid;
-	}
-
-	public void setUid(long uid) {
-		this.uid = uid;
-	}
-
 }

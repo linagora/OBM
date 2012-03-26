@@ -103,13 +103,8 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 				while (Character.isDigit(payload.charAt(endUid))) {
 					endUid++;
 				}
-				long uid = Long.parseLong(payload.substring(uidIdx, endUid));
-
-				// logger.info("payload: " + r.getPayload()+" uid: "+uid);
-
 				FlagsList flagsList = new FlagsList();
 				parseFlags(flags, flagsList);
-				flagsList.setUid(uid);
 				list.add(flagsList);
 			}
 			data = list;

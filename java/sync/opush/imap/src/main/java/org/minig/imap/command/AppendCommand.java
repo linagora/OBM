@@ -60,7 +60,7 @@ public class AppendCommand extends Command<Boolean> {
 		cmd.append(toUtf7(mailbox));
 		cmd.append(" ");
 		if (!flags.isEmpty()) {
-			cmd.append(flags.toString());
+			cmd.append(flags.asCommandValue());
 			cmd.append(" ");
 		}
 
