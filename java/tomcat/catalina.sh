@@ -21,7 +21,6 @@ CATALINA_HOME="/usr/share/tomcat"
 
 # application settings
 CATALINA_OPTS="-Dfile.encoding=UTF-8"
-CATALINA_OPTS="${CATALINA_OPTS} -Dfunambol.ds.home=/usr/share/funambol-6.5.1/ds-server"
 
 # vm tuning options
 CATALINA_OPTS="${CATALINA_OPTS} -Xmn100m -Xms${MEM}m -Xmx${MEM}m"
