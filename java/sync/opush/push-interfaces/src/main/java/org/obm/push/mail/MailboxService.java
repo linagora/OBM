@@ -89,7 +89,7 @@ public interface MailboxService {
 
 	boolean getActivateTLS();
 	
-	Collection<Email> fetchEmails(BackendSession bs, Collection<Long> uids) throws MailException;
+	Collection<Email> fetchEmails(BackendSession bs, String collectionName, Collection<Long> uids) throws MailException;
 
 	Set<Email> fetchEmails(BackendSession bs, String collectionName, Date windows) throws MailException;
 

@@ -615,24 +615,15 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Collection<Email> fetchEmails(BackendSession bs, Collection<Long> uids) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
-		try {
-			login(store);
-			Collection<FastFetch> fetch = store.uidFetchFast(uids);
-			Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
-						@Override
-						public Email apply(FastFetch input) {
-							return new Email(input.getUid(), input.isRead(), input.getInternalDate());
-						}
-					});
-			return emails;	
-		} catch (IMAPException e) {
-			throw new MailException(e);
-		} finally {
-			store.logout();
-		}
-		
+	public Collection<Email> fetchEmails(BackendSession bs, String collectionName, Collection<Long> uids) throws MailException {
+		Collection<FastFetch> fetch = fetchFast(bs, collectionName, uids);
+		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
+					@Override
+					public Email apply(FastFetch input) {
+						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
+					}
+				});
+		return emails;	
 	}
 	
 	@Override
@@ -643,7 +634,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			store.select( parseMailBoxName(bs, collectionName) );
 			SearchQuery query = new SearchQuery.Builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
-			Collection<FastFetch> mails = store.uidFetchFast(uids);
+			Collection<FastFetch> mails = fetchFast(bs, collectionName, uids);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -678,7 +669,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, List<Long> uids) throws MailException {
+	public Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException {
 		ImapStore store = null;
 		Map<Long, IMAPMessage> imapMessages = null;
 		try {

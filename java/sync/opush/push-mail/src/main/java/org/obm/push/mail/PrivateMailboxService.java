@@ -32,7 +32,6 @@
 package org.obm.push.mail;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.minig.imap.FastFetch;
 import org.minig.imap.MailboxFolder;
@@ -49,5 +48,5 @@ public interface PrivateMailboxService {
 	
 	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
 
-	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, List<Long> uids) throws MailException;
+	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
 }

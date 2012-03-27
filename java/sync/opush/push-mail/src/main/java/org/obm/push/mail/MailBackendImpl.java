@@ -345,7 +345,7 @@ public class MailBackendImpl implements MailBackend {
 					Integer wasteBasketId = mappingService.getCollectionIdFor(bs.getDevice(), wasteBasketPath);
 					mailboxService.moveItem(bs, collectionName, wasteBasketPath, uid);
 					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
-					addMessageInCache(bs, devDbId, wasteBasketId, uid);
+					addMessageInCache(bs, devDbId, wasteBasketId, uid, wasteBasketPath);
 				} else {
 					mailboxService.delete(bs, collectionName, uid);
 				}
@@ -401,7 +401,7 @@ public class MailBackendImpl implements MailBackend {
 			final Integer devDbId = bs.getDevice().getDatabaseId();
 			Long newUidMail = mailboxService.moveItem(bs, srcFolder, dstFolder, currentMailUid);
 			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
-			addMessageInCache(bs, devDbId, dstFolderId, currentMailUid);
+			addMessageInCache(bs, devDbId, dstFolderId, currentMailUid, dstFolder);
 			return dstFolderId + ":" + newUidMail;	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
@@ -708,8 +708,8 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids) throws DaoException, MailException {
-		Collection<Email> emails = mailboxService.fetchEmails(bs, ImmutableList.of(mailUids));
+	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids, String collectionName) throws DaoException, MailException {
+		Collection<Email> emails = mailboxService.fetchEmails(bs, collectionName, ImmutableList.of(mailUids));
 		try {
 			markEmailsAsSynced(devId, collectionId, emails);
 		} catch (DaoException e) {
