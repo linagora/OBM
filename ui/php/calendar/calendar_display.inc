@@ -3227,7 +3227,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 		$comment_style = 'text-align:center;';
 		$user_comment_display =  "<a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$GLOBALS[l_add_comment]...', 'user');\" title=\"$l_add\"></a>";
 	}else{
-		$user_comment = addslashes($comment);
+		$user_comment = phpStringToJsString(str_replace("\n\r", ', ', $comment));
 		$user_comment_display =  $comment." <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($u_id, $id, '$user_comment', 'user');\" title=\"$l_edit\"></a>";
          }
 	  $saved_checked = $state;
@@ -3359,7 +3359,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $state = $entity['state'];
         
         $comment = $entity['comment'];
-        $resource_comment = addslashes($comment);
+        $resource_comment = phpStringToJsString(str_replace("\n\r", ', ', $comment));
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\" disabled";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
