@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
 
@@ -77,11 +76,6 @@ public class ImapTestUtils {
 	
 	public Email sendEmailToInbox() throws MailException {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		return emailInInbox();
-	}
-
-	public Email sendEmailToInbox(InputStream email) throws MailException {
-		mailboxService.storeInInbox(bs, email, false);
 		return emailInInbox();
 	}
 	

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -59,8 +58,6 @@ import com.google.common.collect.Lists;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.IMAPInputStream;
-import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.protocol.IMAPProtocol;
 
 public class OpushImapFolder {
@@ -139,21 +136,6 @@ public class OpushImapFolder {
 		FetchProfile fetchProfile = new FetchProfile();
 		fetchProfile.add(FetchProfile.Item.ENVELOPE);
 		return fetch(messageUid, fetchProfile);
-	}
-
-	public InputStream uidFetchMessage(long messageUid) throws MessagingException, ImapMessageNotFoundException {
-		IMAPMessage messageToFetch = (IMAPMessage) getMessageByUID(messageUid);
-		return peekMessageStream(messageToFetch);
-	}
-
-	private InputStream peekMessageStream(IMAPMessage messageToFetch) {
-		return peekMessageStream(messageToFetch, null);
-	}
-
-	private InputStream peekMessageStream(IMAPMessage messageToFetch, String mimePartAddress) {
-		int noMaxByteCount = -1;
-		boolean usePeek = true;
-		return new IMAPInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
 	}
 	
 	public Collection<Long> uidSearch(SearchQuery query) throws MessagingException {
