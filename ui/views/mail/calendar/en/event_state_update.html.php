@@ -39,8 +39,27 @@ applicable to the OBM software.
     </tr>
     <tr>
       <td colspan="2">
-<?php echo $target; ?> has <?php echo $targetState; ?> the event <?php echo $title; ?> scheduled on <?php echo $start; ?>.
+		<?php echo $target; ?> has <?php echo $targetState; ?> the following event :
       </td>
     </tr>
-
+        <tr>
+        <td style="text-align:right;width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">When</td><td style="font-weight:bold;"><?php echo $start; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+		<td style="text-align:right;padding-right:1em;">Comment</td><td style="font-weight:bold;"><?php echo $targetComment; ?></td>
+	</tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;" colspan="2">
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Details</a>
+        </td>
+    </tr>
 </table>

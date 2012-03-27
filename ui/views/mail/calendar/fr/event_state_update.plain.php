@@ -33,8 +33,23 @@ applicable to the OBM software.
 ?>
 Message automatique envoyé par OBM
 ------------------------------------------------------------------
-PARTICIPATION AU RENDEZ-VOUS
+PARTICIPATION : MISE A JOUR
 ------------------------------------------------------------------
 
-<?php echo $target; ?> a <?php echo $targetState; ?> l'événement <?php echo $title; ?> prévu le <?php echo $start; ?>.
+<?php echo $target; ?> a <?php echo $targetState; ?> l'événement suivant :
 
+Sujet           : <?php echo $title; ?>
+
+Quand           : <?php echo $start; ?>
+
+Organisateur    : <?php echo $organizer; ?>
+
+Participant(s)  : <?php echo $attendees; ?>
+
+
+:: Commentaire :
+<?php echo $targetComment; ?>
+
+
+:: Pour plus de détails :
+<?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

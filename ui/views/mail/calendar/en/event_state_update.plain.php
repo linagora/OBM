@@ -36,5 +36,20 @@ This email was automatically sent by OBM
 ATTENDEE STATE UPDATED
 ------------------------------------------------------------------
 
-<?php echo $target; ?> has <?php echo $targetState; ?> the event <?php echo $title; ?> scheduled on <?php echo $start; ?>.
+<?php echo $target; ?> has <?php echo $targetState; ?> the following event :
 
+Subject         : <?php echo $title; ?>
+
+When            : <?php echo $start; ?>
+
+Organizer       : <?php echo $organizer; ?>
+
+Attendee(s)     : <?php echo $attendees; ?>
+
+
+:: Comment :
+<?php echo $targetComment; ?>
+
+
+:: More information about this appointment :
+<?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
