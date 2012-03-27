@@ -3405,7 +3405,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_accepted</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_needs_action</span>
           <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_declined</span>
-            </td><td>$resource_comment</td>
+            </td><td>$comment</td>
             </tr>";          
         }
       }
@@ -4307,7 +4307,7 @@ function dis_event_comment_popup() {
 		</h1>
 		<div class=\"contentcomment\">
 			<form>
-				<textarea placeholder=\"\" style=\"width:90%;\"></textarea>
+				<textarea placeholder=\"\"></textarea>
 				<fieldset class=\"buttons\">
 					<a href='' onclick=\"obm.calendarCommentPopup.updateComment(); return false;\" class=\"closeSticky\">$GLOBALS[l_validate]</a>
 					<a href='' id='popup_form_close' class='closeSticky' onclick='return false;'>$GLOBALS[l_cancel]</a>
