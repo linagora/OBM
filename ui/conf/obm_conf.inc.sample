@@ -265,6 +265,9 @@ $cgp_show['section']['compta'] = false;
 //$cgp_show['module']['company'] = 'com';
 //$cgp_show['module']['campaign'] = 'com';
 
+// --- Webmail module --- false to hide
+$cgp_show['module']['webmail'] = 'gw';
+
 // Groupware configuration by default
 $cgp_show['module']['company'] = false;
 $cgp_show['module']['lead'] = false;

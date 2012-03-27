@@ -490,7 +490,7 @@ if ($cgp_show['module']['organizationalchart']) {
 if ($cgp_show['module']['webmail'] && $u['mail_perms'] == 1) {
   $modules['webmail'] = array('Name'=> $l_module_webmail,
                                     'Ico' => "$ico_webmail",
-                                    'Url' => "$path/minig/WebmailUI.".strtolower(get_lang()).".html",
+                                    'Url' => "$path/webmail",
 			            'Right'=> $cright_read);
 }
 
