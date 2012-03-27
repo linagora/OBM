@@ -48,9 +48,10 @@ public class ObmEventToMsEventConverterParticipationRoleTest {
 		converter = new ObmEventToMSEventConverterImpl();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test
 	public void testNullParticipationRole() {
-		converter.participationRole(null);
+		AttendeeType role = converter.participationRole(null);
+		assertThat(role).isEqualTo(AttendeeType.REQUIRED);
 	}
 
 	@Test

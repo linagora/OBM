@@ -68,6 +68,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverter {
 
+	public static final AttendeeType RFC5545_DEFAULT_ATTENDEE_ROLE = AttendeeType.REQUIRED;
+	
 	@Override
 	public MSEvent convert(Event e, MSEventUid uid, User user) {
 		MSEvent mse = new MSEvent();
@@ -241,7 +243,9 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 	}
 
 	@VisibleForTesting AttendeeType participationRole(ParticipationRole role) {
-		Preconditions.checkNotNull(role);
+		if (role == null) {
+			return RFC5545_DEFAULT_ATTENDEE_ROLE; 
+		}
 		switch (role) {
 		case REQ:
 		case CHAIR:
