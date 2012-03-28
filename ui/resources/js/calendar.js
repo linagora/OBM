@@ -2092,12 +2092,16 @@ Obm.CalendarCommentPopup = new Class({
 		this.charCount = $('calendarCommentPopup').getElementById('charCount');
 		this.maxLength = 255;
 	},
-	compute: function(uid,evtid,comment,type) {
+	compute: function(uid,evtid,comment,type,usePlaceholder) {
 		this.uid = uid;
 		this.evtid = evtid;
 		this.comment = comment;
 		this.type = type;
-		this.textarea.setProperty('placeholder', this.comment);
+		if(usePlaceholder) {
+			this.textarea.setProperty('placeholder', this.comment);
+		} else {
+			this.textarea.setProperty('value', this.comment);
+		}
 		this.show();
 	},
 	show: function() {
@@ -2172,7 +2176,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.yourDecision = $('calendarDecisionPopup').getElementById('yourDecision');
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
 	},
-	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang) {
+	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, usePlaceholder) {
 		this.uid = uid;
 		this.evtid = evtid;
 		this.decision = decision;
@@ -2181,7 +2185,11 @@ Obm.CalendarDecisionPopup = new Class({
 		this.type = type;
 		this.comment = comment;
 		this.eventTitle = title;
-		this.textarea.setProperty('placeholder', this.comment);
+		if(usePlaceholder) {
+			this.textarea.setProperty('placeholder', this.comment);
+		} else {
+			this.textarea.setProperty('value', this.comment);
+		}
 		this.yourDecision.appendText(this.choiceByLang);
 		this.eventTitlePlace.appendText(this.eventTitle);
 		this.show();
