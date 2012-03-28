@@ -68,6 +68,13 @@ if [ $? -eq 1 ]; then
 	fix_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} 0.0.0.0/0 md5
 	restart_pgsql=1
 fi
+check_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} ::1/128 md5
+if [ $? -eq 1 ]; then
+    fix_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} ::1/128 md5
+    restart_pgsql=1
+fi
+  
+
 # Check listen addrese and fix it
 if [ "${OBM_HOST}" != "127.0.0.1" ]; then
 	#check_listen_adress ${OBM_HOST}
