@@ -38,7 +38,7 @@ echo "*** Document repository creation"
 ./install_document_2.4.sh
 
 if [ -z $installation_type ] || [ $installation_type != 'filldata' ]; then
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "full" ${H}
+  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} ${H} "full"
 else
-  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} "filldata" ${H}
+  ./install_obmdb_${DBTYPE}_2.4.sh ${DB} ${U} ${P} ${OBM_LANG} ${H} "filldata"
 fi
