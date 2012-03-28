@@ -80,4 +80,7 @@ public interface ImapStore {
 	
 	Map<Long, IMAPMessage> fetchFast(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException;
 
+	Map<Long, IMAPMessage> fetchBodyStructure(String folderSrc, Collection<Long> uids) 
+			throws ImapCommandException, ImapMessageNotFoundException;
+
 }

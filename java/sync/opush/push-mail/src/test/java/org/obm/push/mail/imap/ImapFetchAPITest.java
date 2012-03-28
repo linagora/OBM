@@ -42,6 +42,7 @@ import javax.mail.internet.MimeMessage;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.minig.imap.Address;
@@ -63,6 +64,7 @@ import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -203,5 +205,52 @@ public class ImapFetchAPITest {
 		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
 		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());
+	}
+	
+	@Test
+	public void testFetchBodyStructureNoUid() throws MailException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Collection<org.minig.imap.mime.MimeMessage> result = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of());
+		Assertions.assertThat(result).isEmpty();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testFetchBodyStructureNullUids() throws MailException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		privateMailboxService.fetchBodyStructure(bs, inbox, null);
+	}
+	
+	@Ignore("need to implement buildMimeMessageCollectionFromIMAPMessage")
+	@Test
+	public void testBodyStructureOneSimpleTextPlainMessage() throws MailException, AddressException, MessagingException, UserException {
+		String messageContent = "message content";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
+		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
+		
+		Assertions.assertThat(collections).hasSize(1);
+		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(onlyElement.getMimePart().isMultipart()).isFalse();
+	}
+	
+	@Ignore("need to implement buildMimeMessageCollectionFromIMAPMessage")
+	@Test
+	public void testBodyStructureOneComplexMultipartMixedMessage() throws MailException, UserException {
+		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartMixed.eml.eml");
+		testUtils.deliverToUserInbox(greenMailUser, 
+				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
+		
+		Assertions.assertThat(collections).hasSize(1);
+		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		Assertions.assertThat(onlyElement.getMimePart().isMultipart()).isTrue();
+		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("multipart/mixed");
 	}
 }

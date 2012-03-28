@@ -244,6 +244,18 @@ public class ImapStoreImpl implements ImapStore {
 		}
 	}
 	
+	@Override
+	public Map<Long, IMAPMessage> fetchBodyStructure(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException {
+		try {
+			OpushImapFolder opushImapFolder = select(folderSrc);
+			return opushImapFolder.fetchBodyStructure(uids);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command fetch fast failed. user=%s, folder=%s", userId, folderSrc);
+			throw new ImapCommandException(msg, e);
+		}
+	}
+	
 	private OpushImapFolder newOpushImapFolder(IMAPFolder folder) {
 		return new OpushImapFolder(messageInputStreamProvider, folder);
 	}

@@ -37,6 +37,7 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
+import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.mail.imap.OpushImapFolder;
 
@@ -49,4 +50,6 @@ public interface PrivateMailboxService {
 	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
 
 	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+	
+	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
 }

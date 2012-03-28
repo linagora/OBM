@@ -50,6 +50,7 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
+import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.Email;
 import org.obm.push.mail.MailException;
 
@@ -154,5 +155,13 @@ public class ImapMailBoxUtils {
 					Flag.toFlag( ImapMailBoxUtils.flags.get(flag) ));
 		}
 		return flags;
+	}
+
+	public Collection<MimeMessage> buildMimeMessageCollectionFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) {
+		Collection<MimeMessage> mimeMessageCollection = new ArrayList<MimeMessage>();
+		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
+			// build mime message tree from IMAPMessage
+		}
+		return mimeMessageCollection;
 	}
 }

@@ -243,4 +243,20 @@ public class OpushImapFolder {
 	private SearchTerm buildNotDeleted() {
 		return new NotTerm(new FlagTerm(new Flags(Flags.Flag.DELETED), true));
 	}
+	
+	public Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {
+		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
+		FetchProfile fetchFastProfile = getFetchBodyStructureProfile();
+		for (long uid: uids) {
+			IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
+			imapMessages.put(uid, imapMessage);
+		}
+		return imapMessages;
+	}
+
+	private FetchProfile getFetchBodyStructureProfile() {
+		FetchProfile fetchProfile = new FetchProfile();
+		fetchProfile.add(FetchProfile.Item.CONTENT_INFO);
+		return fetchProfile;
+	}	
 }

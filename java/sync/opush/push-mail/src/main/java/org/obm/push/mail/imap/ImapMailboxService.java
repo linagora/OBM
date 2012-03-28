@@ -57,6 +57,7 @@ import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.MimeMessage;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
@@ -696,5 +697,31 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 		
 		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);
+	}
+	
+	@Override
+	public Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException {
+		ImapStore store = null;
+		Map<Long, IMAPMessage> imapMessages = null;
+		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			String mailboxName = parseMailBoxName(bs, collectionPath);
+			imapMessages = store.fetchBodyStructure(mailboxName, uids);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
+		return imapMailBoxUtils.buildMimeMessageCollectionFromIMAPMessage(imapMessages);
 	}
 }
