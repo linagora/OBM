@@ -34,10 +34,13 @@ $path = pathinfo(__FILE__);
 $path = $path['dirname'];
 $includePath = realpath("$path/jobs").":".realpath("$path/..");
 $jobsPath = "$path/jobs/";
+$cronJobProcessing = true;
 
 ini_set('error_reporting', E_ALL & ~E_NOTICE);
 ini_set('include_path', ".:$includePath");
 
+//set the timezone before any date function to avoid the php 5.3 warning
+date_default_timezone_set('GMT');
 $obminclude = 'obminclude';
 include_once("$obminclude/global.inc");
 include_once("Logger.class.php");
@@ -47,7 +50,6 @@ define("L_LEVEL", L_WARN);
 
 set_error_handler('errorHandler');
 
-date_default_timezone_set('GMT');
 
 SI18n::set_default_locale($set_lang_default);
 

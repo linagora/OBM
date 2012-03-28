@@ -1,4 +1,4 @@
-<script language="php">
+<script language="php"> 
 /******************************************************************************
 Copyright (C) 2011-2012 Linagora
 
@@ -543,6 +543,13 @@ $cmd_update_ftp_entity = "$path/../auto/update.pl --entity --domain-id";
 
 $section = $cgp_show['module'][$module];
 
+//---------------------------------------------------------------------------------------------//
+//Setting up the default date timezone before using any date function to avoid PHP 5.3 Warnings //
+if(!isset($_SESSION['set_timezone']) && !isset($cronJobProcessing)) {
+	date_default_timezone_set($set_timezone_default);
+}
+
+//---------------------------------------------------------------------------------------------//
 // Time : Day beginning a week (0=Sunday, 1=Monday,...)
 $c_week_first_day = date('w', strtotime($ccalendar_weekstart));
 //-----------------------------//
