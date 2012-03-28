@@ -4307,7 +4307,9 @@ function dis_event_comment_popup() {
 		</h1>
 		<div class=\"contentcomment\">
 			<form>
-				<textarea placeholder=\"\"></textarea>
+				<textarea placeholder=\"\" maxlength=\"255\" style=\"width:90%;\"
+					onKeyPress=\"obm.calendarCommentPopup.displayCharLimit();\" onKeyUp=\"obm.calendarCommentPopup.displayCharLimit();\" onKeyDown=\"obm.calendarCommentPopup.displayCharLimit();\"></textarea>
+				<span style=\"text-align:left;font-size:90%;\"><span id=\"charCount\" style=\"font-weight:bold;font-size:90%;\">255</span>&nbsp;$GLOBALS[l_remainingChar]</span>
 				<fieldset class=\"buttons\">
 					<a href='' onclick=\"obm.calendarCommentPopup.updateComment(); return false;\" class=\"closeSticky\">$GLOBALS[l_validate]</a>
 					<a href='' id='popup_form_close' class='closeSticky' onclick='return false;'>$GLOBALS[l_cancel]</a>
@@ -4391,7 +4393,9 @@ function dis_event_decision_popup() {
 				<input type=\"submit\" href='' onclick=\"obm.calendarDecisionPopup.updateDecision(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_without_comment]\" />
 				</fieldset>
 				<p><img src='$GLOBALS[ico_comment]' alt='comment:' /> $GLOBALS[l_comment_decision]
-				<textarea id=\"comment\" placeholder=\"$GLOBALS[l_add_comment]...\"></textarea>
+				<textarea id=\"comment\" placeholder=\"\" maxlength=\"255\"
+					onKeyPress=\"obm.calendarDecisionPopup.displayCharLimit();\" onKeyUp=\"obm.calendarDecisionPopup.displayCharLimit();\" onKeyDown=\"obm.calendarDecisionPopup.displayCharLimit();\"></textarea>
+				<span style=\"text-align:left;font-size:80%;\"><span id=\"charCountForDecision\" style=\"font-weight:bold;font-size:80%;\">255</span>&nbsp;$GLOBALS[l_remainingChar]</span>
 				</p>
 				<fieldset class=\"buttons\">
 				<input type=\"submit\" href='' onclick=\"obm.calendarDecisionPopup.updateDecision(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_with_comment]\"/>         

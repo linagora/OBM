@@ -2089,6 +2089,8 @@ Obm.CalendarPopupManager = new Class({
 Obm.CalendarCommentPopup = new Class({
 	initialize: function() {
 		this.textarea = $('calendarCommentPopup').getElements('textarea');
+		this.charCount = $('calendarCommentPopup').getElementById('charCount');
+		this.maxLength = 255;
 	},
 	compute: function(uid,evtid,comment,type) {
 		this.uid = uid;
@@ -2119,6 +2121,9 @@ Obm.CalendarCommentPopup = new Class({
 				}
 			}
 		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
+	},
+	displayCharLimit: function(){
+		this.charCount.innerHTML = this.maxLength - this.textarea[0].value.length;
 	}
 });
 Obm.CalendarAlarmPopup = new Class({
@@ -2162,6 +2167,8 @@ Obm.CalendarAlarmPopup = new Class({
 Obm.CalendarDecisionPopup = new Class({
 	initialize: function() {
 		this.textarea = $('calendarDecisionPopup').getElements('textarea');
+		this.charCountForDecision = $('calendarDecisionPopup').getElementById('charCountForDecision');
+		this.maxLength = 255;
 		this.yourDecision = $('calendarDecisionPopup').getElementById('yourDecision');
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
 	},
@@ -2201,6 +2208,9 @@ Obm.CalendarDecisionPopup = new Class({
 				}
 			}
 		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
+	},
+	displayCharLimit: function(){
+		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
 	}
 });
 /******************************************************************************

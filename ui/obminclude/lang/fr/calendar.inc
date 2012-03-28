@@ -430,3 +430,4 @@ $l_comment_decision = "Commenter votre décision";
 $l_addedit_comment = "Ajouter / Modifier un commentaire";
 $l_without_comment = "Répondre sans commentaire";
 $l_with_comment = "Répondre avec commentaire";
+$l_remainingChar = "caractères restants";
