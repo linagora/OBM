@@ -57,8 +57,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + MessageSet.asString(uids)
-				+ " (UID BODYSTRUCTURE)";
+		String cmd = "FETCH " + MessageSet.asString(uids) + " (UID BODYSTRUCTURE)";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
@@ -66,10 +65,10 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 	@Override
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
-		
-		for (IMAPResponse r : rs) {
-			logger.debug("ri: " + r.getPayload() + " [stream:"
-					+ (r.getStreamData() != null) + "]");
+		if (imaplogger.isInfoEnabled()) {
+			for (IMAPResponse r: rs) {
+				imaplogger.info(r.getPayload());
+			}
 		}
 		
 		if (isOK) {
