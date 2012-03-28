@@ -59,7 +59,10 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID SEARCH NOT DELETED";
+		String cmd = "UID SEARCH";
+		if (!sq.isMatchDeleted()) {
+			cmd += " NOT DELETED";
+		}
 		if (sq.getAfter() != null) {
 			DateFormat df = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
 			cmd += " NOT BEFORE " + df.format(sq.getAfter());

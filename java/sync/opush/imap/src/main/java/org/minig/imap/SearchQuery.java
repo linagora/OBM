@@ -37,10 +37,16 @@ import java.util.Date;
 public class SearchQuery {
 
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
+	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, true);
 	
 	public static class Builder {
 		private Date before;
 		private Date after;
+		private boolean includeDeleted;
+		
+		public Builder() {
+			this.includeDeleted = false;
+		}
 		
 		public Builder before(Date before) {
 			this.before = before;
@@ -52,8 +58,13 @@ public class SearchQuery {
 			return this;
 		}
 		
+		public Builder includeDeleted(boolean includeDeleted) {
+			this.includeDeleted = includeDeleted;
+			return this;
+		}
+		
 		public SearchQuery build() {
-			return new SearchQuery(before, after);
+			return new SearchQuery(before, after, includeDeleted);
 		}
 	}
 	
@@ -64,12 +75,18 @@ public class SearchQuery {
 	 *            is within or later than the specified date.
 	 */
 	private SearchQuery(Date before, Date after) {
+		this(before, after, false);
+	}
+	
+	private SearchQuery(Date before, Date after, boolean matchDeleted) {
 		this.after = after;
 		this.before = before;
+		this.matchDeleted = matchDeleted;
 	}
 
 	private Date after;
 	private Date before;
+	private boolean matchDeleted;
 
 	public Date getAfter() {
 		return after;
@@ -87,5 +104,11 @@ public class SearchQuery {
 		this.before = before;
 	}
 
-	
+	public boolean isMatchDeleted() {
+		return matchDeleted;
+	}
+
+	public void setMatchDeleted(boolean matchDeleted) {
+		this.matchDeleted = matchDeleted;
+	}
 }

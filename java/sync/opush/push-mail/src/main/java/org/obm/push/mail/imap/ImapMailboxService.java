@@ -34,6 +34,7 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -92,6 +93,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -170,6 +172,21 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			throw new MailException(e);
 		} finally {
 			closeQuietly(store);
+		}
+	}
+	
+	@Override
+	public Collection<Flag> uidFetchFlags(BackendSession bs, String collectionName, long uid) throws MailException {
+		StoreClient store = imapClientProvider.getImapClient(bs);
+		try {
+			login(store);
+			store.select( parseMailBoxName(bs, collectionName) );
+			Collection<FlagsList> fetchFlags = store.uidFetchFlags(Arrays.asList(uid));
+			return Iterables.getOnlyElement(fetchFlags);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
 		}
 	}
 	

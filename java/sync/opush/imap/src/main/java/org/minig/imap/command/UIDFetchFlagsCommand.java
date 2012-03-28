@@ -129,6 +129,9 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 		if (flags.contains("\\Answered")) {
 			flagsList.add(Flag.ANSWERED);
 		}
+		if (flags.contains("\\Draft")) {
+			flagsList.add(Flag.DRAFT);
+		}
 	}
 
 }

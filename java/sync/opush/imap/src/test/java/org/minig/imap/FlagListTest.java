@@ -29,31 +29,79 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.minig.imap;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import junit.framework.Assert;
 
-public class FlagsList extends HashSet<Flag> {
+import org.junit.Test;
 
-	private static final char FLAGS_SEPARATOR = ' ';
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 
-	public FlagsList() {}
+public class FlagListTest {
+
+	@Test
+	public void testFlagDeleteForCommand() {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.DELETED);
+		
+		Assert.assertEquals("(\\Deleted)", fl.asCommandValue());
+	}
 	
-	public String asCommandValue() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("(");
+	@Test
+	public void testFlagAnsweredForCommand() {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.ANSWERED);
+		
+		Assert.assertEquals("(\\Answered)", fl.asCommandValue());
+	}
+	
+	@Test
+	public void testFlagDraftForCommand() {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.DRAFT);
+		
+		Assert.assertEquals("(\\Draft)", fl.asCommandValue());
+	}
+	
+	@Test
+	public void testFlagFlaggedForCommand() {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.FLAGGED);
+		
+		Assert.assertEquals("(\\Flagged)", fl.asCommandValue());
+	}
+	
+	@Test
+	public void testFlagSeenForCommand() {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.SEEN);
+		
+		Assert.assertEquals("(\\Seen)", fl.asCommandValue());
+	}
+	
+	@Test
+	public void testFlagAllForCommand() {
+		for (int i = 0 ; i <100000;i++){
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.ANSWERED);
+		fl.add(Flag.DELETED);
+		fl.add(Flag.DRAFT);
+		fl.add(Flag.FLAGGED);
+		fl.add(Flag.SEEN);
+		
+		String asCommandValue = fl.asCommandValue();
 
-		Iterator<Flag> it = iterator();
-		for (int i = 0; i < size(); i++) {
-			if (i > 0) {
-				sb.append(FLAGS_SEPARATOR);
-			}
-			sb.append(it.next().asCommandValue());
+		int antiSlashCount = charCount(asCommandValue, '\\');
+		int spaceCount =  charCount(asCommandValue, ' ');
+		
+		Assert.assertEquals(antiSlashCount, 5);
+		Assert.assertEquals(spaceCount, 4);
 		}
+	}
 
-		sb.append(")");
-		return sb.toString();
+	private int charCount(String asCommandValue, char charToCount) {
+		Iterable<String> splitted = Splitter.on(charToCount).split(asCommandValue);
+		return Iterables.size(splitted) -1;
 	}
 }
