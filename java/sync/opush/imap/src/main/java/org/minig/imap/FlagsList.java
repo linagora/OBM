@@ -32,6 +32,7 @@
 
 package org.minig.imap;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -40,6 +41,10 @@ public class FlagsList extends HashSet<Flag> {
 	private static final char FLAGS_SEPARATOR = ' ';
 
 	public FlagsList() {}
+	
+	public FlagsList(Collection<? extends Flag> initializingCollection) {
+		super(initializingCollection);
+	}
 	
 	public String asCommandValue() {
 		StringBuilder sb = new StringBuilder();

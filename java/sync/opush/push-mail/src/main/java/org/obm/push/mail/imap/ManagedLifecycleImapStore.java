@@ -48,12 +48,15 @@ public class ManagedLifecycleImapStore extends ImapStoreImpl implements Closable
 		
 		private final MessageInputStreamProvider messageInputStreamProvider;
 		private final Provider<ImapStoreManager> imapStoreManagerProvider;
+		private final ImapMailBoxUtils imapMailBoxUtils;
 
 		@Inject
 		@VisibleForTesting Factory(Provider<ImapStoreManager> imapStoreManagerProvider,
-				MessageInputStreamProvider messageInputStreamProvider) {
+				MessageInputStreamProvider messageInputStreamProvider,
+				ImapMailBoxUtils imapMailBoxUtils) {
 			this.imapStoreManagerProvider = imapStoreManagerProvider;
 			this.messageInputStreamProvider = messageInputStreamProvider;
+			this.imapMailBoxUtils = imapMailBoxUtils;
 		}
 		
 		public ImapStore create(Session session, IMAPStore store, String userId, String password, String host, int port) {
@@ -62,7 +65,8 @@ public class ManagedLifecycleImapStore extends ImapStoreImpl implements Closable
 					new ImapStoreMessageInputStreamProvider(messageInputStreamProvider, imapStoreManager);
 			
 			ManagedLifecycleImapStore imapStore = new ManagedLifecycleImapStore(imapStoreManager,
-					imapStoreMessageInputStreamProvider, session, store, userId, password, host, port);
+					imapStoreMessageInputStreamProvider, imapMailBoxUtils,
+					session, store, userId, password, host, port);
 			imapStoreManager.setImapStore(imapStore);
 			return imapStore;
 		}
@@ -70,10 +74,11 @@ public class ManagedLifecycleImapStore extends ImapStoreImpl implements Closable
 
 	private final ImapStoreManager imapStoreManager;	
 	
-	private ManagedLifecycleImapStore(ImapStoreManager imapStoreManager, MessageInputStreamProvider messageInputStreamProvider,
+	private ManagedLifecycleImapStore(ImapStoreManager imapStoreManager, 
+			MessageInputStreamProvider messageInputStreamProvider, ImapMailBoxUtils imapMailBoxUtils,
 			Session session, IMAPStore store, String userId, String password, String host, int port) {
 		
-		super(session, store, messageInputStreamProvider, userId, password, host, port);
+		super(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port);
 		this.imapStoreManager = imapStoreManager;
 	}
 

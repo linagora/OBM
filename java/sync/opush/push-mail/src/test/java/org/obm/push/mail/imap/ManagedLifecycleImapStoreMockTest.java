@@ -158,7 +158,7 @@ public class ManagedLifecycleImapStoreMockTest {
 	private ImapStore createManagedLifecycleImapStore(Provider<ImapStoreManager> imapStoreManagerProvider, IMAPStore store) {
 		
 		ManagedLifecycleImapStore.Factory factory = new ManagedLifecycleImapStore.Factory(
-				imapStoreManagerProvider, new MessageInputStreamProviderImpl());
+				imapStoreManagerProvider, new MessageInputStreamProviderImpl(), null);
 
 		replay(imapStoreManagerProvider, imapStoreManagerMock, store);
 		

@@ -59,8 +59,6 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	private final int imapPort;
 	private final Session defaultSession;
 
-
-
 	@Inject
 	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, LocatorService locatorService,
 			ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory) {

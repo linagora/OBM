@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
@@ -51,6 +52,8 @@ import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchException;
 import javax.mail.search.SearchTerm;
 
+import org.minig.imap.Flag;
+import org.minig.imap.FlagsList;
 import org.minig.imap.SearchQuery;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.imap.command.IMAPCommand;
@@ -67,10 +70,12 @@ import com.sun.mail.imap.protocol.IMAPProtocol;
 public class OpushImapFolder {
 
 	private final MessageInputStreamProvider imapResourceProvider;
+	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final IMAPFolder folder;
 
-	public OpushImapFolder(MessageInputStreamProvider imapResourceProvider, IMAPFolder folder) {
+	public OpushImapFolder(ImapMailBoxUtils imapMailBoxUtils, MessageInputStreamProvider imapResourceProvider, IMAPFolder folder) {
 		this.imapResourceProvider = imapResourceProvider;
+		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.folder = folder;
 	}
 
@@ -142,6 +147,23 @@ public class OpushImapFolder {
 		FetchProfile fetchProfile = new FetchProfile();
 		fetchProfile.add(FetchProfile.Item.ENVELOPE);
 		return fetch(messageUid, fetchProfile);
+	}
+
+	public FlagsList uidFetchFlags(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+		IMAPMessage messageToFetch = getMessageByUID(messageUid);
+		folder.fetch(new Message[]{messageToFetch}, getFetchFlagsProfile());
+		return flagsList(messageToFetch.getFlags());
+	}
+
+	private FlagsList flagsList(Flags flagsToConvert) {
+		Set<Flag> convertedFlags = imapMailBoxUtils.buildFlagToIMAPMessageFlags(flagsToConvert);
+		return new FlagsList(convertedFlags);
+	}
+
+	private FetchProfile getFetchFlagsProfile() {
+		FetchProfile fetchProfile = new FetchProfile();
+		fetchProfile.add(FetchProfile.Item.FLAGS);
+		return fetchProfile;
 	}
 
 	public InputStream uidFetchMessage(long messageUid) throws MessagingException, ImapMessageNotFoundException {

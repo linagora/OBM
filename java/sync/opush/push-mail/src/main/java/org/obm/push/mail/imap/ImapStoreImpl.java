@@ -64,16 +64,18 @@ public class ImapStoreImpl implements ImapStore {
 	private final Session session;
 	private final IMAPStore store;
 	private final MessageInputStreamProvider messageInputStreamProvider;
+	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final String password;
 	private final String userId;
 	private final String host;
 	private final int port;
 
-	protected ImapStoreImpl(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
+	protected ImapStoreImpl(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider, ImapMailBoxUtils imapMailBoxUtils,
 			String userId, String password, String host, int port) {
 		this.session = session;
 		this.store = store;
 		this.messageInputStreamProvider = messageInputStreamProvider;
+		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.userId = userId;
 		this.password = password;
 		this.host = host;
@@ -257,7 +259,7 @@ public class ImapStoreImpl implements ImapStore {
 	}
 	
 	private OpushImapFolder newOpushImapFolder(IMAPFolder folder) {
-		return new OpushImapFolder(messageInputStreamProvider, folder);
+		return new OpushImapFolder(imapMailBoxUtils, messageInputStreamProvider, folder);
 	}
 
 	protected MessageInputStreamProvider getMessageInputStreamProvider() {

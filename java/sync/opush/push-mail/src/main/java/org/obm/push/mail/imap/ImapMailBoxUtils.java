@@ -159,7 +159,7 @@ public class ImapMailBoxUtils {
 		}
 	}
 
-	private Set<Flag> buildFlagToIMAPMessageFlags(Flags imapMessageFlags) {
+	public Set<Flag> buildFlagToIMAPMessageFlags(Flags imapMessageFlags) {
 		Set<Flag> flags = new HashSet<Flag>();
 		for (javax.mail.Flags.Flag flag: imapMessageFlags.getSystemFlags()) {
 			flags.add(

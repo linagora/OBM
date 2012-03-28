@@ -82,5 +82,4 @@ public interface ImapStore {
 
 	Map<Long, IMAPMessage> fetchBodyStructure(String folderSrc, Collection<Long> uids) 
 			throws ImapCommandException, ImapMessageNotFoundException;
-
 }

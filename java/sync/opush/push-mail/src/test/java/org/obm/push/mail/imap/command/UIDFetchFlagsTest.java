@@ -172,7 +172,7 @@ public class UIDFetchFlagsTest {
 	private void assertContainsOnlyFlags(Collection<Flag> fetchFlags, Flag...expectedFlags) {
 		Assertions.assertThat(fetchFlags).containsOnly((Object[])expectedFlags);
 	}
-
+	
 	private FlagsList list(Flag... expectedFlags) {
 		FlagsList expectedFlagsList = new FlagsList();
 		expectedFlagsList.addAll(Arrays.asList(expectedFlags));
