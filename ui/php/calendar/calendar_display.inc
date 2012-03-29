@@ -3217,7 +3217,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
             $bell_alert_onclick ="onclick=\"obm.calendarAlarmPopup.compute(-1, $u_id, $id);\"";
             $bell_alert_title = " title=\"$l_add_alarm\" ";
           }
-          $$state = "checked=\"checked\"";
+          $$state = "checked=\"checked\" disabled";
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
 	  
 	  $bell_alert_icon = "<a class=\"$bell_alert_class\" $bell_alert_onclick $bell_alert_title></a>";
@@ -3271,7 +3271,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $ACCEPTED = '';
         ${'NEEDS-ACTION'} = '';
         $DECLINED = '';
-          $$state = "checked=\"checked\"";
+          $$state = "checked=\"checked\" disabled";
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
 
           $dis_contact_list .= "
@@ -3361,7 +3361,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         $comment = $entity['comment'];
         $resource_comment = addslashes($comment);
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
-          $$state = "checked=\"checked\"";
+          $$state = "checked=\"checked\" disabled";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
 	  
 	  if($resource_comment != ''){
@@ -5581,7 +5581,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>
       <form>
         <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '".$obm_wait->f('event_title')."','$l_decision_ACCEPTED')\" /> $l_accept</span><br/>
-        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'NEEDS-ACTIONS', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '".$obm_wait->f('event_title')."','$l_decision_NEEDS_ACTIONS')\" checked=\"checked\"/> $l_wait</span><br/>
+        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'NEEDS-ACTIONS', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '".$obm_wait->f('event_title')."','$l_decision_NEEDS_ACTIONS')\" checked=\"checked\" disabled/> $l_wait</span><br/>
         <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'DECLINED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '".$obm_wait->f('event_title')."','$l_decision_DECLINED')\" /> $l_refuse</span>
       </form>
      </td>
