@@ -44,7 +44,7 @@ import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
-import org.minig.imap.mime.MimeType;
+import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.impl.BodyParamParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -239,7 +239,7 @@ public class BodyStructureParser {
 		}
 
 		boolean setMimeType() {
-			MimeType mimetype = (MimeType) pop();
+			ContentType mimetype = (ContentType) pop();
 			IMimePart mimePart = (IMimePart) peek();
 			mimePart.setMimeType(mimetype);
 			return true;
@@ -273,7 +273,7 @@ public class BodyStructureParser {
 			String contentTransfertEncoding = (String)pop();
 			String bodyId = (String)pop();
 			Set<BodyParam> bodyParams = (Set<BodyParam>) pop();
-			MimeType mimeType = (MimeType) pop();
+			ContentType mimeType = (ContentType) pop();
 			MimePart mimePart = new MimePart();
 			mimePart.setMimeType(mimeType);
 			mimePart.setBodyParams(bodyParams);
@@ -352,12 +352,14 @@ public class BodyStructureParser {
 
 		boolean createMimeType() {
 			swap();
-			push(new MimeType((String)pop(), (String)pop()));
+			push(
+					new ContentType.Builder().primaryType((String) pop()).subType((String) pop()).build());
 			return true;
 		}
 		
 		Rule mediaMessage() {
-			return Sequence("\"MESSAGE\"", whitespaces(), "\"RFC822\"", push(new MimeType("MESSAGE", "RFC822")));
+			ContentType.Builder builder = new ContentType.Builder().primaryType("MESSAGE").subType("RFC822");
+			return Sequence("\"MESSAGE\"", whitespaces(), "\"RFC822\"", push(builder.build()));
 		}
 
 		Rule mediaSubType() {
@@ -365,7 +367,8 @@ public class BodyStructureParser {
 		}
 
 		Rule mediaText() {
-			return Sequence("\"TEXT\"", whitespaces(), mediaSubType(), push(new MimeType("TEXT", (String) pop())));
+			return Sequence("\"TEXT\"", whitespaces(), mediaSubType(), 
+					push(new ContentType.Builder().primaryType("TEXT").subType((String) pop()).build()));
 		}
 
 		public Rule rule() {

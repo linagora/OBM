@@ -31,69 +31,53 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.mime;
 
+import com.google.common.base.Objects;
+
 public class BodyParam {
 	
-	private String key;
-	private String value;
-	
-	public BodyParam() {
-	}
+	private final String key;
+	private final String value;
 	
 	public BodyParam(String key, String value) {
-		setKey(key);
-		setValue(value);
+		this.key = key.toLowerCase().trim();
+		this.value = value;
 	}
 
 	public String getKey() {
 		return key;
 	}
 	
-	public void setKey(String key) {
-		this.key = key.toLowerCase();
-	}
-	
 	public String getValue() {
 		return value;
 	}
-	
-	public void setValue(String value) {
-		this.value = value;
-	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BodyParam other = (BodyParam) obj;
-		if (key == null) {
-			if (other.key != null)
-				return false;
-		} else if (!key.equals(other.key))
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equalsIgnoreCase(other.value))
-			return false;
-		return true;
+	public final int hashCode(){
+		return Objects.hashCode(key, value);
 	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof BodyParam) {
+			BodyParam that = (BodyParam) object;
+			if (this.key != null && that.key != null && 
+					this.value != null && that.value != null) {
+				return this.key.equalsIgnoreCase(that.key)
+						&& this.value.trim().equalsIgnoreCase(that.value.trim());	
+			}
+			if (this.key == null && that.key == null) {
+				return true;
+			}
+			return this.value == null && that.value == null;
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("; %s=%s", key, value);
+		return Objects.toStringHelper(this)
+			.add("key", key)
+			.add("value", value)
+			.toString();
 	}
-
 }

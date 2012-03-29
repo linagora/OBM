@@ -85,6 +85,10 @@
 			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-assert-core</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

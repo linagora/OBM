@@ -66,9 +66,9 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public void setMimeType(MimeType mimetype) {
-		this.mimeSubtype = mimetype.getSubtype();
-		this.mimeType = mimetype.getType();
+	public void setMimeType(ContentType mimetype) {
+		this.mimeSubtype = mimetype.getSubType();
+		this.mimeType = mimetype.getPrimaryType();
 	}
 	
 	@Override

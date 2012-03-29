@@ -189,7 +189,7 @@ public class MimeMessage implements IMimePart {
 	}
 	
 	@Override
-	public void setMimeType(MimeType mimetype) {
+	public void setMimeType(ContentType mimetype) {
 		from.setMimeType(mimetype);		
 	}
 	

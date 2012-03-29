@@ -38,14 +38,14 @@ import java.util.Map.Entry;
 import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
-import org.minig.imap.mime.MimeType;
+import org.minig.imap.mime.ContentType;
 
 import com.google.common.collect.Sets;
 
 public class MimeMessageFactory {
 
 	private static <T extends MimePart> T fillSimpleMimePart(T mimePart, String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {
-		mimePart.setMimeType(new MimeType(mimeType, mimeSubtype));
+		mimePart.setMimeType( buildMimeType(mimeType, mimeSubtype) );
 		HashSet<BodyParam> params = Sets.newHashSet();
 		for (Entry<String, String> entry: bodyParams.entrySet()) {
 			params.add(new BodyParam(entry.getKey(), entry.getValue()));
@@ -57,6 +57,11 @@ public class MimeMessageFactory {
 		mimePart.setContentId(contentId);
 		mimePart.setContentTransfertEncoding(encoding);
 		return mimePart;
+	}
+	
+	private static ContentType buildMimeType(String mimeType, String mimeSubtype) {
+		ContentType.Builder builder = new ContentType.Builder();
+		return builder.primaryType(mimeType).subType(mimeSubtype).build();
 	}
 	
 	public static MimePart createSimpleMimePart(String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {

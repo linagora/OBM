@@ -74,7 +74,7 @@ public interface IMimePart {
 
 	void setBodyParams(Collection<BodyParam> newParams);
 
-	void setMimeType(MimeType mimetype);
+	void setMimeType(ContentType mimetype);
 
 	String getName();
 

@@ -33,6 +33,8 @@ package org.minig.imap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.ContentType;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -55,6 +57,8 @@ public class BeansTest {
 					.add(MailboxFolders.class)
 					.add(Envelope.class)
 					.add(FastFetch.class)
+					.add(ContentType.class)
+					.add(BodyParam.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
