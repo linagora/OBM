@@ -1,6 +1,5 @@
 #/bin/bash
 #installation script
-set -x
 set -e
 
 cd /usr/share/obm-storage/update-install/scripts/2.4

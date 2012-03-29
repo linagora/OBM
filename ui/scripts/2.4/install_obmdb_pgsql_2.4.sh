@@ -31,14 +31,15 @@ EOF"
   
   echo "  Create new $DB database"
   
-  su - postgres -c "createdb -O ${user} --encoding=UTF-8 ${db}"
-fi
+  su - postgres -c "createdb  -O ${user} --encoding=UTF-8 ${db}"
 
-su - postgres -c "psql ${db} <<EOF
+  su - postgres -c "psql ${db} <<EOF
 CREATE LANGUAGE plpgsql;
 ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
 EOF"
+
+fi
 
 psql -U ${user} -h ${host} ${db} -f \
 create_obmdb_2.4.pgsql.sql > /tmp/data_insert.log 2>&1
