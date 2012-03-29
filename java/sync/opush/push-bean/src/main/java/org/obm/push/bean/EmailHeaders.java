@@ -29,35 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.bean;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.MailboxFolder;
-import org.minig.imap.MailboxFolders;
-import org.minig.imap.SearchQuery;
-import org.minig.imap.mime.MimeMessage;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.EmailHeaders;
-import org.obm.push.mail.imap.OpushImapFolder;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-public interface PrivateMailboxService {
+public class EmailHeaders {
 
-	MailboxFolders listAllFolders(BackendSession bs) throws MailException;
+	public static class Builder implements org.obm.push.bean.Builder<EmailHeaders> {
+
+		private final List<EmailHeader> headers;
+		
+		public Builder() {
+			headers = Lists.newArrayList();
+		}
+		
+		public EmailHeaders.Builder header(EmailHeader header) {
+			headers.add(header);
+			return this;
+		}
+		
+		@Override
+		public EmailHeaders build() {
+			return new EmailHeaders(headers);
+		}
+	}
 	
-	OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException;
+	private HashSet<EmailHeader> headers;
+
+	private EmailHeaders(List<EmailHeader> headers) {
+		this.headers = Sets.newHashSet(headers);
+	}
 	
-	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
-
-	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
-	
-	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
-
-	Collection<Flag> uidFetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
-
-	IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
-
+	public String[] toStringArray() {
+		Collection<String> asStrings = Collections2.transform(headers, new Function<EmailHeader, String>() {
+			@Override
+			public String apply(EmailHeader header) {
+				return header.getHeader();
+			}
+		});
+		return asStrings.toArray(new String[0]);
+	}
 }

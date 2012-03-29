@@ -81,7 +81,6 @@ public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
 		Map<String, String> rawHeaders = new HeadersParser().parseRawHeaders(reader);
 		IMAPHeaders h = new IMAPHeaders();
 		h.setRawHeaders(rawHeaders);
-		h.setUid(message.getUid());
 		return h;
 	}
 

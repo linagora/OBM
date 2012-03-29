@@ -48,7 +48,6 @@ public class IMAPHeaders {
 	private static final Logger logger = LoggerFactory
 			.getLogger(IMAPHeaders.class);
 
-	private long uid;
 	private Map<String, String> raw;
 	private Address from;
 	private List<Address> to;
@@ -57,14 +56,6 @@ public class IMAPHeaders {
 	private List<Address> dispositionNotification;
 	private String subject;
 	private Date date;
-
-	public long getUid() {
-		return uid;
-	}
-
-	public void setUid(long uid) {
-		this.uid = uid;
-	}
 
 	public void setRawHeaders(Map<String, String> rawHeaders) {
 		this.raw = rawHeaders;

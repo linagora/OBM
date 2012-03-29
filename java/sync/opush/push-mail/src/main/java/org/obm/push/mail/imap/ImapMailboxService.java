@@ -34,6 +34,7 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -52,6 +53,7 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
+import org.minig.imap.IMAPHeaders;
 import org.minig.imap.MailboxFolder;
 import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
@@ -64,6 +66,7 @@ import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionPathException;
@@ -91,7 +94,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -148,6 +153,25 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			store.logout();
 		}
 		return mails;
+	}
+
+	@Override
+	public IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
+		Preconditions.checkNotNull(headersToFetch);
+		StoreClient store = imapClientProvider.getImapClient(bs);
+		try {
+			login(store);
+			store.select(parseMailBoxName(bs, collectionName));
+			Collection<IMAPHeaders> fetchHeaders = store.uidFetchHeaders(Arrays.asList(uid), headersToFetch.toStringArray());
+			if (fetchHeaders.size() < 1) {
+				throw new ImapMessageNotFoundException("message UID " + uid);
+			}
+			return Iterables.getOnlyElement(fetchHeaders);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
+		}
 	}
 
 	@Override

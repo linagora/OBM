@@ -55,6 +55,8 @@ public interface ImapStore {
 	void logout();
 	boolean isConnected();
 
+	Message createMessage();
+
 	Message createMessage(InputStream messageContent) throws MessagingException;
 
 	Message createStreamedMessage(InputStream messageContent, int mailSize);

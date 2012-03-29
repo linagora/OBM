@@ -128,7 +128,6 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 				}
 
 				IMAPHeaders imapHeaders = new IMAPHeaders();
-				imapHeaders.setUid(uid);
 				imapHeaders.setRawHeaders(rawHeaders);
 				data.add(imapHeaders);
 				i++;

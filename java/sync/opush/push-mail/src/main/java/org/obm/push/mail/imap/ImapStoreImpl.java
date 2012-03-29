@@ -81,6 +81,11 @@ public class ImapStoreImpl implements ImapStore {
 		this.host = host;
 		this.port = port;
 	}
+
+	@Override
+	public Message createMessage() {
+		return new MimeMessage(session);
+	}
 	
 	@Override
 	public Message createMessage(InputStream messageContent) throws MessagingException {

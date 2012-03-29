@@ -29,35 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.bean;
 
-import java.util.Collection;
+public class EmailHeader {
 
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.MailboxFolder;
-import org.minig.imap.MailboxFolders;
-import org.minig.imap.SearchQuery;
-import org.minig.imap.mime.MimeMessage;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.EmailHeaders;
-import org.obm.push.mail.imap.OpushImapFolder;
+	public enum Common {
+		
+		TO("TO"),
+		CC("CC"),
+		BCC("BCC"),
+		FROM("FROM"),
+		DATE("DATE"),
+		SUBJECT("SUBJECT"),
+		MESSAGE_ID("MESSAGE-ID"),
+		MIME_VERSION("MIME-VERSION"),
+		IMPORTANCE("IMPORTANCE"),
+		RETURN_PATH("RETURN-PATH"),
+		RECEIVED("RECEIVED"),
+		USER_AGENT("USER-AGENT"),
+		CONTENT_TYPE("CONTENT-TYPE"),
+		CONTENT_TRANSFER_ENCODING("CONTENT-TRANSFER-ENCODING"),
+		CONTENT_DISPOSITION("CONTENT-DISPOSITION");
+		
+		private final EmailHeader header;
+		
+		private Common(String imapHeader) {
+			this.header = new EmailHeader(imapHeader);
+		}
+		
+		public EmailHeader getHeader() {
+			return header;
+		}
 
-public interface PrivateMailboxService {
-
-	MailboxFolders listAllFolders(BackendSession bs) throws MailException;
+	}
 	
-	OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException;
+	private final String header;
 	
-	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
-
-	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+	public EmailHeader(String header) {
+		this.header = header;
+	}
 	
-	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
-
-	Collection<Flag> uidFetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
-
-	IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
-
+	public String getHeader() {
+		return header;
+	}
+	
 }
