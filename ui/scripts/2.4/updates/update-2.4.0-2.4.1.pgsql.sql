@@ -28,6 +28,6 @@ ALTER TABLE opush_event_mapping DROP CONSTRAINT opush_event_mapping_device_id_ke
 ALTER TABLE opush_event_mapping DROP COLUMN event_id;
 ALTER TABLE opush_event_mapping ADD CONSTRAINT opush_event_mapping_device_id_event_ext_id_unique UNIQUE (device_id, event_ext_id);
 
-UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
-
 ALTER TABLE eventlink ADD COLUMN eventlink_comment VARCHAR(255);
+
+UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';

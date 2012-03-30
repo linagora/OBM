@@ -31,6 +31,6 @@ CREATE UNIQUE INDEX opush_event_mapping_device_id_event_ext_id_fkey ON opush_eve
 CREATE TRIGGER opush_event_mapping_event_ext_id_hash_create_trigger BEFORE INSERT ON opush_event_mapping FOR EACH ROW SET NEW.event_ext_id_hash = UNHEX(SHA1(NEW.event_ext_id));
 CREATE TRIGGER opush_event_mapping_event_ext_id_hash_update_trigger BEFORE UPDATE ON opush_event_mapping FOR EACH ROW SET NEW.event_ext_id_hash = UNHEX(SHA1(NEW.event_ext_id));
 
-UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
-
 ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);
+
+UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
