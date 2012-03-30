@@ -2190,8 +2190,8 @@ Obm.CalendarDecisionPopup = new Class({
 		} else {
 			this.textarea.setProperty('value', this.comment);
 		}
-		this.yourDecision.appendText(this.choiceByLang);
-		this.eventTitlePlace.appendText(this.eventTitle);
+		this.yourDecision.set('text', this.choiceByLang);
+		this.eventTitlePlace.set('text', this.eventTitle);
 		this.show();
 	},
 	show: function() {
