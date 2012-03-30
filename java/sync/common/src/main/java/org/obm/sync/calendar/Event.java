@@ -269,6 +269,7 @@ public class Event implements Indexed<Integer> {
 
 	public void setExtId(EventExtId extId) {
 		this.extId = extId;
+		this.recurrence.setExtIdOnEventExceptions(extId);
 	}
 
 	public Date getTimeUpdate() {

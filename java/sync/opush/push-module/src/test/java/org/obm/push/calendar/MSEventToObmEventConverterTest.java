@@ -293,6 +293,23 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test
+	public void testRetrievePriorityFromOldEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withSubject("Any Subject")
+				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.build();
+		
+		Event oldEvent = new Event();
+		oldEvent.setPriority(2);
+		
+		Event convertedEvent = convertToOBMEventWithEditingEvent(msEvent, oldEvent);
+		
+		Assertions.assertThat(convertedEvent.getPriority()).isEqualTo(2);
+	}
+	
+	@Test
 	public void testConvertAttributeDtStampJustCreated() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))

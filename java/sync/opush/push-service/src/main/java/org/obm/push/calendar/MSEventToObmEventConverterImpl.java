@@ -114,6 +114,10 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		convertedEvent.setTimeUpdate(msEvent.getDtStamp());
 		convertedEvent.setDuration(convertDuration(msEvent));
 		convertedEvent.setStartDate(msEvent.getStartTime());
+		
+		if (eventFromDB != null) {
+			convertedEvent.setPriority(eventFromDB.getPriority());
+		}
 	}
 	
 	private void fillEventProperties(User user, Event convertedEvent, Event eventFromDB, MSEvent msEvent, 

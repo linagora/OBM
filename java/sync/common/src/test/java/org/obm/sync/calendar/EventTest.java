@@ -47,6 +47,8 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Iterables;
+
 import fr.aliacom.obm.ToolBox;
 
 public class EventTest {
@@ -1100,5 +1102,16 @@ public class EventTest {
 
 		Collection<Date> deletedExceptions = after.getNegativeExceptionsChanges(before);
 		Assertions.assertThat(deletedExceptions).containsOnly(addedException);
+	}
+	
+	@Test
+	public void testExtIdIsPropagatedToEventExceptions() {
+		String extIdString = "parent-extid";
+		Event event = new Event();
+		event.addEventException(new Event());
+		event.setExtId(new EventExtId(extIdString));
+		Assertions.assertThat(event.getExtId().getExtId()).isEqualTo(extIdString);
+		Event eventException = Iterables.getOnlyElement(event.getEventsExceptions());
+		Assertions.assertThat(eventException.getExtId().getExtId()).isEqualTo(extIdString);
 	}
 }

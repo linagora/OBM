@@ -251,4 +251,10 @@ public class EventRecurrence {
 		return !this.exceptions.isEmpty();
 	}
 
+	protected void setExtIdOnEventExceptions(EventExtId extId) {
+		for (Event exception: eventExceptions) {
+			exception.setExtId(extId);
+		}
+	}
+
 }
