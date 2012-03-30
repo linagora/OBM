@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,23 +43,33 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Flags;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
+import javax.mail.Part;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimePartDataSource;
 
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
+import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.MimeMessage;
+import org.minig.imap.mime.MimePart;
 import org.obm.push.bean.Email;
 import org.obm.push.mail.MailException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPMultipartDataSource;
+import com.sun.mail.imap.IMAPNestedMessage;
 
 @Singleton
 public class ImapMailBoxUtils {
@@ -157,11 +168,94 @@ public class ImapMailBoxUtils {
 		return flags;
 	}
 
-	public Collection<MimeMessage> buildMimeMessageCollectionFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) {
+	public Collection<MimeMessage> buildMimeMessageCollectionFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) 
+			throws MailException {
+		
 		Collection<MimeMessage> mimeMessageCollection = new ArrayList<MimeMessage>();
 		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
-			// build mime message tree from IMAPMessage
+			MimePart mimePart = buildMimePartTree(entry.getValue());
+			MimeMessage mimeMessage = new MimeMessage(mimePart);
+			mimeMessage.setUid(entry.getKey());
+			mimeMessageCollection.add(mimeMessage);
 		}
 		return mimeMessageCollection;
+	}
+
+	private MimePart buildMimePartTree(javax.mail.internet.MimePart mimePart) throws MailException {
+		try {
+			DataSource dataSource = getDataSource(mimePart);
+			if (dataSource instanceof IMAPMultipartDataSource) {
+				return buildMimePartFromIMAPMultipartDataSource(mimePart);
+			} else if (dataSource instanceof MimePartDataSource) {
+				return buildMimePart(mimePart);
+			} else {
+				return buildMimePartFromIMAPNestedMessage(mimePart);
+			}
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		}
+	}
+
+	private DataSource getDataSource(Part part) throws MessagingException {
+		DataHandler dataHandler = part.getDataHandler();
+		return dataHandler.getDataSource();
+	}
+
+	private MimePart buildMimePartFromIMAPMultipartDataSource(javax.mail.internet.MimePart mimePart) 
+			throws MessagingException, MailException {
+		
+		IMAPMultipartDataSource imapMultipartDataSource = (IMAPMultipartDataSource) getDataSource(mimePart);
+		MimePart parentMimePart = buildMimePart(mimePart);
+		addChildMimePartToParentMimePart(parentMimePart, imapMultipartDataSource);
+		return parentMimePart;
+	}
+
+	private MimePart buildMimePart(ContentType contentType, String contentId, String encoding) {
+		MimePart mimePart = new MimePart();
+		mimePart.setMimeType(contentType);
+		if (!Strings.isNullOrEmpty(contentId)) {
+			mimePart.setContentId(contentId);
+		}
+		if (!Strings.isNullOrEmpty(encoding)) {
+			mimePart.setContentTransfertEncoding(encoding);
+		}
+		mimePart.setBodyParams(contentType.getBodyParams());
+		return mimePart;
+	}
+
+	private void addChildMimePartToParentMimePart(MimePart parentMimePart, IMAPMultipartDataSource imapMultipartDataSource) 
+			throws MessagingException, MailException {
+		
+		int countChild = imapMultipartDataSource.getCount();
+		for (int cpt = 0; cpt < countChild; cpt++) {
+			MimeBodyPart mimeBodyPart = (MimeBodyPart) imapMultipartDataSource.getBodyPart(cpt);
+			parentMimePart.addPart( buildMimePartTree(mimeBodyPart) );
+		}
+	}
+
+	private MimePart buildMimePart(javax.mail.internet.MimePart mimePart) throws MessagingException {
+		ContentType contentType = buildContentType(mimePart.getContentType());
+		return buildMimePart(contentType, mimePart.getContentID(), mimePart.getEncoding());
+	}
+	
+	private ContentType buildContentType(String contentType) {
+		ContentType.Builder builder = new ContentType.Builder();
+		builder.contentType(contentType);
+		return builder.build();
+	}
+	
+	private MimePart buildMimePartFromIMAPNestedMessage(javax.mail.internet.MimePart mimePart) 
+			throws MessagingException, MailException {
+		
+		try {
+			Object content = mimePart.getContent();
+			if (content instanceof IMAPNestedMessage) {
+				return buildMimePart((IMAPNestedMessage) content);
+			} else {
+				throw new MailException("Unknown MimePart type.");
+			}
+		} catch (IOException e) {
+			throw new MailException(e);
+		}
 	}
 }

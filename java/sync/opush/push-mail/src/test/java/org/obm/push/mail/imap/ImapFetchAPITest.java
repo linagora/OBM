@@ -49,6 +49,8 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.IMimePart;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -220,9 +222,8 @@ public class ImapFetchAPITest {
 		privateMailboxService.fetchBodyStructure(bs, inbox, null);
 	}
 	
-	@Ignore("need to implement buildMimeMessageCollectionFromIMAPMessage")
 	@Test
-	public void testBodyStructureOneSimpleTextPlainMessage() throws MailException, AddressException, MessagingException, UserException {
+	public void testFetchBodyStructureOneSimpleTextPlainMessage() throws MailException, AddressException, MessagingException, UserException {
 		String messageContent = "message content";
 		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
@@ -230,17 +231,18 @@ public class ImapFetchAPITest {
 		
 		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
 		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
-		
+
 		Assertions.assertThat(collections).hasSize(1);
 		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
-		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("text/plain");
+
 		Assertions.assertThat(onlyElement.getMimePart().isMultipart()).isFalse();
+		Assertions.assertThat(onlyElement.getMimePart().getChildren()).isEmpty();
+		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("text/plain");
 	}
 	
-	@Ignore("need to implement buildMimeMessageCollectionFromIMAPMessage")
 	@Test
-	public void testBodyStructureOneComplexMultipartMixedMessage() throws MailException, UserException {
-		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartMixed.eml.eml");
+	public void testFetchBodyStructureOneComplexMultipartMixedMessage() throws MailException, UserException {
+		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartMixed.eml");
 		testUtils.deliverToUserInbox(greenMailUser, 
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
@@ -248,9 +250,81 @@ public class ImapFetchAPITest {
 		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
 		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
+		IMimePart multiPartMixed = onlyElement.getMimePart();
+		IMimePart multiPartAlternative = multiPartMixed.getChildren().get(0);
+		IMimePart attachment = multiPartMixed.getChildren().get(1);
+		IMimePart textPlain = multiPartAlternative.getChildren().get(0);
+		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
+		
 		Assertions.assertThat(collections).hasSize(1);
 		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
-		Assertions.assertThat(onlyElement.getMimePart().isMultipart()).isTrue();
-		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("multipart/mixed");
+		
+		Assertions.assertThat(multiPartMixed.isMultipart()).isTrue();
+		
+		Assertions.assertThat(multiPartMixed.getFullMimeType()).isEqualTo("multipart/mixed");
+		Assertions.assertThat(multiPartMixed.getBodyParam("boundary")).
+			isEqualTo(new BodyParam("boundary", "\"----=_Part_0_1330682067197\""));
+		
+		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
+		
+		Assertions.assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		Assertions.assertThat(textPlain.getContentTransfertEncoding()).isEqualTo("8bit");
+		
+		Assertions.assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
+		Assertions.assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		Assertions.assertThat(textHtml.getContentTransfertEncoding()).isEqualTo("8bit");
+		
+		Assertions.assertThat(attachment.getFullMimeType()).isEqualTo("application/octet-stream");
+		Assertions.assertThat(attachment.getContentTransfertEncoding()).isEqualTo("base64");
+		Assertions.assertThat(attachment.isInvitation()).isFalse();
+	}
+	
+	@Test
+	public void testFetchBodyStructureOneComplexMultipartAlternativeMessage() throws MailException, UserException {
+		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartAlternative.eml");
+		testUtils.deliverToUserInbox(greenMailUser, 
+				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
+		
+		IMimePart multiPartAlternative = onlyElement.getMimePart();
+		IMimePart textPlain = multiPartAlternative.getChildren().get(0);
+		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
+		IMimePart textCalendar = multiPartAlternative.getChildren().get(2);
+		
+		Assertions.assertThat(collections.size()).isEqualTo(1);
+		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		
+		Assertions.assertThat(multiPartAlternative.isMultipart()).isTrue();
+		
+		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
+		Assertions.assertThat(multiPartAlternative.getBodyParam("boundary")).
+			isEqualTo(new BodyParam("boundary", "\"----=_Part_2_1320656625672\""));
+		
+		Assertions.assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
+		Assertions.assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		
+		Assertions.assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
+		Assertions.assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		
+		Assertions.assertThat(textCalendar.getFullMimeType()).isEqualTo("text/calendar");
+		Assertions.assertThat(textCalendar.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		Assertions.assertThat(textCalendar.getBodyParam("method")).isEqualTo(new BodyParam("method", "REPLY"));
+		Assertions.assertThat(textCalendar.getContentTransfertEncoding()).isEqualTo("base64");
+		Assertions.assertThat(textCalendar.isInvitation()).isFalse();
+	}
+	
+	@Ignore("The parsing of a message complex rfc822 is not implemented in GreenMail")
+	@Test
+	public void testFetchBodyStructureOneComplexRFC822Message() throws MailException, UserException {
+		InputStream messageInputStream = MailTestsUtils.loadEmail("messageRfc822ContentType.eml");
+		testUtils.deliverToUserInbox(greenMailUser, 
+				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
 	}
 }
