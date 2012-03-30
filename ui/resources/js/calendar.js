@@ -2126,13 +2126,11 @@ Obm.CalendarAlarmPopup = new Class({
 		this.radios = $('calendarAlarmPopup').getElements('input[type=radio]');
 	},
 	compute: function(alert, uid, evtid) {  
-		console.log(alert,uid,evtid);
 		this.uid = uid;
 		this.evtid = evtid;
 		var radiochecked = this.radios.filter(function(radio){
 			if(radio.getProperty('value') == alert) return true;
 		});
-		console.log(radiochecked[0]);
 		if(radiochecked.length > 0) radiochecked[0].setProperty('checked', true);
 		this.show();
 	},
