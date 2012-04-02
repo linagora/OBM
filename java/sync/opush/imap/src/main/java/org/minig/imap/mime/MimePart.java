@@ -66,9 +66,10 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public void setMimeType(ContentType mimetype) {
-		this.mimeSubtype = mimetype.getSubType();
-		this.mimeType = mimetype.getPrimaryType();
+	public void setMimeType(ContentType contentType) {
+		this.mimeSubtype = contentType.getSubType();
+		this.mimeType = contentType.getPrimaryType();
+		this.setBodyParams(contentType.getBodyParams());
 	}
 	
 	@Override
@@ -223,7 +224,7 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		}
 		return ImmutableList.of();
 	}
-	
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())

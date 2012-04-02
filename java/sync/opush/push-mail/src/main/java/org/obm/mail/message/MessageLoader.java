@@ -127,39 +127,15 @@ public class MessageLoader {
 			mailBody = getMailBody(chosenPart);
 		}
 		List<MailMessageAttachment> attach = extractAttachments(chosenPart);
-		MailMessageInvitation invitation = extractInvitation(chosenPart);
 		mailMessage.setBody(mailBody);
 		mailMessage.setAttachments(attach);
-		mailMessage.setInvitation(invitation);
+		mailMessage.setInvitation(chosenPart.getInvitation());
 		return mailMessage;
 	}
 
-	private MailMessageInvitation extractInvitation(IMimePart mimePart) {
-		IMimePart parentMessage = findRootMessage(mimePart);
-		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
-			if (mp.isInvitation() || mp.isCancelInvitation()) {
-				return new MailMessageInvitation(mp.getContentId(), mp);
-			} 	
-		}
-		return null;
-	}
-
-	private IMimePart findRootMessage(IMimePart mimePart) {
-		IMimePart current = mimePart;
-		while (true) {
-			if (current == null) {
-				return message;
-			}
-			if (current.isNested()) {
-				return current;
-			}
-			current = current.getParent();
-		}
-	}
-	
 	private List<MailMessageAttachment> extractAttachments(IMimePart mimePart) {
 		List<MailMessageAttachment> attachments = new ArrayList<MailMessageAttachment>();
-		IMimePart parentMessage = findRootMessage(mimePart);
+		IMimePart parentMessage = mimePart.findRootMimePartInTree();
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isAttachment()) {
 				MailMessageAttachment mailMessageAttachment = extractMailMessageAttachment(mp);

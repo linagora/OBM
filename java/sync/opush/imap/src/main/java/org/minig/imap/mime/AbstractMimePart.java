@@ -93,5 +93,24 @@ public abstract class AbstractMimePart implements IMimePart {
 		}
 		this.bodyParams = params;
 	}
-
+	
+	@Override
+	public IMimePart getInvitation() {
+		Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
+		for (IMimePart mimePart: mimeParts) {
+			if (mimePart.isInvitation() || mimePart.isCancelInvitation()) {
+				return mimePart;
+			} 	
+		}
+		return null;
+	}
+	
+	@Override
+	public IMimePart findRootMimePartInTree() {
+		if (this.getParent() != null) {
+			return this.getParent().findRootMimePartInTree();
+		} else {
+			return this;
+		}
+	}
 }

@@ -44,10 +44,10 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.minig.imap.Address;
-import org.minig.imap.UIDEnvelope;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.StoreClient;
+import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.conversation.MailBody;
@@ -55,7 +55,6 @@ import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.conversation.MessageId;
 import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
-import org.obm.mail.message.MailMessageInvitation;
 import org.obm.mail.message.MessageLoader;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.MSAddress;
@@ -173,9 +172,9 @@ public class MailMessageLoader {
 		return msEmail;
 	}
 
-	private void setInvitation(final MSEmail msEmail, final BackendSession bs, final MailMessageInvitation mailMessageInvitation, 
-			final long uid, final long messageId) throws ConversionException {			
-		final IMimePart mimePart = mailMessageInvitation.getPart();
+	private void setInvitation(final MSEmail msEmail, final BackendSession bs, final IMimePart mimePart, final long uid, 
+			final long messageId) throws ConversionException {
+		
 		try {	
 			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
 			final MSEvent event = getInvitation(bs, inputStreamInvitation);

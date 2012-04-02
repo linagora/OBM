@@ -86,15 +86,11 @@ public class MimeMessage implements IMimePart {
 		return false;
 	}
 
-	public boolean hasInvitation() {
-		for (IMimePart part: this.listLeaves(true, true)) {
-			if (part.isInvitation()) {
-				return true;
-			}
-		}
-		return false;
+	@Override
+	public IMimePart getInvitation() {
+		return from.getInvitation();
 	}
-
+	
 	public long getUid() {
 		return uid;
 	}
@@ -235,5 +231,10 @@ public class MimeMessage implements IMimePart {
 	
 	public IMimePart getMimePart() {
 		return from;
+	}
+
+	@Override
+	public IMimePart findRootMimePartInTree() {
+		return getMimePart();
 	}
 }

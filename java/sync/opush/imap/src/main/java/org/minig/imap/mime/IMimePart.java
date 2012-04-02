@@ -88,4 +88,7 @@ public interface IMimePart {
 
 	boolean isNested();
 	
+	IMimePart getInvitation();
+
+	IMimePart findRootMimePartInTree();
 }

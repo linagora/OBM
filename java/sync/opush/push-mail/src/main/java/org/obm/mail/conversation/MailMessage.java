@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.minig.imap.Address;
+import org.minig.imap.mime.IMimePart;
 import org.obm.mail.message.MailMessageAttachment;
-import org.obm.mail.message.MailMessageInvitation;
 
 public class MailMessage implements Serializable, Comparable<MailMessage> {
 
@@ -57,7 +57,7 @@ public class MailMessage implements Serializable, Comparable<MailMessage> {
 	private Map<String, String> headers;
 	private Set<MailMessage> forwardMessage;
 	private long uid;
-	private MailMessageInvitation invitation;
+	private IMimePart invitation;
 
 	private List<Address> to;
 	private List<Address> cc;
@@ -219,11 +219,11 @@ public class MailMessage implements Serializable, Comparable<MailMessage> {
 		}
 	}
 
-	public MailMessageInvitation getInvitation() {
+	public IMimePart getInvitation() {
 		return invitation;
 	}
 
-	public void setInvitation(MailMessageInvitation invitation) {
+	public void setInvitation(IMimePart invitation) {
 		this.invitation = invitation;
 	}
 
