@@ -35,10 +35,11 @@ import java.io.Serializable;
 
 import com.google.common.base.Objects;
 
-public class BodyPreference implements Serializable {
+public final class BodyPreference implements Serializable {
 
 	private Integer truncationSize;
 	private MSEmailBodyType type;
+	private Boolean allOrNone;
 	
 	public Integer getTruncationSize() {
 		return this.truncationSize;
@@ -56,17 +57,28 @@ public class BodyPreference implements Serializable {
 		this.type = type;
 	}
 
+	public Boolean getAllOrNone() {
+		return allOrNone;
+	}
+
+	public void setAllOrNone(Boolean allOrNone) {
+		this.allOrNone = allOrNone;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(truncationSize, type);
+		return Objects.hashCode(super.hashCode(), truncationSize, type, allOrNone);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof BodyPreference) {
+			if (!super.equals(object)) 
+				return false;
 			BodyPreference that = (BodyPreference) object;
 			return Objects.equal(this.truncationSize, that.truncationSize)
-				&& Objects.equal(this.type, that.type);
+				&& Objects.equal(this.type, that.type)
+				&& Objects.equal(this.allOrNone, that.allOrNone);
 		}
 		return false;
 	}
@@ -77,7 +89,7 @@ public class BodyPreference implements Serializable {
 			.add("super", super.toString())
 			.add("truncationSize", truncationSize)
 			.add("type", type)
+			.add("allOrNone", allOrNone)
 			.toString();
 	}
-	
 }
