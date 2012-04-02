@@ -43,6 +43,9 @@ import org.minig.imap.impl.DateParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+
 public class IMAPHeaders {
 
 	private static final Logger logger = LoggerFactory
@@ -56,6 +59,13 @@ public class IMAPHeaders {
 	private List<Address> dispositionNotification;
 	private String subject;
 	private Date date;
+
+	public IMAPHeaders() {
+	}
+	
+	public IMAPHeaders(Map<String, String> headersMap) {
+		setRawHeaders(headersMap);
+	}
 
 	public void setRawHeaders(Map<String, String> rawHeaders) {
 		this.raw = rawHeaders;
@@ -208,7 +218,7 @@ public class IMAPHeaders {
 	}
 
 	public Map<String, String> getRawHeaders() {
-		return raw;
+		return Objects.firstNonNull(raw, ImmutableMap.<String, String>of());
 	}
 	
 }

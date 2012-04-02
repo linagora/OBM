@@ -55,6 +55,8 @@ import javax.mail.search.SearchTerm;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.SearchQuery;
+import org.obm.push.bean.EmailHeader;
+import org.obm.push.bean.EmailHeaders;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
@@ -141,6 +143,14 @@ public class OpushImapFolder {
 		IMAPMessage message = getMessageByUID(messageUid);
 		folder.fetch(new Message[]{message}, fetchProfile);
 		return message;
+	}
+	
+	public Message fetchHeaders(long messageUid, EmailHeaders headersToFetch) throws MessagingException, ImapMessageNotFoundException {
+		FetchProfile fetchProfile = new FetchProfile();
+		for (EmailHeader header: headersToFetch) {
+			fetchProfile.add(header.getHeader());
+		}
+		return fetch(messageUid, fetchProfile);
 	}
 	
 	public Message fetchEnvelope(long messageUid) throws MessagingException, ImapMessageNotFoundException {

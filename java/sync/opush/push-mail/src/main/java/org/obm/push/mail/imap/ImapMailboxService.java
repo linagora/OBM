@@ -34,16 +34,18 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -98,6 +100,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
@@ -158,20 +161,40 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	@Override
 	public IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
 		Preconditions.checkNotNull(headersToFetch);
-		StoreClient store = imapClientProvider.getImapClient(bs);
+		if (Iterables.isEmpty(headersToFetch)) {
+			return new IMAPHeaders();
+		}
+		
+		ImapStore store = null;
 		try {
-			login(store);
-			store.select(parseMailBoxName(bs, collectionName));
-			Collection<IMAPHeaders> fetchHeaders = store.uidFetchHeaders(Arrays.asList(uid), headersToFetch.toStringArray());
-			if (fetchHeaders.size() < 1) {
-				throw new ImapMessageNotFoundException("message UID " + uid);
-			}
-			return Iterables.getOnlyElement(fetchHeaders);
-		} catch (IMAPException e) {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			OpushImapFolder folder = store.select(parseMailBoxName(bs, collectionName));
+			Message message = folder.fetchHeaders(uid, headersToFetch);
+			return toIMAPHeaders(message);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
 			throw new MailException(e);
 		} finally {
-			store.logout();
+			closeQuietly(store);
 		}
+	}
+
+	private IMAPHeaders toIMAPHeaders(Message message) throws MessagingException {
+		Map<String, String> headersMap = Maps.newHashMap();
+		Enumeration<Header> rawHeaders = message.getAllHeaders();
+		while (rawHeaders.hasMoreElements()) {
+			Header header = rawHeaders.nextElement();
+			headersMap.put(header.getName().toLowerCase(Locale.ENGLISH), header.getValue());
+		}
+		return new IMAPHeaders(headersMap);
 	}
 
 	@Override

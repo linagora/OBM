@@ -31,16 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class EmailHeaders {
+public class EmailHeaders implements Iterable<EmailHeader> {
 
 	public static class Builder implements org.obm.push.bean.Builder<EmailHeaders> {
 
@@ -67,13 +65,8 @@ public class EmailHeaders {
 		this.headers = Sets.newHashSet(headers);
 	}
 	
-	public String[] toStringArray() {
-		Collection<String> asStrings = Collections2.transform(headers, new Function<EmailHeader, String>() {
-			@Override
-			public String apply(EmailHeader header) {
-				return header.getHeader();
-			}
-		});
-		return asStrings.toArray(new String[0]);
+	@Override
+	public Iterator<EmailHeader> iterator() {
+		return headers.iterator();
 	}
 }

@@ -198,6 +198,24 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(fetchHeaders.getRawHeader(headerName)).isEqualTo(headerValue);
 	}
 	
+	@Test
+	public void testCustomCaseInsensitiveHeader() throws Exception {
+		String headerName = "X-MyCustomHeader";
+		String headerValue = "value of custom header";
+		MimeMessage messageToSend = message();
+		messageToSend.addHeader(headerName, headerValue);
+		sendMessage(messageToSend);
+
+		EmailHeaders headersToFetch = 
+				new EmailHeaders.Builder()
+					.header(new EmailHeader(headerName))
+					.build();
+		
+		IMAPHeaders fetchHeaders = uidFetchHeaders(1, headersToFetch);
+
+		Assertions.assertThat(fetchHeaders.getRawHeader(headerName.toUpperCase())).isEqualTo(headerValue);
+	}
+	
 	private void sendMessage(MimeMessage message) throws UserException {
 		testUtils.deliverToUserInbox(greenmailUser, message, DateUtils.date("2012-01-01T12:00:00"));
 	}
