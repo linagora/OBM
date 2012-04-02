@@ -268,9 +268,19 @@ public class MailMessageLoader {
 		final MSEmailBody emailBody = new MSEmailBody();
 		for (final String format: body.availableFormats()) {
 			final String value = body.getValue(format);
-			emailBody.addConverted(MSEmailBodyType.getValueOf(format), value);
+			emailBody.addConverted(mimeTypeToBodyType(format), value);
 		}		
 		return emailBody;
+	}
+	
+	private MSEmailBodyType mimeTypeToBodyType(String mimeType) {
+		if ("text/rtf".equals(mimeType)) {
+			return MSEmailBodyType.RTF;
+		} else if ("text/html".equals(mimeType)) {
+			return MSEmailBodyType.HTML;
+		} else {
+			return MSEmailBodyType.PlainText;
+		}
 	}
 	
 	private byte[] extractPartData(final IMimePart mp, final InputStream bodyText, final long messageId) throws IOException {

@@ -172,8 +172,7 @@ public class EmailEncoder implements IDataEncoder {
 		MSEmailBodyType availableFormat = getAvailableFormat(c, mail);
 		String data = getBodyData(mail, availableFormat);
 
-		DOMUtils.createElementAndText(elemBody, "AirSyncBase:Type",
-				availableFormat.asIntString());
+		DOMUtils.createElementAndText(elemBody, "AirSyncBase:Type", availableFormat.asXmlValue());
 		if (data != null) {
 			DOMUtils.createElementAndText(elemBody,
 					"AirSyncBase:EstimatedDataSize", ""
@@ -205,7 +204,7 @@ public class EmailEncoder implements IDataEncoder {
 		}
 
 		DOMUtils.createElementAndText(parent, "AirSyncBase:NativeBodyType",
-				availableFormat.asIntString());
+				availableFormat.asXmlValue());
 
 	}
 

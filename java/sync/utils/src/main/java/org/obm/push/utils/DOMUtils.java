@@ -300,13 +300,16 @@ public final class DOMUtils {
 		el.appendChild(txt);
 		return el;
 	}
+	
+	public static Element createElementAndText(Element parent, String elementName, int value) {
+		return createElementAndText(parent, elementName, String.valueOf(value));
+	}
 
 	public static Element createElement(Element parent, String elementName) {
 		Element el = parent.getOwnerDocument().createElement(elementName);
 		parent.appendChild(el);
 		return el;
 	}
-
 
 	public static String serializeHtmlDocument(final Document replyHtmlDoc)
 			throws TransformerConfigurationException,

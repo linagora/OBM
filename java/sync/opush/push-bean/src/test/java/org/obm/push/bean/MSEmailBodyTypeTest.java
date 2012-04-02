@@ -31,38 +31,49 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import org.fest.assertions.api.Assertions;
+import org.junit.Test;
 
 
-public enum MSEmailBodyType {
-	
-	PlainText(1), HTML(2), RTF(3), MIME(4);
+public class MSEmailBodyTypeTest {
 
-	private final int xmlValue;
-	private static Map<Integer, MSEmailBodyType> values;
-	static {
-		Builder<Integer, MSEmailBodyType> builder = ImmutableMap.builder();
-		for (MSEmailBodyType type: values()) {
-			builder.put(type.asXmlValue(), type);
-		}
-		values = builder.build();
+	@Test
+	public void testPlainText() {
+		MSEmailBodyType plainText = MSEmailBodyType.getValueOf(1);
+		Assertions.assertThat(plainText).isEqualTo(MSEmailBodyType.PlainText);
+		Assertions.assertThat(plainText.asXmlValue()).isEqualTo(1);
 	}
 	
-	private MSEmailBodyType(int xmlValue) {
-		this.xmlValue = xmlValue;
+	@Test
+	public void testHTML() {
+		MSEmailBodyType html = MSEmailBodyType.getValueOf(2);
+		Assertions.assertThat(html).isEqualTo(MSEmailBodyType.HTML);
+		Assertions.assertThat(html.asXmlValue()).isEqualTo(2);
 	}
 	
-	public int asXmlValue() {
-		return xmlValue;
+	@Test
+	public void testRTF() {
+		MSEmailBodyType rtf = MSEmailBodyType.getValueOf(3);
+		Assertions.assertThat(rtf).isEqualTo(MSEmailBodyType.RTF);
+		Assertions.assertThat(rtf.asXmlValue()).isEqualTo(3);
 	}
 	
-	public static final MSEmailBodyType getValueOf(Integer xmlValue) {
-		if (xmlValue == null) {
-			return null;
-		}
-		return values.get(xmlValue);
+	@Test
+	public void testMime() {
+		MSEmailBodyType mime = MSEmailBodyType.getValueOf(4);
+		Assertions.assertThat(mime).isEqualTo(MSEmailBodyType.MIME);
+		Assertions.assertThat(mime.asXmlValue()).isEqualTo(4);
+	}
+	
+	@Test
+	public void testInvalidInteger() {
+		MSEmailBodyType mime = MSEmailBodyType.getValueOf(0);
+		Assertions.assertThat(mime).isNull();
+	}
+	
+	@Test
+	public void testNullInteger() {
+		MSEmailBodyType mime = MSEmailBodyType.getValueOf(null);
+		Assertions.assertThat(mime).isNull();
 	}
 }
