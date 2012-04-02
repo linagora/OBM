@@ -138,8 +138,7 @@ public class IMAPHeaders {
 				String dName = rawHeader.substring(0, idx).trim();
 				return new Address(dName, mail);
 			} else {
-				logger.warn("invalid email: " + rawHeader + " subject: "
-						+ getSubject());
+				logger.warn("invalid email: " + rawHeader + " subject: " + getSubject());
 				return new Address(rawHeader);
 			}
 		}
@@ -198,20 +197,14 @@ public class IMAPHeaders {
 		if (subject == null) {
 			String rs = getRawHeader("subject");
 			if (rs != null) {
-				subject = EncodedWord.decode(rs).toString();
-			} else {
-				subject = "[Empty Subject]";
+				return EncodedWord.decode(rs).toString();
 			}
 		}
 		return subject;
 	}
 
 	public void setSubject(String s) {
-		if (s != null) {
-			this.subject = s;
-		} else {
-			this.subject = "[Empty Subject]";
-		}
+		this.subject = s;
 	}
 
 	public Map<String, String> getRawHeaders() {

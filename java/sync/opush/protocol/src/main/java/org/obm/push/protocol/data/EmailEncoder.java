@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.primitives.Bytes;
 import com.google.inject.Inject;
 
@@ -101,8 +102,7 @@ public class EmailEncoder implements IDataEncoder {
 		} else {
 			DOMUtils.createElementAndText(parent, "Email:From", "");
 		}
-		DOMUtils.createElementAndText(parent, "Email:Subject",
-				mail.getSubject());
+		DOMUtils.createElementAndText(parent, "Email:Subject", Objects.firstNonNull(mail.getSubject(), "[Empty Subject]"));
 
 		if (mail.getDate() != null) {
 			DOMUtils.createElementAndText(parent, "Email:DateReceived",

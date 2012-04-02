@@ -124,7 +124,7 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(headers.getDispositionNotification()).isEmpty();
 		Assertions.assertThat(headers.getRawHeaders()).isEmpty();
 		Assertions.assertThat(headers.getRecipients()).isEmpty();
-		Assertions.assertThat(headers.getSubject()).isEqualTo("[Empty Subject]"); //but should be null
+		Assertions.assertThat(headers.getSubject()).isNull();
 		Assertions.assertThat(headers.getTo()).isEmpty();
 		Assertions.assertThat(headers.getFrom()).isNull();
 	}
