@@ -73,12 +73,10 @@ public class IMAPHeaders {
 			try {
 				String rawD = getRawHeader("date");
 				if (rawD != null) {
-					date = DateParser.parse(rawD);
-				} else {
-					date = new Date();
+					return DateParser.parse(rawD);
 				}
 			} catch (ParseException e) {
-				date = new Date();
+				return null;
 			}
 		}
 		return date;

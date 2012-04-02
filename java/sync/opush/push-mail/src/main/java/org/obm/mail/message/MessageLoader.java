@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.minig.imap.IMAPHeaders;
@@ -50,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.io.CharStreams;
 
 
@@ -104,7 +106,7 @@ public class MessageLoader {
 
 	private void copyHeaders(IMAPHeaders h, MailMessage mm) {
 		mm.setSender(h.getFrom());
-		mm.setDate(h.getDate());
+		mm.setDate(Objects.firstNonNull(h.getDate(), new Date()));
 		mm.setSubject(h.getSubject());
 		mm.setHeaders(h.getRawHeaders());
 		mm.setCc(h.getCc());

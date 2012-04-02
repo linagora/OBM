@@ -120,7 +120,7 @@ public class UIDFetchHeadersTest {
 		IMAPHeaders headers = uidFetchHeaders(1, new EmailHeaders.Builder().build());
 		Assertions.assertThat(headers.getBcc()).isEmpty();
 		Assertions.assertThat(headers.getCc()).isEmpty();
-		Assertions.assertThat(headers.getDate()).isNotNull(); //but should be null
+		Assertions.assertThat(headers.getDate()).isNull();
 		Assertions.assertThat(headers.getDispositionNotification()).isEmpty();
 		Assertions.assertThat(headers.getRawHeaders()).isEmpty();
 		Assertions.assertThat(headers.getRecipients()).isEmpty();
