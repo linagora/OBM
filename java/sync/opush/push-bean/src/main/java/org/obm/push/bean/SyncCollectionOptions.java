@@ -33,7 +33,9 @@ package org.obm.push.bean;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import com.google.common.base.Objects;
 
 public class SyncCollectionOptions implements Serializable {
@@ -46,7 +48,7 @@ public class SyncCollectionOptions implements Serializable {
 	private Integer conflict;
 	private Boolean deletesAsMoves;
 	private FilterType filterType;
-	private Map<MSEmailBodyType,BodyPreference> bodyPreferences;
+	private Map<MSEmailBodyType, BodyPreference> bodyPreferences;
 	
 	public SyncCollectionOptions() {
 		conflict = 1;
@@ -116,6 +118,12 @@ public class SyncCollectionOptions implements Serializable {
 		this.bodyPreferences.put(bodyPreference.getType(), bodyPreference);
 	}
 
+	public void setBodyPreferences(List<BodyPreference> bodyPreferences) {
+		for (BodyPreference bodyPreference: bodyPreferences) {
+			addBodyPreference(bodyPreference);
+		}
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(truncation, mimeSupport, mimeTruncation, conflict, 
@@ -150,5 +158,4 @@ public class SyncCollectionOptions implements Serializable {
 			.add("bodyPreferences", bodyPreferences)
 			.toString();
 	}
-	
 }

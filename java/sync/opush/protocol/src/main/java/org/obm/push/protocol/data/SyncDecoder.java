@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -210,26 +211,30 @@ public class SyncDecoder {
 				}
 			}
 
-			NodeList bodyPreferences = optionsElement.getElementsByTagName("BodyPreference");
-			if (bodyPreferences != null) {
-				for (int i = 0; i < bodyPreferences.getLength(); i++) {
-					Element bodyPreference = (Element) bodyPreferences.item(i);
-					String truncationSize = DOMUtils.getElementText(
-							bodyPreference, "TruncationSize");
-					String type = DOMUtils.getElementText(bodyPreference,
-							"Type");
-					BodyPreference bp = new BodyPreference();
-					// nokia n900 sets type without truncationsize
-					if (truncationSize != null) {
-						bp.setTruncationSize(Integer.parseInt(truncationSize));
-					}
-					bp.setType(MSEmailBodyType.getValueOf(Integer
-							.parseInt(type)));
-					options.addBodyPreference(bp);
-				}
-			}
+			options.setBodyPreferences(getBodyPreference(optionsElement));
 		}
 		return options;
+	}
+
+	private List<BodyPreference> getBodyPreference(Element optionsElement) {
+		NodeList bodyPreferences = optionsElement.getElementsByTagName("BodyPreference");
+		List<BodyPreference> preferences = new ArrayList<BodyPreference>();
+		if (bodyPreferences != null) {
+			for (int i = 0; i < bodyPreferences.getLength(); i++) {
+				Element bodyPreference = (Element) bodyPreferences.item(i);
+				String truncationSize = DOMUtils.getElementText(bodyPreference, "TruncationSize");
+				String type = DOMUtils.getElementText(bodyPreference, "Type");
+				String allOrNone = DOMUtils.getElementText(bodyPreference, "AllOrNone");
+				BodyPreference bp = new BodyPreference();
+				if (truncationSize != null) {
+					bp.setTruncationSize(Integer.parseInt(truncationSize));
+				}
+				bp.setType(MSEmailBodyType.getValueOf(Integer.parseInt(type)));
+				bp.setAllOrNone(Boolean.valueOf(allOrNone));
+				preferences.add(bp);
+			}
+		}
+		return preferences;
 	}
 
 	private Integer getCollectionId(Element col) {
