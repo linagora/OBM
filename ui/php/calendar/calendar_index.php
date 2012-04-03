@@ -662,7 +662,7 @@ if ($action == 'search') {
     $json[] = 'occDelete:true';
     $json[] = 'checkDelete:false';
   }
-  if ($entities['user']['ids'] == array($obm['uid']) && !$resourceNotification ) {
+  if ($entities['user']['ids'] == array($obm['uid']) && !$resourceNotification && count($entities['contact']['ids']) == 0 ) {
     $json[] = 'mail:false';
   } else {
     $json[] = 'mail:true';

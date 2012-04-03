@@ -5622,7 +5622,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
   $ent_q = run_query_get_events_attendee(array($event_id));
 
   if ($ent_q->nf() > 1 || ($ent_q->next_record() &&  $ent_q->f('eventlink_entity') == 'user' && $ent_q->f('eventlink_entity_id') != $GLOBALS['obm']['uid'])) {
-    $mail = "<input id='send_mail' name='send_mail' value='1' type='checkbox' ><label for='send_mail'>$GLOBALS[l_sendamail]</label>";
+    $mail = "<input id='send_mail' name='send_mail' value='1' type='checkbox' checked='checked'><label for='send_mail'>$GLOBALS[l_sendamail]</label>";
   }
 
   $event_details_q = run_query_calendar_detail($event_id);
