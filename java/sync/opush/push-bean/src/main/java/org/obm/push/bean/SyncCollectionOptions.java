@@ -124,6 +124,17 @@ public class SyncCollectionOptions implements Serializable {
 		}
 	}
 	
+	public void initTruncation() {
+		setTruncation(null);
+		Map<MSEmailBodyType, BodyPreference> bodyPreferences = new HashMap<MSEmailBodyType, BodyPreference>();
+		for (BodyPreference bodyPreference: this.bodyPreferences.values()) {
+			MSEmailBodyType type = bodyPreference.getType();
+			bodyPreferences.put(type,
+					new BodyPreference.Builder().allOrNone(bodyPreference.getAllOrNone()).bodyType(type).build());
+		}
+		this.bodyPreferences = bodyPreferences;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(truncation, mimeSupport, mimeTruncation, conflict, 

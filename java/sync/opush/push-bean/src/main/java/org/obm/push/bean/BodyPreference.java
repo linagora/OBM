@@ -37,44 +37,61 @@ import com.google.common.base.Objects;
 
 public final class BodyPreference implements Serializable {
 
-	private Integer truncationSize;
-	private MSEmailBodyType type;
-	private Boolean allOrNone;
+	public static class Builder {
+		private Integer truncationSize;
+		private MSEmailBodyType type;
+		private Boolean allOrNone;
+		
+		public Builder truncationSize(int size) {
+			this.truncationSize = size;
+			return this;
+		}
+		
+		public Builder bodyType(MSEmailBodyType msEmailBodyType) {
+			this.type = msEmailBodyType;
+			return this;
+		}
+		
+		public Builder allOrNone(boolean allOrNone) {
+			this.allOrNone = allOrNone;
+			return this;
+		}
+		
+		public BodyPreference build() {
+			return new BodyPreference(this.truncationSize, this.type, this.allOrNone);
+		}
+	}
+	
+	private final Integer truncationSize;
+	private final MSEmailBodyType type;
+	private final Boolean allOrNone;
+	
+	private BodyPreference(Integer truncationSize, MSEmailBodyType msEmailBodyType, Boolean allOrNone) {
+		this.truncationSize = truncationSize;
+		type = msEmailBodyType;
+		this.allOrNone = allOrNone;
+	}
 	
 	public Integer getTruncationSize() {
 		return this.truncationSize;
 	}
 
-	public void setTruncationSize(Integer truncationSize) {
-		this.truncationSize = truncationSize;
-	}
-	
 	public MSEmailBodyType getType() {
 		return type;
-	}
-
-	public void setType(MSEmailBodyType type) {
-		this.type = type;
 	}
 
 	public Boolean getAllOrNone() {
 		return allOrNone;
 	}
 
-	public void setAllOrNone(Boolean allOrNone) {
-		this.allOrNone = allOrNone;
-	}
-
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(super.hashCode(), truncationSize, type, allOrNone);
+		return Objects.hashCode(truncationSize, type, allOrNone);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof BodyPreference) {
-			if (!super.equals(object)) 
-				return false;
 			BodyPreference that = (BodyPreference) object;
 			return Objects.equal(this.truncationSize, that.truncationSize)
 				&& Objects.equal(this.type, that.type)
@@ -86,7 +103,6 @@ public final class BodyPreference implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("super", super.toString())
 			.add("truncationSize", truncationSize)
 			.add("type", type)
 			.add("allOrNone", allOrNone)

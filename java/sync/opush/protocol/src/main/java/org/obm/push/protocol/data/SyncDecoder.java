@@ -225,13 +225,12 @@ public class SyncDecoder {
 				String truncationSize = DOMUtils.getElementText(bodyPreference, "TruncationSize");
 				String type = DOMUtils.getElementText(bodyPreference, "Type");
 				String allOrNone = DOMUtils.getElementText(bodyPreference, "AllOrNone");
-				BodyPreference bp = new BodyPreference();
+				BodyPreference.Builder bp = new BodyPreference.Builder().
+						bodyType(MSEmailBodyType.getValueOf(Integer.parseInt(type))).allOrNone(Boolean.valueOf(allOrNone));
 				if (truncationSize != null) {
-					bp.setTruncationSize(Integer.parseInt(truncationSize));
+					bp.truncationSize(Integer.parseInt(truncationSize));
 				}
-				bp.setType(MSEmailBodyType.getValueOf(Integer.parseInt(type)));
-				bp.setAllOrNone(Boolean.valueOf(allOrNone));
-				preferences.add(bp);
+				preferences.add(bp.build());
 			}
 		}
 		return preferences;

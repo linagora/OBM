@@ -38,7 +38,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
@@ -143,10 +142,7 @@ public class SyncProtocol {
 			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asXmlValue());
-			c.getSyncCollection().getOptions().setTruncation(null);
-			for (BodyPreference bp : c.getSyncCollection().getOptions().getBodyPreferences().values()) {
-				bp.setTruncationSize(null);
-			}
+			c.getSyncCollection().getOptions().initTruncation();
 			serializeChange(bs, add, c.getSyncCollection(), ic, encoderFactory);
 		}
 	}

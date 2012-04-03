@@ -231,8 +231,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 				fetchResult.setItemChange(itemChanges.get(0));
 				SyncCollection c = new SyncCollection();
 				c.setCollectionId(collectionId);
-				BodyPreference bp = new BodyPreference();
-				bp.setType(type);
+				BodyPreference bp = new BodyPreference.Builder().bodyType(type).build();
 				SyncCollectionOptions options = new SyncCollectionOptions();
 				options.addBodyPreference(bp);
 				c.setOptions(options);

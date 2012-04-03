@@ -74,7 +74,7 @@ public class SerializableTest {
 	@Test
 	public void testSyncCollectionOptions() throws IOException {
 		SyncCollectionOptions obj = new SyncCollectionOptions();
-		obj.addBodyPreference(new BodyPreference());
+		obj.addBodyPreference(new BodyPreference.Builder().build());
 		objectOutputStream.writeObject(obj);
 	}
 	
