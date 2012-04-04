@@ -386,7 +386,8 @@ function run_query_group_insert($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_id($group) {
   global $cdg_sql;
-
+  
+  $obm_q = new DB_OBM;
   $system = sql_parse_int($group['system']);
   $name = $group['name'];
   $desc = $group['desc'];
@@ -404,7 +405,6 @@ function run_query_group_id($group) {
   $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_id()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -425,7 +425,8 @@ function run_query_group_id($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_update($group) {
   global $obm, $cdg_sql;
-
+  
+  $obm_q = new DB_OBM;
   $id = sql_parse_id($group['group_id'], true);
   $name = $group['name'];
   $samba = ($group['samba'] == 1) ? 1 : 0;
@@ -456,7 +457,6 @@ function run_query_group_update($group) {
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($id > 0) {
