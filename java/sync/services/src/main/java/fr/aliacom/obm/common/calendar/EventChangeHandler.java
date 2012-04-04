@@ -63,13 +63,12 @@ public class EventChangeHandler {
 
 	public void update(Event previous, Event current, boolean notification, AccessToken token)throws NotificationException {
 		if (current.hasChangesExceptedEventException(previous)) {
-			update(notification, token, previous, current);
-		} else {
-			updateAddedEventExceptions(previous, current, notification, token);
-			updateModifiedEventExceptions(previous, current, notification, token);
-			updateDeletedEventExceptions(previous, current, notification, token);
-			updateNegativeExceptionsChanges(previous, current, notification, token);
+			updateEvent(notification, token, previous, current);
 		}
+		updateAddedEventExceptions(previous, current, notification, token);
+		updateModifiedEventExceptions(previous, current, notification, token);
+		updateDeletedEventExceptions(previous, current, notification, token);
+		updateNegativeExceptionsChanges(previous, current, notification, token);
 	}
 
 	private void updateAddedEventExceptions(Event previous, Event current,
@@ -77,7 +76,7 @@ public class EventChangeHandler {
 		List<Event> addedEventExceptions = current.getAddedEventExceptions(previous);
 		for (Event eventException: addedEventExceptions) {
 			Event previousException = previous.getOccurrence(eventException.getRecurrenceId());
-			update(notification, token, previousException, eventException);
+			updateEvent(notification, token, previousException, eventException);
 		}
 	}
 
@@ -86,7 +85,7 @@ public class EventChangeHandler {
 		List<Event> modifiedEventExceptions = current.getModifiedEventExceptions(previous);
 		for (Event eventException: modifiedEventExceptions) {
 			Event previousException = previous.getOccurrence(eventException.getRecurrenceId());
-			update(notification, token, previousException, eventException);
+			updateEvent(notification, token, previousException, eventException);
 		}
 	}
 
@@ -122,10 +121,10 @@ public class EventChangeHandler {
 		}
 	}
 
-	private void update(boolean notification, AccessToken token, Event previousException, Event exception) {
-		jmsService.writeIcsInvitationRequest(token, exception);
+	private void updateEvent(boolean notification, AccessToken token, Event previousEvent, Event currentEvent) {
+		jmsService.writeIcsInvitationRequest(token, currentEvent);
 		if (notification) {
-			eventNotificationService.notifyUpdatedEvent(previousException, exception, token);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, token);
 		}
 	}
 

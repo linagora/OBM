@@ -37,51 +37,173 @@ import java.util.Date;
 
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
 
 import fr.aliacom.obm.ToolBox;
 
 public class EventChangeHandlerTest {
 
+
+	private AccessToken token;
+	private Event previousEvent;
+	private MessageQueueService jmsService;
+	private EventNotificationService eventNotificationService;
+
+	@Before
+	public void setUp() {
+		token = ToolBox.mockAccessToken();
+		previousEvent = getFakePreviousEvent();
+		jmsService = EasyMock.createMock(MessageQueueService.class);
+		eventNotificationService = EasyMock.createMock(EventNotificationService.class);
+	}
+
 	@Test
 	public void testNegativeException() {
-		Attendee attendee = ToolBox.getFakeAttendee("james.jesus.angleton@cia.gov");
-		attendee.setState(ParticipationState.ACCEPTED);
-
-		int previousSequence = 0;
-		Date eventDate = after();
-		AccessToken token = ToolBox.mockAccessToken();
-		Event previousEvent = ToolBox.getFakeDailyRecurrentEvent(eventDate, previousSequence,
-				attendee);
-		previousEvent.setOwner(attendee.getEmail());
-
-		int currentSequence = previousSequence + 1;
-		Event currentEvent = ToolBox.getFakeDailyRecurrentEvent(eventDate, currentSequence,
-				attendee);
-		Date exceptionDate = new DateTime(eventDate).plusMonths(1).toDate();
+		Event currentEvent = previousEvent.clone();
+		Date exceptionDate = new DateTime(after()).plusMonths(1).toDate();
 		currentEvent.addException(exceptionDate);
-		currentEvent.setOwner(attendee.getEmail());
 
-		Event negativeExceptionEvent = ToolBox.getFakeNegativeExceptionEvent(currentEvent,
-				exceptionDate);
+		Event negativeExceptionEvent = ToolBox.getFakeNegativeExceptionEvent(currentEvent, exceptionDate);
 
-		MessageQueueService jmsService = EasyMock.createMock(MessageQueueService.class);
 		jmsService.writeIcsInvitationCancel(token, negativeExceptionEvent);
+		eventNotificationService.notifyDeletedEvent(negativeExceptionEvent, token);
 
-		EventNotificationService notifService = EasyMock.createMock(EventNotificationService.class);
-		notifService.notifyDeletedEvent(negativeExceptionEvent, token);
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentEvent, jmsService, eventNotificationService);
+	}
 
-		EasyMock.replay(token, jmsService, notifService);
+	@Test
+	public void testAddedEventException() {
+		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
 
-		boolean notification = true;
+		Event currentEvent = previousEvent.clone();
+		Event AddedEventException = currentEvent.getOccurrence(new Date());
+		currentEvent.addEventException(AddedEventException);
 
-		EventChangeHandler handler = new EventChangeHandler(jmsService, notifService);
-		handler.update(previousEvent, currentEvent, notification, token);
+		jmsService.writeIcsInvitationRequest(token, AddedEventException);
+		eventNotificationService.notifyUpdatedEvent(AddedEventException, AddedEventException, token);
 
-		EasyMock.verify(jmsService, notifService);
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentEvent, jmsService, eventNotificationService);	
+	}
+
+	@Test
+	public void testUpdateParentEventAndAddAnEventException() {
+		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
+
+		Event currentEvent = previousEvent.clone();
+		Event AddedEventException = currentEvent.getOccurrence(new Date());
+		currentEvent.addEventException(AddedEventException);
+
+		currentEvent.setLocation("a new location");
+
+		jmsService.writeIcsInvitationRequest(token, currentEvent);
+		eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, token);
+
+		jmsService.writeIcsInvitationRequest(token, AddedEventException);
+		eventNotificationService.notifyUpdatedEvent(AddedEventException, AddedEventException, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentEvent, jmsService, eventNotificationService);		
+	}
+
+	@Test
+	public void testModifiedEventException() {
+		Event previousEventException = previousEvent.getOccurrence(previousEvent.getStartDate());
+		previousEvent.addEventException(previousEventException);
+
+		Event currentParentEvent = previousEvent.clone();
+
+		Event modifiedEventException = currentParentEvent.getEventsExceptions().get(0);
+		modifiedEventException.setLocation("a new Location");
+
+		jmsService.writeIcsInvitationRequest(token, modifiedEventException);
+		eventNotificationService.notifyUpdatedEvent(previousEventException, modifiedEventException, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentParentEvent, jmsService, eventNotificationService);	
+	}
+
+	@Test
+	public void testUpdateParentEventAndModifiedAnEventException() {
+		Event previousEventException = previousEvent.getOccurrence(previousEvent.getStartDate());
+		previousEvent.addEventException(previousEventException);
+
+		Event currentEvent = previousEvent.clone();
+
+		Event modifiedEventException = currentEvent.getEventsExceptions().get(0);
+		modifiedEventException.setLocation("a new Location");
+
+		currentEvent.setLocation("a new location");
+
+		jmsService.writeIcsInvitationRequest(token, currentEvent);
+		eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, token);
+
+		jmsService.writeIcsInvitationRequest(token, modifiedEventException);
+		eventNotificationService.notifyUpdatedEvent(previousEventException, modifiedEventException, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentEvent, jmsService, eventNotificationService);	
+	}
+
+	@Test
+	public void testDeletedEventException() {
+		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
+
+		Event currentParentEvent = previousEvent.clone();
+		Event deletedEventException = currentParentEvent.getEventsExceptions().remove(0);
+
+		jmsService.writeIcsInvitationCancel(token, deletedEventException);
+		eventNotificationService.notifyDeletedEvent(deletedEventException, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentParentEvent, jmsService, eventNotificationService);		
+	}
+
+	@Test
+	public void testUpdateParentEventAndDeleteEventException() {
+		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
+
+		Event currentEvent = previousEvent.clone();
+		Event deletedEventException = currentEvent.getEventsExceptions().remove(0);
+
+		currentEvent.setLocation("a new location");
+
+		jmsService.writeIcsInvitationRequest(token, currentEvent);
+		eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, token);
+
+		jmsService.writeIcsInvitationCancel(token, deletedEventException);
+		eventNotificationService.notifyDeletedEvent(deletedEventException, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentEvent, jmsService, eventNotificationService);		
+	}
+
+	@Test
+	public void testUpdateOnlyParentEvent() {
+		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
+
+		Event currentParentEvent = previousEvent.clone();
+		currentParentEvent.setLocation("a location");
+
+		jmsService.writeIcsInvitationRequest(token, currentParentEvent);
+		eventNotificationService.notifyUpdatedEvent(previousEvent, currentParentEvent, token);
+
+		verifyEventChangeHandlerUpdate(token, previousEvent, currentParentEvent, jmsService, eventNotificationService);
+	}
+
+	private Event getFakePreviousEvent() {
+		Attendee attendee = ToolBox.getFakeAttendee("james.jesus.angleton@cia.gov");
+		Date eventDate = after();
+		Event previousEvent = ToolBox.getFakeDailyRecurrentEvent(eventDate, 0, attendee);
+		previousEvent.setOwner(attendee.getEmail());
+		return previousEvent;
+	}
+
+	private void verifyEventChangeHandlerUpdate(AccessToken token, Event previousEvent, Event currentEvent,
+			MessageQueueService jmsService, EventNotificationService eventNotificationService) {
+		EasyMock.replay(token, jmsService, eventNotificationService);
+
+		EventChangeHandler handler = new EventChangeHandler(jmsService, eventNotificationService);
+		handler.update(previousEvent, currentEvent, true, token);
+
+		EasyMock.verify(jmsService, eventNotificationService);
 	}
 }
