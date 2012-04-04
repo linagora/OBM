@@ -47,8 +47,8 @@ public class MimeMessageTestUtils {
 	public static void checkMimeTree(IMimePart expected, IMimePart actual) {
 		Assert.assertEquals(prefixMessage(expected) + " has wrong number of children", 
 				expected.getChildren().size(), actual.getChildren().size());
-		Assert.assertEquals(prefixMessage(expected), expected.getMimeType(), actual.getMimeType());
-		Assert.assertEquals(prefixMessage(expected), expected.getMimeSubtype(), actual.getMimeSubtype());
+		Assert.assertEquals(prefixMessage(expected), expected.getPrimaryType(), actual.getPrimaryType());
+		Assert.assertEquals(prefixMessage(expected), expected.getSubtype(), actual.getSubtype());
 		Assert.assertEquals(prefixMessage(expected), expected.getContentTransfertEncoding(), actual.getContentTransfertEncoding());
 		Assert.assertEquals(prefixMessage(expected), expected.getContentId(), actual.getContentId());
 		Assert.assertArrayEquals(prefixMessage(expected), expected.getBodyParams().toArray(), actual.getBodyParams().toArray());

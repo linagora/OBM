@@ -38,16 +38,16 @@ public class MimeMessageTest {
 
 	@Test
 	public void testGetInvitationOnMimeMessageWithoutInvitation() {
-		IMimePart mimePart = buildContentType("text/plain;");
+		IMimePart mimePart = buildMimePart("text/plain;");
 		MimeMessage mimeMessage = new MimeMessage(mimePart);
 		Assertions.assertThat(mimeMessage.getInvitation()).isNull();
 	}
 	
 	@Test
 	public void testGetInvitationOnMimeMessageWithRequestInvitation() {
-		IMimePart parentMimePart = buildContentType("multipart/alternative;");
+		IMimePart parentMimePart = buildMimePart("multipart/alternative;");
 
-		IMimePart textPlain = buildContentType("text/plain;");
+		IMimePart textPlain = buildMimePart("text/plain;");
 		parentMimePart.addPart(textPlain);
 		
 		IMimePart textCalendar = buildInvitationContentType("REQUEST");
@@ -62,9 +62,9 @@ public class MimeMessageTest {
 	
 	@Test
 	public void testGetInvitationOnMimeMessagetWithCancelInvitation() {
-		IMimePart parentMimePart = buildContentType("multipart/alternative;");
+		IMimePart parentMimePart = buildMimePart("multipart/alternative;");
 
-		IMimePart textPlain = buildContentType("text/plain;");
+		IMimePart textPlain = buildMimePart("text/plain;");
 		parentMimePart.addPart(textPlain);
 		
 		IMimePart textCalendar = buildInvitationContentType("CANCEL");
@@ -79,9 +79,9 @@ public class MimeMessageTest {
 	
 	@Test
 	public void testGetInvitationOnParentMimePartWithInvitation() {
-		IMimePart parentMimePart = buildContentType("multipart/alternative;");
+		IMimePart parentMimePart = buildMimePart("multipart/alternative;");
 
-		IMimePart textPlain = buildContentType("text/plain;");
+		IMimePart textPlain = buildMimePart("text/plain;");
 		parentMimePart.addPart(textPlain);
 		
 		IMimePart textCalendar = buildInvitationContentType("REQUEST");
@@ -95,9 +95,9 @@ public class MimeMessageTest {
 	
 	@Test
 	public void testGetInvitationOnChildMimePartWithInvitation() {
-		IMimePart parentMimePart = buildContentType("multipart/alternative;");
+		IMimePart parentMimePart = buildMimePart("multipart/alternative;");
 
-		IMimePart textPlain = buildContentType("text/plain;");
+		IMimePart textPlain = buildMimePart("text/plain;");
 		parentMimePart.addPart(textPlain);
 		
 		IMimePart textCalendar = buildInvitationContentType("REQUEST");
@@ -111,27 +111,118 @@ public class MimeMessageTest {
 	
 	@Test
 	public void testGetInvitationOnChildMimePartWithoutInvitation() {
-		IMimePart parentMimePart = buildContentType("multipart/alternative;");
+		IMimePart parentMimePart = buildMimePart("multipart/alternative;");
 
-		IMimePart textPlain = buildContentType("text/plain;");
+		IMimePart textPlain = buildMimePart("text/plain;");
 		parentMimePart.addPart(textPlain);
 		
-		IMimePart textHtml = buildContentType("text/html;");
+		IMimePart textHtml = buildMimePart("text/html;");
 		parentMimePart.addPart(textHtml);
 		
 		Assertions.assertThat(textHtml.getInvitation()).isNull();
 	}
 	
-	private IMimePart buildContentType(String contentType) {
+	@Test
+					public void testFindMainMessageNullContentType() {
+						IMimePart mimePart = buildMimePart("text/plain");
+						
+						MimeMessage mimeMessage = new MimeMessage(mimePart);
+						Assertions.assertThat(mimeMessage.findMainMessage(null)).isNull();
+					}
+	
+	@Test
+					public void testFindMainMessageUnknowContentType() {
+						IMimePart mimePart = buildMimePart("text/plain");
+						
+						MimeMessage mimeMessage = new MimeMessage(mimePart);
+						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isNull();
+					}
+	
+	@Test
+			public void testFindMainMessageSimpleMimePart() {
+				IMimePart mimePart = buildMimePart("text/plain");
+				
+				MimeMessage mimeMessage = new MimeMessage(mimePart);
+				Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/plain"))).isSameAs(mimePart);
+			}
+	
+	@Test
+			public void testFindMainMessageSimpleMimePartCaseInsensitive() {
+				IMimePart mimePart = buildMimePart("text/plain");
+				
+				MimeMessage mimeMessage = new MimeMessage(mimePart);
+				Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("TEXT/PLAIN"))).isSameAs(mimePart);
+			}
+	
+	@Test
+					public void testFindMainMessageInMultiPartAlternativeTree() {
+						IMimePart mimePart = buildMimePart("multipart/alternative");
+						
+						IMimePart textPlain = buildMimePart("text/plain;");
+						mimePart.addPart(textPlain);
+						
+						IMimePart textHtml = buildMimePart("text/html;");
+						mimePart.addPart(textHtml);
+						
+						MimeMessage mimeMessage = new MimeMessage(mimePart);
+						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isSameAs(textHtml);
+					}
+	
+	@Test
+					public void testFindMainMessageInMultiPartMixedTree() {
+						IMimePart multiPartMixed = buildMimePart("multipart/mixed");
+						
+						IMimePart multiPartAlternative = buildMimePart("multipart/alternative");
+						IMimePart textPlain = buildMimePart("text/plain;");
+						IMimePart textHtml = buildMimePart("text/html;");
+						multiPartAlternative.addPart(textPlain);
+						multiPartAlternative.addPart(textHtml);
+						
+						IMimePart application = buildMimePart("application/octet-stream");
+						multiPartMixed.addPart(multiPartAlternative);
+						multiPartMixed.addPart(application);
+						
+						MimeMessage mimeMessage = new MimeMessage(multiPartMixed);
+						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isSameAs(textHtml);
+					}
+	
+	@Test
+					public void testFindMainMessageWithNestedMessage() {
+						IMimePart multiPartMixed = buildMimePart("multipart/mixed");
+						multiPartMixed.addPart(buildMimePart("text/plain;"));
+						
+						IMimePart nestedMessage = buildMimePart("message/rfc822");
+						nestedMessage.addPart(buildMimePart("text/plain;"));
+						nestedMessage.addPart(buildMimePart("text/html;"));
+						multiPartMixed.addPart(nestedMessage);
+						
+						MimeMessage mimeMessage = new MimeMessage(multiPartMixed);
+						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isNull();
+					}
+	
+	@Test
+					public void testFindMainMessageWithAttachmentMimePart() {
+						IMimePart multiPartMixed = buildMimePart("multipart/mixed");
+						multiPartMixed.addPart(buildMimePart("text/plain;"));
+						multiPartMixed.addPart(buildMimePart("text/html;"));
+						
+						MimeMessage mimeMessage = new MimeMessage(multiPartMixed);
+						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isNull();
+					}
+	
+	private IMimePart buildMimePart(String contentType) {
 		IMimePart mimePart = new MimePart();
-		mimePart.setMimeType(
-				new ContentType.Builder().contentType(contentType).build());
+		mimePart.setContentType(buildContentType(contentType));
 		return mimePart;
+	}
+	
+	private ContentType buildContentType(String contentType) {
+		return new ContentType.Builder().contentType(contentType).build();
 	}
 	
 	private IMimePart buildInvitationContentType(String method) {
 		IMimePart mimePart = new MimePart();
-		mimePart.setMimeType(
+		mimePart.setContentType(
 				new ContentType.Builder().contentType("text/calendar; charset=utf-8; method=" + method).build());
 		return mimePart;
 	}

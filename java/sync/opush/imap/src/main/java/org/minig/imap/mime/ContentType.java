@@ -109,7 +109,8 @@ public class ContentType {
 		public ContentType build() {
 			Preconditions.checkNotNull(primaryType);
 			Preconditions.checkNotNull(subType);
-			return new ContentType(primaryType, subType, bodyParams);
+			return new ContentType(primaryType.toLowerCase(), 
+					subType.toLowerCase(), bodyParams);
 		}
 	}
 
@@ -135,7 +136,7 @@ public class ContentType {
 		return bodyParams;
 	}
 
-	public String getContentType() {
+	public String getFullMimeType() {
 		return primaryType + "/" + subType;
 	}
 	

@@ -61,7 +61,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = new MimePart();
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		EasyMock.replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(
@@ -76,7 +76,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = new MimePart();
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/html"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(expectedMimePart);
 		
 		EasyMock.replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(
@@ -91,7 +91,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = new MimePart();
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/rtf"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(expectedMimePart);
 		
 		EasyMock.replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(
@@ -116,8 +116,8 @@ public class MimePartSelectorTest {
 	@Test
 	public void testSelectDefaultBodyPreferences() {
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(null);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/html"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null);
 		
 		EasyMock.replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
@@ -131,8 +131,8 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = new MimePart();
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/rtf"))).andReturn(null);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/html"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(expectedMimePart);
 		
 		EasyMock.replay(mimeMessage);
 		List<BodyPreference> bodyPreferences = 
@@ -147,8 +147,8 @@ public class MimePartSelectorTest {
 	@Test
 	public void testSelectSeveralBodyPreferencesReturnMimeMessage() {
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/rtf"))).andReturn(null);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/html"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null);
 		
 		EasyMock.replay(mimeMessage);
 		List<BodyPreference> bodyPreferences = 
@@ -168,7 +168,7 @@ public class MimePartSelectorTest {
 		EasyMock.expect(expectedMimePart.getSize()).andReturn(50);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(true).build();
@@ -186,7 +186,7 @@ public class MimePartSelectorTest {
 		EasyMock.expect(expectedMimePart.getSize()).andReturn(10);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(50).allOrNone(true).build();
@@ -204,7 +204,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).allOrNone(true).build();
@@ -222,7 +222,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).allOrNone(false).build();
@@ -240,7 +240,7 @@ public class MimePartSelectorTest {
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(false).build();
@@ -262,9 +262,9 @@ public class MimePartSelectorTest {
 		EasyMock.expect(expectedMimePart.getSize()).andReturn(10);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/rtf"))).andReturn(null);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/plain"))).andReturn(plainTextMimePart);
-		EasyMock.expect(mimeMessage.findMimePart(contentType("text/html"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(null);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(plainTextMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(expectedMimePart);
 		
 		BodyPreference rtfBodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.RTF).build();
 		BodyPreference plainTextBodyPreference = new BodyPreference.Builder().

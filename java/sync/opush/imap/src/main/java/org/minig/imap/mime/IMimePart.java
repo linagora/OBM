@@ -38,9 +38,9 @@ public interface IMimePart {
 
 	void addPart(IMimePart child);
 
-	String getMimeType();
+	String getPrimaryType();
 
-	String getMimeSubtype();
+	String getSubtype();
 
 	List<IMimePart> getChildren();
 
@@ -74,7 +74,7 @@ public interface IMimePart {
 
 	void setBodyParams(Collection<BodyParam> newParams);
 
-	void setMimeType(ContentType mimetype);
+	void setContentType(ContentType mimetype);
 
 	String getName();
 
@@ -92,9 +92,17 @@ public interface IMimePart {
 
 	IMimePart findRootMimePartInTree();
 
-	IMimePart findMimePart(ContentType contentType);
+	IMimePart findMainMessage(ContentType contentType);
 
 	Integer getSize();
 
 	void setSize(int size);
+
+	boolean hasMultiPartMixedParent();
+
+	boolean isMultiPartMixed();
+
+	boolean isFirstElementInParent();
+
+	boolean hasMimePart(ContentType contentType);
 }

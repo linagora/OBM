@@ -45,7 +45,7 @@ import com.google.common.collect.Sets;
 public class MimeMessageFactory {
 
 	private static <T extends MimePart> T fillSimpleMimePart(T mimePart, String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {
-		mimePart.setMimeType( buildMimeType(mimeType, mimeSubtype) );
+		mimePart.setContentType( buildMimeType(mimeType, mimeSubtype) );
 		HashSet<BodyParam> params = Sets.newHashSet();
 		for (Entry<String, String> entry: bodyParams.entrySet()) {
 			params.add(new BodyParam(entry.getKey(), entry.getValue()));

@@ -86,6 +86,7 @@ public abstract class AbstractMimePart implements IMimePart {
 		return bodyParams.get(param.toLowerCase());
 	}
 	
+	@Override
 	public void setBodyParams(Collection<BodyParam> bodyParams) {
 		HashMap<String, BodyParam> params = new HashMap<String, BodyParam>();
 		for (BodyParam param: bodyParams) {
@@ -115,13 +116,27 @@ public abstract class AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public IMimePart findMimePart(ContentType contentType) {
-		Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
-		for (IMimePart mimePart: mimeParts) {
-			if (mimePart.getFullMimeType().equalsIgnoreCase(contentType.getContentType())) {
-				return mimePart;
+	public IMimePart findMainMessage(ContentType contentType) {
+		if (contentType != null) {
+			Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
+			for (IMimePart mimePart: mimeParts) {
+				if (isMatching(contentType, mimePart)) {
+					return mimePart;
+				}
 			}
 		}
 		return null;
+	}
+
+	private boolean isMatching(ContentType contentType, IMimePart mimePart) {
+		if (mimePart.hasMimePart(contentType)) {
+			if (mimePart.hasMultiPartMixedParent()) {
+				return mimePart.isFirstElementInParent();
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 }

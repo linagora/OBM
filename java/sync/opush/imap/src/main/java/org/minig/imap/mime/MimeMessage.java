@@ -65,7 +65,7 @@ public class MimeMessage implements IMimePart {
 	}
 
 	private void printMimeDetails(StringBuilder sb, IMimePart mimeTree) {
-		sb.append(mimeTree.getMimeType() + "/" + mimeTree.getMimeSubtype());
+		sb.append(mimeTree.getFullMimeType());
 		String name = mimeTree.getName();
 		if (name != null) {
 			sb.append(" " + name);
@@ -105,13 +105,13 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
-	public String getMimeType() {
-		return from.getMimeType();
+	public String getPrimaryType() {
+		return from.getPrimaryType();
 	}
 
 	@Override
-	public String getMimeSubtype() {
-		return from.getMimeSubtype();
+	public String getSubtype() {
+		return from.getSubtype();
 	}
 
 	@Override
@@ -185,8 +185,8 @@ public class MimeMessage implements IMimePart {
 	}
 	
 	@Override
-	public void setMimeType(ContentType mimetype) {
-		from.setMimeType(mimetype);		
+	public void setContentType(ContentType mimetype) {
+		from.setContentType(mimetype);		
 	}
 	
 	@Override
@@ -201,7 +201,7 @@ public class MimeMessage implements IMimePart {
 	
 	@Override
 	public String getMultipartSubtype() {
-		return from.getMimeSubtype();
+		return from.getSubtype();
 	}
 	
 	@Override
@@ -239,8 +239,8 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
-	public IMimePart findMimePart(ContentType contentType) {
-		return from.findMimePart(contentType);
+	public IMimePart findMainMessage(ContentType contentType) {
+		return from.findMainMessage(contentType);
 	}
 
 	@Override
@@ -251,5 +251,25 @@ public class MimeMessage implements IMimePart {
 	@Override
 	public void setSize(int size) {
 		from.setSize(size);
+	}
+
+	@Override
+	public boolean hasMultiPartMixedParent() {
+		return from.hasMultiPartMixedParent();
+	}
+
+	@Override
+	public boolean isMultiPartMixed() {
+		return from.isMultiPartMixed();
+	}
+
+	@Override
+	public boolean isFirstElementInParent() {
+		return from.isFirstElementInParent();
+	}
+
+	@Override
+	public boolean hasMimePart(ContentType contentType) {
+		return from.hasMimePart(contentType);
 	}
 }

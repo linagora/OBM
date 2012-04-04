@@ -241,7 +241,7 @@ public class BodyStructureParser {
 		boolean setMimeType() {
 			ContentType mimetype = (ContentType) pop();
 			IMimePart mimePart = (IMimePart) peek();
-			mimePart.setMimeType(mimetype);
+			mimePart.setContentType(mimetype);
 			return true;
 		}
 		
@@ -259,7 +259,7 @@ public class BodyStructureParser {
 						Iterables.concat(message.getBodyParams(), child.getBodyParams()));
 				message.setBodyParams(params);
 				message.setChildren(child.getChildren());
-				message.setMultipartSubtype(child.getMimeSubtype());
+				message.setMultipartSubtype(child.getSubtype());
 			}
 			return true;
 		}
@@ -275,7 +275,7 @@ public class BodyStructureParser {
 			Set<BodyParam> bodyParams = (Set<BodyParam>) pop();
 			ContentType mimeType = (ContentType) pop();
 			MimePart mimePart = new MimePart();
-			mimePart.setMimeType(mimeType);
+			mimePart.setContentType(mimeType);
 			mimePart.setBodyParams(bodyParams);
 			mimePart.setContentId(bodyId);
 			mimePart.setContentTransfertEncoding(contentTransfertEncoding);

@@ -92,7 +92,7 @@ public class MimePartSelector {
 
 	private IMimePart findMimePartMatching(MimeMessage mimeMessage, BodyPreference bodyPreference) {
 		ContentType contentType = toContentType(bodyPreference.getType());
-		return mimeMessage.findMimePart(contentType);
+		return mimeMessage.findMainMessage(contentType);
 	}
 
 	private boolean isContentType(BodyPreference bodyPreference) {

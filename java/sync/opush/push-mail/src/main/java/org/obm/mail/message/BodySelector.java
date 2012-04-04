@@ -50,7 +50,7 @@ public class BodySelector {
 
 	public IMimePart findBodyTextPart() {
 		final IMimePart part = findTextPart(parts, mimeSubtypeInPriorityOrder);
-		if (part != null && (!mimeSubtypeInPriorityOrder.get(0).equalsIgnoreCase(part.getMimeSubtype()))) {
+		if (part != null && (!mimeSubtypeInPriorityOrder.get(0).equalsIgnoreCase(part.getSubtype()))) {
 			return lookForAlternativePart(part);
 		}
 		return part;
@@ -61,7 +61,7 @@ public class BodySelector {
 		if (mimePartParent != null && (mimePartParent.isMultipart() || mimePartParent.isNested()) && mimePartParent.getMultipartSubtype().equalsIgnoreCase("ALTERNATIVE")) {
 			final Collection<IMimePart> listParentParts = mimePartParent.listLeaves(true, true);
 			for (String type: mimeSubtypeInPriorityOrder) {
-				if (type.equalsIgnoreCase(mimePart.getMimeSubtype())) {
+				if (type.equalsIgnoreCase(mimePart.getSubtype())) {
 					return mimePart;
 				}
 				final IMimePart part = findTextPart(listParentParts, ImmutableList.of(type));
@@ -75,7 +75,7 @@ public class BodySelector {
 
 	private IMimePart findTextPart(Collection<IMimePart> parts, List<String> mimeSubtypeInPriorityOrder) {
 		for (IMimePart part: parts) {
-			final String mimeSubtype = part.getMimeSubtype();
+			final String mimeSubtype = part.getSubtype();
 			for (final String firstMimeSubtypePriority: mimeSubtypeInPriorityOrder) {
 				if (mimeSubtype.equalsIgnoreCase(firstMimeSubtypePriority)) {
 					return part;

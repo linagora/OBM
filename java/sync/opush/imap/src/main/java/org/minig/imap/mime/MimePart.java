@@ -42,9 +42,8 @@ import com.google.common.collect.Lists;
 
 public class MimePart extends AbstractMimePart implements IMimePart {
 
-	private String mimeType;
-	private String mimeSubtype;
 	private IMimePart parent;
+	private ContentType contentType;
 	private int idx;
 	private String contentTransfertEncoding;
 	private String contentId;
@@ -62,24 +61,19 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public String getMimeType() {
-		return mimeType;
+	public String getPrimaryType() {
+		return contentType.getPrimaryType();
 	}
 	
 	@Override
-	public void setMimeType(ContentType contentType) {
-		this.mimeSubtype = contentType.getSubType();
-		this.mimeType = contentType.getPrimaryType();
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
 		this.setBodyParams(contentType.getBodyParams());
 	}
 	
 	@Override
-	public String getMimeSubtype() {
-		return mimeSubtype;
-	}
-
-	public void setMimeSubtype(String mimeSubtype) {
-		this.mimeSubtype = mimeSubtype;
+	public String getSubtype() {
+		return contentType.getSubType();
 	}
 
 	@Override
@@ -104,7 +98,7 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 
 	@Override
 	public boolean isMultipart() {
-		return getMimeType() == null || getMimeType().equals("multipart");
+		return getPrimaryType() == null || getPrimaryType().equals("multipart");
 	}
 	
 	private Integer selfAddress() {
@@ -117,15 +111,12 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		return idx;
 	}
 
+	@Override
 	public String getFullMimeType() {
-		StringBuilder sb = new StringBuilder(50);
-		sb.append(getMimeType() != null ? getMimeType().toLowerCase() : "null");
-		sb.append("/");
-		sb.append(getMimeSubtype() != null ? getMimeSubtype().toLowerCase()
-				: "null");
-		return sb.toString();
+		return contentType.getFullMimeType();
 	}
 
+	@Override
 	public String getContentTransfertEncoding() {
 		return contentTransfertEncoding;
 	}
@@ -143,21 +134,19 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		return null;
 	}
 	
+	@Override
 	public boolean isAttachment() {
-		return (idx > 1 && getMimeType() != null && !"html".equalsIgnoreCase(getMimeSubtype()))
-				|| !"text".equalsIgnoreCase(getMimeType());
+		return (idx > 1 && getPrimaryType() != null && !"html".equalsIgnoreCase(getSubtype()))
+				|| !"text".equalsIgnoreCase(getPrimaryType());
 	}
 
+	@Override
 	public String getContentId() {
 		return contentId;
 	}
 
 	public void setContentId(String contentId) {
 		this.contentId = contentId;
-	}
-
-	public int getIdx() {
-		return idx;
 	}
 
 	@Override
@@ -174,7 +163,8 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		}
 		return null;
 	}
-	
+
+	@Override
 	public boolean isInvitation() {
 		String method = retrieveMethodFromCalendarPart();
 		return "REQUEST".equalsIgnoreCase(method);
@@ -185,6 +175,7 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		return getFullMimeType().equalsIgnoreCase("message/rfc822");
 	}
 	
+	@Override
 	public boolean isCancelInvitation() {
 		String method = retrieveMethodFromCalendarPart();
 		return "CANCEL".equalsIgnoreCase(method);
@@ -208,7 +199,7 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		if (multipartSubtype != null) {
 			return multipartSubtype;
 		}
-		return getMimeSubtype();
+		return getSubtype();
 	}
 	
 	@Override
@@ -236,6 +227,28 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		this.size = size;
 	}
 
+	@Override
+	public boolean hasMultiPartMixedParent() {
+		return getParent() != null && getParent().isMultiPartMixed();
+	}
+	
+	@Override
+	public boolean isMultiPartMixed() {
+		return isMultipart() && getSubtype().equalsIgnoreCase("mixed");
+	}
+
+	@Override
+	public boolean isFirstElementInParent() {
+		MimeAddress mimeAddress = getAddressInternal();
+		return mimeAddress != null && mimeAddress.getLastIndex() == 1;
+	}
+
+	@Override
+	public boolean hasMimePart(ContentType contentType) {
+		return this.getFullMimeType().
+				equalsIgnoreCase(contentType.getFullMimeType());
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())

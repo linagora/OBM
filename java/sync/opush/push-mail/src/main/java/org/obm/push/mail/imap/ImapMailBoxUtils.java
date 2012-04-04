@@ -212,7 +212,7 @@ public class ImapMailBoxUtils {
 
 	private MimePart buildMimePart(ContentType contentType, String contentId, String encoding) {
 		MimePart mimePart = new MimePart();
-		mimePart.setMimeType(contentType);
+		mimePart.setContentType(contentType);
 		if (!Strings.isNullOrEmpty(contentId)) {
 			mimePart.setContentId(contentId);
 		}
