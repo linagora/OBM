@@ -204,7 +204,7 @@ class Backup {
     $smtp_query = "SELECT
         DISTINCT host_name AS smtpServer
         FROM Host
-        INNER JOIN ServiceProperty ON host_id=serviceproperty_value
+        INNER JOIN ServiceProperty ON host_id=#CAST(serviceproperty_value,INTEGER)
         INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id
         WHERE domainentity_domain_id=$realm_id AND serviceproperty_service='mail' AND serviceproperty_property='smtp_in'";
     $obm_q->query($smtp_query);
