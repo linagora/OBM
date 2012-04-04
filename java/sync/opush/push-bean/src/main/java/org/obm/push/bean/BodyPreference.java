@@ -40,7 +40,11 @@ public final class BodyPreference implements Serializable {
 	public static class Builder {
 		private Integer truncationSize;
 		private MSEmailBodyType type;
-		private Boolean allOrNone;
+		private boolean allOrNone;
+		
+		public Builder() {
+			allOrNone = false;
+		}
 		
 		public Builder truncationSize(int size) {
 			this.truncationSize = size;
@@ -58,17 +62,18 @@ public final class BodyPreference implements Serializable {
 		}
 		
 		public BodyPreference build() {
-			return new BodyPreference(this.truncationSize, this.type, this.allOrNone);
+			return new BodyPreference(
+					this.truncationSize, this.type, allOrNone);
 		}
 	}
 	
 	private final Integer truncationSize;
 	private final MSEmailBodyType type;
-	private final Boolean allOrNone;
+	private final boolean allOrNone;
 	
 	private BodyPreference(Integer truncationSize, MSEmailBodyType msEmailBodyType, Boolean allOrNone) {
 		this.truncationSize = truncationSize;
-		type = msEmailBodyType;
+		this.type = msEmailBodyType;
 		this.allOrNone = allOrNone;
 	}
 	
@@ -80,10 +85,10 @@ public final class BodyPreference implements Serializable {
 		return type;
 	}
 
-	public Boolean getAllOrNone() {
+	public boolean isAllOrNone() {
 		return allOrNone;
 	}
-
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(truncationSize, type, allOrNone);

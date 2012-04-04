@@ -49,6 +49,7 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	private String contentTransfertEncoding;
 	private String contentId;
 	private String multipartSubtype;
+	private Integer size;
 	
 	public MimePart() {
 		super();
@@ -223,6 +224,16 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 			return copy;
 		}
 		return ImmutableList.of();
+	}
+	
+	@Override
+	public Integer getSize() {
+		return size;
+	}
+
+	@Override
+	public void setSize(int size) {
+		this.size = size;
 	}
 
 	@Override

@@ -113,4 +113,15 @@ public abstract class AbstractMimePart implements IMimePart {
 			return this;
 		}
 	}
+	
+	@Override
+	public IMimePart findMimePart(ContentType contentType) {
+		Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
+		for (IMimePart mimePart: mimeParts) {
+			if (mimePart.getFullMimeType().equalsIgnoreCase(contentType.getContentType())) {
+				return mimePart;
+			}
+		}
+		return null;
+	}
 }

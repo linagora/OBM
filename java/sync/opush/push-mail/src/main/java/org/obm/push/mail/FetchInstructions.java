@@ -29,72 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap.mime;
+package org.obm.push.mail;
 
-import java.util.Collection;
-import java.util.List;
+import org.minig.imap.mime.IMimePart;
 
-public interface IMimePart {
+import com.google.common.base.Preconditions;
 
-	void addPart(IMimePart child);
 
-	String getMimeType();
+public class FetchInstructions {
 
-	String getMimeSubtype();
-
-	List<IMimePart> getChildren();
-
-	List<IMimePart> getSibling();
+	public static class Builder {
+		private IMimePart mimePart;
+		private Integer truncation;
+		
+		public Builder() {}
+		
+		public Builder mimePart(IMimePart mimePart) {
+			this.mimePart = mimePart;
+			return this;
+		}
+		
+		public Builder truncation(Integer truncation) {
+			this.truncation = truncation;
+			return this;
+		}
+		
+		public FetchInstructions build() {
+			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
+			return new FetchInstructions(
+					this.mimePart, this.truncation);
+		}
+	}
 	
-	MimeAddress getAddress();
+	private final IMimePart mimePart;
+	private final Integer truncation;
 	
-	MimeAddress getAddressInternal();
-
-	Collection<BodyParam> getBodyParams();
-
-	BodyParam getBodyParam(final String param);
-
-	IMimePart getParent();
-
-	Collection<IMimePart> listLeaves(boolean depthFirst, boolean filterNested);
-
-	void defineParent(IMimePart parent, int index);
-
-	String getFullMimeType();
-
-	boolean isInvitation();
-
-	String getContentTransfertEncoding();
+	private FetchInstructions(IMimePart mimePart, Integer truncation) {
+		this.mimePart = mimePart;
+		this.truncation = truncation;
+	}
 	
-	String getCharset();
-
-	String getContentId();
-
-	boolean isCancelInvitation();
-
-	void setBodyParams(Collection<BodyParam> newParams);
-
-	void setMimeType(ContentType mimetype);
-
-	String getName();
-
-	boolean isMultipart();
-
-	String getMultipartSubtype();
-
-	void setMultipartSubtype(String subtype);
-
-	boolean isAttachment();
-
-	boolean isNested();
+	public IMimePart getMimePart() {
+		return mimePart;
+	}
 	
-	IMimePart getInvitation();
-
-	IMimePart findRootMimePartInTree();
-
-	IMimePart findMimePart(ContentType contentType);
-
-	Integer getSize();
-
-	void setSize(int size);
+	public Integer getTruncation() {
+		return truncation;
+	}
 }

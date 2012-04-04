@@ -135,6 +135,10 @@ public class ContentType {
 		return bodyParams;
 	}
 
+	public String getContentType() {
+		return primaryType + "/" + subType;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(primaryType, subType, bodyParams);

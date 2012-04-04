@@ -130,7 +130,7 @@ public class SyncCollectionOptions implements Serializable {
 		for (BodyPreference bodyPreference: this.bodyPreferences.values()) {
 			MSEmailBodyType type = bodyPreference.getType();
 			bodyPreferences.put(type,
-					new BodyPreference.Builder().allOrNone(bodyPreference.getAllOrNone()).bodyType(type).build());
+					new BodyPreference.Builder().allOrNone(bodyPreference.isAllOrNone()).bodyType(type).build());
 		}
 		this.bodyPreferences = bodyPreferences;
 	}

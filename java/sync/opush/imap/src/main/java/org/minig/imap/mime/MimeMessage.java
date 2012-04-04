@@ -237,4 +237,19 @@ public class MimeMessage implements IMimePart {
 	public IMimePart findRootMimePartInTree() {
 		return getMimePart();
 	}
+
+	@Override
+	public IMimePart findMimePart(ContentType contentType) {
+		return from.findMimePart(contentType);
+	}
+
+	@Override
+	public Integer getSize() {
+		return from.getSize();
+	}
+
+	@Override
+	public void setSize(int size) {
+		from.setSize(size);
+	}
 }
