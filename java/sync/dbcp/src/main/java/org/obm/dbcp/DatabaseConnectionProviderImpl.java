@@ -87,29 +87,21 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		createDataSource();
 	}
 
-
 	private void createDataSource() {
-		try {
-			cf = buildJDBCConnectionFactory(system);
-			ds = new DBConnectionPool(cf, host, name, login, password, maxPoolSize);
-		} catch (Throwable t) {
-			logger.error(t.getMessage(), t);
-		}
+		cf = buildJDBCConnectionFactory(system);
+		ds = new DBConnectionPool(cf, host, name, login, password, maxPoolSize);
 	}
 
-	private IJDBCDriver buildJDBCConnectionFactory(DatabaseSystem dbType)
-			throws Exception {
+	private IJDBCDriver buildJDBCConnectionFactory(DatabaseSystem dbType) {
 		IJDBCDriver cf = null;
 		if (dbType.equals(DatabaseSystem.PGSQL)) {
 			cf = new PgSqlJDBCDriver();
 		}
-		if (dbType.equals(DatabaseSystem.MYSQL)) {
+		else if (dbType.equals(DatabaseSystem.MYSQL)) {
 			cf = new MySqlJDBCDriver();
 		}
-		if (cf == null) {
-			logger.error("No connection factory found for dbtype " + dbType);
-			throw new Exception("No connection factory found for dbtype "
-					+ dbType);
+		else {
+		    throw new IllegalArgumentException("No connection factory found for dbtype " + dbType);
 		}
 		lastInsertIdQuery = cf.getLastInsertIdQuery();
 		return cf;
