@@ -36,7 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProvider;
 
 import com.google.inject.Inject;
 
@@ -44,10 +44,10 @@ public class ObmHelper {
 	public static final String USER_TRANSACTION = "java:comp/UserTransaction";
 	public static final String DATA_SOURCE = "java:comp/env/jdbc/AutoConfDS";
 
-	private final IDBCP dbcp;
+	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
-	public ObmHelper(IDBCP dbcp) {
+	public ObmHelper(DatabaseConnectionProvider dbcp) {
 		this.dbcp = dbcp;
 	}
 

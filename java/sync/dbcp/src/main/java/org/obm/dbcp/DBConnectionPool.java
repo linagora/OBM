@@ -36,6 +36,8 @@ import java.sql.SQLException;
 
 import org.obm.dbcp.jdbc.IJDBCDriver;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
 public class DBConnectionPool {
@@ -44,18 +46,18 @@ public class DBConnectionPool {
 	private static final String VALIDATION_QUERY = "SELECT 666";
 
 	/* package */ DBConnectionPool(IJDBCDriver cf, String dbHost, String dbName,
-			String login, String password) {
-		poolingDataSource = buildConnectionFactory(cf, dbHost, dbName, login, password);
+			String login, String password, Integer maxPoolSize) {
+		poolingDataSource = buildConnectionFactory(cf, dbHost, dbName, login, password, maxPoolSize);
 	}
 
 	private PoolingDataSource buildConnectionFactory(
 			IJDBCDriver cf, String dbHost, String dbName, String login,
-			String password) {
+			String password, Integer maxPoolSize) {
 
 		PoolingDataSource poolds = new PoolingDataSource();
 		poolds.setClassName(cf.getDataSourceClassName());
 		poolds.setUniqueName(cf.getUniqueName());
-		poolds.setMaxPoolSize(10);
+		poolds.setMaxPoolSize(maxPoolSize);
 		poolds.setAllowLocalTransactions(true);
 		poolds.getDriverProperties().putAll(cf.getDriverProperties(login, password, dbName, dbHost));
 		poolds.setTestQuery(VALIDATION_QUERY);
@@ -63,8 +65,12 @@ public class DBConnectionPool {
 		return poolds;
 	}
 
-	/* package */ Connection getConnection() throws SQLException {
+	@VisibleForTesting Connection getConnection() throws SQLException {
 		return poolingDataSource.getConnection();
+	}
+	
+	public void cleanup() {
+	    poolingDataSource.close();
 	}
 
 }

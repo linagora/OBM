@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
@@ -49,7 +49,7 @@ public class DaoModule extends AbstractModule{
 	@Override
 	protected void configure() {
 
-		bind(IDBCP.class).to(DBCP.class);
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);

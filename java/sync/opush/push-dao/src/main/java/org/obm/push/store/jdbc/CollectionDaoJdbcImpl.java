@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
@@ -64,7 +64,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			Joiner.on(',').join("id", "last_sync", "sync_key");
 	
 	@Inject
-	protected CollectionDaoJdbcImpl(IDBCP dbcp) {
+	protected CollectionDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 

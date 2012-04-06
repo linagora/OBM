@@ -29,12 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.dbcp;
+package org.obm.configuration;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+public enum DatabaseSystem {
 
-public interface IDBCP {
-	public Connection getConnection() throws SQLException;
-	public int lastInsertId(Connection con) throws SQLException;	
+	MYSQL, PGSQL;
+
 }
