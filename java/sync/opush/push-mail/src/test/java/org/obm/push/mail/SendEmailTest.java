@@ -49,10 +49,15 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class SendEmailTest {
 
 	@Test(expected=NullPointerException.class)

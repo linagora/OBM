@@ -43,6 +43,8 @@ import javax.transaction.TransactionManager;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -51,6 +53,9 @@ import com.google.inject.Provider;
 import com.google.inject.matcher.Matchers;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class TransactionalTest {
 
 	public abstract static class AbstractTestClass {

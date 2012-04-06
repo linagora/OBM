@@ -86,6 +86,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 

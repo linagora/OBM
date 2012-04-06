@@ -48,11 +48,14 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
+
+import org.junit.internal.matchers.StringContains;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.obm.filter.SlowFilterRule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.template.ITemplateLoader;
 
@@ -70,6 +73,9 @@ import freemarker.template.Template;
 @SuiteClasses({ErrorMailerTest.Error.class, ErrorMailerTest.Expire.class})
 public class ErrorMailerTest {
 
+	@Rule
+	public SlowFilterRule slowFilterRule = new SlowFilterRule();
+	
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
 	
 	protected static AccessToken getMockAccessToken(){

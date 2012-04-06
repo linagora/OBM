@@ -9,6 +9,8 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
@@ -18,6 +20,9 @@ import org.obm.push.utils.Mime4jUtils;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ErrorsManagerTest {
 
 	@Test

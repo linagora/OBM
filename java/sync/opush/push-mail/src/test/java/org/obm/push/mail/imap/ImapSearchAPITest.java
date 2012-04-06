@@ -44,6 +44,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.minig.imap.SearchQuery;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -62,6 +64,9 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ImapSearchAPITest {
 	
 	@Rule

@@ -10,6 +10,8 @@ import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.ConfigurationService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.AbstractOpushEnv;
@@ -29,6 +31,9 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class AutodiscoverHandlerTest {
 
 	private static class AutodiscoverHandlerTestModule extends AbstractOpushEnv {}

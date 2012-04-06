@@ -33,7 +33,12 @@ package org.obm.sync.calendar;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class RecurrenceDaysSerializerTest {
 	@Test
 	public void testSerialize() {

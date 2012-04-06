@@ -33,6 +33,8 @@ package org.obm.sync;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -43,6 +45,9 @@ import org.obm.sync.calendar.RecurrenceId;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

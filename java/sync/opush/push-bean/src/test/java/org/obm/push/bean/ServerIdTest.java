@@ -33,8 +33,13 @@ package org.obm.push.bean;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.exception.activesync.InvalidServerId;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ServerIdTest {
 
 	@SuppressWarnings("unused")

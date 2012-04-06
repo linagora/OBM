@@ -46,9 +46,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(SlowFilterRunner.class)
 public class TestQueueManager {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

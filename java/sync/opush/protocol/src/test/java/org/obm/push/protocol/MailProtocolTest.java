@@ -36,12 +36,17 @@ import java.io.InputStream;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MailProtocolTest {
 	
 	@Test

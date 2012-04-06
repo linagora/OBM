@@ -45,6 +45,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
@@ -75,6 +77,9 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ImapFetchAPITest {
 
 	@Rule

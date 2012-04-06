@@ -42,12 +42,17 @@ import org.eclipse.jetty.http.HttpHeaders;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ItemOperationsProtocolTest {
 
 	private ItemOperationsProtocol itemOperationsProtocol;

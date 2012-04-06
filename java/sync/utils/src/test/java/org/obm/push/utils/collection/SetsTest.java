@@ -36,10 +36,15 @@ import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class SetsTest {
 
 	private final class ComparatorUsingAMember implements Comparator<A> {

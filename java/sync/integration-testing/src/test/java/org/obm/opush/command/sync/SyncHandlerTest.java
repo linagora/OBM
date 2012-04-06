@@ -16,6 +16,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.PortNumber;
 import org.obm.opush.SingleUserFixture;
@@ -37,6 +39,9 @@ import org.obm.sync.push.client.SyncResponse;
 
 import com.google.inject.Inject;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class SyncHandlerTest {
 
 	@Rule

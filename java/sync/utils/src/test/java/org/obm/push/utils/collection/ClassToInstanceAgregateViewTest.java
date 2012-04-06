@@ -2,10 +2,15 @@ package org.obm.push.utils.collection;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ClassToInstanceAgregateViewTest {
 
 	@Test

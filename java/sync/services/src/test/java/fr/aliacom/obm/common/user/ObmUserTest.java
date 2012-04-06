@@ -35,10 +35,15 @@ import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ObmUserTest {
 
 	@Test

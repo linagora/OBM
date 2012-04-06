@@ -33,7 +33,12 @@ package org.obm.sync.calendar;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class EventPrivacyTest {
 
 	@Test

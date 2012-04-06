@@ -41,6 +41,8 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -61,6 +63,9 @@ import org.obm.sync.calendar.EventPrivacy;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterTest {
 
 	private MSEventToObmEventConverterImpl converter;

@@ -35,9 +35,14 @@ import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.CollectionPathException;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class CollectionPathHelperTest {
 
 	private BackendSession bs;

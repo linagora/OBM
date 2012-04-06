@@ -39,6 +39,8 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.BackendSession;
@@ -56,6 +58,9 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class CalendarEncoderTest {
 	private CalendarEncoder encoder;
 

@@ -10,12 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ResponderImplTest {
 
 	@Before

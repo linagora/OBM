@@ -45,9 +45,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import bitronix.tm.TransactionManagerServices;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class TransactionManagerTest {
 
 	private TransactionManager tm;

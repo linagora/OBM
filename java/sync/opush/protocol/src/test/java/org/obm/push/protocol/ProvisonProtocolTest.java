@@ -36,12 +36,17 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ProvisonProtocolTest {
 	
 	private static final long _3378841480L = 3378841480L;

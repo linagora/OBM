@@ -54,6 +54,11 @@
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>

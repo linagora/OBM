@@ -40,8 +40,6 @@ import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Objects;
-
 public abstract class AbstractItemsParser {
 
 	protected String s(Element e, String name) {

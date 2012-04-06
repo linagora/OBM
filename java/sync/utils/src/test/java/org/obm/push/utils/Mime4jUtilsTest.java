@@ -45,9 +45,14 @@ import org.apache.james.mime4j.message.MessageImpl;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.base.Charsets;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class Mime4jUtilsTest {
 
 	private Mime4jUtils mime4jUtils;

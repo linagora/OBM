@@ -34,10 +34,15 @@ package org.obm.push.backend;
 import java.util.Date;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.Email;
 
 import junit.framework.Assert;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class EmailEqualsTest {
 	
 	@Test

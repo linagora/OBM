@@ -40,6 +40,8 @@ import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -61,6 +63,9 @@ import org.obm.push.bean.User.Factory;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class SerializableTest {
 
 	private ObjectOutputStream objectOutputStream;

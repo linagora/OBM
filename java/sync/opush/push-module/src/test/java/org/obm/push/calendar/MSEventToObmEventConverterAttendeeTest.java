@@ -36,6 +36,8 @@ import java.util.Date;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.DateUtils;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -51,6 +53,9 @@ import org.obm.sync.calendar.ParticipationState;
 
 import com.google.common.collect.Sets;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterAttendeeTest {
 
 	private MSEventToObmEventConverterImpl converter;

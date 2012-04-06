@@ -37,10 +37,14 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
 
+@RunWith(SlowFilterRunner.class)
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;

@@ -56,10 +56,13 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.obm.filter.SlowFilterRule;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -88,8 +91,10 @@ import fr.aliacom.obm.utils.HelperService;
 	EventNotificationServiceTest.DeleteTests.class, 
 	EventNotificationServiceTest.UpdateParticipationTests.class,
 	EventNotificationServiceTest.ComputeAttendeesDiffsTests.class})
-
 public class EventNotificationServiceTest {
+	
+	@Rule
+	public SlowFilterRule slowFilterRule = new SlowFilterRule();
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
 	private static final String ICS_DATA_REMOVE = "ics data remove attendee";

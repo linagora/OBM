@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -45,6 +47,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class TimeOutMapTest {
 
 	private final static String APPLY_VALUE = "DEFAULT-VALUE";

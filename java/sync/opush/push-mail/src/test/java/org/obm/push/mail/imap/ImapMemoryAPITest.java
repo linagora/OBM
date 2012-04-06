@@ -50,6 +50,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.junit.rules.TemporaryFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
@@ -73,6 +75,9 @@ import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ImapMemoryAPITest {
 	
 	@Rule

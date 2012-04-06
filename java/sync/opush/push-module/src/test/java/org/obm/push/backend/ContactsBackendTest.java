@@ -5,11 +5,16 @@ import java.util.TreeSet;
 import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.contacts.ComparatorUsingFolderName;
 import org.obm.sync.book.Folder;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ContactsBackendTest {
 
 	@Test

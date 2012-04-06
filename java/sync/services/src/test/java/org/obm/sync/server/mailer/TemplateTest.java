@@ -41,6 +41,8 @@ import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.junit.internal.matchers.StringContains;
 
 import com.google.common.collect.ImmutableMap;
@@ -51,6 +53,9 @@ import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class TemplateTest {
 	
 	private String applyTemplate(Template template,

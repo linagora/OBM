@@ -45,6 +45,8 @@ import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
@@ -62,6 +64,9 @@ import org.obm.push.mail.smtp.SmtpSender;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MockBasedImapMailboxServiceTest {
 
 	private BackendSession bs;

@@ -39,12 +39,17 @@ import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.minig.imap.command.parser.BodyStructureParser;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.mime.MimeMessage;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class UIDFetchBodyStructureCommandTest {
 
 	private static final String INPUT_LINE1 = 

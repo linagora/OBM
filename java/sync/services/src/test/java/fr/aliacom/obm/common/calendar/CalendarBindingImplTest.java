@@ -56,6 +56,8 @@ import org.joda.time.DateTime;
 import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -89,6 +91,9 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class CalendarBindingImplTest {
 
 	private HelperService mockRightsHelper(String calendar, AccessToken accessToken) {

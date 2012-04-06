@@ -15,6 +15,8 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.exception.NotQuotableEmailException;
@@ -23,6 +25,9 @@ import org.obm.push.utils.Mime4jUtils;
 import com.google.common.collect.ImmutableMap;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ForwardEmailTest {
 
 	private Mime4jUtils mime4jUtils;

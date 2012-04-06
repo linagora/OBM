@@ -47,12 +47,17 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ToolBox;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class EventTest {
 
 	@Test

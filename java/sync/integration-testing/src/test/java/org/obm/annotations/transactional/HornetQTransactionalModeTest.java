@@ -40,6 +40,8 @@ import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.junit4.GuiceBerryRule;
@@ -47,6 +49,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class HornetQTransactionalModeTest {
 
 	public static class Module extends AbstractModule {

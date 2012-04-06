@@ -88,6 +88,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.junit.internal.matchers.StringContains;
 import org.junit.internal.matchers.TypeSafeMatcher;
 import org.obm.DateUtils;
@@ -114,6 +116,9 @@ import com.google.common.collect.Lists;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class Ical4jHelperTest {
 
 	private static class StringLengthLessThan extends TypeSafeMatcher<String> {

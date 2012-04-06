@@ -36,9 +36,14 @@ import java.io.IOException;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import com.google.common.io.ByteStreams;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class SizeLimitingInputStreamTest {
 
 	@Test

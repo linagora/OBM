@@ -41,10 +41,15 @@ import java.util.List;
 import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.DateUtils;
 
 import com.google.common.collect.Lists;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class EventRecurrenceTest {
 		
 	@Test

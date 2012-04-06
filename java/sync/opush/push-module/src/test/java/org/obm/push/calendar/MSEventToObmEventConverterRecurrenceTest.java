@@ -40,6 +40,8 @@ import java.util.TimeZone;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.DateUtils;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
@@ -55,6 +57,9 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.Sets;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterRecurrenceTest {
 
 	private MSEventToObmEventConverterImpl converter;

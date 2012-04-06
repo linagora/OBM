@@ -37,6 +37,8 @@ import static org.obm.push.TestUtils.getXml;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
@@ -45,6 +47,9 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.w3c.dom.Document;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class CalendarDecoderTest {
 	
 	private CalendarDecoder decoder;

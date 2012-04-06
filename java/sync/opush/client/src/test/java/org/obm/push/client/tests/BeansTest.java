@@ -2,6 +2,8 @@ package org.obm.push.client.tests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Add;
@@ -15,6 +17,9 @@ import org.obm.sync.push.client.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

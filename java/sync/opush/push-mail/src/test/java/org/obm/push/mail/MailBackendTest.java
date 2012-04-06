@@ -40,6 +40,8 @@ import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.User;
@@ -59,6 +61,9 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MailBackendTest {
 	
 	@Test

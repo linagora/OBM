@@ -36,10 +36,15 @@ import org.junit.Test;
 import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.ContentType;
 import org.obm.push.mail.MimeAddress;
+import org.junit.runner.RunWith;
+
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

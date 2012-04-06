@@ -38,11 +38,16 @@ import static org.minig.imap.MimeMessageTestUtils.checkMimeTree;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 
 import com.google.common.collect.ImmutableMap;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class BodyStructureParserTest {
 
 	private IMimePart parseStringAsBodyStructure(String bs) {

@@ -35,10 +35,15 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
 import org.obm.sync.calendar.ParticipationRole;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ObmEventToMsEventConverterParticipationRoleTest {
 
 	private ObmEventToMSEventConverterImpl converter;

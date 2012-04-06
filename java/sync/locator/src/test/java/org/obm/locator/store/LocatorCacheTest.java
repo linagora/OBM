@@ -36,12 +36,17 @@ import junit.framework.Assert;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class LocatorCacheTest {
 
 	private String loginAtDomain;

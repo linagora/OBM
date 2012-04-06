@@ -56,11 +56,13 @@ import org.easymock.EasyMock;
 import org.hamcrest.core.IsInstanceOf;
 import org.jsoup.Jsoup;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.obm.filter.SlowFilterRule;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -91,9 +93,11 @@ import freemarker.template.Template;
 	EventChangeMailerTest.AcceptedCreationRecurrentEvent.class, EventChangeMailerTest.Cancelation.class, EventChangeMailerTest.CancelationRecurrentEvent.class,
 	EventChangeMailerTest.NotifyAcceptedUpdateUsers.class, EventChangeMailerTest.NeedActionUpdate.class, EventChangeMailerTest.NotifyAcceptedUpdateUsersCanWriteOnCalendar.class,
 	EventChangeMailerTest.NeedActionUpdateRecurrentEvent.class, EventChangeMailerTest.AcceptedParticipationStateChangeEvent.class, EventChangeMailerTest.ParticipationStateChangeEventWithNullComment.class})
-
 public class EventChangeMailerTest {
 
+	@Rule
+	public SlowFilterRule slowFilterRule = new SlowFilterRule();
+	
 	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
 	
 	public abstract static class Common {

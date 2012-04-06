@@ -42,6 +42,8 @@ import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
@@ -56,6 +58,9 @@ import com.google.common.collect.ImmutableSet;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class AddressBookBindingImplTest {
 	
 	private ObmHelper mockHelper() throws SQLException {

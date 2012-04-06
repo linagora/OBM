@@ -35,6 +35,8 @@ import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPResponseParser;
 import org.minig.imap.impl.MinaIMAPMessage;
@@ -42,6 +44,9 @@ import org.minig.imap.impl.MinaIMAPMessage;
 import com.google.common.collect.ImmutableList;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class UIDFetchEnvelopeCommandTest {
 
 	@Test

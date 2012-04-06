@@ -38,11 +38,16 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.junit.internal.matchers.StringContains;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class DOMUtilsTest {
 	
 	@Test

@@ -37,10 +37,15 @@ import java.util.Date;
 import java.util.Set;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.ChangedCollections;
 import com.google.common.collect.ImmutableSet;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class CollectionChangeListenerTest {
 
 	@Test

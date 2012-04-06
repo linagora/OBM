@@ -42,12 +42,17 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.junit.internal.matchers.StringContains;
 import org.obm.sync.calendar.Attendee;
 
 import com.ctc.wstx.io.CharsetNames;
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class MailSendTest {
 
 	@Test

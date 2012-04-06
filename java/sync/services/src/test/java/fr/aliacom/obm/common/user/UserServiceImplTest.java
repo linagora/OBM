@@ -34,12 +34,17 @@ package fr.aliacom.obm.common.user;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expect;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class UserServiceImplTest {
 
 	@Test
