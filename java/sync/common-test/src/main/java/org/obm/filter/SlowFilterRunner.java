@@ -29,24 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.mail;
+package org.obm.filter;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.util.List;
 
-import com.google.common.base.Charsets;
+import org.junit.rules.TestRule;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
 
-public class StreamMailTestsUtils {
+import com.google.common.collect.ImmutableList;
 
-	private static final byte[] CRLF = { (byte)'\r', (byte)'\n'};
-	
-	public static InputStream getHeaders() {
-		String crlf = new String(CRLF);
-		return newInputStreamFromString("From: toto" + crlf + crlf);
-	}
-	
-	public static ByteArrayInputStream newInputStreamFromString(String content) {
-		return new ByteArrayInputStream(new String(content).getBytes(Charsets.UTF_8));
+public class SlowFilterRunner extends BlockJUnit4ClassRunner {
+
+	public SlowFilterRunner(Class<?> klass) throws InitializationError {
+		super(klass);
 	}
 
+	@Override
+	protected List<TestRule> getTestRules(Object target) {
+		return ImmutableList.<TestRule>builder().addAll(super.getTestRules(target)).add(new SlowFilterRule()).build();
+	}
+	
 }

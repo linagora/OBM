@@ -34,17 +34,15 @@ package org.obm.filter;
 import java.lang.annotation.Annotation;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRule;
 
+import org.junit.runner.RunWith;
 
+@RunWith(SlowFilterRunner.class)
 public class SlowFilterRuleTest {
 
-	@Rule
-	public SlowFilterRule slowFilterRule = new SlowFilterRule();
-	
 	@Test
 	public void testHasToRunTestWhenNoAnnotation() {
 		Slow methodAnnotation = null;

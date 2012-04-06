@@ -31,25 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.filter;
 
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
-public final class SlowFilterRule implements MethodRule {
+public final class SlowFilterRule implements TestRule {
 
 	private static final String SLOW_CONFIGURATION_VALUE = System.getenv(Slow.CONFIGURATION_ENVIRONMENT_KEY);
 	private static final boolean SLOW_TEST_ALLOWED = configurationAllowSlowTests(SLOW_CONFIGURATION_VALUE);
 	
 	@Override
-	public Statement apply(final Statement test, final FrameworkMethod method, final Object target) {
+	public Statement apply(final Statement test, final Description description) {
 		return new Statement() {
 			
 			@Override
 			public void evaluate() throws Throwable {
-				Slow methodAnnotation = method.getAnnotation(Slow.class);
+				Slow methodAnnotation = description.getAnnotation(Slow.class);
 				if (hasToRunTest(methodAnnotation)) {
 					test.evaluate();
 				}
