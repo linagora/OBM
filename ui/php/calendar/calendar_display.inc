@@ -4399,7 +4399,9 @@ function dis_event_decision_popup() {
 				<span>$GLOBALS[l_decision_possibility]</span>
 			</p>
 			<form>
+				<span style=\"text-align:center;margin-left:10px;\"><input type=\"checkbox\" id=\"forceinsertion\" />$GLOBALS[l_force_insert]</span>
 				<fieldset class=\"buttons\">
+				<br/>
 				<input type=\"submit\" href='' onclick=\"obm.calendarDecisionPopup.updateDecision(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_without_comment]\" />
 				</fieldset>
 				<p><img src='$GLOBALS[ico_comment]' alt='comment:' /> $GLOBALS[l_comment_decision]

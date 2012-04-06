@@ -367,7 +367,12 @@ if ($action == 'search') {
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'], 'read')) {
-    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    if($params['errormessage']){
+      $display['msg'] .= display_err_msg($params['errormessage']);
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    }else{
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    }
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
   }

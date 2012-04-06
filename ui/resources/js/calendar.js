@@ -2121,7 +2121,7 @@ Obm.CalendarCommentPopup = new Class({
 					showMessage('ok', message.message);
 					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
 				}else{
-					showMessage('error', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
 				}
 			}
 		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
@@ -2162,7 +2162,7 @@ Obm.CalendarAlarmPopup = new Class({
 					showMessage('ok', message.message);
 					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
 				}else{
-					showMessage('error', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
 				}
 			}
 		}).post({ajax : 1, action : 'update_alert', calendar_id : this.evtid, user_id : this.uid, sel_alert : checked[0].value});
@@ -2175,6 +2175,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.maxLength = 255;
 		this.yourDecision = $('calendarDecisionPopup').getElementById('yourDecision');
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
+		this.check_force = $('calendarDecisionPopup').getElementById('forceinsertion');
 	},
 	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, usePlaceholder) {
 		this.uid = uid;
@@ -2203,6 +2204,7 @@ Obm.CalendarDecisionPopup = new Class({
 	},
 	updateDecision: function(){
 		this.comment = this.textarea[0].value;
+        this.force = this.check_force.getProperty('checked') ? true : '';
 		var self = this;
 		new Request.JSON({
 			url: obm.vars.consts.calendarUrl,
@@ -2212,10 +2214,10 @@ Obm.CalendarDecisionPopup = new Class({
 					showMessage('ok', message.message);
 					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
 				}else{
-					showMessage('error', message.message);
+					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
 				}
 			}
-		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
+		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, force:this.force});
 	},
 	displayCharLimit: function(){
 		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
