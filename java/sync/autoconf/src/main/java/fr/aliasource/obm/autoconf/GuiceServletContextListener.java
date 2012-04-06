@@ -38,8 +38,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.DBCP;
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseConnectionProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -68,7 +68,7 @@ public class GuiceServletContextListener implements ServletContextListener{
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-            	bind(IDBCP.class).to(DBCP.class);
+               bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
             }
         }, new TransactionalModule());
 

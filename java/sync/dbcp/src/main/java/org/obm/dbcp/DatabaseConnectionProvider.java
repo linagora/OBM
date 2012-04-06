@@ -29,44 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.dbcp;
 
-package org.obm.dbcp.impl;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import org.obm.push.utils.IniFile;
-
-public class ObmConfIni extends IniFile {
-	
-	public ObmConfIni() {
-		super("/etc/obm/obm_conf.ini");
-	}
-
-	@Override
-	public String getCategory() {
-		return "obm";
-	}
-
-	public String get(String string) {
-		return getData().get(string).replace("\"", "");
-	}
-	
-	public String getDbType() {
-		return get("dbtype");
-	}
-	
-	public String getLogin() {
-		return get("user");
-	}
-	
-	public String getPassword() {
-		return get("password");
-	}
-	
-	public String getDbName() {
-		return get("db");
-	}
-	
-	public String getDbHost() {
-		return get("host");
-	}
-
+public interface DatabaseConnectionProvider {
+	public Connection getConnection() throws SQLException;
+	public int lastInsertId(Connection con) throws SQLException;	
 }

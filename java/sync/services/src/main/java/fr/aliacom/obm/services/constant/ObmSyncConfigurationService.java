@@ -32,8 +32,8 @@
 package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseSystem;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.base.ObmDbType;
 
 import com.google.common.base.Splitter;
 import com.google.inject.Inject;
@@ -94,10 +94,6 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 			return bindPassword.replace("\"", "");
 		}
 		return null;
-	}
-
-	public ObmDbType getDbType() {
-		return ObmDbType.valueOf(getStringValue("dbtype").trim());
 	}
 
 	public Iterable<String> getLemonLdapIps() {

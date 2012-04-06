@@ -36,7 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.HearbeatDao;
@@ -49,7 +49,7 @@ import com.google.inject.Singleton;
 public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HearbeatDao{
 
 	@Inject
-	private HearbeatDaoJdbcDaoImpl(IDBCP dbcp) {
+	private HearbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 
