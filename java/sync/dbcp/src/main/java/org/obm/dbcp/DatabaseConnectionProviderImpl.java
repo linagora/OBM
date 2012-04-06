@@ -69,7 +69,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	private String password;
 	private String host;
 	private String name;
-	private Integer maxPoolSize;
+	private int maxPoolSize;
 
 	@Inject
 	public DatabaseConnectionProviderImpl(
