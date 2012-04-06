@@ -2111,7 +2111,7 @@ Obm.CalendarCommentPopup = new Class({
 		obm.popup.hide('calendarCommentPopup');
 	},
 	updateComment: function(){
-		this.comment = this.textarea[0].value;
+		this.comment = this.textarea[0].value == '' ? null : this.textarea[0].value ;
 		var self = this;
 		new Request.JSON({      
 			url: obm.vars.consts.calendarUrl,
@@ -2119,7 +2119,7 @@ Obm.CalendarCommentPopup = new Class({
 			onSuccess : function(message){
 				if(message.error == 0){
 					showMessage('ok', message.message);
-					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+                    window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
 				}else{
 					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
 				}

@@ -678,15 +678,13 @@ if ($action == 'search') {
 
 } elseif ($action == 'update_comment') {
 ///////////////////////////////////////////////////////////////////////////////
-  if( isset($params['comment']) ){
-    $GLOBALS["send_notification_mail"] = true;
-    $comment_inserted = run_query_calendar_event_comment_insert($params['calendar_id'],
-      $params['user_id'],$params['comment'],$params['type'], true);
-    if ($comment_inserted) {
-      json_ok_msg("$l_event : $l_update_ok");
-    } else {
-      json_error_msg("$l_event : $err[msg]");
-    }
+  $GLOBALS["send_notification_mail"] = true;
+  $comment_inserted = run_query_calendar_event_comment_insert($params['calendar_id'],
+    $params['user_id'],$params['comment'],$params['type'], true);
+  if ($comment_inserted) {
+    json_ok_msg("$l_event : $l_update_ok");
+  } else {
+    json_error_msg("$l_event : $err[msg]");
   }
   echo "({".$display['json']."})";
   exit();
