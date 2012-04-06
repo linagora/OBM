@@ -2177,7 +2177,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
 		this.check_force = $('calendarDecisionPopup').getElementById('forceinsertion');
 	},
-	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, usePlaceholder) {
+	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang) {
 		this.uid = uid;
 		this.evtid = evtid;
 		this.decision = decision;
@@ -2186,11 +2186,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.type = type;
 		this.comment = comment;
 		this.eventTitle = title;
-		if(usePlaceholder) {
-			this.textarea.setProperty('placeholder', this.comment);
-		} else {
-			this.textarea.setProperty('value', this.comment);
-		}
+		this.textarea.setProperty('placeholder', this.comment);
 		this.yourDecision.set('text', this.choiceByLang);
 		this.eventTitlePlace.set('text', this.eventTitle);
 		this.show();
