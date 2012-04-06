@@ -46,10 +46,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.minig.imap.Address;
 import org.minig.imap.IMAPHeaders;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
@@ -71,6 +74,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+@RunWith(SlowFilterRunner.class)
 public class UIDFetchHeadersTest {
 
 	@Rule
@@ -129,12 +133,12 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(headers.getFrom()).isNull();
 	}
 	
-	@Test(expected=ImapMessageNotFoundException.class)
+	@Test(expected=ImapMessageNotFoundException.class) @Slow
 	public void unknownEmailUid() throws Exception {
 		uidFetchHeaders(1, new EmailHeaders.Builder().header(EmailHeader.Common.FROM.getHeader()).build());
 	}
 	
-	@Test
+	@Test @Slow
 	public void retrievingUndefinedHeader() throws Exception {
 		sendMessage(message());
 		String header = "X-UNDEFINED";
@@ -142,7 +146,7 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(headers.getRawHeader(header)).isNull();
 	}
 	
-	@Test
+	@Test @Slow
 	public void testUidFetchHeaders() throws Exception {
 		String fromAddress = "from@adress";
 		String toAddress = "to@adress";
@@ -180,7 +184,7 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(fetchHeaders.getDate()).isEqualTo(date);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testCustomHeader() throws Exception {
 		String headerName = "X-MyCustomHeader";
 		String headerValue = "value of custom header";
@@ -198,7 +202,7 @@ public class UIDFetchHeadersTest {
 		Assertions.assertThat(fetchHeaders.getRawHeader(headerName)).isEqualTo(headerValue);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testCustomCaseInsensitiveHeader() throws Exception {
 		String headerName = "X-MyCustomHeader";
 		String headerValue = "value of custom header";

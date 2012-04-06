@@ -47,6 +47,7 @@ import org.minig.imap.mime.MimeMessage;
 
 import com.google.common.collect.ImmutableList;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -64,7 +65,7 @@ public class UIDFetchBodyStructureCommandTest {
 		"ISO-8859-1''%44%69%70%6C%F4%6D%E9%73%20%64%65%70%75%69%73%20%32%30%30%31%2D%32%30%30%32%2E%7A%69%70)) NIL NIL) \"MIXED\" (\"BOUNDARY\" \"------------040903010203040509010609\") NIL NIL NIL)";
 
 	
-	@Test
+	@Test @Slow
 	public void testResponseReceived() {
 		BodyStructureParser resultCallback = EasyMock.createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);

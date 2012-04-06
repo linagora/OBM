@@ -62,6 +62,7 @@ import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -155,7 +156,7 @@ public class EhcacheTransactionalModeTest {
 		return new Element("key", "value");
 	}
 	
-	@Test
+	@Test @Slow
 	public void transactionIsShorterThanCacheTimeout() throws InterruptedException, ExecutionException {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		List<Future<Boolean>> futures = executeTwoPutInParallel(100);
@@ -170,7 +171,7 @@ public class EhcacheTransactionalModeTest {
 		}
 	}
 	
-	@Test(expected=DeadLockException.class)
+	@Test(expected=DeadLockException.class) @Slow
 	public void transactionIsGreaterThanCacheTimeout() throws Throwable {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		try {

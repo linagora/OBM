@@ -44,9 +44,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.minig.imap.MailboxFolder;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
@@ -60,6 +63,7 @@ import org.obm.push.mail.PrivateMailboxService;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
+@RunWith(SlowFilterRunner.class) @Slow
 public class ManagedLifecycleImapStoreTest {
 
 	@Rule

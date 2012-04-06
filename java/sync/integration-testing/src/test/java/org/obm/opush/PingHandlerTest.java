@@ -94,9 +94,10 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class PingHandlerTest {
 
 	@Rule
@@ -124,12 +125,12 @@ public class PingHandlerTest {
 		testHeartbeatInterval(5, 5, 5);
 	}
 
-	
+
 	@Test
 	public void testMinInterval() throws Exception {
 		testHeartbeatInterval(1, 5, 5);
 	}
-	
+
 	@Test
 	public void test3BlockingClient() throws Exception {
 		prepareMockNoChange();
@@ -171,7 +172,7 @@ public class PingHandlerTest {
 		checkExecutionTime(5, 1, stopwatch);
 		checkHasChangeResponse(response);
 	}
-	
+
 	@Test
 	public void testPushNotificationOnBackendChangeLong() throws Exception {
 		prepareMockHasChanges(2);

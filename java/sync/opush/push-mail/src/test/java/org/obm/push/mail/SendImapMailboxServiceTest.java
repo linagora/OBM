@@ -51,9 +51,10 @@ import org.obm.push.mail.imap.ImapMailboxService;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class SendImapMailboxServiceTest {
 
 	@Rule

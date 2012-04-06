@@ -49,6 +49,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -97,7 +98,7 @@ public class HornetQTransactionalModeTest {
 		
 	}
 	
-	@Test
+	@Test @Slow
 	public void testSimple() throws Exception {
 		String testText = "test text";
 		xaMessageQueueInstance.put(testText);

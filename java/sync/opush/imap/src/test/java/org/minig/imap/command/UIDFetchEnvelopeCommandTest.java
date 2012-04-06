@@ -44,12 +44,13 @@ import org.minig.imap.impl.MinaIMAPMessage;
 import com.google.common.collect.ImmutableList;
 
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class UIDFetchEnvelopeCommandTest {
 
-	@Test
+	@Test @Slow
 	public void testMoreThanOneLine() {
 		String firstLine = 
 			"* 20 FETCH (UID 20 ENVELOPE (\"Tue, 28 Apr 2009 17:10:03 +0200\" {43}";

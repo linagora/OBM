@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import bitronix.tm.TransactionManagerServices;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -118,8 +119,8 @@ public class TransactionManagerTest {
 		assertTrue(tm.getStatus() == Status.STATUS_MARKED_ROLLBACK);
 		tm.rollback();
 	}
-	
-	@Test
+
+	@Test @Slow
 	public void testSet2sTimeout() throws Exception {
 		tm.setTransactionTimeout(2);
 		tm.begin();

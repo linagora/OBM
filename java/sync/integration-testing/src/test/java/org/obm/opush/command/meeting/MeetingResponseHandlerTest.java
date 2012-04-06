@@ -90,9 +90,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class MeetingResponseHandlerTest {
 
 	@Rule

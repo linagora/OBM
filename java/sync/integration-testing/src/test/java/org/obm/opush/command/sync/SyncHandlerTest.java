@@ -39,9 +39,10 @@ import org.obm.sync.push.client.SyncResponse;
 
 import com.google.inject.Inject;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class SyncHandlerTest {
 
 	@Rule

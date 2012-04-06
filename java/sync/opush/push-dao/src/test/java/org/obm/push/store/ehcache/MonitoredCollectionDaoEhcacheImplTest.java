@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -85,7 +86,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		Assert.assertNotNull(syncCollections);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testSimplePut() {
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
 		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
@@ -94,7 +95,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		containsCollectionWithId(syncCollections, 1);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testPutNewItems() {
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(2, 3));

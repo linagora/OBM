@@ -64,9 +64,10 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class ImapSearchAPITest {
 	
 	@Rule

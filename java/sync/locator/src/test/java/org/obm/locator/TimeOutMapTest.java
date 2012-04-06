@@ -47,6 +47,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -84,7 +85,7 @@ public class TimeOutMapTest {
 		Assert.assertEquals(APPLY_VALUE, localCache.get("KEY-NOT-EXIST") );
 	}
 	
-	@Test
+	@Test @Slow
 	public void returnApplyValueExpireAfterAccess() throws InterruptedException, ExecutionException {
 		Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.SECONDS)
 				.build(new CacheLoader<String, String>() {
@@ -103,7 +104,7 @@ public class TimeOutMapTest {
 		Assert.assertEquals(APPLY_VALUE, cache.get(key) );
 	}
 	
-	@Test
+	@Test @Slow
 	public void testTimeOutMap() throws Exception {
 		Cache<String, Object> cache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS)
 				.removalListener(new RemovalListener<String, Object>() {

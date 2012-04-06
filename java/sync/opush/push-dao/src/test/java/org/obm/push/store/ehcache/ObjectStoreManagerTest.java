@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
@@ -66,7 +67,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		Assert.assertEquals(3, stores.size());
 	}
 	
-	@Test
+	@Test @Slow
 	public void createNewThreeCachesAndRemoveOne() {
 		opushCacheManager.createNewStore("test 1");
 		opushCacheManager.createNewStore("test 2");

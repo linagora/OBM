@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -138,7 +139,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		Assert.assertTrue( contains(itemChangesTwoCollection, itemChange21) );	
 	}
 	
-	@Test
+	@Test @Slow
 	public void addTwoItemsDifferentTypeOnTheSameCollection() {
 		ItemChange itemChange1 = buildItemChange("test 1");
 		ItemChange itemChange2 = buildItemChange("test 2");
@@ -158,7 +159,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		Assert.assertFalse( contains(itemChanges, itemChange3) );
 	}
 	
-	@Test
+	@Test @Slow
 	public void clear() {
 		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
 				ImmutableList.of(buildItemChange("test 1")));

@@ -59,9 +59,10 @@ import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class ImapDeleteAPITest {
 
 	private static final String INBOX = EmailConfiguration.IMAP_INBOX_NAME;

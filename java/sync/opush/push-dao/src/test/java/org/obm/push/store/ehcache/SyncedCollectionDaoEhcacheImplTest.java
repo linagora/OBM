@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -57,7 +58,7 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager objectStoreManager;

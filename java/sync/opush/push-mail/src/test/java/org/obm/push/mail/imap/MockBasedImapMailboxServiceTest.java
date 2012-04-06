@@ -64,6 +64,7 @@ import org.obm.push.mail.smtp.SmtpSender;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -134,7 +135,7 @@ public class MockBasedImapMailboxServiceTest {
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
-	@Test
+	@Test @Slow
 	public void testParseINBOXWithOtherFolderEndingByINBOX() throws Exception {
 		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
 

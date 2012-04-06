@@ -44,6 +44,7 @@ import org.obm.locator.LocatorClientImpl;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -92,7 +93,7 @@ public class LocatorCacheTest {
 		Assert.assertTrue(false);
 	}
 	
-	@Test(expected=UncheckedExecutionException.class)
+	@Test(expected=UncheckedExecutionException.class) @Slow
 	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 
@@ -156,14 +157,14 @@ public class LocatorCacheTest {
 		Assert.assertEquals(returnOpushValue, opushValue);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testCacheExpireWithRegularKeys() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 		
 		assertCacheExpireWithServiceKey(obmSyncService); 
 	}
 
-	@Test
+	@Test @Slow
 	public void testCacheExpireWithNullLoginAtDomainKey() throws LocatorClientException, InterruptedException {
 		loginAtDomain = null;
 		String serviceKey = "obm-sync";
@@ -171,14 +172,14 @@ public class LocatorCacheTest {
 		assertCacheExpireWithServiceKey(serviceKey); 
 	}
 	
-	@Test
+	@Test @Slow
 	public void testCacheExpireWithNullServiceKey() throws LocatorClientException, InterruptedException {
 		String nullServiceKey = null;
 		
 		assertCacheExpireWithServiceKey(nullServiceKey); 
 	}
 	
-	@Test
+	@Test @Slow
 	public void testCacheExpireWithNullKeys() throws LocatorClientException, InterruptedException {
 		loginAtDomain = null;
 		String nullServiceKey = null;

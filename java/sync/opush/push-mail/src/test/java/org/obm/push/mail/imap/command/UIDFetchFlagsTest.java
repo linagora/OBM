@@ -41,6 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
@@ -48,6 +49,8 @@ import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
@@ -66,6 +69,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
+@RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchFlagsTest {
 
 	@Rule

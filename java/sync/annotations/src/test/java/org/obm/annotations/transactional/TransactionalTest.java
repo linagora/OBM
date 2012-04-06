@@ -52,7 +52,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.matcher.Matchers;
 
-
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
@@ -223,7 +223,7 @@ public class TransactionalTest {
 		EasyMock.expectLastCall().once();
 	}
 
-	@Test
+	@Test @Slow
 	public void testSub() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -238,7 +238,7 @@ public class TransactionalTest {
 		EasyMock.verify(transactionManager);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -259,7 +259,7 @@ public class TransactionalTest {
 		Assert.fail("RuntimeExceptionExpected");
 	}
 
-	@Test
+	@Test @Slow
 	public void testSubRollback() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -280,7 +280,7 @@ public class TransactionalTest {
 		Assert.fail("RuntimeExceptionExpected");
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test(expected=RuntimeException.class) @Slow
 	public void testRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -300,7 +300,7 @@ public class TransactionalTest {
 		}
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test(expected=RuntimeException.class) @Slow
 	public void testSubRollbackException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -439,7 +439,7 @@ public class TransactionalTest {
 		}
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test(expected=RuntimeException.class) @Slow
 	public void requiredWithNestedChildThrowingRuntimeException() throws SystemException, NotSupportedException, SecurityException, IllegalStateException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
@@ -461,7 +461,7 @@ public class TransactionalTest {
 		EasyMock.verify(transactionManager);
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test(expected=RuntimeException.class) @Slow
 	public void requiredThrowingRuntimeExceptionAfterNestedChild() throws SystemException, NotSupportedException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
 		Transaction transaction = EasyMock.createMock(Transaction.class);
 		TransactionManager transactionManager = EasyMock.createStrictMock(TransactionManager.class);
