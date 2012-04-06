@@ -132,7 +132,6 @@ public class Event implements Indexed<Integer> {
 
 	public void setDuration(int duration) {
 		Preconditions.checkArgument(duration >= 0, "Duration must be a positive integer value");
-		Preconditions.checkState(allday == false, "Duration can't be set on an AllDay event");
 		this.duration = duration;
 	}
 
