@@ -106,7 +106,7 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 	}
 
 	private Date endTime(long startTime, int duration) {
-		if (duration > 0) {
+		if (duration >= 0) {
 			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 			c.setTimeInMillis(startTime);
 			c.add(Calendar.SECOND, duration);

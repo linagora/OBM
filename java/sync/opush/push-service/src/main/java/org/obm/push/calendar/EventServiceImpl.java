@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.calendar;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,10 +45,10 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.calendar.EventConverter;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
+import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -56,6 +56,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.client.login.LoginService;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
@@ -71,7 +72,7 @@ public class EventServiceImpl implements EventService {
 	private final LoginService loginService;
 
 	@Inject
-	protected EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter, 
+	@VisibleForTesting EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter, 
 			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory, LoginService loginService) {
 		super();
 		this.calendarDao = calendarDao;

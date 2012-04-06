@@ -277,7 +277,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(exception.getEndTime()).isEqualTo(date("2004-12-21T22:39:45Z"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void testExceptionWithNoDuration() throws ConversionException {
 		Event event = basicEvent();
 		EventRecurrence eventRecurrence = new EventRecurrence();
@@ -298,7 +298,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(exception.getCategories()).isNullOrEmpty();
 		assertThat(exception.getDescription()).isNull();
 		assertThat(exception.getDtStamp()).isNull();
-		assertThat(exception.getEndTime()).isEqualTo(date("2004-12-21T22:39:45Z"));
+		assertThat(exception.getEndTime()).isEqualTo(date("2004-12-21T21:39:45Z"));
 	}
 	
 	@Test
