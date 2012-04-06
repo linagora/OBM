@@ -53,6 +53,13 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	
 	private final static String EXTERNAL_URL_KEY = "external-url";
 	
+	private static final String DB_TYPE_KEY = "dbtype";
+	private static final String DB_HOST_KEY = "host";
+	private static final String DB_NAME_KEY = "db";
+	private static final String DB_USER_KEY = "user";
+	private static final String DB_PASSWORD_KEY = "password";
+	private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
+
 	private final static String LOCATOR_PORT = "8084";
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
@@ -71,7 +78,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	@Override
 	public String getLocatorUrl() throws ConfigurationException {
-		String locatorHost = getStringValue("host");
+		String locatorHost = getStringValue(DB_HOST_KEY);
 		if (locatorHost == null) {
 			throw new ConfigurationException(
 					"Missing host key in configuration");
@@ -145,6 +152,36 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	private String getExternalUrl() {
 		return getStringValue(EXTERNAL_URL_KEY);
+	}
+
+	@Override
+	public Integer getDataBaseMaxConnectionPoolSize() {
+		return getIntValue(DB_MAX_POOL_SIZE_KEY, 10);
+	}
+
+	@Override
+	public DatabaseSystem getDataBaseSystem() {
+		return DatabaseSystem.valueOf(getStringValue(DB_TYPE_KEY).trim());
+	}
+
+	@Override
+	public String getDataBaseName() {
+		return getStringValue(DB_NAME_KEY);
+	}
+
+	@Override
+	public String getDataBaseHost() {
+		return getStringValue(DB_HOST_KEY);
+	}
+
+	@Override
+	public String getDatabaseLogin() {
+		return getStringValue(DB_USER_KEY);
+	}
+
+	@Override
+	public String getDatabasePassword() {
+		return getStringValue(DB_PASSWORD_KEY);
 	}
 	
 }

@@ -38,7 +38,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -52,7 +52,7 @@ import com.google.inject.Singleton;
 public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTrackingDao {
 	
 	@Inject
-	private ItemTrackingDaoJdbcImpl(IDBCP dbcp) {
+	private ItemTrackingDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 	

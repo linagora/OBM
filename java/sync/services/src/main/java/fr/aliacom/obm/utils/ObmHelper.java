@@ -37,8 +37,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
-import org.obm.dbcp.IDBCP;
-import org.obm.sync.base.ObmDbType;
+import org.obm.configuration.DatabaseSystem;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,14 +55,14 @@ public class ObmHelper {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
 
-	private ObmDbType type = ObmDbType.PGSQL;
+	private DatabaseSystem type = DatabaseSystem.PGSQL;
 
-	private final IDBCP dbcp;
+	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
-	private ObmHelper(ObmSyncConfigurationService configuration, IDBCP dbcp) {
+	private ObmHelper(ObmSyncConfigurationService configuration, DatabaseConnectionProvider dbcp) {
 		this.dbcp = dbcp;
-		type = configuration.getDbType();
+		type = configuration.getDataBaseSystem();
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class ObmHelper {
 		ResultSet rs = null;
 		try {
 			st = con.createStatement();
-			if (type == ObmDbType.PGSQL) {
+			if (type == DatabaseSystem.PGSQL) {
 				rs = st.executeQuery("SELECT lastval()");
 			} else {
 				rs = st.executeQuery("SELECT last_insert_id()");
@@ -202,7 +202,7 @@ public class ObmHelper {
 		}
 	}
 
-	public ObmDbType getType() {
+	public DatabaseSystem getType() {
 		return type;
 	}
 }

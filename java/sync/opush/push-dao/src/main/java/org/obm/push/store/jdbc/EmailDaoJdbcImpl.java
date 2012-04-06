@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.dbcp.IDBCP;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -62,7 +62,7 @@ import com.google.inject.Singleton;
 public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 
 	@Inject
-	private EmailDaoJdbcImpl(IDBCP dbcp) {
+	private EmailDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 	

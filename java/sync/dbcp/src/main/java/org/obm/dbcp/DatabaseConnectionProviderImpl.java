@@ -29,7 +29,6 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.dbcp;
 
 import java.sql.Connection;
@@ -40,7 +39,8 @@ import java.sql.Statement;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.dbcp.impl.ObmConfIni;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DatabaseSystem;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 import org.obm.dbcp.jdbc.MySqlJDBCDriver;
 import org.obm.dbcp.jdbc.PgSqlJDBCDriver;
@@ -48,61 +48,62 @@ import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class DBCP implements IDBCP{
+public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final ITransactionAttributeBinder transactionAttributeBinder;
-	
+
 	private DBConnectionPool ds;
 	private IJDBCDriver cf;
 
 	private String lastInsertIdQuery;
 
-	private String dbType;
+	private DatabaseSystem system;
 	private String login;
 	private String password;
-	private String dbHost;
-	private String dbName;
+	private String host;
+	private String name;
+	private Integer maxPoolSize;
 
 	@Inject
-	public DBCP(final ITransactionAttributeBinder transactionAttributeBinder) {
+	public DatabaseConnectionProviderImpl(
+			ITransactionAttributeBinder transactionAttributeBinder,
+			ConfigurationService configuration) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
+		login = configuration.getDatabaseLogin();
+		password = configuration.getDatabasePassword();
+		host = configuration.getDataBaseHost();
+		name = configuration.getDataBaseName();
+		system = configuration.getDataBaseSystem();
+		maxPoolSize = configuration.getDataBaseMaxConnectionPoolSize();
+		logger.info("Database system is " + system);
 		logger.info("Starting OBM connection pool...");
-		readObmConfIni();
 		createDataSource();
 	}
-	
-	private void readObmConfIni() {
-		ObmConfIni oci = new ObmConfIni();
-		dbType = oci.getDbType();
-		login = oci.getLogin();
-		password = oci.getPassword();
-		dbHost = oci.getDbHost();
-		dbName = oci.getDbName();
-		logger.info("dbtype from obm_conf.ini is " + dbType);
-	}
+
 
 	private void createDataSource() {
 		try {
-			cf = buildJDBCConnectionFactory(dbType);
-			ds = new DBConnectionPool(cf, dbHost, dbName, login, password);
+			cf = buildJDBCConnectionFactory(system);
+			ds = new DBConnectionPool(cf, host, name, login, password, maxPoolSize);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		}
 	}
 
-	private IJDBCDriver buildJDBCConnectionFactory(String dbType)
+	private IJDBCDriver buildJDBCConnectionFactory(DatabaseSystem dbType)
 			throws Exception {
 		IJDBCDriver cf = null;
-		if (dbType.equalsIgnoreCase("PGSQL")) {
+		if (dbType.equals(DatabaseSystem.PGSQL)) {
 			cf = new PgSqlJDBCDriver();
 		}
-		if (dbType.equalsIgnoreCase("MYSQL")) {
+		if (dbType.equals(DatabaseSystem.MYSQL)) {
 			cf = new MySqlJDBCDriver();
 		}
 		if (cf == null) {
@@ -137,7 +138,7 @@ public class DBCP implements IDBCP{
 		return connection;
 	}
 
-	private void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
+	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
 		if(cf.readOnlySupported()){
 			try {
 				boolean isReadOnlyTransaction = isReadOnlyTransaction();
@@ -151,9 +152,13 @@ public class DBCP implements IDBCP{
 		}
 	}
 
-	private boolean isReadOnlyTransaction() throws TransactionException {
-			Transactional transactional = transactionAttributeBinder.getTransactionalInCurrentTransaction();
-			return transactional.readOnly();
+	@VisibleForTesting boolean isReadOnlyTransaction() throws TransactionException {
+		Transactional transactional = transactionAttributeBinder.getTransactionalInCurrentTransaction();
+		return transactional.readOnly();
 	}
-	
+
+	public void cleanup() {
+	    ds.cleanup();
+	}
+
 }
