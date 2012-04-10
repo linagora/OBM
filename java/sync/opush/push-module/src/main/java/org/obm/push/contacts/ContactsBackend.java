@@ -179,12 +179,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private String getParentId(BackendSession bs, Folder folder) throws DaoException {
-		if (isDefaultFolder(folder.getName())) {
-			return contactConfiguration.getDefaultParentId(); 
-		} else {
+		String defaultParentId = contactConfiguration.getDefaultParentId();
+		if (!isDefaultFolder(folder.getName())) {
 			String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
-			return getServerIdFromCollectionPath(bs, collectionPath);
+			String parentId = getServerIdFromCollectionPath(bs, collectionPath);
+			if (parentId != null) {
+				return parentId;
+			}
 		}
+		return defaultParentId;
 	}
 	
 	private FolderType getItemType(Folder folder) {
