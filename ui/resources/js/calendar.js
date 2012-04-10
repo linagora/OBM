@@ -2200,7 +2200,6 @@ Obm.CalendarDecisionPopup = new Class({
 	},
 	updateDecision: function(){
 		this.comment = this.textarea[0].value;
-        this.force = this.check_force.getProperty('checked') ? true : '';
 		var self = this;
 		new Request.JSON({
 			url: obm.vars.consts.calendarUrl,
@@ -2210,10 +2209,16 @@ Obm.CalendarDecisionPopup = new Class({
 					showMessage('ok', message.message);
 					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
 				}else{
-					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
+					var redirectUrl = message.redirectUrl;
+					if (redirectUrl != null) {
+						window.location=redirectUrl;
+					}
+					else {
+						window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
+					}
 				}
 			}
-		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, force:this.force});
+		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
 	},
 	displayCharLimit: function(){
 		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;

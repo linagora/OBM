@@ -698,6 +698,19 @@ if ($action == 'search') {
   }
   catch (ConflictException $ex) {
     json_error_msg("$l_event : $l_conflicts");
+    
+    $obm_q = run_query_calendar_detail($params['calendar_id']);
+    $begin = new Of_Date($obm_q->f('event_date'), 'GMT');
+    $end = clone $begin;
+    $end->addSecond($obm_q->f('event_duration'));
+    $date_begin = $begin->getURL();
+    $date_end = $end->getURL();
+    $time_end = $end->getHour();
+    $min_end = $end->getMinute();
+    
+    $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id']."&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".$date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".$params['decision_event'];
+    echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
+    exit();
   }
   catch (Exception $ex) {
     json_error_msg("$l_event : $err[msg]");
