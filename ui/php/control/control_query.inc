@@ -59,23 +59,23 @@ function get_control_user_infos($domain_id='') {
   }
 
   // get # users
-  $query = "SELECT count(*) FROM P_UserObm WHERE 1=1 $where_domain";
+  $query = "SELECT count(*) AS nb FROM P_UserObm WHERE 1=1 $where_domain";
 
   display_debug_msg($query, $cdg_sql, 'get_control_user_infos(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $r['nb'] = $obm_q->f('count(*)');
+  $r['nb'] = $obm_q->f('nb');
 
   // get # archive users
-  $query = "SELECT count(*) FROM P_UserObm
+  $query = "SELECT count(*) AS nb FROM P_UserObm
     WHERE userobm_archive=1
       $where_domain";
 
   display_debug_msg($query, $cdg_sql, 'get_control_user_infos(2)');
   $obm_q->query($query);
   $obm_q->next_record();
-  $r['nb_archive'] = $obm_q->f('count(*)');
+  $r['nb_archive'] = $obm_q->f('nb');
 
   return $r;
 }
@@ -101,23 +101,23 @@ function get_control_group_infos($domain_id='') {
 
   // get # groups
 
-  $query = "SELECT count(*) FROM P_UGroup WHERE 1=1 $where_domain";
+  $query = "SELECT count(*) AS nb FROM P_UGroup WHERE 1=1 $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_control_group_infos(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $r['nb_public'] = $obm_q->f('count(*)');
+  $r['nb_public'] = $obm_q->f('nb');
 
   // get # private groups
 
-  $query = "SELECT count(*) FROM UGroup
+  $query = "SELECT count(*) AS nb FROM UGroup
     WHERE group_privacy = 1
       $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_control_group_infos(2)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $r['nb_private'] = $obm_q->f('count(*)');
+  $r['nb_private'] = $obm_q->f('nb');
 
   return $r;
 }
@@ -141,13 +141,13 @@ function get_control_mailshare_infos($domain_id='') {
     $where_domain = "WHERE mailshare_domain_id $domain_id"; 
   }
 
-  $query = "SELECT count(*) FROM P_MailShare $where_domain";
+  $query = "SELECT count(*) AS nb FROM P_MailShare $where_domain";
 
   display_debug_msg($query, $cdg_sql, 'get_control_mailshare_infos()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $nb = $obm_q->f('count(*)');
+  $nb = $obm_q->f('nb');
 
   return $nb;
 }
