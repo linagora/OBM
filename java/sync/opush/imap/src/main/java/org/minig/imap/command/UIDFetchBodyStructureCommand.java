@@ -57,7 +57,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "FETCH " + MessageSet.asString(uids) + " (UID BODYSTRUCTURE)";
+		String cmd = "UID FETCH " + MessageSet.asString(uids) + " (UID BODYSTRUCTURE)";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
