@@ -38,6 +38,7 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class IndexUtilsTest {
 
@@ -66,6 +67,14 @@ public class IndexUtilsTest {
 	public void testNullList() {
 		@SuppressWarnings("unused")
 		ArrayList<Integer> listIndexes = IndexUtils.listIndexes((List<Indexed<Integer>>)null);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testNullElementInList() {
+		List<IntIndexed> list = Lists.newArrayList();
+		list.add(null);
+		@SuppressWarnings("unused")
+		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(list);
 	}
 
 	@Test

@@ -285,7 +285,7 @@ public class ContactDao {
 		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
 		HashMap<EventObmId, Contact> eventIdMap = new HashMap<EventObmId, Contact>();
 		for (Contact c : entityContact.values()) {
-			if (c.getBirthdayId() != null) {
+			if (c.getAnniversaryId() != null) {
 				bdayIds.add(c.getAnniversaryId());
 				eventIdMap.put(c.getAnniversaryId(), c);
 			}
