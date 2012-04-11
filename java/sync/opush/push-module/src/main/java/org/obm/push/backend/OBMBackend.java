@@ -172,6 +172,10 @@ public class OBMBackend implements IBackend {
 		final BackendSession backendSession = collectionChangeListener.getSession();
 		
 		for (SyncCollection syncCollection: collectionChangeListener.getMonitoredCollections()) {
+
+			if (!syncCollection.hasSyncState()) {
+				syncCollection.newSyncSate();
+			}
 			
 			int count = getItemEstimateSize(backendSession, syncCollection);
 			if (count > 0) {

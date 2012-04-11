@@ -160,12 +160,17 @@ public class PingHandler extends WbxmlRequestHandler implements
 
 	private void loadSyncKeys(BackendSession bs, Set<SyncCollection> syncCollections) 
 			throws CollectionNotFoundException, DaoException, CollectionPathException {
+		
 		for (SyncCollection collection: syncCollections) {
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
 			collection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath));
 			SyncState lastKnownState = stMachine.lastKnownState(bs.getDevice(), collection.getCollectionId());
-			collection.setSyncState(lastKnownState);
+			if (lastKnownState != null) {
+				collection.setSyncState(lastKnownState);
+			} else {
+				collection.newSyncSate();
+			}
 		}
 	}
 
@@ -227,7 +232,8 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
-			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, 
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();

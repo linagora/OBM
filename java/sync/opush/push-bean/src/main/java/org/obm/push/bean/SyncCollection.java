@@ -168,6 +168,14 @@ public class SyncCollection implements Serializable {
 		this.options = options;
 	}
 
+	public boolean hasSyncState() {
+		return syncState != null;
+	}
+	
+	public void newSyncSate() {
+		this.syncState = new SyncState(this.getSyncKey());
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(syncState, fetchIds, dataClass, collectionId, collectionPath, 
