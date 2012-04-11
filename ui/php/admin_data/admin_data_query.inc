@@ -432,7 +432,7 @@ function update_admin_data_sound_aka_one_contact($id, $aka, $sound) {
   global $cdg_sql;
   $u_q = new DB_OBM;
 
-  $aka_s = $u_q->($aka);
+  $aka_s = $u_q->escape($aka);
   $id = sql_parse_id( $id, true);
   $query = "UPDATE Contact SET
       contact_aka='$aka_s',
