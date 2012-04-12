@@ -3602,7 +3602,9 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
 
   $event = OBM_EventFactory::getInstance()->getById($event_id);
 
-  // we prepare the ICS file bc we can't create it once the event is deleted from the database...
+  // First increment the sequence then
+  // prepare the ICS file bc we can't create it once the event is deleted from the database...
+  run_query_increment_sequence($event->uid);
   $icsFile = $event->getIcs($GLOBALS['obm']['uid'],"cancel",false);
 
   // If connectors in use
