@@ -163,8 +163,8 @@ class DB_Sql {
     return pg_query($this->Link_ID, "commit");
   }
 
-    function escape($string) {
-      if (get_magic_quotes_gpc())
+    function escape($string, $force = false) {
+      if (!force && get_magic_quotes_gpc())
         return $string;
       else                                                                    
         return pg_escape_string($string);                                            
