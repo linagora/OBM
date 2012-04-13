@@ -1137,7 +1137,7 @@ function run_query_user_update($u_id, $user) {
     userobm_fax2 = '".$obm_q->escape($fax2)."',
     userobm_company = '".$obm_q->escape($company)."',
     userobm_direction = '".$obm_q->escape($direction)."',
-    userobm_service = '".$obm_q->escape($servic)."e',
+    userobm_service = '".$obm_q->escape($service)."',
     userobm_address1 = '".$obm_q->escape($ad1)."',
     userobm_address2 = '".$obm_q->escape($ad2)."',
     userobm_address3 = '".$obm_q->escape($ad3)."',
