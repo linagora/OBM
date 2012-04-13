@@ -821,7 +821,7 @@ function run_query_contact_coords_update($id, $contact,$contactId=NULL) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".$obm_q->escape(trim($email['address']))."', '".$obm_q->escape().";X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".$obm_q->escape(trim($email['address']))."', '".$obm_q->escape($email['label']).";X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);
       }
