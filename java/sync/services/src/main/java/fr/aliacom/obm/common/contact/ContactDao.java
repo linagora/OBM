@@ -924,6 +924,39 @@ public class ContactDao {
 		}
 	}
 
+	public Integer findAttendeeContactEntityIdFrom(String contactEmail, Event event) throws SQLException {
+		String q = "SELECT contactentity_entity_id "
+				+ "FROM Contact "
+				+ "JOIN ContactEntity ON contactentity_contact_id = contact_id "
+				+ "JOIN EventLink ON eventlink_entity_id = contactentity_entity_id "
+				+ "JOIN Email ON email_entity_id = contactentity_entity_id "
+				+ "WHERE email_address = ? "
+				+ "AND eventlink_event_id = ? "
+				+ "AND contact_archive != 1";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(q);
+
+			int idx = 1;
+			ps.setString(idx++, contactEmail);
+			ps.setInt(idx++, event.getObmId().getObmId());
+			rs = ps.executeQuery();
+
+			Integer contactId = null;
+			if (rs.next()) {
+				contactId = rs.getInt(1);
+			}
+			return contactId;
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+	}
+
 	/**
 	 * bulk loads all emails of the given entities (contacts)
 	 */

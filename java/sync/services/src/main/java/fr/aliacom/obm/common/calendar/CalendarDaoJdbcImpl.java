@@ -1947,23 +1947,33 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ImmutableSet.copyOf(attendees);
 	}
 
-	private Integer getUserEntityOrContactEntity(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
-		Integer userEntity  = userDao.userEntityIdFromEmail(con,
-				email, editor.getDomain().getId());
-		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
-			userEntity = null;
-			logger.info("user with email " + email
-					+ " not found. Checking contacts.");
-		}
+	private Integer getUserEntityOrContactEntity(AccessToken token, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
+		Integer userEntity = getUserEntityIdFromEmail(token, con, userEntityCalendar, email, useObmUser);
 		if (userEntity == null) {
-			userEntity = userDao.contactEntityFromEmailQuery(con,
-					email);
+			userEntity = userDao.contactEntityFromEmailQuery(con, email);
 		}
 		return userEntity;
 	}
 
-	private void updateAttendees(AccessToken updater, Connection con, String calendar, Event ev,
-			Boolean useObmUser) throws SQLException, ServerFault {
+	private Integer getAttendeeEntityId(AccessToken token, Connection con, Event event, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
+		Integer userEntityId = getUserEntityIdFromEmail(token, con, userEntityCalendar, email, useObmUser);
+		if(userEntityId == null) {
+			return contactDao.findAttendeeContactEntityIdFrom(email, event);
+		} else {
+			return userEntityId;
+		}
+	}
+
+	private Integer getUserEntityIdFromEmail(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
+		Integer userEntity  = userDao.userEntityIdFromEmail(con, email, editor.getDomain().getId());
+		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
+			userEntity = null;
+			logger.info("user with email " + email + " not found. Checking contacts.");
+		}
+		return userEntity;
+	}
+
+	private void updateAttendees(AccessToken token, Connection con, String calendar, Event event, Boolean useObmUser) throws SQLException, ServerFault {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
 				+ "where eventlink_event_id=? AND "
 				+ "eventlink_entity_id IN "
@@ -1976,9 +1986,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(q);
-			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, updater.getDomain().getId());
-			for (Attendee at : ev.getAttendees()) {
-				Integer userEntity = getUserEntityOrContactEntity(updater, con, userEntityCalendar, at.getEmail(), useObmUser);
+			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, token.getDomain().getId());
+			for (Attendee at : event.getAttendees()) {
+				Integer userEntity = getAttendeeEntityId(token, con, event, userEntityCalendar, at.getEmail(), useObmUser);
 				if (userEntity == null) {
 					logger.info("skipping attendee update for email "
 							+ at.getEmail() + ". Will add as contact");
@@ -1991,9 +2001,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						at.getState().getJdbcObject(obmHelper.getType()));
 				ps.setObject(idx++,
 						at.getParticipationRole().getJdbcObject(obmHelper.getType()));
-				ps.setInt(idx++, updater.getObmId());
+				ps.setInt(idx++, token.getObmId());
 				ps.setInt(idx++, at.getPercent());
-				ps.setInt(idx++, ev.getObmId().getObmId());
+				ps.setInt(idx++, event.getObmId().getObmId());
 				ps.setInt(idx++, userEntity);
 				ps.setInt(idx++, userEntity);
 				ps.addBatch();
@@ -2012,35 +2022,35 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		
 		logger.info("event modification needs to add " + toInsert.size() + " attendees.");
-		insertAttendees(updater, calendar, ev, con, toInsert, useObmUser);
+		insertAttendees(token, calendar, event, con, toInsert, useObmUser);
 
 		Statement st = null;
 		try {
 			st = con.createStatement();
-			if (ev.getAlert() == null) {
+			if (event.getAlert() == null) {
 				st.executeUpdate("delete from EventAlert where eventalert_user_id="
-						+ updater.getObmId()
+						+ token.getObmId()
 						+ " AND eventalert_event_id="
-						+ ev.getObmId().getObmId());
+						+ event.getObmId().getObmId());
 			} else {
 				int upd = st
 						.executeUpdate("update EventAlert set eventalert_duration="
-								+ ev.getAlert()
+								+ event.getAlert()
 								+ ", eventalert_userupdate="
-								+ updater.getObmId()
+								+ token.getObmId()
 								+ " where eventalert_user_id="
-								+ updater.getObmId()
+								+ token.getObmId()
 								+ " AND eventalert_event_id="
-								+ ev.getObmId().getObmId());
+								+ event.getObmId().getObmId());
 				if (upd <= 0) {
 					st.executeUpdate("insert into EventAlert (eventalert_duration, eventalert_event_id, eventalert_usercreate, eventalert_user_id)"
 							+ " values ("
-							+ ev.getAlert()
+							+ event.getAlert()
 							+ ","
-							+ ev.getObmId().getObmId()
+							+ event.getObmId().getObmId()
 							+ ","
-							+ updater.getObmId()
-							+ "," + updater.getObmId() + " )");
+							+ token.getObmId()
+							+ "," + token.getObmId() + " )");
 				}
 			}
 		} finally {
