@@ -155,6 +155,52 @@ public class MSEventToObmEventConverterTest {
 		convertToOBMEvent(msEvent);
 	}
 
+	@Test(expected=ConversionException.class)
+	public void testConvertAttributeAllDayTrueNeedStartTime() throws ConversionException {
+	    MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(null)
+                .withEndTime(date("2004-12-12T11:15:10Z"))
+                .withAllDayEvent(true)
+                .build();
+
+	    convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=ConversionException.class)
+	public void testConvertAttributeAllDayNullNeedEndTime() throws ConversionException {
+	    MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(date("2004-12-12T11:15:10Z"))
+                .withEndTime(null)
+                .withAllDayEvent(null)
+                .build();
+
+	    convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected = ConversionException.class)
+	public void testConvertAttributeAllDayFalseNeedEndTime()
+            throws ConversionException {
+	    MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(date("2004-12-12T11:15:10Z"))
+                .withEndTime(null)
+                .withAllDayEvent(false)
+                .build();
+
+	    convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected = ConversionException.class)
+	public void testConvertAttributeAllDayTrueNeedEndTime()
+            throws ConversionException {
+	    MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(date("2004-12-12T11:15:10Z"))
+                .withEndTime(null)
+                .withAllDayEvent(true)
+                .build();
+
+	    convertToOBMEvent(msEvent);
+	}
+
 	@Test
 	public void testConvertAttributeBusyStatusFree() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
