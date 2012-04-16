@@ -514,6 +514,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
 				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(true)
 				.withExceptionStartTime(date("2004-10-11T11:15:10Z"))

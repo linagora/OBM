@@ -67,7 +67,6 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -77,7 +76,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverter {
 
-	private static final int EVENT_ALLDAY_DURATION_IN_MS = 24 * 3600;
 	private static final int EVENT_CATEGORIES_MAX = 300;
 	
 	@Override
@@ -695,23 +693,15 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private boolean isAllDayEvent(MSEventCommon msEvent) {
 		return Objects.firstNonNull(msEvent.getAllDayEvent(), false);
 	}
-
-	@VisibleForTesting int convertDuration(MSEventCommon data) throws ConversionException {
-		if (isAllDayEvent(data)) {
-			return EVENT_ALLDAY_DURATION_IN_MS;
-		} else {
-			return convertDurationAttributeByStartTime(data);
-		}
-	}
 	
-	private int convertDurationAttributeByStartTime(MSEventCommon data) throws ConversionException {
+	private int convertDuration(MSEventCommon data) throws ConversionException {
 		assertEventTimesValidity(data);
 		
 		int duration = (int) ((data.getEndTime().getTime() - data.getStartTime().getTime()) / 1000);
 		return duration;
 	}
 	
-	@VisibleForTesting void assertEventTimesValidity(MSEventCommon event) throws ConversionException {
+	private void assertEventTimesValidity(MSEventCommon event) throws ConversionException {
 		if (!eventHasStartTime(event)) {
 			throw new ConversionException("StartTime is required");
 		}

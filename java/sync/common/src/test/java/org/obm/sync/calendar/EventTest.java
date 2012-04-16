@@ -650,17 +650,110 @@ public class EventTest {
 		Event event = new Event();
 		event.setDuration(-10);
 	}
-	
+
+	@Test
+	public void testDurationIsValidForAllDayWhenOneDayInSeconds() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.durationIsValidForAllDay()).isTrue();
+	}
+
+	@Test
+	public void testDurationIsValidForAllDayWhenTwoDaysInSeconds() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY * 2);
+	    assertThat(event.durationIsValidForAllDay()).isTrue();
+	}
+
+	@Test
+	public void testDurationIsValidForAllDayWhenNotMultipleOfSecondsInADay() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY * 2 + 10);
+	    assertThat(event.durationIsValidForAllDay()).isFalse();
+	}
+
+	@Test
+	public void testDurationIsValidForAllDayWhenZero() {
+	    Event event = new Event();
+	    event.setDuration(0);
+	    assertThat(event.durationIsValidForAllDay()).isFalse();
+	}
+
+	@Test
+	public void testValidAllDayDurationWhenZero() {
+	    Event event = new Event();
+	    event.setDuration(10);
+	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	}
+
+	@Test
+	public void testValidAllDayDurationWhenAFewSeconds() {
+	    Event event = new Event();
+	    event.setDuration(10);
+	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	}
+
+	@Test
+	public void testValidAllDayDurationWhenOneDayAndAFewSeconds() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY + 10);
+	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY * 2);
+	}
+
+	@Test
+	public void testGetDurationAllDayWhenZero() {
+	    Event event = new Event();
+	    event.setDuration(0);
+	    event.setAllday(true);
+	    assertThat(event.getDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.isAllday()).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetDurationAllDayWhenAFewSeconds() {
+	    Event event = new Event();
+	    event.setDuration(10);
+	    event.setAllday(true);
+	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.isAllday()).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetDurationAllDayWhenOneDay() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY);
+	    event.setAllday(true);
+	    assertThat(event.getDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.isAllday()).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetDurationAllDayWhenOneDayAndAFewSeconds() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY + 10);
+	    event.setAllday(true);
+	    assertThat(event.getDuration()).isEqualTo(Event.SECONDS_IN_A_DAY * 2);
+	    assertThat(event.isAllday()).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetDurationAllDayWhenTwoDays() {
+	    Event event = new Event();
+	    event.setDuration(Event.SECONDS_IN_A_DAY * 2);
+	    event.setAllday(true);
+	    assertThat(event.getDuration()).isEqualTo(Event.SECONDS_IN_A_DAY * 2);
+	    assertThat(event.isAllday()).isEqualTo(true);
+	}
+
 	@Test
 	public void testDurationThenAllDay() {
-		Event event = new Event();
-		event.setDuration(10);
-		event.setAllday(true);
-		int secondsInADay = 3600*24;
-		assertThat(event.getDuration()).isEqualTo(secondsInADay);
-		assertThat(event.isAllday()).isEqualTo(true);
+	    Event event = new Event();
+	    event.setDuration(10);
+	    event.setAllday(true);
+	    assertThat(event.getDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.isAllday()).isEqualTo(true);
 	}
-	
+
 	@Ignore("We don't have anyway to enforce this without a complete rework of DB schema")
 	@Test(expected=IllegalStateException.class)
 	public void testAllDayThenDuration() {

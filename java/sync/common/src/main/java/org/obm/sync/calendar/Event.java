@@ -44,6 +44,7 @@ import java.util.Set;
 import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -121,11 +122,25 @@ public class Event implements Indexed<Integer> {
 	}
 
 	/**
+	 * @return true if duration is different from zero and is a multiple of SECONDS_IN_A_DAY
+	 */
+	@VisibleForTesting boolean durationIsValidForAllDay() {
+	    return duration != 0 && (duration % SECONDS_IN_A_DAY == 0);
+	}
+
+	/**
+	 * @return duration in seconds rounded up to the nearest multiple of SECONDS_IN_A_DAY if necessary.
+	 */
+	@VisibleForTesting int validAllDayDuration() {
+	    return (duration / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY + SECONDS_IN_A_DAY;
+	}
+
+	/**
 	 * @return duration in second
 	 */
 	public int getDuration() {
-		if (allday) {
-			return SECONDS_IN_A_DAY;
+		if (allday && !durationIsValidForAllDay()) {
+			return validAllDayDuration();
 		}
 		return duration;
 	}

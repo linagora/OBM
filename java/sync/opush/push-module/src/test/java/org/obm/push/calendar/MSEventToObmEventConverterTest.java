@@ -201,6 +201,66 @@ public class MSEventToObmEventConverterTest {
 	    convertToOBMEvent(msEvent);
 	}
 
+    @Test
+    public void testConvertAttributeAllDayFalseOneHourDuration()
+            throws ConversionException {
+
+        Date startTime = date("2004-12-12T11:15:10Z");
+
+        Date endTime = new Date(startTime.getTime() + 3600 * 1000);
+
+        MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(startTime)
+                .withEndTime(endTime)
+                .withSubject("Any Subject")
+                .withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+                .withAllDayEvent(false)
+                .build();
+
+        Event convertedEvent = convertToOBMEvent(msEvent);
+        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(3600);
+    }
+
+    @Test
+    public void testConvertAttributeAllDayTrueOneDayDuration()
+            throws ConversionException {
+
+        Date startTime = date("2004-12-12T11:15:10Z");
+
+        Date endTime = new Date(startTime.getTime() + Event.SECONDS_IN_A_DAY * 1000);
+
+        MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(startTime)
+                .withEndTime(endTime)
+                .withSubject("Any Subject")
+                .withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+                .withAllDayEvent(true)
+                .build();
+
+        Event convertedEvent = convertToOBMEvent(msEvent);
+        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+    }
+
+    @Test
+    public void testConvertAttributeAllDayTrueTwoDaysDuration()
+            throws ConversionException {
+
+        Date startTime = date("2004-12-12T11:15:10Z");
+
+        Date endTime = new Date(startTime.getTime() + Event.SECONDS_IN_A_DAY * 2 * 1000);
+
+        MSEvent msEvent = new MSEventBuilder()
+                .withStartTime(startTime)
+                .withEndTime(endTime)
+                .withSubject("Any Subject")
+                .withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+                .withAllDayEvent(true)
+                .build();
+
+        Event convertedEvent = convertToOBMEvent(msEvent);
+        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond() * 2));
+    }
+
 	@Test
 	public void testConvertAttributeBusyStatusFree() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
@@ -928,7 +988,7 @@ public class MSEventToObmEventConverterTest {
 		MSEvent msEvent = new MSEventBuilder()
 				.withSubject("Any Subject")
 				.withStartTime(date("2004-12-11T11:15:10Z"))
-				.withEndTime(date("2005-12-11T12:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
 				.withAllDayEvent(true)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
@@ -939,13 +999,14 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(converted.isAllday()).isTrue();
 		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
 		Assertions.assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
-		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneDayInSecond());
+		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 
 	@Test
 	public void testCalculatedAttributeDurationByAllDayOnly() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withAllDayEvent(true)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
