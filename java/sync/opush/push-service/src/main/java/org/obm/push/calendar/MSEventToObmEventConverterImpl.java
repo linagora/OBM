@@ -67,6 +67,7 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -695,7 +696,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return Objects.firstNonNull(msEvent.getAllDayEvent(), false);
 	}
 
-	private int convertDuration(MSEventCommon data) throws ConversionException {
+	@VisibleForTesting int convertDuration(MSEventCommon data) throws ConversionException {
 		if (isAllDayEvent(data)) {
 			return EVENT_ALLDAY_DURATION_IN_MS;
 		} else {
@@ -710,11 +711,12 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return duration;
 	}
 	
-	private void assertEventTimesValidity(MSEventCommon event) throws ConversionException {
+	@VisibleForTesting void assertEventTimesValidity(MSEventCommon event) throws ConversionException {
 		if (!eventHasStartTime(event)) {
 			throw new ConversionException("StartTime is required");
-		} else if (!isAllDayEvent(event) && !eventHasEndTime(event)) {
-			throw new ConversionException("If not AllDayEvent then EndTime is required");
+		}
+		if (!eventHasEndTime(event)) {
+			throw new ConversionException("EndTime is required");
 		}
 	}
 
