@@ -87,6 +87,7 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.service.EventService;
@@ -562,7 +563,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress)
+	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, MimeAddress mimePartAddress)
 			throws MailException {
 		
 		ImapStore store = null;

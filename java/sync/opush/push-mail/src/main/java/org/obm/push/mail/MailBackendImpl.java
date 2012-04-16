@@ -638,7 +638,7 @@ public class MailBackendImpl implements MailBackend {
 						.parseInt(collectionId));
 				InputStream is = mailboxService.findAttachment(bs,
 						collectionName, Long.parseLong(messageId),
-						mimePartAddress);
+						new MimeAddress(mimePartAddress));
 
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				FileUtils.transfer(is, out, true);

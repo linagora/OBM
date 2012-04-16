@@ -35,6 +35,8 @@ package org.minig.imap.mime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obm.push.mail.MimeAddress;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;

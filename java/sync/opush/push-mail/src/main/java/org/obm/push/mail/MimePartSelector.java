@@ -51,7 +51,7 @@ public class MimePartSelector {
 					.add(new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML)
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build()).build(); 
 	
-	FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		if (bodyPreferences.isEmpty()) {
 			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		} else {

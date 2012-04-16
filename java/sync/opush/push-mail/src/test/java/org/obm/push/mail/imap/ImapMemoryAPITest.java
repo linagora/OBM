@@ -63,6 +63,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailTestsUtils;
+import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -179,7 +180,7 @@ public class ImapMemoryAPITest {
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
 		ImapStore client = loggedClient();
 		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		return folder.uidFetchPart(uid, partToFetch);
+		return folder.uidFetchPart(uid, new MimeAddress(partToFetch));
 	}
 	
 	private ImapStore loggedClient() throws Exception {

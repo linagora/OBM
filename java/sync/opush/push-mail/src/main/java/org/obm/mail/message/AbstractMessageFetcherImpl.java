@@ -42,9 +42,9 @@ import org.apache.james.mime4j.codec.Base64InputStream;
 import org.minig.imap.IMAPHeaders;
 import org.minig.imap.command.parser.HeadersParser;
 import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeAddress;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.conversation.MailMessage;
+import org.obm.push.mail.MimeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

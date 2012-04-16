@@ -58,6 +58,7 @@ import org.minig.imap.SearchQuery;
 import org.obm.push.bean.EmailHeader;
 import org.obm.push.bean.EmailHeaders;
 import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
 
@@ -180,7 +181,7 @@ public class OpushImapFolder {
 		return peekAtMessageStream(messageUid);
 	}
 
-	public InputStream uidFetchPart(long messageUid, String mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
+	public InputStream uidFetchPart(long messageUid, MimeAddress mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
 		return peekAtMessageStream(messageUid, mimePartAddress);
 	}
 
@@ -188,7 +189,7 @@ public class OpushImapFolder {
 		return peekAtMessageStream(messageUid, null);
 	}
 
-	private InputStream peekAtMessageStream(long messageUid, String mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
+	private InputStream peekAtMessageStream(long messageUid, MimeAddress mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
 		int noMaxByteCount = -1;
 		boolean usePeek = true;
 		IMAPMessage messageToFetch = getMessageByUID(messageUid);
@@ -196,7 +197,7 @@ public class OpushImapFolder {
 	}
 
 	public InputStream getMessageInputStream(long messageUID) throws MessagingException, ImapMessageNotFoundException {
-		return peekAtMessageStream(messageUID, null);
+		return peekAtMessageStream(messageUID, new MimeAddress(null));
 	}
 	
 	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {

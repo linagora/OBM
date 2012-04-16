@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.ContentType;
+import org.obm.push.mail.MimeAddress;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -59,6 +60,7 @@ public class BeansTest {
 					.add(FastFetch.class)
 					.add(ContentType.class)
 					.add(BodyParam.class)
+					.add(MimeAddress.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

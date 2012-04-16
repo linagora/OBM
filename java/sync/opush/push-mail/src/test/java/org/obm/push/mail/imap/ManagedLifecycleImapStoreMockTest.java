@@ -49,6 +49,7 @@ import javax.mail.MessagingException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.mail.MimeAddress;
 
 import com.google.inject.Provider;
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -95,7 +96,7 @@ public class ManagedLifecycleImapStoreMockTest {
 		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
 
 		long anyMessageUID = 1l;
-		String anyMimePartAddress = "1.2.1";
+		MimeAddress anyMimePartAddress = new MimeAddress("1.2.1");
 		imapFolder.uidFetchPart(anyMessageUID, anyMimePartAddress);
 		
 		EasyMock.verify(imapStoreManagerMock);

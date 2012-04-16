@@ -33,6 +33,8 @@ package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 
+import org.obm.push.mail.MimeAddress;
+
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
@@ -42,9 +44,17 @@ public class MessageInputStreamProviderImpl implements MessageInputStreamProvide
 
 	@Override
 	public InputStream createMessageInputStream(IMAPMessage messageToFetch,
-			String mimePartAddress, int noMaxByteCount, boolean usePeek) {
+			MimeAddress mimePartAddress, int noMaxByteCount, boolean usePeek) {
 
-		return new IMAPInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+		return new IMAPInputStream(messageToFetch, address(mimePartAddress), noMaxByteCount, usePeek);
+	}
+	
+	private String address(MimeAddress mimeAddress) {
+		if (mimeAddress != null) {
+			return mimeAddress.getAddress();
+		} else {
+			return null;
+		}
 	}
 
 }

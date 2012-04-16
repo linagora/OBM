@@ -52,6 +52,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.ImapStore;
@@ -265,7 +266,7 @@ public class UIDFetchPartTest {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
 		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
-		InputStream attachment = mailboxService.findAttachment(bs, inbox, sentEmail.getUid(), "3");
+		InputStream attachment = mailboxService.findAttachment(bs, inbox, sentEmail.getUid(), new MimeAddress("3"));
 		
 		Assertions.assertThat(attachment).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
 	}
@@ -273,7 +274,7 @@ public class UIDFetchPartTest {
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
 		ImapStore client = loggedClient();
 		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		return folder.uidFetchPart(uid, partToFetch);
+		return folder.uidFetchPart(uid, new MimeAddress(partToFetch));
 	}
 	
 	private ImapStore loggedClient() throws Exception {

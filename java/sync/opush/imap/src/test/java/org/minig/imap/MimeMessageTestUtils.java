@@ -36,7 +36,7 @@ import java.util.Iterator;
 
 import org.junit.Assert;
 import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeAddress;
+import org.obm.push.mail.MimeAddress;
 
 public class MimeMessageTestUtils {
 

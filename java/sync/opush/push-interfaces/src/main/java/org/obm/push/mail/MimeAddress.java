@@ -29,25 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap.mime;
+package org.obm.push.mail;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.base.Objects;
 
 public class MimeAddress {
 
-	private String addr;
+	private final String address;
 	private transient Integer nestLevel;
 	
-	public MimeAddress(String addr) {
-		this.addr = addr;
-	}
-	
-	@Override
-	public String toString() {
-		return addr;
+	public MimeAddress(String address) {
+		this.address = address;
 	}
 	
 	public int compareNestLevel(MimeAddress rhs) {
@@ -59,57 +55,54 @@ public class MimeAddress {
 
 	public int countNestLevel() {
 		if (nestLevel == null) {
-			nestLevel = Iterables.size(Splitter.on(".").split(addr));
+			nestLevel = Iterables.size(Splitter.on(".").split(address));
 		}
 		return nestLevel;
 	}
 
 	public static MimeAddress concat(MimeAddress firstPart,	Integer secondPart) {
-		String firstPartAsString = null;
+		String firstPartAddress = null;
 		if (firstPart != null) {
-			firstPartAsString = firstPart.toString();
+			firstPartAddress = firstPart.getAddress();
 		}
 		String secondPartAsString = null;
 		if (secondPart != null) {
 			secondPartAsString = String.valueOf(secondPart);
 		}
 		return new MimeAddress(Joiner.on(".").skipNulls().join(
-				Strings.emptyToNull(firstPartAsString), secondPartAsString));
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((addr == null) ? 0 : addr.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MimeAddress other = (MimeAddress) obj;
-		if (addr == null) {
-			if (other.addr != null)
-				return false;
-		} else if (!addr.equals(other.addr))
-			return false;
-		return true;
+				Strings.emptyToNull(firstPartAddress), secondPartAsString));
 	}
 
 	public int getLastIndex() {
-		String lastIdx = Iterables.getLast(Splitter.on('.').split(addr));
+		String lastIdx = Iterables.getLast(Splitter.on('.').split(address));
 		if (Strings.isNullOrEmpty(lastIdx)) {
 			return -1;
 		}
 		return Integer.valueOf(lastIdx);
 	}
+
+	public String getAddress() {
+		return address;
+	}
 	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(address);
+	}
 	
-	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MimeAddress) {
+			MimeAddress that = (MimeAddress) object;
+			return Objects.equal(this.address, that.address);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("address", address)
+			.toString();
+	}
 }

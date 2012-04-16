@@ -38,7 +38,7 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeAddress;
+import org.obm.push.mail.MimeAddress;
 
 public class LeafPartsFinder {
 

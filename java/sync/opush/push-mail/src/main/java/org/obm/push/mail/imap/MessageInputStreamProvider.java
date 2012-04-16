@@ -33,10 +33,12 @@ package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 
+import org.obm.push.mail.MimeAddress;
+
 import com.sun.mail.imap.IMAPMessage;
 
 public interface MessageInputStreamProvider {
 	
-	InputStream createMessageInputStream(IMAPMessage messageToFetch, String mimePartAddress, int noMaxByteCount, boolean usePeek); 
+	InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, int noMaxByteCount, boolean usePeek); 
 	
 }

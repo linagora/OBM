@@ -33,6 +33,8 @@ package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 
+import org.obm.push.mail.MimeAddress;
+
 import com.sun.mail.imap.IMAPMessage;
 
 public class ImapStoreMessageInputStreamProvider implements MessageInputStreamProvider {
@@ -48,7 +50,7 @@ public class ImapStoreMessageInputStreamProvider implements MessageInputStreamPr
 	
 	@Override
 	public InputStream createMessageInputStream(IMAPMessage messageToFetch,
-			String mimePartAddress, int noMaxByteCount, boolean usePeek) {
+			MimeAddress mimePartAddress, int noMaxByteCount, boolean usePeek) {
 		
 		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(
 				messageToFetch, mimePartAddress, noMaxByteCount, usePeek);

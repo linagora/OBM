@@ -69,7 +69,7 @@ public interface MailboxService {
 	void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;
 
-	InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, String mimePartAddress) throws MailException;
+	InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 
 	Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 

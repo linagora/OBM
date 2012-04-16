@@ -89,6 +89,11 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-interfaces</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>
