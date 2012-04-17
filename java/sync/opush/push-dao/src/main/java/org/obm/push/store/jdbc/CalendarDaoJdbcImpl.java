@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao {
 
 	@Inject
-	private CalendarDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	private CalendarDaoJdbcImpl(IDBCP dbcp) {
 		super(dbcp);
 	}
 	

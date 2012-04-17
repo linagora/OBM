@@ -34,14 +34,14 @@ package org.obm.sync.calendar;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
-import org.obm.configuration.DatabaseSystem;
+import org.obm.sync.base.ObmDbType;
 
 public enum EventOpacity {
 
 	OPAQUE, TRANSPARENT;
 
-	public Object getJdbcObject(DatabaseSystem type) throws SQLException {
-		if (type == DatabaseSystem.PGSQL) {
+	public Object getJdbcObject(ObmDbType type) throws SQLException {
+		if (type == ObmDbType.PGSQL) {
 			try {
 				Object o = Class.forName("org.postgresql.util.PGobject")
 						.newInstance();

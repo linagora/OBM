@@ -44,8 +44,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.locator.store.LocatorService;
 import org.obm.locator.store.LocatorCache;
 import org.obm.sync.server.template.ITemplateLoader;
@@ -83,6 +83,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     	XTrustProvider.install();
     	
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
+
         
         try {
         	Injector injector = createInjector();
@@ -107,7 +108,7 @@ public class GuiceServletContextListener implements ServletContextListener {
     			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
     			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
     			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-                bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+    			bind(IDBCP.class).to(DBCP.class);
     			bind(LocatorService.class).to(LocatorCache.class);
     			bind(HelperService.class).to(HelperServiceImpl.class);
     			bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);

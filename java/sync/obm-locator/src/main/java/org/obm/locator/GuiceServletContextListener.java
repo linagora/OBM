@@ -39,8 +39,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DBCP;
+import org.obm.dbcp.IDBCP;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 			protected void configure() {
 				install(new TransactionalModule());
 				install(new LocatorServletModule());
-				bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+				bind(IDBCP.class).to(DBCP.class);
 			}
 		});
     }

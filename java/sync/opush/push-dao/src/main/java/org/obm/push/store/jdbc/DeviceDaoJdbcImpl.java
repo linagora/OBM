@@ -36,7 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
 import org.obm.push.bean.User;
@@ -53,7 +53,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	private Factory deviceFactory;
 
 	@Inject
-	private DeviceDaoJdbcImpl(DatabaseConnectionProvider dbcp, Device.Factory deviceFactory) {
+	private DeviceDaoJdbcImpl(IDBCP dbcp, Device.Factory deviceFactory) {
 		super(dbcp);
 		this.deviceFactory = deviceFactory;
 	}
