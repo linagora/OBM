@@ -221,12 +221,12 @@ class DB_Sql {
     return $res;
   }
 
-    function escape($string, $force = false) {                                          
-      if (!force && get_magic_quotes_gpc())
-        return $string;
-      else                                                                    
-        return mysql_real_escape_string($string);                
-    }
+  function escape($string, $force = false) {                                          
+    if (!$force && get_magic_quotes_gpc())
+      return $string;
+    else                                                                    
+      return mysql_real_escape_string($string);                
+  }
 
   /* public: evaluate the result (size, width) */
   function affected_rows() {
