@@ -494,7 +494,7 @@ class UserPattern {
     //multidomain
     if (!$GLOBALS['obm']['domain_global']) {
       $domain_id = sql_parse_id($GLOBALS['obm']['domain_id'], true);
-      $where[] = "(domain_id $domain_id)";
+      $where[] = "((domain_id $domain_id) OR (domain_id IN (SELECT d.domain_id FROM Domain d WHERE d.domain_global=TRUE)))";
     }
 
     if (!empty($where))
@@ -550,6 +550,28 @@ class UserPattern {
     // Querying
     $query = "SELECT id, title FROM userpattern $whereq";
     display_debug_msg($query, $cdg_sql, "UserPattern::all()");
+    $obm_q->query($query);
+
+    $return = array();
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('id');
+      $return[$id] = $obm_q->f('title');
+    }
+
+    return $return;
+  }
+
+  static public function getDomainPatternsAndGlobalPatterns($domain_id) {
+    global $cdg_sql;
+
+    $obm_q = new DB_OBM;
+
+    // Querying
+    $query = "SELECT id, title
+        FROM userpattern u
+        WHERE u.domain_id = ".sql_parse_id($domain_id)."
+        OR u.domain_id IN (SELECT d.domain_id FROM Domain d WHERE d.domain_global=TRUE)";
+    display_debug_msg($query, $cdg_sql, "UserPattern::getDomainPatternsAndGlobalPatterns()");
     $obm_q->query($query);
 
     $return = array();

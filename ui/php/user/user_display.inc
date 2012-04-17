@@ -2312,7 +2312,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   // User pattern selector
   if (($action == 'new') || ($action == 'insert')) {
-    $patterns = UserPattern::all();
+    $patterns = UserPattern::getDomainPatternsAndGlobalPatterns($GLOBALS['obm']['domain_id']);
   }
   if (!empty($patterns)) {
     $choices = "<option value=\"\">---</option>";
