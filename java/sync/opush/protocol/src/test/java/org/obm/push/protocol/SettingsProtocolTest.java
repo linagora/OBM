@@ -29,53 +29,62 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push.protocol;
 
-import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
-import org.obm.push.backend.IContentsImporter;
-import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.impl.DOMDumper;
-import org.obm.push.impl.Responder;
-import org.obm.push.protocol.SettingsProtocol;
-import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.wbxml.WBXMLTools;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import javax.xml.transform.TransformerException;
+
+import org.junit.Test;
+import org.obm.push.bean.User;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+public class SettingsProtocolTest {
 
-@Singleton
-public class SettingsHandler extends WbxmlRequestHandler {
-
-	private final SettingsProtocol protocol;
-
-	@Inject
-	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter,
-			IContentsExporter contentsExporter, StateMachine stMachine, SettingsProtocol protocol,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+	@Test
+	public void testResponseWithUser() throws TransformerException {
+		User user = User.Factory.create().createUser("domain\\userId", "useremail@domain", "user");
 		
-		super(backend, encoderFactory, contentsImporter, 
-				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
-		this.protocol = protocol;
+		String responseAsText = new StringBuilder() 
+			.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+			.append("<Settings>")
+			.append("<Status>1</Status>")
+			.append("<DeviceInformaton><Status>1</Status></DeviceInformaton>")
+			
+			.append("<UserInformation><Status>1</Status>")
+			.append("<Get><EmailAddresses>")
+			.append("<SmtpAddress>")
+			.append(user.getEmail())
+			.append("</SmtpAddress>")
+			.append("</EmailAddresses></Get>")
+			.append("</UserInformation>")
+			
+			.append("</Settings>").toString();
+		
+		Document response = new SettingsProtocol().encodeResponse(user);
+		
+		assertThat(DOMUtils.serialize(response)).isEqualTo(responseAsText);
 	}
 
-	@Override
-	public void process(IContinuation continuation, UserDataRequest udr,
-			Document doc, ActiveSyncRequest request, Responder responder) {
+	@Test(expected=NullPointerException.class)
+	public void testResponseWithNullUser() {
+		User user = null;
 
-		try {
-			Document documentResponse = protocol.encodeResponse(udr.getUser());
-			responder.sendWBXMLResponse("Settings", documentResponse);
-		} catch (Exception e) {
-			logger.error("Error creating settings response");
-		}
-
+		new SettingsProtocol().encodeResponse(user);
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testResponseWithNullUserEmail() {
+		User user = User.Factory.create().createUser("userId", null, "user");
+
+		new SettingsProtocol().encodeResponse(user);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testResponseWithEmptyUserEmail() {
+		User user = User.Factory.create().createUser("userId", "", "user");
+
+		new SettingsProtocol().encodeResponse(user);
+	}
 }

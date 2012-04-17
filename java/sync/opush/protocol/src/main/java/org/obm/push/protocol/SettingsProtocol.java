@@ -29,53 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push.protocol;
 
-import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
-import org.obm.push.backend.IContentsImporter;
-import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.impl.DOMDumper;
-import org.obm.push.impl.Responder;
-import org.obm.push.protocol.SettingsProtocol;
-import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.state.StateMachine;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.wbxml.WBXMLTools;
+import javax.xml.parsers.FactoryConfigurationError;
+
+import org.obm.push.bean.User;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import com.google.inject.Inject;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SettingsHandler extends WbxmlRequestHandler {
+public class SettingsProtocol {
 
-	private final SettingsProtocol protocol;
+	private static final String SETTINGS_SUCCESS = "1";
 
-	@Inject
-	protected SettingsHandler(IBackend backend, EncoderFactory encoderFactory,
-			IContentsImporter contentsImporter,
-			IContentsExporter contentsExporter, StateMachine stMachine, SettingsProtocol protocol,
-			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+	public Document encodeResponse(User user) throws FactoryConfigurationError {
+		Preconditions.checkNotNull(user);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(user.getEmail()));
 		
-		super(backend, encoderFactory, contentsImporter, 
-				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
-		this.protocol = protocol;
+		Document ret = DOMUtils.createDoc(null, "Settings");
+		Element root = ret.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", SETTINGS_SUCCESS);
+		
+		Element deviceInformaton = DOMUtils.createElement(root, "DeviceInformaton");
+		DOMUtils.createElementAndText(deviceInformaton, "Status", SETTINGS_SUCCESS);
+		
+		Element userInformaton = DOMUtils.createElement(root, "UserInformation");
+		DOMUtils.createElementAndText(userInformaton, "Status", SETTINGS_SUCCESS);
+		Element getUserInformaton = DOMUtils.createElement(userInformaton, "Get");
+		Element addressesUserInformaton = DOMUtils.createElement(getUserInformaton, "EmailAddresses");
+		DOMUtils.createElementAndText(addressesUserInformaton, "SmtpAddress", user.getEmail());
+
+		return ret;
 	}
-
-	@Override
-	public void process(IContinuation continuation, UserDataRequest udr,
-			Document doc, ActiveSyncRequest request, Responder responder) {
-
-		try {
-			Document documentResponse = protocol.encodeResponse(udr.getUser());
-			responder.sendWBXMLResponse("Settings", documentResponse);
-		} catch (Exception e) {
-			logger.error("Error creating settings response");
-		}
-
-	}
-
+	
 }
