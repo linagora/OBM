@@ -290,6 +290,7 @@ public class OpushImapFolder {
 	private FetchProfile getFetchBodyStructureProfile() {
 		FetchProfile fetchProfile = new FetchProfile();
 		fetchProfile.add(FetchProfile.Item.CONTENT_INFO);
+		fetchProfile.add(IMAPFolder.FetchProfileItem.SIZE);
 		return fetchProfile;
 	}	
 }

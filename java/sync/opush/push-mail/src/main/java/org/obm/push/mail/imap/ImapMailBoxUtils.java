@@ -210,7 +210,7 @@ public class ImapMailBoxUtils {
 		return parentMimePart;
 	}
 
-	private MimePart buildMimePart(ContentType contentType, String contentId, String encoding) {
+	private MimePart buildMimePart(ContentType contentType, String contentId, String encoding, int size) {
 		MimePart mimePart = new MimePart();
 		mimePart.setContentType(contentType);
 		if (!Strings.isNullOrEmpty(contentId)) {
@@ -220,6 +220,7 @@ public class ImapMailBoxUtils {
 			mimePart.setContentTransfertEncoding(encoding);
 		}
 		mimePart.setBodyParams(contentType.getBodyParams());
+		mimePart.setSize(size);
 		return mimePart;
 	}
 
@@ -235,7 +236,7 @@ public class ImapMailBoxUtils {
 
 	private MimePart buildMimePart(javax.mail.internet.MimePart mimePart) throws MessagingException {
 		ContentType contentType = buildContentType(mimePart.getContentType());
-		return buildMimePart(contentType, mimePart.getContentID(), mimePart.getEncoding());
+		return buildMimePart(contentType, mimePart.getContentID(), mimePart.getEncoding(), mimePart.getSize());
 	}
 	
 	private ContentType buildContentType(String contentType) {
