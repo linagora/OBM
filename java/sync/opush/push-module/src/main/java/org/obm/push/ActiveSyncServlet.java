@@ -278,15 +278,15 @@ public class ActiveSyncServlet extends HttpServlet {
 	 */
 	private void sendASHeaders(HttpServletResponse response) {
 		response.setHeader("Server", "Microsoft-IIS/6.0");
-		response.setHeader("MS-Server-ActiveSync", "8.1");
+		response.setHeader("MS-Server-ActiveSync", "14.1");
 		response.setHeader("Cache-Control", "private");
 	}
 
 	private void sendOptionsResponse(HttpServletResponse response) {
 		response.setStatus(200);
 		response.setHeader("Server", "Microsoft-IIS/6.0");
-		response.setHeader("MS-Server-ActiveSync", "8.1");
-		response.setHeader("MS-ASProtocolVersions", "1.0,2.0,2.1,2.5,12.0,12.1");
+		response.setHeader("MS-Server-ActiveSync", "14.1");
+		response.setHeader("MS-ASProtocolVersions", "12.1");
 		response.setHeader(
 				"MS-ASProtocolCommands",
 				"Sync,SendMail,SmartForward,SmartReply,GetAttachment,GetHierarchy,CreateCollection,DeleteCollection,MoveCollection,FolderSync,FolderCreate,FolderDelete,FolderUpdate,MoveItems,GetItemEstimate,MeetingResponse,Search,Settings,Ping,ItemOperations,Provision,ResolveRecipients,ValidateCert");
