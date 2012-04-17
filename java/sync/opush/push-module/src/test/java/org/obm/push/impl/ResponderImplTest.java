@@ -80,7 +80,7 @@ public class ResponderImplTest {
 		byte[] data = null;
 		
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
-		servletResponse.setContentType("application/vnd.ms-sync.wbxml");
+		servletResponse.setContentType("application/vnd.ms-sync");
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		Document document = EasyMock.createMock(Document.class);
@@ -110,7 +110,7 @@ public class ResponderImplTest {
 		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
 		
 		EasyMock.expect(wbxmlTools.toWbxml(namespace, document)).andReturn(data);
-		servletResponse.setContentType("application/vnd.ms-sync.wbxml");
+		servletResponse.setContentType("application/vnd.ms-sync");
 		servletResponse.setContentLength(data.length);
 		EasyMock.expect(servletResponse.getOutputStream()).andReturn(servletOutputStream);
 		servletOutputStream.write(data);

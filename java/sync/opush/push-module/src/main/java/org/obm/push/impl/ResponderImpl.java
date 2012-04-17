@@ -103,7 +103,7 @@ public class ResponderImpl implements Responder {
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
-			writeData(wbxml, "application/vnd.ms-sync.wbxml");	
+			writeData(wbxml, "application/vnd.ms-sync");	
 		} catch (WBXmlException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
