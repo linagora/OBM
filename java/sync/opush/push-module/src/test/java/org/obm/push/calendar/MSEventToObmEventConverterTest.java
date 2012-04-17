@@ -134,7 +134,7 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test(expected=ConversionException.class)
-	public void testConvertAttributeAllDayFalseNeedStartTime() throws ConversionException {
+	public void testConvertAttributeAllDayFalseNeedsStartTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
 				.withEndTime(date("2004-12-12T11:15:10Z"))
@@ -145,7 +145,7 @@ public class MSEventToObmEventConverterTest {
 	}
 	
 	@Test(expected=ConversionException.class)
-	public void testConvertAttributeAllDayNullNeedStartTime() throws ConversionException {
+	public void testConvertAttributeAllDayNullNeedsStartTime() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(null)
 				.withEndTime(date("2004-12-12T11:15:10Z"))
@@ -156,7 +156,7 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test(expected=ConversionException.class)
-	public void testConvertAttributeAllDayTrueNeedStartTime() throws ConversionException {
+	public void testConvertAttributeAllDayTrueNeedsStartTime() throws ConversionException {
 	    MSEvent msEvent = new MSEventBuilder()
                 .withStartTime(null)
                 .withEndTime(date("2004-12-12T11:15:10Z"))
@@ -167,7 +167,7 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test(expected=ConversionException.class)
-	public void testConvertAttributeAllDayNullNeedEndTime() throws ConversionException {
+	public void testConvertAttributeAllDayNullNeedsEndTime() throws ConversionException {
 	    MSEvent msEvent = new MSEventBuilder()
                 .withStartTime(date("2004-12-12T11:15:10Z"))
                 .withEndTime(null)
@@ -178,7 +178,7 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test(expected = ConversionException.class)
-	public void testConvertAttributeAllDayFalseNeedEndTime()
+	public void testConvertAttributeAllDayFalseNeedsEndTime()
             throws ConversionException {
 	    MSEvent msEvent = new MSEventBuilder()
                 .withStartTime(date("2004-12-12T11:15:10Z"))
@@ -190,7 +190,7 @@ public class MSEventToObmEventConverterTest {
 	}
 
 	@Test(expected = ConversionException.class)
-	public void testConvertAttributeAllDayTrueNeedEndTime()
+	public void testConvertAttributeAllDayTrueNeedsEndTime()
             throws ConversionException {
 	    MSEvent msEvent = new MSEventBuilder()
                 .withStartTime(date("2004-12-12T11:15:10Z"))
