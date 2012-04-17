@@ -407,8 +407,16 @@ Obm.Drag = new Class ({
 
       this.value.now[z] = this.value.now[z]/this.pixelUnitSize[z];
       if (this.options.grid[z]) this.value.now[z] -= (this.value.now[z] % this.options.grid[z]);
-      if (this.options.style) this.element.setStyle(this.options.modifiers[z], this.value.now[z] + this.options.units[z]);
-      else this.element[this.options.modifiers[z]] = this.value.now[z];
+      if (this.options.style) {
+    	  var value = this.value.now[z] + this.options.units[z];
+    	  if(this.options.modifiers[z] == 'left') {
+    		  var fixedValue = parseFloat(value).toFixed(2) + '%';
+    		  value = fixedValue;
+    	  }
+    	  this.element.setStyle(this.options.modifiers[z], value);
+      } else {
+    	  this.element[this.options.modifiers[z]] = this.value.now[z];
+      }
     }
     this.fireEvent('drag', this.element);
   }
