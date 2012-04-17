@@ -75,16 +75,15 @@ public class GuiceServletContextListener implements ServletContextListener {
     } 
     
     private Injector createInjector() {
-        return Guice.createInjector(new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                install(new TransactionalModule());
-                install(new LocatorServletModule());
-                bind(DatabaseConnectionProvider.class).to(
-                        DatabaseConnectionProviderImpl.class);
-            }
-        });
+    	return Guice.createInjector(new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				install(new TransactionalModule());
+				install(new LocatorServletModule());
+				bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+			}
+		});
     }
     
     private void failStartup(String message) { 

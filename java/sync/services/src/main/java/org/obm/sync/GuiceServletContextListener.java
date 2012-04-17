@@ -97,37 +97,37 @@ public class GuiceServletContextListener implements ServletContextListener {
     } 
     
     private Injector createInjector() throws Exception {
-        return Guice.createInjector(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(DomainService.class).to(DomainCache.class);
-                bind(UserService.class).to(UserServiceImpl.class);
-                bind(SettingsService.class).to(SettingsServiceImpl.class);
-                bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
-                bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-                bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
-                bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
+    	return Guice.createInjector(new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(DomainService.class).to(DomainCache.class);
+				bind(UserService.class).to(UserServiceImpl.class);
+				bind(SettingsService.class).to(SettingsServiceImpl.class);
+    			bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
+    			bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+    			bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
+    			bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
                 bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-                bind(LocatorService.class).to(LocatorCache.class);
-                bind(HelperService.class).to(HelperServiceImpl.class);
-                bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-                bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
-                bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
+    			bind(LocatorService.class).to(LocatorCache.class);
+    			bind(HelperService.class).to(HelperServiceImpl.class);
+    			bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+    			bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
+    			bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
+    			
+    		    ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load( FreeBusyPluginModule.class );
+    		    
+    		    List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
+    		    for(FreeBusyPluginModule pluginModule : pluginModules) {
+    		    	pluginModulesList.add(pluginModule);
+    		    }
 
-                ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
-                        .load(FreeBusyPluginModule.class);
-
-                List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
-                for (FreeBusyPluginModule pluginModule : pluginModules) {
-                    pluginModulesList.add(pluginModule);
-                }
-
-                Collections.sort(pluginModulesList, Collections.reverseOrder());
-                for (FreeBusyPluginModule pluginModule : pluginModulesList) {
-                    this.install(pluginModule);
-                }
-            }
-        }, new MessageQueueModule(), new TransactionalModule());
+    		    Collections.sort(pluginModulesList, Collections.reverseOrder());
+    		    for(FreeBusyPluginModule pluginModule : pluginModulesList) {
+    		    	this.install(pluginModule);
+    		    }
+			}
+    	}, new MessageQueueModule()
+    	, new TransactionalModule());
     }
     
     private void failStartup(String message) { 
