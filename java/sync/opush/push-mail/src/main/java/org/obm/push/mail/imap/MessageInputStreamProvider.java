@@ -39,6 +39,7 @@ import com.sun.mail.imap.IMAPMessage;
 
 public interface MessageInputStreamProvider {
 	
-	InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, int noMaxByteCount, boolean usePeek); 
-	
+	InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress);
+
+	InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit);
 }

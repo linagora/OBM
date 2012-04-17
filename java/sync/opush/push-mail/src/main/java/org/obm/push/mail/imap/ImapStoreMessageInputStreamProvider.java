@@ -49,16 +49,18 @@ public class ImapStoreMessageInputStreamProvider implements MessageInputStreamPr
 	}
 	
 	@Override
-	public InputStream createMessageInputStream(IMAPMessage messageToFetch,
-			MimeAddress mimePartAddress, int noMaxByteCount, boolean usePeek) {
-		
-		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(
-				messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress) {
+		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(messageToFetch, mimePartAddress);
+		return imapStoreManager.bindTo(messageStream);
+	}
+
+	@Override
+	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit) {
+		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(messageToFetch, mimePartAddress, limit);
 		return imapStoreManager.bindTo(messageStream);
 	}
 
 	protected ImapStoreManager getImapStoreManager() {
 		return imapStoreManager;
 	}
-	
 }

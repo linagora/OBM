@@ -75,7 +75,7 @@ public class OpushImapFolder {
 	private final MessageInputStreamProvider imapResourceProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final IMAPFolder folder;
-
+	
 	public OpushImapFolder(ImapMailBoxUtils imapMailBoxUtils, MessageInputStreamProvider imapResourceProvider, IMAPFolder folder) {
 		this.imapResourceProvider = imapResourceProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
@@ -190,10 +190,8 @@ public class OpushImapFolder {
 	}
 
 	private InputStream peekAtMessageStream(long messageUid, MimeAddress mimePartAddress) throws MessagingException, ImapMessageNotFoundException {
-		int noMaxByteCount = -1;
-		boolean usePeek = true;
 		IMAPMessage messageToFetch = getMessageByUID(messageUid);
-		return imapResourceProvider.createMessageInputStream(messageToFetch, mimePartAddress, noMaxByteCount, usePeek);
+		return imapResourceProvider.createMessageInputStream(messageToFetch, mimePartAddress);
 	}
 
 	public InputStream getMessageInputStream(long messageUID) throws MessagingException, ImapMessageNotFoundException {
@@ -292,5 +290,12 @@ public class OpushImapFolder {
 		fetchProfile.add(FetchProfile.Item.CONTENT_INFO);
 		fetchProfile.add(IMAPFolder.FetchProfileItem.SIZE);
 		return fetchProfile;
-	}	
+	}
+
+	public InputStream uidFetchPart(long messageUid, MimeAddress mimePartAddress, Integer limit) 
+			throws MessagingException, ImapMessageNotFoundException {
+		
+		IMAPMessage messageToFetch = getMessageByUID(messageUid);
+		return imapResourceProvider.createMessageInputStream(messageToFetch, mimePartAddress, limit);
+	}
 }

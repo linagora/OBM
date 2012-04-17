@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.minig.imap.FastFetch;
@@ -60,4 +61,6 @@ public interface PrivateMailboxService {
 
 	IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
 
+	InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, FetchInstructions fetchInstructions) 
+			throws MailException;
 }

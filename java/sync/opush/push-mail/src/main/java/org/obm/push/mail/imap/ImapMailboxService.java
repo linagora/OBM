@@ -83,6 +83,7 @@ import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
+import org.obm.push.mail.FetchInstructions;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
@@ -794,5 +795,42 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			closeQuietly(store);
 		}
 		return imapMailBoxUtils.buildMimeMessageCollectionFromIMAPMessage(imapMessages);
+	}
+	
+	@Override
+	public InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, 
+			FetchInstructions fetchInstructions) throws MailException {
+
+		Preconditions.checkNotNull(fetchInstructions);
+		ImapStore store = null;
+		try {
+			store = imapClientProvider.getImapClientWithJM(bs);
+			store.login();
+			
+			String mailBoxName = parseMailBoxName(bs, collectionName);
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			
+			MimeAddress address = fetchInstructions.getMimePart().getAddress();
+			Integer truncation = fetchInstructions.getTruncation();
+			if (truncation != null) {
+				return imapFolder.uidFetchPart(uid, address, truncation);
+			} else {
+				return imapFolder.uidFetchPart(uid, address);
+			}
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (NoImapClientAvailableException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} finally {
+			closeQuietly(store);
+		}
 	}
 }
