@@ -124,14 +124,14 @@ public class Event implements Indexed<Integer> {
 	/**
 	 * @return true if duration is different from zero and is a multiple of SECONDS_IN_A_DAY
 	 */
-	@VisibleForTesting boolean durationIsValidForAllDay() {
+	@VisibleForTesting boolean lastsFullDays() {
 	    return duration != 0 && (duration % SECONDS_IN_A_DAY == 0);
 	}
 
 	/**
 	 * @return duration in seconds rounded up to the nearest multiple of SECONDS_IN_A_DAY if necessary.
 	 */
-	@VisibleForTesting int validAllDayDuration() {
+	@VisibleForTesting int durationInFullDays() {
 	    return (duration / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY + SECONDS_IN_A_DAY;
 	}
 
@@ -139,8 +139,8 @@ public class Event implements Indexed<Integer> {
 	 * @return duration in second
 	 */
 	public int getDuration() {
-		if (allday && !durationIsValidForAllDay()) {
-			return validAllDayDuration();
+		if (allday && !lastsFullDays()) {
+			return durationInFullDays();
 		}
 		return duration;
 	}

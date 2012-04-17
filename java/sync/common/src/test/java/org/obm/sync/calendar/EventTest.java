@@ -652,52 +652,52 @@ public class EventTest {
 	}
 
 	@Test
-	public void testDurationIsValidForAllDayWhenOneDayInSeconds() {
+	public void testLastsFullDaysWhenOneDayInSeconds() {
 	    Event event = new Event();
 	    event.setDuration(Event.SECONDS_IN_A_DAY);
-	    assertThat(event.durationIsValidForAllDay()).isTrue();
+	    assertThat(event.lastsFullDays()).isTrue();
 	}
 
 	@Test
-	public void testDurationIsValidForAllDayWhenTwoDaysInSeconds() {
+	public void testLastsFullDaysWhenTwoDaysInSeconds() {
 	    Event event = new Event();
 	    event.setDuration(Event.SECONDS_IN_A_DAY * 2);
-	    assertThat(event.durationIsValidForAllDay()).isTrue();
+	    assertThat(event.lastsFullDays()).isTrue();
 	}
 
 	@Test
-	public void testDurationIsValidForAllDayWhenNotMultipleOfSecondsInADay() {
+	public void testLastsFullDaysWhenNotMultipleOfSecondsInADay() {
 	    Event event = new Event();
 	    event.setDuration(Event.SECONDS_IN_A_DAY * 2 + 10);
-	    assertThat(event.durationIsValidForAllDay()).isFalse();
+	    assertThat(event.lastsFullDays()).isFalse();
 	}
 
 	@Test
-	public void testDurationIsValidForAllDayWhenZero() {
+	public void testLastsFullDaysDayWhenZero() {
 	    Event event = new Event();
 	    event.setDuration(0);
-	    assertThat(event.durationIsValidForAllDay()).isFalse();
+	    assertThat(event.lastsFullDays()).isFalse();
 	}
 
 	@Test
-	public void testValidAllDayDurationWhenZero() {
+	public void testDurationInFullDaysWhenZero() {
 	    Event event = new Event();
 	    event.setDuration(10);
-	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.durationInFullDays()).isEqualTo(Event.SECONDS_IN_A_DAY);
 	}
 
 	@Test
-	public void testValidAllDayDurationWhenAFewSeconds() {
+	public void testDurationInFullDaysWhenAFewSeconds() {
 	    Event event = new Event();
 	    event.setDuration(10);
-	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.durationInFullDays()).isEqualTo(Event.SECONDS_IN_A_DAY);
 	}
 
 	@Test
-	public void testValidAllDayDurationWhenOneDayAndAFewSeconds() {
+	public void testDurationInFullDaysWhenOneDayAndAFewSeconds() {
 	    Event event = new Event();
 	    event.setDuration(Event.SECONDS_IN_A_DAY + 10);
-	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY * 2);
+	    assertThat(event.durationInFullDays()).isEqualTo(Event.SECONDS_IN_A_DAY * 2);
 	}
 
 	@Test
@@ -714,7 +714,7 @@ public class EventTest {
 	    Event event = new Event();
 	    event.setDuration(10);
 	    event.setAllday(true);
-	    assertThat(event.validAllDayDuration()).isEqualTo(Event.SECONDS_IN_A_DAY);
+	    assertThat(event.durationInFullDays()).isEqualTo(Event.SECONDS_IN_A_DAY);
 	    assertThat(event.isAllday()).isEqualTo(true);
 	}
 
