@@ -45,14 +45,14 @@ public class DBConnectionPool {
 	private final PoolingDataSource poolingDataSource;
 	private static final String VALIDATION_QUERY = "SELECT 666";
 
-	@VisibleForTesting DBConnectionPool(IJDBCDriver cf, String dbHost, String dbName,
+	/* package */ DBConnectionPool(IJDBCDriver cf, String dbHost, String dbName,
 			String login, String password, int maxPoolSize) {
 		poolingDataSource = buildConnectionFactory(cf, dbHost, dbName, login, password, maxPoolSize);
 	}
 
 	private PoolingDataSource buildConnectionFactory(
 			IJDBCDriver cf, String dbHost, String dbName, String login,
-			String password, int maxPoolSize) {
+			String password, Integer maxPoolSize) {
 
 		PoolingDataSource poolds = new PoolingDataSource();
 		poolds.setClassName(cf.getDataSourceClassName());
