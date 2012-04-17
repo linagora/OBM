@@ -132,7 +132,8 @@ public class Event implements Indexed<Integer> {
 	 * @return duration in seconds rounded up to the nearest multiple of SECONDS_IN_A_DAY if necessary.
 	 */
 	@VisibleForTesting int durationInFullDays() {
-	    return (duration / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY + SECONDS_IN_A_DAY;
+	    int truncatedNumberOfDays = duration / SECONDS_IN_A_DAY;
+	    return (truncatedNumberOfDays + 1) * SECONDS_IN_A_DAY;
 	}
 
 	/**
