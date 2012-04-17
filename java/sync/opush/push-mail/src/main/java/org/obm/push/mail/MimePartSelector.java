@@ -64,10 +64,10 @@ public class MimePartSelector {
 			if (isContentType(bodyPreference)) {
 				IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
 				if (isMatching(mimePart, bodyPreference)) {
-					return buildMimePartSelector(mimePart, bodyPreference);
+					return buildFetchInstructions(mimePart, bodyPreference);
 				}
 			} else {
-				return buildMimePartSelector(mimeMessage, bodyPreference);
+				return buildFetchInstructions(mimeMessage, bodyPreference);
 			}
 		}
 		return null;
@@ -85,7 +85,7 @@ public class MimePartSelector {
 		}
 	}
 	
-	private FetchInstructions buildMimePartSelector(IMimePart mimePart, BodyPreference bodyPreference) {
+	private FetchInstructions buildFetchInstructions(IMimePart mimePart, BodyPreference bodyPreference) {
 		return new FetchInstructions.Builder().
 				mimePart(mimePart).truncation(bodyPreference.getTruncationSize()).build();
 	}
