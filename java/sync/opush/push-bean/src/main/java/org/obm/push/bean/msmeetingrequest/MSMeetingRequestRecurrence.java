@@ -35,9 +35,92 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 
 public class MSMeetingRequestRecurrence implements Serializable {
+	
+	public static class Builder {
+		private MSMeetingRequestRecurrenceType type;
+		private Integer interval;
+		private Date until;
+		private Integer occurrences;
+		private Integer weekOfMonth;
+		private Integer dayOfMonth;
+		private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek;
+		private Integer monthOfYear;
+		
+		public Builder type(MSMeetingRequestRecurrenceType type) {
+			this.type = type;
+			return this;
+		}
+		
+		public Builder interval(Integer interval) {
+			this.interval = interval;
+			return this;
+		}
+		
+		public Builder until(Date until) {
+			this.until = until;
+			return this;
+		}
+		
+		public Builder occurrences(Integer occurrences) {
+			this.occurrences = occurrences;
+			return this;
+		}
+		
+		public Builder weekOfMonth(Integer weekOfMonth) {
+			this.weekOfMonth = weekOfMonth;
+			return this;
+		}
+		
+		public Builder dayOfMonth(Integer dayOfMonth) {
+			this.dayOfMonth = dayOfMonth;
+			return this;
+		}
+		
+		public Builder dayOfWeek(List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek) {
+			this.dayOfWeek = dayOfWeek;
+			return this;
+		}
+		
+		public Builder monthOfYear(Integer monthOfYear) {
+			this.monthOfYear = monthOfYear;
+			return this;
+		}
+		
+		public MSMeetingRequestRecurrence build() {
+			Preconditions.checkNotNull(type, "The field type is required");
+			Preconditions.checkNotNull(interval, "The field interval is required");
+			Preconditions.checkNotNull(until, "The field until is required");
+			Preconditions.checkArgument(occurrences != null && occurrences > 0, "The field occurrences is required");
+			
+			if (type == MSMeetingRequestRecurrenceType.YEARLY) {
+				Preconditions.checkNotNull(weekOfMonth, "The field weekOfMonth is required");
+			}
+			
+			if (type == MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY
+					|| type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
+				
+				Preconditions.checkNotNull(dayOfMonth, "The field dayOfMonth is required");
+			}
+			
+			if (type == MSMeetingRequestRecurrenceType.WEEKLY 
+					|| type == MSMeetingRequestRecurrenceType.MONTHLY 
+					|| type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
+				
+				Preconditions.checkNotNull(dayOfWeek, "The field dayOfWeek is required");
+			}
+			
+			if (type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
+				Preconditions.checkNotNull(monthOfYear, "The field monthOfYear is required");
+			}
+			
+			return new MSMeetingRequestRecurrence(type, interval, until, 
+					occurrences, weekOfMonth, dayOfMonth, dayOfWeek, monthOfYear);
+		}
+	}
 	
 	private final MSMeetingRequestRecurrenceType type;
 	private final Integer interval;
@@ -48,7 +131,7 @@ public class MSMeetingRequestRecurrence implements Serializable {
 	private final List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek;
 	private final Integer monthOfYear;
 	
-	public MSMeetingRequestRecurrence(MSMeetingRequestRecurrenceType type, Integer interval, 
+	private MSMeetingRequestRecurrence(MSMeetingRequestRecurrenceType type, Integer interval, 
 			Date until, Integer occurrences, Integer weekOfMonth, Integer dayOfMonth, 
 			List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek, Integer monthOfYear) {
 		
