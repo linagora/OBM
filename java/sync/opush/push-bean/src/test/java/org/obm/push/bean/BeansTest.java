@@ -38,6 +38,9 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -90,6 +93,9 @@ public class BeansTest {
 					.add(AutodiscoverResponseError.class)
 					.add(AutodiscoverResponseServer.class)
 					.add(AutodiscoverResponseUser.class)
+					.add(MSMeetingRequest.class)
+					.add(MSMeetingRequestRecurrence.class)
+					.add(MSMeetingRequestCategory.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
