@@ -1195,38 +1195,8 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     if (response.error == 0) {
-
-      // Delete dragged event
-      if (this.oldEvent) {
-        var evt = obm.calendarManager.events.get(this.oldEvent.elementId);
-        if (evt) {
-          try {
-            obm.calendarManager.unregister(evt);
-          } catch (e) {}
-          obm.calendarManager.events.erase(evt.element.id);
-          evt.element.destroy();
-          delete evt;
-        }
-      }
-
-      // Delete serie events
-      $$('div.evt_'+response.eventId).each(function(e) {
-        var evt = obm.calendarManager.events.get(e.id);
-        try {
-          obm.calendarManager.unregister(evt);
-        } catch (e) {}
-        obm.calendarManager.events.erase(evt.element.id);
-        evt.element.destroy();
-        delete evt;
-      });
-
-      // Draw updated event
-      response.events.each(function(evt) {
-        eval(evt);
-      });
-
+      this.refresh();
       obm.calendarManager.eventIndexing(response.eventId);
-
       showOkMessage(response.message);
 
     } else {
