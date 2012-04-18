@@ -1749,7 +1749,7 @@ Obm.CalendarInDayEvent = new Class({
   updateTime: function() {
     var time = this.element.getStyle('top').toFloat()/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit;
     this.event.date.setTime(obm.calendarManager.startTime*1000);
-    this.event.date.setDate(this.event.date.getDate() + Math.floor((this.element.getStyle('left').toFloat())/obm.vars.consts.cellWidth));
+    this.event.date.setDate(this.event.date.getDate() + Math.floor((this.element.getStyle('left').toFloat()).toFixed(2)/obm.vars.consts.cellWidth));    
     this.event.date.setHours(time/3600);
     this.event.date.setMinutes((time)%3600 / 60);
     this.event.time = Math.floor(this.event.date.getTime() / 1000);
