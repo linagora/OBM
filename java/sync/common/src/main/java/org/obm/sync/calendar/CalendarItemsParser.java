@@ -53,10 +53,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	private static final EventPrivacy DEFAULT_PRIVACY_VALUE = EventPrivacy.PUBLIC;
-	private static final int DEFAULT_PRIORITY_VALUE = 0;
-	private static final int DEFAULT_DURATION_VALUE = 0;
-
 	public EventChanges parseChanges(Document doc) {
 		EventChanges changes = new EventChanges();
 		Element root = doc.getDocumentElement();
@@ -120,9 +116,9 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setTimezoneName(tz);
 		ev.setDescription(s(e, "description"));
 		ev.setStartDate(d(e, "date"));
-		ev.setPrivacy(getPrivacy(e));
-		ev.setPriority(i(e, "priority", DEFAULT_PRIORITY_VALUE));
-		ev.setDuration(i(e, "duration", DEFAULT_DURATION_VALUE));
+		ev.setPrivacy(EventPrivacy.fromXmlIntCode(i(e, "privacy")));
+		ev.setPriority(i(e, "priority"));
+		ev.setDuration(i(e, "duration"));
 		ev.setCategory(s(e, "category"));
 		ev.setLocation(s(e, "location"));
 		ev.setAlert(getAlert(e));
@@ -145,14 +141,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			}
 		}
 		return ev;
-	}
-
-	private EventPrivacy getPrivacy(Element e) {
-		Integer privacy = i(e, "privacy");
-		if (privacy != null) {
-			return EventPrivacy.fromXmlIntCode(privacy);
-		}
-		return DEFAULT_PRIVACY_VALUE;
 	}
 
 	private Integer getAlert(Element e) {
@@ -347,7 +335,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			Element lineE = (Element) nlines.item(j);
 			fbl.setAllDay(b(lineE, "allDay"));
 			fbl.setStart(d(lineE, "start"));
-			fbl.setDuration(i(lineE, "duration", DEFAULT_DURATION_VALUE));
+			fbl.setDuration(i(lineE, "duration"));
 			fb.addFreeBusyInterval(fbl);
 		}
 		return fb;

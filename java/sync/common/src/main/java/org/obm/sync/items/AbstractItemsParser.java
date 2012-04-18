@@ -40,8 +40,6 @@ import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Objects;
-
 public abstract class AbstractItemsParser {
 
 	protected String s(Element e, String name) {
@@ -60,18 +58,14 @@ public abstract class AbstractItemsParser {
 		return null;
 	}
 
-	protected Integer i(Element e, String name, Integer defaultValue) {
+	protected Integer i(Element e, String name) {
 		String txt = DOMUtils.getElementTextInChildren(e, name);
 		if (txt != null) {
 			return Integer.parseInt(txt);
 		}
-		return defaultValue;
+		return 0;
 	}
 
-	protected Integer i(Element e, String name) {
-		return i(e, name, null);
-	}
-	
 	protected boolean b(Element e, String name) {
 		String txt = DOMUtils.getElementTextInChildren(e, name);
 		if (txt != null) {
