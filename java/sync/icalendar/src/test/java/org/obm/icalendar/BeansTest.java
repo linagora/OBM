@@ -51,6 +51,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(Ical4jUser.class)
+					.add(ICalendar.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
