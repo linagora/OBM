@@ -36,7 +36,7 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS RÉCURRENT ANNULÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant à été annulé
+Le rendez-vous suivant a été annulé
 
 du              : <?php echo $startDate; ?>
 

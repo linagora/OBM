@@ -34,7 +34,7 @@ applicable to the OBM software.
 
 Madame, Monsieur,
 
-Un nouvel utilisateur à été crée dans la délégation dont vous êtes 
+Un nouvel utilisateur a été créé dans la délégation dont vous êtes 
 l'administrateur.
 L'utilisateur <?php echo $user_label ?> a été créé par <?php echo $creator_label ?>
  dans la délégation "<?php echo $delegation ?>".

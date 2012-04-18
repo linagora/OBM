@@ -5,7 +5,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous récurrent suivant à été annulé:</td>
+        <td colspan="2">Le rendez-vous récurrent suivant a été annulé :</td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${subject}</td>

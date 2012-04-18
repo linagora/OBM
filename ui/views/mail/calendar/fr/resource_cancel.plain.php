@@ -36,7 +36,7 @@ Message automatique envoyé par OBM
 RESERVATION DE RESSOURCE ANNULEE !
 ------------------------------------------------------------------
 
-La réservation suivante à été annulée
+La réservation suivante a été annulée
 
 du              : <?php echo $start; ?>
 

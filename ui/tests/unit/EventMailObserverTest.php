@@ -123,7 +123,7 @@ auteur : domainezz.com Admin
 NOUVELLE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-Une ressource dont vous êtes responsable à été réservée
+Une ressource dont vous êtes responsable a été réservée
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -144,7 +144,7 @@ auteur : domainezz.com Admin
 RENDEZ-VOUS ANNULÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant à été annulé
+Le rendez-vous suivant a été annulé
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -159,7 +159,7 @@ auteur : domainezz.com Admin
 RESERVATION DE RESSOURCE ANNULEE !
 ------------------------------------------------------------------
 
-La réservation suivante à été annulée
+La réservation suivante a été annulée
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -221,7 +221,7 @@ a été modifié et se déroulera du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu
 RENDEZ-VOUS ANNULÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant à été annulé
+Le rendez-vous suivant a été annulé
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -261,7 +261,7 @@ calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=use
 RESERVATION DE RESSOURCE ANNULEE !
 ------------------------------------------------------------------
 
-La réservation suivante à été annulée
+La réservation suivante a été annulée
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00

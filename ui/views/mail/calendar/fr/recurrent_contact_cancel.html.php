@@ -38,7 +38,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-        <td colspan="2"><strong>Le rendez-vous suivant à été annulé :</strong></td>
+        <td colspan="2"><strong>Le rendez-vous suivant a été annulé :</strong></td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>

@@ -38,7 +38,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-        <td colspan="2">La réservation suivante à été annulée:</td>
+        <td colspan="2">La réservation suivante a été annulée:</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
