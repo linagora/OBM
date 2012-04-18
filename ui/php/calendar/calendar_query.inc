@@ -2593,7 +2593,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     if ($isMovedException) {
         $oldEvent->set("date_begin",$olddatebegin);
         $oldEvent->date_end = clone $oldEvent->date_begin;
-        $oldEvent->date_end->addSecond($event_duration);
+        $oldEvent->date_end->addSecond($oldEvent->duration);
         OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
     }
     else {
