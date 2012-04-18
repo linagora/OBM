@@ -512,6 +512,7 @@ function run_query_company_insert($company) {
 function run_query_company_update($cid, $company) {
   global $obm, $cdg_sql, $cgp_hide;
 
+  $obm_q = new DB_OBM;
   $number = $company['number'];
   $vat = $company['vat'];
   $siret = $company['siret'];
@@ -563,7 +564,6 @@ function run_query_company_update($cid, $company) {
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_update()');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
