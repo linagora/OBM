@@ -17,9 +17,9 @@ set_db_to_gmt() {
 }
 
 create_obm_schema() {
-        pushd /usr/share/obm-storage/update-install/scripts/2.4
+        cd /usr/share/obm-storage/update-install/scripts/2.4
         bash ./install_obmdb_2.4.sh filldata
-        popd
+        cd -
 }
 
 . /etc/dbconfig-common/$1.conf
