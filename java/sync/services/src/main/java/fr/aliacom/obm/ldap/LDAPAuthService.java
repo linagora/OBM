@@ -43,6 +43,7 @@ import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -67,6 +68,7 @@ public class LDAPAuthService implements IAuthentificationService {
 		this.directory = authConfig.getDirectory();
 	}
 
+	@Override
 	public String getObmDomain(String login) {
 		String ret = directory.getObmDomain();
 		if (ret == null) {
@@ -75,8 +77,10 @@ public class LDAPAuthService implements IAuthentificationService {
 		return ret;
 	}
 
+	@Override
 	public boolean doAuth(String userLogin, ObmDomain obmDomain,
-			String clearTextPassword) {
+			String clearTextPassword, boolean isPasswordHashed) {
+		Preconditions.checkArgument(!isPasswordHashed, "The LDAP authentication service does not handle already hashed passwords");
 		return doBindAuth(userLogin, obmDomain.getName(), clearTextPassword);
 	}
 
@@ -136,6 +140,7 @@ public class LDAPAuthService implements IAuthentificationService {
 		return ret;
 	}
 
+	@Override
 	public String getType() {
 		return "LDAP";
 	}

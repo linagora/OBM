@@ -159,7 +159,7 @@ public class SessionManagement {
 	 */
 	public AccessToken login(String specifiedLogin, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 		
 		String login = chooseLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logger.debug("Login trial for login: " + login
@@ -192,7 +192,7 @@ public class SessionManagement {
 		} else {
 			valid = doAuthSpecialAccount(userLogin, obmDomain, clientIP);
 			if (!valid) {
-				valid = authService.doAuth(userLogin, obmDomain, password);
+				valid = authService.doAuth(userLogin, obmDomain, password, isPasswordHashed);
 			}
 		}
 		if (valid) {
@@ -284,5 +284,4 @@ public class SessionManagement {
 	private void logSessionRemoval(AccessToken token) {
 		logger.info(LogUtils.prefix(token) + "logout.");
 	}
-	
 }

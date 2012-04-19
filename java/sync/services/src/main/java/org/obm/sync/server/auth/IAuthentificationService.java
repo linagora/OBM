@@ -37,7 +37,7 @@ public interface IAuthentificationService {
 
 	String getObmDomain(String userLogin);
 
-	boolean doAuth(String userLogin, ObmDomain obmDomain, String password);
+	boolean doAuth(String userLogin, ObmDomain obmDomain, String password, boolean isPasswordHashed);
 
 	String getType();
 

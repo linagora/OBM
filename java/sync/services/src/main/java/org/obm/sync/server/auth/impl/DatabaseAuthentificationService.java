@@ -66,10 +66,11 @@ public class DatabaseAuthentificationService implements
 		this.helperService = helperService;
 	}
 	
-	public boolean doAuth(String userLogin, ObmDomain obmDomain, String password) {
+	@Override
+	public boolean doAuth(String userLogin, ObmDomain obmDomain, String password, boolean isPasswordHashed) {
 		boolean valid = false;
 		try {
-			valid = isValidPassword(userLogin, password, obmDomain.getId());
+			valid = isValidPassword(userLogin, password, obmDomain.getId(), isPasswordHashed);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -88,7 +89,7 @@ public class DatabaseAuthentificationService implements
 	 *            database id of the domain
 	 * @return true if the credential matches
 	 */
-	private boolean isValidPassword(String login, String password, int domainId) {
+	private boolean isValidPassword(String login, String password, int domainId, boolean isPasswordHashed) {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -112,7 +113,7 @@ public class DatabaseAuthentificationService implements
 				String pass = rs.getString(2);
 				if (passType.equals("crypt")) {
 					ret = UnixCrypt.matches(pass, password);
-				} else if (passType.equals("md5sum")) {
+				} else if (passType.equals("md5sum") && !isPasswordHashed) {
 					ret = pass.equals(helperService.getMD5Diggest(password));
 				} else {
 					ret = pass.equals(password);
@@ -126,6 +127,7 @@ public class DatabaseAuthentificationService implements
 		return ret;
 	}
 
+	@Override
 	public String getObmDomain(String userLogin) {
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -157,6 +159,7 @@ public class DatabaseAuthentificationService implements
 		return dn;
 	}
 
+	@Override
 	public String getType() {
 		return "OBM DB";
 	}

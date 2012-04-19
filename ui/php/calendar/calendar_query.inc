@@ -1420,6 +1420,10 @@ function run_icalendar_obmsync_insert($ics){
   $origin= $GLOBALS['c_origin_web'];
 
   $loginUrl = $obmSyncRootPath.$loginPath."?login=".$username."&password=".$password."&origin=".$origin;
+  if ($userInfo["password_type"] == "MD5SUM") {
+      $loginUrl .= "&isPasswordHashed=true";
+      error_log("Password already hashed, adding 'isPasswordHashed' parameter to the obm-sync call");
+  }
   $xmlLogin = new DomDocument();
   $xmlLogin->load($loginUrl);
   $errors = $xmlLogin->getElementsByTagName("error");

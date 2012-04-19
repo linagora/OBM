@@ -98,6 +98,8 @@ public class LoginHandler implements ISyncHandler {
 		String login = params.getParameter("login");
 		String pass = params.getParameter("password");
 		String origin = params.getParameter("origin");
+		boolean isPasswordHashed = params.getParameter("isPasswordHashed") != null ? Boolean
+				.valueOf(params.getParameter("isPasswordHashed")) : false;
 		
 		try {
 			if (origin == null) {
@@ -110,7 +112,7 @@ public class LoginHandler implements ISyncHandler {
 			}
 			
 			AccessToken token = binding.logUserIn(login, pass, origin, params.getClientIP(), params.getRemoteIP(),
-					params.getLemonLdapLogin(), params.getLemonLdapDomain());
+					params.getLemonLdapLogin(), params.getLemonLdapDomain(), isPasswordHashed);
 			
 			if (token != null) {
 				versionValidator.checkObmConnectorVersion(token);

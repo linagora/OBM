@@ -53,9 +53,9 @@ public class LoginBindingImpl {
 	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 		
-		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
+		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}
 
 	@Transactional(readOnly=true)
