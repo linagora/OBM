@@ -48,7 +48,7 @@ $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 require("$obminclude/global.inc");
 $params = get_global_params('Entity');
-page_open(array('sess' => 'OBM_No_Session', 'auth' => 'OBM_No_Auth', 'perm' => 'OBM_Perm'));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 require("$obminclude/global_pref.inc");
 
 $module = ($_GET['module'])?$_GET['module']:'webmail';
