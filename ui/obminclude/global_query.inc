@@ -1429,6 +1429,7 @@ function randomColor($min = 100, $max = 200, $diff = 30) {
 ///////////////////////////////////////////////////////////////////////////////
 function global_freeze_user($params) {
   global $cdg_sql, $c_nb_login_failed, $c_frozen_duration, $c_login_interval;
+  global $c_default_domain;
 
   $login = $params['login'];
   $domain = $params['domain_id'];
