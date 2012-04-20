@@ -35,8 +35,8 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/obm-jetty
-install -p -m 755 %{SOURCE0} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty.xml.sample
-install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.xml.sample
+install -p -m 644 %{SOURCE0} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty.xml.sample
+install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.xml.sample
 
 %files
 %defattr(-,root,root,-)
