@@ -405,13 +405,17 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
+
+		syncCollectionResponse.setCollectionValidity(true);
+		syncCollectionResponse.setSyncStateValid(true);
 		
 		ItemSyncState st = stMachine.getItemSyncState(syncCollection.getSyncKey());
-		if (st == null) {
+		if (!collectionExist(syncCollection.getCollectionId())) {
+			syncCollectionResponse.setCollectionValidity(false);
+		} else if (st == null) {
 			syncCollectionResponse.setSyncStateValid(false);
 		} else {
 			syncCollection.setItemSyncState(st);
-			syncCollectionResponse.setSyncStateValid(true);
 			Date syncDate = null;
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
@@ -427,11 +431,21 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
+	private boolean collectionExist(Integer collectionId) throws DaoException {
+		try {
+			collectionDao.getCollectionPath(collectionId);
+		} catch (CollectionNotFoundException e) {
+			return false;
+		}
+		return true;
+	}
+
+	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse)
 			throws DaoException, InvalidServerId {
 		
 		backend.resetCollection(udr, syncCollection.getCollectionId());
 		syncCollectionResponse.setSyncStateValid(true);
+		syncCollectionResponse.setCollectionValidity(true);
 		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
 		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
 		String newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);

@@ -88,10 +88,15 @@ public class SyncProtocol {
 				DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
 			}
 			
-			if (!collectionResponse.isSyncStatevalid()) {
-				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asSpecificationValue());
-				DOMUtils.createElementAndText(ce, "SyncKey", "0");
+			if (!collectionResponse.isValid()) {
+				if (!collectionResponse.isCollectionValid()) {
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+					DOMUtils.createElementAndText(ce, "Status", SyncStatus.CONFLICT.asSpecificationValue());
+				} else if (!collectionResponse.isSyncStatevalid()) {
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+					DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asSpecificationValue());
+					DOMUtils.createElementAndText(ce, "SyncKey", "0");
+				}
 			} else {
 				Element sk = DOMUtils.createElement(ce, "SyncKey");
 				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
