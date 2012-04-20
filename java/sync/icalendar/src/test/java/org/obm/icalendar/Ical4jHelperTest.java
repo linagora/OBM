@@ -703,10 +703,9 @@ public class Ical4jHelperTest {
 
 		DateTime expectedExceptionOne = new DateTime(deletedExceptionOne);
 		DateTime expectedExceptionTwo = new DateTime(deletedExceptionTwo);
-		DateTime expectedExceptionThree = new DateTime(regularExceptionDate);
-		Assertions.assertThat(ret.getDates()).hasSize(3);
+		Assertions.assertThat(ret.getDates()).hasSize(2);
 		Assertions.assertThat(ret.getDates()).containsOnly(
-				expectedExceptionOne, expectedExceptionTwo, expectedExceptionThree);
+				expectedExceptionOne, expectedExceptionTwo);
 		Assertions.assertThat(ret.getDates().isUtc());
 	}
 

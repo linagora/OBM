@@ -1378,9 +1378,6 @@ public class Ical4jHelper {
 		for (Date exceptionDeleted : eventRecurrence.getExceptions()) {
 			exceptionDates.add(new DateTime(exceptionDeleted));
 		}
-		for (Event exception : eventRecurrence.getEventExceptions()) {
-			exceptionDates.add(new DateTime(exception.getRecurrenceId()));
-		}
 		return new ExDate(exceptionDates);
 	}
 
