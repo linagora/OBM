@@ -32,18 +32,18 @@ FIC_RPM_CONF="${REP_ETC_OBM}/obm-rpm.conf"
 
 echo -e "================= OBM system user configuration ==================\n"
 
-# Test de l'existance du fichier de conf obm-rpm.conf
+# Source the obm-rpm.conf file if exists
 if [ -s $FIC_RPM_CONF ]; then
         source $FIC_RPM_CONF
 else
-        echo "$0 (Err):Le fichier $FIC_RPM_CONF n'exite pas ou est vide"
-        echo "La configuration des utilisateurs systèmes est annulé"
+        echo "$0 (Err): The $FIC_RPM_CONF file is empty or does not exist"
+        echo "$0 (Err): System users configuration aborted"
 	exit 1
 fi
 
 
-# Demande du mot de passe pour le compte ldapadmin
-echo -e "o Enter root ldap password [mdp3PaAl]\n"
+# LDAP admin password
+echo -e "o Enter the root ldap password [mdp3PaAl]\n"
 stty -echo
 read rootpw
 stty echo
@@ -51,8 +51,8 @@ if [ "x${rootpw}" == "x" ];then
 	rootpw='mdp3PaAL'
 fi
 
-# Demande du mot de passe pour le compte cyrus
-echo -e "o Enter admin cyrus password [cyrus]\n"
+# Cyrus admin password
+echo -e "o Enter the cyrus administrator password [cyrus]\n"
 stty -echo
 read cyruspw
 stty echo
@@ -60,17 +60,16 @@ if [ "x${cyruspw}" == "x" ];then
 	cyruspw='cyrus'
 fi
 
-if [ "${SAMBA_MODULE}" == "true" ]; then
-	echo -e "o Enter password for samba user [m#Pa!NtA]\n"
-	stty -echo
-	read sambapw
-	stty echo
-	if [ "x${sambapw}" == "x" ]; then
-		sambapw='m#Pa!NtA'
-	fi
+# Samba password
+echo -e "o Enter the Samba user password [m#Pa!NtA]\n"
+stty -echo
+read sambapw
+stty echo
+if [ "x${sambapw}" == "x" ]; then
+	sambapw='m#Pa!NtA'
 fi
 
-echo -e "o Do you want add syncrepl user? (y)es,(n)o [n]\n"
+echo -e "o Do you want to add a LDAP syncrepl user? (y)es,(n)o [n]\n"
 read add_synrepl
 if [ "x${add_synrepl}" == "xy" ]; then
 	echo "o Enter password for syncrepl user [MoSync#]"
@@ -83,25 +82,22 @@ if [ "x${add_synrepl}" == "xy" ]; then
 fi
 
 
-# Détection du tpye de base de données
-
-# definition des requetes PGSQL
+# PGSQL update/insert requests
 PG_SYNCREPL="INSERT into usersystem (usersystem_login,usersystem_password,usersystem_uid,usersystem_gid,usersystem_homedir,usersystem_lastname,usersystem_firstname,usersystem_shell) VALUES ('syncrepl','${synreplpw}','102','65534','/','LDAP Syncrepl user','LDAP Syncrepl user','/sbin/nologin');"
 PG_LDAPADMIN_PW="UPDATE usersystem SET usersystem_password = '${rootpw}' WHERE usersystem_login = 'ldapadmin';"
 PG_SAMBA_PW="UPDATE usersystem SET usersystem_password = '${sambapw}' WHERE usersystem_login = 'samba';"
 PG_CYRUS_PW="UPDATE usersystem SET usersystem_password = '${cyruspw}' WHERE usersystem_login = 'cyrus';"
 
+# MYSQL update/insert requests
 MY_SYNCREPL="INSERT into UserSystem (usersystem_login,usersystem_password,usersystem_uid,usersystem_gid,usersystem_homedir,usersystem_lastname,usersystem_firstname,usersystem_shell) VALUES ('syncrepl','${synreplpw}','102','65534','/','LDAP Syncrepl user','LDAP Syncrepl user','/sbin/nologin');"
 MY_LDAPADMIN_PW="UPDATE UserSystem SET usersystem_password = '${rootpw}' WHERE usersystem_login = 'ldapadmin';"
 MY_SAMBA_PW="UPDATE UserSystem SET usersystem_password = '${sambapw}' WHERE usersystem_login = 'samba';"
 MY_CYRUS_PW="UPDATE UserSystem SET usersystem_password = '${cyruspw}' WHERE usersystem_login = 'cyrus';"
 
-echo "Insertion des utilisateurs en BD"
+echo "Inserting system users into the database..."
 if [ "${OBM_DBTYPE}" == "PGSQL" ]; then
 export PGPASSWORD="${OBM_PASSWD}";
-# On recharge les index pour les sequences postgres
-#psql -U ${OBM_DBUSER} ${OBM_DBNAME} -c "VACUUM;"
-# ci-dessus ne fonctionne pas donc:
+
 export PGPASSWORD=${OBM_PASSWD}
 psql -U ${OBM_DBUSER} -h ${OBM_HOST} ${OBM_DBNAME} -c "SELECT nextval('usersystem_usersystem_id_seq');" 1>/dev/null 2>&1
 	if [ "x${add_synrepl}" == "xy" ]; then 
