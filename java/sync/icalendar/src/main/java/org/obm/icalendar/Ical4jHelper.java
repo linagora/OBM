@@ -1373,6 +1373,7 @@ public class Ical4jHelper {
 
 	private ExDate buildExDate(EventRecurrence eventRecurrence) {
 		DateList exceptionDates = new DateList();
+		exceptionDates.setUtc(true);
 
 		for (Date exceptionDeleted : eventRecurrence.getExceptions()) {
 			exceptionDates.add(new DateTime(exceptionDeleted));

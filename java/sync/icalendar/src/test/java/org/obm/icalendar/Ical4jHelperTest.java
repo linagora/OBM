@@ -34,7 +34,6 @@ package org.obm.icalendar;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -207,18 +206,33 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testParseEvents() {
+	public void testParseEvents() throws IOException {
 		Event event1 = getTestEvent();
 		Event event2 = getTestEvent();
 		List<Event> l = new LinkedList<Event>();
 		l.add(event1);
 		l.add(event2);
+
+		InputStream stream = getStreamICS("serializedOBMEvent.ics");
+		String expectedICS = IOUtils.toString(stream);
+		stream.close();
+
 		AccessToken token = new AccessToken(0, "OBM");
 		String ics = getIcal4jHelper().parseEvents(getDefaultObmUser(), l, token);
-		assertNotNull(ics);
-		assertNotSame("", ics);
-	}
 
+		String icsWithoutTimestamps = stripTimestamps(ics);
+		String expectedICSWithoutTimestamps = stripTimestamps(expectedICS);
+
+		Assertions.assertThat(icsWithoutTimestamps).isNotNull().isNotEmpty()
+				.isEqualTo(expectedICSWithoutTimestamps);
+	}
+	
+	private String stripTimestamps(String ics) {
+		String minusDtStamp = ics.replaceAll("DTSTAMP:\\d{8}T\\d{6}Z", "");
+		String minusLastAck = minusDtStamp.replaceAll("X-MO-LASTACK:\\d{8}T\\d{6}Z", "");
+		return minusLastAck;
+	}
+	
 	@Test(expected = IllegalRecurrenceKindException.class)
 	public void testGetRecurWithIllegalRecurrenceKind() {
 		EventRecurrence eventRecurrence = EasyMock.createMock(EventRecurrence.class);
@@ -641,9 +655,11 @@ public class Ical4jHelperTest {
 
 		DateTime expectedExceptionOne = new DateTime(exceptionOne);
 		DateTime expectedExceptionTwo = new DateTime(exceptionTwo);
+		
 		ExDate ret = getIcal4jHelper().getExDate(event);
 		assertEquals(2, ret.getDates().size());
 		Assertions.assertThat(ret.getDates()).containsOnly(expectedExceptionOne, expectedExceptionTwo);
+		Assertions.assertThat(ret.getDates().isUtc());
 	}
 
 	@Test
@@ -691,6 +707,7 @@ public class Ical4jHelperTest {
 		Assertions.assertThat(ret.getDates()).hasSize(3);
 		Assertions.assertThat(ret.getDates()).containsOnly(
 				expectedExceptionOne, expectedExceptionTwo, expectedExceptionThree);
+		Assertions.assertThat(ret.getDates().isUtc());
 	}
 
 	@Test
@@ -1027,10 +1044,11 @@ public class Ical4jHelperTest {
 	
 	private Event buildEvent() {
 		final Event event = new Event();
-		event.setStartDate(new Date());
+		
+		event.setStartDate(new Date(1334914893));
 
 		event.setExtId(new EventExtId("2bf7db53-8820-4fe5-9a78-acc6d3262eza9"));
-		event.setTitle("rdv " + System.currentTimeMillis());
+		event.setTitle("rdv abc");
 		event.setOwner("obm");
 		event.setDuration(3600);
 		event.setLocation("obm loca");
