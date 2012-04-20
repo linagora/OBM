@@ -4,6 +4,9 @@
 %global _binary_payload w9.gzdio
 %global _source_payload w9.gzdio
 
+#Define obm-jetty configuration
+%global obmjettyconf %{_sysconfig}/jetty
+
 Name: obm-jetty
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
@@ -22,7 +25,6 @@ Obsoletes: jetty6 <= 6.1.14-2
 
 BuildArch: noarch
 Requires(post): jetty
-
 
 
 %description
@@ -44,17 +46,13 @@ install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.x
 %{_docdir}/obm-jetty/jetty-logging.xml.sample
 
 %post
-service jetty stop > /dev/null 2>&1 || :
-if [ -e %{_sysconfdir}/jetty/jetty.xml ] && [ `diff %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty/jetty.xml` -ne 0 ]; then
-	cp %{_sysconfdir}/jetty/jetty.xml %{_sysconfdir}/jetty/jetty.xml.orig
-fi
-cp %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty/jetty.xml
+for f in jetty.xml jetty-logging.xml ; do
+  if [ -e %{obmjettyconf}/${f} ] ; then
+    if [ %{obmjettyconf}/${f} -nt %{_docdir}/obm-jetty/${f}.sample ] ; then
+      cp -p %{obmjettyconf}/${f} %{obmjettyconf}/${f}.orig
+    fi
+  fi
+  cp -p %{_docdir}/obm-jetty/${f}.sample %{obmjettyconf}/${f}
+done
 
-if [ -e %{_sysconfdir}/jetty/jetty-logging.xml ] && [ `diff %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty/jetty-logging.xml` ]; then
-	cp %{_sysconfdir}/jetty/jetty-logging.xml %{_sysconfdir}/jetty/jetty-logging.xml.orig
-fi
-cp %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty/jetty-logging.xml
-if [ `grep -F %{_sysconfdir}/jetty/jetty-logging.xml %{_sysconfdir}/jetty/jetty-logging.xml` -ne 0 ]; then
-    echo %{_sysconfdir}/jetty/jetty-logging.xml >> %{_sysconfdir}/jetty/jetty-logging.xml
-fi
-service jetty start > /dev/null 2>&1 || :
+service jetty restart > /dev/null 2>&1 || :
