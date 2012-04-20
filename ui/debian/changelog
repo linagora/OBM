@@ -1,3 +1,9 @@
+obm (2.4.1~alpha9) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Fri, 20 Apr 2012 17:50:25 +0000
+
 obm (2.4.1~alpha8) stable; urgency=low
 
   * New upstream release.
