@@ -109,6 +109,7 @@ public class ActiveSyncServletTest {
 		expect(activeSyncRequest.getDeviceType()).andReturn(deviceType).anyTimes();
 		expect(activeSyncRequest.getUserAgent()).andReturn(userAgent).anyTimes();
 		expect(activeSyncRequest.getMsPolicyKey()).andReturn(null).anyTimes();
+		expect(activeSyncRequest.getHttpServletRequest()).andReturn(request).anyTimes();
 		
 		policyService = mocksControl.createMock(PolicyService.class);
 		expect(policyService.needProvisionning(activeSyncRequest, user)).andReturn(false);
@@ -165,7 +166,7 @@ public class ActiveSyncServletTest {
 
 	private ResponderImpl.Factory createResponderFactory() {
 		ResponderImpl.Factory responderFactory = mocksControl.createMock(ResponderImpl.Factory.class);
-		expect(responderFactory.createResponder(response)).andReturn(null).anyTimes();
+		expect(responderFactory.createResponder(request, response)).andReturn(null).anyTimes();
 		return responderFactory;
 	}
 

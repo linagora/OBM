@@ -105,7 +105,7 @@ public class AutodiscoverServletTest {
 	
 	private ResponderImpl.Factory bindResponderFactory(Responder responder) {
 		ResponderImpl.Factory responderFactory = mocksControl.createMock(ResponderImpl.Factory.class);
-		expect(responderFactory.createResponder(response)).andReturn(responder).anyTimes();
+		expect(responderFactory.createResponder(request, response)).andReturn(responder).anyTimes();
 		return responderFactory;
 	}
 

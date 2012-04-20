@@ -143,7 +143,7 @@ public class ActiveSyncServlet extends HttpServlet {
 							continuation.isResumed(), request.getMethod(), continuation.getReqId() });
 
 			if (continuation.isResumed() || !continuation.isInitial()) {
-				handleContinuation(response, continuation);
+				handleContinuation(request, response, continuation);
 				return;
 			}
 
@@ -181,7 +181,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 
-	private void handleContinuation(HttpServletResponse response, IContinuation c) {
+	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {
 		UserDataRequest udr = c.getUserDataRequest();
 
 		IListenerRegistration reg = c.getListenerRegistration();
@@ -196,7 +196,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
-		Responder responder = responderFactory.createResponder(response);
+		Responder responder = responderFactory.createResponder(request, response);
 		if (c.isError()) {
 			ph.sendError(udr.getDevice(), responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
@@ -205,7 +205,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 	
 	private void checkAuthorizedDevice(ActiveSyncRequest request, Credentials credentials) throws AuthFault, DaoException {
-		
 		String deviceId = request.getDeviceId();
 		String deviceType = request.getDeviceType();
 		String userAgent = request.getUserAgent();
@@ -243,7 +242,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			}
 	
 			sendASHeaders(response);
-			responder = responderFactory.createResponder(response);
+			responder = responderFactory.createResponder(request.getHttpServletRequest(), response);
 			rh.process(continuation, userDataRequest, request, responder);
 		} finally {
 			if (userDataRequest != null) {

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
@@ -75,21 +76,24 @@ public class ResponderImpl implements Responder {
 			this.domDumper = domDumper;
 		}
 		
-		public Responder createResponder(HttpServletResponse resp) {
-			return new ResponderImpl(resp, intEncoder, wbxmlTools, domDumper);
+		public Responder createResponder(HttpServletRequest req, HttpServletResponse resp) {
+			return new ResponderImpl(req, resp, intEncoder, wbxmlTools, domDumper);
 		}
 		
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ResponderImpl.class);
-	private HttpServletResponse resp;
+	
+	private final HttpServletRequest req;
+	private final HttpServletResponse resp;
 	private final IntEncoder intEncoder;
 	private final WBXMLTools wbxmlTools;
 	private final DOMDumper domDumper;
 	
-	/* package */ ResponderImpl(HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools, 
+	/* package */ ResponderImpl(HttpServletRequest req, HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools, 
 			DOMDumper domDumper) {
 		
+		this.req = req;
 		this.resp = resp;
 		this.intEncoder = intEncoder;
 		this.wbxmlTools = wbxmlTools;
@@ -103,7 +107,7 @@ public class ResponderImpl implements Responder {
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
-			writeData(wbxml, "application/vnd.ms-sync");	
+			writeData(wbxml, req.getContentType());	
 		} catch (WBXmlException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {

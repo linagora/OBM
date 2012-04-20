@@ -82,7 +82,7 @@ public class AutodiscoverServlet extends HttpServlet {
 			
 			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null, null);
 			SimpleQueryString queryString = new SimpleQueryString(request);
-			Responder responder = responderFactory.createResponder(response);
+			Responder responder = responderFactory.createResponder(request, response);
 			
 			autodiscoverHandler.process(null, userDataRequest, queryString, responder);
 		} finally {
