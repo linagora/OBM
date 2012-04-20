@@ -428,6 +428,9 @@ rm -rf $RPM_BUILD_ROOT
 %post		-n %{name}-ui
 if [ $1 -eq 1 ] ; then
   chkconfig httpd on &>/dev/null
+  if [ -f %{_sbindir}/setsebool ] ; then
+    %{_sbindir}/setsebool httpd_can_network_connect=1 &>/dev/null
+  fi
 fi
 
 %files
