@@ -465,6 +465,23 @@ class Perm {
   }
 
 
+  function user_can_edit_peer_profile($user_profile, $peer_profile) {
+    $user_privilege = $user_profile['properties']['level'];
+    $user_manage_peers = $user_profile['properties']['level_managepeers'];
+    $peer_privilege = $peer_profile['properties']['level'];
+    return self::user_has_profile_privileges($user_privilege, $peer_privilege, $user_manage_peers);
+  }
+
+  function user_has_profile_privileges(
+        $user_privilege,
+        $peer_privilege,
+        $user_manage_peers) {
+    return
+      ($user_manage_peers
+        && $user_privilege == $peer_privilege)
+      || $user_privilege > $peer_privilege;
+  }
+
   //-------------------------------------------------------------------------//
   // Return the profile access right of the section given as parameter       //
   // Parameters:
