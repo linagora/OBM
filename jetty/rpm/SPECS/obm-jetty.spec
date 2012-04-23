@@ -10,13 +10,8 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: jetty.xml.sample
 Source1: jetty-logging.xml.sample
 
-#Clear previous jetty6 from jpackage.org provided by obm.org
-Provides: jetty6 = 6.1.14-2
-Obsoletes: jetty6 <= 6.1.14-2
-
 BuildArch: noarch
-Requires(post): jetty
-
+Requires(post): jetty6
 
 
 %description
@@ -38,17 +33,17 @@ install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.x
 %{_docdir}/obm-jetty/jetty-logging.xml.sample
 
 %post
-service jetty stop > /dev/null 2>&1 || :
-if [ -e %{_sysconfdir}/jetty/jetty.xml ] && [ `diff %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty/jetty.xml` -ne 0 ]; then
-	cp %{_sysconfdir}/jetty/jetty.xml %{_sysconfdir}/jetty/jetty.xml.orig
+service jetty6 stop > /dev/null 2>&1 || :
+if [ -e %{_sysconfdir}/jetty6/jetty.xml ] && [ `diff %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty6/jetty.xml` -ne 0 ]; then
+	cp %{_sysconfdir}/jetty6/jetty.xml %{_sysconfdir}/jetty6/jetty.xml.orig
 fi
-cp %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty/jetty.xml
+cp %{_docdir}/obm-jetty/jetty.xml.sample %{_sysconfdir}/jetty6/jetty.xml
 
-if [ -e %{_sysconfdir}/jetty/jetty-logging.xml ] && [ `diff %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty/jetty-logging.xml` ]; then
-	cp %{_sysconfdir}/jetty/jetty-logging.xml %{_sysconfdir}/jetty/jetty-logging.xml.orig
+if [ -e %{_sysconfdir}/jetty6/jetty-logging.xml ] && [ `diff %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty6/jetty-logging.xml` ]; then
+	cp %{_sysconfdir}/jetty6/jetty-logging.xml %{_sysconfdir}/jetty6/jetty-logging.xml.orig
 fi
-cp %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty/jetty-logging.xml
-if [ `grep -F %{_sysconfdir}/jetty/jetty-logging.xml %{_sysconfdir}/jetty/jetty-logging.xml` -ne 0 ]; then
-    echo %{_sysconfdir}/jetty/jetty-logging.xml >> %{_sysconfdir}/jetty/jetty-logging.xml
+cp %{_docdir}/obm-jetty/jetty-logging.xml.sample %{_sysconfdir}/jetty6/jetty-logging.xml
+if [ `grep -F %{_sysconfdir}/jetty6/jetty-logging.xml %{_sysconfdir}/jetty6/jetty-logging.xml` -ne 0 ]; then
+    echo %{_sysconfdir}/jetty6/jetty-logging.xml >> %{_sysconfdir}/jetty6/jetty-logging.xml
 fi
-service jetty start > /dev/null 2>&1 || :
+service jetty6 start > /dev/null 2>&1 || :
