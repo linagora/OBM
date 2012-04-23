@@ -71,7 +71,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps = con.prepareStatement("SELECT id, identifier, type FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-					+ "WHERE identifier=? AND lower(userobm_login)=? AND lower(domain_name)=?");
+					+ "WHERE identifier=? AND userobm_login=? AND domain_name=?");
 			ps.setString(1, deviceId);
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
@@ -102,7 +102,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps = con.prepareStatement("INSERT INTO opush_device (identifier, type, owner) "
 					+ "SELECT ?, ?, userobm_id FROM UserObm "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-					+ "WHERE lower(userobm_login)=? AND lower(domain_name)=?");
+					+ "WHERE userobm_login=? AND domain_name=?");
 			ps.setString(1, deviceId);
 			ps.setString(2, deviceType);
 			ps.setString(3, user.getLogin());
@@ -126,7 +126,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN UserObm u ON owner=userobm_id "
 					+ "INNER JOIN Domain d ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device od ON device_id=id "
-					+ "WHERE od.identifier=? AND lower(u.userobm_login)=? AND lower(d.domain_name)=?");
+					+ "WHERE od.identifier=? AND u.userobm_login=? AND d.domain_name=?");
 			ps.setString(1, deviceId);
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
@@ -159,7 +159,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device ON device_id=id "
-					+ "WHERE identifier=? AND lower(userobm_login)=? AND lower(domain_name)=?");
+					+ "WHERE identifier=? AND userobm_login=? AND domain_name=?");
 			ps.setString(1, deviceId);
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
@@ -192,7 +192,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "SELECT ?, id, owner FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-					+ "WHERE lower(userobm_login)=? AND lower(domain_name)=? AND identifier=? LIMIT 1");
+					+ "WHERE userobm_login=? AND domain_name=? AND identifier=? LIMIT 1");
 
 			ps.setLong(1, newPolicyKeyId);
 			ps.setString(2, user.getLogin());
@@ -246,7 +246,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 						+ "SELECT policy FROM opush_sync_perms "
 						+ "INNER JOIN UserObm ON owner=userobm_id "
 						+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-						+ "WHERE lower(userobm_login)=? AND lower(domain_name)=? AND device_id=?);");
+						+ "WHERE userobm_login=? AND domain_name=? AND device_id=?);");
 
 			ps.setString(1, user.getLogin());
 			ps.setString(2, user.getDomain());
