@@ -125,7 +125,6 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		boolean hasSyncPerm = false;
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT policy FROM opush_sync_perms "
@@ -139,18 +138,15 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				hasSyncPerm = true;
+				return true;
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
-		if (!hasSyncPerm) {
-			logger.info(user
-					+ " isn't authorized to synchronize in OBM-UI");
-		}
-		return hasSyncPerm;
+		logger.info(user + " isn't authorized to synchronize in OBM-UI");
+		return false;
 	}
 
 	@Override
