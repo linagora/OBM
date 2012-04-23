@@ -1585,7 +1585,7 @@ Obm.CalendarInDayEvent = new Class({
     } else {
       var end =  new Obm.DateTime((this.event.time+this.event.duration) * 1000);
       var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' - ' + end.format(obm.vars.regexp.dispTimeFormat);
-      this.locationContainer.set('html',location);
+      this.locationContainer.set('text',location);
     }
     
     // Workaround : HTML entities aren't converted to actual symbols in a JS-inserted "title" attribute
@@ -1595,7 +1595,7 @@ Obm.CalendarInDayEvent = new Class({
 
     this.element.setProperty('title', decodedTitle + ' ' + location);
     this.timeContainer.set('html',time);
-    this.titleContainer.set('html',title);
+    this.titleContainer.set('text',title);
   },
 
 
@@ -2327,11 +2327,11 @@ Obm.CalendarQuickForm = new Class({
       }
     }
 
-    this.description.set('html',evt.event.description);
+    this.description.set('text',evt.event.description);
     this.item.set('html',evt.event.item);
     this.category.set('html',evt.event.category);
-    this.location.set('html',evt.event.location);
-    this.organizer.set('html',evt.event.organizer_name);
+    this.location.set('text',evt.event.location);
+    this.organizer.set('text',evt.event.organizer_name);
 
     this.data.setStyle('display','block');
     if (!this.eventData.all_day) {

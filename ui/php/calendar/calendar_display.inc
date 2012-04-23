@@ -3031,15 +3031,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $event_q->f('event_owner') == $obm['uid'] ||
       in_array($obm['uid'],$entities['user']['ids'])) {
 
-    $title = $event_q->f('event_title');
-    $location = $event_q->f('event_location');
+    $title = htmlspecialchars($event_q->f('event_title'));
+    $location = htmlspecialchars($event_q->f('event_location'));
     $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
     $priority = $event_q->f('event_priority'); 
     $properties = $event_q->f('event_properties');
-    $description = nl2br($event_q->f('event_description'));
+    $description = nl2br(htmlspecialchars($event_q->f('event_description')));
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset' ?".">".$properties;
