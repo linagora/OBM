@@ -1,4 +1,4 @@
-# Force using the same RPM properties as EL5
+# Forcing using the same RPM properties as EL5
 %global _source_filedigest_algorithm 1
 %global _binary_filedigest_algorithm 1
 %global _binary_payload w9.gzdio
