@@ -77,23 +77,24 @@ public class ResponderImpl implements Responder {
 		}
 		
 		public Responder createResponder(HttpServletRequest req, HttpServletResponse resp) {
-			return new ResponderImpl(req, resp, intEncoder, wbxmlTools, domDumper);
+			return new ResponderImpl(req.getContentType(), resp, intEncoder, wbxmlTools, domDumper);
 		}
 		
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ResponderImpl.class);
 	
-	private final HttpServletRequest req;
+	private final String contentType;
 	private final HttpServletResponse resp;
 	private final IntEncoder intEncoder;
 	private final WBXMLTools wbxmlTools;
 	private final DOMDumper domDumper;
+
 	
-	/* package */ ResponderImpl(HttpServletRequest req, HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools, 
+	/* package */ ResponderImpl(String contentType, HttpServletResponse resp, IntEncoder intEncoder, WBXMLTools wbxmlTools, 
 			DOMDumper domDumper) {
 		
-		this.req = req;
+		this.contentType = contentType;
 		this.resp = resp;
 		this.intEncoder = intEncoder;
 		this.wbxmlTools = wbxmlTools;
@@ -107,7 +108,7 @@ public class ResponderImpl implements Responder {
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);
-			writeData(wbxml, req.getContentType());	
+			writeData(wbxml, contentType);	
 		} catch (WBXmlException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {

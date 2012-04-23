@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMock;
@@ -80,10 +79,8 @@ public class ResponderImplTest {
 		String namespace = "myNamespace";
 		byte[] data = null;
 
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		String contentType = "application/vnd.ms-sync";
-		EasyMock.expect(servletRequest.getContentType()).andReturn(contentType).once();
 		servletResponse.setContentType(contentType);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
@@ -91,8 +88,8 @@ public class ResponderImplTest {
 		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
 		
 		EasyMock.expect(wbxmlTools.toWbxml(namespace, document)).andReturn(data);
-		EasyMock.replay(servletRequest, servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
+		ResponderImpl responder = new ResponderImpl(contentType, servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		
 		try {
@@ -106,7 +103,6 @@ public class ResponderImplTest {
 	
 	private void sendResponseWithData(String namespace, byte[] data)
 			throws WBXmlException, IOException {
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		ServletOutputStream servletOutputStream = EasyMock.createMock(ServletOutputStream.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
@@ -116,7 +112,6 @@ public class ResponderImplTest {
 		
 		EasyMock.expect(wbxmlTools.toWbxml(namespace, document)).andReturn(data);
 		String contentType = "application/vnd.ms-sync";
-		EasyMock.expect(servletRequest.getContentType()).andReturn(contentType).once();
 		servletResponse.setContentType(contentType);
 		servletResponse.setContentLength(data.length);
 		EasyMock.expect(servletResponse.getOutputStream()).andReturn(servletOutputStream);
@@ -124,8 +119,8 @@ public class ResponderImplTest {
 		servletOutputStream.flush();
 		servletOutputStream.close();
 		
-		EasyMock.replay(servletRequest, servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
+		ResponderImpl responder = new ResponderImpl(contentType, servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		responder.sendWBXMLResponse(namespace, document);
 		
@@ -150,7 +145,6 @@ public class ResponderImplTest {
 
 	private void sendResponseFile(String contentType, byte[] data)
 			throws IOException {
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		ServletOutputStream servletOutputStream = EasyMock.createMock(ServletOutputStream.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
@@ -166,7 +160,7 @@ public class ResponderImplTest {
 		servletResponse.setStatus(200);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		ResponderImpl responder = new ResponderImpl(contentType, servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		responder.sendResponseFile(contentType, new ByteArrayInputStream(data));
 		
@@ -178,14 +172,13 @@ public class ResponderImplTest {
 		String contentType = null;
 		byte[] data = {1, 2, 3, 4, 5};
 
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		ResponderImpl responder = new ResponderImpl("unused content type", servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		try {
 			responder.sendResponseFile(contentType, new ByteArrayInputStream(data));
@@ -199,14 +192,13 @@ public class ResponderImplTest {
 	public void sendResponseFileWithNullStream() throws Throwable {
 		String contentType = "application/pdf";
 
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
 		DOMDumper domDumper = EasyMock.createMock(DOMDumper.class);
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		ResponderImpl responder = new ResponderImpl("unused content type", servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		try {
 			responder.sendResponseFile(contentType, null);
@@ -219,7 +211,6 @@ public class ResponderImplTest {
 	@Test
 	public void sendError() throws IOException {
 		int status = 123;
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
 		WBXMLTools wbxmlTools = EasyMock.createMock(WBXMLTools.class);
@@ -227,7 +218,7 @@ public class ResponderImplTest {
 		
 		servletResponse.sendError(status);
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		ResponderImpl responder = new ResponderImpl("unused content type", servletResponse, intEncoder, wbxmlTools, domDumper);
 		responder.sendError(status);
 		EasyMock.verify(servletResponse, intEncoder, wbxmlTools);
 	}
@@ -239,7 +230,6 @@ public class ResponderImplTest {
 		byte[] textData = {4, 3, 2, 1};
 		byte[] binaryPart = {1, 2, 3};
 
-		HttpServletRequest servletRequest = EasyMock.createMock(HttpServletRequest.class);
 		HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);
 		ServletOutputStream servletOutputStream = EasyMock.createMock(ServletOutputStream.class);
 		IntEncoder intEncoder = EasyMock.createMock(IntEncoder.class);
@@ -261,7 +251,7 @@ public class ResponderImplTest {
 		servletOutputStream.close();
 		
 		EasyMock.replay(servletResponse, intEncoder, wbxmlTools, document);
-		ResponderImpl responder = new ResponderImpl(servletRequest, servletResponse, intEncoder, wbxmlTools, domDumper);
+		ResponderImpl responder = new ResponderImpl("unused content type", servletResponse, intEncoder, wbxmlTools, domDumper);
 		
 		responder.sendMSSyncMultipartResponse(namespace, document, Arrays.asList(binaryPart), false);
 		
