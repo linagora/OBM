@@ -167,6 +167,16 @@ public final class DOMUtils {
 		return null;
 	}
 
+	public static Integer getElementInteger(Element node) {
+		if (isTextElement(node)) {
+			Text txtElem = (Text) node.getFirstChild();
+			if (txtElem != null) {
+				return Integer.valueOf(txtElem.getData());
+			}
+		}
+		return null;
+	}
+	
 	private static boolean isTextElement(Element node) {
 		if (node.getFirstChild() instanceof Text) {
 			return true;

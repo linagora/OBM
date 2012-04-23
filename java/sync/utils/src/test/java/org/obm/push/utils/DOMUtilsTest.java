@@ -159,5 +159,33 @@ public class DOMUtilsTest {
 	private String streamToString(ByteArrayOutputStream out) {
 		return new String(out.toByteArray(), Charsets.UTF_8);
 	}
+	
+	@Test
+	public void getElementIntegerIntNode() {
+		int expected = 123;
+		Document reply = DOMUtils.createDoc(null, "Sync");
+		Element root = reply.getDocumentElement();
+		Element intNode = DOMUtils.createElementAndText(root, "myNode", String.valueOf(expected));
+		Integer actual = DOMUtils.getElementInteger(intNode);
+		assertThat(actual).isEqualTo(expected);
+	}
+
+	@Test
+	public void getElementIntegerNullIntNode() {
+		Document reply = DOMUtils.createDoc(null, "Sync");
+		Element root = reply.getDocumentElement();
+		Element intNode = DOMUtils.createElement(root, "myNode");
+		Integer actual = DOMUtils.getElementInteger(intNode);
+		assertThat(actual).isNull();
+	}
+	
+	@Test(expected=NumberFormatException.class)
+	public void getElementIntegerNonIntNode() {
+		Document reply = DOMUtils.createDoc(null, "Sync");
+		Element root = reply.getDocumentElement();
+		Element intNode = DOMUtils.createElementAndText(root, "myNode", "toto");
+		DOMUtils.getElementInteger(intNode);
+	}
+	
 }
 
