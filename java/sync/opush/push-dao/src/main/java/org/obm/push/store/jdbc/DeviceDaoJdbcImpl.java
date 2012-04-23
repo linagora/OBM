@@ -167,9 +167,9 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps.setString(3, user.getDomain());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				Object policyKey = rs.getObject("policy");
-				if (policyKey != null) {
-					return ((Number) policyKey).longValue();
+				long policyKey = rs.getLong("policy");
+				if (!rs.wasNull()) {
+					return policyKey;
 				}
 			}
 		} catch (SQLException e) {
