@@ -74,7 +74,7 @@ public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
 		if (messageAddress == null) {
 			part = "HEADER";
 		} else {
-			part = messageAddress.toString() + ".HEADER";
+			part = messageAddress.getAddress() + ".HEADER";
 		}
 		InputStream is = uidFetchPart(message, part);
 		InputStreamReader reader = new InputStreamReader(is, getHeaderCharsetDecoder(mimePart));

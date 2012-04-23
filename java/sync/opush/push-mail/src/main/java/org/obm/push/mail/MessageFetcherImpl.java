@@ -55,12 +55,12 @@ public class MessageFetcherImpl extends AbstractMessageFetcherImpl {
 
 	@Override
 	protected InputStream uidFetchPart(MimeMessage message, IMimePart mimePart) {
-		return storeClient.uidFetchPart(message.getUid(), mimePart.getAddress().toString());
+		return storeClient.uidFetchPart(message.getUid(), mimePart.getAddress().getAddress());
 	}
 
 	@Override
 	protected InputStream uidFetchPart(MailMessage message, IMimePart mimePart) {
-		return storeClient.uidFetchPart(message.getUid(), mimePart.getAddress().toString());
+		return storeClient.uidFetchPart(message.getUid(), mimePart.getAddress().getAddress());
 	}
 
 }

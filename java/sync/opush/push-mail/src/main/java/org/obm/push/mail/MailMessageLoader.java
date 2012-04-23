@@ -190,7 +190,7 @@ public class MailMessageLoader {
 	
 	private InputStream extractInputStreamInvitation(final IMimePart mp, final long uid, final long messageId) throws IOException {
 		byte[] data = null;
-		final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().toString());
+		final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
 		data = extractPartData(mp, part, messageId);
 		if (data != null) {
 			return new ByteArrayInputStream(data);
@@ -309,11 +309,11 @@ public class MailMessageLoader {
 			
 			if (mp.getName() != null || mp.getContentId() != null) {
 				byte[] data = null;
-				final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().toString());
+				final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
 				data = extractPartData(mp, part, messageId);
 				
 				final String id = AttachmentHelper.getAttachmentId(collectionId.toString(), String.valueOf(messageId), 
-						mp.getAddress().toString(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
+						mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
 				
 				String name = mp.getName();
 				if (name == null) {
