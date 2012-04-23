@@ -474,6 +474,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			
 			boolean isInternal = eventConverter.isInternalEvent(previousEvent, false);
 			Event newEvent = convertMSObjectToObmObject(bs, event, previousEvent, isInternal);
+			newEvent.setExtId(extId);
 			
 			if (previousEvent == null) {
 				try {

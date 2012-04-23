@@ -52,6 +52,7 @@ import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.client.login.LoginService;
@@ -121,7 +122,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional(readOnly=true)
-	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException {
+	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException {
 		return calendarDao.getEventExtIdFor(msEventUid, device);
 	}
 	

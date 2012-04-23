@@ -11,6 +11,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.calendar.EventExtId;
 
 import com.google.inject.Inject;
@@ -23,7 +24,7 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 	}
 	
 	@Override
-	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException {
+	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException {
 		PreparedStatement ps = null;
 		Connection con = null;
 		ResultSet rs = null;
@@ -41,7 +42,8 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
-		return null;
+		String msg = String.format("No ExtId mapping found for Uid:{%s} and Device:{%s}", msEventUid.serializeToString(), device.getDatabaseId());
+		throw new EventNotFoundException(msg);
 	}
 	
 	@Override
