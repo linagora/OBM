@@ -53,6 +53,7 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -121,9 +122,9 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		provisionResponse.setPolicyStatus(ProvisionPolicyStatus.SUCCESS);
 	}
 
-	private boolean isCurrentPolicyKey(UserDataRequest udr, long policyKey) throws DaoException {
-		Long actualPolicyKey = deviceDao.getPolicyKey(udr.getUser(), udr.getDevId());
-		return actualPolicyKey != null && actualPolicyKey.longValue() == policyKey;
+	private boolean isCurrentPolicyKey(UserDataRequest bs, long policyKey) throws DaoException {
+		Long actualPolicyKey = deviceDao.getPolicyKey(bs.getUser(), bs.getDevId());
+		return Objects.equal(actualPolicyKey, policyKey);
 	}
 
 	private long allocateNewPolicyKey(UserDataRequest udr) throws DaoException {
