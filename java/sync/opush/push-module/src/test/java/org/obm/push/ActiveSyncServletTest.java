@@ -159,7 +159,8 @@ public class ActiveSyncServletTest {
 
 	private DeviceService createDeviceService() throws DaoException {
 		DeviceService deviceService = mocksControl.createMock(DeviceService.class);
-		expect(deviceService.initDevice(user, deviceId, deviceType, userAgent)).andReturn(true).anyTimes();
+		deviceService.initDevice(user, deviceId, deviceType, userAgent);
+		expectLastCall().anyTimes();
 		expect(deviceService.syncAuthorized(user, deviceId)).andReturn(true).anyTimes();
 		return deviceService;
 	}

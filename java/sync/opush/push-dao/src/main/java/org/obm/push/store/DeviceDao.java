@@ -42,10 +42,10 @@ public interface DeviceDao {
 	 */
 	boolean syncAuthorized(User user, String deviceId) throws DaoException;
 
-	public Device getDevice(User user, String deviceId, String userAgent)
+	Device getDevice(User user, String deviceId, String userAgent)
 			throws DaoException;
 
-	public boolean registerNewDevice(User user, String deviceId,
+	void registerNewDevice(User user, String deviceId,
 			String deviceType) throws DaoException;
 
 	Long getPolicyKey(User user, String deviceId) throws DaoException;

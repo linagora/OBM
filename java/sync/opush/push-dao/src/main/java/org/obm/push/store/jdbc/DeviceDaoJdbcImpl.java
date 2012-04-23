@@ -91,8 +91,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		return null;
 	}
 
-	public boolean registerNewDevice(User user, String deviceId,
-			String deviceType) throws DaoException {
+	@Override
+	public void registerNewDevice(User user, String deviceId, String deviceType) throws DaoException {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -107,7 +107,12 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps.setString(2, deviceType);
 			ps.setString(3, user.getLogin());
 			ps.setString(4, user.getDomain());
-			return ps.executeUpdate() != 0;
+			int updateStatus = ps.executeUpdate();
+			if (updateStatus == 0) {
+				throw new IllegalStateException("unknown user " + user.getLoginAtDomain());
+			} else if (updateStatus > 1) {
+				throw new IllegalStateException("several user " + user.getLoginAtDomain());
+			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -115,6 +120,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		}
 	}
 	
+	@Override
 	public boolean syncAuthorized(User user, String deviceId) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;

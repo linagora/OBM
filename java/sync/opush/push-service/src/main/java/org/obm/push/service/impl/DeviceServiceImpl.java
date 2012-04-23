@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -60,24 +61,16 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 	
 	@Override
-	public boolean initDevice(User loginAtDomain, String deviceId,
-			String deviceType, String userAgent) {
-		boolean ret = true;
+	public void initDevice(User loginAtDomain, String deviceId, String deviceType, String userAgent) {
 		try {
 			Device opushDeviceId = deviceDao.getDevice(loginAtDomain, deviceId, userAgent);
 			if (opushDeviceId == null) {
-				boolean registered = deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
-				if (!registered) {
-					logger.warn("did not insert any row in device table for device "
-							+ deviceType + " of " + loginAtDomain);
-					ret = false;
-				}
+				deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
 			}
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-			ret = false;
+		} catch (DaoException e) {
+			Throwables.propagate(e);
 		}
-		return ret;
+		
 	}
 	
 	@Override
