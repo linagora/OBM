@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
@@ -194,7 +193,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "SELECT ?, id, owner FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
-					+ "WHERE userobm_login=? AND domain_name=? AND identifier=? LIMIT 1");
+					+ "WHERE userobm_login=? AND domain_name=? AND identifier=?");
 
 			ps.setLong(1, newPolicyKeyId);
 			ps.setString(2, user.getLogin());
@@ -219,14 +218,11 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		ResultSet rs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_sec_policy DEFAULT VALUES;", Statement.RETURN_GENERATED_KEYS);
-			ps.executeUpdate();
-			rs = ps.getGeneratedKeys();
-			if (rs.next()) {
-				return rs.getLong("id");
-			} else {
+			ps = con.prepareStatement("INSERT INTO opush_sec_policy DEFAULT VALUES");
+			if (ps.executeUpdate() != 1) {
 				throw new DaoException("Cannot find the new generated id in result set");
 			}
+			return dbcp.lastInsertId(con);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
