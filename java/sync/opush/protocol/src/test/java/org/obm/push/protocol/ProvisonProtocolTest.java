@@ -77,11 +77,11 @@ public class ProvisonProtocolTest {
 	private Document buildRequestObjectTypeDocument(String policyKey) throws FactoryConfigurationError {
 		Document document = DOMUtils.createDoc(null, "Provision");
 		Element root = document.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", ProvisionStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", ProvisionStatus.SUCCESS.getSpecificationValue());
 		Element policies = DOMUtils.createElement(root, "Policies");
 		Element policyNode = DOMUtils.createElement(policies, "Policy");
 		DOMUtils.createElementAndText(policyNode, "PolicyType", MS_EAS_PROVISIONING_WBXML);
-		DOMUtils.createElementAndText(policyNode, "Status", ProvisionStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(policyNode, "Status", ProvisionStatus.SUCCESS.getSpecificationValue());
 		DOMUtils.createElementAndText(policyNode, "PolicyKey", policyKey);
 		return document;
 	}	

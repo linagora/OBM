@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import org.obm.push.bean.ProvisionPolicyStatus;
+import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,19 +58,34 @@ public abstract class Provision extends TemplateBasedCommand<ProvisionResponse> 
 		Node policyStatusNode = policyTypeNode.getNextSibling();
 		Node policyKeyNode = policyStatusNode.getNextSibling();
 
-		Long policyStatusValue = null;
-		if (policyKeyNode != null) {
-			policyStatusValue = Long.valueOf(policyKeyNode.getTextContent());
-		}
+		Long policyStatusValue = policyStatusValue(policyKeyNode);
 		boolean policyDataIsPresent = (policyKeyNode != null) && (policyKeyNode.getNextSibling() != null);
 
+		ProvisionStatus provisionStatus = provisionStatus(statusNode.getTextContent());
+		ProvisionPolicyStatus policyStatus = policyStatus(policyStatusNode.getTextContent()); 
+
 		return ProvisionResponse.builder()
-				.provisionStatus(Integer.valueOf(statusNode.getTextContent()))
-				.policyStatus(Integer.valueOf(policyStatusNode.getTextContent()))
+				.provisionStatus(provisionStatus)
+				.policyStatus(policyStatus)
 				.policyKey(policyStatusValue)
 				.policyType(policyTypeNode.getTextContent())
 				.hasPolicyData(policyDataIsPresent)
 				.build();
+	}
+
+	private ProvisionPolicyStatus policyStatus(String textContent) {
+		return ProvisionPolicyStatus.fromSpecificationValue(Integer.valueOf(textContent));
+	}
+
+	private ProvisionStatus provisionStatus(String textContent) {
+		return ProvisionStatus.fromSpecificationValue(Integer.valueOf(textContent));
+	}
+
+	private Long policyStatusValue(Node policyKeyNode) {
+		if (policyKeyNode != null) {
+			return Long.valueOf(policyKeyNode.getTextContent());
+		}
+		return null;
 	}
 
 }

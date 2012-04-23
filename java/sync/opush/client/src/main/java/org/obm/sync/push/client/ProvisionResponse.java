@@ -44,8 +44,8 @@ public class ProvisionResponse {
 	}
 	
 	public static class Builder {
-		private Integer provisionStatus;
-		private Integer policyStatus;
+		private ProvisionStatus provisionStatus;
+		private ProvisionPolicyStatus policyStatus;
 		private Long policyKey;
 		private String policyType;
 		private boolean hasPolicyData;
@@ -54,12 +54,12 @@ public class ProvisionResponse {
 			super();
 		}
 		
-		public Builder provisionStatus(Integer provisionStatus) {
+		public Builder provisionStatus(ProvisionStatus provisionStatus) {
 			this.provisionStatus = provisionStatus;
 			return this;
 		}
 		
-		public Builder policyStatus(Integer policyStatus) {
+		public Builder policyStatus(ProvisionPolicyStatus policyStatus) {
 			this.policyStatus = policyStatus;
 			return this;
 		}
@@ -80,9 +80,7 @@ public class ProvisionResponse {
 		}
 		
 		public ProvisionResponse build() {
-			ProvisionStatus status = ProvisionStatus.values()[provisionStatus-1];
-			ProvisionPolicyStatus policy = ProvisionPolicyStatus.values()[policyStatus-1];
-			return new ProvisionResponse(status, policy, policyKey, policyType, hasPolicyData);
+			return new ProvisionResponse(provisionStatus, policyStatus, policyKey, policyType, hasPolicyData);
 		}
 		
 	}

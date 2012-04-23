@@ -33,25 +33,28 @@ package org.obm.push.bean;
 
 public enum ProvisionPolicyStatus {
 
-	SUCCESS, // 1
-	POLICY_NOT_DEFINED, // 2
-	UNKNOW_POLICY_TYPE_VALUE, // 3
-	SERVER_POLICY_STATE_CORRUPTED, // 4
-	THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY; // 5
+	SUCCESS(1),
+	POLICY_NOT_DEFINED(2),
+	UNKNOW_POLICY_TYPE_VALUE(3),
+	SERVER_POLICY_STATE_CORRUPTED(4),
+	THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY(5);
 	
-	public String asXmlValue() {
-		switch (this) {
-		case POLICY_NOT_DEFINED:
-			return "2";
-		case UNKNOW_POLICY_TYPE_VALUE:
-			return "3";
-		case SERVER_POLICY_STATE_CORRUPTED:
-			return "4";
-		case THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY:
-			return "5";
-		case SUCCESS:
-		default:
-			return "1";
+	private final int specificationValue;
+
+	private ProvisionPolicyStatus(int specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+	
+	public int getSpecificationValue() {
+		return specificationValue;
+	}
+
+	public static ProvisionPolicyStatus fromSpecificationValue(int value) {
+		for (ProvisionPolicyStatus status: values()) {
+			if (status.getSpecificationValue() == value) {
+				return status;
+			}
 		}
+		throw new IllegalArgumentException("no status specified for value " + value);
 	}
 }

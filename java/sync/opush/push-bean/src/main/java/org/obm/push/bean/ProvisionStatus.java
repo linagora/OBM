@@ -33,22 +33,27 @@ package org.obm.push.bean;
 
 public enum ProvisionStatus {
 
-	SUCCESS, // 1
-	PROTOCOL_ERROR, // 2
-	GENERAL_SERVER_ERROR, // 3
-	DEVICE_EXTERNALLY_MANAGER; // 4
+	SUCCESS(1),
+	PROTOCOL_ERROR(2),
+	GENERAL_SERVER_ERROR(3),
+	DEVICE_EXTERNALLY_MANAGER(4);
 	
-	public String asXmlValue() {
-		switch (this) {
-		case PROTOCOL_ERROR:
-			return "2";
-		case GENERAL_SERVER_ERROR:
-			return "3";
-		case DEVICE_EXTERNALLY_MANAGER:
-			return "4";
-		case SUCCESS:
-		default:
-			return "1";
+	private final int specificationValue;
+
+	private ProvisionStatus(int specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+
+	public int getSpecificationValue() {
+		return specificationValue;
+	}
+	
+	public static ProvisionStatus fromSpecificationValue(int value) {
+		for (ProvisionStatus status: values()) {
+			if (status.getSpecificationValue() == value) {
+				return status;
+			}
 		}
+		throw new IllegalArgumentException("no status specified for value " + value);
 	}
 }
