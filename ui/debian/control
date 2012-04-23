@@ -135,7 +135,7 @@ Description: LDAP configuration for OBM
 Package: obm-cyrus
 Architecture: all
 Pre-depends: obm-satellite
-Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, obm-munin-node, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.4|cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.4|cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.4|cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.4|cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.4|cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, obm-munin-node, ${misc:Depends}
 Description: Cyrus/SASL configuration for OBM
  This package configures Cyrus/SASL for OBM.
  .
