@@ -36,7 +36,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.IDBCP;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +50,10 @@ public class LocatorDbHelper {
 	private static final Logger logger = LoggerFactory
 			.getLogger(LocatorDbHelper.class);
 
-	private final DatabaseConnectionProvider dbcp;
+	private final IDBCP dbcp;
 	
 	@Inject
-	protected LocatorDbHelper(DatabaseConnectionProvider dbcp) {
+	protected LocatorDbHelper(IDBCP dbcp) {
 		this.dbcp = dbcp;
 	}
 	
