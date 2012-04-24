@@ -39,8 +39,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

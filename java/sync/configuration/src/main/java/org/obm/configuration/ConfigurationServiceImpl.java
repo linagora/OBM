@@ -47,36 +47,27 @@ import com.google.common.collect.ImmutableMap;
 
 public class ConfigurationServiceImpl extends AbstractConfigurationService implements ConfigurationService {
 
-    private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
+	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
-    private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
-    private static final String LOCATOR_CACHE_TIMEOUT_KEY = "locator-cache-timeout";
-    private static final int LOCATOR_CACHE_TIMEOUT_DEFAULT = 30;
+	private final static String ASCMD = "Microsoft-Server-ActiveSync";
+	
+	private final static String EXTERNAL_URL_KEY = "external-url";
+	
+	private static final String DB_TYPE_KEY = "dbtype";
+	private static final String DB_HOST_KEY = "host";
+	private static final String DB_NAME_KEY = "db";
+	private static final String DB_USER_KEY = "user";
+	private static final String DB_PASSWORD_KEY = "password";
+	private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
 
-    private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
-    private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
-    private static final int TRANSACTION_TIMEOUT_DEFAULT = 1;
+	private final static String LOCATOR_PORT = "8084";
+	private final static String LOCATOR_APP_NAME = "obm-locator";
 
-    private final static String ASCMD = "Microsoft-Server-ActiveSync";
-
-    private final static String EXTERNAL_URL_KEY = "external-url";
-
-    private static final String DB_TYPE_KEY = "dbtype";
-    private static final String DB_HOST_KEY = "host";
-    private static final String DB_NAME_KEY = "db";
-    private static final String DB_USER_KEY = "user";
-    private static final String DB_PASSWORD_KEY = "password";
-    private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
-    private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
-
-    private final static String LOCATOR_PORT = "8084";
-    private final static String LOCATOR_APP_NAME = "obm-locator";
-
-    private final static String OBM_SYNC_PORT = "8080";
-    private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
-
-    private final ImmutableMap<String, TimeUnit> timeUnits;
-
+	private final static String OBM_SYNC_PORT = "8080";
+	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
+	
+	private final ImmutableMap<String, TimeUnit> timeUnits;
+	
 	public ConfigurationServiceImpl() {
 		super("/etc/obm/obm_conf.ini");
 		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
@@ -115,23 +106,23 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	
 	@Override
 	public int getLocatorCacheTimeout() {
-		return getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);
+		return getIntValue("locator-cache-timeout", 30);
 	}
 	
 	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
-		String key = getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
+		String key = getStringValue("locator-cache-timeunit");
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 	
 	@Override
 	public int getTransactionTimeout() {
-		return getIntValue(TRANSACTION_TIMEOUT_KEY, TRANSACTION_TIMEOUT_DEFAULT);
+		return getIntValue("transaction-timeout", 1);
 	}
 	
 	@Override
 	public TimeUnit getTransactionTimeoutUnit() {
-		String key = getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
+		String key = getStringValue("transaction-timeout-unit");
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 	
@@ -165,7 +156,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	@Override
 	public Integer getDataBaseMaxConnectionPoolSize() {
-		return getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
+		return getIntValue(DB_MAX_POOL_SIZE_KEY, 10);
 	}
 
 	@Override
