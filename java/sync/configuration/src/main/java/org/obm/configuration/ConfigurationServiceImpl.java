@@ -42,7 +42,6 @@ import javax.naming.ConfigurationException;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
@@ -188,15 +187,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	public String getDatabaseLogin() {
 		return getStringValue(DB_USER_KEY);
 	}
-	
-	@VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
-	{
-	    return toUnquote.replaceAll("^\"(.+)\"$", "$1");
-	}
 
 	@Override
 	public String getDatabasePassword() {
-	    return removeEnclosingDoubleQuotes(getStringValue(DB_PASSWORD_KEY));
+		return getStringValue(DB_PASSWORD_KEY);
 	}
 	
 }
