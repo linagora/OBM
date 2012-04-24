@@ -46,7 +46,7 @@ public class DBConnectionPool {
 	private static final String VALIDATION_QUERY = "SELECT 666";
 
 	/* package */ DBConnectionPool(IJDBCDriver cf, String dbHost, String dbName,
-			String login, String password, int maxPoolSize) {
+			String login, String password, Integer maxPoolSize) {
 		poolingDataSource = buildConnectionFactory(cf, dbHost, dbName, login, password, maxPoolSize);
 	}
 
