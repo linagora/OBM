@@ -2082,7 +2082,7 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
 
   
 
-  if ($datebegin != $oldEvent->date_begin
+  if ($datebegin->getTimestamp() != $oldEvent->date_begin->getTimestamp()
   	|| $repeat_kind != $oldEvent->repeat_kind 
   	|| $frequency != $oldEvent->repeatfrequency 
   	|| $repeat_days != $oldEvent->repeat_days
