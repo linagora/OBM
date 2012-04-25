@@ -890,14 +890,14 @@ class OBM_EventMailObserver implements  OBM_IObserver {
   private function sendOldUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
       if (!empty($invit_recipients)) {
-        if ($new->repeat_kind == 'none') {
+        if ($old->repeat_kind == 'none') {
       	$this->mailer->sendEventCancel($old, $invit_recipients);
       } else {
       	$this->mailer->sendRecurrentEventCancel($old, $invit_recipients);
       }
     }
     if (!empty($notice_recipients)) {
-      if ($new->repeat_kind == 'none') {
+      if ($old->repeat_kind == 'none') {
         $this->mailer->sendEventCancelNotice($old, $notice_recipients);
       } else {
       	$this->mailer->sendRecurrentEventCancelNotice($old, $notice_recipients);
