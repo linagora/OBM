@@ -30,7 +30,9 @@ is_initial_configuration() {
 if is_initial_configuration "$@"; then
   # Configuration de Cyrus/SASL
   invoke-rc.d saslauthd stop || true
-  invoke-rc.d cyrus2.2 stop || true
+  test -f /etc/init.d/cyrus2.2 && invoke-rc.d cyrus2.2 stop 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  test -f /etc/init.d/cyrus2.3 && invoke-rc.d cyrus2.3 stop 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  test -f /etc/init.d/cyrus-imapd && invoke-rc.d cyrus-imapd stop 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 
   echo -n "Configuration de Cyrus/SASL... "
 
@@ -76,6 +78,7 @@ if is_initial_configuration "$@"; then
   invoke-rc.d saslauthd start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
   test -f /etc/init.d/cyrus2.2 && invoke-rc.d cyrus2.2 start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
   test -f /etc/init.d/cyrus2.3 && invoke-rc.d cyrus2.3 start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
+  test -f /etc/init.d/cyrus-imapd && invoke-rc.d cyrus-imapd start 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 
 fi
 
@@ -120,7 +123,14 @@ CONFIG=/etc/obm-satellite/mods-available/cyrusPartition
 TEMPLATE=/usr/share/obm-satellite/sample/cyrusPartition
 cp "${TEMPLATE}" "${NEWFILE}"
 if [ ! -e /etc/init.d/cyrus2.3 ]; then
-  echo "cyrusStartupScript = /etc/init.d/cyrus2.2" >> ${NEWFILE}
+  if [ -e /etc/init.d/cyrus-imapd ]; then
+    echo "cyrusStartupScript = /etc/init.d/cyrus-imapd" >> ${NEWFILE}
+  elif [ -e /etc/init.d/cyrus2.2 ]; then
+    echo "cyrusStartupScript = /etc/init.d/cyrus2.2" >> ${NEWFILE}
+  else
+    echo "Warning : Cyrus IMAP init script not found."
+    echo "Please update $CONFIG with the correct one."
+  fi
 fi
 ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
 ucfr obm-satellite "${CONFIG}"
