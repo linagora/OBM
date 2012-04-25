@@ -49,6 +49,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ToolBox;
 
@@ -1208,5 +1209,132 @@ public class EventTest {
 		Assertions.assertThat(event.getExtId().getExtId()).isEqualTo(extIdString);
 		Event eventException = Iterables.getOnlyElement(event.getEventsExceptions());
 		Assertions.assertThat(eventException.getExtId().getExtId()).isEqualTo(extIdString);
+	}
+
+	private Event createNonRecurrentEventWithMostFields() {
+		Event event = new Event();
+		event.setTitle("my event");
+		event.setDescription("description");
+		event.setUid(new EventObmId(2));
+		event.setExtId(new EventExtId("my_event"));
+		event.setOwner("owner");
+		event.setOwnerDisplayName("owner display name");
+		event.setOwnerEmail("owner@email.com");
+		event.setCreatorDisplayName("creator");
+		event.setCreatorEmail("creator@email.com");
+		event.setLocation("location");
+		event.setStartDate(new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate());
+		event.setDuration(3660);
+		event.setAlert(3);
+		event.setCategory("category");
+		event.setPriority(2);
+		event.setAllday(false);
+		event.setType(EventType.VEVENT);
+		event.setOpacity(EventOpacity.TRANSPARENT);
+		event.setTimeCreate(new DateTime(2012, Calendar.APRIL, 24, 14, 0).toDate());
+		event.setTimeUpdate(new DateTime(2012, Calendar.APRIL, 24, 18, 0).toDate());
+		event.setTimezoneName("timezone");
+		event.setInternalEvent(false);
+		event.setSequence(2);
+
+		Attendee att1 = new Attendee();
+		att1.setEmail("att1@email.com");
+
+		Attendee att2 = new Attendee();
+		att2.setEmail("att2@email.com");
+
+		event.addAttendee(att1);
+		event.addAttendee(att2);
+
+		return event;
+	}
+
+	private Event createPrivateAnonymizedEvent() {
+		Event event = new Event();
+		event.setPrivacy(EventPrivacy.PRIVATE);
+		event.setUid(new EventObmId(2));
+		event.setExtId(new EventExtId("my_event"));
+		event.setOwner("owner");
+		event.setOwnerDisplayName("owner display name");
+		event.setOwnerEmail("owner@email.com");
+		event.setCreatorDisplayName("creator");
+		event.setCreatorEmail("creator@email.com");
+		event.setStartDate(new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate());
+		event.setDuration(3660);
+		event.setPriority(2);
+		event.setAllday(false);
+		event.setType(EventType.VEVENT);
+		event.setOpacity(EventOpacity.TRANSPARENT);
+		event.setTimeCreate(new DateTime(2012, Calendar.APRIL, 24, 14, 0).toDate());
+		event.setTimeUpdate(new DateTime(2012, Calendar.APRIL, 24, 18, 0).toDate());
+		event.setTimezoneName("timezone");
+		event.setInternalEvent(false);
+		event.setSequence(2);
+
+		return event;
+	}
+
+	@Test
+	public void testAnonymizePublicEvent() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+
+		Assertions.assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+	}
+
+	@Test
+	public void testAnonymizePrivateEvent() {
+		Event privateEvent = createNonRecurrentEventWithMostFields();
+		privateEvent.setPrivacy(EventPrivacy.PRIVATE);
+
+		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
+
+		Assertions.assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
+	}
+
+	@Test
+	public void testAnonymizePublicRecurrentEvent() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+
+		Event exception = createNonRecurrentEventWithMostFields();
+		exception.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
+
+		recurrence.setEventExceptions(Lists.newArrayList(exception));
+
+		publicEvent.setRecurrence(recurrence);
+
+		Assertions.assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+	}
+
+	@Test
+	public void testAnonymizePrivateRecurrentEvent() {
+		Event privateEvent = createNonRecurrentEventWithMostFields();
+		privateEvent.setPrivacy(EventPrivacy.PRIVATE);
+
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+
+		Event exception = createNonRecurrentEventWithMostFields();
+		exception.setPrivacy(EventPrivacy.PRIVATE);
+		exception.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
+
+		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		privateEvent.setRecurrence(recurrence);
+
+		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
+
+		EventRecurrence anonymizedRecurrence = new EventRecurrence();
+		anonymizedRecurrence.setKind(RecurrenceKind.daily);
+
+		Event anonymizedException = createPrivateAnonymizedEvent();
+		anonymizedException.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
+
+		anonymizedRecurrence.setEventExceptions(Lists.newArrayList(anonymizedException));
+
+		privateAnonymizedEvent.setRecurrence(anonymizedRecurrence);
+
+		Assertions.assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
 	}
 }

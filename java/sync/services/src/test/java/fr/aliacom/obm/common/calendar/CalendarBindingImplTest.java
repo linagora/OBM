@@ -65,9 +65,11 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
@@ -1559,5 +1561,75 @@ public class CalendarBindingImplTest {
 
 		Attendee calendarOwnerAsAttendee = removedEvent.findAttendeeFromEmail(attendee.getEmail());
 		Assertions.assertThat(calendarOwnerAsAttendee.getState()).isEqualTo(ParticipationState.DECLINED);
+	}
+
+	@Test
+	public void testReadOnlyCalendarWithPrivateEventsIsAnonymized() throws ServerFault,
+			FindException {
+		String calendar = "bill.colby@cia.gov";
+		ObmUser user = ToolBox.getDefaultObmUser();
+		AccessToken token = ToolBox.mockAccessToken();
+
+		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date lastSyncDate = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date syncDateFromDao = new DateTime(lastSyncDate).plusSeconds(5).toDate();
+
+		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId(
+				"deleted event 1"));
+		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId(
+				"deleted event 2"));
+
+		Event publicUpdatedEvent1 = new Event();
+		publicUpdatedEvent1.setTitle("publicUpdatedEvent1");
+		publicUpdatedEvent1.setTimeCreate(timeCreate);
+		Event publicUpdatedEvent2 = new Event();
+		publicUpdatedEvent2.setTitle("publicUpdatedEvent2");
+		publicUpdatedEvent2.setTimeCreate(timeCreate);
+		Event privateUpdatedEvent1 = new Event();
+		privateUpdatedEvent1.setTitle("privateUpdatedEvent1");
+		privateUpdatedEvent1.setPrivacy(EventPrivacy.PRIVATE);
+		privateUpdatedEvent1.setTimeCreate(timeCreate);
+
+		EventChanges eventChangesFromDao = new EventChanges();
+		eventChangesFromDao.setLastSync(syncDateFromDao);
+		eventChangesFromDao.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		eventChangesFromDao.setParticipationUpdated(new ArrayList<ParticipationChanges>());
+		eventChangesFromDao.setUpdated(Lists.newArrayList(publicUpdatedEvent1, publicUpdatedEvent2,
+				privateUpdatedEvent1));
+
+		Event privateUpdatedAndAnonymizedEvent1 = new Event();
+		privateUpdatedAndAnonymizedEvent1.setTitle(null);
+		privateUpdatedAndAnonymizedEvent1.setPrivacy(EventPrivacy.PRIVATE);
+		privateUpdatedAndAnonymizedEvent1.setTimeCreate(timeCreate);
+
+		EventChanges anonymizedEventChanges = new EventChanges();
+		anonymizedEventChanges.setLastSync(syncDateFromDao);
+		anonymizedEventChanges.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		anonymizedEventChanges.setParticipationUpdated(new ArrayList<ParticipationChanges>());
+		anonymizedEventChanges.setUpdated(Lists.newArrayList(publicUpdatedEvent1,
+				publicUpdatedEvent2, privateUpdatedAndAnonymizedEvent1));
+
+		UserService userService = createMock(UserService.class);
+		EasyMock.expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user)
+				.atLeastOnce();
+
+		HelperService rightsHelper = createMock(HelperService.class);
+		expect(rightsHelper.canReadCalendar(token, calendar)).andReturn(true).once();
+		expect(rightsHelper.canWriteOnCalendar(token, calendar)).andReturn(false).once();
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.getSync(token, user, lastSyncDate, null, null, false)).andReturn(
+				eventChangesFromDao);
+
+		Object[] mocks = { token, userService, calendarDao, rightsHelper };
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
+				calendarDao, null, rightsHelper, null, null);
+
+		EventChanges actualChanges = calendarService.getSyncWithSortedChanges(token, calendar,
+				lastSyncDate);
+		EasyMock.verify(mocks);
+		Assertions.assertThat(actualChanges).isEqualTo(anonymizedEventChanges);
 	}
 }

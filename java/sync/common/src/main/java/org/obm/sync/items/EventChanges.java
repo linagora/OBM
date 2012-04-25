@@ -34,12 +34,15 @@ package org.obm.sync.items;
 import java.util.Date;
 import java.util.List;
 
+import org.obm.sync.calendar.Anonymizable;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
-public class EventChanges {
+public final class EventChanges implements Anonymizable<EventChanges> {
 
 	private List<DeletedEvent> deletedEvents;
 	private List<Event> updatedEvents;
@@ -83,5 +86,41 @@ public class EventChanges {
 	public void setParticipationUpdated(List<ParticipationChanges> participationUpdated) {
 		this.participationUpdated = participationUpdated;
 	}
-	
+
+	@Override
+	public EventChanges anonymizePrivateItems() {
+		EventChanges anonymizedEventChanges = new EventChanges();
+		anonymizedEventChanges.lastSync = this.lastSync;
+		anonymizedEventChanges.deletedEvents = this.deletedEvents;
+
+		anonymizedEventChanges.updatedEvents = Lists.transform(this.updatedEvents,
+				new Function<Event, Event>() {
+					@Override
+					public Event apply(Event event) {
+						return event.anonymizePrivateItems();
+					}
+
+				});
+		anonymizedEventChanges.participationUpdated = this.participationUpdated;
+		return anonymizedEventChanges;
+
+	}
+
+	@Override
+	public final boolean equals(Object other) {
+		if (other instanceof EventChanges) {
+			EventChanges otherChanges = (EventChanges) other;
+			return Objects.equal(this.lastSync, otherChanges.lastSync)
+					&& Objects.equal(this.deletedEvents, otherChanges.deletedEvents)
+					&& Objects.equal(this.participationUpdated, otherChanges.participationUpdated)
+					&& Objects.equal(this.updatedEvents, otherChanges.updatedEvents);
+		}
+		return false;
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(this.lastSync, this.deletedEvents, this.participationUpdated,
+				this.updatedEvents);
+	}
 }

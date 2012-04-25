@@ -714,12 +714,15 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 		try {
-			EventChanges ret = calendarDao.getSync(token, calendarUser,
+			EventChanges changesFromDatabase = calendarDao.getSync(token, calendarUser,
 					lastSync, syncRange, type, onEventDate);
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
-					+ calendar + ") => " + ret.getUpdated().size() + " upd, "
-					+ ret.getDeletedEvents().size() + " rmed.");
-			return ret;
+					+ calendar + ") => " + changesFromDatabase.getUpdated().size() + " upd, "
+					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
+			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
+
+			return userHasReadOnlyDelegation ? changesFromDatabase.anonymizePrivateItems()
+					: changesFromDatabase;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());

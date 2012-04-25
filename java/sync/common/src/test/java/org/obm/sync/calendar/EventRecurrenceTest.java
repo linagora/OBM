@@ -247,7 +247,85 @@ public class EventRecurrenceTest {
 		boolean exceptionFound = recurrence.hasEventException();
 		Assertions.assertThat(exceptionFound).isFalse();
 	}
-	
+
+	@Test
+	public void testAnonymizeWithoutPrivateMovedExceptions() {
+		Date exceptionDeleted = DateUtils.date("2004-12-14T22:00:00Z");
+
+		Event publicEventException1 = new Event();
+		publicEventException1.setTitle("public event exception 1");
+		publicEventException1.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		publicEventException1.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event publicEventException2 = new Event();
+		publicEventException2.setTitle("public event exception 2");
+		publicEventException2.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		publicEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+				publicEventException2));
+		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
+
+		Assertions.assertThat(recurrence.anonymizePrivateItems()).isEqualTo(recurrence);
+	}
+
+	@Test
+	public void testAnonymizeWithPrivateMovedExceptions() {
+		Date exceptionDeleted = DateUtils.date("2004-12-14T22:00:00Z");
+
+		Event publicEventException1 = new Event();
+		publicEventException1.setUid(new EventObmId(1));
+		publicEventException1.setTitle("public event exception 1");
+		publicEventException1.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		publicEventException1.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event publicEventException2 = new Event();
+		publicEventException2.setUid(new EventObmId(2));
+		publicEventException2.setTitle("public event exception 2");
+		publicEventException2.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		publicEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event privateEventException1 = new Event();
+		privateEventException1.setUid(new EventObmId(3));
+		privateEventException1.setTitle("private event exception 1");
+		privateEventException1.setPrivacy(EventPrivacy.PRIVATE);
+		privateEventException1.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		privateEventException1.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event privateEventException2 = new Event();
+		privateEventException2.setUid(new EventObmId(4));
+		privateEventException2.setTitle("private event exception 2");
+		privateEventException2.setPrivacy(EventPrivacy.PRIVATE);
+		privateEventException2.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		privateEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event privateAnonymizedEventException1 = new Event();
+		privateAnonymizedEventException1.setUid(new EventObmId(3));
+		privateAnonymizedEventException1.setPrivacy(EventPrivacy.PRIVATE);
+		privateAnonymizedEventException1.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		privateAnonymizedEventException1.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		Event privateAnonymizedEventException2 = new Event();
+		privateAnonymizedEventException2.setUid(new EventObmId(4));
+		privateAnonymizedEventException2.setPrivacy(EventPrivacy.PRIVATE);
+		privateAnonymizedEventException2.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
+		privateAnonymizedEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
+
+		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		recurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+				publicEventException2, privateEventException1, privateEventException2));
+		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
+
+		EventRecurrence anonymizedRecurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
+		anonymizedRecurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+				publicEventException2, privateAnonymizedEventException1,
+				privateAnonymizedEventException2));
+		anonymizedRecurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
+
+		Assertions.assertThat(recurrence.anonymizePrivateItems()).isEqualTo(anonymizedRecurrence);
+	}
+
 	private EventRecurrence getOneDailyEventRecurence() {
 		EventRecurrence rec = new EventRecurrence();
 		rec.setKind(RecurrenceKind.daily);

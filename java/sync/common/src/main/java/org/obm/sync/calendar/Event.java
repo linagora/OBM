@@ -54,7 +54,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class Event implements Indexed<Integer> {
+public final class Event implements Indexed<Integer>, Anonymizable<Event> {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	
@@ -720,6 +720,56 @@ public class Event implements Indexed<Integer> {
 			.add("uid", uid)
 			.add("date", startDate)
 			.toString();
+	}
+
+	@Override
+	public Event anonymizePrivateItems() {
+		Preconditions.checkState(this.privacy == EventPrivacy.PRIVATE
+				|| this.privacy == EventPrivacy.PUBLIC, "Cannot handle the privacy level "
+				+ this.privacy);
+		if (this.privacy == EventPrivacy.PRIVATE) {
+			return this.anonymize();
+		} else {
+			return this.clone();
+		}
+	}
+
+	private Event anonymize() {
+		Event anonymizedEvent = new Event();
+
+		anonymizedEvent.owner = this.owner;
+		anonymizedEvent.ownerDisplayName = this.ownerDisplayName;
+		anonymizedEvent.ownerEmail = this.ownerEmail;
+		anonymizedEvent.creatorDisplayName = this.creatorDisplayName;
+		anonymizedEvent.creatorEmail = this.creatorEmail;
+
+		anonymizedEvent.uid = this.uid;
+		anonymizedEvent.extId = this.extId;
+		anonymizedEvent.entityId = this.entityId;
+
+		anonymizedEvent.type = this.type;
+		anonymizedEvent.internalEvent = this.internalEvent;
+		anonymizedEvent.sequence = this.sequence;
+
+		anonymizedEvent.allday = this.allday;
+		anonymizedEvent.startDate = this.startDate;
+		anonymizedEvent.duration = this.duration;
+
+		anonymizedEvent.timeCreate = this.timeCreate;
+		anonymizedEvent.timeUpdate = this.timeUpdate;
+		anonymizedEvent.timezoneName = this.timezoneName;
+
+		anonymizedEvent.privacy = this.privacy;
+		anonymizedEvent.priority = this.priority;
+		anonymizedEvent.completion = this.completion;
+		anonymizedEvent.opacity = this.opacity;
+
+		anonymizedEvent.percent = this.percent;
+
+		anonymizedEvent.recurrenceId = this.recurrenceId;
+		anonymizedEvent.recurrence = this.recurrence.anonymizePrivateItems();
+
+		return anonymizedEvent;
 	}
 	
 }

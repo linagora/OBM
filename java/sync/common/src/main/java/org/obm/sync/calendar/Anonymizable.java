@@ -29,31 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.sync.calendar;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.RecurrenceDays;
-import org.obm.sync.items.EventChanges;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
-	@Test
-	public void test() {
-		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class, Event.class,
-				EventRecurrence.class, EventChanges.class);
-	}
-	
+public interface Anonymizable<T> {
+	public T anonymizePrivateItems();
 }

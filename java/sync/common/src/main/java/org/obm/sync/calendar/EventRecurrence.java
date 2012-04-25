@@ -40,11 +40,12 @@ import java.util.List;
 
 import org.obm.push.utils.collection.Sets;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-public class EventRecurrence {
+public final class EventRecurrence implements Anonymizable<EventRecurrence> {
 
 	private static final int UNSPECIFIED_FREQUENCY_VALUE = 0;
 	private RecurrenceDays days;
@@ -257,4 +258,21 @@ public class EventRecurrence {
 		}
 	}
 
+	@Override
+	public EventRecurrence anonymizePrivateItems() {
+		EventRecurrence anonymizedRecurrence = new EventRecurrence();
+		anonymizedRecurrence.days = this.days;
+		anonymizedRecurrence.end = this.end;
+		anonymizedRecurrence.exceptions = this.exceptions;
+		anonymizedRecurrence.frequence = frequence;
+		anonymizedRecurrence.kind = kind;
+		anonymizedRecurrence.eventExceptions = Lists.transform(this.eventExceptions,
+				new Function<Event, Event>() {
+					@Override
+					public Event apply(Event event) {
+						return event.anonymizePrivateItems();
+					}
+				});
+		return anonymizedRecurrence;
+	}
 }
