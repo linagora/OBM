@@ -29,30 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.icalendar;
+package org.obm.push.exception;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils;
+public class ICalendarConverterException extends Exception {
 
-import com.google.common.collect.ImmutableList;
-
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public ICalendarConverterException() {
+		super();
 	}
-	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Ical4jUser.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+
+	public ICalendarConverterException(String message, Throwable cause) {
+		super(message, cause);
 	}
-	
+
+	public ICalendarConverterException(String message) {
+		super(message);
+	}
+
+	public ICalendarConverterException(Throwable cause) {
+		super(cause);
+	}
 }

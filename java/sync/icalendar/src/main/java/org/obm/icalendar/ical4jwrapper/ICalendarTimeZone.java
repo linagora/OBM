@@ -29,30 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.icalendar;
+package org.obm.icalendar.ical4jwrapper;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import java.util.TimeZone;
 
-import com.google.common.collect.ImmutableList;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.TzId;
 
-public class BeansTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+
+public class ICalendarTimeZone {
+
+	private final VTimeZone vTimeZone;
+
+	public ICalendarTimeZone(Calendar calendar) {
+		this.vTimeZone = (VTimeZone)calendar.getComponent(Component.VTIMEZONE);
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Ical4jUser.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public TimeZone getTimeZone() {
+		if (vTimeZone != null) {
+			TzId timeZoneId = vTimeZone.getTimeZoneId();
+			return TimeZone.getTimeZone(timeZoneId.getValue());
+		}
+		return null;
 	}
-	
 }

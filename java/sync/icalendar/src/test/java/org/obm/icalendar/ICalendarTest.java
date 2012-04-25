@@ -31,28 +31,49 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
-import org.junit.Before;
+import java.io.IOException;
+import java.io.InputStream;
+
+import junit.framework.Assert;
+
+import net.fortuna.ical4j.data.ParserException;
+
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils;
 
-import com.google.common.collect.ImmutableList;
+public class ICalendarTest {
 
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Ical4jUser.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testRightFormatICalendarBuilder() throws IOException, ParserException {
+		ICalendar icalendar = icalendar("attendee.ics");
+		Assertions.assertThat(icalendar.getICalendar()).isNotNull();
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void testEmptyICalendarBuilder() throws IOException, ParserException {
+		new ICalendar.Builder().build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testNullStreamICalendarBuilder() throws IOException, ParserException {
+		new ICalendar.Builder().inputStream(null).build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testNullStringICalendarBuilder() throws IOException, ParserException {
+		new ICalendar.Builder().iCalendar(null).build();
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testWrongFormatICalendarBuilder() throws IOException, ParserException {
+		icalendar("wrong-format.ics");
+	}
+	
+	private ICalendar icalendar(String filename) throws IOException, ParserException {
+		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFile/" + filename);
+		if (in == null) {
+			Assert.fail("Cannot load " + filename);
+		}
+		return new ICalendar.Builder().inputStream(in).build();	
+	}
 }

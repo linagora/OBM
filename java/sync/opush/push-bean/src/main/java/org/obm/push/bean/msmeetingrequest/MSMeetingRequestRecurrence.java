@@ -31,23 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 
-public class MSMeetingRequestRecurrence implements Serializable {
+public class MSMeetingRequestRecurrence {
 	
 	public static class Builder {
 		private MSMeetingRequestRecurrenceType type;
 		private Integer interval;
 		private Date until;
-		private Integer occurrences;
+		private Integer occurrences = -1;
 		private Integer weekOfMonth;
 		private Integer dayOfMonth;
-		private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek;
+		private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek = Lists.newArrayList();
 		private Integer monthOfYear;
 		
 		public Builder type(MSMeetingRequestRecurrenceType type) {
@@ -93,29 +94,18 @@ public class MSMeetingRequestRecurrence implements Serializable {
 		public MSMeetingRequestRecurrence build() {
 			Preconditions.checkNotNull(type, "The field type is required");
 			Preconditions.checkNotNull(interval, "The field interval is required");
-			Preconditions.checkNotNull(until, "The field until is required");
-			Preconditions.checkArgument(occurrences != null && occurrences > 0, "The field occurrences is required");
-			
-			if (type == MSMeetingRequestRecurrenceType.YEARLY) {
-				Preconditions.checkNotNull(weekOfMonth, "The field weekOfMonth is required");
-			}
-			
-			if (type == MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY
-					|| type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
-				
-				Preconditions.checkNotNull(dayOfMonth, "The field dayOfMonth is required");
-			}
 			
 			if (type == MSMeetingRequestRecurrenceType.WEEKLY 
-					|| type == MSMeetingRequestRecurrenceType.MONTHLY 
 					|| type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
 				
-				Preconditions.checkNotNull(dayOfWeek, "The field dayOfWeek is required");
+				Preconditions.checkArgument(dayOfWeek != null && !dayOfWeek.isEmpty(), "The field dayOfWeek is required");
 			}
 			
-			if (type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY) {
+			if (type == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY 
+					|| type == MSMeetingRequestRecurrenceType.YEARLY) {
+				
 				Preconditions.checkNotNull(monthOfYear, "The field monthOfYear is required");
-			}
+			}		
 			
 			return new MSMeetingRequestRecurrence(type, interval, until, 
 					occurrences, weekOfMonth, dayOfMonth, dayOfWeek, monthOfYear);

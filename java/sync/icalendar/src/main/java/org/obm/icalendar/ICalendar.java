@@ -33,7 +33,15 @@ package org.obm.icalendar;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.data.UnfoldingReader;
+import net.fortuna.ical4j.model.Calendar;
+
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
+import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
 import org.obm.push.utils.FileUtils;
 
 import com.google.common.base.Objects;
@@ -55,7 +63,7 @@ public class ICalendar {
 			return this;
 		}
 		
-		public ICalendar build() throws IOException {
+		public ICalendar build() throws IOException, ParserException {
 			Preconditions.checkState(inputStream != null || iCalendar != null, 
 					"Either the inputStream or the iCalendar field must be present");
 			
@@ -75,9 +83,18 @@ public class ICalendar {
 		}
 	}
 	
+	private final Calendar calendar;
+	private final ICalendarEvent iCalendarEvent;
+	private final ICalendarTimeZone iCalendarTimeZone;
 	private final String iCalendar;
 	
-	private ICalendar(String iCalendar) {
+	private ICalendar(String iCalendar) throws IOException, ParserException {
+		this.calendar = new CalendarBuilder()
+			.build(new UnfoldingReader(new StringReader(iCalendar), true));
+		
+		this.iCalendarEvent = new ICalendarEvent(calendar);
+		this.iCalendarTimeZone = new ICalendarTimeZone(calendar);
+
 		this.iCalendar = iCalendar;
 	}
 	
@@ -85,13 +102,21 @@ public class ICalendar {
 		return iCalendar;
 	}
 
+	public ICalendarEvent getICalendarEvent() {
+		return iCalendarEvent;
+	}
+	
+	public ICalendarTimeZone getICalendarTimeZone() {
+		return iCalendarTimeZone;
+	}
+	
 	@Override
-	public final int hashCode(){
+	public int hashCode(){
 		return Objects.hashCode(iCalendar);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	public boolean equals(Object object){
 		if (object instanceof ICalendar) {
 			ICalendar that = (ICalendar) object;
 			return Objects.equal(this.iCalendar, that.iCalendar);

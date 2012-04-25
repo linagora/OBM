@@ -31,12 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
-import java.io.Serializable;
-
 import com.google.common.base.Objects;
 
 
-public class MSMeetingRequestCategory implements Serializable {
+public class MSMeetingRequestCategory {
 	
 	private final String category;
 

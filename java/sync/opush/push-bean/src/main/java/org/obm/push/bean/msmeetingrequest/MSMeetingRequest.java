@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.commons.codec.binary.Base64;
 import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.base.Objects;
@@ -43,9 +43,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class MSMeetingRequest implements Serializable {
+public class MSMeetingRequest {
 
-	public static class Builder {
+	public static class MsMeetingRequestBuilder {
+		public final static String DEFAULT_TIME_ZONE = 
+				"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAA" +
+				"AAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZw" +
+				"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
 		private boolean allDayEvent;
 		private Date startTime;
 		private Date dtStamp;
@@ -59,86 +63,88 @@ public class MSMeetingRequest implements Serializable {
 		private List<MSMeetingRequestRecurrence> recurrences;
 		private MSMeetingRequestSensitivity sensitivity;
 		private MSMeetingRequestIntDBusyStatus intDBusyStatus;
-		private TimeZone timeZone;
+		private String timeZone;
 		private String globalObjId;
 		private List<MSMeetingRequestCategory> categories;
 		
-		public Builder allDayEvent(boolean allDayEvent) {
+		public MsMeetingRequestBuilder allDayEvent(boolean allDayEvent) {
 			this.allDayEvent = allDayEvent;
 			return this;
 		}
 		
-		public Builder startTime(Date startTime) {
+		public MsMeetingRequestBuilder startTime(Date startTime) {
 			this.startTime = startTime;
 			return this;
 		}
 		
-		public Builder dtStamp(Date dtStamp) {
+		public MsMeetingRequestBuilder dtStamp(Date dtStamp) {
 			this.dtStamp = dtStamp;
 			return this;
 		}
 		
-		public Builder endTime(Date endTime) {
+		public MsMeetingRequestBuilder endTime(Date endTime) {
 			this.endTime = endTime;
 			return this;
 		}
 		
-		public Builder instanceType(MSMeetingRequestInstanceType instanceType) {
+		public MsMeetingRequestBuilder instanceType(MSMeetingRequestInstanceType instanceType) {
 			this.instanceType = instanceType;
 			return this;
 		}
 		
-		public Builder location(String location) {
+		public MsMeetingRequestBuilder location(String location) {
 			this.location = location;
 			return this;
 		}
 		
-		public Builder organizer(String organizer) {
+		public MsMeetingRequestBuilder organizer(String organizer) {
 			this.organizer = organizer;
 			return this;
 		}
 		
-		public Builder recurrenceId(Date recurrenceId) {
+		public MsMeetingRequestBuilder recurrenceId(Date recurrenceId) {
 			this.recurrenceId = recurrenceId;
 			return this;
 		}
 		
-		public Builder reminder(Long reminder) {
+		public MsMeetingRequestBuilder reminder(Long reminder) {
 			this.reminder = reminder;
 			return this;
 		}
 		
-		public Builder responseRequested(boolean responseRequested) {
+		public MsMeetingRequestBuilder reponseRequested(boolean responseRequested) {
 			this.responseRequested = responseRequested;
 			return this;
 		}
 		
-		public Builder recurrences(List<MSMeetingRequestRecurrence> recurrences) {
+		public MsMeetingRequestBuilder recurrences(List<MSMeetingRequestRecurrence> recurrences) {
 			this.recurrences = recurrences;
 			return this;
 		}
 		
-		public Builder sensitivity(MSMeetingRequestSensitivity sensitivity) {
+		public MsMeetingRequestBuilder sensitivity(MSMeetingRequestSensitivity sensitivity) {
 			this.sensitivity = sensitivity;
 			return this;
 		}
 		
-		public Builder intDBusyStatus(MSMeetingRequestIntDBusyStatus intDBusyStatus) {
+		public MsMeetingRequestBuilder intDBusyStatus(MSMeetingRequestIntDBusyStatus intDBusyStatus) {
 			this.intDBusyStatus = intDBusyStatus;
 			return this;
 		}
 		
-		public Builder timeZone(TimeZone timeZone) {
-			this.timeZone = timeZone;
+		public MsMeetingRequestBuilder timeZone(TimeZone timeZone) {
+			if (timeZone != null) {
+				this.timeZone = timeZone.getID();
+			}
 			return this;
 		}
 		
-		public Builder globalObjId(String globalObjId) {
+		public MsMeetingRequestBuilder globalObjId(String globalObjId) {
 			this.globalObjId = globalObjId;
 			return this;
 		}
 		
-		public Builder categories(List<MSMeetingRequestCategory> categories) {
+		public MsMeetingRequestBuilder categories(List<MSMeetingRequestCategory> categories) {
 			this.categories = categories;
 			return this;
 		}
@@ -168,8 +174,13 @@ public class MSMeetingRequest implements Serializable {
 				intDBusyStatus = MSMeetingRequestIntDBusyStatus.FREE;
 			}
 			
-			Preconditions.checkNotNull(timeZone, "The field timeZone is required");
-			Preconditions.checkNotNull(globalObjId, "The field globalObjId is required");
+			if (timeZone != null) {
+				timeZone = Base64.encodeBase64String(timeZone.getBytes());
+			} else {
+				timeZone = DEFAULT_TIME_ZONE;
+			}
+
+			Preconditions.checkNotNull(globalObjId, "The field GlobalObjId is required");
 			
 			return new MSMeetingRequest(allDayEvent, startTime, dtStamp, endTime, instanceType, location, 
 					organizer, recurrenceId, reminder, responseRequested, recurrences, sensitivity, 
@@ -190,14 +201,14 @@ public class MSMeetingRequest implements Serializable {
 	private final List<MSMeetingRequestRecurrence> recurrences;
 	private final MSMeetingRequestSensitivity sensitivity;
 	private final MSMeetingRequestIntDBusyStatus intDBusyStatus;
-	private final TimeZone timeZone;
+	private final String timeZoneInBase64;
 	private final String globalObjId;
 	private final List<MSMeetingRequestCategory> categories;
 	
 	private MSMeetingRequest(boolean allDayEvent, Date startTime, Date dtStamp, Date endTime, MSMeetingRequestInstanceType instanceType, 
 			String location, String organizer, Date recurrenceId, Long reminder, boolean responseRequested,
 			List<MSMeetingRequestRecurrence> recurrences, MSMeetingRequestSensitivity sensitivity, 
-			MSMeetingRequestIntDBusyStatus intDBusyStatus, TimeZone timeZone, String globalObjId, 
+			MSMeetingRequestIntDBusyStatus intDBusyStatus, String timeZoneInBase64, String globalObjId, 
 			List<MSMeetingRequestCategory> categories) {
 		
 		super();
@@ -214,7 +225,7 @@ public class MSMeetingRequest implements Serializable {
 		this.recurrences = recurrences;
 		this.sensitivity = sensitivity;
 		this.intDBusyStatus = intDBusyStatus;
-		this.timeZone = timeZone;
+		this.timeZoneInBase64 = timeZoneInBase64;
 		this.globalObjId = globalObjId;
 		this.categories = categories;
 	}
@@ -271,10 +282,10 @@ public class MSMeetingRequest implements Serializable {
 		return intDBusyStatus;
 	}
 
-	public TimeZone getTimeZone() {
-		return timeZone;
+	public String getTimeZoneInBase64() {
+		return timeZoneInBase64;
 	}
-
+	
 	public String getGlobalObjId() {
 		return globalObjId;
 	}
@@ -287,7 +298,7 @@ public class MSMeetingRequest implements Serializable {
 	public final int hashCode(){
 		return Objects.hashCode(allDayEvent, startTime, dtStamp, endTime, 
 				instanceType, location, organizer, recurrenceId, reminder, 
-				responseRequested, recurrences, sensitivity, intDBusyStatus, timeZone, globalObjId, categories);
+				responseRequested, recurrences, sensitivity, intDBusyStatus, timeZoneInBase64, globalObjId, categories);
 	}
 	
 	@Override
@@ -307,7 +318,7 @@ public class MSMeetingRequest implements Serializable {
 				&& Objects.equal(this.recurrences, that.recurrences)
 				&& Objects.equal(this.sensitivity, that.sensitivity)
 				&& Objects.equal(this.intDBusyStatus, that.intDBusyStatus)
-				&& Objects.equal(this.timeZone, that.timeZone)
+				&& Objects.equal(this.timeZoneInBase64, that.timeZoneInBase64)
 				&& Objects.equal(this.globalObjId, that.globalObjId)
 				&& Objects.equal(this.categories, that.categories);
 		}
