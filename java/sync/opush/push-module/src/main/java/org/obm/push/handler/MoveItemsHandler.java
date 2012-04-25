@@ -142,14 +142,19 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 					moveItemsItem.setDstMesgId(newDstId);
 				} catch (CollectionNotFoundException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					logger.error(e.getMessage(), e);
 				} catch (DaoException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					logger.error(e.getMessage(), e);
 				} catch (ProcessingEmailException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					logger.error(e.getMessage(), e);
 				} catch (CollectionPathException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					logger.error(e.getMessage(), e);
 				} catch (UnsupportedBackendFunctionException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					logger.error(e.getMessage(), e);
 				}
 			}
 			moveItemsItems.add(moveItemsItem);
@@ -173,6 +178,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 				status.dstCollection = collectionDao.getCollectionPath(status.dstCollectionId);
 			} catch (CollectionNotFoundException ex) {
 				status.status = MoveItemsStatus.INVALID_DESTINATION_COLLECTION_ID;
+				logger.warn("Invalid destination collection", ex);
 			}
 
 			try {
@@ -180,6 +186,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 				status.srcCollection = collectionDao.getCollectionPath(status.srcCollectionId);
 			} catch (CollectionNotFoundException ex) {
 				status.status = MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID;
+				logger.warn("Invalid source collection", ex);
 			}
 
 			if (status.status == null && status.srcCollectionId.equals(status.dstCollectionId)) {
@@ -187,6 +194,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			}
 		} catch (DaoException ex) {
 			status.status = MoveItemsStatus.SERVER_ERROR;
+			logger.error(ex.getMessage(), ex);
 		}
 		return status;
 	}
