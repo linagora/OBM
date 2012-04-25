@@ -205,13 +205,18 @@ class Vcalendar_Reader_OBM {
     $vevent = &$this->document->createElement('vevent');
     $vevent->private = ($vevent->private && $data['event_privacy']);
     $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['event_owner']));
-    $created = $this->parseDate($data['timecreate']);
+    // here we cast bc PHP ceil when ms is > 500 and lightning floor watever the miliseconds value
+    // so we remove miliseconds
+    $created = $this->parseDate((integer)$data['timecreate']);
     $created->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('created', $created);
-
-    $last_modified = $this->parseDate($data['timeupdate']);
+    // here we cast bc PHP ceil when ms is > 500 and lightning floor watever the miliseconds value
+    // so we remove miliseconds
+    // OBMFULL-3595
+    $last_modified = $this->parseDate((integer)$data['timeupdate']);
     $last_modified->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('last-modified', $last_modified);
+    $vevent->set('dtstamp', $last_modified);
 
     if ($this->recurrenceId == null) {
       $dtstart = $this->parseDate($data['event_date']);

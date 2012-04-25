@@ -90,9 +90,9 @@ class Vcalendar_Writer_ICS {
       $this->writeProperty($name, $value);
     }
 
-    
-    // FIXME ??? maybe a good substitute
-    $this->writeProperty('dtstamp', $this->parseDate(new Of_Date()));
+    if ( ! array_key_exists("dtstamp",$properties) ) {
+        $this->writeProperty('dtstamp', new Of_Date());
+    }
     $this->buffer .= 'END:'.$this->parseName($vevent->name)."\r\n";
   }
 
@@ -139,6 +139,11 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeLastModified($name, $value) {
+    $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseDate($value));
+    $this->buffer .= "\r\n";      
+  }
+
+  function writeDtstamp($name, $value) {
     $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseDate($value));
     $this->buffer .= "\r\n";      
   }
