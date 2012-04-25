@@ -571,7 +571,7 @@ public class MSEventToObmEventConverterTest {
 		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(msEvent.getSubject());
 	}
 
-	@Test(expected=ConversionException.class)
+	@Test
 	public void testConvertAttributeSubjectEmpty() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -579,11 +579,13 @@ public class MSEventToObmEventConverterTest {
 				.withSubject("")
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
-		
-		convertToOBMEvent(msEvent);
+
+		Event convertedEvent = convertToOBMEvent(msEvent);
+
+		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(MSEventToObmEventConverter.EVENT_DEFAULT_SUBJECT);
 	}
 
-	@Test(expected=ConversionException.class)
+	@Test
 	public void testConvertAttributeSubjectNull() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
@@ -591,8 +593,10 @@ public class MSEventToObmEventConverterTest {
 				.withSubject(null)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
-		
-		convertToOBMEvent(msEvent);
+
+		Event convertedEvent = convertToOBMEvent(msEvent);
+
+		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(MSEventToObmEventConverter.EVENT_DEFAULT_SUBJECT);
 	}
 	
 	@Test

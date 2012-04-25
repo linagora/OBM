@@ -341,23 +341,21 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return reminder;
 	}
 
-	private String convertSubjectToTitle(MSEventCommon msEvent) throws ConversionException {
+	private String convertSubjectToTitle(MSEventCommon msEvent) {
 		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
 			return msEvent.getSubject();
 		} else {
-			throw new ConversionException("Subject is required");
+			return EVENT_DEFAULT_SUBJECT;
 		}
 	}
 	
-	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) throws ConversionException {
-		try {
-			return convertSubjectToTitle(msEvent);
-		} catch (ConversionException ex) {
-			if (!Strings.isNullOrEmpty(parentEvent.getTitle())) {
-				return parentEvent.getTitle();
-			} else {
-				throw ex;
-			}
+	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) {
+		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
+			return msEvent.getSubject();
+		} else if (!Strings.isNullOrEmpty(parentEvent.getTitle())) {
+			return parentEvent.getTitle();
+		} else {
+			return EVENT_DEFAULT_SUBJECT;
 		}
 	}
 
