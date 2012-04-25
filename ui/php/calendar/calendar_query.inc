@@ -2155,10 +2155,11 @@ function run_query_calendar_quick_event_update($calendar) {
   }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
+  $escape_title = ($oldEvent->privacy == 1) ? $obm_q->escape($oldEvent->title) : $obm_q->escape($title);
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
       event_userupdate = $obm[uid],
-      event_title = '".$obm_q->escape($title)."',
+      event_title = '".$escape_title."',
       $event_date
       event_origin = '$GLOBALS[c_origin_ajax]',
       event_duration = '$event_duration',
@@ -2473,6 +2474,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $sequence_number = $event_q->f('event_sequence');
     # Increment sequence number, just like we do in OBM-Sync
     $sequence_number++;
+    $escape_title = ($oldEvent->privacy == 1) ? $obm_q->escape($oldEvent->title) : $obm_q->escape($title);
 
     $query = "INSERT INTO Event (
       event_ext_id,
@@ -2510,7 +2512,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
       '$GLOBALS[c_origin_web]',
       $oldOwner,
       '".Of_Date::getOption('timezone')."',
-      '".$obm_q->escape($title)."',
+      '".$escape_title."',
       '".$obm_q->escape($datebegin)."',
       '".$obm_q->escape($description)."',
       '$properties',

@@ -2300,6 +2300,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.duration = evt.event.duration;
     this.eventData.periodic = evt.event.periodic;
     this.eventData.element_id = evt.element.id;
+    this.eventData.private = evt.event.private;
     this.eventData.formAction = 'quick_update';
     this.gotoURI = 'action=detailupdate&calendar_id='+evt.event.id;
     
@@ -2470,9 +2471,11 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&date_begin='
-      +encodeURIComponent(this.eventData.date_begin)+'&duration='
-      +this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)
+      +encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration
       +'&new_user_id[]='+this.eventData.entity_id;
+    if(!this.eventData.private) {
+    	this.gotoURI += '&title='+encodeURIComponent(this.form.tf_title.value);
+    }
     if(this.eventData.all_day == '1'  && obm.vars.consts.calendarRange != 'month'){
       this.gotoURI += '&all_day=1&opacity=TRANSPARENT'
     } 
