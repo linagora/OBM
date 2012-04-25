@@ -2147,7 +2147,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
 		this.check_force = $('calendarDecisionPopup').getElementById('forceinsertion');
 	},
-	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang) {
+	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, uriAction) {
 		this.uid = uid;
 		this.evtid = evtid;
 		this.decision = decision;
@@ -2159,6 +2159,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.textarea.setProperty('placeholder', this.comment);
 		this.yourDecision.set('text', this.choiceByLang);
 		this.eventTitlePlace.set('text', this.eventTitle);
+		this.uriAction = uriAction;
 		this.show();
 	},
 	show: function() {
@@ -2177,7 +2178,7 @@ Obm.CalendarDecisionPopup = new Class({
 			onSuccess : function(message){
 				if(message.error == 0){
 					showMessage('ok', message.message);
-					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+					window.location='../calendar/calendar_index.php?action='+encodeURIComponent(self.uriAction)+'&calendar_id='+self.evtid;
 				}else{
 					var redirectUrl = message.redirectUrl;
 					if (redirectUrl != null) {

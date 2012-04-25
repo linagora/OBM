@@ -690,6 +690,7 @@ if ($action == 'search') {
   exit();
 
 } elseif ($action == 'update_decision_and_comment') {
+///////////////////////////////////////////////////////////////////////////////
   try {
     $comment_and_decision_updated = update_decision_and_comment($params, $obm['uid']);
     if ($comment_and_decision_updated) {
