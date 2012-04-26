@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
-public class ProvisonProtocolTest {
+public class ProvisionProtocolTest {
 	
 	private static final long _3378841480L = 3378841480L;
 	private static final String MS_EAS_PROVISIONING_WBXML = "MS-EAS-Provisioning-WBXML";
