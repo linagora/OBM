@@ -45,7 +45,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-public final class EventRecurrence implements Anonymizable<EventRecurrence> {
+public class EventRecurrence implements Anonymizable<EventRecurrence> {
 
 	private static final int UNSPECIFIED_FREQUENCY_VALUE = 0;
 	private RecurrenceDays days;

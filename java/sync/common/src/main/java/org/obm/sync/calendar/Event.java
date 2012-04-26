@@ -54,7 +54,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public final class Event implements Indexed<Integer>, Anonymizable<Event> {
+public class Event implements Indexed<Integer>, Anonymizable<Event> {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	

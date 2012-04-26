@@ -42,7 +42,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
-public final class EventChanges implements Anonymizable<EventChanges> {
+public class EventChanges implements Anonymizable<EventChanges> {
 
 	private List<DeletedEvent> deletedEvents;
 	private List<Event> updatedEvents;
