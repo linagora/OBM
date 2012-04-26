@@ -50,4 +50,8 @@ public class SlowFilterRunner extends BlockJUnit4ClassRunner {
 		return ImmutableList.<TestRule>builder().addAll(super.getTestRules(target)).add(new SlowFilterRule()).build();
 	}
 	
+	@Override
+	protected List<TestRule> classRules() {
+		return ImmutableList.<TestRule>builder().addAll(super.classRules()).add(new SlowFilterRule()).build();
+	}
 }
