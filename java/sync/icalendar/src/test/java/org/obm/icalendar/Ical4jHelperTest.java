@@ -1312,4 +1312,43 @@ public class Ical4jHelperTest {
 				new Attendee.Builder().email("usera@obm.lng.org").build(), 
 				new Attendee.Builder().email("userc@obm.lng.org").build());
 	}
+
+	@Test
+	public void testDtstampWithNullTimeUpdate() {
+		Event event = buildEvent();
+		Ical4jUser obmUser = buildObmUser(event.findOrganizer());
+		AccessToken token = new AccessToken(0, "OBM");
+
+		event.setTimeCreate(DateUtils.date("2012-01-01T09:12:13Z"));
+		event.setTimeUpdate(null);
+
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event, token);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event, token);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser, token);
+
+		String DTSTAMP = "DTSTAMP:20120101T091213Z";
+
+		Assertions.assertThat(icsRequest).contains(DTSTAMP);
+		Assertions.assertThat(icsCancel).contains(DTSTAMP);
+		Assertions.assertThat(icsReply).contains(DTSTAMP);
+	}
+
+	@Test
+	public void testDtstampWithNotNullTimeUpdate() {
+		Event event = buildEvent();
+		Ical4jUser obmUser = buildObmUser(event.findOrganizer());
+		AccessToken token = new AccessToken(0, "OBM");
+
+		event.setTimeCreate(DateUtils.date("2012-01-01T09:12:13Z"));
+		event.setTimeUpdate(DateUtils.date("2012-01-02T10:14:15Z"));
+
+		String icsRequest = new Ical4jHelper().buildIcsInvitationRequest(obmUser, event, token);
+		String icsCancel = new Ical4jHelper().buildIcsInvitationCancel(obmUser, event, token);
+		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser, token);
+
+		String DTSTAMP = "DTSTAMP:20120102T101415Z";
+		Assertions.assertThat(icsRequest).contains(DTSTAMP);
+		Assertions.assertThat(icsCancel).contains(DTSTAMP);
+		Assertions.assertThat(icsReply).contains(DTSTAMP);
+	}
 }

@@ -138,6 +138,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -219,6 +220,7 @@ public class Ical4jHelper {
 	private VEvent buildIcsInvitationVEventDefaultValue(Event event) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
+		appendDtstamp(event, vEvent);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
 		appendSequence(prop, event);
@@ -683,6 +685,7 @@ public class Ical4jHelper {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
+		appendDtstamp(event, vEvent);
 		appendUidToICS(prop, event, parentExtID);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
@@ -719,6 +722,15 @@ public class Ical4jHelper {
 			appendXObmDomainProperties(iCal4jUser, prop);
 		}
 		return vEvent;
+	}
+
+	private void appendDtstamp(Event event, VEvent vEvent) {
+		Date eventTimeUpdate = event.getTimeUpdate();
+		Date eventTimeCreate = event.getTimeCreate();
+		if (eventTimeUpdate == null && eventTimeCreate == null) {
+			return;
+		}
+		vEvent.getDateStamp().setDateTime(new DateTime(Objects.firstNonNull(eventTimeUpdate, eventTimeCreate).getTime()));
 	}
 
 	private boolean canAddVAlarmToICS(Method method) {
