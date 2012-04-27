@@ -167,6 +167,17 @@ public final class DOMUtils {
 		return null;
 	}
 
+	public static Long getElementLong(Element node) {
+		if (isTextElement(node)) {
+			Text txtElem = (Text) node.getFirstChild();
+			if (txtElem != null) {
+				return Long.valueOf(txtElem.getData());
+			}
+		}
+		return null;
+	}
+
+	
 	public static Integer getElementInteger(Element node) {
 		if (isTextElement(node)) {
 			Text txtElem = (Text) node.getFirstChild();
@@ -178,7 +189,7 @@ public final class DOMUtils {
 	}
 	
 	private static boolean isTextElement(Element node) {
-		if (node.getFirstChild() instanceof Text) {
+		if (node != null && node.getFirstChild() instanceof Text) {
 			return true;
 		}
 		return false;

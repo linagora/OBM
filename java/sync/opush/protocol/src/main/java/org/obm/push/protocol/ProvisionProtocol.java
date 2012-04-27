@@ -47,20 +47,16 @@ public class ProvisionProtocol {
 	public ProvisionRequest getRequest(Document doc) throws InvalidPolicyKeyException {
 		String policyType = DOMUtils.getUniqueElement(doc.getDocumentElement(),	"PolicyType").getTextContent();
 		Element pKeyElem = DOMUtils.getUniqueElement(doc.getDocumentElement(), "PolicyKey");
-		long policyKey = getPolicyKey(pKeyElem);
+		Long policyKey = getPolicyKey(pKeyElem);
 		return new ProvisionRequest(policyType, policyKey);
 	}
 
-	private long getPolicyKey(Element pKeyElem) throws InvalidPolicyKeyException {
-		long policyKey = 0;
-		if (pKeyElem != null) {
-			try {
-				policyKey = Long.valueOf( pKeyElem.getTextContent() );
-			} catch (NumberFormatException e) {
-				throw new InvalidPolicyKeyException(e);
-			}
+	private Long getPolicyKey(Element pKeyElem) throws InvalidPolicyKeyException {
+		try {
+			return DOMUtils.getElementLong(pKeyElem);
+		} catch (NumberFormatException e) {
+			throw new InvalidPolicyKeyException(e);
 		}
-		return policyKey;
 	}
 
 	public Document encodeResponse(ProvisionResponse provisionResponse) throws FactoryConfigurationError {

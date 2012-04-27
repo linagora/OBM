@@ -33,6 +33,10 @@ package org.obm.push.exception;
 
 public class InvalidPolicyKeyException extends Exception {
 
+	public InvalidPolicyKeyException() {
+		super();
+	}
+	
 	public InvalidPolicyKeyException(NumberFormatException e) {
 		super(e);
 	}

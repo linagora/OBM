@@ -31,15 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
+import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,22 +61,36 @@ public class ProvisionProtocolTest {
 	}
 	
 	@Test
-	public void parseRequest() {
-		Document document = buildRequestObjectTypeDocument(String.valueOf(_3378841480L));
-		try {
-			provisionProtocol.getRequest(document);
-			Assert.assertTrue(true);
-		} catch (InvalidPolicyKeyException e) {
-			Assert.assertTrue(false);
-		}
+	public void parseRequest() throws InvalidPolicyKeyException {
+		Document document = buildRequestDocument(String.valueOf(_3378841480L));
+		ProvisionRequest request = provisionProtocol.getRequest(document);
+		assertThat(request.getPolicyKey()).isEqualTo(_3378841480L);
 	}
 
 	@Test(expected=InvalidPolicyKeyException.class)
 	public void parseRequestWithWrongPolicyKey() throws InvalidPolicyKeyException {
-		provisionProtocol.getRequest( buildRequestObjectTypeDocument("3378841480ZZD") );
+		provisionProtocol.getRequest( buildRequestDocument("3378841480ZZD") );
+	}
+
+	public void parseRequestWithoutPolicyKey() throws InvalidPolicyKeyException {
+		ProvisionRequest request = provisionProtocol.getRequest( buildRequestDocumentWithoutPolicyKey() );
+		assertThat(request.getPolicyType()).isEqualTo(MS_EAS_PROVISIONING_WBXML);
+		assertThat(request.getPolicyKey()).isNull();
 	}
 	
-	private Document buildRequestObjectTypeDocument(String policyKey) throws FactoryConfigurationError {
+	private Document buildRequestDocumentWithoutPolicyKey() throws FactoryConfigurationError {
+		Document document = DOMUtils.createDoc(null, "Provision");
+		Element root = document.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", ProvisionStatus.SUCCESS.getSpecificationValue());
+		Element policies = DOMUtils.createElement(root, "Policies");
+		Element policyNode = DOMUtils.createElement(policies, "Policy");
+		DOMUtils.createElementAndText(policyNode, "PolicyType", MS_EAS_PROVISIONING_WBXML);
+		DOMUtils.createElementAndText(policyNode, "Status", ProvisionStatus.SUCCESS.getSpecificationValue());
+		return document;
+	}	
+
+	
+	private Document buildRequestDocument(String policyKey) throws FactoryConfigurationError {
 		Document document = DOMUtils.createDoc(null, "Provision");
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", ProvisionStatus.SUCCESS.getSpecificationValue());

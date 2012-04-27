@@ -117,15 +117,8 @@ public class SyncDecoder {
 	}
 
 	private Integer getWait(Element root) {
-		Integer ret = 0;
-		String wait = DOMUtils.getElementText(root, "Wait");
-		if (wait != null && wait.length() > 0) {
-			try {
-				ret = Integer.parseInt(wait);
-			} catch (NumberFormatException e) {
-			}
-		}
-		return ret;
+		Element node = DOMUtils.getUniqueElement(root, "Wait");
+		return DOMUtils.getElementInteger(node);
 	}
 
 	private SyncCollection getCollection(UserDataRequest udr, Element col, boolean isPartial)

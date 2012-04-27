@@ -104,9 +104,9 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, UserDataRequest udr) throws DaoException {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
 		provisionResponse.setStatus(ProvisionStatus.SUCCESS);
-		long policyKey = provisionRequest.getPolicyKey();
-		
-		if (policyKey == INITIAL_POLICYKEY) {
+		Long policyKey = provisionRequest.getPolicyKey();
+
+		if (isInitialProvisionRequest(policyKey)) {
 			setUpNewPolicyKey(udr, provisionResponse);
 			provisionResponse.setPolicy(backend.getDevicePolicy(udr));
 		} else if (isCurrentPolicyKey(udr, policyKey)) {
@@ -120,6 +120,10 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	private void setUpNewPolicyKey(UserDataRequest udr, ProvisionResponse provisionResponse) throws DaoException {
 		provisionResponse.setPolicyKey(allocateNewPolicyKey(udr));
 		provisionResponse.setPolicyStatus(ProvisionPolicyStatus.SUCCESS);
+	}
+
+	private boolean isInitialProvisionRequest(Long policyKey) {
+		return policyKey == null || policyKey == INITIAL_POLICYKEY;
 	}
 
 	private boolean isCurrentPolicyKey(UserDataRequest bs, long policyKey) throws DaoException {

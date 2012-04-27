@@ -36,14 +36,14 @@ import com.google.common.base.Objects;
 public class ProvisionRequest {
 
 	private final String policyType;
-	private final long policyKey;
+	private final Long policyKey;
 
-	public ProvisionRequest(String policyType, long policyKey) {
+	public ProvisionRequest(String policyType, Long policyKey) {
 		this.policyType = policyType;
 		this.policyKey = policyKey;
 	}
 	
-	public long getPolicyKey() {
+	public Long getPolicyKey() {
 		return policyKey;
 	}
 	
