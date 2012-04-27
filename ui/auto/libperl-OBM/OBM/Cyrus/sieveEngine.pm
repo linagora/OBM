@@ -104,24 +104,39 @@ sub _doWork {
         return 1;
     }
 
-
     # Getting active script name
-    my $sieveScriptName;
-    sieve_list( $sieveSrvConn, sub{ my( $scriptName, $state) = @_; $sieveScriptName = $scriptName if ($state); } );
+    my @sieveScripts;
+    sieve_list( $sieveSrvConn, sub{ my( $scriptName, $state) = @_; push @sieveScripts, [$scriptName, $state]; } );
 
-    # If no active script, create new
-    if( !$sieveScriptName ) {
-        $sieveScriptName = $entityMailboxName.'.sieve';
-        $sieveScriptName =~ s/@/-/g;
+    my @activeScripts = grep { $_->[1] } @sieveScripts;
+    my $activeSieveScriptName;
+    my $sieveScriptExists;
+    my $sieveScriptName;
+    if (@activeScripts == 1) {
+        $sieveScriptName = $activeScripts[0]->[0];
+        $sieveScriptExists = 1;
+    }
+    else {
+        my $defaultSieveScriptName = $entityMailboxName.'.sieve';
+        $defaultSieveScriptName =~ s/@/-/g;
+
+        $sieveScriptName = $defaultSieveScriptName;
+        $sieveScriptExists =  (grep { $_->[0] eq $sieveScriptName } @sieveScripts) > 0;
     }
 
-
-    my $currentScriptString = '';
-    # Get server sieveScriptName sieve script content if exists
-    sieve_get( $sieveSrvConn, $sieveScriptName, $currentScriptString );
     my @oldSieveScript;
-    if( defined($currentScriptString) ) {
-        @oldSieveScript = split( /\n/, $currentScriptString );
+    my $currentScriptString;
+    if ($sieveScriptExists) {
+        $self->_log("Sieve script $sieveScriptName retrieved", 3);
+        # Get server sieveScriptName sieve script content if exists
+        sieve_get( $sieveSrvConn, $sieveScriptName, $currentScriptString );
+        if( defined($currentScriptString) ) {
+            @oldSieveScript = split( /\n/, $currentScriptString );
+        }
+    }
+    else {
+        $self->_log("No active or default sieve script found, a fresh one ".
+            "will be generated", 3);
     }
 
 
