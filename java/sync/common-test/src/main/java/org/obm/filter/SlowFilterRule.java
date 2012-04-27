@@ -40,7 +40,7 @@ import com.google.common.base.Strings;
 
 public final class SlowFilterRule implements TestRule {
 
-	private static final String SLOW_CONFIGURATION_VALUE = System.getenv(Slow.CONFIGURATION_ENVIRONMENT_KEY);
+	private static final String SLOW_CONFIGURATION_VALUE = System.getProperty(Slow.CONFIGURATION_ENVIRONMENT_KEY);
 	private static final boolean SLOW_TEST_ALLOWED = configurationAllowSlowTests(SLOW_CONFIGURATION_VALUE);
 	
 	@Override
