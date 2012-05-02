@@ -29,44 +29,44 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.push.bean;
 
-import org.obm.push.bean.GetItemEstimateStatus;
-import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.OPClient;
-import org.w3c.dom.Element;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-	private final String syncKey;
-	private final int collectionId;
+@RunWith(SlowFilterRunner.class)
+public class GetItemEstimateStatusTest {
 
-	public GetItemEstimateEmailFolderCommand(String syncKey, int collectionId) {
-		super(NS.GetItemEstimate, "GetItemEstimate", "GetItemEstimateRequestEmail.xml");
-		this.syncKey = syncKey;
-		this.collectionId = collectionId;
+	@Test(expected=IllegalArgumentException.class)
+	public void fromSpecificationZero() {
+		GetItemEstimateStatus.fromSpecificationValue(0);
+	}
+	
+	@Test
+	public void fromSpecificationOK() {
+		assertThat(GetItemEstimateStatus.fromSpecificationValue(1)).isEqualTo(GetItemEstimateStatus.OK);
 	}
 
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:SyncKey");
-		sk.setTextContent(syncKey);
-		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
-		collection.setTextContent(String.valueOf(collectionId));
+	@Test
+	public void fromSpecificationInvalidCollection() {
+		assertThat(GetItemEstimateStatus.fromSpecificationValue(2)).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
 	}
 
-	@Override
-	protected GetItemEstimateSingleFolderResponse parseResponse(Element root) {
-		Integer colId = DOMUtils.getElementInteger(root, "CollectionId");
-		Integer estimate = DOMUtils.getElementInteger(root, "Estimate"); 
-		GetItemEstimateStatus status = findStatus(root);
-		return new GetItemEstimateSingleFolderResponse(colId, estimate, status);
+	@Test
+	public void fromSpecificationNeedSync() {
+		assertThat(GetItemEstimateStatus.fromSpecificationValue(3)).isEqualTo(GetItemEstimateStatus.NEED_SYNC);
+	}
+	
+	@Test
+	public void fromSpecificationInvlidSyncKey() {
+		assertThat(GetItemEstimateStatus.fromSpecificationValue(4)).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
 	}
 
-	private GetItemEstimateStatus findStatus(Element root) {
-		int status = Integer.parseInt(DOMUtils.getElementText(root, "Status"));
-		return GetItemEstimateStatus.fromSpecificationValue(status);
+	@Test(expected=IllegalArgumentException.class)
+	public void fromSpecificationFive() {
+		GetItemEstimateStatus.fromSpecificationValue(5);
 	}
 }

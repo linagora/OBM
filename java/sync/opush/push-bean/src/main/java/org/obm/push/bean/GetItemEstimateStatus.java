@@ -31,26 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 public enum GetItemEstimateStatus {
-	OK, // 1 Success.
-	INVALID_COLLECTION, // 2 A collection was invalid or one of the specified
-						// collection IDs was invalid.
-	NEED_SYNC, // 3 Synchronization state has not been primed yet. The Sync
-				// command MUST be performed first.
-	INVALID_SYNC_KEY; // 4 The specified synchronization key was invalid
+	OK(1),
+	INVALID_COLLECTION(2),
+	NEED_SYNC(3),
+	INVALID_SYNC_KEY(4);
 	
-	public String asXmlValue() {
-		switch (this) {
-		case INVALID_COLLECTION:
-			return "2";
-		case NEED_SYNC:
-			return "3";
-		case INVALID_SYNC_KEY:
-			return "4";
-		case OK:
-		default:
-			return "1";
+	private final int specificationValue;
+
+	private static Map<Integer, GetItemEstimateStatus> values;
+	static {
+		Builder<Integer, GetItemEstimateStatus> builder = ImmutableMap.builder();
+		for (GetItemEstimateStatus type: values()) {
+			builder.put(type.specificationValue, type);
 		}
+		values = builder.build();
+	}
+	
+	private GetItemEstimateStatus(int specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+	
+	public int getSpecificationValue() {
+		return specificationValue;
+	}
+
+	public static GetItemEstimateStatus fromSpecificationValue(int specificationValue) {
+		GetItemEstimateStatus status = values.get(specificationValue);
+		if (status != null) {
+			return status;
+		}
+		throw new IllegalArgumentException("no status bound for value " + specificationValue);
 	}
 
 }

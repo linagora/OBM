@@ -54,6 +54,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
@@ -69,6 +70,10 @@ import com.google.common.collect.Iterables;
 
 public class IntegrationTestUtils {
 
+	public static void expectSyncState(StateMachine stateMachine, String syncKey, ItemSyncState syncState) throws DaoException {
+		expect(stateMachine.getItemSyncState(syncKey)).andReturn(syncState).anyTimes();
+	}
+	
 	public static void expectUserLoginFromOpush(LoginService loginService, Collection<OpushUser> users) throws AuthFault {
 		for (OpushUser user : users) {
 			expectUserLoginFromOpush(loginService, user);

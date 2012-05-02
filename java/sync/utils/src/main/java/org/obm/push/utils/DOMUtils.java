@@ -188,6 +188,11 @@ public final class DOMUtils {
 		return null;
 	}
 	
+	public static Integer getElementInteger(Element node, String elementName) {
+		Element integerElement = getUniqueElement(node, elementName);
+		return getElementInteger(integerElement);
+	}
+	
 	private static boolean isTextElement(Element node) {
 		if (node != null && node.getFirstChild() instanceof Text) {
 			return true;

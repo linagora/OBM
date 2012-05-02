@@ -31,16 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
+import org.obm.push.bean.GetItemEstimateStatus;
+
 import com.google.common.base.Objects;
 
 
 public final class GetItemEstimateSingleFolderResponse implements IEasReponse {
 
-	private final int collectionId;
-	private final int estimate;
-	private final int status;
+	private final Integer collectionId;
+	private final Integer estimate;
+	private final GetItemEstimateStatus status;
 
-	public GetItemEstimateSingleFolderResponse(int collectionId, int estimate, int status) {
+	public GetItemEstimateSingleFolderResponse(Integer collectionId, Integer estimate, GetItemEstimateStatus status) {
 		this.collectionId = collectionId;
 		this.estimate = estimate;
 		this.status = status;
@@ -51,15 +53,15 @@ public final class GetItemEstimateSingleFolderResponse implements IEasReponse {
 		throw new IllegalAccessError("GetItemEstimate's response has no SyncKey");
 	}
 
-	public int getCollectionId() {
+	public Integer getCollectionId() {
 		return collectionId;
 	}
 
-	public int getEstimate() {
+	public Integer getEstimate() {
 		return estimate;
 	}
 
-	public int getStatus() {
+	public GetItemEstimateStatus getStatus() {
 		return status;
 	}
 

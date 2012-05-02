@@ -131,7 +131,7 @@ public abstract class OPClient {
 		return run(new ProvisionStepTwo(acknowledgingPolicyKey));
 	}
 	
-	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, String collectionId) throws Exception {
+	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, int collectionId) throws Exception {
 		return run(new GetItemEstimateEmailFolderCommand(key, collectionId));
 	}
 	

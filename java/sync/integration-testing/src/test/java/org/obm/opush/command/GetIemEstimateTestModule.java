@@ -29,44 +29,47 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.opush.command;
 
-import org.obm.push.bean.GetItemEstimateStatus;
-import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.OPClient;
-import org.w3c.dom.Element;
+import org.obm.opush.ModuleUtils;
+import org.obm.opush.env.AbstractOpushEnv;
+import org.obm.opush.env.AbstractOverrideModule;
+import org.obm.push.state.StateMachine;
 
-public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
-	private final String syncKey;
-	private final int collectionId;
-
-	public GetItemEstimateEmailFolderCommand(String syncKey, int collectionId) {
-		super(NS.GetItemEstimate, "GetItemEstimate", "GetItemEstimateRequestEmail.xml");
-		this.syncKey = syncKey;
-		this.collectionId = collectionId;
+public class GetIemEstimateTestModule  extends AbstractOpushEnv {
+	
+	public GetIemEstimateTestModule() {
+		super();
 	}
-
+	
 	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:SyncKey");
-		sk.setTextContent(syncKey);
-		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
-		collection.setTextContent(String.valueOf(collectionId));
+	protected Module overrideModule() throws Exception {
+		Module overrideModule = super.overrideModule();
+		
+		Module stateMachine = bindStateMachineModule();
+		Module contentsExporterBackend = bindContentsExporterBackendModule();
+		
+		return Modules.combine(overrideModule, stateMachine, contentsExporterBackend);
 	}
 
-	@Override
-	protected GetItemEstimateSingleFolderResponse parseResponse(Element root) {
-		Integer colId = DOMUtils.getElementInteger(root, "CollectionId");
-		Integer estimate = DOMUtils.getElementInteger(root, "Estimate"); 
-		GetItemEstimateStatus status = findStatus(root);
-		return new GetItemEstimateSingleFolderResponse(colId, estimate, status);
-	}
+	private Module bindStateMachineModule() {
+		AbstractOverrideModule mailBackend = new AbstractOverrideModule() {
 
-	private GetItemEstimateStatus findStatus(Element root) {
-		int status = Integer.parseInt(DOMUtils.getElementText(root, "Status"));
-		return GetItemEstimateStatus.fromSpecificationValue(status);
+			@Override
+			protected void configureImpl() {
+				bindWithMock(StateMachine.class);
+			}
+		};
+		getMockMap().addMap(mailBackend.getMockMap());
+		return mailBackend;
+	}
+	
+	private Module bindContentsExporterBackendModule() {
+		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule();
+		getMockMap().addMap(contentsExporterBackend.getMockMap());
+		return contentsExporterBackend;
 	}
 }

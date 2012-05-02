@@ -171,7 +171,13 @@ public class EmailSyncTestUtils {
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 
 				anyObject(SyncCollection.class)))
-		.andReturn(delta).once();
+				.andReturn(delta).once();
+		
+		expect(contentsExporter.getItemEstimateSize(
+				anyObject(UserDataRequest.class), 
+				anyObject(SyncState.class),
+				anyObject(SyncCollection.class)))
+			.andReturn(delta.getItemEstimateSize()).anyTimes();
 	}
 
 }

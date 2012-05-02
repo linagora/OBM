@@ -144,7 +144,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				String syncKey = syncCollection.getSyncKey();
 				SyncState state = stMachine.getItemSyncState(syncKey);
 				if (state == null) {
-					throw new InvalidSyncKeyException(syncKey);
+					throw new InvalidSyncKeyException(collectionId, syncKey);
 				}
 				
 				int unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);

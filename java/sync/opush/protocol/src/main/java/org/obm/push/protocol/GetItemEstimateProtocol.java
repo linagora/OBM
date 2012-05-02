@@ -83,7 +83,7 @@ public class GetItemEstimateProtocol {
 		final Document document = createDocument();
 		for (Estimate estimate: response.getEstimates()) {
 			final Element responseElement = createResponseNode(document);
-			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.OK.asXmlValue());
+			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.OK.getSpecificationValue());
 			final Element collectionElement = DOMUtils.createElement(responseElement, "Collection");
 			createCollectionIdElement(estimate.getCollection(), collectionElement);
 			createEstimateElement(estimate.getEstimate(), collectionElement);
@@ -115,7 +115,7 @@ public class GetItemEstimateProtocol {
 	public Document buildError(GetItemEstimateStatus status, Integer collectionId) {
 		Document document = createDocument();
 		Element responseNode = createResponseNode(document);
-		DOMUtils.createElementAndText(responseNode, "Status", status.asXmlValue());
+		DOMUtils.createElementAndText(responseNode, "Status", status.getSpecificationValue());
 		if (collectionId != null) {
 			Element ce = DOMUtils.createElement(responseNode, "Collection");
 			DOMUtils.createElementAndText(ce, "CollectionId", String.valueOf(collectionId));
