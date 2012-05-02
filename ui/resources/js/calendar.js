@@ -2189,7 +2189,7 @@ Obm.CalendarDecisionPopup = new Class({
 					}
 				}
 			}
-		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type});
+		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, uriAction: this.uriAction});
 	},
 	displayCharLimit: function(){
 		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;

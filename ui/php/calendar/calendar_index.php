@@ -237,7 +237,7 @@ if ($action == 'search') {
       $display['msg'] .= display_err_msg($err['msg']);
     }
     $obm_wait = run_query_calendar_waiting_events();
-    if ($obm_wait->nf() != 0) {
+    if ($obm_wait->nf() != 0 && $params['uriAction'] == 'waiting_events') {
       $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
       $display['detail'] = html_calendar_waiting_events($obm_wait);
     } else {
@@ -709,7 +709,10 @@ if ($action == 'search') {
     $time_end = $end->getHour();
     $min_end = $end->getMinute();
     
-    $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id']."&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".$date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".$params['decision_event'];
+    $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id'].
+      "&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".
+      $date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".
+      $params['decision_event']."&uriAction=".$params['uriAction'];
     echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
     exit();
   }
