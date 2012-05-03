@@ -5,7 +5,7 @@
 %global _source_payload w9.gzdio
 
 #Define obm-jetty configuration
-%global obmjettyconf %{_sysconfig}/jetty
+%global obmjettyconf %{_sysconfdir}/jetty
 
 Name: obm-jetty
 Version: %{obm_version}
