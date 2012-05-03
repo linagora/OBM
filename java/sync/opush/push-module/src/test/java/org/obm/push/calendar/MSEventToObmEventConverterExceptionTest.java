@@ -35,7 +35,6 @@ package org.obm.push.calendar;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.fest.assertions.api.Assertions;
@@ -47,7 +46,6 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
-import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
@@ -262,7 +260,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
 				.withDtStamp(date("2004-12-10T12:15:10"))
-				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
+				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(msEventException))
 				.build();
 		
@@ -295,7 +293,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withEndTime(date("2004-12-12T11:15:10"))
 				.withSubject("Any Subject")
 				.withDtStamp(null)
-				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
+				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(msEventException))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
@@ -451,7 +449,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
+				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(msEventException))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
@@ -1269,7 +1267,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(simpleDailyRecurrence(RecurrenceType.DAILY, RecurrenceDayOfWeek.FRIDAY))
+				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(exceptions))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
@@ -1277,11 +1275,10 @@ public class MSEventToObmEventConverterExceptionTest {
 		return msEvent;
 	}
 	
-	private MSRecurrence simpleDailyRecurrence(RecurrenceType type, RecurrenceDayOfWeek day) {
+	private MSRecurrence simpleDailyRecurrence() {
 		MSRecurrence recurrence = new MSRecurrence();
 		recurrence.setInterval(1);
-		recurrence.setType(type);
-		recurrence.setDayOfWeek(EnumSet.of(day));
+		recurrence.setType(RecurrenceType.DAILY);
 		return recurrence;
 	}
 

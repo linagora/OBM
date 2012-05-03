@@ -37,7 +37,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.obm.push.RecurrenceDayOfWeekConverter;
@@ -51,7 +50,6 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
-import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
@@ -64,7 +62,6 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
-import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
@@ -427,7 +424,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		switch (msEventRecurrence.getType()) {
 		case DAILY:
 			convertedRecurrence.setKind(RecurrenceKind.daily);
-			convertedRecurrence.setDays(dailyToDays(msEventRecurrence.getDayOfWeek()));
+			if (msEventRecurrence.getDayOfWeek() != null) {
+				throw new ConversionException("daily recurrence mustn't provide recurrence days");
+			}
 			break;
 		case MONTHLY:
 			convertedRecurrence.setKind(RecurrenceKind.monthlybydate);
@@ -477,14 +476,6 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return new Date(cal.getTimeInMillis());
 	}
 
-	private RecurrenceDays dailyToDays(Set<RecurrenceDayOfWeek> daysOfWeek) {
-        if (daysOfWeek != null) {
-                return RecurrenceDayOfWeekConverter.toRecurrenceDays(daysOfWeek);
-        } else {
-                return RecurrenceDays.ALL_DAYS;
-        }
-	}
-	
 	private void moveRecurrentEventStartDate(MSEvent msEvent) throws ConversionException {
 		if (msEvent.getRecurrence().getType() == RecurrenceType.YEARLY) {
 			moveRecurrentYearlyEventStartDate(msEvent);
