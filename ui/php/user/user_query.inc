@@ -2337,11 +2337,19 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
-  // Remove all Events that have non attendees !
-  $query = "DELETE FROM Event
-     WHERE event_id IN (SELECT event_id FROM Event LEFT JOIN EventLink ON event_id = eventlink_event_id WHERE eventlink_event_id IS NULL AND event_owner $user_id)"; 
+  // Remove all Events from this user that have non attendees !
+  $query = "SELECT event_id FROM Event LEFT JOIN EventLink ON event_id = eventlink_event_id WHERE eventlink_event_id IS NULL AND event_owner $user_id";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
+
+  $obm_q2 = new DB_OBM;
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('event_id');
+    $query2 = "DELETE FROM Event WHERE event_id = $id"; 
+    display_debug_msg($query2, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
+    $obm_q2->query($query2);
+  }
 }
 
 
