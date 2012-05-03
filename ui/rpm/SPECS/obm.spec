@@ -226,9 +226,12 @@ Summary:        Postfix configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-config = %{version}-%{release}
-Requires:	obm-satellite
-Requires:	postfix
+Requires(post): chkconfig
+Requires(post): obm-satellite
 Conflicts:	sendmail
+Requires:	postfix
+Requires:	cyrus-sasl
+Requires:	cyrus-sasl-plain
 
 %description    postfix
 This package configures Postfix for OBM.
@@ -243,9 +246,11 @@ Summary:        Cyrus/SASL configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-config = %{version}-%{release}
-Requires:	obm-satellite
 Requires:	cyrus-imapd
 Requires:	cyrus-imapd-utils
+Requires(post): cyrus-sasl
+Requires(post): cyrus-sasl-plain
+Requires(post): obm-satellite
 
 %description    cyrus
 This package configures Cyrus/SASL for OBM.
@@ -543,15 +548,24 @@ fi
 
 %post           -n %{name}-postfix
 if [ "$1" = "1" ]; then
-  echo -n "[obm-postfix] activate obm-satellite postfix module..."
+  echo -n "[obm-postfix] activating obm-satellite postfix module..."
   /usr/sbin/osenmod postfixSmtpInMaps
   /usr/sbin/osenmod postfixAccess
+  if [ -e /etc/obm/certs/obm_cert.pem ] ; then
+    /etc/init.d/obmSatellite start
+  fi
+fi
+%{_sbindir}/alternatives --set mta /usr/sbin/sendmail.postfix || :
+
+if [ "$1" = "2" ]; then
   /etc/init.d/obmSatellite restart
 fi
 
+
+
 %postun         -n %{name}-postfix
 if [ "$1" = "0" ]; then
-  echo -n "[obm-postfix] remove obm-satellite postfix module..."
+  echo -n "[obm-postfix] removing obm-satellite postfix module..."
   if [ -e /usr/sbin/osdismod ]; then
     /usr/sbin/osdismod postfixSmtpInMaps
     /usr/sbin/osdismod postfixAccess
@@ -567,13 +581,8 @@ fi
 %doc 	doc/conf/cyrus_saslauthd.sample
 
 %post           -n %{name}-cyrus
+#obm-cyrus installation
 if [ "$1" = "1" ]; then
-  echo -n "[obm-cyrus] activate obm-satellite cyrus module..."
-  /usr/sbin/osenmod cyrusPartition
-  /etc/init.d/obmSatellite restart
-fi
-
-if [ "$1" = "2" ]; then
   imapd_file="/etc/imapd.conf"
   saslauthd_file="/etc/saslauthd.conf"
   SINGLE_NAME_SPACE="OK"
@@ -603,12 +612,24 @@ if [ "$1" = "2" ]; then
     echo "ldap_filter: ${ldap_filter}" >> ${saslauthd_file}
     echo "DONE."
   fi
+  echo -n "[obm-cyrus] activating obm-satellite cyrus module..."
+  /usr/sbin/osenmod cyrusPartition
+  #We need a certificate before starting
+  if [ -e /etc/obm/certs/obm_cert.pem ] ; then
+    /etc/init.d/obmSatellite start
+  fi
 fi
+
+#obm-cyrus update
+if [ "$1" = "2" ]; then
+  /etc/init.d/obmSatellite restart
+fi
+
 
 
 %postun         -n %{name}-cyrus
 if [ "$1" = "0" ]; then
-  echo -n "[obm-cyrus remove obm-satellite cyrus module..."
+  echo -n "[obm-cyrus removing obm-satellite cyrus module..."
   if [ -e /usr/sbin/osdismod ]; then
     /usr/sbin/osdismod cyrusPartition
   fi
