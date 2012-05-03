@@ -1510,7 +1510,7 @@ function display_last_visited() {
   $obm_q->query($query);
   if($obm_q->next_record()) {
     $id = $obm_q->f('event_id');
-    $title = $obm_q->f('event_title');
+    $title = htmlspecialchars($obm_q->f('event_title'));
     $dis_last .= "
       <li>
         <a id=\"last_visit_calendar_event_a\" href=\"$cal_url$id\">

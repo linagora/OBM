@@ -1812,8 +1812,8 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
           $title = $l_private;
           $description = $title;
         } else {
-          $title = $event->title;
-          if($location != '') $title .= " ($l_location : $location)";
+          $title = htmlspecialchars($event->title);
+          if($location != '') $title .= " ($l_location : ".htmlspecialchars($location).")";
           $description = $event->description;
           $properties = $event->properties;
           $item_list = '';
@@ -1836,16 +1836,16 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
             }
           }
           if($event->isPrivate()) {
-            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> $title";
+            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> ".htmlspecialchars($title);
           }
           if($event->isMeeting()) {
-            $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> $title";
+            $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> ".htmlspecialchars($title);
           }
           if ($event->isPeriodic()) {
-            $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> $title";
+            $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> ".htmlspecialchars($title);
           }                  
           if ($event->isAllDay()) {
-            $title = "<img src=\"$ico_allday_alt\" alt=\"[All Day]\" /> $title";
+            $title = "<img src=\"$ico_allday_alt\" alt=\"[All Day]\" /> ".htmlspecialchars($title);
           }                  
         }
         $dis_owner = $event->owner_name;
@@ -1926,10 +1926,10 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
               </tr>
                 $dis_category
               <tr>
-                <th>$l_location</th><td>$location</td>
+                <th>$l_location</th><td>".htmlspecialchars($location)."</td>
               </tr>
               <tr>
-                <th>$l_desc</th><td>$description</td>
+                <th>$l_desc</th><td>".htmlspecialchars($description)."</td>
               </tr>
               <tr>
                 <th>$l_owner</th><td>$dis_owner</td>
@@ -2236,7 +2236,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
               if(!is_string($category) || !isset($cats_color[$category])){
                 $category = '';
               }
-              $location = $event->location;
+              $location = htmlspecialchars($event->location);
               if($event->all_day) {
                 $ad = ": $l_all_day";
               } else {
@@ -2253,9 +2253,9 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
                   $style = '';
                 }                
                 if ($location != '') {
-                  $today_events[] = "<li style=\"$style\">".$event->title." ($location) $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".htmlspecialchars($event->title)." ($location) $ad</li>";
                 } else {
-                  $today_events[] = "<li style=\"$style\">".$event->title." $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".htmlspecialchars($event->title)." $ad</li>";
                 } 
               }
             }            
@@ -2599,7 +2599,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   if ($occurrence->event->privacy == 1 && !(array_key_exists($obm['uid'],$occurrence->event->attendee['user']))) {
     $title = $l_private;
   } else {
-    $title = $occurrence->event->title;
+    $title = htmlspecialchars($occurrence->event->title);
     if ($occurrence->event->location != '') {
       $location = "<br />$l_location : ".$occurrence->event->location;
     }            
@@ -2653,7 +2653,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
   if ($occurrence->event->privacy == 1 && !(array_key_exists($obm['uid'],$occurrence->event->attendee['user']))) {
     $title = $l_private;
   } else {
-    $title = $occurrence->event->title;
+    $title = htmlspecialchars($occurrence->event->title);
     if ($occurrence->event->location != '') {
       $location = "<br />$l_location : ".$occurrence->event->location;
     }            
@@ -2752,8 +2752,8 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
         $private = false;
       }
     if (!$private) {
-      $title = $conflict->event->title;
-      $location = $conflict->event->location;
+      $title = htmlspecialchars($conflict->event->title);
+      $location = htmlspecialchars($conflict->event->location);
     } else {
       $title = $l_private;
       $location = $l_private;
@@ -5571,16 +5571,16 @@ function html_calendar_waiting_events($obm_wait) {
     $min_end = $end->getMinute();
     
     $current_entity_comment = "$GLOBALS[l_add_comment]...";
-    $escaped_title = phpStringToJsString(str_replace("\n\r", ', ', $obm_wait->f('event_title')));
-
+    $title_unescaped = htmlspecialchars($obm_wait->f('event_title'));
+    $escaped_title = phpStringToJsString(str_replace("\n\r", ', ', $title_unescaped));
     $block .= "
     <tr style=\"text-align:center;\">
      <td style=\"text-align:left;\">
-       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a>
+       <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".htmlspecialchars($obm_wait->f('event_title'))."</a>
        <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=waiting_events&show_calendar=1&date=$begin\"><img src=\"$GLOBALS[ico_calendar]\" /></a>
      </td>
      <td>$periodic</td> 
-     <td>".$obm_wait->f('event_location')."</td>
+     <td>".htmlspecialchars($obm_wait->f('event_location'))."</td>
      <td>".$obm_wait->f('eventcategory1_label')."</td>
      <td>$priority</td>
      <td>$user_create</td>
@@ -10102,8 +10102,9 @@ function dis_calendar_waiting_portlet() {
     $url = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
     $evt_end = clone $evt_begin;
     $evt_end->addSecond($evt['event_duration']);
+    $title = htmlspecialchars($evt[event_title]);
     $dis_waiting .= "<tr>
-      <td><a href='$url' target='_blank'>$evt[event_title]</a></td>
+      <td><a href='$url' target='_blank'>$title</a></td>
       <td>$evt[entity_label]</td>
       <td>".$evt_begin->getOutputDateTime()."</td>
       <td>".$evt_end->getOutputDateTime()."</td>
@@ -10137,7 +10138,7 @@ function dis_calendar_task_portlet() {
   $data = run_query_get_todos();
   while ($data->next_record()) {
     $id = $data->f('event_id');
-    $title = $data->f('event_title');
+    $title = htmlspecialchars($data->f('event_title'));
     $priority = $data->f('event_priority');
     $percent = $data->f('eventlink_percent');
     $deadline = new Of_Date($data->f('event_deadline'));

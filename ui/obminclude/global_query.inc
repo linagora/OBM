@@ -883,7 +883,7 @@ function global_session_load_user_todos($pri='todo_priority') {
 
     $option = "todo_$rank";
     $t_id = $todolist_q->f('event_id');
-    $t_title = $todolist_q->f('event_title');
+    $t_title = htmlspecialchars($todolist_q->f('event_title'));
 
     $todos[$rank]['id'] = $t_id; 
     $todos[$rank]['title'] = $t_title; 

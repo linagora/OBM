@@ -1594,7 +1594,7 @@ Obm.CalendarInDayEvent = new Class({
     var decodedTitle = tmpTa.value; 
 
     this.element.setProperty('title', decodedTitle + ' ' + location);
-    this.timeContainer.set('html',time);
+    this.timeContainer.set('text',time);
     this.titleContainer.set('text',title);
   },
 
@@ -1843,7 +1843,7 @@ Obm.CalendarAllDayEvent = new Class({
     var decodedTitle = tmpTa.value;
 
     this.element.setProperty('title', decodedTitle);
-    this.titleContainer.set('html',time);
+    this.titleContainer.set('text',time);
   },
 
 
