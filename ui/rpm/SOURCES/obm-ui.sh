@@ -83,7 +83,7 @@ if [ -e $FIC_HTTPD_OBM ]; then
 	read replace_httpd_conf
 	if [ "x$replace_httpd_conf" == "xy" ]; then
 		cp $FIC_HTTPD_OBM ${FIC_HTTPD_OBM}.old
-		sed -i -e "s/FULL_NAME/${EXTERNALURL}/" ${FIC_HTTPD_OBM}
+		sed -i -e "s%.*ServerName.*%ServerName ${EXTERNALURL}%" ${FIC_HTTPD_OBM}
                 sed -i -e "s%.*DocumentRoot.*%DocumentRoot /usr/share/obm/php%" ${FIC_HTTPD_OBM} 
                 sed -i -e "s%.*ErrorLog.*%ErrorLog /var/log/httpd/obm-error.log%" ${FIC_HTTPD_OBM} 
                 sed -i -e "s%.*CustomLog.*%CustomLog /var/log/httpd/obm-access.log common%" ${FIC_HTTPD_OBM} 
