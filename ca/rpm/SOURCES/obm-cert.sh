@@ -66,9 +66,14 @@ function checkcertselinux ()
 	fi
 }
 
-echo "Generate Certificate for this host (${OBM_EXTERNALURL})"
-gencertif
-checkcertselinux
+if [ ! -e /etc/obm/certs/${OBM_EXTERNALURL}_signed.pem ] ; then
+	echo "Generate Certificate for this host (${OBM_EXTERNALURL})"
+	gencertif
+	checkcertselinux
+else
+	echo "A Certificate already exists for this host (${OBM_EXTERNALURL})"
+        echo
+fi
 
 echo "============ End of OBM cert configuration  ============"
 echo
