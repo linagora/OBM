@@ -251,6 +251,7 @@ Requires:	cyrus-imapd-utils
 Requires(post): cyrus-sasl
 Requires(post): cyrus-sasl-plain
 Requires(post): obm-satellite
+Requires(post): openldap-clients
 
 %description    cyrus
 This package configures Cyrus/SASL for OBM.
@@ -581,14 +582,25 @@ fi
 %doc 	doc/conf/cyrus_saslauthd.sample
 
 %post           -n %{name}-cyrus
-#obm-cyrus installation
-if [ "$1" = "1" ]; then
+#obm-cyrus install
+if [ "$1" = "1" ] ; then
+  echo -n "[obm-cyrus] activating obm-satellite cyrus module..."
+  /usr/sbin/osenmod cyrusPartition
+  #We need a certificate before starting
+  if [ -e /etc/obm/certs/obm_cert.pem ] ; then
+    echo -n "[obm-cyrus] starting obm-satellite cyrus module..."
+    /etc/init.d/obmSatellite start
+  fi
+fi
+
+#obm-cyrus upgrade from 2.3
+if [ "$1" = "2" ]; then
   imapd_file="/etc/imapd.conf"
   saslauthd_file="/etc/saslauthd.conf"
   SINGLE_NAME_SPACE="OK"
   grep -i '^virtdomains.*userid' ${imapd_file} && SINGLE_NAME_SPACE="NOK"
   if [ $SINGLE_NAME_SPACE = 'OK' ]; then
-    echo -n "[OBM-CYRUS] update imapd.conf ... "
+    echo -n "[obm-cyrus] update imapd.conf ... "
 
     cp ${imapd_file} ${imapd_file}_BEFORE_OBM_2.3_UPDATE
     LDAPSERVER=`cat /etc/obm/obm_conf.ini | grep -i "ldapServer" | cut -d'=' -f2 | sed -e "s/ //g"|sed -e "s#ldap://##"`
@@ -601,7 +613,7 @@ if [ "$1" = "1" ]; then
     echo "defaultdomain: ${DEFAULT_DOMAIN}" >> ${imapd_file}
     echo "DONE."
 
-    echo -n "[OBM-CYRUS] update saslauthd.conf ... "
+    echo -n "[obm-cyrus] update saslauthd.conf ... "
     cp ${saslauthd_file} ${saslauthd_file}_BEFORE_OBM_2.3_UPDATE
     sed -i -e 's/\(^ldap_filter.*\)/###COMMENT_BY_UPGRADE##\1/' $saslauthd_file
     ldap_filter="(|(&(|(mailBox=%U@%d)(mailBox=%U@<singleDomainName>))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))"
@@ -612,16 +624,7 @@ if [ "$1" = "1" ]; then
     echo "ldap_filter: ${ldap_filter}" >> ${saslauthd_file}
     echo "DONE."
   fi
-  echo -n "[obm-cyrus] activating obm-satellite cyrus module..."
-  /usr/sbin/osenmod cyrusPartition
-  #We need a certificate before starting
-  if [ -e /etc/obm/certs/obm_cert.pem ] ; then
-    /etc/init.d/obmSatellite start
-  fi
-fi
-
-#obm-cyrus update
-if [ "$1" = "2" ]; then
+  echo -n "[obm-cyrus] restarting obm-satellite cyrus module..."
   /etc/init.d/obmSatellite restart
 fi
 
@@ -629,7 +632,7 @@ fi
 
 %postun         -n %{name}-cyrus
 if [ "$1" = "0" ]; then
-  echo -n "[obm-cyrus removing obm-satellite cyrus module..."
+  echo -n "[obm-cyrus] removing obm-satellite cyrus module..."
   if [ -e /usr/sbin/osdismod ]; then
     /usr/sbin/osdismod cyrusPartition
   fi
