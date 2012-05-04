@@ -8183,10 +8183,14 @@ function html_share_calendar($id,$name) {
         window.addEvent('domready', function() {
           $('tooltip_public').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_public]</label>\");
           $('tooltip_private').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_private]</label>\");
-          $('tooltip_freebusy').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_freebusy]</label>\");
           new Obm.Tip($('tooltip_public'), {fixed:false, click:false}, 'shareTip');
           new Obm.Tip($('tooltip_private'), {fixed:false, click:false}, 'shareTip');
-          new Obm.Tip($('tooltip_freebusy'), {fixed:false, click:false}, 'shareTip');
+          var freebusyContainer = $('tooltip_freebusy');
+          if ( freebusyContainer ) {
+            freebusyContainer.store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_freebusy]</label>\");
+            new Obm.Tip(freebusyContainer, {fixed:false, click:false}, 'shareTip');
+          }
+
         });
       </script>
       $share_pop_up
