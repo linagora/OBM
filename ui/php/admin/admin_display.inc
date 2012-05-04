@@ -229,13 +229,7 @@ function dis_admin_clear_sess($mode, $lifetime) {
     $ltime = 86400;
   }
 
-  $date_limit = date('Y-m-d H:i:s',time() - $ltime);
-  $obm_q = run_query_admin_passive_user($ltime);
-
-  while($obm_q->next_record()) {
-    run_query_log_session($obm_q);
-    run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
-  }
+  run_query_admin_activeuserobm_purge($ltime);
 
   $block = "";
   if ($mode == 'html') {

@@ -147,22 +147,20 @@ function run_query_admin_passive_user($delay) {
   return $obm_q;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Delete an ActiveUserObm entry                           //
+// Query Execution - Purge ActiveUserObm entries                             //
 // Parameters:
-//   - $sid : session id
+//   - $ltime : lifetime
 // Returns:
 //   - DBO : list of passive user session
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_admin_activeuserobm_delete($sid) {
+function run_query_admin_activeuserobm_purge($ltime) {
   global $cdg_sql;
 
-  $query = "delete from ActiveUserObm where activeuserobm_sid = '$sid'";
+  $date_limit = date('Y-m-d H:i:s',time() - $ltime);
+  $query = "DELETE FROM ActiveUserObm WHERE activeuserobm_timeupdate < '$date_limit'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
 }
-
 ?>
