@@ -102,16 +102,17 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 	
 	@Override
 	public void insertExtIdMSEventUidMapping(EventExtId eventExtId,
-			MSEventUid msEventUid, Device device) throws DaoException {
+			MSEventUid msEventUid, Device device, byte[] hashedExtId) throws DaoException {
 		
 		Connection con = null;
 		PreparedStatement ps = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_event_mapping (device_id, event_ext_id, event_uid) VALUES (?, ?, ?)");
+			ps = con.prepareStatement("INSERT INTO opush_event_mapping (device_id, event_ext_id, event_uid, event_ext_id_hash) VALUES (?, ?, ?, ?)");
 			ps.setInt(1, device.getDatabaseId());
 			ps.setString(2, eventExtId.getExtId());
 			ps.setString(3, msEventUid.serializeToString());
+			ps.setBytes(4, hashedExtId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new DaoException(e);
