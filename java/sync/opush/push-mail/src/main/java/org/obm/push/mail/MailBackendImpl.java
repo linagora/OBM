@@ -401,7 +401,7 @@ public class MailBackendImpl implements MailBackend {
 			final Integer devDbId = bs.getDevice().getDatabaseId();
 			Long newUidMail = mailboxService.moveItem(bs, srcFolder, dstFolder, currentMailUid);
 			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
-			addMessageInCache(bs, devDbId, dstFolderId, currentMailUid, dstFolder);
+			addMessageInCache(bs, devDbId, dstFolderId, newUidMail, dstFolder);
 			return dstFolderId + ":" + newUidMail;	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
