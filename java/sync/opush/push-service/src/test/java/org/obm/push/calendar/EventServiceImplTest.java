@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import org.fest.assertions.api.Assertions;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,6 +43,7 @@ import org.obm.icalendar.Ical4jUser.Factory;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.calendar.EventConverterImpl;
@@ -55,6 +57,7 @@ import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.client.login.LoginService;
 
@@ -75,7 +78,7 @@ public class EventServiceImplTest {
 		EasyMock.expectLastCall();
 		CalendarDao calendarDao = EasyMock.createMock(CalendarDao.class);
 		EasyMock.expect(calendarDao.getMSEventUidFor(EasyMock.anyObject(EventExtId.class), EasyMock.anyObject(Device.class))).andReturn(new MSEventUid("uid"));
-		calendarDao.insertExtIdMSEventUidMapping(EasyMock.anyObject(EventExtId.class), EasyMock.anyObject(MSEventUid.class), EasyMock.anyObject(Device.class));
+		calendarDao.insertExtIdMSEventUidMapping(EasyMock.anyObject(EventExtId.class), EasyMock.anyObject(MSEventUid.class), EasyMock.anyObject(Device.class), EasyMock.anyObject(byte[].class));
 		EasyMock.expectLastCall();
 		Factory factory = EasyMock.createMock(Ical4jUser.Factory.class);
 		EasyMock.replay(loginService, calendarDao);
@@ -88,5 +91,136 @@ public class EventServiceImplTest {
 		
 		EasyMock.verify(loginService);
 	}
-	
+
+	@Test
+	public void testConvertEventToMSEventWithExistingId() throws DaoException, ConversionException {
+		EventExtId eventExtId = eventExtId();
+
+		Event event = new Event();
+		event.setExtId(eventExtId);
+
+		Device device = device();
+
+		User user = user();
+		Credentials credentials = new Credentials(user, "password");
+
+		BackendSession bs = EasyMock.createMock(BackendSession.class);
+		EasyMock.expect(bs.getDevice()).andReturn(device).once();
+		EasyMock.expect(bs.getCredentials()).andReturn(credentials).once();
+
+		MSEventUid msEventUid = msEventUid();
+
+		MSEvent expectedMsEvent = new MSEvent();
+		expectedMsEvent.setUid(msEventUid);
+		expectedMsEvent.setLocation("expected ms event location");
+
+		CalendarDao calendarDao = EasyMock.createMock(CalendarDao.class);
+		EasyMock.expect(calendarDao.getMSEventUidFor(event.getExtId(), device))
+				.andReturn(msEventUid).once();
+
+		EasyMock.expectLastCall();
+
+		EventConverter converter = EasyMock.createMock(EventConverter.class);
+		EasyMock.expect(converter.convert(event, msEventUid, user)).andReturn(expectedMsEvent);
+
+		Object[] mocks = { calendarDao, bs, converter };
+		EasyMock.replay(mocks);
+
+		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
+
+		MSEvent msEvent = eventService.convertEventToMSEvent(bs, event);
+		Assertions.assertThat(msEvent).equals(expectedMsEvent);
+
+		EasyMock.verify(mocks);
+	}
+
+	@Test
+	public void testConvertEventToMSEventWithNewId() throws DaoException, ConversionException {
+		EventExtId eventExtId = eventExtId();
+
+		Event event = new Event();
+		event.setExtId(eventExtId);
+
+		Device device = device();
+
+		User user = user();
+		Credentials credentials = new Credentials(user, "password");
+
+		BackendSession bs = EasyMock.createMock(BackendSession.class);
+		EasyMock.expect(bs.getDevice()).andReturn(device).once();
+		EasyMock.expect(bs.getCredentials()).andReturn(credentials).once();
+
+		MSEventUid msEventUid = msEventUid();
+
+		MSEvent expectedMsEvent = new MSEvent();
+		expectedMsEvent.setUid(msEventUid);
+		expectedMsEvent.setLocation("expected ms event location");
+
+		byte[] hashedExtId = hashedExtId();
+
+		CalendarDao calendarDao = EasyMock.createMock(CalendarDao.class);
+		EasyMock.expect(calendarDao.getMSEventUidFor(event.getExtId(), device)).andReturn(null)
+				.once();
+
+		calendarDao.insertExtIdMSEventUidMapping(EasyMock.eq(eventExtId), EasyMock.eq(msEventUid),
+				EasyMock.eq(device), EasyMock.aryEq(hashedExtId));
+		EasyMock.expectLastCall();
+
+		EventConverter converter = EasyMock.createMock(EventConverter.class);
+		EasyMock.expect(converter.convert(event, msEventUid, user)).andReturn(expectedMsEvent);
+
+		Object[] mocks = { calendarDao, bs, converter };
+		EasyMock.replay(mocks);
+
+		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
+
+		MSEvent msEvent = eventService.convertEventToMSEvent(bs, event);
+		Assertions.assertThat(msEvent).equals(expectedMsEvent);
+
+		EasyMock.verify(mocks);
+	}
+
+	@Test
+	public void testTrackEventExtIdMSEventUidTranslation() throws DaoException {
+		CalendarDao calendarDao = EasyMock.createMock(CalendarDao.class);
+
+		EventExtId eventExtId = eventExtId();
+		MSEventUid msEventUid = new MSEventUid("ms_event_uid");
+		Device device = device();
+		byte[] hashedExtId = hashedExtId();
+
+		calendarDao.insertExtIdMSEventUidMapping(EasyMock.eq(eventExtId), EasyMock.eq(msEventUid),
+				EasyMock.eq(device), EasyMock.aryEq(hashedExtId));
+		EasyMock.expectLastCall();
+
+		Object[] mocks = { calendarDao };
+		EasyMock.replay(mocks);
+
+		EventService eventService = new EventServiceImpl(calendarDao, null, null, null, null);
+		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEventUid, device);
+		EasyMock.verify(mocks);
+	}
+
+	private EventExtId eventExtId() {
+		return new EventExtId("event_ext_id");
+	}
+
+	private byte[] hashedExtId() {
+		return new byte[] { (byte) 0xb5, (byte) 0x1a, (byte) 0x02, (byte) 0x52,
+				(byte) 0x8d, (byte) 0x0b, (byte) 0xf8, (byte) 0xc8, (byte) 0xec, (byte) 0x3f,
+				(byte) 0x46, (byte) 0x60, (byte) 0x3a, (byte) 0xfa, (byte) 0xb6, (byte) 0x85,
+				(byte) 0xf3, (byte) 0xb4, (byte) 0x42, (byte) 0xa1 };
+	}
+
+	private Device device() {
+		return new Device(1, "devType", "devId", null);
+	}
+
+	private MSEventUid msEventUid() {
+		return new MSEventUid("6576656e745f6578745f6964");
+	}
+
+	private User user() {
+		return User.Factory.create().createUser("user@obm", "user@obm", "user display name");
+	}
 }

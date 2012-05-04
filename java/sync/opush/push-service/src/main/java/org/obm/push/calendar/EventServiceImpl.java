@@ -60,6 +60,8 @@ import org.obm.sync.client.login.LoginService;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -102,8 +104,14 @@ public class EventServiceImpl implements EventService {
 
 	private MSEventUid createMSEventUidInDatabase(Event event, Device device) throws DaoException {
 		MSEventUid convertedFromExtId = createMSEventUidFromEventExtId(event);
-		calendarDao.insertExtIdMSEventUidMapping(event.getExtId(), convertedFromExtId, device);
+		byte[] hashedExtId = hashExtId(event.getExtId());
+		calendarDao.insertExtIdMSEventUidMapping(event.getExtId(), convertedFromExtId, device, hashedExtId);
 		return convertedFromExtId;
+	}
+
+	private byte[] hashExtId(EventExtId extId) {
+		HashCode hashCode = Hashing.sha1().hashString(extId.getExtId(), Charsets.US_ASCII);
+		return hashCode.asBytes();
 	}
 
 	private MSEventUid retrieveMSEventUidFromDatabase(Event event, Device device)
@@ -130,7 +138,8 @@ public class EventServiceImpl implements EventService {
 	@Transactional
 	public void trackEventExtIdMSEventUidTranslation(EventExtId eventExtId,
 			MSEventUid msEventUid, Device device) throws DaoException {
-		calendarDao.insertExtIdMSEventUidMapping(eventExtId, msEventUid, device);
+		byte[] hashedExtId = hashExtId(eventExtId);
+		calendarDao.insertExtIdMSEventUidMapping(eventExtId, msEventUid, device, hashedExtId);
 	}
 	
 	@Override
