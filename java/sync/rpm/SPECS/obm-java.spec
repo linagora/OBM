@@ -159,7 +159,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %files -n opush
 %defattr(-,root,root,-)
 %{_datadir}/jetty/webapps/opush
-%{_localstatedir}/log/opush
+%attr(0775,jetty,jetty) %{_localstatedir}/log/opush
 %config(noreplace) %{_sysconfdir}/opush/sync_perms.ini
 %config(noreplace) %{_sysconfdir}/opush/ldap_conf.ini
 %config(noreplace) %{_sysconfdir}/opush/mail_conf.ini
