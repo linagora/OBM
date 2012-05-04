@@ -32,7 +32,6 @@
 package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseSystem;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.common.base.Splitter;
