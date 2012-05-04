@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.utils.DOMUtils;
@@ -74,7 +72,6 @@ import com.google.common.base.Strings;
 
 public class XmlResponder {
 
-	private HttpServletRequest request;
 	private HttpServletResponse resp;
 	private Logger logger =  LoggerFactory.getLogger(getClass());
 	private CalendarItemsWriter ciw;
@@ -82,8 +79,7 @@ public class XmlResponder {
 	private SettingItemsWriter siw;
 	private MailingListItemsWriter mliw;
 
-	public XmlResponder(HttpServletRequest request, HttpServletResponse resp) {
-		this.request = request;
+	public XmlResponder(HttpServletResponse resp) {
 		this.resp = resp;
 		this.ciw = new CalendarItemsWriter();
 		this.biw = new BookItemsWriter();
@@ -140,18 +136,9 @@ public class XmlResponder {
 		return res;
 	}
 
-	private void copyCookies() {
-		if (request.getCookies() != null) {
-			for (Cookie cookie : request.getCookies()) {
-				resp.addCookie(cookie);
-			}
-		}
-	}
-
 	private String emitResponse(Document doc) {
 		String res = "";
 		try {
-			copyCookies();
 			resp.setContentType("text/xml;charset=UTF-8");
 			DOMUtils.serialize(doc, resp.getOutputStream());
 

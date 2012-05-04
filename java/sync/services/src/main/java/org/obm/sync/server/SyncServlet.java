@@ -66,7 +66,7 @@ public class SyncServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		Request request;
-		XmlResponder responder = new XmlResponder(req, resp);
+		XmlResponder responder = new XmlResponder(resp);
 
 		try {
 			request = new Request(req);

@@ -124,7 +124,7 @@ public class LoginHandler implements ISyncHandler {
 				responder.sendError("Login failed for user '" + login + "'");
 			}
 		} catch (OBMConnectorVersionException e) {
-			logger.error(e.getToken().getOrigin() + " isn't longer suppored.");
+			logger.error(e.getToken().getOrigin() + " is not supported anymore.");
 			ObmUser user = userService.getUserFromAccessToken(e.getToken());
 			UserSettings settings = settingsService.getSettings(user);
 			errorMailer.notifyConnectorVersionError(e.getToken(), e
