@@ -1836,16 +1836,16 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
             }
           }
           if($event->isPrivate()) {
-            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> ".htmlspecialchars($title);
+            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> "$title;
           }
           if($event->isMeeting()) {
-            $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> ".htmlspecialchars($title);
+            $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> ".$title;
           }
           if ($event->isPeriodic()) {
-            $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> ".htmlspecialchars($title);
+            $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> ".$title;
           }                  
           if ($event->isAllDay()) {
-            $title = "<img src=\"$ico_allday_alt\" alt=\"[All Day]\" /> ".htmlspecialchars($title);
+            $title = "<img src=\"$ico_allday_alt\" alt=\"[All Day]\" /> ".$title;
           }                  
         }
         $dis_owner = $event->owner_name;
