@@ -5589,7 +5589,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>
       <form>
         <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_ACCEPTED', 'waiting_events')\" /> $l_accept</span><br/>
-        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'NEEDS-ACTIONS', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_NEEDS_ACTIONS', 'waiting_events')\" checked=\"checked\"/> $l_wait</span><br/>
+        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" checked=\"checked\" disabled=\"disabled\"/> $l_wait</span><br/>
         <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'DECLINED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_DECLINED', 'waiting_events')\" /> $l_refuse</span>
       </form>
      </td>
