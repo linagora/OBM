@@ -1836,7 +1836,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
             }
           }
           if($event->isPrivate()) {
-            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> "$title;
+            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> ".$title;
           }
           if($event->isMeeting()) {
             $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> ".$title;
