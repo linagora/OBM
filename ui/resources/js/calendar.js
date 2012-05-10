@@ -833,8 +833,17 @@ Obm.CalendarManager = new Class({
    * Show previous range
    */
   showPrev: function() {
-    var f = obm.vars.consts.calendarRange.charAt(0).toUpperCase();
-    eval('this.prev'+f+obm.vars.consts.calendarRange.substr(1)+'()');
+    if ( obm.vars.consts.calendarRange == "month" ) {
+      this.prevMonth();
+    } else if ( obm.vars.consts.calendarRange == "week" ) {
+      this.prevWeek();
+    } else if ( obm.vars.consts.calendarRange == "day" ) {
+      this.prevDay();
+    } else if ( obm.vars.consts.calendarRange == "custom" ) {
+      this.prevCustom();
+    } else if ( console && "log" in console ) {
+      console.log("calendar.js showPrev: unknown calendarRange ",obm.vars.consts.calendarRange);
+    }
   },
 
 
@@ -842,8 +851,17 @@ Obm.CalendarManager = new Class({
    * Show next range
    */
   showNext: function() {
-    var f = obm.vars.consts.calendarRange.charAt(0).toUpperCase();
-    eval('this.next'+f+obm.vars.consts.calendarRange.substr(1)+'()');
+    if ( obm.vars.consts.calendarRange == "month" ) {
+      this.nextMonth();
+    } else if ( obm.vars.consts.calendarRange == "week" ) {
+      this.nextWeek();
+    } else if ( obm.vars.consts.calendarRange == "day" ) {
+      this.nextDay();
+    } else if ( obm.vars.consts.calendarRange == "custom" ) {
+      this.nextCustom();
+    } else if ( console && "log" in console ) {
+      console.log("calendar.js showNext: unknown calendarRange ",obm.vars.consts.calendarRange);
+    }
   },
 
 
@@ -929,7 +947,7 @@ Obm.CalendarManager = new Class({
       data.date = new Obm.DateTime(min).format('c');
       data.ndays = Math.ceil((max - min)/86400000)+1;
       data.cal_range = 'custom';
-      obm.vars.consts.nbDisplayedDays = data.date;
+      obm.vars.consts.nbDisplayedDays = data.ndays;
     } else {
       if (this.current)	data.date = this.current.format('c');
       data.cal_range = obm.vars.consts.calendarRange;
