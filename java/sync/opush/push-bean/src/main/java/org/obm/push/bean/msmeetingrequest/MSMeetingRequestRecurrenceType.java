@@ -63,6 +63,10 @@ public enum MSMeetingRequestRecurrenceType {
 		return xmlValue;
 	}
 	
+	public String specificationValue() {
+		return String.valueOf(xmlValue);
+	}
+	
 	public static final MSMeetingRequestRecurrenceType getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;

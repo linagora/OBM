@@ -61,6 +61,10 @@ public enum MSMeetingRequestSensitivity {
 		return xmlValue;
 	}
 	
+	public String specificationValue() {
+		return String.valueOf(xmlValue);
+	}
+	
 	public static final MSMeetingRequestSensitivity getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;

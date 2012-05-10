@@ -61,6 +61,10 @@ public enum MSMeetingRequestIntDBusyStatus {
 		return xmlValue;
 	}
 	
+	public String specificationValue() {
+		return String.valueOf(xmlValue);
+	}
+	
 	public static final MSMeetingRequestIntDBusyStatus getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;

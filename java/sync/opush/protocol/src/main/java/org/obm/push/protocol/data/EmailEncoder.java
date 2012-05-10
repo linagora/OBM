@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.IApplicationData;
@@ -60,9 +59,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Charsets;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.common.primitives.Bytes;
 import com.google.inject.Inject;
 
 public class EmailEncoder implements IDataEncoder {
@@ -77,7 +75,7 @@ public class EmailEncoder implements IDataEncoder {
 	private final IntEncoder intEncoder;
 
 	@Inject
-	/* package */ EmailEncoder(IntEncoder intEncoder) {
+	@VisibleForTesting EmailEncoder(IntEncoder intEncoder) {
 		this.intEncoder = intEncoder;
 		sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -139,7 +137,7 @@ public class EmailEncoder implements IDataEncoder {
 		DOMUtils.createElementAndText(parent, "Email:MessageClass", mail
 				.getMessageClass().toString());
 		if (mail.getInvitation() != null) {
-			appendMeetintRequest(parent, mail);
+			appendMeetingRequest(parent, mail);
 		}
 
 		DOMUtils.createElementAndText(parent, "Email:InternetCPID", "65001");
@@ -268,7 +266,7 @@ public class EmailEncoder implements IDataEncoder {
 		return "";
 	}
 
-	private void appendMeetintRequest(Element parent, MSEmail mail) {
+	private void appendMeetingRequest(Element parent, MSEmail mail) {
 		if (mail.getInvitation() != null) {
 			Element mr = DOMUtils.createElement(parent, "Email:MeetingRequest");
 
@@ -320,7 +318,7 @@ public class EmailEncoder implements IDataEncoder {
 			MSEventUid eventUid = invi.getUid();
 			if (eventUid != null) {
 				DOMUtils.createElementAndText(mr, "Email:GlobalObjId",
-						msEventUidToGlobalObjId(eventUid));
+						MSMeetingRequestSerializer.msEventUidToGlobalObjId(eventUid, intEncoder));
 			} else {
 				throw new InvalidParameterException("a MSEvent must have an UID");
 			}
@@ -328,32 +326,6 @@ public class EmailEncoder implements IDataEncoder {
 		}
 	}
 
-	/* package */ String msEventUidToGlobalObjId(MSEventUid msEventUid) {
-		String eventUidAsString = msEventUid.serializeToString();
-		byte[] eventUidAsBytes = eventUidAsString.getBytes(Charsets.US_ASCII);
-		byte[] preambule = buildByteSequence(
-				0x4, 0x0, 0x0, 0x0, 0x82, 0x0, 0xE0, 0, 0x74, 0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08,
-				0x0, 0x0, 0x0, 0x0,
-				0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
-		
-		byte[] marker = "vCal-Uid".getBytes(Charsets.US_ASCII);
-		byte[] markerEnd = buildByteSequence(0x1, 0x0, 0x0, 0x0);
-		byte[] dataEnd = buildByteSequence(0x0);
-		byte[] length = intEncoder.toByteArray(
-				marker.length + markerEnd.length + eventUidAsBytes.length + dataEnd.length);
-		byte[] result = Bytes.concat(preambule, length, marker, markerEnd, eventUidAsBytes, dataEnd);
-		return Base64.encodeBase64String(result);
-	}
-	
-	/* package*/ byte[] buildByteSequence(int... bytes) {
-		byte[] byteArray = new byte[bytes.length];
-		int i = 0;
-		for (int b: bytes) {
-			byteArray[i++] = (byte) b;
-		}
-		return byteArray;
-	}
-	
 	private void appendRecurence(Element parent, MSEvent invi) {
 		MSRecurrence recur = invi.getRecurrence();
 		if (recur != null) {
@@ -442,9 +414,14 @@ public class EmailEncoder implements IDataEncoder {
 			}
 		}
 	}
-
-	private String formatDate(Date d) {
-		return sdf.format(d);
+	
+	private String formatDate(Date date) {
+		if (date != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS''");
+			return dateFormat.format(date);
+		} else {
+			return null;
+		}
 	}
 
 	private String buildStringAdresses(List<MSAddress> addresses) {

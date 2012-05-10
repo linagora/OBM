@@ -61,6 +61,10 @@ public enum MSMeetingRequestInstanceType {
 		return xmlValue;
 	}
 	
+	public String specificationValue() {
+		return String.valueOf(xmlValue);
+	}
+	
 	public static final MSMeetingRequestInstanceType getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;

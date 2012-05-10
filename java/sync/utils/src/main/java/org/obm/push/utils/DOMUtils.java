@@ -397,4 +397,25 @@ public final class DOMUtils {
 		return (Document) doc.cloneNode(true);
 	}
 	
+	public static void createElementAndText(Element element, String tagName, boolean value) {
+		createElementAndText(element, tagName, value ? "1" : "0");
+	}
+	
+	public static void createElementAndTextIfNotNull(Element element, String tagName, Long value) {
+		if (value != null) {
+			createElementAndText(element, tagName, String.valueOf(value));
+		}
+	}
+	
+	public static void createElementAndTextIfNotNull(Element element, String tagName, String value) {
+		if (value != null) {
+			createElementAndText(element, tagName, value);
+		}
+	}
+	
+	public static void createElementAndTextIfNotNull(Element element, String tagName, Integer value) {
+		if (value != null) {
+			createElementAndText(element, tagName, String.valueOf(value));
+		}
+	}
 }

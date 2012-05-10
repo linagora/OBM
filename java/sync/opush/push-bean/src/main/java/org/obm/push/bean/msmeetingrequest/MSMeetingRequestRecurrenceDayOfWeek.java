@@ -64,6 +64,10 @@ public enum MSMeetingRequestRecurrenceDayOfWeek {
 		return xmlValue;
 	}
 	
+	public String specificationValue() {
+		return String.valueOf(xmlValue);
+	}
+	
 	public static final MSMeetingRequestRecurrenceDayOfWeek getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;
