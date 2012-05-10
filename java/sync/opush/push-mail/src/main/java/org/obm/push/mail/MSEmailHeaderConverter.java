@@ -29,64 +29,49 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.mail;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
+import org.minig.imap.Address;
+import org.minig.imap.IMAPHeaders;
+import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSEmailHeader;
 
-public class MSAddress implements Serializable {
+import com.google.common.base.Preconditions;
+import com.google.inject.Singleton;
+
+@Singleton
+public class MSEmailHeaderConverter {
 	
-	private final String mail;
-	private final String displayName;
-
-	public MSAddress(String displayName, String mail) {
-		super();
-		this.displayName = displayName;
-		this.mail = mail;
+	public MSEmailHeader convertToMSEmailHeader(IMAPHeaders imapHeaders) {
+		Preconditions.checkNotNull(imapHeaders);
+		return new MSEmailHeader.Builer()
+		.from(toMSAddress(imapHeaders.getFrom()))
+		.to(toMSAddresses(imapHeaders.getTo()))
+		.bcc(toMSAddresses(imapHeaders.getBcc()))
+		.cc(toMSAddresses(imapHeaders.getCc()))
+		.subject(imapHeaders.getSubject())
+		.date(imapHeaders.getDate())
+		.build();
 	}
 
-	public String getMail() {
-		return mail;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public String toMSProtocol() {
-		StringBuilder sb = new StringBuilder();
-		if (!Strings.isNullOrEmpty(displayName)) {
-			sb.append("\"").append(displayName).append("\"");
+	private List<MSAddress> toMSAddresses(List<Address> addresses) {
+		List<MSAddress> msAddresses = new ArrayList<MSAddress>();
+		if (addresses != null) {
+			for (Address address: addresses) {
+				msAddresses.add(toMSAddress(address));
+			}
 		}
-		if (!Strings.isNullOrEmpty(mail)) {
-			sb.append(" <").append(mail).append("> ");
-		}
-		return sb.toString();
-	}
-	
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(mail, displayName);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof MSAddress) {
-			MSAddress that = (MSAddress) object;
-			return Objects.equal(this.mail, that.mail)
-				&& Objects.equal(this.displayName, that.displayName);
-		}
-		return false;
+		return msAddresses;
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("mail", mail)
-			.add("displayName", displayName)
-			.toString();
+	private MSAddress toMSAddress(Address address) {
+		if (address != null) {
+			return new MSAddress(address.getDisplayName(), address.getMail());
+		} else {
+			return null;
+		}
 	}
-
 }
