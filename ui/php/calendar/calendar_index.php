@@ -67,11 +67,9 @@ if(isset($params['date']) && !empty($params['date'])) {
   $set_date = true;
 }
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-require_once($obminclude . '/global_pref.inc');
+require_once("$obminclude/global_pref.inc");
 require_once('calendar_query.inc');
-require_once($obminclude . '/of/of_contact.php');
-require_once($obminclude . '/of/of_query.inc');
-require_once($obminclude . '/of/of_session.inc');
+require_once("$obminclude/of/of_contact.php");
 
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -169,7 +167,6 @@ if( isset($GLOBALS['ccalendar_ics_eventStompObserver']) && $GLOBALS['ccalendar_i
 // For debugging purpose, this observer outputs in /tmp/debug
 // OBM_EventFactory::getInstance()->attach(new OBM_EventDebugObserver());
 
-$profiles = get_all_profiles(false);
 
 // Category Filter 
 if (($action == 'insert') || ($action == 'update') 
@@ -890,9 +887,7 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $peer_profile_id = get_user_profile_id($params['entity_id']);
-  if (Perm::user_can_edit_peer_profile($profiles[$obm['profile']], $profiles[$peer_profile_id]) 
-      && OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {    
+  if (OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display['msg'] .= display_warn_msg($l_of_right_err_auth);

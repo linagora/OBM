@@ -3668,14 +3668,6 @@ function get_all_profiles($cached = true) {
   return $profiles;    
 }
 
-function get_user_profile_id($uid) {
-  $obm_q = new DB_OBM;
-  $obm_q->query(
-    '  SELECT userobm_perms AS profile_id '
-    . 'FROM UserObm '
-    . 'WHERE userobm_id = #INT(' . $uid . ')');
-  return $obm_q->next_record() ? $obm_q->f('profile_id')  : null;
-}
 
 /**
  * of_entity_insert 
