@@ -1,1 +1,3 @@
 usr/share/obm-sync
+var/lib/obm-sync
+var/lib/obm-sync/jms

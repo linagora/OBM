@@ -59,7 +59,14 @@ rm -rf /var/lib/obm-locator/org.*
 if [ -d /var/log/obm-locator ]; then
   chown -R jetty:adm /var/log/obm-locator
 else 
-  echo "/var/log/obm-locator must exist"
+  echo "error : /var/log/obm-locator must exist."
+  exit 1
+fi
+
+if [ -d /var/lib/obm-locator ]; then
+  chown -R jetty:adm /var/log/obm-locator
+else
+  echo "error : /var/lib/obm-locator must exist."
   exit 1
 fi
 
