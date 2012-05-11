@@ -184,6 +184,26 @@ class DB {
       $this->error);
   }
 
+  function begin() {
+    $this->query('BEGIN');
+  }
+
+  function commit() {
+    $this->query('COMMIT');
+  }
+
+  function rollback() {
+    $this->query('ROLLBACK');
+  }
+
+  function lock_table_for_writing($table) {
+    $this->query("LOCK TABLES $table WRITE");
+  }
+
+  function unlock_tables() {
+    $this->query('UNLOCK TABLES');
+  }
+
   static function xParser($query) {
     preg_match_all('/#[\w_]+(\((?:(?>[^()]+)|(?1))*\))?/', $query, $pcodes);
     $translate = array();
