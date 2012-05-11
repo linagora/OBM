@@ -202,6 +202,26 @@ class DB {
     }
   }
 
+  function begin() {
+    $this->query('BEGIN');
+  }
+
+  function commit() {
+    $this->query('COMMIT');
+  }
+
+  function rollback() {
+    $this->query('ROLLBACK');
+  }
+
+  function lock_table_for_writing($table) {
+    $this->query("LOCK TABLE $table IN SHARE MODE");
+  }
+
+  function unlock_tables() {
+      # No unlock command in Postgres
+  }
+
   static function xParser($query) {
     // Search for any pseuso code substring (begining by #).
     // This is buggy for exemple field='#toto', this should not be interpretted

@@ -30,14 +30,19 @@ class UpdateObject {
     return $this->$key;
   }
 
-  protected function query($query) {
+  protected function get_con() {
     if(count(self::$free) > 0) {
       $con = array_shift(self::$free);
     } else {
-      $con = new DB($this); 
+      $con = new DB($this);
     }
     $con->setId(count(self::$busy));
     self::$busy[$con->getId()] = $con;
+    return $con;
+  }
+
+  public function query($query) {
+    $con = $this->get_con();
     $con->query($query);
     return $con;
   }
@@ -49,6 +54,36 @@ class UpdateObject {
       unset(self::$busy[$id]);
       self::$free[] = $con;
     }
+  }
+
+  public function begin() {
+    $con = $this->get_con();
+    $con->begin();
+    $this->free($con->getId());
+  }
+
+  public function commit() {
+    $con = $this->get_con();
+    $con->commit();
+    $this->free($con->getId());
+  }
+
+  public function rollback() {
+    $con = $this->get_con();
+    $con->rollback();
+    $this->free($con->getId());
+  }
+
+  public function lock_table_for_writing($table) {
+    $con = $this->get_con();
+    $con->lock_table_for_writing($table);
+    $this->free($con->getId());
+  }
+
+  public function unlock_tables() {
+    $con = $this->get_con();
+    $con->unlock_tables();
+    $this->free($con->getId());
   }
 }
 ?>
