@@ -31,74 +31,161 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.ms;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBody;
-import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class MSEmail implements IApplicationData, Serializable {
 
+	public static class MSEmailBuilder {
+
+		private long uid;
+		
+		private MSEmailHeader header;
+		private MSEmailBody body;
+		private Set<MSEmail> forwardMessage;
+		private Set<MSAttachement> attachements;
+		private MSMeetingRequest meetingRequest;
+		private MSMessageClass messageClass;
+		private MSImportance importance;
+
+		private SerializableInputStream mimeData;
+		
+		private boolean read;
+		private boolean starred;
+		private boolean answered;
+
+		public MSEmailBuilder uid(long uid) {
+			this.uid = uid;
+			return this;
+		}
+
+		public MSEmailBuilder header(MSEmailHeader header) {
+			this.header = header;
+			return this;
+		}
+
+		public MSEmailBuilder body(MSEmailBody body) {
+			this.body = body;
+			return this;
+		}
+		
+		public MSEmailBuilder forwardMessage(Set<MSEmail> forwardMessage) {
+			this.forwardMessage = forwardMessage;
+			return this;
+		}
+		
+		public MSEmailBuilder attachements(Set<MSAttachement> attachements) {
+			this.attachements = attachements;
+			return this;
+		}
+		
+		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest) {
+			return meetingRequest(meetingRequest, MSMessageClass.ScheduleMeetingRequest);
+		}
+		
+		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
+			Preconditions.checkArgument(messageClass != null);
+			this.meetingRequest = meetingRequest;
+			this.messageClass = messageClass;
+			return this;
+		}
+		
+		public MSEmailBuilder messageClass(MSMessageClass messageClass) {
+			this.messageClass = messageClass;
+			return this;
+		}
+		
+		public MSEmailBuilder importance(MSImportance importance) {
+			this.importance = importance;
+			return this;
+		}
+		
+		public MSEmailBuilder mimeData(SerializableInputStream mimeData) {
+			this.mimeData = mimeData;
+			return this;
+		}
+		
+		public MSEmailBuilder read(boolean read) {
+			this.read = read;
+			return this;
+		}
+		
+		public MSEmailBuilder starred(boolean starred) {
+			this.starred = starred;
+			return this;
+		}
+		
+		public MSEmailBuilder answered(boolean answered) {
+			this.answered = answered;
+			return this;
+		}
+		
+		public MSEmail build() {
+			if (messageClass == null) {
+				messageClass = MSMessageClass.Note;
+			}
+			if (importance == null) {
+				importance = MSImportance.NORMAL;
+			}
+			return new MSEmail(uid, header, body, attachements, meetingRequest, messageClass,
+					importance, forwardMessage, mimeData, read, starred, answered);
+		}
+	}
+	
 	@Override
 	public PIMDataType getType() {
 		return PIMDataType.EMAIL;
 	}
 
-	private MSEmailHeader header;
-	private MSEmailBody body;
-	private Set<MSEmail> forwardMessage;
-	private Set<MSAttachement> attachements;
-	private long uid;
-	private MSEvent invitation;
-	private MSMessageClass messageClass;
-	private MSImportance importance;
+	private final long uid;
 
-	private SerializableInputStream mimeData;
+	private final MSEmailHeader header;
+	private final MSEmailBody body;
+	private final Set<MSEmail> forwardMessage;
+	private final Set<MSAttachement> attachements;
+	private final MSMeetingRequest meetingRequest;
+	private final MSMessageClass messageClass;
+	private final MSImportance importance;
 
-	private String smtpId;
+	private final SerializableInputStream mimeData;
 	
-	private boolean read;
-	private boolean starred;
-	private boolean answered;
+	private final boolean read;
+	private final boolean starred;
+	private final boolean answered;
 
-	public MSEmail() {
-		this("subject", new MSEmailBody(MSEmailBodyType.PlainText, "body"),
-				new HashSet<MSAttachement>(), new Date(), null, null, null, null);
-	}
-
-	public MSEmail(String subject, MSEmailBody body,
-			Set<MSAttachement> attachements, Date date, MSAddress from,
-			List<MSAddress>  to, List<MSAddress>  cc, List<MSAddress>  bcc) {
+	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachements,
+			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
+			Set<MSEmail> forwardMessage, SerializableInputStream mimeData,
+			boolean read, boolean starred, boolean answered) {
+		this.uid = uid;
+		this.header = header;
 		this.body = body;
 		this.attachements = attachements;
-		this.forwardMessage = new HashSet<MSEmail>();
-		this.read = false;
-		this.messageClass = MSMessageClass.Note;
-		this.importance = MSImportance.NORMAL;
-		this.header = new MSEmailHeader.Builer()
-				.from(from)
-				.to(to)
-				.cc(cc)
-				.bcc(bcc)
-				.subject(subject)
-				.date(date)
-				.build();
+		this.meetingRequest = meetingRequest;
+		this.messageClass = messageClass;
+		this.importance = importance;
+		this.forwardMessage = forwardMessage;
+		this.mimeData = mimeData;
+		this.read = read;
+		this.starred = starred;
+		this.answered = answered;
 	}
 
 	public MSAddress getFrom() {
@@ -128,121 +215,56 @@ public class MSEmail implements IApplicationData, Serializable {
 	public MSEmailHeader getHeader() {
 		return header;
 	}
-
-	public void setHeader(MSEmailHeader header) {
-		this.header = header;
+	
+	public long getUid() {
+		return uid;
 	}
 
 	public MSEmailBody getBody() {
 		return body;
-	}
-	
-	public void setBody(MSEmailBody body) {
-		this.body = body;
-	}
-
-	public void setForwardMessage(Set<MSEmail> forwardMessage) {
-		this.forwardMessage = forwardMessage;
 	}
 
 	public Set<MSEmail> getForwardMessage() {
 		return forwardMessage;
 	}
 
-	public void addForwardMessage(MSEmail forwardMessage) {
-		this.forwardMessage.add(forwardMessage);
+	public Set<MSAttachement> getAttachements() {
+		return attachements;
 	}
 
-	public long getUid() {
-		return uid;
+	public MSMeetingRequest getMeetingRequest() {
+		return meetingRequest;
 	}
 
-	public void setUid(long uid) {
-		this.uid = uid;
+	public MSMessageClass getMessageClass() {
+		return messageClass;
 	}
 
-	public MSEvent getInvitation() {
-		return invitation;
+	public MSImportance getImportance() {
+		return importance;
 	}
 
-	public void setInvitation(MSEvent invitation, MSMessageClass messageClass) {
-		this.invitation = invitation;
-		if(messageClass != null){
-			this.messageClass = messageClass;
-		} else {
-			this.messageClass = MSMessageClass.ScheduleMeetingRequest;
-		}
+	public SerializableInputStream getMimeData() {
+		return mimeData;
 	}
 
-	public String getSmtpId() {
-		return smtpId;
-	}
-
-	public void setSmtpId(String smtpId) {
-		this.smtpId = smtpId;
-	}
-	
 	public boolean isRead() {
 		return read;
-	}
-
-	public void setRead(boolean read) {
-		this.read = read;
 	}
 
 	public boolean isStarred() {
 		return starred;
 	}
 
-	public void setStarred(boolean starred) {
-		this.starred = starred;
-	}
-
 	public boolean isAnswered() {
 		return answered;
 	}
 
-	public void setAnswered(boolean answered) {
-		this.answered = answered;
-	}
-	
-	public MSMessageClass getMessageClass() {
-		return messageClass;
-	}
-
-	public void setMessageClass(MSMessageClass messageClass) {
-		this.messageClass = messageClass;
-	}
-	
-	public MSImportance getImportance() {
-		return importance;
-	}
-
-	public void setImportance(MSImportance importance) {
-		this.importance = importance;
-	}
-	
-	public Set<MSAttachement> getAttachements() {
-		return attachements;
-	}
-
-	public void setAttachements(Set<MSAttachement> attachements) {
-		this.attachements = attachements;
-	}
-	
-	public InputStream getMimeData() {
-		return mimeData;
-	}
-
-	public void setMimeData(InputStream mimeData) {
-		this.mimeData = new SerializableInputStream(mimeData);
-	}
-	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(answered, attachements, header, body, 
-				forwardMessage, importance, invitation, messageClass,
-				mimeData, read, smtpId, starred, uid);
+				forwardMessage, importance, meetingRequest, messageClass,
+				mimeData, read, starred, uid);
 	}
 	
 	@Override
@@ -256,11 +278,10 @@ public class MSEmail implements IApplicationData, Serializable {
 				.append(body, other.body)
 				.append(forwardMessage, other.forwardMessage)
 				.append(importance, other.importance)
-				.append(invitation, other.invitation)
+				.append(meetingRequest, other.meetingRequest)
 				.append(messageClass, other.messageClass)
 				.append(mimeData, other.mimeData)
 				.append(read, other.read)
-				.append(smtpId, other.smtpId)
 				.append(starred, other.starred)
 				.append(uid, other.uid)
 				.isEquals();
