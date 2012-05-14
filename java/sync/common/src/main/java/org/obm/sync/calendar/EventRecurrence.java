@@ -192,7 +192,7 @@ public class EventRecurrence implements Anonymizable<EventRecurrence> {
 				hasDeletedExceptionAtDate(exceptionDateToFind);
 	}
 
-	private boolean hasEventExceptionAtDate(Date exceptionDateToFind) {
+	public boolean hasEventExceptionAtDate(Date exceptionDateToFind) {
 		for (Event eventException : eventExceptions) {
 			if (eventException.getRecurrenceId().equals(exceptionDateToFind)) {
 				return true;
@@ -201,7 +201,16 @@ public class EventRecurrence implements Anonymizable<EventRecurrence> {
 		return false;
 	}
 	
-	private boolean hasDeletedExceptionAtDate(Date exceptionDateToFind) {
+	public boolean hasDifferentEventExceptionAtDate(Event event){
+		for (Event eventException : eventExceptions) {
+			if (eventException.getRecurrenceId().equals(event.getRecurrenceId()) && !event.equals(eventException)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasDeletedExceptionAtDate(Date exceptionDateToFind) {
 		return exceptions.contains(exceptionDateToFind);
 	}
 

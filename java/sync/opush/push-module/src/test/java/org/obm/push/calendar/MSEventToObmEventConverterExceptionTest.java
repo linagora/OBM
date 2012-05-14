@@ -1266,6 +1266,129 @@ public class MSEventToObmEventConverterExceptionTest {
 		convertToOBMEvent(msEvent);
 	}
 
+	@Test(expected=ConversionException.class)
+	public void testConvertWhenTwoEventExceptionWithDifferentSubjectAtSameDate() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEventException msEventException2 = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Another Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventException2);
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test(expected=ConversionException.class)
+	public void testConvertWhenTwoEventExceptionWithDifferentDtStampAtSameDate() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEventException msEventException2 = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-11-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventException2);
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	
+	@Test(expected=ConversionException.class)
+	public void testConvertWhenExistRegularAndDeletedExceptionsAtSameDate() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		MSEventException msEventExceptionDeleted = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(true)
+				.build();
+
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventExceptionDeleted, msEventException);
+		
+		convertToOBMEvent(msEvent);
+	}
+
+	@Test
+	public void testConvertWhenDuplicateDeletedExceptions() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		
+		MSEventException msEventExceptionDeleted = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(true)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventExceptionDeleted, msEventExceptionDeleted);
+		
+		convertToOBMEvent(msEvent);
+	}
+	
+	@Test
+	public void testConvertWhenDuplicateRegularExceptions() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventException);
+		
+		convertToOBMEvent(msEvent);
+	}
+	
 	private MSEvent makeMSEventWithException(MSEventException... exceptions) {
 		MSEvent msEvent = new MSEventBuilder()
 				.withDtStamp(date("2004-12-11T11:15:10Z"))

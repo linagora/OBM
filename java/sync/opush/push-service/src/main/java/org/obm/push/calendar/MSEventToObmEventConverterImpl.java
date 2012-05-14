@@ -178,9 +178,17 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 					Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
 							msEventException, isObmInternalEvent);
 
+					assertEventExceptionUnicityAtDate(eventRecurrence, obmEvent);
+					
 					eventRecurrence.addEventException(obmEvent);
 				}
 			}
+		}
+	}
+
+	private void assertEventExceptionUnicityAtDate(EventRecurrence eventRecurrence, Event event) throws ConversionException {
+		if (eventRecurrence.hasDifferentEventExceptionAtDate(event)) {
+			throw new ConversionException("Trying to add two different event exceptions at the same date");
 		}
 	}
 	
@@ -719,8 +727,12 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 	private void assertExceptionDoesntExistInRecurrence(EventRecurrence recurrence, MSEventException exception)
 			throws ConversionException {
-		if (recurrence.hasAnyExceptionAtDate(exception.getExceptionStartTime())) {
-			throw new ConversionException("Try to add an already existing exception date");
+		if (!exception.isDeleted()) {
+			if (recurrence.hasDeletedExceptionAtDate(exception.getExceptionStartTime())) {
+					throw new ConversionException("Trying to add a moved exception where a deleted exception already exists");
+			}
+		} else if (recurrence.hasEventExceptionAtDate(exception.getExceptionStartTime())) {
+			throw new ConversionException("Trying to add a deleted exception where a moved exception already exists");
 		}
 	}
 
