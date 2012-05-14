@@ -34,7 +34,7 @@ package org.obm.push.bean;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
@@ -46,8 +46,6 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -104,6 +102,15 @@ public class BeansTest {
 					.add(MSEmailHeader.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+	}
+	
+	@Test
+	public void testClassWithCharsetField() {
+		ImmutableList<Class<?>> list = ImmutableList.<Class<?>>builder()
+					.add(org.obm.push.bean.ms.MSEmail.class)
+					.build();
+		
+		equalsVerifierUtilsTest.testClassWithCharsetField(list);
 	}
 	
 }

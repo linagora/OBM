@@ -34,7 +34,9 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
 public class MSEmailHeader implements Serializable {
 
@@ -77,6 +79,15 @@ public class MSEmailHeader implements Serializable {
 		}
 		
 		public MSEmailHeader build() {
+			if (to == null) {
+				this.to = ImmutableList.<MSAddress>of();
+			}
+			if (cc == null) {
+				this.cc = ImmutableList.<MSAddress>of();
+			}
+			if (bcc == null) {
+				this.bcc = ImmutableList.<MSAddress>of();
+			}
 			return new MSEmailHeader(from, to, cc, bcc, subject, date);
 		}
 	}

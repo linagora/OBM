@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.bean;
 
+import java.nio.charset.Charset;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
 public class EqualsVerifierUtils {
@@ -50,7 +53,15 @@ public class EqualsVerifierUtils {
 		}
 	}
 
-	private EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
+	public void testClassWithCharsetField(ImmutableList<Class<?>> list) {
+		for (Class<?> clazz: list) {
+			createEqualsVerifier(clazz)
+				.withPrefabValues(Charset.class, Charsets.UTF_8, Charsets.US_ASCII)
+				.verify();
+		}
+	}
+
+	public EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
 		return EqualsVerifier.forClass(clazz).suppress(Warning.NONFINAL_FIELDS).debug();
 	}
 	
