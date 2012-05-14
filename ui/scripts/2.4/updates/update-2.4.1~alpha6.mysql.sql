@@ -24,11 +24,6 @@ ALTER TABLE opush_event_mapping DROP COLUMN event_id;
 -- we want (device_id, event_ext_id) to be unique but the key is too long for mysql
 -- we implement this by using a "hash" trigger and putting the hash in a unique key
 
-ALTER TABLE opush_event_mapping ADD COLUMN event_ext_id_hash binary(20);
-UPDATE opush_event_mapping SET event_ext_id_hash = UNHEX(SHA1(event_ext_id));
-ALTER TABLE opush_event_mapping MODIFY event_ext_id_hash binary(20) NOT NULL;
-CREATE UNIQUE INDEX opush_event_mapping_device_id_event_ext_id_fkey ON opush_event_mapping (device_id, event_ext_id_hash);
-
 ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);
 
 -- prevent lock timeout on mail deletion
