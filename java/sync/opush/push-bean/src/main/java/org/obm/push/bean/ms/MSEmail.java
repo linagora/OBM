@@ -40,7 +40,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
-import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
