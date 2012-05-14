@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-public enum Importance {
+public enum MSImportance {
 	LOW, NORMAL, HIGH;
 	
 	public String asIntString() {

@@ -62,7 +62,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	private long uid;
 	private MSEvent invitation;
 	private MessageClass messageClass;
-	private Importance importance;
+	private MSImportance importance;
 
 	private List<MSAddress> to;
 	private List<MSAddress> cc;
@@ -109,7 +109,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		this.read = false;
 		this.messageClass = MessageClass.Note;
-		this.importance = Importance.NORMAL;
+		this.importance = MSImportance.NORMAL;
 	}
 
 	public String getSubject() {
@@ -261,11 +261,11 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.messageClass = messageClass;
 	}
 	
-	public Importance getImportance() {
+	public MSImportance getImportance() {
 		return importance;
 	}
 
-	public void setImportance(Importance importance) {
+	public void setImportance(MSImportance importance) {
 		this.importance = importance;
 	}
 	
