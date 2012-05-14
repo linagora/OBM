@@ -49,6 +49,7 @@ class Zend_Pdf_Cell {
 	const POSITION_TOP=8;
 	const POSITION_BOTTOM=16;
 	
+	const ETCETERA="[...]";
 	/**
 	 * Width of the cell
 	 */
@@ -177,7 +178,7 @@ class Zend_Pdf_Cell {
 		$align = null;//$this->_text[$this->_lineNumber]['alignment'];
 		$offset = 0;//$this->_text[$this->_lineNumber]['x'];
 		//if adding this section over flows borders
-		if ($lineWidth > 0 && $lineWidth+$section['width'] > $maxWidth) {
+		if ($lineWidth+$section['width'] > $maxWidth) {
 			//section of text is greater than our box's diminsions
 			$splitSection=explode(' ',$section['text']);
 			$maxTextSection=$this->_makeTextSection(array_shift($splitSection).' ', $encoding);
@@ -190,6 +191,14 @@ class Zend_Pdf_Cell {
               * $this->_fontSize * (count($this->_text)+1);
             if($textHeight > $maxHeight) {
               // No more space available, wipe the rest out
+              $end = ' '.Zend_Pdf_Cell::ETCETERA.' ';
+
+              while ($lineWidth+strlen($end) > $maxWidth) {
+              	$this->_section--;
+              	$lineWidth=$lineWidth-$this->_text[$this->_lineNumber][$this->_section]['width'];
+              }
+              
+              $this->addEtcetera($section);
               $section['text'] = '';
               return true;
             }
@@ -253,7 +262,6 @@ class Zend_Pdf_Cell {
 		
 		
 		$section=$this->_makeTextSection($text,$charEncoding);
-		
 		if ($this->_wordWrap(&$section)) {
 			return; //word wrap has already taken care of calling addText
 		}
@@ -328,7 +336,15 @@ class Zend_Pdf_Cell {
 			$this->_autoHeight+=$this->_text[$this->_lineNumber-1]['height'];
 		}
 	}
-	
+
+	private function addEtcetera($section) {
+		$this->_text[$this->_lineNumber][$this->_section]['text']=Zend_Pdf_Cell::ETCETERA;
+		$this->_text[$this->_lineNumber][$this->_section]['encoding']=$section['encoding'];
+		$this->_text[$this->_lineNumber][$this->_section]['font']=$section['font'];
+		$this->_text[$this->_lineNumber][$this->_section]['fontSize']=$section['fontSize'];
+		$this->_text[$this->_lineNumber][$this->_section]['width']=$section['width'];
+	}
+
 	/**
 	 * Returns the width of the cell, without the border
 	 *
