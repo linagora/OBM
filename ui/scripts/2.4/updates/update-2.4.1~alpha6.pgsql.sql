@@ -26,7 +26,6 @@ UPDATE opush_event_mapping SET event_ext_id = Event.event_ext_id FROM Event WHER
 ALTER TABLE opush_event_mapping ALTER event_ext_id SET NOT NULL;
 ALTER TABLE opush_event_mapping DROP CONSTRAINT opush_event_mapping_device_id_key;
 ALTER TABLE opush_event_mapping DROP COLUMN event_id;
-ALTER TABLE opush_event_mapping ADD CONSTRAINT opush_event_mapping_device_id_event_ext_id_unique UNIQUE (device_id, event_ext_id);
 
 ALTER TABLE eventlink ADD COLUMN eventlink_comment VARCHAR(255);
 
