@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.minig.imap.Address;
-import org.minig.imap.IMAPHeaders;
+import org.minig.imap.Envelope;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
 
@@ -45,15 +45,15 @@ import com.google.inject.Singleton;
 @Singleton
 public class MSEmailHeaderConverter {
 	
-	public MSEmailHeader convertToMSEmailHeader(IMAPHeaders imapHeaders) {
-		Preconditions.checkNotNull(imapHeaders);
+	public MSEmailHeader convertToMSEmailHeader(Envelope envelope) {
+		Preconditions.checkNotNull(envelope);
 		return new MSEmailHeader.Builer()
-		.from(toMSAddress(imapHeaders.getFrom()))
-		.to(toMSAddresses(imapHeaders.getTo()))
-		.bcc(toMSAddresses(imapHeaders.getBcc()))
-		.cc(toMSAddresses(imapHeaders.getCc()))
-		.subject(imapHeaders.getSubject())
-		.date(imapHeaders.getDate())
+		.from(toMSAddress(envelope.getFrom()))
+		.replyTo(toMSAddress(envelope.getReplyTo()))
+		.to(toMSAddresses(envelope.getTo()))
+		.cc(toMSAddresses(envelope.getCc()))
+		.subject(envelope.getSubject())
+		.date(envelope.getDate())
 		.build();
 	}
 

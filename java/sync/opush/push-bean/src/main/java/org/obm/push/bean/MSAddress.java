@@ -47,6 +47,10 @@ public class MSAddress implements Serializable {
 		this.mail = mail;
 	}
 
+	public MSAddress(String mail) {
+		this(null, mail);
+	}
+	
 	public String getMail() {
 		return mail;
 	}

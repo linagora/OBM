@@ -36,15 +36,12 @@ import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
@@ -68,7 +65,6 @@ public class EmailEncoder implements IDataEncoder {
 	private static final Logger logger = LoggerFactory
 			.getLogger(EmailEncoder.class);
 	
-	private SimpleDateFormat sdf;
 	private HTMLBodyFormatter htmlFormatter;
 	private PlainBodyFormatter plainFormatter;
 
@@ -77,8 +73,6 @@ public class EmailEncoder implements IDataEncoder {
 	@Inject
 	@VisibleForTesting EmailEncoder(IntEncoder intEncoder) {
 		this.intEncoder = intEncoder;
-		sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		htmlFormatter = new HTMLBodyFormatter();
 		plainFormatter = new PlainBodyFormatter();
 	}
@@ -89,10 +83,10 @@ public class EmailEncoder implements IDataEncoder {
 		MSEmail mail = (MSEmail) data;
 
 		DOMUtils.createElementAndText(parent, "Email:To",
-				buildStringAdresses(mail.getTo()));
+				MSEmailHeaderSerializer.formatMSAddresses(mail.getTo()));
 		if (mail.getCc().size() > 0) {
 			DOMUtils.createElementAndText(parent, "Email:CC",
-					buildStringAdresses(mail.getCc()));
+					MSEmailHeaderSerializer.formatMSAddresses(mail.getCc()));
 		}
 		if (mail.getFrom() != null) {
 			DOMUtils.createElementAndText(parent, "Email:From", mail.getFrom().toMSProtocol());
@@ -103,7 +97,7 @@ public class EmailEncoder implements IDataEncoder {
 
 		if (mail.getDate() != null) {
 			DOMUtils.createElementAndText(parent, "Email:DateReceived",
-					sdf.format(mail.getDate()));
+					MSEmailHeaderSerializer.formatDate(mail.getDate()));
 		} else {
 			logger.warn("date received is null for mail " + mail.getUid()
 					+ " s: " + mail.getSubject());
@@ -422,17 +416,5 @@ public class EmailEncoder implements IDataEncoder {
 		} else {
 			return null;
 		}
-	}
-
-	private String buildStringAdresses(List<MSAddress> addresses) {
-		StringBuilder sb = new StringBuilder();
-		for (Iterator<MSAddress> it = addresses.iterator(); it.hasNext();) {
-			MSAddress addr = it.next();
-			sb.append(addr.toMSProtocol());
-			if (it.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
 	}
 }

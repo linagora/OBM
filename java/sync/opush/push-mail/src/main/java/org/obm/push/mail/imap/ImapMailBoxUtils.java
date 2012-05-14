@@ -113,10 +113,11 @@ public class ImapMailBoxUtils {
 			List<Address> cc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.CC));
 			List<Address> bcc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.BCC));
 			Address from = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getFrom()) );
+			Address replyTo = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getReplyTo()) );
 			
-			return Envelope.createBuilder().messageNumber(msgno).
+			return new Envelope.Builder().messageNumber(msgno).
 					date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
-					messageID(messageID).inReplyTo(message.getInReplyTo()).build();
+					messageID(messageID).replyTo(replyTo).build();
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		}

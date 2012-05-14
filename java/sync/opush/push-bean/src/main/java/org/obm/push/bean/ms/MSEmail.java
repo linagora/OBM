@@ -199,10 +199,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		return header.getCc();
 	}
 
-	public List<MSAddress> getBcc() {
-		return header.getBcc();
-	}
-
 	public String getSubject() {
 		return header.getSubject();
 	}

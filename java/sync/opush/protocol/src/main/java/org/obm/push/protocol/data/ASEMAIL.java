@@ -34,6 +34,13 @@ package org.obm.push.protocol.data;
 
 public enum ASEMAIL {
 
+	TO("To"),
+	REPLY_TO("ReplyTo"),
+	DISPLAY_TO("DisplayTo"),
+	CC("Cc"),
+	FROM("From"),
+	SUBJECT("Subject"),
+	DATE_RECEIVED("DateReceived"),
 	MEETING_REQUEST("MeetingRequest"),
 	ALL_DAY_EVENT("AllDayEvent"),
 	START_TIME("StartTime"),

@@ -719,7 +719,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
-	@VisibleForTesting UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException {
+	@Override
+	public UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException {
 		ImapStore store = null;
 		IMAPMessage message = null;
 		try {

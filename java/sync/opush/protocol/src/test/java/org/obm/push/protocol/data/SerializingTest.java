@@ -29,41 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.protocol.data;
 
-import java.io.InputStream;
-import java.util.Collection;
+import javax.xml.parsers.FactoryConfigurationError;
 
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.MailboxFolder;
-import org.minig.imap.MailboxFolders;
-import org.minig.imap.SearchQuery;
-import org.minig.imap.UIDEnvelope;
-import org.minig.imap.mime.MimeMessage;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.EmailHeaders;
-import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-public interface PrivateMailboxService {
+public class SerializingTest {
 
-	MailboxFolders listAllFolders(BackendSession bs) throws MailException;
-	
-	OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException;
-	
-	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
+	public String tagValue(Element element, ASEMAIL asemail) {
+		return tag(element, asemail).getTextContent();
+	}
 
-	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
-	
-	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+	public Node tag(Element element, ASEMAIL asemail) {
+		NodeList tags = tags(element, asemail);
+		if (tags.getLength() == 0) {
+			return null;
+		} else if (tags.getLength() == 1) {
+			return tags.item(0);
+		} else {
+			throw new IllegalStateException("No more than one field expected for the tag : " + asemail.getName());
+		}
+	}
 
-	Collection<Flag> uidFetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
+	private NodeList tags(Element element, ASEMAIL asemail) {
+		return element.getElementsByTagName(asemail.asASValue());
+	}
 
-	IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
-
-	InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, FetchInstructions fetchInstructions) 
-			throws MailException;
-
-	UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException;
+	public Element createRootDocument() throws FactoryConfigurationError {
+		return DOMUtils.createDoc("TestNameSpace", "RootElement").getDocumentElement();
+	}
 }

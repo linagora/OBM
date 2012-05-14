@@ -48,9 +48,9 @@ public class Envelope {
 		private List<Address> bcc;
 		private Address from;
 		private String messageId;
-		private String inReplyTo;
+		private Address replyTo;
 		
-		private Builder() {
+		public Builder() {
 			this.msgno = -1;
 			this.to = Lists.<Address>newArrayList();
 			this.bcc = Lists.<Address>newArrayList();
@@ -97,18 +97,14 @@ public class Envelope {
 			return this;
 		}
 		
-		public Builder inReplyTo(String inReplyTo) {
-			if ("NIL".equals(inReplyTo)) {
-				this.inReplyTo = null;
-			} else {
-				this.inReplyTo = inReplyTo;
-			}
+		public Builder replyTo(Address replyTo) {
+			this.replyTo = replyTo;
 			return this;
 		}
 		
 		public Envelope build() {
 			return new Envelope(this.msgno, this.date, this.subject, this.messageId,  
-					this.from, this.to, this.cc, this.bcc, this.inReplyTo);
+					this.from, this.to, this.cc, this.bcc, this.replyTo);
 		}
 	}
 	
@@ -120,10 +116,10 @@ public class Envelope {
 	private final List<Address> to;
 	private final List<Address> cc;
 	private final List<Address> bcc;
-	private final String inReplyTo;
+	private final Address replyTo;
 
 	private Envelope(int msgno, Date date, String subject, String messageId, 
-			Address from, List<Address> to, List<Address> cc, List<Address> bcc, String inReplyTo) {
+			Address from, List<Address> to, List<Address> cc, List<Address> bcc, Address replyTo) {
 		
 		super();
 		this.msgno = msgno;
@@ -134,13 +130,9 @@ public class Envelope {
 		this.to = to;
 		this.cc = cc;
 		this.bcc = bcc;
-		this.inReplyTo = inReplyTo;
+		this.replyTo = replyTo;
 	}
 
-	public static Builder createBuilder() {
-        return new Builder();
-	}
-	
 	public int getMsgno() {
 		return msgno;
 	}
@@ -169,8 +161,8 @@ public class Envelope {
 		return messageId;
 	}
 
-	public String getInReplyTo() {
-		return inReplyTo;
+	public Address getReplyTo() {
+		return replyTo;
 	}
 
 	public List<Address> getBcc() {
@@ -179,7 +171,7 @@ public class Envelope {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(msgno, date, subject, to, cc, bcc, from, messageId, inReplyTo);
+		return Objects.hashCode(msgno, date, subject, to, cc, bcc, from, messageId, replyTo);
 	}
 	
 	@Override
@@ -194,7 +186,7 @@ public class Envelope {
 				&& Objects.equal(this.bcc, that.bcc)
 				&& Objects.equal(this.from, that.from)
 				&& Objects.equal(this.messageId, that.messageId)
-				&& Objects.equal(this.inReplyTo, that.inReplyTo);
+				&& Objects.equal(this.replyTo, that.replyTo);
 		}
 		return false;
 	}

@@ -37,19 +37,26 @@ import java.util.List;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 
 public class MSEmailHeader implements Serializable {
 
 	public static class Builer {
 		private MSAddress from;
+		private MSAddress replyTo;
 		private List<MSAddress> to;
 		private List<MSAddress> cc;
-		private List<MSAddress> bcc;
 		private String subject;
 		private Date date;
 		
 		public Builer from(MSAddress from) {
 			this.from = from;
+			return this;
+		}
+		
+		public Builer replyTo(MSAddress replyTo) {
+			this.replyTo = replyTo;
 			return this;
 		}
 		
@@ -60,11 +67,6 @@ public class MSEmailHeader implements Serializable {
 		
 		public Builer cc(List<MSAddress> cc) {
 			this.cc = cc;
-			return this;
-		}
-		
-		public Builer bcc(List<MSAddress> bcc) {
-			this.bcc = bcc;
 			return this;
 		}
 		
@@ -85,34 +87,41 @@ public class MSEmailHeader implements Serializable {
 			if (cc == null) {
 				this.cc = ImmutableList.<MSAddress>of();
 			}
-			if (bcc == null) {
-				this.bcc = ImmutableList.<MSAddress>of();
+			if (from == null) {
+				from = new MSAddress("Empty From", "o-push@linagora.com");
 			}
-			return new MSEmailHeader(from, to, cc, bcc, subject, date);
+			if (Strings.isNullOrEmpty(subject)) {
+				subject = "[Empty Subject]";
+			}
+			return new MSEmailHeader(from, replyTo, to, cc, subject, date);
 		}
 	}
 	
 	private final MSAddress from;
+	private final MSAddress replyTo;
 	private final List<MSAddress> to;
 	private final List<MSAddress> cc;
-	private final List<MSAddress> bcc;
 	private final String subject;
 	private final Date date;
 	
-	private MSEmailHeader(MSAddress from, List<MSAddress> to, List<MSAddress> cc, 
-			List<MSAddress> bcc, String subject, Date date) {
+	private MSEmailHeader(MSAddress from, MSAddress replyTo, List<MSAddress> to, List<MSAddress> cc, 
+			String subject, Date date) {
 		
 		super();
 		this.from = from;
+		this.replyTo = replyTo;
 		this.to = to;
 		this.cc = cc;
-		this.bcc = bcc;
 		this.subject = subject;
 		this.date = date;
 	}
 	
 	public MSAddress getFrom() {
 		return from;
+	}
+	
+	public MSAddress getReplyTo() {
+		return replyTo;
 	}
 	
 	public List<MSAddress> getTo() {
@@ -123,10 +132,6 @@ public class MSEmailHeader implements Serializable {
 		return cc;
 	}
 	
-	public List<MSAddress> getBcc() {
-		return bcc;
-	}
-	
 	public String getSubject() {
 		return subject;
 	}
@@ -135,9 +140,17 @@ public class MSEmailHeader implements Serializable {
 		return date;
 	}
 
+	public MSAddress getDisplayTo() {
+		if (to != null && !to.isEmpty()) {
+			return Iterables.get(to, 0);
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(from, to, cc, bcc, subject, date);
+		return Objects.hashCode(from, replyTo, to, cc, subject, date);
 	}
 	
 	@Override
@@ -145,9 +158,9 @@ public class MSEmailHeader implements Serializable {
 		if (object instanceof MSEmailHeader) {
 			MSEmailHeader that = (MSEmailHeader) object;
 			return Objects.equal(this.from, that.from)
+				&& Objects.equal(this.replyTo, that.replyTo)
 				&& Objects.equal(this.to, that.to)
 				&& Objects.equal(this.cc, that.cc)
-				&& Objects.equal(this.bcc, that.bcc)
 				&& Objects.equal(this.subject, that.subject)
 				&& Objects.equal(this.date, that.date);
 		}
@@ -158,9 +171,9 @@ public class MSEmailHeader implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("from", from)
+			.add("replyTo", replyTo)
 			.add("to", to)
 			.add("cc", cc)
-			.add("bcc", bcc)
 			.add("subject", subject)
 			.add("date", date)
 			.toString();

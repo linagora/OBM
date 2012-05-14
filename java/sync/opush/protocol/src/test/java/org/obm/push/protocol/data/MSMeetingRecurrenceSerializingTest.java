@@ -34,6 +34,7 @@ package org.obm.push.protocol.data;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.fest.assertions.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
@@ -45,15 +46,20 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence.Builder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class)
 public class MSMeetingRecurrenceSerializingTest {
+
+	private SerializingTest serializingTest;
+
+	@Before
+	public void setUp() {
+		serializingTest = new SerializingTest();
+	}
 
 	@Test
 	public void testMeetingRequestDayOfMonthNull() {
@@ -311,31 +317,12 @@ public class MSMeetingRecurrenceSerializingTest {
 				.recurrenceId(DateUtils.date("1970-01-01T15:00:00"));
 	}
 
-	private String tagValue(Element encodedDocument, ASEMAIL asemail) {
-		return tag(encodedDocument, asemail).getTextContent();
-	}
-
-	private Node tag(Element encodedDocument, ASEMAIL asemail) {
-		NodeList tags = tags(encodedDocument, asemail);
-		if (tags.getLength() == 0) {
-			return null;
-		} else if (tags.getLength() == 1) {
-			return tags.item(0);
-		} else {
-			throw new IllegalStateException("No more than one field expected for the tag : " + asemail.getName());
-		}
-	}
-
-	private NodeList tags(Element encodedDocument, ASEMAIL asemail) {
-		return encodedDocument.getElementsByTagName(asemail.asASValue());
-	}
-
 	private Element encode(MSMeetingRequestRecurrence meetingRequestRecurrence) throws FactoryConfigurationError {
 		MSMeetingRequest meetingRequest = meetingRequestWithRecurrences(meetingRequestRecurrence);
 		
-		Element encodedDocument = createRootDocument();
-		new MSMeetingRequestSerializer(new IntEncoder(), encodedDocument, meetingRequest).serializeMSMeetingRequest();
-		return encodedDocument;
+		Element parentElement = createRootDocument();
+		new MSMeetingRequestSerializer(new IntEncoder(), parentElement, meetingRequest).serializeMSMeetingRequest();
+		return parentElement;
 	}
 
 	private MSMeetingRequest meetingRequestWithRecurrences(MSMeetingRequestRecurrence meetingRequestRecurrence) {
@@ -344,8 +331,16 @@ public class MSMeetingRecurrenceSerializingTest {
 				.build();
 		return meetingRequest;
 	}
+	
+	private Node tag(Element element, ASEMAIL asemail) {
+		return serializingTest.tag(element, asemail);
+	}
 
-	private Element createRootDocument() throws FactoryConfigurationError {
-		return DOMUtils.createDoc("TestNameSpace", "RootElement").getDocumentElement();
+	private String tagValue(Element element, ASEMAIL asemail) {
+		return serializingTest.tagValue(element, asemail);
+	}
+
+	private Element createRootDocument() {
+		return serializingTest.createRootDocument();
 	}
 }

@@ -50,19 +50,19 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuild
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 @RunWith(SlowFilterRunner.class)
 public class MSMeetingRequestSerializingTest {
 
 	private SimpleDateFormat protocolDateFormat;
+	private SerializingTest serializingTest;
 
 	@Before
 	public void setUp() {
 		protocolDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS''");
+		serializingTest = new SerializingTest();
 	}
 	
 	@Test
@@ -475,37 +475,21 @@ public class MSMeetingRequestSerializingTest {
 				.globalObjId("a global object id");
 	}
 
-	private String tagValue(Element encodedDocument, ASEMAIL asemail) {
-		Node tag = tag(encodedDocument, asemail);
-		if (tag != null) {
-			return tag.getTextContent();
-		} else {
-			return null;
-		}
-	}
-
-	private Node tag(Element encodedDocument, ASEMAIL asemail) {
-		NodeList tags = tags(encodedDocument, asemail);
-		if (tags.getLength() == 0) {
-			return null;
-		} else if (tags.getLength() == 1) {
-			return tags.item(0);
-		} else {
-			throw new IllegalStateException("No more than one field expected for the tag : " + asemail.getName() );
-		}
-	}
-
-	private NodeList tags(Element encodedDocument, ASEMAIL asemail) {
-		return encodedDocument.getElementsByTagName(asemail.asASValue());
-	}
-
 	private Element encode(MSMeetingRequest meetingRequest) throws FactoryConfigurationError {
-		Element encodedDocument = createRootDocument();
-		new MSMeetingRequestSerializer(new IntEncoder(), encodedDocument, meetingRequest).serializeMSMeetingRequest();
-		return encodedDocument;
+		Element parentElement = createRootDocument();
+		new MSMeetingRequestSerializer(new IntEncoder(), parentElement, meetingRequest).serializeMSMeetingRequest();
+		return parentElement;
 	}
 
-	private Element createRootDocument() throws FactoryConfigurationError {
-		return DOMUtils.createDoc("TestNameSpace", "RootElement").getDocumentElement();
+	private Node tag(Element element, ASEMAIL asemail) {
+		return serializingTest.tag(element, asemail);
+	}
+
+	private String tagValue(Element element, ASEMAIL asemail) {
+		return serializingTest.tagValue(element, asemail);
+	}
+
+	private Element createRootDocument() {
+		return serializingTest.createRootDocument();
 	}
 }

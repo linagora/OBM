@@ -31,13 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.minig.imap.IMAPHeaders;
+import org.minig.imap.Address;
+import org.minig.imap.Envelope;
 import org.obm.DateUtils;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
@@ -48,11 +46,11 @@ import com.google.common.collect.Lists;
 public class MSEmailHeaderConverterTest {
 
 	private final static String FROM = "from@obm.lng.org";
+	private final static String REPLY_TO = "from@perso.com";
 	private final static String TO = "to@obm.lng.org";
 	private final static String CC = "cc@obm.lng.org";
-	private final static String BCC = "bcc@obm.lng.org";
 	private final static String SUBJECT = "subject";
-	private final static String DATE = "Tue May 01 11:00:00 CEST 2012";
+	private final static String DATE = "2012-05-01T11:00:00Z";
 	
 	private MSEmailHeaderConverter msEmailHeaderConverter;
 
@@ -63,66 +61,59 @@ public class MSEmailHeaderConverterTest {
 	
 	@Test
 	public void testMSEmailHeaderConverter() {
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("from", FROM);
-		headers.put("to", TO);
-		headers.put("cc", CC);
-		headers.put("bcc", BCC);
-		headers.put("subject", SUBJECT);
-		headers.put("date", DATE);
+		Envelope envelope = new Envelope.Builder()
+			.from(new Address(FROM))
+			.replyTo(new Address(REPLY_TO))
+			.to(Lists.newArrayList(new Address(TO)))
+			.cc(Lists.newArrayList(new Address(CC)))
+			.subject(SUBJECT)
+			.date(DateUtils.date(DATE)).build();
 		
-		IMAPHeaders imapHeaders = new IMAPHeaders(headers);
-		MSEmailHeader convertToMSMeetingRequest = msEmailHeaderConverter.convertToMSEmailHeader(imapHeaders);
+		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
-		Assertions.assertThat(convertToMSMeetingRequest).isNotNull();
-		Assertions.assertThat(convertToMSMeetingRequest.getFrom()).isEqualTo(toMSAddress(FROM));
-		Assertions.assertThat(convertToMSMeetingRequest.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
-		Assertions.assertThat(convertToMSMeetingRequest.getBcc()).isEqualTo(Lists.newArrayList(toMSAddress(BCC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getSubject()).isEqualTo(SUBJECT);
-		Assertions.assertThat(convertToMSMeetingRequest.getDate()).isEqualTo(DateUtils.date("2012-05-01T11:00:00Z"));
+		Assertions.assertThat(msEmailHeader).isNotNull();
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(toMSAddress(FROM));
+		Assertions.assertThat(msEmailHeader.getReplyTo()).isEqualTo(toMSAddress(REPLY_TO));
+		Assertions.assertThat(msEmailHeader.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
+		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
+		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);
+		Assertions.assertThat(msEmailHeader.getDate()).isEqualTo(DateUtils.date(DATE));
 	}
 	
 	@Test
 	public void testMSEmailHeaderConverterWithoutFrom() {
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("to", TO);
-		headers.put("cc", CC);
-		headers.put("bcc", BCC);
-		headers.put("subject", SUBJECT);
-		headers.put("date", DATE);
+		Envelope envelope = new Envelope.Builder()
+		.to(Lists.newArrayList(new Address(TO)))
+		.cc(Lists.newArrayList(new Address(CC)))
+		.subject(SUBJECT)
+		.date(DateUtils.date(DATE)).build();
 		
-		IMAPHeaders imapHeaders = new IMAPHeaders(headers);
-		MSEmailHeader convertToMSMeetingRequest = msEmailHeaderConverter.convertToMSEmailHeader(imapHeaders);
+		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
-		Assertions.assertThat(convertToMSMeetingRequest).isNotNull();
-		Assertions.assertThat(convertToMSMeetingRequest.getFrom()).isNull();
-		Assertions.assertThat(convertToMSMeetingRequest.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
-		Assertions.assertThat(convertToMSMeetingRequest.getBcc()).isEqualTo(Lists.newArrayList(toMSAddress(BCC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getSubject()).isEqualTo(SUBJECT);
-		Assertions.assertThat(convertToMSMeetingRequest.getDate()).isEqualTo(DateUtils.date("2012-05-01T11:00:00Z"));
+		Assertions.assertThat(msEmailHeader).isNotNull();
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(new MSAddress("Empty From", "o-push@linagora.com"));
+		Assertions.assertThat(msEmailHeader.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
+		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
+		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);
+		Assertions.assertThat(msEmailHeader.getDate()).isEqualTo(DateUtils.date("2012-05-01T11:00:00Z"));
 	}
 	
 	@Test
 	public void testMSEmailHeaderConverterWithoutTo() {
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("from", FROM);
-		headers.put("cc", CC);
-		headers.put("bcc", BCC);
-		headers.put("subject", SUBJECT);
-		headers.put("date", DATE);
+		Envelope envelope = new Envelope.Builder()
+		.from(new Address(FROM))
+		.cc(Lists.newArrayList(new Address(CC)))
+		.subject(SUBJECT)
+		.date(DateUtils.date(DATE)).build();
 		
-		IMAPHeaders imapHeaders = new IMAPHeaders(headers);
-		MSEmailHeader convertToMSMeetingRequest = msEmailHeaderConverter.convertToMSEmailHeader(imapHeaders);
+		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
-		Assertions.assertThat(convertToMSMeetingRequest).isNotNull();
-		Assertions.assertThat(convertToMSMeetingRequest.getFrom()).isEqualTo(toMSAddress(FROM));
-		Assertions.assertThat(convertToMSMeetingRequest.getTo()).isEmpty();
-		Assertions.assertThat(convertToMSMeetingRequest.getBcc()).isEqualTo(Lists.newArrayList(toMSAddress(BCC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
-		Assertions.assertThat(convertToMSMeetingRequest.getSubject()).isEqualTo(SUBJECT);
-		Assertions.assertThat(convertToMSMeetingRequest.getDate()).isEqualTo(DateUtils.date("2012-05-01T11:00:00Z"));
+		Assertions.assertThat(msEmailHeader).isNotNull();
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(toMSAddress(FROM));
+		Assertions.assertThat(msEmailHeader.getTo()).isEmpty();
+		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
+		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);
+		Assertions.assertThat(msEmailHeader.getDate()).isEqualTo(DateUtils.date(DATE));
 	}
 	
 	@Test(expected=NullPointerException.class)

@@ -207,10 +207,6 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		List<Address> bcc = parseList(parser.getLastReadToken(), parser);
 
 		pos = parser.consumeToken(pos, env); // In-Reply-To
-		String inReplyTo = null;
-		if (parser.getLastTokenType() != TokenType.NIL) {
-			inReplyTo = new String(parser.getLastReadToken());
-		}
 
 		parser.consumeToken(pos, env); // Message-ID
 		String mid = new String(parser.getLastReadToken());
@@ -221,8 +217,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		} else {
 			address = new Address();
 		}
-		return Envelope.createBuilder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(address).
-				messageID(mid).inReplyTo(inReplyTo).build();
+		return new Envelope.Builder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(address).
+				messageID(mid).build();
 	}
 
 	private List<Address> parseList(byte[] token, ParenListParser parser) {
