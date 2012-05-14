@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-public enum MessageClass {
+public enum MSMessageClass {
 	Note {
 		@Override
 		public String toString() {

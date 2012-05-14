@@ -61,7 +61,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	private Set<MSAttachement> attachements;
 	private long uid;
 	private MSEvent invitation;
-	private MessageClass messageClass;
+	private MSMessageClass messageClass;
 	private MSImportance importance;
 
 	private List<MSAddress> to;
@@ -108,7 +108,7 @@ public class MSEmail implements IApplicationData, Serializable {
 			this.bcc = new LinkedList<MSAddress>();
 		}
 		this.read = false;
-		this.messageClass = MessageClass.Note;
+		this.messageClass = MSMessageClass.Note;
 		this.importance = MSImportance.NORMAL;
 	}
 
@@ -212,12 +212,12 @@ public class MSEmail implements IApplicationData, Serializable {
 		return invitation;
 	}
 
-	public void setInvitation(MSEvent invitation, MessageClass messageClass) {
+	public void setInvitation(MSEvent invitation, MSMessageClass messageClass) {
 		this.invitation = invitation;
 		if(messageClass != null){
 			this.messageClass = messageClass;
 		} else {
-			this.messageClass = MessageClass.ScheduleMeetingRequest;
+			this.messageClass = MSMessageClass.ScheduleMeetingRequest;
 		}
 	}
 
@@ -253,11 +253,11 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.answered = answered;
 	}
 	
-	public MessageClass getMessageClass() {
+	public MSMessageClass getMessageClass() {
 		return messageClass;
 	}
 
-	public void setMessageClass(MessageClass messageClass) {
+	public void setMessageClass(MSMessageClass messageClass) {
 		this.messageClass = messageClass;
 	}
 	

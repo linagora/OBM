@@ -63,7 +63,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.MessageClass;
+import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.service.EventService;
@@ -179,9 +179,9 @@ public class MailMessageLoader {
 			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
 			final MSEvent event = getInvitation(bs, inputStreamInvitation);
 			if (mimePart.isInvitation()) {
-				msEmail.setInvitation(event, MessageClass.ScheduleMeetingRequest);
+				msEmail.setInvitation(event, MSMessageClass.ScheduleMeetingRequest);
 			} else if (mimePart.isCancelInvitation()) {
-				msEmail.setInvitation(event, MessageClass.ScheduleMeetingCanceled);
+				msEmail.setInvitation(event, MSMessageClass.ScheduleMeetingCanceled);
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());
