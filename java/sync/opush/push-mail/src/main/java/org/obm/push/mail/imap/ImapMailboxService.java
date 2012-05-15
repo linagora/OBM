@@ -161,7 +161,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
+	public IMAPHeaders fetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
 		Preconditions.checkNotNull(headersToFetch);
 		if (Iterables.isEmpty(headersToFetch)) {
 			return new IMAPHeaders();
@@ -223,7 +223,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public Collection<Flag> uidFetchFlags(BackendSession bs, String collectionName, long uid) throws MailException {
+	public Collection<Flag> fetchFlags(BackendSession bs, String collectionName, long uid) throws MailException {
 		ImapStore store = null;
 		try {
 			store = imapClientProvider.getImapClientWithJM(bs);

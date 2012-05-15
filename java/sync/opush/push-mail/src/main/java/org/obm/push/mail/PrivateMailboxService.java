@@ -58,9 +58,9 @@ public interface PrivateMailboxService {
 	
 	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
 
-	Collection<Flag> uidFetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
+	Collection<Flag> fetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
 
-	IMAPHeaders uidFetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
+	IMAPHeaders fetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
 
 	InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, FetchInstructions fetchInstructions) 
 			throws MailException;

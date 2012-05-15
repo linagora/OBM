@@ -230,7 +230,7 @@ public class UIDFetchHeadersTest {
 
 	private IMAPHeaders uidFetchHeaders(long uid, EmailHeaders headersToFetch) throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return privateMailboxService.uidFetchHeaders(bs, inbox, uid, headersToFetch);
+		return privateMailboxService.fetchHeaders(bs, inbox, uid, headersToFetch);
 	}
 
 	private Address addr(String address) {
