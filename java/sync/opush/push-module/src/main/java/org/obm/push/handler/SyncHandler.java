@@ -91,6 +91,7 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -279,7 +280,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return itemChangesDeletion;
 	}
 
-	private List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
+	@VisibleForTesting List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
 		
 		final Credentials credentials = backendSession.getCredentials();
