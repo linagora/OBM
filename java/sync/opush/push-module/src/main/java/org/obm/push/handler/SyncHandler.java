@@ -87,7 +87,6 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
