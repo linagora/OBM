@@ -34,6 +34,7 @@ package org.obm.push.handler;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -101,12 +103,12 @@ public class ResponseWindowingProcessor {
 			}
 		}
 
-		ArrayList<ItemChange> toKeepForLaterSync = new ArrayList<ItemChange>();
+		LinkedList<ItemChange> toKeepForLaterSync = Lists.newLinkedList();
 		
 		int changedSize = changed.size();
 		for (int i = windowSize; i < changedSize; i++) {
 			ItemChange ic = changed.get(changed.size() - 1);
-			toKeepForLaterSync.add(ic);
+			toKeepForLaterSync.addFirst(ic);
 			changed.remove(ic);
 		}
 
