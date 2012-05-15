@@ -179,9 +179,9 @@ public class MailMessageLoader {
 			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
 			final MSEvent event = getInvitation(bs, inputStreamInvitation);
 			if (mimePart.isInvitation()) {
-				msEmail.setInvitation(event, MSMessageClass.ScheduleMeetingRequest);
+				msEmail.setInvitation(event, MSMessageClass.SCHEDULE_MEETING_REQUEST);
 			} else if (mimePart.isCancelInvitation()) {
-				msEmail.setInvitation(event, MSMessageClass.ScheduleMeetingCanceled);
+				msEmail.setInvitation(event, MSMessageClass.SCHEDULE_MEETING_CANCELED);
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());

@@ -38,7 +38,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncStatus;
@@ -51,7 +50,6 @@ import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.data.IDataEncoder;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -150,10 +148,8 @@ public class SyncProtocol {
 	private void serializeChange(BackendSession bs, Element col,
 			SyncCollection c, ItemChange ic, EncoderFactory encoderFactory) {
 		
-		IApplicationData data = ic.getData();
-		IDataEncoder encoder = encoderFactory.getEncoder(data);
 		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoder.encode(bs, apData, data, c, true);
+		encoderFactory.encode(bs, apData, ic.getData(), c, true);
 	}
 	
 	private void buildUpdateItemChange(BackendSession bs, SyncCollectionResponse c,	Map<String, String> processedClientIds, 

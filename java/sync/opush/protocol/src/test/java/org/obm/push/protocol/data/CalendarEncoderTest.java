@@ -40,7 +40,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.BackendSession;
@@ -51,14 +51,11 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class CalendarEncoderTest {
@@ -86,17 +83,12 @@ public class CalendarEncoderTest {
 		return bs;
 	}
 
-	private SyncCollection getFakeSyncCollection() {
-		SyncCollection col = new SyncCollection();
-		return col;
-	}
-
 	@Test
 	public void testEncodeEmptyAttendees() throws Exception {
 		MSEvent event = getFakeMSEvent();
 		Document doc = DOMUtils.createDoc("test", "ApplicationData");
 		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
-				event, getFakeSyncCollection(), true);
+				event, true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, outputStream);
 		String actual = new String(outputStream.toByteArray());
@@ -130,7 +122,7 @@ public class CalendarEncoderTest {
 
 		Document doc = DOMUtils.createDoc("test", "ApplicationData");
 		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
-				event, getFakeSyncCollection(), true);
+				event, true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, outputStream);
 		String actual = new String(outputStream.toByteArray());

@@ -108,7 +108,7 @@ public class MSEmail implements IApplicationData, Serializable {
 			this.bcc = new LinkedList<MSAddress>();
 		}
 		this.read = false;
-		this.messageClass = MSMessageClass.Note;
+		this.messageClass = MSMessageClass.NOTE;
 		this.importance = MSImportance.NORMAL;
 	}
 
@@ -217,7 +217,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		if(messageClass != null){
 			this.messageClass = messageClass;
 		} else {
-			this.messageClass = MSMessageClass.ScheduleMeetingRequest;
+			this.messageClass = MSMessageClass.SCHEDULE_MEETING_REQUEST;
 		}
 	}
 

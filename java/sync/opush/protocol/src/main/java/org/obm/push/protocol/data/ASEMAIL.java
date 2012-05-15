@@ -66,7 +66,12 @@ public enum ASEMAIL {
 	DAY_OF_MONTH("Recurrence_DayOfMonth"),
 	WEEK_OF_MONTH("Recurrence_WeekOfMonth"),
 	DAY_OF_WEEK("Recurrence_DayOfWeek"),
-	MONTH_OF_YEAR("Recurrence_MonthOfYear");
+	MONTH_OF_YEAR("Recurrence_MonthOfYear"),
+	READ("Read"),
+	IMPORTANCE("Importance"),
+	MESSAGE_CLASS("MessageClass"),
+	CPID("InternetCPID"),
+	CONTENT_CLASS("ContentClass");
 	
 	private final String name;
 

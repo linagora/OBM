@@ -38,16 +38,15 @@ import java.util.TimeZone;
 
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSTask;
 import org.obm.push.bean.MSRecurrence;
+import org.obm.push.bean.MSTask;
 import org.obm.push.bean.RecurrenceDayOfWeek;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
 
-public class TaskEncoder extends Encoder implements IDataEncoder {
+public class TaskEncoder extends Encoder {
 	
 	private SimpleDateFormat sdf;
 	
@@ -59,10 +58,7 @@ public class TaskEncoder extends Encoder implements IDataEncoder {
 		this.sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 	
-	@Override
-	public void encode(BackendSession bs, Element p, IApplicationData data,
-			SyncCollection c, boolean isResponse) {
-
+	public void encode(BackendSession bs, Element p, IApplicationData data) {
 		MSTask ta = (MSTask) data;
 
 		s(p, "Tasks:Subject", ta.getSubject());

@@ -35,9 +35,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -71,6 +73,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import com.google.common.io.CharStreams;
 
 public final class DOMUtils {
 
@@ -417,5 +421,12 @@ public final class DOMUtils {
 		if (value != null) {
 			createElementAndText(element, tagName, String.valueOf(value));
 		}
+	}
+	
+	public static Element createElementAndText(Element parent, String elementName, 
+			InputStream inputStream, Charset charset) throws IOException {
+		
+		return createElementAndText(parent, elementName, 
+				CharStreams.toString(new InputStreamReader(inputStream, charset)));
 	}
 }

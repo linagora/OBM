@@ -32,58 +32,25 @@
 package org.obm.push.bean;
 
 public enum MSMessageClass {
-	Note {
-		@Override
-		public String toString() {
-			return "IPM.Note";
-		}
-	}, NoteRulesOofTemplateMicrosoft {
-		@Override
-		public String toString() {
-			return "IPM.Note.Rules.OofTemplate.Microsoft";
-		}
-	}, NoteSMIME {
-		@Override
-		public String toString() {
-			return "IPM.Note.SMIME";
-		}
-	}, NoteSMIMEMultipartSigned {
-		@Override
-		public String toString() {
-			return "IPM.Note.SMIME.MultipartSigned";
-		}
-	}, ScheduleMeetingRequest {
-		@Override
-		public String toString() {
-			return "IPM.Schedule.Meeting.Request";
-		}
-	}, ScheduleMeetingCanceled {
-		@Override
-		public String toString() {
-			return "IPM.Schedule.Meeting.Canceled";
-		}
-	}, ScheduleMeetingRespPos {
-		@Override
-		public String toString() {
-			return "IPM.Schedule.Meeting.Resp.Pos";
-		}
-	}, ScheduleMeetingRespTent {
-		@Override
-		public String toString() {
-			return "IPM.Schedule.Meeting.Resp.Tent";
-		}
-	}, ScheduleMeetingRespNeg {
-		@Override
-		public String toString() {
-			return "IPM.Schedule.Meeting.Resp.Neg";
-		}
-	}, Post {
-		@Override
-		public String toString() {
-			return "IPM.Post";
-		}
-	};
+	
+	NOTE("IPM.Note"),
+	NOTE_RULES_OOFTEMPLATE_MS("IPM.Note.Rules.OofTemplate.Microsoft"),
+	NOTE_SMIME("IPM.Note.SMIME"),
+	NOTE_SMIME_MULTIPART_SIGNED("IPM.Note.SMIME.MultipartSigned"),
+	SCHEDULE_MEETING_REQUEST("IPM.Schedule.Meeting.Request"),
+	SCHEDULE_MEETING_CANCELED("IPM.Schedule.Meeting.Canceled"),
+	SCHEDULE_MEETING_RESP_POS("IPM.Schedule.Meeting.Resp.Pos"),
+	SCHEDULE_MEETING_RESP_TENT("IPM.Schedule.Meeting.Resp.Tent"),
+	SCHEDULE_MEETING_RESP_NEG("IPM.Schedule.Meeting.Resp.Neg"),
+	POST("IPM.Post");
+	
+	private final String value;
 
-	public abstract String toString();
-
+	private MSMessageClass(String value) {
+		this.value = value;
+	}
+	
+	public String specificationValue() {
+		return value;
+	}
 }

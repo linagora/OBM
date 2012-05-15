@@ -60,7 +60,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
 
-public class EmailEncoder implements IDataEncoder {
+public class EmailEncoder {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(EmailEncoder.class);
@@ -77,9 +77,8 @@ public class EmailEncoder implements IDataEncoder {
 		plainFormatter = new PlainBodyFormatter();
 	}
 
-	@Override
 	public void encode(BackendSession bs, Element parent,
-			IApplicationData data, SyncCollection c, boolean isResponse) {
+			IApplicationData data, SyncCollection c) {
 		MSEmail mail = (MSEmail) data;
 
 		DOMUtils.createElementAndTextIfNotNull(parent, "Email:To",

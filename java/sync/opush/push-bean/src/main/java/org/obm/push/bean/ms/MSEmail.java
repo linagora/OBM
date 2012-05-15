@@ -96,7 +96,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest) {
-			return meetingRequest(meetingRequest, MSMessageClass.ScheduleMeetingRequest);
+			return meetingRequest(meetingRequest, MSMessageClass.SCHEDULE_MEETING_REQUEST);
 		}
 		
 		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
@@ -138,7 +138,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		
 		public MSEmail build() {
 			if (messageClass == null) {
-				messageClass = MSMessageClass.Note;
+				messageClass = MSMessageClass.NOTE;
 			}
 			if (importance == null) {
 				importance = MSImportance.NORMAL;

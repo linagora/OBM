@@ -48,7 +48,6 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
@@ -56,7 +55,7 @@ import org.w3c.dom.Element;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
-public class CalendarEncoder extends Encoder implements IDataEncoder {
+public class CalendarEncoder extends Encoder {
 
 	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private SimpleDateFormat sdf;
@@ -77,9 +76,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 	// <StartTime>20010101T000000Z</StartTime>
 	// <UID>74455CE0E49D486DBDBC7CB224C5212D00000000000000000000000000000000</UID>
 	// <MeetingStatus>0</MeetingStatus>
-	@Override
-	public void encode(BackendSession bs, Element p, IApplicationData data,
-			SyncCollection c, boolean isReponse) {
+	public void encode(BackendSession bs, Element p, IApplicationData data, boolean isResponse) {
 
 		MSEvent ev = (MSEvent) data;
 
@@ -164,7 +161,7 @@ public class CalendarEncoder extends Encoder implements IDataEncoder {
 					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
-		if (isReponse && bs.getProtocolVersion().compareTo(TWELVE) > 0) {
+		if (isResponse && bs.getProtocolVersion().compareTo(TWELVE) > 0) {
 			s(p, "AirSyncBase:NativeBodyType", Type.PLAIN_TEXT.toString());
 		}
 

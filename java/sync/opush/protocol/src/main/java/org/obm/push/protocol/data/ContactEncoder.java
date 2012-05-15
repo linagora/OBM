@@ -38,13 +38,12 @@ import java.util.TimeZone;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
 
-public class ContactEncoder implements IDataEncoder {
+public class ContactEncoder {
 
 	private SimpleDateFormat sdf;
 
@@ -54,9 +53,7 @@ public class ContactEncoder implements IDataEncoder {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
-	@Override
-	public void encode(BackendSession bs, Element parent,
-			IApplicationData data, SyncCollection collectio, boolean isResponse) {
+	public void encode(BackendSession bs, Element parent, IApplicationData data) {
 		// TODO Auto-generated method stub
 		MSContact c = (MSContact) data;
 
@@ -178,5 +175,4 @@ public class ContactEncoder implements IDataEncoder {
 			DOMUtils.createElementAndText(p, name, val);
 		}
 	}
-
 }

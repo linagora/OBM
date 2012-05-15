@@ -31,9 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obm.push.bean.SyncCollection;
+import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -42,8 +43,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class EncoderFactory {
 
-	private static final Logger logger = LoggerFactory.getLogger(EncoderFactory.class);
-	
 	private final Provider<CalendarEncoder> calendarProvider;
 	private final Provider<ContactEncoder> contactProvider;
 	private final Provider<TaskEncoder> taskEncoder;
@@ -61,26 +60,24 @@ public class EncoderFactory {
 		this.emailEncoder = emailEncoder;
 	}
 	
-	public IDataEncoder getEncoder(IApplicationData data) {
+	public void encode(BackendSession bs, Element parent, 
+			IApplicationData data, SyncCollection c, boolean isResponse) {
+		
 		if (data != null) {
 			switch (data.getType()) {
-
 			case CALENDAR:
-				return calendarProvider.get();
-
+				calendarProvider.get().encode(bs, parent, data, isResponse);
+				break;
 			case CONTACTS:
-				return contactProvider.get();
-
+				contactProvider.get().encode(bs, parent, data);
+				break;
 			case TASKS:
-				return taskEncoder.get();
-
+				taskEncoder.get().encode(bs, parent, data);
+				break;
 			case EMAIL:
-			default:
-				return emailEncoder.get();
+				emailEncoder.get().encode(bs, parent, data, c);
+				break;
 			}
-		} else {
-			logger.warn("TRY TO ENCODE NULL OBJECT");
-			return null;
 		}
 	}
 

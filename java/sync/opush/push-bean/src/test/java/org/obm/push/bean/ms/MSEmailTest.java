@@ -63,7 +63,7 @@ public class MSEmailTest {
 				.meetingRequest(anyMeetingRequest())
 				.build();
 	
-		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.ScheduleMeetingRequest);
+		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
 	}
 	
 	@Test
@@ -71,10 +71,10 @@ public class MSEmailTest {
 		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
-				.meetingRequest(anyMeetingRequest(), MSMessageClass.ScheduleMeetingCanceled)
+				.meetingRequest(anyMeetingRequest(), MSMessageClass.SCHEDULE_MEETING_CANCELED)
 				.build();
 	
-		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.ScheduleMeetingCanceled);
+		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_CANCELED);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -85,7 +85,7 @@ public class MSEmailTest {
 				.meetingRequest(anyMeetingRequest(), null)
 				.build();
 	
-		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.ScheduleMeetingRequest);
+		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {

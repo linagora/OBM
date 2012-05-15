@@ -47,7 +47,6 @@ import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.data.IDataEncoder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -184,8 +183,7 @@ public class ItemOperationsProtocol {
 				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
-			IDataEncoder encoder = encoderFactory.getEncoder(data);
-			encoder.encode(bs, dataElem, data, fetchItemResult.getSyncCollection(),	true);
+			encoderFactory.encode(bs, dataElem, data, fetchItemResult.getSyncCollection(), true);
 		}
 	}
 	

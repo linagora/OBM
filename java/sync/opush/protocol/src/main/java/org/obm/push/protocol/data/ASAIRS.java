@@ -31,13 +31,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.SyncCollection;
-import org.w3c.dom.Element;
 
-public interface IDataEncoder {
+public enum ASAIRS {
 
-	void encode(BackendSession bs, Element parent, IApplicationData data, SyncCollection c, boolean isResponse);
+	BODY("Body"),
+	TYPE("Type"),
+	ESTIMATED_DATA_SIZE("EstimatedDataSize"),
+	TRUNCATED("Truncated"),
+	DATA("Data"),
+	ATTACHMENTS("Attachments"),
+	ATTACHMENT("Attachment"),
+	DISPLAY_NAME("DisplayName"),
+	FILE_REFERENCE("FileReference"),
+	METHOD("Method"), 
+	NATIVE_TYPE("NativeBodyType");
+	
+	private final String name;
 
+	private ASAIRS(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public String asASValue() {
+		return "AirSyncBase:".concat(getName());
+	}
 }
