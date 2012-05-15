@@ -31,12 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.EasyMock.*;
 import org.fest.assertions.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.OpushUser;
@@ -53,7 +56,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
-public class SyncHandlerTest {
+public class ResponseWindowingTest {
 
 	@Test
 	public void processWindowSizeChangesFitTheWindow() {
@@ -65,11 +68,10 @@ public class SyncHandlerTest {
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		SyncHandler syncHandler = 
-				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null, responseWindowingProcessor);
+		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				syncHandler.processWindowSize(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -93,14 +95,12 @@ public class SyncHandlerTest {
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		SyncHandler syncHandler = 
-				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null, responseWindowingProcessor);
 		List<ItemChange> firstCall = 
-				syncHandler.processWindowSize(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> secondCall = 
-				syncHandler.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> thirdCall = 
-				syncHandler.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		

@@ -243,7 +243,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = c.getSyncState().getLastSync();
 		}
 
-		List<ItemChange> changed = processWindowSize(c, delta, bs, processedClientIds);
+		List<ItemChange> changed = responseWindowingProcessor.processWindowSize(c, delta, bs, processedClientIds);
 		syncCollectionResponse.setItemChanges(changed);
 	
 		List<ItemChange> itemChangesDeletion = serializeDeletion(bs, c, processedClientIds, delta);
@@ -277,11 +277,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		unSynchronizedItemCache.storeItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), toKeepForLaterSync);
 		
 		return itemChangesDeletion;
-	}
-
-	@VisibleForTesting List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
-			BackendSession backendSession, Map<String, String> processedClientIds) {
-		return responseWindowingProcessor.processWindowSize(c, delta, backendSession, processedClientIds);
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
