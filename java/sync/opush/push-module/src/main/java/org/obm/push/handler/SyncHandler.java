@@ -242,7 +242,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = c.getSyncState().getLastSync();
 		}
 
-		List<ItemChange> changed = responseWindowingProcessor.processWindowSize(c, delta, bs, processedClientIds);
+		List<ItemChange> changed = responseWindowingProcessor.window(c, delta, bs, processedClientIds);
 		syncCollectionResponse.setItemChanges(changed);
 	
 		List<ItemChange> itemChangesDeletion = serializeDeletion(bs, c, processedClientIds, delta);
