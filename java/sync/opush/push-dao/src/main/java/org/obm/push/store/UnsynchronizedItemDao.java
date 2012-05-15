@@ -42,7 +42,7 @@ public interface UnsynchronizedItemDao {
 	
 	void storeItemsToAdd(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic);
 
-	Set<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId);
+	Collection<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId);
 
 	void clearItemsToAdd(Credentials credentials, Device device, int collectionId);
 	
