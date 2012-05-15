@@ -64,7 +64,6 @@ import org.obm.push.mail.MailException;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPMessage;
@@ -112,8 +111,8 @@ public class ImapMailBoxUtils {
 			List<Address> to = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.TO));
 			List<Address> cc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.CC));
 			List<Address> bcc = buildAddressListFromJavaMailAddress(message.getRecipients(RecipientType.BCC));
-			Address from = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getFrom()) );
-			Address replyTo = Iterables.getOnlyElement( buildAddressListFromJavaMailAddress(message.getReplyTo()) );
+			List<Address> from = buildAddressListFromJavaMailAddress(message.getFrom());
+			List<Address> replyTo = buildAddressListFromJavaMailAddress(message.getReplyTo());
 			
 			return new Envelope.Builder().messageNumber(msgno).
 					date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).

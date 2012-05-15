@@ -36,75 +36,101 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class MSEmailHeader implements Serializable {
 
-	public static class Builer {
-		private MSAddress from;
-		private MSAddress replyTo;
+	public static class Builder {
+		private List<MSAddress> from;
+		private List<MSAddress> replyTo;
 		private List<MSAddress> to;
 		private List<MSAddress> cc;
 		private String subject;
 		private Date date;
 		
-		public Builer from(MSAddress from) {
+		public Builder() {}
+		
+		public Builder from(List<MSAddress> from) {
 			this.from = from;
 			return this;
 		}
 		
-		public Builer replyTo(MSAddress replyTo) {
+		public Builder from(MSAddress... from) {
+			this.from = Lists.newArrayList(from);
+			return this;
+		}
+		
+		public Builder replyTo(List<MSAddress> replyTo) {
 			this.replyTo = replyTo;
 			return this;
 		}
 		
-		public Builer to(List<MSAddress> to) {
+		public Builder replyTo(MSAddress... replyTo) {
+			this.replyTo = Lists.newArrayList(replyTo);
+			return this;
+		}
+		
+		public Builder to(List<MSAddress> to) {
 			this.to = to;
 			return this;
 		}
 		
-		public Builer cc(List<MSAddress> cc) {
+		public Builder to(MSAddress... to) {
+			this.to = Lists.newArrayList(to);
+			return this;
+		}
+		
+		public Builder cc(List<MSAddress> cc) {
 			this.cc = cc;
 			return this;
 		}
 		
-		public Builer subject(String subject) {
+		public Builder cc(MSAddress... cc) {
+			this.cc = Lists.newArrayList(cc);
+			return this;
+		}
+		
+		public Builder subject(String subject) {
 			this.subject = subject;
 			return this;
 		}
 
-		public Builer date(Date date) {
+		public Builder date(Date date) {
 			this.date = date;
 			return this;
 		}
 		
 		public MSEmailHeader build() {
-			if (to == null) {
-				this.to = ImmutableList.<MSAddress>of();
-			}
-			if (cc == null) {
-				this.cc = ImmutableList.<MSAddress>of();
-			}
-			if (from == null) {
-				from = new MSAddress("Empty From", "o-push@linagora.com");
+			if (from == null || from.isEmpty()) {
+				from = Lists.newArrayList(new MSAddress("Empty From", "o-push@linagora.com"));
 			}
 			if (Strings.isNullOrEmpty(subject)) {
 				subject = "[Empty Subject]";
+			}
+			if (to == null) {
+				to = ImmutableList.of();
+			}
+			if (cc == null) {
+				cc = ImmutableList.of();
+			}
+			if (replyTo == null) {
+				replyTo = ImmutableList.of();
 			}
 			return new MSEmailHeader(from, replyTo, to, cc, subject, date);
 		}
 	}
 	
-	private final MSAddress from;
-	private final MSAddress replyTo;
+	private final List<MSAddress> from;
+	private final List<MSAddress> replyTo;
 	private final List<MSAddress> to;
 	private final List<MSAddress> cc;
 	private final String subject;
 	private final Date date;
 	
-	private MSEmailHeader(MSAddress from, MSAddress replyTo, List<MSAddress> to, List<MSAddress> cc, 
+	private MSEmailHeader(List<MSAddress> from, List<MSAddress> replyTo, List<MSAddress> to, List<MSAddress> cc, 
 			String subject, Date date) {
 		
 		super();
@@ -116,11 +142,11 @@ public class MSEmailHeader implements Serializable {
 		this.date = date;
 	}
 	
-	public MSAddress getFrom() {
+	public List<MSAddress> getFrom() {
 		return from;
 	}
 	
-	public MSAddress getReplyTo() {
+	public List<MSAddress> getReplyTo() {
 		return replyTo;
 	}
 	

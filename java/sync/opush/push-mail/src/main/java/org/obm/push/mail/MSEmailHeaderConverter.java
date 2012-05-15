@@ -47,9 +47,9 @@ public class MSEmailHeaderConverter {
 	
 	public MSEmailHeader convertToMSEmailHeader(Envelope envelope) {
 		Preconditions.checkNotNull(envelope);
-		return new MSEmailHeader.Builer()
-		.from(toMSAddress(envelope.getFrom()))
-		.replyTo(toMSAddress(envelope.getReplyTo()))
+		return new MSEmailHeader.Builder()
+		.from(toMSAddresses(envelope.getFrom()))
+		.replyTo(toMSAddresses(envelope.getReplyTo()))
 		.to(toMSAddresses(envelope.getTo()))
 		.cc(toMSAddresses(envelope.getCc()))
 		.subject(envelope.getSubject())

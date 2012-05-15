@@ -82,12 +82,12 @@ public class EmailEncoder implements IDataEncoder {
 			IApplicationData data, SyncCollection c, boolean isResponse) {
 		MSEmail mail = (MSEmail) data;
 
-		DOMUtils.createElementAndText(parent, "Email:To",
+		DOMUtils.createElementAndTextIfNotNull(parent, "Email:To",
 				MSEmailHeaderSerializer.formatMSAddresses(mail.getTo()));
-		if (mail.getCc().size() > 0) {
-			DOMUtils.createElementAndText(parent, "Email:CC",
+		
+		DOMUtils.createElementAndTextIfNotNull(parent, "Email:CC",
 					MSEmailHeaderSerializer.formatMSAddresses(mail.getCc()));
-		}
+		
 		if (mail.getFrom() != null) {
 			DOMUtils.createElementAndText(parent, "Email:From", mail.getFrom().toMSProtocol());
 		} else {

@@ -45,6 +45,8 @@ import org.minig.imap.impl.MailThread;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.push.utils.FileUtils;
 
+import com.google.common.collect.Iterables;
+
 @Ignore("It's necessary to do again all tests")
 public class BasicStoreTests extends LoggedTestCase {
 
@@ -318,7 +320,7 @@ public class BasicStoreTests extends LoggedTestCase {
 		for (UIDEnvelope e : h) {
 			assertNotNull(e.getEnvelope().getSubject());
 			assertNotNull(e.getEnvelope().getSubject());
-			assertNotNull(e.getEnvelope().getFrom().getDisplayName());
+			assertNotNull(Iterables.getOnlyElement(e.getEnvelope().getFrom()).getDisplayName());
 		}
 
 	}

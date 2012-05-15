@@ -125,8 +125,8 @@ public class ImapFetchAPITest {
 		messageNumber(1).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
-		from(new Address("Ad Min admin@opush.test")).
-		replyTo(new Address("Ad Min admin@opush.test")).
+		from(Lists.newArrayList(new Address("Ad Min admin@opush.test"))).
+		replyTo(Lists.newArrayList(new Address("Ad Min admin@opush.test"))).
 		to(Lists.newArrayList(new Address("a@test"), new Address("B b@test"))).
 		cc(Lists.newArrayList(new Address("c@test"))).
 		bcc(Lists.newArrayList(new Address("d@test"))).build();

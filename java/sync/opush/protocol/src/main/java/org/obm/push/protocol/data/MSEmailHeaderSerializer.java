@@ -77,14 +77,12 @@ public class MSEmailHeaderSerializer {
 	
 	private void serializeFrom() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEMAIL.FROM.asASValue(), msEmailHeader.getFrom().toMSProtocol());
+				ASEMAIL.FROM.asASValue(), formatMSAddresses(msEmailHeader.getFrom()));
 	}
 	
 	private void serializeReplyTo() {
-		if (msEmailHeader.getReplyTo() != null) {
-			DOMUtils.createElementAndText(element, 
-					ASEMAIL.REPLY_TO.asASValue(), msEmailHeader.getReplyTo().toMSProtocol());
-		}
+		DOMUtils.createElementAndTextIfNotNull(element, 
+				ASEMAIL.REPLY_TO.asASValue(), formatMSAddresses(msEmailHeader.getReplyTo()));
 	}
 	
 	private void serializeSubject() {

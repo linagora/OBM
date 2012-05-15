@@ -62,8 +62,8 @@ public class MSEmailHeaderConverterTest {
 	@Test
 	public void testMSEmailHeaderConverter() {
 		Envelope envelope = new Envelope.Builder()
-			.from(new Address(FROM))
-			.replyTo(new Address(REPLY_TO))
+			.from(Lists.newArrayList(new Address(FROM)))
+			.replyTo(Lists.newArrayList(new Address(REPLY_TO)))
 			.to(Lists.newArrayList(new Address(TO)))
 			.cc(Lists.newArrayList(new Address(CC)))
 			.subject(SUBJECT)
@@ -72,8 +72,8 @@ public class MSEmailHeaderConverterTest {
 		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
 		Assertions.assertThat(msEmailHeader).isNotNull();
-		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(toMSAddress(FROM));
-		Assertions.assertThat(msEmailHeader.getReplyTo()).isEqualTo(toMSAddress(REPLY_TO));
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(Lists.newArrayList(toMSAddress(FROM)));
+		Assertions.assertThat(msEmailHeader.getReplyTo()).isEqualTo(Lists.newArrayList(toMSAddress(REPLY_TO)));
 		Assertions.assertThat(msEmailHeader.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
 		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
 		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);
@@ -91,7 +91,7 @@ public class MSEmailHeaderConverterTest {
 		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
 		Assertions.assertThat(msEmailHeader).isNotNull();
-		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(new MSAddress("Empty From", "o-push@linagora.com"));
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(Lists.newArrayList(new MSAddress("Empty From", "o-push@linagora.com")));
 		Assertions.assertThat(msEmailHeader.getTo()).isEqualTo(Lists.newArrayList(toMSAddress(TO)));
 		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
 		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);
@@ -101,7 +101,7 @@ public class MSEmailHeaderConverterTest {
 	@Test
 	public void testMSEmailHeaderConverterWithoutTo() {
 		Envelope envelope = new Envelope.Builder()
-		.from(new Address(FROM))
+		.from(Lists.newArrayList(new Address(FROM)))
 		.cc(Lists.newArrayList(new Address(CC)))
 		.subject(SUBJECT)
 		.date(DateUtils.date(DATE)).build();
@@ -109,7 +109,7 @@ public class MSEmailHeaderConverterTest {
 		MSEmailHeader msEmailHeader = msEmailHeaderConverter.convertToMSEmailHeader(envelope);
 		
 		Assertions.assertThat(msEmailHeader).isNotNull();
-		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(toMSAddress(FROM));
+		Assertions.assertThat(msEmailHeader.getFrom()).isEqualTo(Lists.newArrayList(toMSAddress(FROM)));
 		Assertions.assertThat(msEmailHeader.getTo()).isEmpty();
 		Assertions.assertThat(msEmailHeader.getCc()).isEqualTo(Lists.newArrayList(toMSAddress(CC)));
 		Assertions.assertThat(msEmailHeader.getSubject()).isEqualTo(SUBJECT);

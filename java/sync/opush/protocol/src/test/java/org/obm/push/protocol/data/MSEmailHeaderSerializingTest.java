@@ -45,8 +45,6 @@ import org.obm.push.bean.MSEmailHeader;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.google.common.collect.Lists;
-
 @RunWith(SlowFilterRunner.class)
 public class MSEmailHeaderSerializingTest {
 
@@ -64,11 +62,11 @@ public class MSEmailHeaderSerializingTest {
 		Date date = DateUtils.date("2012-02-05T11:46:32");
 		
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builer()
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
 			.from(new MSAddress("from@obm.lng.org"))
 			.replyTo(new MSAddress("from@mydomain.org"))
-			.cc(Lists.newArrayList(new MSAddress("cc@obm.lng.org")))
-			.to(Lists.newArrayList(new MSAddress("to.1@obm.lng.org"), new MSAddress("to.2@obm.lng.org")))
+			.cc(new MSAddress("cc@obm.lng.org"))
+			.to(new MSAddress("to.1@obm.lng.org"), new MSAddress("to.2@obm.lng.org"))
 			.date(date)
 			.subject("Subject").build();
 		
@@ -86,7 +84,7 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeFrom() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builer()
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
 			.from(new MSAddress("from@obm.lng.org")).build();
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
@@ -97,7 +95,7 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeEmptyFrom() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builer().build();
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
@@ -107,7 +105,7 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeEmptySubject() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builer().build();
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
@@ -117,7 +115,7 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeEmptyField() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builer().build();
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		

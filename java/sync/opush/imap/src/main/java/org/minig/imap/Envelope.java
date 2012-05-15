@@ -35,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 public class Envelope {
 
@@ -46,15 +46,12 @@ public class Envelope {
 		private List<Address> to;
 		private List<Address> cc;
 		private List<Address> bcc;
-		private Address from;
+		private List<Address> from;
 		private String messageId;
-		private Address replyTo;
+		private List<Address> replyTo;
 		
 		public Builder() {
 			this.msgno = -1;
-			this.to = Lists.<Address>newArrayList();
-			this.bcc = Lists.<Address>newArrayList();
-			this.cc = Lists.<Address>newArrayList();
 		}
 		
 		public Builder messageNumber(int msgno) {
@@ -87,7 +84,7 @@ public class Envelope {
 			return this;
 		}
 		
-		public Builder from(Address from) {
+		public Builder from(List<Address> from) {
 			this.from = from;
 			return this;
 		}
@@ -97,12 +94,27 @@ public class Envelope {
 			return this;
 		}
 		
-		public Builder replyTo(Address replyTo) {
+		public Builder replyTo(List<Address> replyTo) {
 			this.replyTo = replyTo;
 			return this;
 		}
 		
 		public Envelope build() {
+			if (to == null) {
+				this.to = ImmutableList.<Address>of();
+			}
+			if (cc == null) {
+				this.cc = ImmutableList.<Address>of();
+			}
+			if (from == null) {
+				this.from = ImmutableList.<Address>of();
+			}
+			if (bcc == null) {
+				this.bcc = ImmutableList.<Address>of();
+			}
+			if (replyTo == null) {
+				this.replyTo = ImmutableList.<Address>of();
+			}
 			return new Envelope(this.msgno, this.date, this.subject, this.messageId,  
 					this.from, this.to, this.cc, this.bcc, this.replyTo);
 		}
@@ -112,14 +124,14 @@ public class Envelope {
 	private final Date date;
 	private final String subject;
 	private final String messageId;
-	private final Address from;
+	private final List<Address> from;
 	private final List<Address> to;
 	private final List<Address> cc;
 	private final List<Address> bcc;
-	private final Address replyTo;
+	private final List<Address> replyTo;
 
 	private Envelope(int msgno, Date date, String subject, String messageId, 
-			Address from, List<Address> to, List<Address> cc, List<Address> bcc, Address replyTo) {
+			List<Address> from, List<Address> to, List<Address> cc, List<Address> bcc, List<Address> replyTo) {
 		
 		super();
 		this.msgno = msgno;
@@ -153,7 +165,7 @@ public class Envelope {
 		return cc;
 	}
 
-	public Address getFrom() {
+	public List<Address> getFrom() {
 		return from;
 	}
 
@@ -161,7 +173,7 @@ public class Envelope {
 		return messageId;
 	}
 
-	public Address getReplyTo() {
+	public List<Address> getReplyTo() {
 		return replyTo;
 	}
 

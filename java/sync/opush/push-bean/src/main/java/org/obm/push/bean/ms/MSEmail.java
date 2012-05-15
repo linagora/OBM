@@ -187,7 +187,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.answered = answered;
 	}
 
-	public MSAddress getFrom() {
+	public List<MSAddress> getFrom() {
 		return header.getFrom();
 	}
 
