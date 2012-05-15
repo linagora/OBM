@@ -31,9 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
@@ -42,6 +43,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.collection.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +55,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ResponseWindowingProcessor {
+public class ResponseWindowingService {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	
 	@Inject
-	@VisibleForTesting ResponseWindowingProcessor(UnsynchronizedItemDao unSynchronizedItemCache) {
+	@VisibleForTesting ResponseWindowingService(UnsynchronizedItemDao unSynchronizedItemCache) {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
@@ -108,9 +110,14 @@ public class ResponseWindowingProcessor {
 	}
 
 	private List<ItemChange> changesFromServer(List<ItemChange> changes, List<ItemChange> itemsChangedByClient) {
-		List<ItemChange> changesFromServer = Lists.newArrayList(changes);
-		changesFromServer.removeAll(itemsChangedByClient);
-		return changesFromServer;
+		return Lists.newArrayList(
+				Sets.difference(changes, itemsChangedByClient, new Comparator<ItemChange>() {
+					@Override
+					public int compare(ItemChange o1, ItemChange o2) {
+						return o1.getServerId().compareTo(o2.getServerId());
+					}
+				})
+			);
 	}
 
 	private List<ItemChange> changedFromClient(List<ItemChange> changes, Map<String, String> processedClientIds) {
@@ -153,10 +160,10 @@ public class ResponseWindowingProcessor {
 		return ImmutableList.<ItemChange>of();
 	}
 
-	private Set<ItemChange> popUnsynchronizedItems(
+	private Collection<ItemChange> popUnsynchronizedItems(
 			final Credentials credentials, final Device device,
 			final Integer collectionId) {
-		Set<ItemChange> unsynchronizedItems = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
+		Collection<ItemChange> unsynchronizedItems = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
 		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
 		return unsynchronizedItems;
 	}
