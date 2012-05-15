@@ -73,7 +73,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -98,11 +98,11 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> firstCall = 
-				responseWindowingProcessor.window(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> secondCall = 
-				responseWindowingProcessor.window(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> thirdCall = 
-				responseWindowingProcessor.window(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -122,7 +122,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -140,7 +140,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -159,7 +159,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(
+				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltasWithOffset(2, 3), 
 						user.backendSession, changesToMap(deltasWithOffset(2, 3)));
 		
@@ -179,13 +179,33 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(
+				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltas(5),
 						user.backendSession, changesToMap(deltas(5)));
 		
 		verify(unsynchronizedItemDao);
 		
 		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
+	}
+	
+	@Test
+	public void windowDeletionsFitTheWindow() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
+		replay(unsynchronizedItemDao);
+		
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		
+		DataDelta deltas = deletions(2);
+		List<ItemChange> actual = 
+				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+		
+		verify(unsynchronizedItemDao);
+				
+		Assertions.assertThat(actual).isEqualTo(deltas.getDeletions());
 	}
 	
 	private Map<String, String> changesToMap(DataDelta deltasWithOffset) {
@@ -198,6 +218,17 @@ public class ResponseWindowingTest {
 
 	private DataDelta emptyDelta() {
 		return new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), DateUtils.date("2012-01-01"));
+	}
+
+	private DataDelta deletions(int nbDeletions) {
+		return deletionsWithOffset(nbDeletions, 0);
+	}
+	
+	private DataDelta deletionsWithOffset(int nbDeletions, int offset) {
+		return new DataDelta(
+				buildItemChangeList(0, "addServerId", 0), 
+				buildItemChangeList(nbDeletions, "delServerId", offset), 
+				DateUtils.date("2012-01-01"));
 	}
 
 	private DataDelta deltas(int nbAdditions) {
