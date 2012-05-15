@@ -29,50 +29,31 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.minig.imap;
 
-import java.util.Collection;
+import org.fest.assertions.api.Assertions;
+import org.junit.Test;
 
-import org.minig.imap.EmailView;
-import org.minig.imap.EmailView.Builder;
-import org.minig.imap.Flag;
-import org.minig.imap.UIDEnvelope;
-import org.obm.push.bean.BackendSession;
 
-public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
+public class EmailOnlyPartTest {
 
-	private final PrivateMailboxService privateMailboxService;
+
+	@Test(expected=IllegalStateException.class)
+	public void testUidDefault() {
+		new EmailView.Builder().build();
+	}
 	
-	private final BackendSession bs;
-	private final String collectionName;
-	private final long messageUidToFetch;
-
-	public EmailViewPartsFetcherImpl(
-			PrivateMailboxService privateMailboxService,
-			BackendSession bs, String collectionName, long messageUidToFetch) {
-		this.privateMailboxService = privateMailboxService;
-		this.bs = bs;
-		this.collectionName = collectionName;
-		this.messageUidToFetch = messageUidToFetch;
-	}
-
-	public EmailView fetch() throws MailException, ImapMessageNotFoundException {
-		Builder emailViewBuilder = new EmailView.Builder();
-		emailViewBuilder.uid(messageUidToFetch);
+	@Test
+	public void testUid() {
+		EmailView emailOnlyPart = new EmailView.Builder().uid(155).build();
 		
-		fetchFlags(emailViewBuilder);
-		fetchEnvelope(emailViewBuilder);
+		Assertions.assertThat(emailOnlyPart.getUid()).isEqualTo(155);
+	}
+	
+	@Test
+	public void testUidNegativeValue() {
+		EmailView emailOnlyPart = new EmailView.Builder().uid(-115).build();
 		
-		return emailViewBuilder.build();
-	}
-
-	private void fetchFlags(Builder emailViewBuilder) throws MailException {
-		Collection<Flag> emailFlags = privateMailboxService.fetchFlags(bs, collectionName, messageUidToFetch);
-		emailViewBuilder.flags(emailFlags);
-	}
-
-	private void fetchEnvelope(Builder emailViewBuilder)throws MailException {
-		UIDEnvelope envelope = privateMailboxService.fetchEnvelope(bs, collectionName, messageUidToFetch);
-		emailViewBuilder.envelope(envelope.getEnvelope());
+		Assertions.assertThat(emailOnlyPart.getUid()).isEqualTo(-115);
 	}
 }

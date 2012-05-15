@@ -60,6 +60,8 @@ import com.google.common.collect.ImmutableList.Builder;
 public class EmailViewPartsFetcherImplTest {
 
 	public static class MessageFixture {
+		long uid = 1l;
+		
 		boolean answered = false;
 		boolean read = false;
 		boolean starred = false;
@@ -73,7 +75,6 @@ public class EmailViewPartsFetcherImplTest {
 	
 	private MessageFixture messageFixture;
 	private String messageCollectionName;
-	private long messageUid;
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
@@ -88,7 +89,6 @@ public class EmailViewPartsFetcherImplTest {
 		
 		messageFixture = new MessageFixture();
 		messageCollectionName = IMAP_INBOX_NAME;
-		messageUid = 1l;
 	}
 	
 	@Test
@@ -293,6 +293,15 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailView.getDate()).isEqualTo(DateUtils.date("2004-12-14T22:00:00"));
 	}
 	
+	@Test
+	public void testUid() throws Exception {
+		messageFixture.uid = 165l; 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getUid()).isEqualTo(165l);
+	}
+	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
 		ImapMailboxService mailboxService = createStrictMock(ImapMailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
@@ -312,7 +321,7 @@ public class EmailViewPartsFetcherImplTest {
 		if (messageFixture.starred) {
 			flagsListBuilder.add(Flag.FLAGGED);
 		}
-		expect(mailboxService.fetchFlags(bs, messageCollectionName, messageUid))
+		expect(mailboxService.fetchFlags(bs, messageCollectionName, messageFixture.uid))
 				.andReturn(flagsListBuilder.build()).once();
 	}
 
@@ -325,14 +334,14 @@ public class EmailViewPartsFetcherImplTest {
 			.date(messageFixture.date)
 			.build();
 		
-		expect(mailboxService.fetchEnvelope(bs, messageCollectionName, messageUid))
-			.andReturn(new UIDEnvelope(messageUid, envelope)).once();
+		expect(mailboxService.fetchEnvelope(bs, messageCollectionName, messageFixture.uid))
+			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
 	}
 
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
 		return new EmailViewPartsFetcherImpl(
 				messageFixtureToMailboxServiceMock(),
-				bs, messageCollectionName, messageUid);
+				bs, messageCollectionName, messageFixture.uid);
 	}
 
 	public Address newEmptyAddress() {

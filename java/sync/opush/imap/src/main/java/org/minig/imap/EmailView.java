@@ -38,15 +38,18 @@ import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 public class EmailView {
 
+	private final long uid;
 	private final Collection<Flag> flags;
 	private final Envelope envelope;
 
 	public static class Builder {
 
+		private Long uid;
 		private Collection<Flag> flags;
 		private Envelope envelope;
 		
@@ -60,15 +63,26 @@ public class EmailView {
 			return this;
 		}
 		
+		public Builder uid(long uid) {
+			this.uid = uid;
+			return this;
+		}
+		
 		public EmailView build() {
-			return new EmailView(flags, envelope);
+			Preconditions.checkState(uid != null, "The uid is required");
+			return new EmailView(uid, flags, envelope);
 		}
 		
 	}
 	
-	private EmailView(Collection<Flag> flags, Envelope envelope) {
+	private EmailView(long uid, Collection<Flag> flags, Envelope envelope) {
+		this.uid = uid;
 		this.flags = flags;
 		this.envelope = envelope;
+	}
+
+	public long getUid() {
+		return uid;
 	}
 
 	public Collection<Flag> getFlags() {
