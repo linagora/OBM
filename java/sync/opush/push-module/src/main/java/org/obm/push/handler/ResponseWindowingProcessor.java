@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,6 +49,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -73,28 +74,20 @@ public class ResponseWindowingProcessor {
 		final Integer collectionId = c.getCollectionId();
 		final Integer windowSize = c.getWindowSize();	
 		
-		final List<ItemChange> changed = new ArrayList<ItemChange>();
+		List<ItemChange> changes = listItems(delta, credentials, device, collectionId);
 		
-		
-		changed.addAll(unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId));
-		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
-		
-		if (delta != null) {
-			changed.addAll(delta.getChanges());
+		if (changesFitWindow(windowSize, changes)) {
+			return changes;
 		}
 		
-		if (changed.size() <= windowSize) {
-			return changed;
-		}
-		
-		logger.info("should send {} change(s)", changed.size());
-		int changeItem = changed.size() - c.getWindowSize();
+		logger.info("should send {} change(s)", changes.size());
+		int changeItem = changes.size() - c.getWindowSize();
 		logger.info("WindowsSize value is {} , {} changes will not be sent", 
 				new Object[]{ c.getWindowSize(), (changeItem < 0 ? 0 : changeItem) });
 
 		final Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
 		// Find changes ask by the device
-		for (Iterator<ItemChange> it = changed.iterator(); it.hasNext();) {
+		for (Iterator<ItemChange> it = changes.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
 			if (processedClientIds.containsKey(ic.getServerId())) {
 				changeByMobile.add(ic);
@@ -107,18 +100,46 @@ public class ResponseWindowingProcessor {
 
 		LinkedList<ItemChange> toKeepForLaterSync = Lists.newLinkedList();
 		
-		int changedSize = changed.size();
+		int changedSize = changes.size();
 		for (int i = windowSize; i < changedSize; i++) {
-			ItemChange ic = changed.get(changed.size() - 1);
+			ItemChange ic = changes.get(changes.size() - 1);
 			toKeepForLaterSync.addFirst(ic);
-			changed.remove(ic);
+			changes.remove(ic);
 		}
 
 		unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, toKeepForLaterSync);
-		changed.addAll(changeByMobile);
+		changes.addAll(changeByMobile);
 		c.setMoreAvailable(true);
 		
-		return changed;
+		return changes;
+	}
+
+	private boolean changesFitWindow(final Integer windowSize,
+			List<ItemChange> changes) {
+		return changes.size() <= windowSize;
+	}
+
+	private List<ItemChange> listItems(DataDelta delta, 	Credentials credentials, Device device, Integer collectionId) {
+		
+		return Lists.newArrayList(
+				Iterables.concat(
+						popUnsynchronizedItems(credentials, device, collectionId),
+						getNewItems(delta)));
+	}
+
+	private List<ItemChange> getNewItems(DataDelta delta) {
+		if (delta != null) {
+			return delta.getChanges();
+		}
+		return ImmutableList.<ItemChange>of();
+	}
+
+	private Set<ItemChange> popUnsynchronizedItems(
+			final Credentials credentials, final Device device,
+			final Integer collectionId) {
+		Set<ItemChange> unsynchronizedItems = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
+		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
+		return unsynchronizedItems;
 	}
 
 	
