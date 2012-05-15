@@ -29,46 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.push.mail;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
-import org.obm.push.mail.MimeAddress;
-import org.junit.runner.RunWith;
+import org.minig.imap.EmailView;
 
-import org.obm.sync.bean.EqualsVerifierUtils;
+public interface EmailViewPartsFetcher {
 
-import com.google.common.collect.ImmutableList;
-
-import org.obm.filter.SlowFilterRunner;
-
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
-					.add(EmailView.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
-	}
+	EmailView fetch() throws MailException, ImapMessageNotFoundException;
 	
 }

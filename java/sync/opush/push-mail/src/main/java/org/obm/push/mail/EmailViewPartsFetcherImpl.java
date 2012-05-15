@@ -29,46 +29,44 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.push.mail;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
-import org.obm.push.mail.MimeAddress;
-import org.junit.runner.RunWith;
+import java.util.Collection;
 
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.minig.imap.EmailView;
+import org.minig.imap.EmailView.Builder;
+import org.minig.imap.Flag;
+import org.obm.push.bean.BackendSession;
 
-import com.google.common.collect.ImmutableList;
+public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
-import org.obm.filter.SlowFilterRunner;
-
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	private final PrivateMailboxService privateMailboxService;
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	private final BackendSession bs;
+	private final String collectionName;
+	private final long messageUidToFetch;
+
+	public EmailViewPartsFetcherImpl(
+			PrivateMailboxService privateMailboxService,
+			BackendSession bs, String collectionName, long messageUidToFetch) {
+		this.privateMailboxService = privateMailboxService;
+		this.bs = bs;
+		this.collectionName = collectionName;
+		this.messageUidToFetch = messageUidToFetch;
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
-					.add(EmailView.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	@Override
+	public EmailView fetch() throws MailException, ImapMessageNotFoundException {
+		Builder emailViewBuilder = new EmailView.Builder();
+		
+		fetchFlags(emailViewBuilder);
+		
+		return emailViewBuilder.build();
 	}
-	
+
+	private void fetchFlags(Builder emailViewBuilder) throws MailException {
+		Collection<Flag> emailFlags = privateMailboxService.fetchFlags(bs, collectionName, messageUidToFetch);
+		emailViewBuilder.flags(emailFlags);
+	}
+
 }

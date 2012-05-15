@@ -31,44 +31,61 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
-import org.obm.push.mail.MimeAddress;
-import org.junit.runner.RunWith;
+import java.util.Collection;
 
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
-import org.obm.filter.SlowFilterRunner;
+public class EmailView {
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+	private final Collection<Flag> flags;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public static class Builder {
+
+		private Collection<Flag> flags;
+		
+		public Builder flags(Collection<Flag> flags) {
+			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
+			return this;
+		}
+		
+		public EmailView build() {
+			return new EmailView(flags);
+		}
+		
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
-					.add(EmailView.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	private EmailView(Collection<Flag> flags) {
+		this.flags = flags;
 	}
 	
+
+	public Collection<Flag> getFlags() {
+		return flags;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("flags", flags)
+			.toString();
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(flags);
+	}
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof EmailView) {
+			EmailView other = (EmailView) obj;
+			return new EqualsBuilder()
+				.append(flags, other.flags)
+				.isEquals();
+		}
+		return false;
+	}
 }
