@@ -31,17 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
+
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.minig.imap.Address;
 import org.minig.imap.EmailView;
+import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
+import org.minig.imap.UIDEnvelope;
+import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
@@ -58,6 +63,12 @@ public class EmailViewPartsFetcherImplTest {
 		boolean answered = false;
 		boolean read = false;
 		boolean starred = false;
+		
+		List<Address> from = ImmutableList.<Address>of(new Address("from@domain.test")); 
+		List<Address> to = ImmutableList.<Address>of(new Address("to@domain.test")); 
+		List<Address> cc = ImmutableList.<Address>of(new Address("cc@domain.test"));
+		String subject = "a subject";
+		Date date = DateUtils.date("2004-12-14T22:00:00");
 	}
 	
 	private MessageFixture messageFixture;
@@ -133,10 +144,159 @@ public class EmailViewPartsFetcherImplTest {
 
 		assertThat(emailView.getFlags()).doesNotContain(Flag.FLAGGED);
 	}
+	
+	@Test
+	public void testHeaderFromNull() throws Exception {
+		messageFixture.from = null;
 
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getFrom()).isEmpty();
+	}
+
+	@Test
+	public void testHeaderFromEmpty() throws Exception {
+		messageFixture.from = ImmutableList.<Address>of(newEmptyAddress());
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getFrom()).containsOnly(newEmptyAddress());
+	}
+	
+	@Test
+	public void testHeaderFrom() throws Exception {
+		messageFixture.from = ImmutableList.<Address>of(new Address("from@domain.test")); 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getFrom()).containsOnly(new Address("from@domain.test"));
+	}
+	
+	@Test
+	public void testHeaderToNull() throws Exception {
+		messageFixture.to = null;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getTo()).isEmpty();
+	}
+
+	@Test
+	public void testHeaderToEmpty() throws Exception {
+		messageFixture.to = ImmutableList.<Address>of(newEmptyAddress());
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getTo()).containsOnly(newEmptyAddress());
+	}
+	
+	@Test
+	public void testHeaderToSingle() throws Exception {
+		messageFixture.to = ImmutableList.<Address>of(new Address("to@domain.test")); 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getTo()).containsOnly(new Address("to@domain.test"));
+	}
+	
+	@Test
+	public void testHeaderToMultiple() throws Exception {
+		messageFixture.to = ImmutableList.<Address>of(
+				new Address("to@domain.test"), new Address("to2@domain.test")); 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getTo()).containsOnly(
+				new Address("to@domain.test"), new Address("to2@domain.test"));
+	}
+	
+	@Test
+	public void testHeaderCcNull() throws Exception {
+		messageFixture.cc = null;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getCc()).isEmpty();
+	}
+
+	@Test
+	public void testHeaderCcEmpty() throws Exception {
+		messageFixture.cc = ImmutableList.<Address>of(newEmptyAddress());
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getCc()).containsOnly(newEmptyAddress());
+	}
+	
+	@Test
+	public void testHeaderCcSingle() throws Exception {
+		messageFixture.cc = ImmutableList.<Address>of(new Address("cc@domain.test")); 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getCc()).containsOnly(new Address("cc@domain.test"));
+	}
+	
+	@Test
+	public void testHeaderCcMultiple() throws Exception {
+		messageFixture.cc = ImmutableList.<Address>of(
+				new Address("cc@domain.test"), new Address("cc2@domain.test")); 
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getCc()).containsOnly(
+				new Address("cc@domain.test"), new Address("cc2@domain.test"));
+	}
+	
+	@Test
+	public void testHeaderSubjectNull() throws Exception {
+		messageFixture.subject = null;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getSubject()).isNull();
+	}
+	
+	@Test
+	public void testHeaderSubjectEmpty() throws Exception {
+		messageFixture.subject = "";
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getSubject()).isEmpty();
+	}
+	
+	@Test
+	public void testHeaderSubject() throws Exception {
+		messageFixture.subject = "a subject";
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getSubject()).isEqualTo("a subject");
+	}
+	
+	@Test
+	public void testHeaderDateNull() throws Exception {
+		messageFixture.date = null;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getDate()).isNull();
+	}
+	
+	@Test
+	public void testHeaderDate() throws Exception {
+		messageFixture.date = DateUtils.date("2004-12-14T22:00:00");
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getDate()).isEqualTo(DateUtils.date("2004-12-14T22:00:00"));
+	}
+	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
 		ImapMailboxService mailboxService = createStrictMock(ImapMailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
+		mockMailboxServiceEnvelope(mailboxService);
 		replay(mailboxService);
 		return mailboxService;
 	}
@@ -155,10 +315,27 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mailboxService.fetchFlags(bs, messageCollectionName, messageUid))
 				.andReturn(flagsListBuilder.build()).once();
 	}
-	
+
+	private void mockMailboxServiceEnvelope(ImapMailboxService mailboxService) throws MailException {
+		Envelope envelope = new Envelope.Builder()
+			.from(messageFixture.from)
+			.to(messageFixture.to)
+			.cc(messageFixture.cc)
+			.subject(messageFixture.subject)
+			.date(messageFixture.date)
+			.build();
+		
+		expect(mailboxService.fetchEnvelope(bs, messageCollectionName, messageUid))
+			.andReturn(new UIDEnvelope(messageUid, envelope)).once();
+	}
+
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
 		return new EmailViewPartsFetcherImpl(
-				messageFixtureToMailboxServiceMock(), 
+				messageFixtureToMailboxServiceMock(),
 				bs, messageCollectionName, messageUid);
+	}
+
+	public Address newEmptyAddress() {
+		return new Address("");
 	}
 }

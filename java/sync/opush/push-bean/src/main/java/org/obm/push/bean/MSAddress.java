@@ -41,14 +41,14 @@ public class MSAddress implements Serializable {
 	private final String mail;
 	private final String displayName;
 
+	public MSAddress(String mail) {
+		this(null, mail);
+	}
+	
 	public MSAddress(String displayName, String mail) {
 		super();
 		this.displayName = displayName;
 		this.mail = mail;
-	}
-
-	public MSAddress(String mail) {
-		this(null, mail);
 	}
 	
 	public String getMail() {

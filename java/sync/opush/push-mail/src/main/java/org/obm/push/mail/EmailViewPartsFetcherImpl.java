@@ -36,6 +36,7 @@ import java.util.Collection;
 import org.minig.imap.EmailView;
 import org.minig.imap.EmailView.Builder;
 import org.minig.imap.Flag;
+import org.minig.imap.UIDEnvelope;
 import org.obm.push.bean.BackendSession;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
@@ -54,12 +55,13 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		this.collectionName = collectionName;
 		this.messageUidToFetch = messageUidToFetch;
 	}
-	
+
 	@Override
 	public EmailView fetch() throws MailException, ImapMessageNotFoundException {
 		Builder emailViewBuilder = new EmailView.Builder();
 		
 		fetchFlags(emailViewBuilder);
+		fetchEnvelope(emailViewBuilder);
 		
 		return emailViewBuilder.build();
 	}
@@ -69,4 +71,8 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.flags(emailFlags);
 	}
 
+	private void fetchEnvelope(Builder emailViewBuilder)throws MailException {
+		UIDEnvelope envelope = privateMailboxService.fetchEnvelope(bs, collectionName, messageUidToFetch);
+		emailViewBuilder.envelope(envelope.getEnvelope());
+	}
 }

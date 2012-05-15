@@ -47,7 +47,7 @@ public class EmailHeaders implements Iterable<EmailHeader> {
 		public Builder() {
 			headers = Lists.newArrayList();
 		}
-		
+
 		public EmailHeaders.Builder header(EmailHeader header) {
 			headers.add(header);
 			return this;

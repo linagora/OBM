@@ -32,6 +32,8 @@
 package org.minig.imap;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 
@@ -41,29 +43,60 @@ import com.google.common.collect.ImmutableSet;
 public class EmailView {
 
 	private final Collection<Flag> flags;
+	private final Envelope envelope;
 
 	public static class Builder {
 
 		private Collection<Flag> flags;
+		private Envelope envelope;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
 			return this;
 		}
 		
+		public Builder envelope(Envelope envelope) {
+			this.envelope = envelope;
+			return this;
+		}
+		
 		public EmailView build() {
-			return new EmailView(flags);
+			return new EmailView(flags, envelope);
 		}
 		
 	}
 	
-	private EmailView(Collection<Flag> flags) {
+	private EmailView(Collection<Flag> flags, Envelope envelope) {
 		this.flags = flags;
+		this.envelope = envelope;
 	}
-	
 
 	public Collection<Flag> getFlags() {
 		return flags;
+	}
+
+	public Envelope getHeaders() {
+		return envelope;
+	}
+	
+	public List<Address> getFrom() {
+		return envelope.getFrom();
+	}
+
+	public List<Address> getTo() {
+		return envelope.getTo();
+	}
+
+	public List<Address> getCc() {
+		return envelope.getCc();
+	}
+
+	public String getSubject() {
+		return envelope.getSubject();
+	}
+
+	public Date getDate() {
+		return envelope.getDate();
 	}
 
 	@Override
