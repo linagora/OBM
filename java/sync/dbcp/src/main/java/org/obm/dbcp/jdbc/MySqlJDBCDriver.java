@@ -51,7 +51,6 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 		b.append("&relaxAutocommit=true");
 		b.append("&jdbcCompliantTruncation=false");
 		b.append("&interactiveClient=true");
-		b.append("&serverTimezone=GMT");
 		b.append("&useGmtMillisForDatetime=true");
 		b.append("&useUnicode=true");
 		b.append("&characterEncoding=utf8");
@@ -91,6 +90,11 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 	@Override
 	public boolean readOnlySupported() {
 		return false;
+	}
+
+	@Override
+	public String getGMTTimezoneQuery() {
+		return "SET time_zone='+00:00'";
 	}
 
 }

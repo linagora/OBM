@@ -45,4 +45,6 @@ public interface IJDBCDriver {
 	Map<String,String> getDriverProperties(String login, String password, String dbName, String dbHost);
 
 	boolean readOnlySupported();
+
+	String getGMTTimezoneQuery();
 }

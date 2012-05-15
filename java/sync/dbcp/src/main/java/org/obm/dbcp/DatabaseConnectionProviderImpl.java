@@ -32,6 +32,7 @@
 package org.obm.dbcp;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -127,7 +128,13 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	public Connection getConnection() throws SQLException {
 		Connection connection = ds.getConnection();
 		setConnectionReadOnlyIfNecessary(connection);
+		setTimeZoneToUTC(connection);
 		return connection;
+	}
+
+	private void setTimeZoneToUTC(Connection connection) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement(cf.getGMTTimezoneQuery());
+		ps.executeUpdate();
 	}
 
 	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {

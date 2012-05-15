@@ -69,4 +69,9 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 	public boolean readOnlySupported() {
 		return true;
 	}
+
+	@Override
+	public String getGMTTimezoneQuery() {
+		return "SET LOCAL TIME ZONE 'GMT'";
+	}
 }
