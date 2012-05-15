@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.IContentsExporter;
@@ -242,40 +241,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = c.getSyncState().getLastSync();
 		}
 
-		List<ItemChange> changed = responseWindowingProcessor.window(c, delta, bs, processedClientIds);
+		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, bs, processedClientIds);
 		syncCollectionResponse.setItemChanges(changed);
 	
-		List<ItemChange> itemChangesDeletion = serializeDeletion(bs, c, processedClientIds, delta);
+		List<ItemChange> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, bs, processedClientIds);
 		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
 		return lastSync;
-	}
-
-	private List<ItemChange> serializeDeletion(BackendSession bs, SyncCollection c, Map<String, String> processedClientIds, 
-			DataDelta delta) {
-		
-		Set<ItemChange> unSyncdeleted = unSynchronizedItemCache.listItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
-		
-		if (delta != null && delta.getDeletions() != null && unSyncdeleted != null) {
-			delta.getDeletions().addAll(unSyncdeleted);
-			unSynchronizedItemCache.clearItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId());
-		}
-
-		ArrayList<ItemChange> toKeepForLaterSync = new ArrayList<ItemChange>();
-		
-		final List<ItemChange> itemChangesDeletion = new ArrayList<ItemChange>();
-		if (delta != null && delta.getDeletions() != null) {
-			for (ItemChange ic: delta.getDeletions()) {
-				if (processedClientIds.containsKey(ic.getServerId())) {
-					toKeepForLaterSync.add(ic);
-				} else {
-					itemChangesDeletion.add(ic);
-				}
-			}
-		}
-		unSynchronizedItemCache.storeItemsToRemove(bs.getCredentials(), bs.getDevice(), c.getCollectionId(), toKeepForLaterSync);
-		
-		return itemChangesDeletion;
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
