@@ -121,15 +121,19 @@ public class ItemChange implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(serverId, parentId);
+		return Objects.hashCode(serverId, parentId, displayName, itemType, isNew, data);
 	}
-
+	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof ItemChange) {
 			ItemChange that = (ItemChange) object;
 			return Objects.equal(this.serverId, that.serverId)
-				&& Objects.equal(this.parentId, that.parentId);
+				&& Objects.equal(this.parentId, that.parentId)
+				&& Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.itemType, that.itemType)
+				&& Objects.equal(this.isNew, that.isNew)
+				&& Objects.equal(this.data, that.data);
 		}
 		return false;
 	}
