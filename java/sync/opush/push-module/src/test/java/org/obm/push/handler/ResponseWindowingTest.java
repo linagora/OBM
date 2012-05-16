@@ -247,7 +247,7 @@ public class ResponseWindowingTest {
 		for (int i = 0; i < nbChanges; ++i) {
 			changes.add(
 					new ItemChangeBuilder()
-						.withServerId(serverIdPrefix + (i + offset))
+						.serverId(serverIdPrefix + (i + offset))
 						.build()
 				);
 		}
