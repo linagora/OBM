@@ -33,23 +33,36 @@ package org.obm.push.mail;
 
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
+import static org.easymock.EasyMock.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
-import org.easymock.EasyMock;
+import org.fest.assertions.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderType;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -60,46 +73,88 @@ import org.obm.sync.services.ICalendar;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 
-
-import org.obm.filter.SlowFilterRunner;
-
 @RunWith(SlowFilterRunner.class)
 public class MailBackendTest {
+
+	private User user;
+	private Device device;
+	private BackendSession bs;
+
+	@Before
+	public void setUp() {
+		user = Factory.create().createUser("test@test", "test@domain", "displayName");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		bs = new BackendSession(new Credentials(user, "password"), "noCommand", device, null);
+	}
 	
 	@Test
 	public void testSendEmailWithBigMail()
 			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException, AuthFault {
-		final User user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		final String password = "pass";
 		final AccessToken at = new AccessToken(1, "o-push");
 		
-		MailboxService emailManager = EasyMock.createMock(MailboxService.class);
-		ICalendar calendarClient = EasyMock.createMock(ICalendar.class);
-		BackendSession backendSession = EasyMock.createMock(BackendSession.class);
-		LoginService login = EasyMock.createMock(LoginService.class);
+		MailboxService emailManager = createMock(MailboxService.class);
+		ICalendar calendarClient = createMock(ICalendar.class);
+		BackendSession backendSession = createMock(BackendSession.class);
+		LoginService login = createMock(LoginService.class);
 		
-		EasyMock.expect(backendSession.getUser()).andReturn(user).once();
-		EasyMock.expect(backendSession.getPassword()).andReturn(password).once();
+		expect(backendSession.getUser()).andReturn(user).once();
+		expect(backendSession.getPassword()).andReturn(password).once();
 
-		EasyMock.expect(login.login(user.getLoginAtDomain(), password))
-				.andReturn(at).once();
-		EasyMock.expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
+		expect(login.login(user.getLoginAtDomain(), password)).andReturn(at).once();
+		expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
 		login.logout(at);
-		EasyMock.expectLastCall().once();
+		expectLastCall().once();
 		Set<Address> addrs = Sets.newHashSet();
-		emailManager.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class), EasyMock.anyBoolean());
-		EasyMock.expectLastCall().once();
+		emailManager.sendEmail(anyObject(BackendSession.class), anyObject(Address.class), 
+				anyObject(addrs.getClass()), anyObject(addrs.getClass()), anyObject(addrs.getClass()), 
+				anyObject(InputStream.class), anyBoolean());
+		
+		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(
 				emailManager, calendarClient, null, null, 
 				login, new Mime4jUtils(), mockOpushConfigurationService(), null, null);
 
-		EasyMock.replay(emailManager, calendarClient, backendSession, login);
+		replay(emailManager, calendarClient, backendSession, login);
 
 		InputStream emailStream = loadEmail("bigEml.eml");
 		mailBackend.sendEmail(backendSession, ByteStreams.toByteArray(emailStream), true);
 		
-		EasyMock.verify(emailManager, calendarClient, backendSession, login);
+		verify(emailManager, calendarClient, backendSession, login);
 	}
 	
+	@Test
+	public void hierarchyAlwaysContainsBaseFolders() throws DaoException, CollectionNotFoundException {
+
+		MappingService mappingService = createStrictMock(MappingService.class);
+		expect(mappingService.getCollectionIdFor(device, "pathForInbox")).andReturn(1);
+		expect(mappingService.collectionIdToString(1)).andReturn("collection1");
+		expect(mappingService.getCollectionIdFor(device, "pathForDraft")).andReturn(2);
+		expect(mappingService.collectionIdToString(2)).andReturn("collection2");
+		expect(mappingService.getCollectionIdFor(device, "pathForSent")).andReturn(3);
+		expect(mappingService.collectionIdToString(3)).andReturn("collection3");
+		expect(mappingService.getCollectionIdFor(device, "pathForTrash")).andReturn(4);
+		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
+		
+		CollectionPathHelper collectionPathHelper = createStrictMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "INBOX")).andReturn("pathForInbox");
+		expect(collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "Drafts")).andReturn("pathForDraft");
+		expect(collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "Sent")).andReturn("pathForSent");
+		expect(collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, "Trash")).andReturn("pathForTrash");
+		
+		replay(collectionPathHelper, mappingService);
+		
+		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		List<ItemChange> hierarchyChanges = mailBackend.getHierarchyChanges(bs);
+		
+		verify(collectionPathHelper, mappingService);
+		
+		Assertions.assertThat(hierarchyChanges).contains(
+				new ItemChangeBuilder().withServerId("collection1").withParentId("0").withItemType(FolderType.DEFAULT_INBOX_FOLDER).withDisplayName("test@test INBOX").build(),
+				new ItemChangeBuilder().withServerId("collection2").withParentId("0").withItemType(FolderType.DEFAULT_DRAFTS_FOLDERS).withDisplayName("test@test Drafts").build(),
+				new ItemChangeBuilder().withServerId("collection3").withParentId("0").withItemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER).withDisplayName("test@test Sent").build(),
+				new ItemChangeBuilder().withServerId("collection4").withParentId("0").withItemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDERS).withDisplayName("test@test Trash").build()
+				);
+	}
 }
