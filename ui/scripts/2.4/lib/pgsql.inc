@@ -59,14 +59,14 @@ class DB {
 	$this->ifadd($this->object->password, "password=");
       $this->link=pg_connect($cstr);
       if (!$this->link) {
-	$this->halt("Link-ID == false, connect failed");
+        throw new PGException("Link-ID == false, connect failed");
       }
     }
   }
 
   // Added an argument to hide error reporting if it must be handled by OBM
   // Extends: in Dynamic lists, a user can fill a query, checked by OBM
-  function query($Query_String, $hide_error="") {
+  function query($Query_String) {
     $this->cache['metadata'] = null;
     /* No empty queries, please, since PHP4 chokes on them. */
     if ($Query_String == "")
@@ -91,12 +91,7 @@ class DB {
     $this->errno = ($this->error == "")?0:1;
 
     if (!$this->queryId) {
-      // Added test (! $hide_error) - Aliacom - PB
-      if ($hide_error) {
-	return "obm:".$this->error;
-      } else {
-	$this->halt("Invalid SQL: ".$Query_String);
-      }
+      throw new PGQueryException($Query_String.": ".$this->errno." (".$this->error.")");
     }
 
     return $this->queryId;
@@ -176,14 +171,6 @@ class DB {
     print $this->record[$Name];
   }
   
-  function halt($msg) {
-    printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
-    printf("<b>PostgreSQL error</b>: %s (%s)<br>\n",
-      $this->errno,
-      $this->error);
-    // die("Session halted.");
-  }
-
   function parse($type,$data) {
     switch(strtolower($type)) {
     case 'bool' :
@@ -394,4 +381,11 @@ class DB {
     return (is_numeric($int))?(int)$int:'NULL';
   }
 }
+
+class PGException extends Exception {
+}
+
+class PGQueryException extends PGException {
+}
+
 ?>
