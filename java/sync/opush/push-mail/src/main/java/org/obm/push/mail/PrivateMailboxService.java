@@ -55,6 +55,8 @@ public interface PrivateMailboxService {
 	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
 
 	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+
+	MimeMessage fetchBodyStructure(BackendSession bs, String collectionPath, long uid) throws MailException;
 	
 	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
 

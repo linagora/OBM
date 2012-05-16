@@ -66,6 +66,7 @@ public class MSEmailBody implements Serializable {
 		return getTruncationSize() != null;
 	}
 	
+
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(mimeData, bodyType, truncationSize);

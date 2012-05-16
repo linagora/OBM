@@ -31,11 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.minig.imap.mime.IMimePart;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -46,12 +48,18 @@ public class EmailView {
 	private final long uid;
 	private final Collection<Flag> flags;
 	private final Envelope envelope;
+	private final InputStream bodyMimePartData;
+	private final IMimePart bodyMimePart;
+	private final Integer bodyTruncation;
 
 	public static class Builder {
 
 		private Long uid;
 		private Collection<Flag> flags;
 		private Envelope envelope;
+		private InputStream bodyMimePartData;
+		private IMimePart bodyMimePart;
+		private Integer bodyTruncation;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
@@ -67,18 +75,45 @@ public class EmailView {
 			this.uid = uid;
 			return this;
 		}
+
+		public Builder bodyMimePartData(InputStream bodyMimePartData) {
+			this.bodyMimePartData = bodyMimePartData;
+			return this;
+		}
+
+		public Builder bodyMimePart(IMimePart bodyMimePart) {
+			this.bodyMimePart = bodyMimePart;
+			return this;
+		}
+
+		public Builder bodyTruncation(Integer bodyTruncation) {
+			this.bodyTruncation = bodyTruncation;
+			return this;
+		}
 		
 		public EmailView build() {
 			Preconditions.checkState(uid != null, "The uid is required");
-			return new EmailView(uid, flags, envelope);
+			Preconditions.checkState(envelope != null, "The envelope is required");
+			Preconditions.checkState(bodyMimePartData != null, "The bodyMimePartData is required");
+			Preconditions.checkState(bodyMimePart != null, "The bodyMimePart is required");
+
+			if (flags == null) {
+				this.flags = ImmutableSet.<Flag>of();
+			}
+			
+			return new EmailView(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation);
 		}
 		
 	}
 	
-	private EmailView(long uid, Collection<Flag> flags, Envelope envelope) {
+	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
+			InputStream bodyMimePartData, IMimePart bodyMimePart, Integer bodyTruncation) {
 		this.uid = uid;
 		this.flags = flags;
 		this.envelope = envelope;
+		this.bodyMimePartData = bodyMimePartData;
+		this.bodyMimePart = bodyMimePart;
+		this.bodyTruncation = bodyTruncation;
 	}
 
 	public long getUid() {
@@ -113,16 +148,31 @@ public class EmailView {
 		return envelope.getDate();
 	}
 
+	public InputStream getBodyMimePartData() {
+		return bodyMimePartData;
+	}
+
+	public IMimePart getBodyMimePart() {
+		return bodyMimePart;
+	}
+
+	public Integer getBodyTruncation() {
+		return bodyTruncation;
+	}
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("flags", flags)
+			.add("bodyMimePartData", bodyMimePartData)
+			.add("bodyMimePart", bodyMimePart)
+			.add("bodyTruncation", bodyTruncation)
 			.toString();
 	}
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(flags);
+		return Objects.hashCode(flags, bodyMimePart, bodyTruncation);
 	}
 	
 	@Override
@@ -131,6 +181,8 @@ public class EmailView {
 			EmailView other = (EmailView) obj;
 			return new EqualsBuilder()
 				.append(flags, other.flags)
+				.append(bodyMimePart, other.bodyMimePart)
+				.append(bodyTruncation, other.bodyTruncation)
 				.isEquals();
 		}
 		return false;

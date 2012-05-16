@@ -31,13 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.minig.imap.EmailView;
 import org.minig.imap.EmailView.Builder;
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.BodyPreference;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
@@ -46,14 +50,16 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private final BackendSession bs;
 	private final String collectionName;
 	private final long messageUidToFetch;
+	private final List<BodyPreference> bodyPreferences;
 
 	public EmailViewPartsFetcherImpl(
-			PrivateMailboxService privateMailboxService,
+			PrivateMailboxService privateMailboxService, List<BodyPreference> bodyPreferences,
 			BackendSession bs, String collectionName, long messageUidToFetch) {
 		this.privateMailboxService = privateMailboxService;
 		this.bs = bs;
 		this.collectionName = collectionName;
 		this.messageUidToFetch = messageUidToFetch;
+		this.bodyPreferences = bodyPreferences;
 	}
 
 	public EmailView fetch() throws MailException, ImapMessageNotFoundException {
@@ -62,6 +68,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		
 		fetchFlags(emailViewBuilder);
 		fetchEnvelope(emailViewBuilder);
+		fetchBody(emailViewBuilder);
 		
 		return emailViewBuilder.build();
 	}
@@ -74,5 +81,15 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchEnvelope(Builder emailViewBuilder)throws MailException {
 		UIDEnvelope envelope = privateMailboxService.fetchEnvelope(bs, collectionName, messageUidToFetch);
 		emailViewBuilder.envelope(envelope.getEnvelope());
+	}
+
+	private void fetchBody(Builder emailViewBuilder) throws MailException {
+		MimeMessage mimeMessage = privateMailboxService.fetchBodyStructure(bs, collectionName, messageUidToFetch);
+		FetchInstructions fetchInstructions = new MimePartSelector().select(bodyPreferences, mimeMessage);
+		InputStream bodyData = privateMailboxService.fetchMimePartData(bs, collectionName, messageUidToFetch, fetchInstructions);
+		
+		emailViewBuilder.bodyMimePartData(bodyData);
+		emailViewBuilder.bodyMimePart(fetchInstructions.getMimePart());
+		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
 	}
 }

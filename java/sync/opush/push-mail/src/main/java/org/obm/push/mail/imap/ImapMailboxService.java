@@ -100,6 +100,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -770,6 +771,11 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 		
 		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);
+	}
+	
+	@Override
+	public MimeMessage fetchBodyStructure(BackendSession bs, String collectionPath, long uid) throws MailException {
+		return Iterables.getOnlyElement(fetchBodyStructure(bs, collectionPath, ImmutableSet.<Long>of(uid)));
 	}
 	
 	@Override

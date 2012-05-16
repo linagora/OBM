@@ -35,6 +35,8 @@ import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,15 +48,23 @@ import org.minig.imap.EmailView;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.ContentType;
+import org.minig.imap.mime.MimeMessage;
+import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.mail.imap.ImapMailboxService;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class)
 public class EmailViewPartsFetcherImplTest {
@@ -71,6 +81,13 @@ public class EmailViewPartsFetcherImplTest {
 		List<Address> cc = ImmutableList.<Address>of(new Address("cc@domain.test"));
 		String subject = "a subject";
 		Date date = DateUtils.date("2004-12-14T22:00:00");
+
+		Integer bodyTruncation = 1000;
+		MSEmailBodyType bodyType = MSEmailBodyType.PlainText;
+		String bodyPrimaryType = "text";
+		String bodySubType = "plain";
+		String bodyCharset = Charsets.UTF_8.displayName();
+		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 	}
 	
 	private MessageFixture messageFixture;
@@ -302,10 +319,139 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailView.getUid()).isEqualTo(165l);
 	}
 	
+	@Test
+	public void testBodyTruncationNull() throws Exception {
+		messageFixture.bodyTruncation = null;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyTruncation()).isNull();
+	}
+	
+	@Test
+	public void testBodyTruncation() throws Exception {
+		messageFixture.bodyTruncation = 1505;
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyTruncation()).isEqualTo(1505);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testBodyMimePartDataNull() throws Exception {
+		messageFixture.bodyData = null;
+
+		newFetcherFromExpectedFixture().fetch();
+	}
+	
+	@Test
+	public void testBodyMimePartData() throws Exception {
+		messageFixture.bodyData = StreamMailTestsUtils.newInputStreamFromString("email data");
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyMimePartData())
+			.hasContentEqualTo(StreamMailTestsUtils.newInputStreamFromString("email data"));
+	}
+	
+	@Test
+	public void testBodyMimePartCharsetNull() throws Exception {
+		messageFixture.bodyCharset = null;
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyMimePart().getCharset()).isNull();
+	}
+	
+	@Test
+	public void testBodyMimePartCharsetEmtpy() throws Exception {
+		messageFixture.bodyCharset = "";
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyMimePart().getCharset()).isEmpty();
+	}
+
+	@Test
+	public void testBodyMimePartCharsetASCII() throws Exception {
+		String asciiCharsetName = Charsets.US_ASCII.displayName();
+		messageFixture.bodyCharset = asciiCharsetName;
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyMimePart().getCharset()).isEqualTo(asciiCharsetName);
+	}
+
+	@Test
+	public void testBodyMimePartCharsetUTF8() throws Exception {
+		String utf8CharsetName = Charsets.UTF_8.displayName();
+		messageFixture.bodyCharset = utf8CharsetName;
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+		
+		assertThat(emailView.getBodyMimePart().getCharset()).isEqualTo(utf8CharsetName);
+	}
+
+	@Test
+	public void testBodyMimePartContentTypeNull() throws Exception {
+		messageFixture.bodyPrimaryType = null;
+		messageFixture.bodySubType = null;
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+
+		assertThat(emailView.getBodyMimePart().getPrimaryType()).isNull();
+		assertThat(emailView.getBodyMimePart().getSubtype()).isNull();
+	}
+
+	@Test
+	public void testBodyMimePartContentTypeEmpty() throws Exception {
+		messageFixture.bodyPrimaryType = "";
+		messageFixture.bodySubType = "";
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+
+		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEmpty();
+		assertThat(emailView.getBodyMimePart().getSubtype()).isEmpty();
+	}
+
+	@Test
+	public void testBodyMimePartContentTypePlainText() throws Exception {
+		messageFixture.bodyPrimaryType = "plain";
+		messageFixture.bodySubType = "text";
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+
+		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("plain");
+		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("text");
+	}
+
+	@Test
+	public void testBodyMimePartContentTypeCalendar() throws Exception {
+		messageFixture.bodyPrimaryType = "plain";
+		messageFixture.bodySubType = "calendar";
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+
+		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("plain");
+		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("calendar");
+	}
+
+	@Test
+	public void testBodyMimePartContentTypeAttachment() throws Exception {
+		messageFixture.bodyPrimaryType = "application";
+		messageFixture.bodySubType = "octet-stream";
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch();
+
+		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("application");
+		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("octet-stream");
+	}
+	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
 		ImapMailboxService mailboxService = createStrictMock(ImapMailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
 		mockMailboxServiceEnvelope(mailboxService);
+		mockMailboxServiceBody(mailboxService);
 		replay(mailboxService);
 		return mailboxService;
 	}
@@ -337,14 +483,49 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mailboxService.fetchEnvelope(bs, messageCollectionName, messageFixture.uid))
 			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
 	}
+	
+	private void mockMailboxServiceBody(ImapMailboxService mailboxService) throws MailException {
+		expect(mailboxService.fetchBodyStructure(bs, messageCollectionName, messageFixture.uid))
+			.andReturn(mockAggregateMimeMessage()).once();
 
+		expect(mailboxService.fetchMimePartData(
+				anyObject(BackendSession.class),
+				anyObject(String.class),
+				anyLong(),
+				anyObject(FetchInstructions.class)))
+			.andReturn(messageFixture.bodyData).once();
+	}
+
+	private MimeMessage mockAggregateMimeMessage() {
+		MimePart mimePart = createMock(MimePart.class);
+		expect(mimePart.getCharset()).andReturn(messageFixture.bodyCharset);
+		expect(mimePart.getPrimaryType()).andReturn(messageFixture.bodyPrimaryType);
+		expect(mimePart.getSubtype()).andReturn(messageFixture.bodySubType);
+
+		MimeMessage mimeMessage = createMock(MimeMessage.class);
+		expect(mimeMessage.findMainMessage(anyObject(ContentType.class))).andReturn(mimePart).anyTimes();
+
+		replay(mimeMessage, mimePart);
+		return mimeMessage;
+	}
+	
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
 		return new EmailViewPartsFetcherImpl(
-				messageFixtureToMailboxServiceMock(),
+				messageFixtureToMailboxServiceMock(), bodyPreferences(),
 				bs, messageCollectionName, messageFixture.uid);
 	}
 
 	public Address newEmptyAddress() {
 		return new Address("");
 	}
+
+	private ArrayList<BodyPreference> bodyPreferences() {
+		BodyPreference.Builder builder = new BodyPreference.Builder()
+			.bodyType(messageFixture.bodyType);
+		if (messageFixture.bodyTruncation != null) {
+			builder.truncationSize(messageFixture.bodyTruncation);
+		}
+		return Lists.newArrayList(builder.build());
+	}
+
 }
