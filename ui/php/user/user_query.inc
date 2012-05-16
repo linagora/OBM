@@ -2337,7 +2337,7 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
-  // Remove all user's events without attendee
+  // Remove all events without attendee from the user's calendar
   $query = "SELECT event_id FROM Event LEFT JOIN EventLink ON event_id = eventlink_event_id WHERE eventlink_event_id IS NULL AND event_owner $user_id";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
