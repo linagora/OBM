@@ -153,19 +153,19 @@ public class MailBackendTest {
 		Assertions.assertThat(hierarchyChanges).contains(
 				new ItemChangeBuilder().serverId("collection1")
 					.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
-					.displayName("test@test INBOX").build(),
+					.displayName("INBOX").build(),
 					
 				new ItemChangeBuilder().serverId("collection2")
 					.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDERS)
-					.displayName("test@test Drafts").build(),
+					.displayName("Drafts").build(),
 					
 				new ItemChangeBuilder().serverId("collection3")
 					.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
-					.displayName("test@test Sent").build(),
+					.displayName("Sent").build(),
 					
 				new ItemChangeBuilder().serverId("collection4")
 					.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDERS)
-					.displayName("test@test Trash").build()
+					.displayName("Trash").build()
 				);
 	}
 }
