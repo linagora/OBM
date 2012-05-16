@@ -291,7 +291,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		
 		IApplicationData ev = eventService.convertEventToMSEvent(bs, event);
 		ItemChange ic = new ItemChangeBuilder()
-			.withServerId(serverId)
+			.serverId(serverId)
 			.withApplicationData(ev)
 			.build();
 		return ic;

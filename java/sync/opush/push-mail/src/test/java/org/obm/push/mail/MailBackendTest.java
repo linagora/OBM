@@ -151,10 +151,21 @@ public class MailBackendTest {
 		verify(collectionPathHelper, mappingService);
 		
 		Assertions.assertThat(hierarchyChanges).contains(
-				new ItemChangeBuilder().withServerId("collection1").withParentId("0").withItemType(FolderType.DEFAULT_INBOX_FOLDER).withDisplayName("test@test INBOX").build(),
-				new ItemChangeBuilder().withServerId("collection2").withParentId("0").withItemType(FolderType.DEFAULT_DRAFTS_FOLDERS).withDisplayName("test@test Drafts").build(),
-				new ItemChangeBuilder().withServerId("collection3").withParentId("0").withItemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER).withDisplayName("test@test Sent").build(),
-				new ItemChangeBuilder().withServerId("collection4").withParentId("0").withItemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDERS).withDisplayName("test@test Trash").build()
+				new ItemChangeBuilder().serverId("collection1")
+					.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
+					.displayName("test@test INBOX").build(),
+					
+				new ItemChangeBuilder().serverId("collection2")
+					.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDERS)
+					.displayName("test@test Drafts").build(),
+					
+				new ItemChangeBuilder().serverId("collection3")
+					.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
+					.displayName("test@test Sent").build(),
+					
+				new ItemChangeBuilder().serverId("collection4")
+					.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDERS)
+					.displayName("test@test Trash").build()
 				);
 	}
 }
