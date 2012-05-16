@@ -33,4 +33,7 @@ CREATE TRIGGER opush_event_mapping_event_ext_id_hash_update_trigger BEFORE UPDAT
 
 ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);
 
+-- prevent lock timeout on mail deletion
+CREATE INDEX opush_sync_mail_tuple_index ON opush_sync_mail (collection_id, device_id, mail_uid);
+
 UPDATE ObmInfo SET obminfo_value = '2.4.1' WHERE obminfo_name = 'db_version';
