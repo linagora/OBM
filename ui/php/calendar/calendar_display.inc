@@ -4550,8 +4550,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $id = $event_q->f('event_id');
 
     if (isset($exception_q)) {
+      $index=0;
       while($exception_q->next_record()) {
-        $date_exception[] = new Of_Date($exception_q->f('eventexception_date'), 'GMT'); 
+        $date_exception[$index]['date'] = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
+        $date_exception[$index]['childId'] = $exception_q->f('eventexception_child_id');
+        $index++;
       }
     }
     // Alerts
@@ -5259,13 +5262,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   // Exception
   if(is_array($date_exception)) {
     foreach($date_exception as $key => $exception) {
-      $block_exception_detail .= "<div id=\"date_exception-$key\">
-         <a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">
-         <img src=\"$ico_delete\" alt=\"[Delete]\">
-         </a>
-         <input type=\"hidden\" name=\"tf_date_exception[]\" value=\"".$exception->getInputDate()."\" />
-         ".$exception->getInputDate()."
-       </div>";
+      $block_exception_detail .= "<div id=\"date_exception-$key\">";
+      if (!$exception['childId']) {
+        $block_exception_detail .= "<a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">";
+        $exception_desc = $GLOBALS['l_eventexception_canceled'];
+      } else {
+        $block_exception_detail .= "<a style=\"visibility:hidden\" href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">";
+        $exception_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=".$exception['childId'];
+        $exception_link = "<a href=\"$exception_url\">".$exception['date']->getOutputDateTime()."</a>";
+        $exception_desc = sprintf($GLOBALS['l_eventexception_moved_to'],$exception_link);
+      }
+      $block_exception_detail .= "<img src=\"$ico_delete\" alt=\"[Delete]\">
+								  </a>";
+      $block_exception_detail .= "<input type=\"hidden\" name=\"tf_date_exception[]\" value=\"".$exception['date']->getInputDate()."\" />
+								 ".$exception['date']->getInputDate()." ($exception_desc)
+								 </div>";
     }
   }
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
