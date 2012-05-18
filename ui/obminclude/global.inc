@@ -311,6 +311,9 @@ $obmdb_password = $ini_array['password'];
 // Single or multi domain
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
+// Max ActiveUserObm rows to diplay
+$c_activeUserObmMaxRows = 10000;
+
 // Backup root
 if (is_null($ini_array['backupRoot'])) {
     $cbackup_root = "/var/lib/obm/backup";

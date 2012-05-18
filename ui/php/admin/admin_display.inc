@@ -95,7 +95,7 @@ function dis_admin_index($mode, $lifetime) {
 function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date;
-  global $l_last_access,$l_nb_connec, $l_clear_passive_session, $l_action, $l_clear_sess, $l_passive_session;
+  global $l_last_access,$l_nb_connec, $l_clear_passive_session, $l_action, $l_clear_sess, $l_passive_session, $l_activeUser_toDisplay;
   global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_singleNameSpace;
 
   $date = of_datetime_format();
@@ -109,6 +109,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
 
   $nbua = $obm_u->nf();
   $list_user = '';
+
   while ($obm_u->next_record()) {
     $last_access = of_datetime_format($obm_u->f('timeupdate'));
     $login = $obm_u->f('userobm_login');
@@ -189,7 +190,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     <tr> 
     <td>$date</td>
     <td>$lifetime</td>
-    <td>$nb_user_ses</td>
+    <td>".$obm_u->nf()." ".$l_activeUser_toDisplay." ".$nb_user_ses."</td>
     </tr>
     </tbody>
     <thead>

@@ -95,7 +95,7 @@ function get_admin_usersession_number() {
 //   - DBO : list of active user session
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin_active_user($delay) {
-  global $cdg_sql;
+  global $cdg_sql, $c_activeUserObmMaxRows;
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
   if ($delay > 0) {
@@ -110,14 +110,12 @@ function run_query_admin_active_user($delay) {
   $timeupdate = sql_date_format($db_type, "activeuserobm_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "activeuserobm_timecreate", "timecreate");
 
-  $query = "select UserObm.userobm_login,
-      UserObm.userobm_timelastaccess,
-      ActiveUserObm.*,
-      $timecreate,
-      $timeupdate
-    from UserObm, ActiveUserObm
-    where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
-      $where_date $multidomain";
+  $query = "SELECT UserObm.userobm_login, UserObm.userobm_timelastaccess,
+                   ActiveUserObm.*, $timecreate, $timeupdate
+            FROM UserObm, ActiveUserObm
+            WHERE ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
+            $where_date $multidomain
+            LIMIT $c_activeUserObmMaxRows";
   display_debug_msg($query,$cdg_sql);
   $obm_q->query($query);
   return $obm_q;

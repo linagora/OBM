@@ -24,6 +24,7 @@ $l_last_page = "Dernière page consultée";
 $l_user_ip = "IP";
 $l_clear_passive_session = "Sessions utilisateurs passives";
 $l_passive_session = "Sessions passives";
+$l_activeUser_toDisplay = "premières entrées sur";
 
 // Titles
 $l_admin = "Admin";
