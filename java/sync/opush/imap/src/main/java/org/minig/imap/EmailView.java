@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 
 import com.google.common.base.Objects;
@@ -51,6 +52,7 @@ public class EmailView {
 	private final InputStream bodyMimePartData;
 	private final IMimePart bodyMimePart;
 	private final Integer bodyTruncation;
+	private final ContentType bodyContentType;
 
 	public static class Builder {
 
@@ -114,6 +116,10 @@ public class EmailView {
 		this.bodyMimePartData = bodyMimePartData;
 		this.bodyMimePart = bodyMimePart;
 		this.bodyTruncation = bodyTruncation;
+		this.bodyContentType = new ContentType.Builder()
+			.primaryType(bodyMimePart.getPrimaryType())
+			.subType(bodyMimePart.getSubtype())
+			.build();
 	}
 
 	public long getUid() {
@@ -158,6 +164,10 @@ public class EmailView {
 
 	public Integer getBodyTruncation() {
 		return bodyTruncation;
+	}
+	
+	public ContentType getBodyContentType() {
+		return bodyContentType;
 	}
 
 	@Override

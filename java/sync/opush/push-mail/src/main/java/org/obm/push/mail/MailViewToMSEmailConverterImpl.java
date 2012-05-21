@@ -33,15 +33,20 @@ package org.obm.push.mail;
 
 import org.minig.imap.EmailView;
 import org.minig.imap.Flag;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
+import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.utils.SerializableInputStream;
 
 import com.google.inject.Singleton;
 
 @Singleton
 public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverter {
 
+	
+	
 	@Override
 	public MSEmail convert(EmailView emailView) {
 		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
@@ -49,6 +54,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		
 		fillFlags(msEmailBuilder, emailView);
 		msEmailBuilder.header(convertHeader(emailView));
+		msEmailBuilder.body(convertBody(emailView));
 		
 		return msEmailBuilder.build();
 	}
@@ -61,6 +67,14 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	private MSEmailHeader convertHeader(EmailView emailView) {
 		return new MSEmailHeaderConverter().convertToMSEmailHeader(emailView.getEnvelope());
+	}
+
+	private MSEmailBody convertBody(EmailView emailView) {
+		SerializableInputStream mimeData = new SerializableInputStream(emailView.getBodyMimePartData());
+		MSEmailBodyType bodyType = MSEmailBodyType.fromMimeType(emailView.getBodyContentType().getFullMimeType());
+		Integer bodyTruncation = emailView.getBodyTruncation();
+		
+		return new MSEmailBody(mimeData, bodyType, null, bodyTruncation);
 	}
 
 	private boolean hasFlag(EmailView emailView, Flag flag) {
