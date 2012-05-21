@@ -44,6 +44,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	@Override
 	public MSEmail convert(EmailView emailView) {
 		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
+		msEmailBuilder.uid(emailView.getUid());
 		
 		fillFlags(msEmailBuilder, emailView);
 		
