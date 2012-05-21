@@ -418,31 +418,38 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $current['addressbook'] = $addressbook->id;
     $current['contact'] = $params['id'];
     
-    if ($addressbook && $addressbook->write && (check_contact_update_rights($params))) {
-      if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-        if(isset($params['id'])) {
-          $c = OBM_Contact::get($params['id']);
-          $retour = run_query_contact_update($params);
-          OBM_IndexingService::commit('contact');          
-          $contact = OBM_Contact::get($params['id']);
-          update_last_visit('contact', $params['id'], $action);    
+  if ($addressbook && $addressbook->write && (check_contact_update_rights($params))) {
+        if (OBM_IndexingService::connect('contact')) {
+            if (check_user_defined_rules() && check_contact_data_form('', $params)) {
+                if(isset($params['id'])) {
+                    $c = OBM_Contact::get($params['id']);
+                    $retour = run_query_contact_update($params);
+                    OBM_IndexingService::commit('contact');          
+                    $contact = OBM_Contact::get($params['id']);
+                    update_last_visit('contact', $params['id'], $action);    
+                } else {
+                    $contact = $addressbook->addContact($params);
+                    OBM_IndexingService::commit('contact');
+                }
+                $subTemplate['card'] = new OBM_Template('card');
+            } else {
+                header('HTTP', true, 400);
+                //FIXME : Not compatible with the HTML/Ajax implemetation
+                echo OBM_Error::getInstance()->toJson();
+                exit();
+            }
         } else {
-          $contact = $addressbook->addContact($params);
-          OBM_IndexingService::commit('contact');
-        }
-        $subTemplate['card'] = new OBM_Template('card');
-      } else {
-        header('HTTP', true, 400);
+            header('HTTP', true, 503);
+            OBM_Error::getInstance()->addError('internal', $GLOBALS['l_solr_connection_err']);
+            echo OBM_Error::getInstance()->toJson();
+            exit();
+        } 
+    } else {
+        header('HTTP', true, 403);
         //FIXME : Not compatible with the HTML/Ajax implemetation
+        OBM_Error::getInstance()->addError('rights', __('Permission denied'));
         echo OBM_Error::getInstance()->toJson();
         exit();
-      }
-    } else {
-      header('HTTP', true, 403);
-      //FIXME : Not compatible with the HTML/Ajax implemetation
-      OBM_Error::getInstance()->addError('rights', __('Permission denied'));
-      echo OBM_Error::getInstance()->toJson();
-      exit();
     }
   } elseif ($action == 'copyContact') {
   ///////////////////////////////////////////////////////////////////////////////
