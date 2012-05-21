@@ -6147,7 +6147,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             }
             $td_id = "user_".$id."_".$d->getTimestamp();
             $u[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
-            $js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
+            $js_tips .= "obm.tip.add($('$td_id'), \"".phpStringToJsString($tip)."\");";
           } else {
             $u[$id] .= "<td class='timeSlot'></td>";
           }
@@ -6179,7 +6179,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
             }
             $td_id = "res_".$id."_".$d->getTimestamp();
             $r[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
-            $js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
+            $js_tips .= "obm.tip.add($('$td_id'), \"".phpStringToJsString($tip)."\");";
           } else {
             $r[$id] .= "<td class='timeSlot'></td>";
           }
@@ -6229,7 +6229,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
         if (!$tip) $tip = $GLOBALS['l_occupied'];				
 				$td_id = "contact_".$id."_".$d->getTimestamp();
 				$c[$id] .= "<td class='timeSlot' id='$td_id'><div class='haveEvent'></div></td>";
-				$js_tips .= "obm.tip.add($('$td_id'), \"$tip\");";
+				$js_tips .= "obm.tip.add($('$td_id'), \"".phpStringToJsString($tip)."\");";
 			  } else {
 				$c[$id] .= "<td class='timeSlot'></td>";
 			  }
@@ -6569,9 +6569,9 @@ function html_freebusy_tip($ocs) {
       $time = $oc->date->format(Of_Date::TIME_SHORT)." - ".$end->format(Of_Date::TIME_SHORT);
     }
     if ($oc->event->isPrivate() && (is_null($oc->event->attendee['user'][$GLOBALS[obm][uid]]) && $oc->event->owner != $GLOBALS[obm][uid])) {
-      $title .= $GLOBALS[l_private]; 
+      $title .= htmlspecialchars($GLOBALS[l_private]);
     } else {
-      $title .= $oc->event->title;
+      $title .= htmlspecialchars($oc->event->title);
     }
     $tip .= "<tr><td class='B'>$time</td></tr>";
     $tip .= "<tr><td>&nbsp;&nbsp;$title</td></tr>";
