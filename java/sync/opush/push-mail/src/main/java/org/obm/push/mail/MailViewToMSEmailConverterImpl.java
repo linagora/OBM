@@ -33,6 +33,7 @@ package org.obm.push.mail;
 
 import org.minig.imap.EmailView;
 import org.minig.imap.Flag;
+import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 
@@ -47,6 +48,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		msEmailBuilder.uid(emailView.getUid());
 		
 		fillFlags(msEmailBuilder, emailView);
+		msEmailBuilder.header(convertHeader(emailView));
 		
 		return msEmailBuilder.build();
 	}
@@ -55,6 +57,10 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		msEmailBuilder.answered(hasFlag(emailView, Flag.ANSWERED));
 		msEmailBuilder.read(hasFlag(emailView, Flag.SEEN));
 		msEmailBuilder.starred(hasFlag(emailView, Flag.FLAGGED));
+	}
+	
+	private MSEmailHeader convertHeader(EmailView emailView) {
+		return new MSEmailHeaderConverter().convertToMSEmailHeader(emailView.getEnvelope());
 	}
 
 	private boolean hasFlag(EmailView emailView, Flag flag) {
