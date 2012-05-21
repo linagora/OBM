@@ -86,8 +86,10 @@ public class MimePartSelector {
 	}
 	
 	private FetchInstructions buildFetchInstructions(IMimePart mimePart, BodyPreference bodyPreference) {
-		return new FetchInstructions.Builder().
-				mimePart(mimePart).truncation(bodyPreference.getTruncationSize()).build();
+		return new FetchInstructions.Builder()
+			.mimePart(mimePart)
+			.truncation(bodyPreference.getTruncationSize())
+			.build();
 	}
 
 	private IMimePart findMimePartMatching(MimeMessage mimeMessage, BodyPreference bodyPreference) {

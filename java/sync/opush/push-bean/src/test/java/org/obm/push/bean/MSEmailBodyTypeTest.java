@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import org.fest.assertions.api.Assertions;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 
@@ -40,40 +41,76 @@ public class MSEmailBodyTypeTest {
 	@Test
 	public void testPlainText() {
 		MSEmailBodyType plainText = MSEmailBodyType.getValueOf(1);
-		Assertions.assertThat(plainText).isEqualTo(MSEmailBodyType.PlainText);
-		Assertions.assertThat(plainText.asXmlValue()).isEqualTo(1);
+		assertThat(plainText).isEqualTo(MSEmailBodyType.PlainText);
+		assertThat(plainText.asXmlValue()).isEqualTo(1);
+		assertThat(plainText.getMimeType()).isEqualTo("text/plain");
+	}
+	
+	@Test
+	public void testPlainTextFromMimeType() {
+		MSEmailBodyType plainText = MSEmailBodyType.fromMimeType("text/plain");
+		assertThat(plainText).isEqualTo(MSEmailBodyType.PlainText);
+		assertThat(plainText.asXmlValue()).isEqualTo(1);
+		assertThat(plainText.getMimeType()).isEqualTo("text/plain");
 	}
 	
 	@Test
 	public void testHTML() {
 		MSEmailBodyType html = MSEmailBodyType.getValueOf(2);
-		Assertions.assertThat(html).isEqualTo(MSEmailBodyType.HTML);
-		Assertions.assertThat(html.asXmlValue()).isEqualTo(2);
+		assertThat(html).isEqualTo(MSEmailBodyType.HTML);
+		assertThat(html.asXmlValue()).isEqualTo(2);
+		assertThat(html.getMimeType()).isEqualTo("text/html");
+	}
+	
+	@Test
+	public void testHTMLFromMimeType() {
+		MSEmailBodyType html = MSEmailBodyType.fromMimeType("text/html");
+		assertThat(html).isEqualTo(MSEmailBodyType.HTML);
+		assertThat(html.asXmlValue()).isEqualTo(2);
+		assertThat(html.getMimeType()).isEqualTo("text/html");
 	}
 	
 	@Test
 	public void testRTF() {
 		MSEmailBodyType rtf = MSEmailBodyType.getValueOf(3);
-		Assertions.assertThat(rtf).isEqualTo(MSEmailBodyType.RTF);
-		Assertions.assertThat(rtf.asXmlValue()).isEqualTo(3);
+		assertThat(rtf).isEqualTo(MSEmailBodyType.RTF);
+		assertThat(rtf.asXmlValue()).isEqualTo(3);
+		assertThat(rtf.getMimeType()).isEqualTo("text/rtf");
+	}
+	
+	@Test
+	public void testRTFFromMimeType() {
+		MSEmailBodyType rtf = MSEmailBodyType.fromMimeType("text/rtf");
+		assertThat(rtf).isEqualTo(MSEmailBodyType.RTF);
+		assertThat(rtf.asXmlValue()).isEqualTo(3);
+		assertThat(rtf.getMimeType()).isEqualTo("text/rtf");
 	}
 	
 	@Test
 	public void testMime() {
 		MSEmailBodyType mime = MSEmailBodyType.getValueOf(4);
-		Assertions.assertThat(mime).isEqualTo(MSEmailBodyType.MIME);
-		Assertions.assertThat(mime.asXmlValue()).isEqualTo(4);
+		assertThat(mime).isEqualTo(MSEmailBodyType.MIME);
+		assertThat(mime.asXmlValue()).isEqualTo(4);
+		assertThat(mime.getMimeType()).isEqualTo("message/rfc822");
+	}
+	
+	@Test
+	public void testMimeFromMimeType() {
+		MSEmailBodyType mime = MSEmailBodyType.fromMimeType("message/rfc822");
+		assertThat(mime).isEqualTo(MSEmailBodyType.MIME);
+		assertThat(mime.asXmlValue()).isEqualTo(4);
+		assertThat(mime.getMimeType()).isEqualTo("message/rfc822");
 	}
 	
 	@Test
 	public void testInvalidInteger() {
 		MSEmailBodyType mime = MSEmailBodyType.getValueOf(0);
-		Assertions.assertThat(mime).isNull();
+		assertThat(mime).isNull();
 	}
 	
 	@Test
 	public void testNullInteger() {
 		MSEmailBodyType mime = MSEmailBodyType.getValueOf(null);
-		Assertions.assertThat(mime).isNull();
+		assertThat(mime).isNull();
 	}
 }

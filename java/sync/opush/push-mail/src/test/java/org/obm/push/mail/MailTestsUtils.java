@@ -164,12 +164,9 @@ public class MailTestsUtils {
 
 	public static MSAttachement attach(String file){
 		MSAttachement attach = new MSAttachement();
-		attach.setContentId(String.valueOf(Math.random()));
 		attach.setDisplayName("picture");
-		attach.setContentLocation(file);
 		attach.setEstimatedDataSize(50000);
 		attach.setFileReference(file);
-		attach.setIsInline("isInLineTrue");
 		attach.setMethod(MethodAttachment.EmbeddedMessage);
 		return attach;
 	}

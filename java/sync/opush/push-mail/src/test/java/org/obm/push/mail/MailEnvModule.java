@@ -95,6 +95,7 @@ public class MailEnvModule extends AbstractModule {
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(PrivateMailboxService.class).to(ImapMailboxService.class);
+		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
 	}
 	
 }

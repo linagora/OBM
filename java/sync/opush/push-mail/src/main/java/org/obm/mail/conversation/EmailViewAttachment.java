@@ -29,42 +29,65 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.mail.conversation;
 
-import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.push.backend.MailMonitoringBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.ImapClientProviderImpl;
-import org.obm.push.mail.imap.ImapMailboxService;
-import org.obm.push.mail.imap.ImapMonitoringImpl;
-import org.obm.push.mail.imap.ImapStoreManager;
-import org.obm.push.mail.imap.ImapStoreManagerImpl;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
-import org.obm.push.mail.smtp.SmtpProvider;
-import org.obm.push.mail.smtp.SmtpProviderImpl;
+import com.google.common.base.Objects;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 
-public class OpushMailModule extends AbstractModule {
+public class EmailViewAttachment {
 
-	@Override
-	protected void configure() {
-		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
-		bind(MailboxService.class).to(ImapMailboxService.class);
-		bind(MailBackend.class).to(MailBackendImpl.class);
-		bind(ImapStoreManager.class).to(ImapStoreManagerImpl.class);
-		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
-		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
-		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
-		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
-		Multibinder<PIMBackend> pimBackends = 
-				Multibinder.newSetBinder(binder(), PIMBackend.class);
-		pimBackends.addBinding().to(MailBackend.class);
-		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
+	private String id;
+	private String displayName;
+	private String fileReference;
+	private Integer size;
+	
+	public EmailViewAttachment(String id, String displayName, String fileReference, Integer size) {
+		this.id = id;
+		this.displayName = displayName;
+		this.fileReference = fileReference;
+		this.size = size;
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public Integer getSize() {
+		return size;
+	}
+
+	public String getFileReference() {
+		return fileReference;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(id, displayName, fileReference, size);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof EmailViewAttachment) {
+			EmailViewAttachment that = (EmailViewAttachment) object;
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.fileReference, that.fileReference)
+				&& Objects.equal(this.size, that.size);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("id", id)
+			.add("displayName", displayName)
+			.add("fileReference", fileReference)
+			.add("size", size)
+			.toString();
+	}
 }
