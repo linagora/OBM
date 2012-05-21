@@ -33,10 +33,10 @@ def build_argument_parser(args):
             default='build.cfg', dest='configuration_file', type=file)
 
     parser.add_argument('-V', '--version', help='version of OBM',
-            default='2.4.0', dest='obm_version')
+            default=None, dest='obm_version')
 
     parser.add_argument('-r', '--release', help='release of OBM',
-            default='', dest='obm_release')
+            default=None, dest='obm_release')
 
     parser.add_argument('--perl-version', help='perl flavor (only for RPMs)',
             default='5.8', dest='perl_version', choices=['5.8', '5.10'])
@@ -55,9 +55,13 @@ def build_argument_parser(args):
     return parser
 
 
-def get_version_release(args, date, sha1):
-    obm_version = args.obm_version
-    obm_release = args.obm_release
+def get_version_release(args, config, date, sha1):
+    obm_version = args.obm_version if args.obm_version is not None else config.get('global', 'version')
+    obm_release = args.obm_release if args.obm_release is not None else config.get('global', 'release')
+
+    if not obm_version:
+        raise ValueError("The obm version should be specified on the "
+                "command line or in the configuration file")
     version = obm_version
     short_sha1 = sha1[:7]
     if args.on_commit: 
@@ -98,7 +102,7 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
 
     date = datetime.datetime.today()
 
-    version, release = get_version_release(args, date, scm_manager.sha1)
+    version, release = get_version_release(args, config, date, scm_manager.sha1)
 
     changelog_updater = ob.ChangelogUpdater(changelog_template=template,
             package_type=args.package_type, date=date, sha1=scm_manager.sha1,

@@ -24,22 +24,22 @@ def build_argument_parser(args):
             default='build.cfg', dest='configuration_file', type=file)
 
     parser.add_argument('-V', '--version', help='version of OBM',
-            default='2.4.0', dest='obm_version')
+            default=None, dest='obm_version')
 
     parser.add_argument('-r', '--release', help='release of OBM',
-            default='', dest='obm_release')
+            default=None, dest='obm_release')
 
     return parser
 
-def update_changelogs(config, args, packages, date, obm_dir):
+def update_changelogs(config, obm_version, obm_release, packages, date, obm_dir):
     for package_type in ['deb', 'rpm']:
         logging.info("Processing %s changelogs" % package_type)
         template_section = "%s_templates" % package_type
         template = config.get(template_section, 'release_changelog')
         changelog_updater = ob.ChangelogUpdater(changelog_template=template,
                 package_type=package_type, date=date, sha1=None,
-                mode=ob.ChangelogUpdater.APPEND, version=args.obm_version,
-                release=args.obm_release)
+                mode=ob.ChangelogUpdater.APPEND, version=obm_version,
+                release=obm_release)
         for package in packages:
             changelog = ob.get_changelog(package.name, package_type,
                     package.path)
@@ -59,12 +59,15 @@ def main():
 
     config = ob.config.read_config(args.configuration_file)
 
+    obm_version = args.obm_version if args.obm_version is not None else config.get('global', 'version')
+    obm_release = args.obm_release if args.obm_release is not None else config.get('global', 'release')
+
     obm_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     available_packages = ob.config.read_packages(config, obm_dir)
 
     date = datetime.datetime.today()
-    update_changelogs(config, args, available_packages, date, obm_dir)
+    update_changelogs(config, obm_version, obm_release, available_packages, date, obm_dir)
 
 if __name__ == "__main__":
     main()
