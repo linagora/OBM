@@ -44,11 +44,13 @@ public class MSEmailBody implements Serializable {
 	private final SerializableInputStream mimeData;
 	private final MSEmailBodyType bodyType;
 	private final Charset charset;
-
-	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, Charset charset) {
+	private final Integer truncationSize;
+	
+	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, Charset charset, Integer truncationSize) {
 		this.mimeData = mimeData;
 		this.bodyType = bodyType;
 		this.charset = charset;
+		this.truncationSize = truncationSize;
 	}
 	
 	public SerializableInputStream getMimeData() {
@@ -63,9 +65,17 @@ public class MSEmailBody implements Serializable {
 		return charset;
 	}
 
+	public Integer getTruncationSize() {
+		return truncationSize;
+	}
+	
+	public boolean isTruncated() {
+		return getTruncationSize() != null;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(mimeData, bodyType, charset);
+		return Objects.hashCode(mimeData, bodyType, charset, truncationSize);
 	}
 	
 	@Override
@@ -74,8 +84,7 @@ public class MSEmailBody implements Serializable {
 			.add("bodyType", bodyType)
 			.add("charset", charset)
 			.add("mimeData", mimeData)
+			.add("truncationSize", truncationSize)
 			.toString();
 	}
-
-	
 }
