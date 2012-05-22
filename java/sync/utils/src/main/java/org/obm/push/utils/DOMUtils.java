@@ -39,7 +39,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -423,10 +422,8 @@ public final class DOMUtils {
 		}
 	}
 	
-	public static Element createElementAndText(Element parent, String elementName, 
-			InputStream inputStream, Charset charset) throws IOException {
-		
+	public static Element createElementAndText(Element parent, String elementName, InputStream inputStream) throws IOException {
 		return createElementAndText(parent, elementName, 
-				CharStreams.toString(new InputStreamReader(inputStream, charset)));
+				CharStreams.toString(new InputStreamReader(inputStream)));
 	}
 }

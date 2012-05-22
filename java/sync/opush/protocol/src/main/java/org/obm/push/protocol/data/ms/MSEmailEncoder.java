@@ -99,7 +99,7 @@ public class MSEmailEncoder {
 
 		Element bodyElement = DOMUtils.createElement(parent, ASAIRS.BODY.asASValue());
 		
-		DOMUtils.createElementAndText(bodyElement, ASAIRS.DATA.asASValue(), mimeData, body.getCharset());
+		DOMUtils.createElementAndText(bodyElement, ASAIRS.DATA.asASValue(), mimeData);
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TYPE.asASValue(), bodyType.asXmlValue());
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TRUNCATED.asASValue(), body.isTruncated());
 		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation.intValue());
