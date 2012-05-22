@@ -32,7 +32,6 @@
 package org.obm.push.bean.ms;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.utils.SerializableInputStream;
@@ -43,13 +42,11 @@ public class MSEmailBody implements Serializable {
 
 	private final SerializableInputStream mimeData;
 	private final MSEmailBodyType bodyType;
-	private final Charset charset;
 	private final Integer truncationSize;
 	
-	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, Charset charset, Integer truncationSize) {
+	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, Integer truncationSize) {
 		this.mimeData = mimeData;
 		this.bodyType = bodyType;
-		this.charset = charset;
 		this.truncationSize = truncationSize;
 	}
 	
@@ -59,10 +56,6 @@ public class MSEmailBody implements Serializable {
 
 	public MSEmailBodyType getBodyType() {
 		return bodyType;
-	}
-
-	public Charset getCharset() {
-		return charset;
 	}
 
 	public Integer getTruncationSize() {
@@ -75,14 +68,13 @@ public class MSEmailBody implements Serializable {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(mimeData, bodyType, charset, truncationSize);
+		return Objects.hashCode(mimeData, bodyType, truncationSize);
 	}
 	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("bodyType", bodyType)
-			.add("charset", charset)
 			.add("mimeData", mimeData)
 			.add("truncationSize", truncationSize)
 			.toString();
