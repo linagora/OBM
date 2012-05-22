@@ -41,9 +41,6 @@ public class MSAttachement implements Serializable {
 	private String fileReference;
 	private MethodAttachment method;
 	private Integer estimatedDataSize;
-	private String contentId;
-	private String contentLocation;
-	private String isInline;
 	
 	public MSAttachement(){
 		method = MethodAttachment.NormalAttachment;
@@ -81,34 +78,9 @@ public class MSAttachement implements Serializable {
 		this.estimatedDataSize = estimatedDataSize;
 	}
 
-	public String getContentId() {
-		return contentId;
-	}
-
-	public void setContentId(String contentId) {
-		this.contentId = contentId;
-	}
-
-	public String getContentLocation() {
-		return contentLocation;
-	}
-
-	public void setContentLocation(String contentLocation) {
-		this.contentLocation = contentLocation;
-	}
-
-	public String getIsInline() {
-		return isInline;
-	}
-
-	public void setIsInline(String isInline) {
-		this.isInline = isInline;
-	}
-
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(displayName, fileReference, method, estimatedDataSize, 
-				contentId, contentLocation, isInline);
+		return Objects.hashCode(displayName, fileReference, method, estimatedDataSize);
 	}
 	
 	@Override
@@ -118,10 +90,7 @@ public class MSAttachement implements Serializable {
 			return Objects.equal(this.displayName, that.displayName)
 				&& Objects.equal(this.fileReference, that.fileReference)
 				&& Objects.equal(this.method, that.method)
-				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize)
-				&& Objects.equal(this.contentId, that.contentId)
-				&& Objects.equal(this.contentLocation, that.contentLocation)
-				&& Objects.equal(this.isInline, that.isInline);
+				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize);
 		}
 		return false;
 	}
@@ -133,9 +102,6 @@ public class MSAttachement implements Serializable {
 			.add("fileReference", fileReference)
 			.add("method", method)
 			.add("estimatedDataSize", estimatedDataSize)
-			.add("contentId", contentId)
-			.add("contentLocation", contentLocation)
-			.add("isInline", isInline)
 			.toString();
 	}
 	
