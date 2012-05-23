@@ -62,7 +62,6 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -147,17 +146,20 @@ public class MailBackendImpl implements MailBackend {
 	
 	@Override
 	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
-		return ImmutableList.of(
-				genItemChange(bs, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER),
-				genItemChange(bs, EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS),
-				genItemChange(bs, EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER),
-				genItemChange(bs, EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
+		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
+		ret.add(genItemChange(bs, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER));
+		ret.add(genItemChange(bs,  EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
+		return ret;
 	}
 
 	private ItemChange genItemChange(BackendSession bs, String imapFolder,
 			FolderType type) throws DaoException {
-		
-		ItemChange ic = new ItemChangeBuilder().parentId("0").displayName(imapFolder).itemType(type).build();
+		ItemChange ic = new ItemChange();
+		ic.setParentId("0");
+		ic.setDisplayName(bs.getUser().getLoginAtDomain() + " " + imapFolder);
+		ic.setItemType(type);
 
 		String imapPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, imapFolder);
 		String serverId;
