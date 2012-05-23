@@ -29,6 +29,9 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if (!$obminclude) $obminclude = 'obminclude';
+require_once($obminclude . '/of/of_session.inc');
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1690,6 +1693,12 @@ function check_user_update_rights($params) {
   return true;
 }
 
+function profile_privilege_error() {
+  global $err;
+  global $l_profile_privilege_error;
+  $err['msg'] = $l_profile_privilege_error;
+  $err['field'] = 'profile';
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data checking and formatting
@@ -1700,7 +1709,7 @@ function check_user_update_rights($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_data_form($p_id, &$user) {
   global $l_exist_error,$l_login_error, $l_login_in_use;
-  global $l_password_error, $l_password_empty, $l_profile_privilege_error;
+  global $l_password_error, $l_password_empty;
   global $l_lname_error, $l_last_admin_error, $l_image_type_error;
   global $l_image_size_error, $l_email_error, $l_mail_server_error;
   global $l_email_exist, $l_uemail_exist;
@@ -1765,51 +1774,26 @@ function check_user_data_form($p_id, &$user) {
   $file = $user['file_tmp'];
   
   $profiles = $user['profiles'];
-  
-  // We can't handle a user with a more privileged profile
-  // Or same privilege with 'impair' profile
-  // If user profile level is not set, OK
-  $level = $profiles[$obm['profile']]['properties']['level'];
-  $managepeers = $profiles[$obm['profile']]['properties']['level_managepeers'];
-  if (isset($profiles[$profile]['properties']['level'])) {
-    if (($profiles[$profile]['properties']['level'] < $level)
-	|| (($profiles[$profile]['properties']['level'] == $level) && (! $managepeers))) {
-      $err['msg'] = "$l_profile_privilege_error";
-      $err['field'] = 'profile';
-      return false;
-    }
-  }
-
   if(!isset($profiles[$profile])) {
     $err['msg'] = $GLOBALS['l_err_profile']." : $profile";
     $err['field'] = 'profile';
     return false;
   }
 
+  if (!Perm::user_profile_can_edit_peer_profile($profiles[$obm['profile']], $profiles[$profile])) {
+    profile_privilege_error();
+    return false;
+  }
+
   if ($action == 'update') {
     $u = get_user_info($id);
-    $domain_id = $u['domain_id'];
     $usr_profile = $u['perms'];
-    if (isset($profiles[$usr_profile]['properties']['level'])) {
-      if (($profiles[$usr_profile]['properties']['level'] < $level)
-	  || (($profiles[$usr_profile]['properties']['level'] == $level) && (! $managepeers))) {
-	$err['msg'] = "$l_profile_privilege_error";
-	$err['field'] = 'profile';
-	return false;
-      }
+    if (!Perm::user_profile_can_edit_peer_profile($profiles[$obm['profile']], $profiles[$usr_profile])) {
+      profile_privilege_error();
+      return false;
     }
-  }
 
-  // Get domain infos for further use
-  $d = of_domain_get_domain_infos($domain_id, true);
-  $domain_aliases = array($d['name']);
-  $one_dom = strtok($d['alias'], "\r\n");
-  while ($one_dom) {
-    $domain_aliases[] = $one_dom; 
-    $one_dom = strtok("\r\n");
-  }
-
-  if ($action == 'update') {
+    $domain_id = $user_info['domain_id'];
 
     // MANDATORY: we do not allow to update last admin'perms
     if (($usr_profile == $perms_admin) && ($profile != $perms_admin)) {
@@ -1828,6 +1812,15 @@ function check_user_data_form($p_id, &$user) {
       $err['field'] = 'smb_perms';
       return false;
     }
+  }
+
+  // Get domain infos for further use
+  $d = of_domain_get_domain_infos($domain_id, true);
+  $domain_aliases = array($d['name']);
+  $one_dom = strtok($d['alias'], "\r\n");
+  while ($one_dom) {
+    $domain_aliases[] = $one_dom;
+    $one_dom = strtok("\r\n");
   }
 
   // MANDATORY: User login, not empty and unique

@@ -67,9 +67,11 @@ if(isset($params['date']) && !empty($params['date'])) {
   $set_date = true;
 }
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
-require_once("$obminclude/global_pref.inc");
+require_once($obminclude . '/global_pref.inc');
 require_once('calendar_query.inc');
-require_once("$obminclude/of/of_contact.php");
+require_once($obminclude . '/of/of_contact.php');
+require_once($obminclude . '/of/of_query.inc');
+require_once($obminclude . '/of/of_session.inc');
 
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -167,6 +169,7 @@ if( isset($GLOBALS['ccalendar_ics_eventStompObserver']) && $GLOBALS['ccalendar_i
 // For debugging purpose, this observer outputs in /tmp/debug
 // OBM_EventFactory::getInstance()->attach(new OBM_EventDebugObserver());
 
+$profiles = get_all_profiles(false);
 
 // Category Filter 
 if (($action == 'insert') || ($action == 'update') 
@@ -877,7 +880,10 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
-  if(Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin") || check_calendar_update_rights($params) ){
+  $peer_profile_id = get_user_profile_id($params['entity_id']);
+  if ((Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin") || check_calendar_update_rights($params))
+    && Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']],
+         $params['entity_id'], $profiles[$peer_profile_id])) {
     $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
   }
   else{
@@ -887,7 +893,10 @@ if ($action == 'search') {
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
+  $peer_profile_id = get_user_profile_id($params['entity_id']);
+  if (Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']],
+       $params['entity_id'], $profiles[$peer_profile_id])
+      && OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display['msg'] .= display_warn_msg($l_of_right_err_auth);

@@ -837,12 +837,13 @@ function get_user_action() {
 // User Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_user_action() {
-  global $params, $actions, $path, $cgp_user;
+  global $params, $actions, $path, $cgp_user, $obm, $profiles;
 
   $id = $params['user_id'];
   if ($id > 0) {
     $u = get_user_info($id);
-    if (check_user_update_rights($params, $u)) {
+    if (Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']], $id, $profiles[$u['perms']])
+        && check_user_update_rights($params, $u)) {
       // Detail Consult
       $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
       $actions['user']['detailconsult']['Condition'][] = 'insert';
