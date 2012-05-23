@@ -42,25 +42,25 @@ public class ItemChangeBuilder implements Builder<ItemChange> {
 		itemChange = new ItemChange();
 	}
 	
-	public ItemChangeBuilder serverId(String serverId) {
+	public ItemChangeBuilder withServerId(String serverId) {
 		Preconditions.checkState(itemChange.getServerId() == null, "serverId already defined");
 		itemChange.setServerId(serverId);
 		return this;
 	}
 	
-	public ItemChangeBuilder parentId(String parentId) {
+	public ItemChangeBuilder withParentId(String parentId) {
 		Preconditions.checkState(itemChange.getParentId() == null, "parentId already defined");
 		itemChange.setParentId(parentId);
 		return this;
 	}
 	
-	public ItemChangeBuilder displayName(String displayName) {
+	public ItemChangeBuilder withDisplayName(String displayName) {
 		Preconditions.checkState(itemChange.getDisplayName() == null, "displayName already defined");
 		itemChange.setDisplayName(displayName);
 		return this;
 	}
 	
-	public ItemChangeBuilder itemType(FolderType itemType) {
+	public ItemChangeBuilder withItemType(FolderType itemType) {
 		Preconditions.checkState(itemChange.getItemType() == null, "itemType already defined");
 		itemChange.setItemType(itemType);
 		return this;
