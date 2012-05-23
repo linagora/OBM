@@ -57,7 +57,6 @@ public class MSEmail implements IApplicationData, Serializable {
 	private MSAddress from;
 	private Date date;
 	private Map<String, String> headers;
-	private Set<MSEmail> forwardMessage;
 	private Set<MSAttachement> attachements;
 	private long uid;
 	private MSEvent invitation;
@@ -91,7 +90,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.from = from;
 		this.headers = headers;
 		this.attachements = attachements;
-		this.forwardMessage = new HashSet<MSEmail>();
 		if (to != null) {
 			this.to = to;
 		} else {
@@ -174,18 +172,6 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	public List<MSAddress> getCc() {
 		return cc;
-	}
-
-	public void setForwardMessage(Set<MSEmail> forwardMessage) {
-		this.forwardMessage = forwardMessage;
-	}
-
-	public Set<MSEmail> getForwardMessage() {
-		return forwardMessage;
-	}
-
-	public void addForwardMessage(MSEmail forwardMessage) {
-		this.forwardMessage.add(forwardMessage);
 	}
 
 	public long getUid() {
@@ -288,7 +274,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(answered, attachements, bcc, body, cc, date, 
-				forwardMessage, from, headers, importance, invitation, messageClass,
+				from, headers, importance, invitation, messageClass,
 				mimeData, read, smtpId, starred, subject, to, uid);
 	}
 	
@@ -303,7 +289,6 @@ public class MSEmail implements IApplicationData, Serializable {
 				.append(body, other.body)
 				.append(cc, other.cc)
 				.append(date, other.date)
-				.append(forwardMessage, other.forwardMessage)
 				.append(from, other.from)
 				.append(headers, other.headers)
 				.append(importance, other.importance)
