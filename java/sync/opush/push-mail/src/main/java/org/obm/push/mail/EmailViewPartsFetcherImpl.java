@@ -31,15 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.minig.imap.EmailView;
-import org.minig.imap.EmailView.Builder;
+import net.fortuna.ical4j.data.ParserException;
+
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
+import org.obm.icalendar.ICalendar;
+import org.obm.mail.conversation.EmailView;
+import org.obm.mail.conversation.EmailViewAttachment;
+import org.obm.mail.conversation.EmailViewInvitationType;
+import org.obm.mail.conversation.EmailView.Builder;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 
@@ -49,29 +57,37 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	
 	private final BackendSession bs;
 	private final String collectionName;
+	private final Integer collectionId;
 	private final long messageUidToFetch;
 	private final List<BodyPreference> bodyPreferences;
 
 	public EmailViewPartsFetcherImpl(
 			PrivateMailboxService privateMailboxService, List<BodyPreference> bodyPreferences,
-			BackendSession bs, String collectionName, long messageUidToFetch) {
+			BackendSession bs, String collectionName, Integer collectionId, long messageUidToFetch) {
+		
 		this.privateMailboxService = privateMailboxService;
 		this.bs = bs;
 		this.collectionName = collectionName;
+		this.collectionId = collectionId;
 		this.messageUidToFetch = messageUidToFetch;
 		this.bodyPreferences = bodyPreferences;
 	}
 
-	public EmailView fetch() throws MailException, ImapMessageNotFoundException {
+	public EmailView fetch() throws MailException, ImapMessageNotFoundException, IOException, ParserException {
 		Builder emailViewBuilder = new EmailView.Builder();
 		emailViewBuilder.uid(messageUidToFetch);
 		
 		fetchFlags(emailViewBuilder);
 		fetchEnvelope(emailViewBuilder);
-		fetchBody(emailViewBuilder);
+		MimeMessage mimeMessage = getMimeMessage();
+		FetchInstructions fetchInstructions = getFetchInstructions(mimeMessage);
+		fetchBody(emailViewBuilder, fetchInstructions);
+		fetchAttachments(emailViewBuilder, fetchInstructions);
+		fetchInvitation(emailViewBuilder, mimeMessage);
 		
 		return emailViewBuilder.build();
 	}
+
 
 	private void fetchFlags(Builder emailViewBuilder) throws MailException {
 		Collection<Flag> emailFlags = privateMailboxService.fetchFlags(bs, collectionName, messageUidToFetch);
@@ -82,14 +98,76 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		UIDEnvelope envelope = privateMailboxService.fetchEnvelope(bs, collectionName, messageUidToFetch);
 		emailViewBuilder.envelope(envelope.getEnvelope());
 	}
+	
+	private MimeMessage getMimeMessage() throws MailException {
+		return privateMailboxService.fetchBodyStructure(bs, collectionName, messageUidToFetch);
+	}
 
-	private void fetchBody(Builder emailViewBuilder) throws MailException {
-		MimeMessage mimeMessage = privateMailboxService.fetchBodyStructure(bs, collectionName, messageUidToFetch);
-		FetchInstructions fetchInstructions = new MimePartSelector().select(bodyPreferences, mimeMessage);
+	private FetchInstructions getFetchInstructions(MimeMessage mimeMessage) {
+		return new MimePartSelector().select(bodyPreferences, mimeMessage);
+	}
+	
+	private void fetchBody(Builder emailViewBuilder, FetchInstructions fetchInstructions) throws MailException {
 		InputStream bodyData = privateMailboxService.fetchMimePartData(bs, collectionName, messageUidToFetch, fetchInstructions);
 		
 		emailViewBuilder.bodyMimePartData(bodyData);
 		emailViewBuilder.bodyMimePart(fetchInstructions.getMimePart());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
+	}
+	
+	private void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions) {
+		List<EmailViewAttachment> attachments = new ArrayList<EmailViewAttachment>();
+		IMimePart parentMessage = fetchInstructions.getMimePart().findRootMimePartInTree();
+		int nbAttachments = 0;
+		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+			if (mp.isAttachment()) {
+				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, nbAttachments++);
+				if (emailViewAttachment != null) {
+					attachments.add(emailViewAttachment);
+				}
+			}
+		}
+		emailViewBuilder.attachments(attachments);
+	}
+	
+	private EmailViewAttachment extractEmailViewAttachment(IMimePart mp, int nbAttachments) {
+		String id = "at_" + messageUidToFetch + "_" + nbAttachments;
+		String partName = mp.getName();
+		
+		String fileReference = AttachmentHelper.getAttachmentId(String.valueOf(collectionId), String.valueOf(messageUidToFetch), 
+				mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
+		
+		if (partName != null) {
+			return new EmailViewAttachment(id, partName, fileReference, mp.getSize());
+		}
+		String contentId = mp.getContentId();
+		if (contentId != null) {
+			return new EmailViewAttachment(id, contentId, fileReference, mp.getSize());
+		}
+		return null;
+	}
+	
+	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage) 
+			throws MailException, IOException, ParserException {
+		
+		IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
+		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+			if (mp.isInvitation()) {
+				fetchICalendar(emailViewBuilder, mp);
+				emailViewBuilder.invitationType(EmailViewInvitationType.REQUEST);
+			}
+			if (mp.isCancelInvitation()) {
+				fetchICalendar(emailViewBuilder, mp);
+				emailViewBuilder.invitationType(EmailViewInvitationType.CANCELED);
+			}
+		}
+	}
+
+	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp)
+			throws MailException, IOException, ParserException {
+
+		InputStream inputStream = privateMailboxService.findAttachment(bs, collectionName, messageUidToFetch, mp.getAddress());
+		ICalendar iCalendar = new ICalendar.Builder().inputStream(inputStream).build();
+		emailViewBuilder.iCalendar(iCalendar);
 	}
 }

@@ -31,11 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.minig.imap.EmailView;
+import org.obm.mail.conversation.EmailView;
 import org.obm.push.bean.ms.MSEmail;
 
 public interface MailViewToMSEmailConverter {
 
 	MSEmail convert(EmailView emailView);
-	
 }

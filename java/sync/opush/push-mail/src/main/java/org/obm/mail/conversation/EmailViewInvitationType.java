@@ -29,43 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.mail.conversation;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.MimeAddress;
-import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
-
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
-	}
-	
+public enum EmailViewInvitationType {
+	REQUEST, CANCELED;
 }

@@ -29,43 +29,65 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.mail.conversation;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.MimeAddress;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import com.google.common.base.Objects;
 
-import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public class EmailViewAttachment {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	private String id;
+	private String displayName;
+	private String fileReference;
+	private Integer size;
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public EmailViewAttachment(String id, String displayName, String fileReference, Integer size) {
+		this.id = id;
+		this.displayName = displayName;
+		this.fileReference = fileReference;
+		this.size = size;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public Integer getSize() {
+		return size;
+	}
+
+	public String getFileReference() {
+		return fileReference;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(id, displayName, fileReference, size);
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof EmailViewAttachment) {
+			EmailViewAttachment that = (EmailViewAttachment) object;
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.displayName, that.displayName)
+				&& Objects.equal(this.fileReference, that.fileReference)
+				&& Objects.equal(this.size, that.size);
+		}
+		return false;
 	}
-	
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("id", id)
+			.add("displayName", displayName)
+			.add("fileReference", fileReference)
+			.add("size", size)
+			.toString();
+	}
 }

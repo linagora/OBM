@@ -31,21 +31,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.minig.imap.EmailView;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.minig.imap.Flag;
+import org.obm.mail.conversation.EmailView;
+import org.obm.mail.conversation.EmailViewAttachment;
+import org.obm.mail.conversation.EmailViewInvitationType;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.inject.Singleton;
 
 @Singleton
 public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverter {
-
-	
 	
 	@Override
 	public MSEmail convert(EmailView emailView) {
@@ -55,6 +62,9 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		fillFlags(msEmailBuilder, emailView);
 		msEmailBuilder.header(convertHeader(emailView));
 		msEmailBuilder.body(convertBody(emailView));
+		msEmailBuilder.attachements(convertAttachment(emailView));
+		msEmailBuilder.meetingRequest(convertICalendar(emailView));
+		msEmailBuilder.messageClass(convertInvitationType(emailView));
 		
 		return msEmailBuilder.build();
 	}
@@ -63,6 +73,10 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		msEmailBuilder.answered(hasFlag(emailView, Flag.ANSWERED));
 		msEmailBuilder.read(hasFlag(emailView, Flag.SEEN));
 		msEmailBuilder.starred(hasFlag(emailView, Flag.FLAGGED));
+	}
+	
+	private boolean hasFlag(EmailView emailView, Flag flag) {
+		return emailView.getFlags().contains(flag);
 	}
 	
 	private MSEmailHeader convertHeader(EmailView emailView) {
@@ -74,11 +88,38 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		MSEmailBodyType bodyType = MSEmailBodyType.fromMimeType(emailView.getBodyContentType().getFullMimeType());
 		Integer bodyTruncation = emailView.getBodyTruncation();
 		
-		return new MSEmailBody(mimeData, bodyType, null, bodyTruncation);
+		return new MSEmailBody(mimeData, bodyType, bodyTruncation);
 	}
 
-	private boolean hasFlag(EmailView emailView, Flag flag) {
-		return emailView.getFlags().contains(flag);
+	private Set<MSAttachement> convertAttachment(EmailView emailView) {
+		Set<MSAttachement> msAttachments = new HashSet<MSAttachement>();
+		if (emailView.getAttachments() != null) {
+			for (EmailViewAttachment attachment : emailView.getAttachments()) {
+				MSAttachement msAttachment = new MSAttachement();
+				msAttachment.setDisplayName(attachment.getDisplayName());
+				msAttachment.setEstimatedDataSize(attachment.getSize());
+				msAttachment.setFileReference(attachment.getFileReference());
+				msAttachment.setMethod(MethodAttachment.NormalAttachment);
+				msAttachments.add(msAttachment);
+			}
+		}
+		return msAttachments;
 	}
 	
+	private MSMeetingRequest convertICalendar(EmailView emailView) {
+		if (emailView.getICalendar() == null) {
+			return null;
+		}
+		return new ICalendarConverter().convertToMSMeetingRequest(emailView.getICalendar());
+	}
+
+	private MSMessageClass convertInvitationType(EmailView emailView) {
+		if (emailView.getInvitationType() == EmailViewInvitationType.REQUEST) {
+			return MSMessageClass.SCHEDULE_MEETING_REQUEST;
+		}
+		if (emailView.getInvitationType() == EmailViewInvitationType.CANCELED) {
+			return MSMessageClass.SCHEDULE_MEETING_CANCELED;
+		}
+		return null;
+	}
 }

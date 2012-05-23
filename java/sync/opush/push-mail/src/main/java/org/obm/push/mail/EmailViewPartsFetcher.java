@@ -31,10 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.minig.imap.EmailView;
+import java.io.IOException;
+
+import net.fortuna.ical4j.data.ParserException;
+
+import org.obm.mail.conversation.EmailView;
 
 public interface EmailViewPartsFetcher {
 
-	EmailView fetch() throws MailException, ImapMessageNotFoundException;
-	
+	EmailView fetch() throws MailException, ImapMessageNotFoundException, IOException, ParserException;
 }
