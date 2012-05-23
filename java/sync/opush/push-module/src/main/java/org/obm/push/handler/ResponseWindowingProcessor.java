@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,74 +66,52 @@ public class ResponseWindowingProcessor {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	@VisibleForTesting List<ItemChange> window(SyncCollection c, DataDelta delta, 
+	@VisibleForTesting List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
 	
 		final Credentials credentials = backendSession.getCredentials();
 		final Device device = backendSession.getDevice();
+		final Integer collectionId = c.getCollectionId();
+		final Integer windowSize = c.getWindowSize();	
 		
-		List<ItemChange> changes = listItems(delta, credentials, device, c.getCollectionId());
+		List<ItemChange> changes = listItems(delta, credentials, device, collectionId);
 		
-		if (changesFitWindow(c.getWindowSize(), changes)) {
+		if (changesFitWindow(windowSize, changes)) {
 			return changes;
-		} else {
-			return handleOverflow(c, processedClientIds, credentials, device, changes);
 		}
-	}
-
-	private List<ItemChange> handleOverflow(SyncCollection c, Map<String, String> processedClientIds, 
-			Credentials credentials, Device device, List<ItemChange> changes) {
 		
-		c.setMoreAvailable(true);
-		
-		logWindowingInformation(c, changes);
+		logger.info("should send {} change(s)", changes.size());
+		int changeItem = changes.size() - c.getWindowSize();
+		logger.info("WindowsSize value is {} , {} changes will not be sent", 
+				new Object[]{ c.getWindowSize(), (changeItem < 0 ? 0 : changeItem) });
 
-		List<ItemChange> changesFromClient = changedFromClient(changes, processedClientIds);
-		List<ItemChange> changesFromServer = changesFromServer(changes, changesFromClient);
-		
-		int numberOfChangesFromServerToInclude = Math.max(0, c.getWindowSize() - changesFromClient.size());
-		storeOverflowingItems(credentials, device, c.getCollectionId(), changesFromServer, numberOfChangesFromServerToInclude);
-		
-		return Lists.newArrayList(
-				Iterables.concat(
-						changesFromClient, 
-						Iterables.limit(changesFromServer, numberOfChangesFromServerToInclude)));
-	}
-
-	private void storeOverflowingItems(final Credentials credentials,
-			final Device device, final Integer collectionId,
-			List<ItemChange> changesFromServer,
-			int numberOfChangesFromServerToInclude) {
-		if (numberOfChangesFromServerToInclude < changesFromServer.size()) {
-			List<ItemChange> itemsToStore = Lists.newArrayList(Iterables.skip(changesFromServer, numberOfChangesFromServerToInclude));
-			unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, itemsToStore);
-		}
-	}
-
-	private List<ItemChange> changesFromServer(List<ItemChange> changes, List<ItemChange> itemsChangedByClient) {
-		List<ItemChange> changesFromServer = Lists.newArrayList(changes);
-		changesFromServer.removeAll(itemsChangedByClient);
-		return changesFromServer;
-	}
-
-	private List<ItemChange> changedFromClient(List<ItemChange> changes, Map<String, String> processedClientIds) {
-		List<ItemChange> itemsChangedByClient = Lists.newArrayList();
-		for (ItemChange change: changes) {
-			if (processedClientIds.containsKey(change.getServerId())) {
-				itemsChangedByClient.add(change);
+		final Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
+		// Find changes ask by the device
+		for (Iterator<ItemChange> it = changes.iterator(); it.hasNext();) {
+			ItemChange ic = it.next();
+			if (processedClientIds.containsKey(ic.getServerId())) {
+				changeByMobile.add(ic);
+				it.remove();
 			}
-			if (processedClientIds.size() == itemsChangedByClient.size()) {
+			if (processedClientIds.size() == changeByMobile.size()) {
 				break;
 			}
 		}
-		
-		return itemsChangedByClient;
-	}
 
-	private void logWindowingInformation(SyncCollection c, List<ItemChange> changes) {
-		int overflow = changes.size() - c.getWindowSize();
-		logger.info("Should send {} change(s)", changes.size());
-		logger.info("WindowsSize value is {} , {} change(s) will not be sent", c.getWindowSize(), overflow);
+		LinkedList<ItemChange> toKeepForLaterSync = Lists.newLinkedList();
+		
+		int changedSize = changes.size();
+		for (int i = windowSize; i < changedSize; i++) {
+			ItemChange ic = changes.get(changes.size() - 1);
+			toKeepForLaterSync.addFirst(ic);
+			changes.remove(ic);
+		}
+
+		unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, toKeepForLaterSync);
+		changes.addAll(changeByMobile);
+		c.setMoreAvailable(true);
+		
+		return changes;
 	}
 
 	private boolean changesFitWindow(final Integer windowSize,
