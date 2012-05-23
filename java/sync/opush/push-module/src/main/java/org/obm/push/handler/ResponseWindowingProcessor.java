@@ -92,7 +92,8 @@ public class ResponseWindowingProcessor {
 		// Find changes ask by the device
 		for (Iterator<ItemChange> it = changed.iterator(); it.hasNext();) {
 			ItemChange ic = it.next();
-			if (processedClientIds.containsKey(ic.getServerId())) {
+			if (processedClientIds.get(ic.getServerId()) != null
+					|| processedClientIds.keySet().contains(ic.getServerId())) {
 				changeByMobile.add(ic);
 				it.remove();
 			}
