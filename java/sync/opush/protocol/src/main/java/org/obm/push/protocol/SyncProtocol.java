@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
@@ -76,7 +76,7 @@ public class SyncProtocol {
 		return new SyncRequest( syncDecoder.decodeSync(doc, userDataRequest) );
 	}
 
-	public Document endcodeResponse(SyncResponse syncResponse) {
+	public Document endcodeResponse(SyncResponse syncResponse) throws IOException {
 		Document reply = DOMUtils.createDoc(null, "Sync");
 		Element root = reply.getDocumentElement();
 		
@@ -133,7 +133,9 @@ public class SyncProtocol {
 		return ret;
 	}
 
-	private void buildFetchItemChange(UserDataRequest udr, SyncCollectionResponse c, Element ce, EncoderFactory encoderFactory) {
+	private void buildFetchItemChange(UserDataRequest udr, SyncCollectionResponse c, Element ce, 
+			EncoderFactory encoderFactory) throws IOException {
+		
 		Element commands = DOMUtils.createElement(ce, "Responses");
 		for (ItemChange ic : c.getItemChanges()) {
 			Element add = DOMUtils.createElement(commands, "Fetch");
@@ -141,19 +143,19 @@ public class SyncProtocol {
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asXmlValue());
 			c.getSyncCollection().getOptions().initTruncation();
-			serializeChange(udr, add, c.getSyncCollection(), ic, encoderFactory);
+			serializeChange(udr, add, ic, encoderFactory);
 		}
 	}
 	
 	private void serializeChange(UserDataRequest udr, Element col,
-			SyncCollection c, ItemChange ic, EncoderFactory encoderFactory) {
+			ItemChange ic, EncoderFactory encoderFactory) throws IOException {
 		
 		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoderFactory.encode(udr, apData, ic.getData(), c, true);
+		encoderFactory.encode(udr, apData, ic.getData(), true);
 	}
 	
-	private void buildUpdateItemChange(UserDataRequest udr, SyncCollectionResponse c, Map<String, String> processedClientIds, 
-			Element ce, EncoderFactory encoderFactory) {
+	private void buildUpdateItemChange(UserDataRequest udr, SyncCollectionResponse c,	Map<String, String> processedClientIds, 
+			Element ce, EncoderFactory encoderFactory) throws IOException {
 		
 		Element responses = DOMUtils.createElement(ce, "Responses");
 		if (c.getSyncCollection().isMoreAvailable()) {
@@ -184,7 +186,7 @@ public class SyncProtocol {
 				String commandName = selectCommandName(ic);
 				Element command = DOMUtils.createElement(commands, commandName);
 				DOMUtils.createElementAndText(command, "ServerId", ic.getServerId());
-				serializeChange(udr, command, c.getSyncCollection(), ic, encoderFactory);
+				serializeChange(udr, command, ic, encoderFactory);
 			}
 			processedClientIds.remove(ic.getServerId());
 		}

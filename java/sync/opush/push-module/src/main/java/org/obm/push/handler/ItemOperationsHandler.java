@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,6 +121,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		} catch (UnsupportedStoreException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (ProcessingEmailException e) {
+			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+		} catch (IOException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}

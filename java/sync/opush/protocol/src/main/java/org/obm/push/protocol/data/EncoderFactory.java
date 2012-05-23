@@ -31,9 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.io.IOException;
+
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
@@ -46,13 +48,13 @@ public class EncoderFactory {
 	private final Provider<CalendarEncoder> calendarProvider;
 	private final Provider<ContactEncoder> contactProvider;
 	private final Provider<TaskEncoder> taskEncoder;
-	private final Provider<EmailEncoder> emailEncoder;
+	private final Provider<MSEmailEncoder> emailEncoder;
 
 	@Inject
 	private EncoderFactory(Provider<CalendarEncoder> calendarProvider,
 			Provider<ContactEncoder> contactProvider,
 			Provider<TaskEncoder> taskEncoder,
-			Provider<EmailEncoder> emailEncoder) {
+			Provider<MSEmailEncoder> emailEncoder) {
 		super();
 		this.calendarProvider = calendarProvider;
 		this.contactProvider = contactProvider;
@@ -61,7 +63,7 @@ public class EncoderFactory {
 	}
 	
 	public void encode(UserDataRequest udr, Element parent, 
-			IApplicationData data, SyncCollection c, boolean isResponse) {
+			IApplicationData data, boolean isResponse) throws IOException {
 		
 		if (data != null) {
 			switch (data.getType()) {
@@ -75,7 +77,7 @@ public class EncoderFactory {
 				taskEncoder.get().encode(udr, parent, data);
 				break;
 			case EMAIL:
-				emailEncoder.get().encode(udr, parent, data, c);
+				emailEncoder.get().encode(parent, data);
 				break;
 			}
 		}
