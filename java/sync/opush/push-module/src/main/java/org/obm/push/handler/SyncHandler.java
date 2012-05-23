@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -184,6 +185,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (ConversionException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (UnsupportedBackendFunctionException e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (IOException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
@@ -363,6 +366,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (InvalidServerId e) {
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);			
 		} catch (ConversionException e) {
+			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
+		} catch (IOException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
