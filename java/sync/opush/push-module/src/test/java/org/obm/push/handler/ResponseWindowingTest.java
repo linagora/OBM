@@ -109,42 +109,6 @@ public class ResponseWindowingTest {
 		Assertions.assertThat(thirdCall).isEqualTo(deltasWithOffset(1, 4).getChanges());
 	}
 
-	@Test
-	public void processNoNewDataButUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
-		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		replay(unsynchronizedItemDao);
-		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		List<ItemChange> actual = 
-				responseWindowingProcessor.processWindowSize(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
-		
-		verify(unsynchronizedItemDao);
-		
-		Assertions.assertThat(actual).isEqualTo(deltas(3).getChanges());
-	}
-
-	@Test
-	public void processNewDataAndUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
-		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		replay(unsynchronizedItemDao);
-		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		List<ItemChange> actual = 
-				responseWindowingProcessor.processWindowSize(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
-		
-		verify(unsynchronizedItemDao);
-		
-		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
-	}
-	
 	private DataDelta emptyDelta() {
 		return new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), DateUtils.date("2012-01-01"));
 	}
