@@ -64,9 +64,8 @@ public class SyncHandlerTest {
 		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
 		replay(unsynchronizedItemDao);
 		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
 		SyncHandler syncHandler = 
-				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null, responseWindowingProcessor);
+				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null);
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
 				syncHandler.processWindowSize(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
@@ -93,9 +92,8 @@ public class SyncHandlerTest {
 		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
 		replay(unsynchronizedItemDao);
 		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
 		SyncHandler syncHandler = 
-				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null, responseWindowingProcessor);
+				new SyncHandler(null, null, null, null, null, unsynchronizedItemDao, null, null, null, null, null, null, null);
 		List<ItemChange> firstCall = 
 				syncHandler.processWindowSize(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> secondCall = 

@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +52,8 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
@@ -123,7 +127,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
 	private final CollectionPathHelper collectionPathHelper;
-	private final ResponseWindowingProcessor responseWindowingProcessor;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -134,8 +137,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ResponseWindowingProcessor responseWindowingProcessor) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -145,7 +147,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.syncProtocol = SyncProtocol;
 		this.itemTrackingDao = itemTrackingDao;
 		this.collectionPathHelper = collectionPathHelper;
-		this.responseWindowingProcessor = responseWindowingProcessor;
 	}
 
 	@Override
@@ -281,7 +282,57 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@VisibleForTesting List<ItemChange> processWindowSize(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
-		return responseWindowingProcessor.processWindowSize(c, delta, backendSession, processedClientIds);
+		
+		final Credentials credentials = backendSession.getCredentials();
+		final Device device = backendSession.getDevice();
+		final Integer collectionId = c.getCollectionId();
+		final Integer windowSize = c.getWindowSize();	
+		
+		final List<ItemChange> changed = new ArrayList<ItemChange>();
+		if (delta != null) {
+			changed.addAll(delta.getChanges());
+		}
+		
+		changed.addAll(unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId));
+		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
+		
+		if (changed.size() <= windowSize) {
+			return changed;
+		}
+		
+		logger.info("should send {} change(s)", changed.size());
+		int changeItem = changed.size() - c.getWindowSize();
+		logger.info("WindowsSize value is {} , {} changes will not be sent", 
+				new Object[]{ c.getWindowSize(), (changeItem < 0 ? 0 : changeItem) });
+
+		final Set<ItemChange> changeByMobile = new HashSet<ItemChange>();
+		// Find changes ask by the device
+		for (Iterator<ItemChange> it = changed.iterator(); it.hasNext();) {
+			ItemChange ic = it.next();
+			if (processedClientIds.get(ic.getServerId()) != null
+					|| processedClientIds.keySet().contains(ic.getServerId())) {
+				changeByMobile.add(ic);
+				it.remove();
+			}
+			if (processedClientIds.size() == changeByMobile.size()) {
+				break;
+			}
+		}
+
+		ArrayList<ItemChange> toKeepForLaterSync = new ArrayList<ItemChange>();
+		
+		int changedSize = changed.size();
+		for (int i = windowSize; i < changedSize; i++) {
+			ItemChange ic = changed.get(changed.size() - 1);
+			toKeepForLaterSync.add(ic);
+			changed.remove(ic);
+		}
+
+		unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, toKeepForLaterSync);
+		changed.addAll(changeByMobile);
+		c.setMoreAvailable(true);
+		
+		return changed;
 	}
 
 	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
