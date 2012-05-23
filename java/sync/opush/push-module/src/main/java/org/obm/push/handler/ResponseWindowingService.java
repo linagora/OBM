@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -164,7 +165,7 @@ public class ResponseWindowingService {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
+	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
 		final Credentials credentials = backendSession.getCredentials();
 		final Device device = backendSession.getDevice();
@@ -184,7 +185,7 @@ public class ResponseWindowingService {
 				return items;
 			}
 			
-		}).window(c, delta.getChanges(), processedClientIds);
+		}).window(c, getNewItems(delta), processedClientIds);
 	}
 
 	public List<ItemChange> windowDeletions(final SyncCollection c, DataDelta delta, final BackendSession backendSession, Map<String, String> processedClientIds) {
@@ -206,8 +207,21 @@ public class ResponseWindowingService {
 				return items;
 			}
 			
-		}).window(c, delta.getDeletions(), processedClientIds);
+		}).window(c, getDeletedItems(delta), processedClientIds);
 	}
 
+	private List<ItemChange> getNewItems(DataDelta delta) {
+		if (delta != null) {
+			return delta.getChanges();
+		}
+		return ImmutableList.<ItemChange>of();
+	}
+
+	private List<ItemChange> getDeletedItems(DataDelta delta) {
+		if (delta != null) {
+			return delta.getDeletions();
+		}
+		return ImmutableList.<ItemChange>of();
+	}
 	
 }
