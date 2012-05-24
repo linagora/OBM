@@ -29,12 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.exception;
 
-import org.obm.mail.conversation.EmailView;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 
-public interface EmailViewPartsFetcher {
+public class EmailViewPartsFetcherException extends Exception {
 
-	EmailView fetch(long uid) throws EmailViewPartsFetcherException;
+	public EmailViewPartsFetcherException(Throwable t) {
+		super(t);
+	}
 }
