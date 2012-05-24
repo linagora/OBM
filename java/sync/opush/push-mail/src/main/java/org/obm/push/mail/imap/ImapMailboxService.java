@@ -64,7 +64,9 @@ import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
+import org.obm.mail.conversation.EmailView;
 import org.obm.push.bean.Address;
+import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.EmailHeaders;
@@ -73,6 +75,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
@@ -83,10 +86,12 @@ import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
+import org.obm.push.mail.EmailViewPartsFetcherImpl;
 import org.obm.push.mail.FetchInstructions;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
+import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
@@ -121,17 +126,21 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	private final ImapClientProvider imapClientProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final CollectionPathHelper collectionPathHelper;
+
+	private final MailViewToMSEmailConverter msEmailConverter;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
-			ImapMailBoxUtils imapMailBoxUtils, CollectionPathHelper collectionPathHelper) {
+			ImapMailBoxUtils imapMailBoxUtils, CollectionPathHelper collectionPathHelper, 
+			MailViewToMSEmailConverter msEmailConverter) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.collectionPathHelper = collectionPathHelper;
+		this.msEmailConverter = msEmailConverter;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
@@ -162,7 +171,24 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
+	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
+			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException {
+		
+		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
+		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
+				new EmailViewPartsFetcherImpl(this, bodyPreferences, udr, collectionName, collectionId);
+		
+		for (Long uid: uids) {
+			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
+			msEmails.add(msEmailConverter.convert(emailView));
+		}
+		return msEmails;
+	}
+	
+	@Override
+	public IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, 
+			long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
+		
 		Preconditions.checkNotNull(headersToFetch);
 		if (Iterables.isEmpty(headersToFetch)) {
 			return new IMAPHeaders();
