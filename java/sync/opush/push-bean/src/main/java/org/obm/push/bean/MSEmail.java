@@ -45,12 +45,7 @@ import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Objects;
 
-public class MSEmail implements IApplicationData, Serializable {
-
-	@Override
-	public PIMDataType getType() {
-		return PIMDataType.EMAIL;
-	}
+public class MSEmail implements Serializable {
 
 	private String subject;
 	private MSEmailBody body;

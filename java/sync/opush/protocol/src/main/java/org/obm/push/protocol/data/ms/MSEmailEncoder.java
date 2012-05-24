@@ -76,7 +76,7 @@ public class MSEmailEncoder {
 		DOMUtils.createElementAndText(parent, ASEMAIL.READ.asASValue(), msEmail.isRead());
 
 		serializeBody(parent, msEmail.getBody());
-		serializeAttachments(parent, msEmail.getAttachements());
+		serializeAttachments(parent, msEmail.getAttachments());
 
 		MSMessageClass messageClass = msEmail.getMessageClass();
 		DOMUtils.createElementAndText(parent, ASEMAIL.MESSAGE_CLASS.asASValue(), messageClass.specificationValue());
@@ -102,7 +102,7 @@ public class MSEmailEncoder {
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.DATA.asASValue(), mimeData);
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TYPE.asASValue(), bodyType.asXmlValue());
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TRUNCATED.asASValue(), body.isTruncated());
-		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation.intValue());
+		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation);
 	}
 
 	private void serializeAttachments(Element parent, Set<MSAttachement> attachments) {
