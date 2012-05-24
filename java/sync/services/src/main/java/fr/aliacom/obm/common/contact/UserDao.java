@@ -40,16 +40,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.ContactLabel;
 import org.obm.sync.book.Email;
+import org.obm.sync.book.Phone;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -59,6 +67,17 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+	
+	private static final Map<ContactLabel, String> contactLabelForUserObmField = 
+			ImmutableMap.<ContactLabel, String>builder()
+				.put(ContactLabel.PHONE, "userobm_phone")
+				.put(ContactLabel.PHONE2, "userobm_phone2")
+				.put(ContactLabel.MOBILE, "userobm_mobile")
+				.put(ContactLabel.FAX, "userobm_fax")
+				.put(ContactLabel.FAX2, "userobm_fax2")
+				.build();
+	
+	
 	private final ObmHelper obmHelper;
 	private final ContactConfiguration contactConfiguration;
 	
@@ -76,7 +95,10 @@ public class UserDao {
 		ContactUpdates cu = new ContactUpdates();
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name "
+				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name, "
+				+ "userobm_phone, userobm_phone2, userobm_mobile, userobm_fax, userobm_fax2, "
+				+ "userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, "
+				+ "userobm_town, userobm_expresspostal " 
 				+ "from UserObm "
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
@@ -121,9 +143,57 @@ public class UserDao {
 		c.setFirstname(rs.getString("userobm_firstname"));
 		c.setLastname(rs.getString("userobm_lastname"));
 		c.setCommonname(rs.getString("userobm_commonname"));
-		c.addEmail("INTERNET;X-OBM-Ref1", new Email(getEmail(rs
-				.getString("userobm_email"), rs.getString("domain_name"))));
+		c.setCompany(rs.getString("userobm_company"));
+		c.setService(rs.getString("userobm_service"));
+		c.setManager(rs.getString("userobm_direction"));
+		c.setTitle(rs.getString("userobm_title"));
+		c.setComment(rs.getString("userobm_description"));
+			
+		c.addEmail(ContactLabel.EMAIL.getContactLabel(), new Email(
+				getEmail(rs.getString("userobm_email"), rs.getString("domain_name"))));
+		
+		addPhonesToContact(rs, c);
+		addAddressToContact(rs, c);
 		return c;
+	}
+
+	private void addAddressToContact(ResultSet rs, Contact c)
+			throws SQLException {
+		
+		String street = buildFullStreetAddressFromResultSet(rs);
+		String zipCode = rs.getString("userobm_zipcode");
+		String cedex = rs.getString("userobm_expresspostal");
+		String town = rs.getString("userobm_town");
+		String country = null;
+		String state = null;
+		Address address = new Address(street , zipCode, cedex, town, country, state);
+		c.addAddress(ContactLabel.ADDRESS.getContactLabel(), address);
+	}
+
+	private String buildFullStreetAddressFromResultSet(ResultSet rs) throws SQLException {
+		return Joiner.on(" ").skipNulls().join(
+			Strings.emptyToNull(rs.getString("userobm_address1")),
+			Strings.emptyToNull(rs.getString("userobm_address2")),
+			Strings.emptyToNull(rs.getString("userobm_address3")));
+	}
+
+	private void addPhonesToContact(ResultSet rs, Contact c)
+			throws SQLException {
+		
+		for (Entry<ContactLabel, String> labelToField : contactLabelForUserObmField.entrySet()) {
+			addPhoneToContact(c, rs, labelToField.getKey(), labelToField.getValue());
+		}
+	}
+
+	private void addPhoneToContact(Contact contact, ResultSet rs,
+			ContactLabel contactLabel, String phoneFieldName) throws SQLException {
+		
+		String phoneFieldValue = rs.getString(phoneFieldName);
+		contact.addPhone(contactLabel.getContactLabel(), phone(phoneFieldValue));
+	}
+
+	private Phone phone(String phoneNumber) {
+		return new Phone(phoneNumber);
 	}
 
 	private String getEmail(String string, String domain) {
