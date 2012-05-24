@@ -31,32 +31,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.ms;
 
+import java.io.ByteArrayInputStream;
+
 import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
+import org.obm.push.utils.SerializableInputStream;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEmailTest {
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=NullPointerException.class)
 	public void testMSEmailBuilderRequireUid() {
 		new MSEmail.MSEmailBuilder().build();
-	}
-	
-	@Test
-	public void testMSEmailBuilderWithUid() {
-		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
-		
-		MSEmail msEmail = msEmailBuilder.uid(34).build();
-	
-		Assertions.assertThat(msEmail.getUid()).isEqualTo(34);
 	}
 	
 	@Test
@@ -103,8 +99,13 @@ public class MSEmailTest {
 	}
 
 	private MSEmailBuilder requirementsInitializedBuilder() {
+		String message = "text";
+		MSEmailBodyType emailBodyType = MSEmailBodyType.PlainText;
 		return new MSEmail.MSEmailBuilder()
-			.uid(1l);
+				.uid(1l)
+				.header(new MSEmailHeader.Builder().build())
+					.body(new MSEmailBody(new SerializableInputStream(
+							new ByteArrayInputStream(message.getBytes())), emailBodyType, null));
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {

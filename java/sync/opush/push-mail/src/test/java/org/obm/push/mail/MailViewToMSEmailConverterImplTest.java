@@ -351,14 +351,14 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getAttachements()).isEmpty();
+		assertThat(convertedMSEmail.getAttachments()).isEmpty();
 	}
 	
 	@Test
 	public void testAttachments() throws IOException, ParserException {
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getAttachements()).hasSize(1);
+		assertThat(convertedMSEmail.getAttachments()).hasSize(1);
 	}
 
 	@Test

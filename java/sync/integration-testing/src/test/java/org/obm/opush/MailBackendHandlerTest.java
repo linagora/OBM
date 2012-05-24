@@ -41,6 +41,7 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -71,17 +72,21 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
 
@@ -147,7 +152,7 @@ public class MailBackendHandlerTest {
 			new ItemChangesBuilder()
 				.addItemChange(
 					new ItemChangeBuilder().serverId(serverId + syncEmailId)
-						.withApplicationData(new MSEmail())))
+						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 		.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -260,5 +265,13 @@ public class MailBackendHandlerTest {
 	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {
 		MailFolder inboxFolder = imapHostManager.getFolder(user, mailbox);
 		Assertions.assertThat(inboxFolder.getMessageCount()).isEqualTo(expectedNumberOfEmails);
+	}
+	
+	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
+		return new MSEmail.MSEmailBuilder()
+			.uid(1l)
+			.header(new MSEmailHeader.Builder().build())
+			.body(new MSEmailBody(new SerializableInputStream(
+					new ByteArrayInputStream(message.getBytes())), emailBodyType, null)).build();
 	}
 }

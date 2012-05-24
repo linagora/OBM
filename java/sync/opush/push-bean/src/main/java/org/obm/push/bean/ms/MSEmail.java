@@ -48,6 +48,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 public class MSEmail implements IApplicationData, Serializable {
 
@@ -57,7 +58,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		
 		private MSEmailHeader header;
 		private MSEmailBody body;
-		private Set<MSAttachement> attachements;
+		private Set<MSAttachement> attachments;
 		private MSMeetingRequest meetingRequest;
 		private MSMessageClass messageClass;
 		private MSImportance importance;
@@ -66,6 +67,10 @@ public class MSEmail implements IApplicationData, Serializable {
 		private boolean starred;
 		private boolean answered;
 
+		public MSEmailBuilder() {
+			attachments = Sets.newHashSet();
+		}
+		
 		public MSEmailBuilder uid(long uid) {
 			this.uid = uid;
 			return this;
@@ -82,7 +87,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmailBuilder attachements(Set<MSAttachement> attachements) {
-			this.attachements = attachements;
+			this.attachments = attachements;
 			return this;
 		}
 		
@@ -123,7 +128,10 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmail build() {
-			Preconditions.checkState(uid != null, "The uid is required");
+			Preconditions.checkNotNull(uid, "The uid is required");
+			Preconditions.checkNotNull(header, "The header is required");
+			Preconditions.checkNotNull(body, "The body is required");
+			Preconditions.checkNotNull(attachments, "The attachments cannot be null");
 			
 			if (messageClass == null) {
 				messageClass = MSMessageClass.NOTE;
@@ -131,7 +139,7 @@ public class MSEmail implements IApplicationData, Serializable {
 			if (importance == null) {
 				importance = MSImportance.NORMAL;
 			}
-			return new MSEmail(uid, header, body, attachements, meetingRequest, messageClass,
+			return new MSEmail(uid, header, body, attachments, meetingRequest, messageClass,
 					importance, read, starred, answered);
 		}
 	}
@@ -145,7 +153,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	private final MSEmailHeader header;
 	private final MSEmailBody body;
-	private final Set<MSAttachement> attachements;
+	private final Set<MSAttachement> attachments;
 	private final MSMeetingRequest meetingRequest;
 	private final MSMessageClass messageClass;
 	private final MSImportance importance;
@@ -154,13 +162,13 @@ public class MSEmail implements IApplicationData, Serializable {
 	private final boolean starred;
 	private final boolean answered;
 
-	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachements,
+	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachments,
 			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
 			boolean read, boolean starred, boolean answered) {
 		this.uid = uid;
 		this.header = header;
 		this.body = body;
-		this.attachements = attachements;
+		this.attachments = attachments;
 		this.meetingRequest = meetingRequest;
 		this.messageClass = messageClass;
 		this.importance = importance;
@@ -201,8 +209,8 @@ public class MSEmail implements IApplicationData, Serializable {
 		return body;
 	}
 
-	public Set<MSAttachement> getAttachements() {
-		return attachements;
+	public Set<MSAttachement> getAttachments() {
+		return attachments;
 	}
 
 	public MSMeetingRequest getMeetingRequest() {
@@ -231,7 +239,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(answered, attachements, header, body, 
+		return Objects.hashCode(answered, attachments, header, body, 
 				importance, meetingRequest, messageClass,
 				read, starred, uid);
 	}
@@ -242,7 +250,7 @@ public class MSEmail implements IApplicationData, Serializable {
 			MSEmail other = (MSEmail) obj;
 			return new EqualsBuilder()
 				.append(answered, other.answered)
-				.append(attachements, other.attachements)
+				.append(attachments, other.attachments)
 				.append(header, other.header)
 				.append(body, other.body)
 				.append(importance, other.importance)
