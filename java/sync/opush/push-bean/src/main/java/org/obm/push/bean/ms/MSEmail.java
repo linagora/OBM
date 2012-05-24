@@ -57,7 +57,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		
 		private MSEmailHeader header;
 		private MSEmailBody body;
-		private Set<MSEmail> forwardMessage;
 		private Set<MSAttachement> attachements;
 		private MSMeetingRequest meetingRequest;
 		private MSMessageClass messageClass;
@@ -79,11 +78,6 @@ public class MSEmail implements IApplicationData, Serializable {
 
 		public MSEmailBuilder body(MSEmailBody body) {
 			this.body = body;
-			return this;
-		}
-		
-		public MSEmailBuilder forwardMessage(Set<MSEmail> forwardMessage) {
-			this.forwardMessage = forwardMessage;
 			return this;
 		}
 		
@@ -138,7 +132,7 @@ public class MSEmail implements IApplicationData, Serializable {
 				importance = MSImportance.NORMAL;
 			}
 			return new MSEmail(uid, header, body, attachements, meetingRequest, messageClass,
-					importance, forwardMessage, read, starred, answered);
+					importance, read, starred, answered);
 		}
 	}
 	
@@ -151,7 +145,6 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	private final MSEmailHeader header;
 	private final MSEmailBody body;
-	private final Set<MSEmail> forwardMessage;
 	private final Set<MSAttachement> attachements;
 	private final MSMeetingRequest meetingRequest;
 	private final MSMessageClass messageClass;
@@ -163,7 +156,6 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachements,
 			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
-			Set<MSEmail> forwardMessage,
 			boolean read, boolean starred, boolean answered) {
 		this.uid = uid;
 		this.header = header;
@@ -172,7 +164,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.meetingRequest = meetingRequest;
 		this.messageClass = messageClass;
 		this.importance = importance;
-		this.forwardMessage = forwardMessage;
 		this.read = read;
 		this.starred = starred;
 		this.answered = answered;
@@ -210,10 +201,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		return body;
 	}
 
-	public Set<MSEmail> getForwardMessage() {
-		return forwardMessage;
-	}
-
 	public Set<MSAttachement> getAttachements() {
 		return attachements;
 	}
@@ -245,7 +232,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(answered, attachements, header, body, 
-				forwardMessage, importance, meetingRequest, messageClass,
+				importance, meetingRequest, messageClass,
 				read, starred, uid);
 	}
 	
@@ -258,7 +245,6 @@ public class MSEmail implements IApplicationData, Serializable {
 				.append(attachements, other.attachements)
 				.append(header, other.header)
 				.append(body, other.body)
-				.append(forwardMessage, other.forwardMessage)
 				.append(importance, other.importance)
 				.append(meetingRequest, other.meetingRequest)
 				.append(messageClass, other.messageClass)
