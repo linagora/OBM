@@ -40,6 +40,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.ms.MSRead;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
@@ -100,6 +101,7 @@ public class BeansTest {
 					.add(MSMeetingRequestRecurrence.class)
 					.add(MSMeetingRequestCategory.class)
 					.add(MSEmailHeader.class)
+					.add(MSRead.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

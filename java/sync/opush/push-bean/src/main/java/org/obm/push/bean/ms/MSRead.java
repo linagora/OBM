@@ -29,17 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.bean.ms;
+
+import java.io.Serializable;
 
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ms.MSRead;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.bean.PIMDataType;
 
-public class EmailDecoder extends Decoder implements IDataDecoder {
+import com.google.common.base.Objects;
+
+public class MSRead implements IApplicationData, Serializable {
 
 	@Override
-	public IApplicationData decode(Element syncData) {
-		return new MSRead(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
+	public PIMDataType getType() {
+		return PIMDataType.EMAIL;
+	}
+
+	private final boolean read;
+
+	public MSRead(boolean read) {
+		this.read = read;
+	}
+	
+	public boolean isRead() {
+		return read;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(read);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSRead) {
+			MSRead that = (MSRead) object;
+			return Objects.equal(this.read, that.read);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("read", read)
+			.toString();
 	}
 }

@@ -70,6 +70,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
@@ -354,13 +355,13 @@ public class MailBackendImpl implements MailBackend {
 	public String createOrUpdate(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, ItemNotFoundException {
 		
-		MSEmail email = (MSEmail) data;
+		MSRead msRead = (MSRead) data;
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
 			if (serverId != null) {
 				Long mailUid = getEmailUidFromServerId(serverId);
-				mailboxService.updateReadFlag(udr, collectionPath, mailUid, email.isRead());
+				mailboxService.updateReadFlag(udr, collectionPath, mailUid, msRead.isRead());
 			}
 			return serverId;
 		} catch (MailException e) {
