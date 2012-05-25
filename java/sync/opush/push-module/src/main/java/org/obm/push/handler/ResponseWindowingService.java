@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.BackendSession;
@@ -58,106 +57,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ResponseWindowingService {
 
-	private interface Store {
-		Collection<ItemChange> listAndRemove();
-		void store(List<ItemChange> itemsToStore);
-	}
-	
-	private static class WindowLogic {
-		private Logger logger = LoggerFactory.getLogger(getClass());
-		private final Store store;
-		
-		WindowLogic(Store store) {
-			this.store = store;
-		}
-		
-		List<ItemChange> window(SyncCollection c, List<ItemChange> newChanges, Map<String, String> processedClientIds) {
-		
-			List<ItemChange> changes = listChanges(newChanges);
-			
-			if (changesFitWindow(c.getWindowSize(), changes)) {
-				return changes;
-			} else {
-				return handleChangesOverflow(c, processedClientIds, changes);
-			}
-		}
-		
-		List<ItemChange> listChanges(List<ItemChange> newChanges) {
-			
-			return Lists.newArrayList(
-					Iterables.concat(
-							popUnsynchronizedChanges(),
-							newChanges));
-		}
-
-		Collection<ItemChange> popUnsynchronizedChanges() {
-			Collection<ItemChange> unsynchronizedItems = store.listAndRemove();
-			return unsynchronizedItems;
-		}
-
-		boolean changesFitWindow(final Integer windowSize, List<ItemChange> changes) {
-			return changes.size() <= windowSize;
-		}
-		
-		private List<ItemChange> handleChangesOverflow(
-				SyncCollection c, Map<String, String> processedClientIds, List<ItemChange> changes) {
-			
-			c.setMoreAvailable(true);
-			
-			logWindowingInformation(c, changes);
-
-			List<ItemChange> changesFromClient = changedFromClient(changes, processedClientIds);
-			List<ItemChange> changesFromServer = changesFromServer(changes, changesFromClient);
-			
-			int numberOfChangesFromServerToInclude = Math.max(0, c.getWindowSize() - changesFromClient.size());
-			storeOverflowingChanges(changesFromServer, numberOfChangesFromServerToInclude);
-			
-			return Lists.newArrayList(
-					Iterables.concat(
-							changesFromClient, 
-							Iterables.limit(changesFromServer, numberOfChangesFromServerToInclude)));
-		}
-		
-		private void logWindowingInformation(SyncCollection c, List<ItemChange> changes) {
-			int overflow = changes.size() - c.getWindowSize();
-			logger.info("Should send {} change(s)", changes.size());
-			logger.info("WindowsSize value is {} , {} change(s) will not be sent", c.getWindowSize(), overflow);
-		}
-
-		private List<ItemChange> changesFromServer(List<ItemChange> changes, List<ItemChange> itemsChangedByClient) {
-			return Lists.newArrayList(
-					Sets.difference(changes, itemsChangedByClient, new Comparator<ItemChange>() {
-						@Override
-						public int compare(ItemChange o1, ItemChange o2) {
-							return o1.getServerId().compareTo(o2.getServerId());
-						}
-					})
-				);
-		}
-
-		private List<ItemChange> changedFromClient(List<ItemChange> changes, Map<String, String> processedClientIds) {
-			List<ItemChange> itemsChangedByClient = Lists.newArrayList();
-			for (ItemChange change: changes) {
-				if (processedClientIds.containsKey(change.getServerId())) {
-					itemsChangedByClient.add(change);
-				}
-				if (processedClientIds.size() == itemsChangedByClient.size()) {
-					break;
-				}
-			}
-			
-			return itemsChangedByClient;
-		}
-		
-		private void storeOverflowingChanges(List<ItemChange> changesFromServer, int numberOfChangesFromServerToInclude) {
-			if (numberOfChangesFromServerToInclude < changesFromServer.size()) {
-				List<ItemChange> itemsToStore = Lists.newArrayList(Iterables.skip(changesFromServer, numberOfChangesFromServerToInclude));
-				store.store(itemsToStore);
-			}
-		}
-
-	}
-	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	
 	@Inject
@@ -165,49 +65,92 @@ public class ResponseWindowingService {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta, 
+	@VisibleForTesting List<ItemChange> window(SyncCollection c, DataDelta delta, 
 			BackendSession backendSession, Map<String, String> processedClientIds) {
+	
 		final Credentials credentials = backendSession.getCredentials();
 		final Device device = backendSession.getDevice();
-		final Integer collectionId = c.getCollectionId();
 		
-		return new WindowLogic(new Store() {
-			
-			@Override
-			public void store(List<ItemChange> itemsToStore) {
-				unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, itemsToStore);
-			}
-
-			@Override
-			public Collection<ItemChange> listAndRemove() {
-				Collection<ItemChange> items = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
-				unSynchronizedItemCache.clearItemsToAdd(credentials, device, collectionId);
-				return items;
-			}
-			
-		}).window(c, getNewItems(delta), processedClientIds);
+		List<ItemChange> changes = listItems(delta, credentials, device, c.getCollectionId());
+		
+		if (changesFitWindow(c.getWindowSize(), changes)) {
+			return changes;
+		} else {
+			return handleOverflow(c, processedClientIds, credentials, device, changes);
+		}
 	}
 
-	public List<ItemChange> windowDeletions(final SyncCollection c, DataDelta delta, final BackendSession backendSession, Map<String, String> processedClientIds) {
-		final Credentials credentials = backendSession.getCredentials();
-		final Device device = backendSession.getDevice();
-		final Integer collectionId = c.getCollectionId();
+	private List<ItemChange> handleOverflow(SyncCollection c, Map<String, String> processedClientIds, 
+			Credentials credentials, Device device, List<ItemChange> changes) {
 		
-		return new WindowLogic(new Store() {
-			
-			@Override
-			public void store(List<ItemChange> itemsToStore) {
-				unSynchronizedItemCache.storeItemsToRemove(credentials, device, collectionId, itemsToStore);
+		c.setMoreAvailable(true);
+		
+		logWindowingInformation(c, changes);
+
+		List<ItemChange> changesFromClient = changedFromClient(changes, processedClientIds);
+		List<ItemChange> changesFromServer = changesFromServer(changes, changesFromClient);
+		
+		int numberOfChangesFromServerToInclude = Math.max(0, c.getWindowSize() - changesFromClient.size());
+		storeOverflowingItems(credentials, device, c.getCollectionId(), changesFromServer, numberOfChangesFromServerToInclude);
+		
+		return Lists.newArrayList(
+				Iterables.concat(
+						changesFromClient, 
+						Iterables.limit(changesFromServer, numberOfChangesFromServerToInclude)));
+	}
+
+	private void storeOverflowingItems(final Credentials credentials,
+			final Device device, final Integer collectionId,
+			List<ItemChange> changesFromServer,
+			int numberOfChangesFromServerToInclude) {
+		if (numberOfChangesFromServerToInclude < changesFromServer.size()) {
+			List<ItemChange> itemsToStore = Lists.newArrayList(Iterables.skip(changesFromServer, numberOfChangesFromServerToInclude));
+			unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, itemsToStore);
+		}
+	}
+
+	private List<ItemChange> changesFromServer(List<ItemChange> changes, List<ItemChange> itemsChangedByClient) {
+		return Lists.newArrayList(
+				Sets.difference(changes, itemsChangedByClient, new Comparator<ItemChange>() {
+					@Override
+					public int compare(ItemChange o1, ItemChange o2) {
+						return o1.getServerId().compareTo(o2.getServerId());
+					}
+				})
+			);
+	}
+
+	private List<ItemChange> changedFromClient(List<ItemChange> changes, Map<String, String> processedClientIds) {
+		List<ItemChange> itemsChangedByClient = Lists.newArrayList();
+		for (ItemChange change: changes) {
+			if (processedClientIds.containsKey(change.getServerId())) {
+				itemsChangedByClient.add(change);
 			}
-			
-			@Override
-			public Collection<ItemChange> listAndRemove() {
-				Set<ItemChange> items = unSynchronizedItemCache.listItemsToRemove(credentials, device, collectionId);
-				unSynchronizedItemCache.clearItemsToRemove(credentials, device, collectionId);
-				return items;
+			if (processedClientIds.size() == itemsChangedByClient.size()) {
+				break;
 			}
-			
-		}).window(c, getDeletedItems(delta), processedClientIds);
+		}
+		
+		return itemsChangedByClient;
+	}
+
+	private void logWindowingInformation(SyncCollection c, List<ItemChange> changes) {
+		int overflow = changes.size() - c.getWindowSize();
+		logger.info("Should send {} change(s)", changes.size());
+		logger.info("WindowsSize value is {} , {} change(s) will not be sent", c.getWindowSize(), overflow);
+	}
+
+	private boolean changesFitWindow(final Integer windowSize,
+			List<ItemChange> changes) {
+		return changes.size() <= windowSize;
+	}
+
+	private List<ItemChange> listItems(DataDelta delta, 	Credentials credentials, Device device, Integer collectionId) {
+		
+		return Lists.newArrayList(
+				Iterables.concat(
+						popUnsynchronizedItems(credentials, device, collectionId),
+						getNewItems(delta)));
 	}
 
 	private List<ItemChange> getNewItems(DataDelta delta) {
@@ -217,11 +160,13 @@ public class ResponseWindowingService {
 		return ImmutableList.<ItemChange>of();
 	}
 
-	private List<ItemChange> getDeletedItems(DataDelta delta) {
-		if (delta != null) {
-			return delta.getDeletions();
-		}
-		return ImmutableList.<ItemChange>of();
+	private Collection<ItemChange> popUnsynchronizedItems(
+			final Credentials credentials, final Device device,
+			final Integer collectionId) {
+		Collection<ItemChange> unsynchronizedItems = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
+		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
+		return unsynchronizedItems;
 	}
+
 	
 }
