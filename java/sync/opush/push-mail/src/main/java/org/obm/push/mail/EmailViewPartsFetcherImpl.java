@@ -33,7 +33,6 @@ package org.obm.push.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,11 +44,13 @@ import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
+import org.obm.mail.conversation.EmailView.Builder;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
-import org.obm.mail.conversation.EmailView.Builder;
 import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
+
+import com.google.common.collect.Lists;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
@@ -116,7 +117,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 	
 	private void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions) {
-		List<EmailViewAttachment> attachments = new ArrayList<EmailViewAttachment>();
+		List<EmailViewAttachment> attachments = Lists.newArrayList();
 		IMimePart parentMessage = fetchInstructions.getMimePart().findRootMimePartInTree();
 		int nbAttachments = 0;
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
