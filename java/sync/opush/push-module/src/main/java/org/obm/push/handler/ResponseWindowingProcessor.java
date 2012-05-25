@@ -74,14 +74,12 @@ public class ResponseWindowingProcessor {
 		final Integer windowSize = c.getWindowSize();	
 		
 		final List<ItemChange> changed = new ArrayList<ItemChange>();
-		
-		
-		changed.addAll(unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId));
-		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
-		
 		if (delta != null) {
 			changed.addAll(delta.getChanges());
 		}
+		
+		changed.addAll(unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId));
+		unSynchronizedItemCache.clearItemsToAdd(credentials, device,collectionId);
 		
 		if (changed.size() <= windowSize) {
 			return changed;
