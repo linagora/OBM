@@ -49,7 +49,6 @@ import org.junit.runner.RunWith;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.UserDataRequest;
@@ -79,7 +78,7 @@ import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowFilterRunner.class)
 public class UIDFetchPartTest {
 
 	@Rule
@@ -332,8 +331,8 @@ public class UIDFetchPartTest {
 		Assertions.assertThat(data).isEqualTo("<b>bo");
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void testFetchMimePartDataWithNullMimePart() throws MailException {
+	@Test
+	public void testFetchMimePartDataWithNullMimePart() throws MailException, IOException {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
@@ -346,7 +345,10 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
+		String data = CharStreams.toString(new InputStreamReader(mimePartData));
+		
+		Assertions.assertThat(data).isEqualTo("bodydata");
 	}
 	
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {

@@ -53,12 +53,27 @@ public class MimePartSelector {
 	
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		if (bodyPreferences == null || bodyPreferences.isEmpty()) {
-			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
+			return fetchIntructions(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		} else {
-			return selectMimePart(bodyPreferences, mimeMessage);
+			return fetchIntructions(bodyPreferences, mimeMessage);
 		}
 	}
 
+	private FetchInstructions fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		FetchInstructions fetchInstructions = selectMimePart(bodyPreferences, mimeMessage);
+		if (fetchInstructions != null) {
+			return fetchInstructions;
+		}
+		
+		if (!bodyPreferences.equals(DEFAULT_BODY_PREFERENCES)) {
+			fetchInstructions = selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
+			if (fetchInstructions != null) {
+				return fetchInstructions;
+			}
+		}
+		return defaultFetchInstructions(mimeMessage);
+	}
+	
 	private FetchInstructions selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		for (BodyPreference bodyPreference: bodyPreferences) {
 			if (isContentType(bodyPreference)) {
@@ -71,6 +86,12 @@ public class MimePartSelector {
 			}
 		}
 		return null;
+	}
+
+	private FetchInstructions defaultFetchInstructions(MimeMessage mimeMessage) {
+		return new FetchInstructions.Builder()
+			.mimePart(mimeMessage.getMimePart())
+			.truncation(DEFAULT_TRUNCATION_SIZE).build();
 	}
 
 	private boolean isMatching(IMimePart mimePart, BodyPreference bodyPreference) {

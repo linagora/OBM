@@ -115,15 +115,20 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectDefaultBodyPreferences() {
+		MimePart mimePart = new MimePart();
+		mimePart.setContentType(
+				new ContentType.Builder().primaryType("text").subType("plain").build());
+
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null);
+		EasyMock.expect(mimeMessage.getMimePart()).andReturn(mimePart);
 		
 		EasyMock.replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
 		EasyMock.verify(mimeMessage);
 		
-		Assertions.assertThat(mimePartSelector).isNull();
+		Assertions.assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
 	}
 	
 	@Test
@@ -164,11 +169,18 @@ public class MimePartSelectorTest {
 	
 	@Test
 	public void testSelectLargerThanQueryPreferencesWithAllOrNone() {
+		MimePart mimePart = new MimePart();
+		mimePart.setContentType(
+				new ContentType.Builder().primaryType("text").subType("html").build());
+		
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		EasyMock.expect(expectedMimePart.getSize()).andReturn(50);
 		
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
+		
+		EasyMock.expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(mimePart);
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(true).build();
@@ -177,7 +189,7 @@ public class MimePartSelectorTest {
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
 		EasyMock.verify(mimeMessage, expectedMimePart);
 		
-		Assertions.assertThat(mimePartSelector).isNull();
+		Assertions.assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
 	}
 	
 	@Test
