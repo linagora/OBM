@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.handler.IContinuationHandler;
 
 
@@ -40,7 +40,7 @@ public interface IContinuation {
 	Boolean isInitial();
 	Boolean isResumed();
 	
-	void suspend(BackendSession bs, long secondsTimeout);
+	void suspend(UserDataRequest udr, long secondsTimeout);
 
 	void resume();
 	
@@ -50,7 +50,7 @@ public interface IContinuation {
 
 	String getErrorStatus();
 
-	BackendSession getBackendSession();
+	UserDataRequest getUserDataRequest();
 	
 	IListenerRegistration getListenerRegistration();
 	void setListenerRegistration(IListenerRegistration reg);

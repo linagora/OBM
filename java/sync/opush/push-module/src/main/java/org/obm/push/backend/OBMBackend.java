@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.push.IContentsExporter;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -116,8 +116,8 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException, DaoException {
-		emailBackend.startMonitoringCollection(bs, collectionId, registeredListeners);
+	public void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException {
+		emailBackend.startMonitoringCollection(udr, collectionId, registeredListeners);
 	}
 
 	@Override
@@ -126,11 +126,11 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public Policy getDevicePolicy(BackendSession bs) {
-		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
+	public Policy getDevicePolicy(UserDataRequest udr) {
+		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
 			return new MSWAPProvisioningXML();
 		} else {
-			return new MSEASProvisioingWBXML(bs.getProtocolVersion());
+			return new MSEASProvisioingWBXML(udr.getProtocolVersion());
 		}
 	}
 
@@ -147,11 +147,11 @@ public class OBMBackend implements IBackend {
 	}
 
 	@Override
-	public void resetCollection(BackendSession bs, Integer collectionId) throws DaoException {
+	public void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException {
 		logger.info("reset Collection {} For Full Sync devId {}", 
-				new Object[]{collectionId, bs.getDevId()});
+				new Object[]{collectionId, udr.getDevId()});
 		try {
-			collectionDao.resetCollection(bs.getDevice(), collectionId);
+			collectionDao.resetCollection(udr.getDevice(), collectionId);
 		} catch (RuntimeException re) {
 			logger.error(re.getMessage(), re);
 			throw re;
@@ -169,7 +169,7 @@ public class OBMBackend implements IBackend {
 			ConversionException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
-		final BackendSession backendSession = collectionChangeListener.getSession();
+		final UserDataRequest userDataRequest = collectionChangeListener.getSession();
 		
 		for (SyncCollection syncCollection: collectionChangeListener.getMonitoredCollections()) {
 
@@ -177,7 +177,7 @@ public class OBMBackend implements IBackend {
 				syncCollection.newSyncSate();
 			}
 			
-			int count = getItemEstimateSize(backendSession, syncCollection);
+			int count = getItemEstimateSize(userDataRequest, syncCollection);
 			if (count > 0) {
 				syncCollectionsChanged.add(syncCollection);
 			}
@@ -186,11 +186,11 @@ public class OBMBackend implements IBackend {
 		return syncCollectionsChanged;
 	}
 	
-	private int getItemEstimateSize(BackendSession backendSession, SyncCollection syncCollection) 
+	private int getItemEstimateSize(UserDataRequest userDataRequest, SyncCollection syncCollection) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
 			ConversionException {
 		
-		return contentsExporter.getItemEstimateSize(backendSession, syncCollection.getSyncState(),
+		return contentsExporter.getItemEstimateSize(userDataRequest, syncCollection.getSyncState(),
 				syncCollection.getCollectionId(), syncCollection.getOptions().getFilterType(), syncCollection.getDataType());
 	}
 	

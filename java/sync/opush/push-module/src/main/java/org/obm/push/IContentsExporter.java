@@ -34,7 +34,7 @@ package org.obm.push;
 import java.util.List;
 
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
@@ -47,17 +47,17 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface IContentsExporter {
 
-	DataDelta getChanged(BackendSession bs, SyncState state,
+	DataDelta getChanged(UserDataRequest udr, SyncState state,
 			Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws DaoException, CollectionNotFoundException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
 
-	List<ItemChange> fetch(BackendSession bs, List<String> itemIds,
+	List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds,
 			PIMDataType dataType) throws CollectionNotFoundException,
 			DaoException, ProcessingEmailException,
 			UnexpectedObmSyncServerException, ConversionException;
 
-	int getItemEstimateSize(BackendSession bs, SyncState state,
+	int getItemEstimateSize(UserDataRequest udr, SyncState state,
 			Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException, ConversionException;

@@ -73,7 +73,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -98,11 +98,11 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> firstCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.userDataRequest, ImmutableMap.<String, String>of());
 		List<ItemChange> secondCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
 		List<ItemChange> thirdCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -122,7 +122,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -140,7 +140,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -161,7 +161,7 @@ public class ResponseWindowingTest {
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltasWithOffset(2, 3), 
-						user.backendSession, changesToMap(deltasWithOffset(2, 3)));
+						user.userDataRequest, changesToMap(deltasWithOffset(2, 3)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -181,7 +181,7 @@ public class ResponseWindowingTest {
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltas(5),
-						user.backendSession, changesToMap(deltas(5)));
+						user.userDataRequest, changesToMap(deltas(5)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -201,7 +201,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deletions(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 				

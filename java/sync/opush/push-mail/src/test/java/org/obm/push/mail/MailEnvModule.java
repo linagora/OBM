@@ -38,7 +38,7 @@ import org.easymock.EasyMock;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.SmtpLocatorException;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.ImapClientProviderImpl;
@@ -82,7 +82,7 @@ public class MailEnvModule extends AbstractModule {
 		bind(SmtpProvider.class).toInstance(new SmtpProvider() {
 
 			@Override
-			public SMTPProtocol getSmtpClient(BackendSession bs)
+			public SMTPProtocol getSmtpClient(UserDataRequest udr)
 					throws SmtpLocatorException {
 				int smtpPort = ServerSetupTest.SMTP.getPort();
 				String address = "127.0.0.1";

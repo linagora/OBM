@@ -38,7 +38,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.HierarchyItemsChanges;
@@ -64,7 +64,7 @@ public class IntegrationPushTestUtils {
 	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
-		expect(calendarBackend.getHierarchyChanges(anyObject(BackendSession.class)))
+		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class)))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 	}
 	
@@ -78,7 +78,7 @@ public class IntegrationPushTestUtils {
 			throws DaoException, UnexpectedObmSyncServerException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
-		expect(contactsBackend.getHierarchyChanges(anyObject(BackendSession.class), anyObject(Date.class)))
+		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
 				.andReturn(new HierarchyItemsChanges(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), new Date())).anyTimes();	
 	}
 

@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
 
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -80,7 +80,7 @@ public class ImapStoreAPITest {
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private String inboxPath;
 
 	@Before
@@ -89,10 +89,10 @@ public class ImapStoreAPITest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
     				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 	}
 	
 	@After
@@ -103,8 +103,8 @@ public class ImapStoreAPITest {
 	@Test
 	public void testStoreInInboxContentAfterStoring() throws Exception {
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, true);
-		InputStream fetchedMailStream = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		mailboxService.storeInInbox(udr, emailData, true);
+		InputStream fetchedMailStream = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		InputStream expectedEmailData = loadEmail("plainText.eml");
 		Assertions.assertThat(fetchedMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -112,8 +112,8 @@ public class ImapStoreAPITest {
 	@Test
 	public void testStoreInInboxContentAfterStoringStream() throws Exception {
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, 279, true);
-		InputStream fetchedMailStream = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		mailboxService.storeInInbox(udr, emailData, 279, true);
+		InputStream fetchedMailStream = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		InputStream expectedEmailData = loadEmail("plainText.eml");
 		Assertions.assertThat(fetchedMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -121,19 +121,19 @@ public class ImapStoreAPITest {
 	@Test
 	public void testStoreInInboxInvitation() throws Exception {
 		InputStream emailData = loadEmail("androidInvit.eml");
-		mailboxService.storeInInbox(bs, emailData, true);
+		mailboxService.storeInInbox(udr, emailData, true);
 
 		InputStream expected = loadEmail("androidInvit.eml");
-		InputStream fetchedContent = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(expected);
 	}
 
 	@Test
 	public void testStoreInInboxInvitationStream() throws Exception {
 		InputStream emailData = loadEmail("androidInvit.eml");
-		mailboxService.storeInInbox(bs, emailData, 3660, true);
+		mailboxService.storeInInbox(udr, emailData, 3660, true);
 		InputStream expected = loadEmail("androidInvit.eml");
-		InputStream fetchedContent = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(expected);
 	}
 
@@ -141,8 +141,8 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxNotAnEmail() throws Exception {
 		byte[] data = new byte[]{'t','e','s','t', '\r', '\n', '\r', '\n'};
 		InputStream notAnEmailData = new ByteArrayInputStream(data);
-		mailboxService.storeInInbox(bs, notAnEmailData, true);
-		InputStream fetchedContent = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		mailboxService.storeInInbox(udr, notAnEmailData, true);
+		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(new ByteArrayInputStream(data));
 	}
 
@@ -150,21 +150,21 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxNotAnEmailStream() throws Exception {
 		byte[] data = new byte[]{'t','e','s','t', '\r', '\n', '\r', '\n'};
 		InputStream notAnEmailData = new ByteArrayInputStream(data);
-		mailboxService.storeInInbox(bs, notAnEmailData, data.length, true);
-		InputStream fetchedContent = mailboxService.fetchMailStream(bs, inboxPath, 1);
+		mailboxService.storeInInbox(udr, notAnEmailData, data.length, true);
+		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(new ByteArrayInputStream(data));
 	}
 	
 	@Test(expected=MailException.class)
 	public void testStoreInInboxThrowExceptionWhenStreamFail() throws Exception {
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		mailboxService.storeInInbox(bs, failingEmailStream, true);
+		mailboxService.storeInInbox(udr, failingEmailStream, true);
 	}
 	
 	@Test(expected=MailException.class)
 	public void testStoreInInboxThrowExceptionWhenStreamFailStream() throws Exception {
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		mailboxService.storeInInbox(bs, failingEmailStream, 100, true);
+		mailboxService.storeInInbox(udr, failingEmailStream, 100, true);
 	}
 
 	@Test(expected=MailException.class)
@@ -172,9 +172,9 @@ public class ImapStoreAPITest {
 		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
-			mailboxService.storeInInbox(bs, failingEmailStream, true);
+			mailboxService.storeInInbox(udr, failingEmailStream, true);
 		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
 			throw e;
 		}
@@ -186,9 +186,9 @@ public class ImapStoreAPITest {
 		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
-			mailboxService.storeInInbox(bs, failingEmailStream, 100, true);
+			mailboxService.storeInInbox(udr, failingEmailStream, 100, true);
 		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
 			throw e;
 		}
@@ -198,8 +198,8 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxReadStatusTrue() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, emailData, true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isTrue();
 	}
@@ -208,8 +208,8 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxReadStatusTrueStream() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, 279, true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, emailData, 279, true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isTrue();
 	}
@@ -218,8 +218,8 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxReadStatusFalse() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, false);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, emailData, false);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isFalse();
 	}
@@ -228,8 +228,8 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxReadStatusFalseStream() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, emailData, 279, false);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, emailData, 279, false);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isFalse();
 	}
@@ -239,7 +239,7 @@ public class ImapStoreAPITest {
 	public void testStoreInInboxThrowExceptionWhenGivenMessageSizeIsShorter() throws Exception {
 		int emailGivenSize = 20;
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
-		mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
+		mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
 	}
 
 	@Test(expected=MailException.class)
@@ -249,9 +249,9 @@ public class ImapStoreAPITest {
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
 
 		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
+			mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
 			throw e;
 		}

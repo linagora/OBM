@@ -35,9 +35,9 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -53,7 +53,7 @@ public class ContactEncoder {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
-	public void encode(BackendSession bs, Element parent, IApplicationData data) {
+	public void encode(UserDataRequest udr, Element parent, IApplicationData data) {
 		// TODO Auto-generated method stub
 		MSContact c = (MSContact) data;
 
@@ -152,7 +152,7 @@ public class ContactEncoder {
 		if(c.getData() != null){
 			dataBody = c.getData().trim();
 		}
-		if (bs.getProtocolVersion().compareTo(BigDecimal.valueOf(12)) > 0) {
+		if (udr.getProtocolVersion().compareTo(BigDecimal.valueOf(12)) > 0) {
 			Element body = DOMUtils.createElement(parent, "AirSyncBase:Body");
 			e(body, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			e(body, "AirSyncBase:EstimatedDataSize", ""+dataBody.length());

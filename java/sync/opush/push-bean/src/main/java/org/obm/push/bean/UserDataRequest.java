@@ -35,14 +35,14 @@ import java.math.BigDecimal;
 
 import com.google.common.base.Objects;
 
-public class BackendSession {
+public class UserDataRequest {
 
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
 
-	public BackendSession(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
+	public UserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
@@ -93,8 +93,8 @@ public class BackendSession {
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof BackendSession) {
-			BackendSession that = (BackendSession) object;
+		if (object instanceof UserDataRequest) {
+			UserDataRequest that = (UserDataRequest) object;
 			return Objects.equal(this.credentials, that.credentials)
 				&& Objects.equal(this.device, that.device)
 				&& Objects.equal(this.command, that.command)

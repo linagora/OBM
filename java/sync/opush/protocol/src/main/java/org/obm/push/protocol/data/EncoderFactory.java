@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
@@ -60,22 +60,22 @@ public class EncoderFactory {
 		this.emailEncoder = emailEncoder;
 	}
 	
-	public void encode(BackendSession bs, Element parent, 
+	public void encode(UserDataRequest udr, Element parent, 
 			IApplicationData data, SyncCollection c, boolean isResponse) {
 		
 		if (data != null) {
 			switch (data.getType()) {
 			case CALENDAR:
-				calendarProvider.get().encode(bs, parent, data, isResponse);
+				calendarProvider.get().encode(udr, parent, data, isResponse);
 				break;
 			case CONTACTS:
-				contactProvider.get().encode(bs, parent, data);
+				contactProvider.get().encode(udr, parent, data);
 				break;
 			case TASKS:
-				taskEncoder.get().encode(bs, parent, data);
+				taskEncoder.get().encode(udr, parent, data);
 				break;
 			case EMAIL:
-				emailEncoder.get().encode(bs, parent, data, c);
+				emailEncoder.get().encode(udr, parent, data, c);
 				break;
 			}
 		}

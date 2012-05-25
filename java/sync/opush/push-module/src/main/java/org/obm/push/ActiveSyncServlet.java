@@ -45,7 +45,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
@@ -169,17 +169,17 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 	}
 
 	private void handleContinuation(HttpServletResponse response, IContinuation c) {
-		BackendSession bs = c.getBackendSession();
+		UserDataRequest udr = c.getUserDataRequest();
 
 		IListenerRegistration reg = c.getListenerRegistration();
 		if (reg != null) {
 			reg.cancel();
 		}
 
-		if (bs == null) {
+		if (udr == null) {
 			return;
 		}
-		getLoggerService().initSession(bs.getUser(), c.getReqId(), bs.getCommand());
+		getLoggerService().initSession(udr.getUser(), c.getReqId(), udr.getCommand());
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
@@ -187,7 +187,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		if (c.isError()) {
 			ph.sendError(responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
-			ph.sendResponseWithoutHierarchyChanges(bs, responder, c);
+			ph.sendResponseWithoutHierarchyChanges(udr, responder, c);
 		}
 	}
 	
@@ -214,23 +214,23 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			ActiveSyncRequest request, HttpServletResponse response)
 			throws IOException, DaoException {
 
-		BackendSession bs = sessionService.getSession(credentials, devId, request);
+		UserDataRequest udr = sessionService.getSession(credentials, devId, request);
 		logger.debug("incoming query");
 		
-		if (bs.getCommand() == null) {
+		if (udr.getCommand() == null) {
 			logger.warn("POST received without explicit command, aborting");
 			return;
 		}
 
-		IRequestHandler rh = getHandler(bs);
+		IRequestHandler rh = getHandler(udr);
 		if (rh == null) {
-			noHandlerError(request, bs);
+			noHandlerError(request, udr);
 			return;
 		}
 
 		sendASHeaders(response);
 		Responder responder = responderFactory.createResponder(response);
-		rh.process(continuation, bs, request, responder);
+		rh.process(continuation, udr, request, responder);
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
@@ -248,8 +248,8 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		}
 	}
 
-	private void noHandlerError(ActiveSyncRequest request, BackendSession bs) {
-		logger.warn("no handler for command = {}", bs.getCommand());
+	private void noHandlerError(ActiveSyncRequest request, UserDataRequest udr) {
+		logger.warn("no handler for command = {}", udr.getCommand());
 		Enumeration<?> heads = request.getHttpServletRequest().getHeaderNames();
 		while (heads.hasMoreElements()) {
 			String h = (String) heads.nextElement();
@@ -291,7 +291,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		response.setContentLength(0);
 	}
 
-	private IRequestHandler getHandler(BackendSession p) {
+	private IRequestHandler getHandler(UserDataRequest p) {
 		return handlers.getHandler(p.getCommand());
 	}
 

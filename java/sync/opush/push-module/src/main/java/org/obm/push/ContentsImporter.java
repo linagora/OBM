@@ -33,7 +33,7 @@ package org.obm.push;
 
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
@@ -63,37 +63,37 @@ public class ContentsImporter implements IContentsImporter {
 	}
 
 	@Override
-	public String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data) 
+	public String importMessageChange(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(data.getType());
-		return backend.createOrUpdate(bs, collectionId, serverId, clientId, data);
+		return backend.createOrUpdate(udr, collectionId, serverId, clientId, data);
 	}
 
 	@Override
-	public void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+	public void importMessageDeletion(UserDataRequest udr, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 					throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException,
 					ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		PIMBackend backend = backends.getBackend(type);
-		backend.delete(bs, collectionId, serverId, moveToTrash);
+		backend.delete(udr, collectionId, serverId, moveToTrash);
 	}
 
-	public String importMoveItem(BackendSession bs, PIMDataType type,
+	public String importMoveItem(UserDataRequest udr, PIMDataType type,
 			String srcFolder, String dstFolder, String messageId)
 					throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		PIMBackend backend = backends.getBackend(type);
-		return backend.move(bs, srcFolder, dstFolder, messageId);
+		return backend.move(udr, srcFolder, dstFolder, messageId);
 	}
 
 	@Override
-	public void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
+	public void emptyFolderContent(UserDataRequest udr, String collectionPath, boolean deleteSubFolder) 
 			throws CollectionNotFoundException, NotAllowedException, DaoException, 
 			ProcessingEmailException, CollectionPathException {
 
 		PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 		PIMBackend backend = backends.getBackend(dataType);
-		backend.emptyFolderContent(bs, collectionPath, deleteSubFolder);
+		backend.emptyFolderContent(udr, collectionPath, deleteSubFolder);
 	}
 
 }

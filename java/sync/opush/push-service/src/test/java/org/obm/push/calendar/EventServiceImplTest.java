@@ -31,25 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import org.fest.assertions.api.Assertions;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.easymock.EasyMock;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.icalendar.Ical4jUser.Factory;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
-import org.obm.push.calendar.EventConverterImpl;
-import org.obm.push.calendar.EventServiceImpl;
-import org.obm.push.calendar.MSEventToObmEventConverterImpl;
-import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
@@ -68,7 +64,7 @@ public class EventServiceImplTest {
 	@Test
 	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, AuthFault, DaoException {
 		
-		BackendSession bs = new BackendSession(
+		UserDataRequest udr = new UserDataRequest(
 				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null, null);
 		
 		LoginService loginService = EasyMock.createMock(LoginService.class);
@@ -87,7 +83,7 @@ public class EventServiceImplTest {
 		
 		InputStream icsStream = ClassLoader.getSystemResourceAsStream("icalendar/OBMFULL-3526.ics");
 		EventService eventService = new EventServiceImpl(calendarDao, eventConverter, new Ical4jHelper(), factory, loginService);
-		eventService.parseEventFromICalendar(bs, new String(ByteStreams.toByteArray(icsStream)));
+		eventService.parseEventFromICalendar(udr, new String(ByteStreams.toByteArray(icsStream)));
 		
 		EasyMock.verify(loginService);
 	}
@@ -104,9 +100,9 @@ public class EventServiceImplTest {
 		User user = user();
 		Credentials credentials = new Credentials(user, "password");
 
-		BackendSession bs = EasyMock.createMock(BackendSession.class);
-		EasyMock.expect(bs.getDevice()).andReturn(device).once();
-		EasyMock.expect(bs.getCredentials()).andReturn(credentials).once();
+		UserDataRequest udr = EasyMock.createMock(UserDataRequest.class);
+		EasyMock.expect(udr.getDevice()).andReturn(device).once();
+		EasyMock.expect(udr.getCredentials()).andReturn(credentials).once();
 
 		MSEventUid msEventUid = msEventUid();
 
@@ -123,12 +119,12 @@ public class EventServiceImplTest {
 		EventConverter converter = EasyMock.createMock(EventConverter.class);
 		EasyMock.expect(converter.convert(event, msEventUid, user)).andReturn(expectedMsEvent);
 
-		Object[] mocks = { calendarDao, bs, converter };
+		Object[] mocks = { calendarDao, udr, converter };
 		EasyMock.replay(mocks);
 
 		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
 
-		MSEvent msEvent = eventService.convertEventToMSEvent(bs, event);
+		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
 		Assertions.assertThat(msEvent).equals(expectedMsEvent);
 
 		EasyMock.verify(mocks);
@@ -146,9 +142,9 @@ public class EventServiceImplTest {
 		User user = user();
 		Credentials credentials = new Credentials(user, "password");
 
-		BackendSession bs = EasyMock.createMock(BackendSession.class);
-		EasyMock.expect(bs.getDevice()).andReturn(device).once();
-		EasyMock.expect(bs.getCredentials()).andReturn(credentials).once();
+		UserDataRequest udr = EasyMock.createMock(UserDataRequest.class);
+		EasyMock.expect(udr.getDevice()).andReturn(device).once();
+		EasyMock.expect(udr.getCredentials()).andReturn(credentials).once();
 
 		MSEventUid msEventUid = msEventUid();
 
@@ -169,12 +165,12 @@ public class EventServiceImplTest {
 		EventConverter converter = EasyMock.createMock(EventConverter.class);
 		EasyMock.expect(converter.convert(event, msEventUid, user)).andReturn(expectedMsEvent);
 
-		Object[] mocks = { calendarDao, bs, converter };
+		Object[] mocks = { calendarDao, udr, converter };
 		EasyMock.replay(mocks);
 
 		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
 
-		MSEvent msEvent = eventService.convertEventToMSEvent(bs, event);
+		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
 		Assertions.assertThat(msEvent).equals(expectedMsEvent);
 
 		EasyMock.verify(mocks);

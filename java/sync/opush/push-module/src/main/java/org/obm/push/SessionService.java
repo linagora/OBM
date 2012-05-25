@@ -33,7 +33,7 @@ package org.obm.push;
 
 import java.math.BigDecimal;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
@@ -56,14 +56,14 @@ public class SessionService {
 		this.deviceService = deviceService;
 	}
 	
-	public BackendSession getSession(
+	public UserDataRequest getSession(
 			Credentials credentials, String devId, ActiveSyncRequest request) throws DaoException {
 
 		String sessionId = credentials.getUser().getLoginAtDomain() + "/" + devId;
 		return createSession(credentials, request, sessionId);
 	}
 
-	private BackendSession createSession(Credentials credentials,
+	private UserDataRequest createSession(Credentials credentials,
 			ActiveSyncRequest r, String sessionId) throws DaoException {
 		
 		String userAgent = r.getUserAgent();
@@ -71,12 +71,12 @@ public class SessionService {
 		
 		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent);
 		
-		BackendSession bs = new BackendSession(credentials, 
+		UserDataRequest udr = new UserDataRequest(credentials, 
 				r.getCommand(), device, getProtocolVersion(r));
 		
 		
 		logger.debug("New session = {}", sessionId);
-		return bs;
+		return udr;
 	}
 
 	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {

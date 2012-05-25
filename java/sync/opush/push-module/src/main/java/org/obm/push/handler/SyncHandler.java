@@ -47,7 +47,6 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
@@ -57,6 +56,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -147,15 +147,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	@Override
-	public void process(IContinuation continuation, BackendSession bs, Document doc, ActiveSyncRequest request, Responder responder) {
+	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			SyncRequest syncRequest = syncProtocol.getRequest(doc, bs);
+			SyncRequest syncRequest = syncProtocol.getRequest(doc, udr);
 			
-			ModificationStatus modificationStatus = processCollections(bs, syncRequest.getSync());
+			ModificationStatus modificationStatus = processCollections(udr, syncRequest.getSync());
 			if (syncRequest.getSync().getWaitInSecond() > 0) {
-				registerWaitingSync(continuation, bs, syncRequest.getSync());
+				registerWaitingSync(continuation, udr, syncRequest.getSync());
 			} else {
-				SyncResponse syncResponse = doTheJob(bs, syncRequest.getSync().getCollections(), 
+				SyncResponse syncResponse = doTheJob(udr, syncRequest.getSync().getCollections(), 
 						 modificationStatus.processedClientIds, continuation);
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			}
@@ -192,7 +192,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		responder.sendWBXMLResponse("AirSync", document);
 	}
 	
-	private void registerWaitingSync(IContinuation continuation, BackendSession bs, Sync sync) 
+	private void registerWaitingSync(IContinuation continuation, UserDataRequest udr, Sync sync) 
 			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException, CollectionPathException {
 		
 		if (sync.getWaitInSecond() > 3540) {
@@ -204,14 +204,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sc.setCollectionPath(collectionPath);
 			PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(collectionPath);
 			if (dataClass == PIMDataType.EMAIL) {
-				backend.startEmailMonitoring(bs, sc.getCollectionId());
+				backend.startEmailMonitoring(udr, sc.getCollectionId());
 				break;
 			}
 		}
 		
 		continuation.setLastContinuationHandler(this);
-		monitoredCollectionService.put(bs.getCredentials(), bs.getDevice(), sync.getCollections());
-		CollectionChangeListener l = new CollectionChangeListener(bs,
+		monitoredCollectionService.put(udr.getCredentials(), udr.getDevice(), sync.getCollections());
+		CollectionChangeListener l = new CollectionChangeListener(udr,
 				continuation, sync.getCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
@@ -221,19 +221,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					continuation);
 		}
 		
-		continuation.suspend(bs, sync.getWaitInSecond());
+		continuation.suspend(udr, sync.getWaitInSecond());
 	}
 
-	private Date doUpdates(BackendSession bs, SyncCollection c,	Map<String, String> processedClientIds, 
+	private Date doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
 			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
 		
-		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), bs.getDevice(), c.getCollectionId()).size();
+		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(bs, c.getSyncState(), c.getCollectionId(), 
+			delta = contentsExporter.getChanged(udr, c.getSyncState(), c.getCollectionId(), 
 					c.getOptions().getFilterType(), c.getDataType());
 			
 			lastSync = delta.getSyncDate();
@@ -241,16 +241,16 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = c.getSyncState().getLastSync();
 		}
 
-		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, bs, processedClientIds);
+		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, processedClientIds);
 		syncCollectionResponse.setItemChanges(changed);
 	
-		List<ItemChange> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, bs, processedClientIds);
+		List<ItemChange> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, processedClientIds);
 		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
 		return lastSync;
 	}
 
-	private ModificationStatus processCollections(BackendSession bs, Sync sync) throws CollectionNotFoundException, DaoException, 
+	private ModificationStatus processCollections(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
@@ -268,7 +268,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 			if (collectionState != null) {
 				collection.setSyncState(collectionState);
-				Map<String, String> processedClientIds = processModification(bs, collection);
+				Map<String, String> processedClientIds = processModification(udr, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
 				SyncState syncState = new SyncState(collection.getSyncKey());
@@ -282,20 +282,20 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	/**
 	 * Handles modifications requested by mobile device
 	 */
-	private Map<String, String> processModification(BackendSession bs, SyncCollection collection) throws CollectionNotFoundException, 
+	private Map<String, String> processModification(UserDataRequest udr, SyncCollection collection) throws CollectionNotFoundException, 
 		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		for (SyncCollectionChange change: collection.getChanges()) {
 			try {
 				if (change.getModType().equals("Modify")) {
-					updateServerItem(bs, collection, change);
+					updateServerItem(udr, collection, change);
 					
 				} else if (change.getModType().equals("Add") || change.getModType().equals("Change")) {
-					addServerItem(bs, collection, processedClientIds, change);
+					addServerItem(udr, collection, processedClientIds, change);
 					
 				} else if (change.getModType().equals("Delete")) {
-					deleteServerItem(bs, collection, processedClientIds, change);
+					deleteServerItem(udr, collection, processedClientIds, change);
 				}
 			} catch (ItemNotFoundException e) {
 				logger.warn("Item with server id {} not found.", change.getServerId());
@@ -304,19 +304,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return processedClientIds;
 	}
 
-	private void updateServerItem(BackendSession bs, SyncCollection collection, SyncCollectionChange change) 
+	private void updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ItemNotFoundException, ConversionException {
 
-		contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
+		contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
 				change.getData());
 	}
 
-	private void addServerItem(BackendSession bs, SyncCollection collection, 
+	private void addServerItem(UserDataRequest udr, SyncCollection collection, 
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException {
 
-		String obmId = contentsImporter.importMessageChange(bs, collection.getCollectionId(), change.getServerId(),
+		String obmId = contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(),
 				change.getClientId(), change.getData());
 		if (obmId != null) {
 			if (change.getClientId() != null) {
@@ -328,12 +328,12 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 	
-	private void deleteServerItem(BackendSession bs, SyncCollection collection,
+	private void deleteServerItem(UserDataRequest udr, SyncCollection collection,
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		String serverId = change.getServerId();
-		contentsImporter.importMessageDeletion(bs, change.getType(), collection.getCollectionId(), serverId, collection
+		contentsImporter.importMessageDeletion(udr, change.getType(), collection.getCollectionId(), serverId, collection
 				.getOptions().isDeletesAsMoves());
 		if (serverId != null) {
 			processedClientIds.put(serverId, null);
@@ -341,14 +341,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	@Override
-	public void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder, IContinuation continuation) {
-		sendResponse(bs, responder, false, continuation);
+	public void sendResponseWithoutHierarchyChanges(UserDataRequest udr, Responder responder, IContinuation continuation) {
+		sendResponse(udr, responder, false, continuation);
 	}
 
 	@Override
-	public void sendResponse(BackendSession bs, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
+	public void sendResponse(UserDataRequest udr, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
 		try {
-			SyncResponse syncResponse = doTheJob(bs, monitoredCollectionService.list(bs.getCredentials(), bs.getDevice()),
+			SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
@@ -366,34 +366,34 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	public SyncResponse doTheJob(BackendSession bs, Collection<SyncCollection> changedFolders, 
+	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
-			SyncCollectionResponse syncCollectionResponse = computeSyncState(bs, processedClientIds, c);
+			SyncCollectionResponse syncCollectionResponse = computeSyncState(udr, processedClientIds, c);
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
-		return new SyncResponse(syncCollectionResponses, bs, getEncoders(), processedClientIds);
+		return new SyncResponse(syncCollectionResponses, udr, getEncoders(), processedClientIds);
 	}
 
-	private SyncCollectionResponse computeSyncState(BackendSession bs,
+	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if ("0".equals(syncCollection.getSyncKey())) {
-			handleInitialSync(bs, syncCollection, syncCollectionResponse);
+			handleInitialSync(udr, syncCollection, syncCollectionResponse);
 		} else {
-			handleDataSync(bs, processedClientIds, syncCollection, syncCollectionResponse);
+			handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
 		}
 		return syncCollectionResponse;
 	}
 
-	private void handleDataSync(BackendSession bs, Map<String, String> processedClientIds, SyncCollection syncCollection,
+	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 		
@@ -405,27 +405,27 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			syncCollectionResponse.setSyncStateValid(true);
 			Date syncDate = null;
 			if (syncCollection.getFetchIds().isEmpty()) {
-				syncDate = doUpdates(bs, syncCollection, processedClientIds, syncCollectionResponse);
+				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
 			} else {
-				List<ItemChange> itemChanges = contentsExporter.fetch(bs, syncCollection.getFetchIds(), syncCollection.getDataType());
+				List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection.getFetchIds(), syncCollection.getDataType());
 				syncCollectionResponse.setItemChanges(itemChanges);
 			}
 			identifyNewItems(syncCollectionResponse, st);
 			String newSyncKey = 
-					stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), syncDate, 
+					stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), syncDate, 
 							syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion());
 			syncCollectionResponse.setNewSyncKey(newSyncKey);
 		}
 	}
 
-	private void handleInitialSync(BackendSession bs, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
+	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
 			throws DaoException, InvalidServerId {
 		
-		backend.resetCollection(bs, syncCollection.getCollectionId());
+		backend.resetCollection(udr, syncCollection.getCollectionId());
 		syncCollectionResponse.setSyncStateValid(true);
 		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
 		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
-		String newSyncKey = stMachine.allocateNewSyncKey(bs, syncCollection.getCollectionId(), null, changed, deleted);
+		String newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 

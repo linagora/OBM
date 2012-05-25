@@ -37,7 +37,7 @@ import java.util.List;
 
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.calendar.CalendarBackend;
@@ -76,22 +76,22 @@ public class HierarchyExporter implements IHierarchyExporter {
 		return taskBackend.getHierarchyChanges();
 	}
 
-	private List<ItemChange> getCalendarChanges(BackendSession bs) throws DaoException, UnexpectedObmSyncServerException {
-		return calendarExporter.getHierarchyChanges(bs);
+	private List<ItemChange> getCalendarChanges(UserDataRequest udr) throws DaoException, UnexpectedObmSyncServerException {
+		return calendarExporter.getHierarchyChanges(udr);
 	}
 
-	private List<ItemChange> getMailChanges(BackendSession bs) throws DaoException {
-		return mailExporter.getHierarchyChanges(bs);
+	private List<ItemChange> getMailChanges(UserDataRequest udr) throws DaoException {
+		return mailExporter.getHierarchyChanges(udr);
 	}
 
 	@Override
-	public HierarchyItemsChanges getChanged(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
+	public HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
 		LinkedList<ItemChange> allItemsChanged = new LinkedList<ItemChange>();
 		
-		allItemsChanged.addAll(getCalendarChanges(bs));
-		allItemsChanged.addAll(getMailChanges(bs));
+		allItemsChanged.addAll(getCalendarChanges(udr));
+		allItemsChanged.addAll(getMailChanges(udr));
 		
-		HierarchyItemsChanges itemsContactChanged = listContactFoldersChanged(bs, lastSync);
+		HierarchyItemsChanges itemsContactChanged = listContactFoldersChanged(udr, lastSync);
 		allItemsChanged.addAll(itemsContactChanged.getItemsAddedOrUpdated());
 		
 		allItemsChanged.addAll(getTasksChanges());
@@ -101,18 +101,18 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 	
 	@Override
-	public HierarchyItemsChanges listContactFoldersChanged(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
-		return contactsBackend.getHierarchyChanges(bs, lastSync);
+	public HierarchyItemsChanges listContactFoldersChanged(UserDataRequest udr, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
+		return contactsBackend.getHierarchyChanges(udr, lastSync);
 	}
 	
 	@Override
-	public int getRootFolderId(BackendSession bs) throws DaoException, CollectionNotFoundException {
-		return folderExporter.getServerIdFor(bs);
+	public int getRootFolderId(UserDataRequest udr) throws DaoException, CollectionNotFoundException {
+		return folderExporter.getServerIdFor(udr);
 	}
 
 	@Override
-	public String getRootFolderUrl(BackendSession bs) {
-		return folderExporter.getColName(bs);
+	public String getRootFolderUrl(UserDataRequest udr) {
+		return folderExporter.getColName(udr);
 	}
 
 }

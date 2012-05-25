@@ -49,7 +49,7 @@ import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -86,7 +86,7 @@ public class UIDFetchMessageTest {
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
 
@@ -97,10 +97,10 @@ public class UIDFetchMessageTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -183,7 +183,7 @@ public class UIDFetchMessageTest {
 	private ImapStore loggedClient()
 			throws LocatorClientException, NoImapClientAvailableException, ImapLoginException  {
 		
-		ImapStore client = clientProvider.getImapClientWithJM(bs);
+		ImapStore client = clientProvider.getImapClientWithJM(udr);
 		client.login();
 		return client;
 	}

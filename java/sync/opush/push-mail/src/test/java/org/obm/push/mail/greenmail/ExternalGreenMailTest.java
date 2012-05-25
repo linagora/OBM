@@ -46,7 +46,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -76,7 +76,7 @@ public class ExternalGreenMailTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	
 	private ClosableProcess greenMailProcess;
 
@@ -85,10 +85,10 @@ public class ExternalGreenMailTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
+		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
 	}
 	
@@ -123,7 +123,7 @@ public class ExternalGreenMailTest {
 
 	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		String inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
-		return mailboxService.fetchEmails(bs, inboxPath, before);
+		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		return mailboxService.fetchEmails(udr, inboxPath, before);
 	}
 }

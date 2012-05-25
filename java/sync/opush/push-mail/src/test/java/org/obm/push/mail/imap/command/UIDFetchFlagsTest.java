@@ -54,10 +54,10 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
@@ -83,7 +83,7 @@ public class UIDFetchFlagsTest {
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private Date beforeTest;
 	private ImapTestUtils testUtils;
 
@@ -94,10 +94,10 @@ public class UIDFetchFlagsTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -198,12 +198,12 @@ public class UIDFetchFlagsTest {
 	
 	private Collection<Flag> uidFetchFlags(long uid) throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return privateMailboxService.fetchFlags(bs, inbox, uid);
+		return privateMailboxService.fetchFlags(udr, inbox, uid);
 	}
 	
 	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {
 		
-		StoreClient client = clientProvider.getImapClient(bs);
+		StoreClient client = clientProvider.getImapClient(udr);
 		client.login(false);
 		return client;
 	}

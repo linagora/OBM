@@ -36,7 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
@@ -91,7 +91,7 @@ public class SyncDecoder {
 				.build();
 	}
 
-	public Sync decodeSync(Document doc, BackendSession backendSession) 
+	public Sync decodeSync(Document doc, UserDataRequest userDataRequest) 
 			throws PartialException, ProtocolException, DaoException, CollectionPathException {
 		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
@@ -104,10 +104,10 @@ public class SyncDecoder {
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
-			SyncCollection collec = getCollection(backendSession, col, isPartial);
+			SyncCollection collec = getCollection(userDataRequest, col, isPartial);
 			ret.addCollection(collec);
 		}
-		syncedCollectionStoreService.put(backendSession.getCredentials(), backendSession.getDevice(), ret.getCollections());
+		syncedCollectionStoreService.put(userDataRequest.getCredentials(), userDataRequest.getDevice(), ret.getCollections());
 		return ret;
 	}
 
@@ -127,7 +127,7 @@ public class SyncDecoder {
 		return ret;
 	}
 
-	private SyncCollection getCollection(BackendSession bs, Element col, boolean isPartial)
+	private SyncCollection getCollection(UserDataRequest udr, Element col, boolean isPartial)
 			throws PartialException, ProtocolException, DaoException, CollectionPathException{
 		
 		SyncCollection collection = new SyncCollection();
@@ -136,7 +136,7 @@ public class SyncDecoder {
 			throw new ProtocolException("CollectionId can't be null");
 		}
 		SyncCollection lastSyncCollection = 
-				syncedCollectionStoreService.get(bs.getCredentials(), bs.getDevice(), collectionId);
+				syncedCollectionStoreService.get(udr.getCredentials(), udr.getDevice(), collectionId);
 		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}

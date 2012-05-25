@@ -37,7 +37,7 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.impl.DOMDumper;
@@ -76,11 +76,11 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 	
 	@Override
-	public void process(IContinuation continuation, BackendSession bs, Document doc, ActiveSyncRequest request, Responder responder) {
+	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			ProvisionRequest provisionRequest = protocol.getRequest(doc);
 			logger.info("required {}", provisionRequest.toString());
-			ProvisionResponse provisionResponse = doTheJob(provisionRequest, bs);
+			ProvisionResponse provisionResponse = doTheJob(provisionRequest, udr);
 			Document ret = protocol.encodeResponse(provisionResponse);
 			sendResponse(responder, ret);
 		} catch (InvalidPolicyKeyException e) {
@@ -97,7 +97,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse("Provision", ret);
 	}
 
-	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, BackendSession bs) {
+	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, UserDataRequest udr) {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
 		final Long nextPolicyKey = nextPolicyKey(provisionRequest.getPolicyKey());
 		if (nextPolicyKey == null) {
@@ -107,7 +107,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 			provisionResponse.setPolicyKey(nextPolicyKey);
 		}
 		if (provisionRequest.getPolicyKey() == 0) {
-			provisionResponse.setPolicy(backend.getDevicePolicy(bs));
+			provisionResponse.setPolicy(backend.getDevicePolicy(udr));
 		}
 		return provisionResponse;
 	}

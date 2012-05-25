@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 
 public class OpushUser {
 
@@ -46,11 +46,11 @@ public class OpushUser {
 		result.password = password;
 		result.credentials = new Credentials(user, password);
 		result.device = new Device.Factory().create(1, "linphone", "linagent", "my phone");
-		result.backendSession = new BackendSession(result.credentials, null, result.device, null);
+		result.userDataRequest = new UserDataRequest(result.credentials, null, result.device, null);
 		return result;
 	}
 	
-	public BackendSession backendSession;
+	public UserDataRequest userDataRequest;
 	public Device device;
 	public Credentials credentials;
 	public String login;

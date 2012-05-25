@@ -33,7 +33,7 @@ package org.obm.push.handler;
 
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MailProtocol;
@@ -55,8 +55,8 @@ public class SendMailHandler extends MailRequestHandler {
 	}
 
 	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException {
-		mailBackend.sendEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent());
+	public void doTheJob(MailRequest mailRequest, UserDataRequest udr) throws ProcessingEmailException {
+		mailBackend.sendEmail(udr, mailRequest.getMailContent(), mailRequest.isSaveInSent());
 	}
 
 }

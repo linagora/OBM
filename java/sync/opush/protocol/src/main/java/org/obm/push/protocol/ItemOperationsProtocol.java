@@ -33,11 +33,11 @@ package org.obm.push.protocol;
 
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.Fetch;
@@ -141,13 +141,13 @@ public class ItemOperationsProtocol {
 				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
 	}
 
-	public Document encodeResponse(ItemOperationsResponse response, BackendSession bs) {
+	public Document encodeResponse(ItemOperationsResponse response, UserDataRequest udr) {
 		Document document = DOMUtils.createDoc(null, "ItemOperations");
 		Element root = document.getDocumentElement();
 		if (response.getEmptyFolderContentsResult() != null) {
 			encodeEmptyFolderOperation(response.getEmptyFolderContentsResult(), root);
 		} else if (response.getMailboxFetchResult() != null) {
-			encodeMailboxFetchResult(response.getMailboxFetchResult(), root, response.isMultipart(), bs);
+			encodeMailboxFetchResult(response.getMailboxFetchResult(), root, response.isMultipart(), udr);
 		}
 		return document;
 	}
@@ -161,17 +161,17 @@ public class ItemOperationsProtocol {
 	}
 
 	private void encodeMailboxFetchResult(
-			MailboxFetchResult mailboxFetchResult, Element root, boolean multipart, BackendSession bs) {
+			MailboxFetchResult mailboxFetchResult, Element root, boolean multipart, UserDataRequest udr) {
 		
 		if (mailboxFetchResult.getFetchItemResult() != null) {
-			encodeFetchItemResult(bs, root, mailboxFetchResult.getFetchItemResult());
+			encodeFetchItemResult(udr, root, mailboxFetchResult.getFetchItemResult());
 		} else if (mailboxFetchResult.getFileReferenceFetch() != null) {
 			encodeFetchAttachmentResult(root, mailboxFetchResult.getFileReferenceFetch(), multipart);
 		}
 	}
 
 	
-	private void encodeFetchItemResult(BackendSession bs, Element root, FetchItemResult fetchItemResult) {
+	private void encodeFetchItemResult(UserDataRequest udr, Element root, FetchItemResult fetchItemResult) {
 		DOMUtils.createElementAndText(root, "Status",
 				ItemOperationsStatus.SUCCESS.asXmlValue());
 		Element resp = DOMUtils.createElement(root, "Response");
@@ -183,7 +183,7 @@ public class ItemOperationsProtocol {
 				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
-			encoderFactory.encode(bs, dataElem, data, fetchItemResult.getSyncCollection(), true);
+			encoderFactory.encode(udr, dataElem, data, fetchItemResult.getSyncCollection(), true);
 		}
 	}
 	

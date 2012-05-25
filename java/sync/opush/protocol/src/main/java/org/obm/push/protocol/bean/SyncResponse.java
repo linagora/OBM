@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.data.EncoderFactory;
@@ -83,13 +83,13 @@ public class SyncResponse {
 	}
 	
 	private final Collection<SyncCollectionResponse> collectionResponses;
-	private final BackendSession backendSession;
+	private final UserDataRequest userDataRequest;
 	private final EncoderFactory encoderFactory;
 	private final Map<String, String> processedClientIds;
 	
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, BackendSession bs, EncoderFactory encoderFactory, Map<String, String> processedClientIds) {
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, UserDataRequest udr, EncoderFactory encoderFactory, Map<String, String> processedClientIds) {
 		this.collectionResponses = collectionResponses;
-		this.backendSession = bs;
+		this.userDataRequest = udr;
 		this.encoderFactory = encoderFactory;
 		this.processedClientIds = processedClientIds;
 	}
@@ -98,8 +98,8 @@ public class SyncResponse {
 		this(null, null, null, null);
 	}
 
-	public BackendSession getBackendSession() {
-		return backendSession;
+	public UserDataRequest getUserDataRequest() {
+		return userDataRequest;
 	}
 	
 	public EncoderFactory getEncoderFactory() {

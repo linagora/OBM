@@ -38,7 +38,7 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
@@ -104,15 +104,15 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	// </Move>
 	// </MoveItems>
 	@Override
-	protected void process(IContinuation continuation, BackendSession bs, Document doc, 
+	protected void process(IContinuation continuation, UserDataRequest udr, Document doc, 
 			ActiveSyncRequest request, Responder responder) {
 		
-		logger.info("process(" + bs.getUser().getLoginAtDomain() + "/" + bs.getDevType()
+		logger.info("process(" + udr.getUser().getLoginAtDomain() + "/" + udr.getDevType()
 				+ ")");
 		try {
 		
 			MoveItemsRequest moveItemsRequest = moveItemsProtocol.getRequest(doc);
-			MoveItemsResponse moveItemsResponse = doTheJob(moveItemsRequest, bs);
+			MoveItemsResponse moveItemsResponse = doTheJob(moveItemsRequest, udr);
 			Document reply = moveItemsProtocol.encodeResponse(moveItemsResponse);
 			sendResponse(responder, reply);
 
@@ -127,7 +127,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse("Move", doc);
 	}
 
-	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, BackendSession bs) {
+	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, UserDataRequest udr) {
 		final List<MoveItemsItem> moveItemsItems = new ArrayList<MoveItemsResponse.MoveItemsItem>();
 		for (MoveItem item: moveItemsRequest.getMoveItems()) {
 			
@@ -136,7 +136,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			if (statusForItem.status == null) {
 				try {
 					PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(statusForItem.srcCollection);
-					String newDstId = contentsImporter.importMoveItem(bs, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
+					String newDstId = contentsImporter.importMoveItem(udr, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
 					moveItemsItem.setDstMesgId(newDstId);

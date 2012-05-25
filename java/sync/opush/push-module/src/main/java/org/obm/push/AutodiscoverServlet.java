@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.handler.AuthenticatedServlet;
@@ -82,11 +82,11 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 			Credentials credentials = authentication(request);
 			getLoggerService().initSession(credentials.getUser(), 0, "autodiscover");
 			
-			BackendSession backendSession = new BackendSession(credentials, "autodiscover", null, null);
+			UserDataRequest userDataRequest = new UserDataRequest(credentials, "autodiscover", null, null);
 			SimpleQueryString queryString = new SimpleQueryString(request);
 			Responder responder = responderFactory.createResponder(response);
 			
-			autodiscoverHandler.process(null, backendSession, queryString, responder);
+			autodiscoverHandler.process(null, userDataRequest, queryString, responder);
 		} catch (AuthFault e) {
 			authLogger.info(e.getMessage());
 			returnHttpUnauthorized(request, response);

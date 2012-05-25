@@ -56,7 +56,7 @@ import org.minig.imap.mime.IMimePart;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -96,7 +96,7 @@ public class ImapFetchAPITest {
 	
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
 	private GreenMailUser greenMailUser;
@@ -108,10 +108,10 @@ public class ImapFetchAPITest {
 		this.mailbox = "to@localhost.com";
 	    this.password = "password";
 	    this.greenMailUser = this.greenMail.setUser(mailbox, password);
-	    this.bs = new BackendSession(
+	    this.udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    this.testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+	    this.testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -132,9 +132,9 @@ public class ImapFetchAPITest {
 		bcc(Lists.newArrayList(new Address("d@test"))).build();
 		
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, inputStream, true);
+		mailboxService.storeInInbox(udr, inputStream, true);
 		
-		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(bs, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 1l);
+		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 1l);
 
 		Assertions.assertThat(uidEnvelope).isNotNull();
 		Assertions.assertThat(uidEnvelope).isEqualTo(new UIDEnvelope(1l, envelope));
@@ -143,9 +143,9 @@ public class ImapFetchAPITest {
 	@Test(expected=MailException.class)
 	public void testFetchEnvelopeWithWrongUID() throws MailException {
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(bs, inputStream, true);
+		mailboxService.storeInInbox(udr, inputStream, true);
 		
-		mailboxService.fetchEnvelope(bs, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 2l);
+		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 2l);
 	}
 	
 	@Test
@@ -155,9 +155,9 @@ public class ImapFetchAPITest {
 		Email email3 = testUtils.sendEmailToInbox();
 		
 		String mailboxPath = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		mailboxService.delete(bs, mailboxPath, emailWillBeDeleted.getUid());
+		mailboxService.delete(udr, mailboxPath, emailWillBeDeleted.getUid());
 		
-		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(bs, mailboxPath, email3.getUid());
+		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, mailboxPath, email3.getUid());
 		Assertions.assertThat(uidEnvelope).isNotNull();
 		Assertions.assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
 		Assertions.assertThat(uidEnvelope.getEnvelope().getMsgno()).isEqualTo(2);
@@ -166,14 +166,14 @@ public class ImapFetchAPITest {
 	@Test
 	public void testFetchFastNoUid() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of());
+		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of());
 		Assertions.assertThat(result).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testFetchFastNullUids() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		privateMailboxService.fetchFast(bs, inbox, null);
+		privateMailboxService.fetchFast(udr, inbox, null);
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class ImapFetchAPITest {
 		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
+		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
 		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
@@ -197,7 +197,7 @@ public class ImapFetchAPITest {
 		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L, 1L));
+		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L, 1L));
 		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
@@ -210,8 +210,8 @@ public class ImapFetchAPITest {
 		String messageContent = "message content";
 		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
-		mailboxService.setAnsweredFlag(bs, inbox, 1);
-		Collection<FastFetch> result = privateMailboxService.fetchFast(bs, inbox, ImmutableList.<Long>of(1L));
+		mailboxService.setAnsweredFlag(udr, inbox, 1);
+		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
 		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());
 	}
@@ -219,14 +219,14 @@ public class ImapFetchAPITest {
 	@Test
 	public void testFetchBodyStructureNoUid() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<org.minig.imap.mime.MimeMessage> result = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of());
+		Collection<org.minig.imap.mime.MimeMessage> result = privateMailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of());
 		Assertions.assertThat(result).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testFetchBodyStructureNullUids() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		privateMailboxService.fetchBodyStructure(bs, inbox, null);
+		privateMailboxService.fetchBodyStructure(udr, inbox, null);
 	}
 	
 	@Test
@@ -236,7 +236,7 @@ public class ImapFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
 		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 
 		Assertions.assertThat(collections).hasSize(1);
@@ -254,7 +254,7 @@ public class ImapFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
 		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
 		IMimePart multiPartMixed = onlyElement.getMimePart();
@@ -294,7 +294,7 @@ public class ImapFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.minig.imap.mime.MimeMessage> collections = privateMailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
 		org.minig.imap.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
 		IMimePart multiPartAlternative = onlyElement.getMimePart();
@@ -332,6 +332,6 @@ public class ImapFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		privateMailboxService.fetchBodyStructure(bs, inbox, ImmutableList.<Long>of(1L));
+		privateMailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
 	}
 }

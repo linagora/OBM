@@ -49,7 +49,7 @@ import org.junit.runner.RunWith;
 import org.minig.imap.SearchQuery;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
@@ -81,7 +81,7 @@ public class ImapSearchAPITest {
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 
 	private Date beforeTest;
 	private ImapTestUtils testUtils;
@@ -94,10 +94,10 @@ public class ImapSearchAPITest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMailUser = greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -108,7 +108,7 @@ public class ImapSearchAPITest {
 	@Test(expected=MailException.class)
 	public void testSearchWrongMailbox() throws Exception {
 		try {
-			privateMailboxService.uidSearch(bs, testUtils.mailboxPath("wrong"), SearchQuery.MATCH_ALL);	
+			privateMailboxService.uidSearch(udr, testUtils.mailboxPath("wrong"), SearchQuery.MATCH_ALL);	
 		} catch (MailException e) {
 			Assertions.assertThat(e).hasMessageContaining("Cannot find IMAP folder");
 			throw e;
@@ -118,13 +118,13 @@ public class ImapSearchAPITest {
 	@Test(expected=NullPointerException.class)
 	public void testSearchNullQuery() throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		privateMailboxService.uidSearch(bs, inbox, null);	
+		privateMailboxService.uidSearch(udr, inbox, null);	
 	}
 	
 	@Test
 	public void testSearchWithMatchAllQuery() throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, SearchQuery.MATCH_ALL);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, SearchQuery.MATCH_ALL);
 		Assertions.assertThat(result).isEmpty();
 	}
 
@@ -133,7 +133,7 @@ public class ImapSearchAPITest {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		MimeMessage message = buildSimpleMessage();
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, SearchQuery.MATCH_ALL);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, SearchQuery.MATCH_ALL);
 		Assertions.assertThat(result).containsOnly(1L);
 	}
 	
@@ -143,7 +143,7 @@ public class ImapSearchAPITest {
 		MimeMessage message = buildSimpleMessage();
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, SearchQuery.MATCH_ALL);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, SearchQuery.MATCH_ALL);
 		Assertions.assertThat(result).containsOnly(1L, 2L);
 	}
 	
@@ -158,7 +158,7 @@ public class ImapSearchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
 		
 		SearchQuery query = new SearchQuery.Builder().after(yesterday).build();
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, query);
 		Assertions.assertThat(result).containsOnly(1L);
 	}
 
@@ -173,7 +173,7 @@ public class ImapSearchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, lastWeek);
 		
 		SearchQuery query = new SearchQuery.Builder().before(yesterday).build();
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, query);
 		Assertions.assertThat(result).containsOnly(2L);
 	}
 
@@ -190,7 +190,7 @@ public class ImapSearchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, lastMonth);
 		
 		SearchQuery query = new SearchQuery.Builder().after(lastWeek).before(yesterday).build();
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, query);
 		Assertions.assertThat(result).containsOnly(2L);
 	}
 
@@ -207,7 +207,7 @@ public class ImapSearchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, lastMonth);
 		
 		SearchQuery query = new SearchQuery.Builder().after(yesterday).before(lastWeek).build();
-		Collection<Long> result = privateMailboxService.uidSearch(bs, inbox, query);
+		Collection<Long> result = privateMailboxService.uidSearch(udr, inbox, query);
 		Assertions.assertThat(result).isEmpty();
 	}
 	

@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
@@ -66,7 +66,7 @@ public class SendImapMailboxServiceTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 
 
 	@Before
@@ -75,7 +75,7 @@ public class SendImapMailboxServiceTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
@@ -87,45 +87,45 @@ public class SendImapMailboxServiceTest {
 
 	@Test
 	public void testParseSentMailBox() throws Exception {
-		mailboxService.createFolder(bs, folder("Sent"));
+		mailboxService.createFolder(udr, folder("Sent"));
 
 		String userSentFolder = 
-				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
 
 	@Test
 	public void testParseSentMailBoxSentIsInsensitive() throws Exception {
-		mailboxService.createFolder(bs, folder("SeNt"));
+		mailboxService.createFolder(udr, folder("SeNt"));
 
 		String userSentFolder = 
-				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo("SeNt");
 	}
 
 	@Test
 	public void testParseSentMailBoxWhenManyNamedSentBox() throws Exception {
-		mailboxService.createFolder(bs, folder("AnyFolderSent"));
-		mailboxService.createFolder(bs, folder("Sent"));
-		mailboxService.createFolder(bs, folder("AnotherSentfolder"));
+		mailboxService.createFolder(udr, folder("AnyFolderSent"));
+		mailboxService.createFolder(udr, folder("Sent"));
+		mailboxService.createFolder(udr, folder("AnotherSentfolder"));
 
 		String userSentFolder = 
-				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
 	
 	@Test
 	public void testParseSentMailBox_OBMFULL3133() throws Exception {
-		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
-		mailboxService.createFolder(bs, folder("Sent"));
-		mailboxService.createFolder(bs, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
+		mailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
+		mailboxService.createFolder(udr, folder("Sent"));
+		mailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
 
 		String userSentFolder = 
-				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-		String parsedMailbox = mailboxService.parseMailBoxName(bs, userSentFolder);
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
 	

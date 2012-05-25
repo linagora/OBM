@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.utils.Mime4jUtils;
@@ -59,12 +59,12 @@ public class ErrorsManagerTest {
 	@Test
 	public void testPrepareMessage() throws ParseException, FileNotFoundException, IOException {
 		User user = User.Factory.create().createUser("test@domain", "test@domain", "displayName");
-		BackendSession backendSession = new BackendSession(new Credentials(user, "password"), null, null, null);
+		UserDataRequest userDataRequest = new UserDataRequest(new Credentials(user, "password"), null, null, null);
 		
 		Mime4jUtils mime4jUtils = new Mime4jUtils();
 		
 		ErrorsManager errorsManager = new ErrorsManager(null, null, mime4jUtils);
-		Message message = errorsManager.prepareMessage(backendSession, "Subject", "Body", 
+		Message message = errorsManager.prepareMessage(userDataRequest, "Subject", "Body", 
 				StreamMailTestsUtils.newInputStreamFromString("It's mail content !"));
 		
 		InputStream stream = mime4jUtils.toInputStream(message);

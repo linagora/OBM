@@ -57,7 +57,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -92,7 +92,7 @@ public class ImapMemoryAPITest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private long maxHeapSize;
 	private String inboxPath;
 	
@@ -109,12 +109,12 @@ public class ImapMemoryAPITest {
 		password = "password";
 		maxHeapSize = getTwiceThisHeapSize();
 		greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
+		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
-		inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 	}
 
 	@After
@@ -147,8 +147,8 @@ public class ImapMemoryAPITest {
 		Date before = new Date();
 		File data = generateBigEmail(getTwiceThisHeapSize());
 		final InputStream heavyInputStream = new SharedFileInputStream(data);
-		mailboxService.storeInInbox(bs, heavyInputStream, true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, heavyInputStream, true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Assertions.assertThat(emails).hasSize(1);
 	}
 
@@ -157,8 +157,8 @@ public class ImapMemoryAPITest {
 		Date before = new Date();
 		long size = getTwiceThisHeapSize();
 		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
-		mailboxService.storeInInbox(bs, heavyInputStream, Ints.checkedCast(size), true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+		mailboxService.storeInInbox(udr, heavyInputStream, Ints.checkedCast(size), true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Assertions.assertThat(emails).hasSize(1);
 	}
 	
@@ -166,8 +166,8 @@ public class ImapMemoryAPITest {
 	public void testFetchMailStream() throws Exception {
 		long size = getTwiceThisHeapSize();
 		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
-		mailboxService.storeInInbox(bs, heavyInputStream, Ints.checkedCast(size), true);
-		InputStream stream = mailboxService.fetchMailStream(bs, inboxPath, 1L);
+		mailboxService.storeInInbox(udr, heavyInputStream, Ints.checkedCast(size), true);
+		InputStream stream = mailboxService.fetchMailStream(udr, inboxPath, 1L);
 		Assertions.assertThat(stream).hasContentEqualTo(new RandomGeneratedInputStream(size));
 	}
 
@@ -176,7 +176,7 @@ public class ImapMemoryAPITest {
 	public void testFetchPartMoreThanMemorySize() throws Exception {
 		File data = generateBigEmail(maxHeapSize);
 		final InputStream heavyInputStream = new SharedFileInputStream(data);
-		mailboxService.storeInInbox(bs, heavyInputStream, true);
+		mailboxService.storeInInbox(udr, heavyInputStream, true);
 
 		InputStream fetchPart = uidFetchPart(1, "1");
 		
@@ -190,7 +190,7 @@ public class ImapMemoryAPITest {
 	}
 	
 	private ImapStore loggedClient() throws Exception {
-		ImapStore client = clientProvider.getImapClientWithJM(bs);
+		ImapStore client = clientProvider.getImapClientWithJM(udr);
 		client.login();
 		return client;
 	}

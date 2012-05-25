@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.impl.MappingService;
@@ -50,12 +50,12 @@ public class FolderBackend {
 		this.mappingService = mappingService;
 	}
 
-	public int getServerIdFor(BackendSession bs) throws DaoException, CollectionNotFoundException {
-		return mappingService.getCollectionIdFor(bs.getDevice(), getColName(bs));
+	public int getServerIdFor(UserDataRequest udr) throws DaoException, CollectionNotFoundException {
+		return mappingService.getCollectionIdFor(udr.getDevice(), getColName(udr));
 	}
 	
-	public String getColName(BackendSession bs){
-		return "obm:\\\\" + bs.getUser().getLoginAtDomain();
+	public String getColName(UserDataRequest udr){
+		return "obm:\\\\" + udr.getUser().getLoginAtDomain();
 	}
 
 }

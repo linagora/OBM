@@ -38,7 +38,7 @@ import org.minig.imap.idle.IdleLine;
 import org.minig.imap.idle.IdleTag;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PushMonitoringManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.imap.ImapClientProvider;
@@ -88,7 +88,7 @@ public class EmailMonitoringThread implements MonitoringService {
 	 * SynchronizedSet, all accesses should be synchronized
 	 */
 	protected MailboxService emailManager;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private String collectionName;
 	private Boolean remainConnected;  
 	private IdleClient store;
@@ -98,7 +98,7 @@ public class EmailMonitoringThread implements MonitoringService {
 
 	public EmailMonitoringThread(
 			PushMonitoringManager pushMonitorManager,
-			BackendSession bs,
+			UserDataRequest udr,
 			String collectionName, MailboxService emailManager, 
 			ImapClientProvider imapClientProvider) throws MailException {
 		
@@ -107,13 +107,13 @@ public class EmailMonitoringThread implements MonitoringService {
 		this.imapClientProvider = imapClientProvider;
 		this.remainConnected = false;
 		this.emailManager = emailManager;
-		this.bs = bs;
-		mailBoxName = emailManager.parseMailBoxName(bs, collectionName);
+		this.udr = udr;
+		mailBoxName = emailManager.parseMailBoxName(udr, collectionName);
 	}
 
 	public synchronized void startIdle() throws IMAPException {
 		if (store == null) {
-			store = imapClientProvider.getImapIdleClient(bs);
+			store = imapClientProvider.getImapIdleClient(udr);
 			store.login(emailManager.getActivateTLS());
 			store.select(mailBoxName);
 			store.startIdle(new Callback());

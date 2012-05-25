@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
@@ -48,6 +47,7 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
@@ -76,7 +76,7 @@ public class CalendarEncoder extends Encoder {
 	// <StartTime>20010101T000000Z</StartTime>
 	// <UID>74455CE0E49D486DBDBC7CB224C5212D00000000000000000000000000000000</UID>
 	// <MeetingStatus>0</MeetingStatus>
-	public void encode(BackendSession bs, Element p, IApplicationData data, boolean isResponse) {
+	public void encode(UserDataRequest udr, Element p, IApplicationData data, boolean isResponse) {
 
 		MSEvent ev = (MSEvent) data;
 
@@ -102,7 +102,7 @@ public class CalendarEncoder extends Encoder {
 			s(p, "Calendar:OrganizerEmail", ev.getOrganizerEmail());
 		}
 
-		if (bs.checkHint("hint.loadAttendees", true)) {
+		if (udr.checkHint("hint.loadAttendees", true)) {
 			if(ev.getAttendees().size()>0){
 				Element at = DOMUtils.createElement(p, "Calendar:Attendees");
 				for (MSAttendee ma : ev.getAttendees()) {
@@ -123,7 +123,7 @@ public class CalendarEncoder extends Encoder {
 					
 					s(ae, "Calendar:AttendeeName", ma.getName());
 
-					if (bs.getProtocolVersion().compareTo(TWELVE) >= 0) {
+					if (udr.getProtocolVersion().compareTo(TWELVE) >= 0) {
 						s(ae, "Calendar:AttendeeStatus", ma.getAttendeeStatus()
 							.asIntString());
 						s(ae, "Calendar:AttendeeType", ma.getAttendeeType()
@@ -136,11 +136,11 @@ public class CalendarEncoder extends Encoder {
 		s(p, "Calendar:Location", ev.getLocation());
 		s(p, "Calendar:EndTime", ev.getEndTime(),sdf);
 
-		encodeBody(bs, p, ev.getDescription());
+		encodeBody(udr, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev);
-			encodeExceptions(bs, ev, p, ev.getExceptions());
+			encodeExceptions(udr, ev, p, ev.getExceptions());
 		}
 
 		s(p, "Calendar:Sensitivity", ev.getSensitivity().asIntString());
@@ -152,7 +152,7 @@ public class CalendarEncoder extends Encoder {
 			s(p, "Calendar:AllDayEvent", "0");
 		}
 
-		if (bs.checkHint("hint.loadAttendees", true)
+		if (udr.checkHint("hint.loadAttendees", true)
 				&& ev.getAttendees().size() > 1) {
 			s(p, "Calendar:MeetingStatus", CalendarMeetingStatus.IS_A_MEETING
 					.asIntString());
@@ -161,7 +161,7 @@ public class CalendarEncoder extends Encoder {
 					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
-		if (isResponse && bs.getProtocolVersion().compareTo(TWELVE) > 0) {
+		if (isResponse && udr.getProtocolVersion().compareTo(TWELVE) > 0) {
 			s(p, "AirSyncBase:NativeBodyType", Type.PLAIN_TEXT.toString());
 		}
 
@@ -173,7 +173,7 @@ public class CalendarEncoder extends Encoder {
 
 	}
 
-	private void encodeExceptions(BackendSession bs,
+	private void encodeExceptions(UserDataRequest udr,
 			MSEvent parent,
 			Element p, List<MSEventException> excepts) {
 		// Exceptions.Exception
@@ -188,7 +188,7 @@ public class CalendarEncoder extends Encoder {
 						CalendarMeetingStatus.MEETING_IS_CANCELED.asIntString());
 
 				} else {
-					if (bs.checkHint("hint.loadAttendees", true)
+					if (udr.checkHint("hint.loadAttendees", true)
 						&& parent.getAttendees().size() > 1) {
 						s(e, "Calendar:MeetingStatus",
 							CalendarMeetingStatus.IS_A_MEETING.asIntString());
@@ -198,7 +198,7 @@ public class CalendarEncoder extends Encoder {
 							.asIntString());
 					}
 
-					encodeBody(bs, e, ex.getDescription());
+					encodeBody(udr, e, ex.getDescription());
 
 					s(e, "Calendar:Location", ex.getLocation());
 					s(e, "Calendar:Sensitivity", ex.getSensitivity().asIntString());
@@ -218,10 +218,10 @@ public class CalendarEncoder extends Encoder {
 		}
 	}
 
-	private void encodeBody(BackendSession bs, Element p,
+	private void encodeBody(UserDataRequest udr, Element p,
 			String description) {
 		String body = Strings.nullToEmpty(description).trim();
-		if (bs.getProtocolVersion().compareTo(TWELVE) >= 0) {
+		if (udr.getProtocolVersion().compareTo(TWELVE) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			s(d, "AirSyncBase:EstimatedDataSize", body.length());

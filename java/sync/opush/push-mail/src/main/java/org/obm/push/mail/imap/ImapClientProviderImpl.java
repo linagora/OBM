@@ -41,7 +41,7 @@ import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.NoImapClientAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,18 +89,18 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 
 	
 	@Override
-	public String locateImap(BackendSession bs) throws LocatorClientException {
+	public String locateImap(UserDataRequest udr) throws LocatorClientException {
 		String imapLocation = locatorService.
-				getServiceLocation("mail/imap_frontend", bs.getUser().getLoginAtDomain());
+				getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		logger.info("Using {} as imap host.", imapLocation);
 		return imapLocation;
 	}
 
 	@Override
-	public StoreClient getImapClient(BackendSession bs) throws LocatorClientException {
-		final String imapHost = locateImap(bs);
-		final String login = getLogin(bs);
-		StoreClient storeClient = new StoreClient(imapHost, imapPort, login, bs.getPassword()); 
+	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException {
+		final String imapHost = locateImap(udr);
+		final String login = getLogin(udr);
+		StoreClient storeClient = new StoreClient(imapHost, imapPort, login, udr.getPassword()); 
 		
 		logger.debug("Creating storeClient with login {} : " +
 				"loginWithDomain = {}", 
@@ -110,9 +110,9 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	}
 	
 	@Override
-	public ImapStore getImapClientWithJM(BackendSession bs) throws LocatorClientException, NoImapClientAvailableException {
-		final String imapHost = locateImap(bs);
-		final String login = getLogin(bs);
+	public ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException {
+		final String imapHost = locateImap(udr);
+		final String login = getLogin(udr);
 		
 		try {
 			logger.debug("Creating storeClient with login {} : loginWithDomain = {}", 
@@ -120,15 +120,15 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 
 			IMAPStore javaMailStore = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
 			return managedLifecycleImapStoreFactory.create(
-					defaultSession, javaMailStore, login, bs.getPassword(), imapHost, imapPort);
+					defaultSession, javaMailStore, login, udr.getPassword(), imapHost, imapPort);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);
 		}
 	}
 
-	private String getLogin(BackendSession bs) {
-		String login = bs.getUser().getLoginAtDomain();
+	private String getLogin(UserDataRequest udr) {
+		String login = udr.getUser().getLoginAtDomain();
 		if (!loginWithDomain) {
 			int at = login.indexOf("@");
 			if (at > 0) {
@@ -140,11 +140,11 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 
 
 	@Override
-	public IdleClient getImapIdleClient(BackendSession bs)
+	public IdleClient getImapIdleClient(UserDataRequest udr)
 			throws LocatorClientException {
-		String login = getLogin(bs);
+		String login = getLogin(udr);
 		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, loginWithDomain);
-		return new IdleClient(locateImap(bs), 143, login, bs.getPassword());
+		return new IdleClient(locateImap(udr), 143, login, udr.getPassword());
 	}
 
 }

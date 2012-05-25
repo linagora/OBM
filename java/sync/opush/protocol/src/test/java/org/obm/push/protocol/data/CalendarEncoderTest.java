@@ -43,7 +43,6 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.Credentials;
@@ -53,6 +52,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
@@ -76,18 +76,18 @@ public class CalendarEncoderTest {
 		return event;
 	}
 
-	private BackendSession getFakeBackendSession() {
+	private UserDataRequest getFakeUserDataRequest() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		BackendSession bs = new BackendSession(new Credentials(user, "test"),
+		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"),
 				"Sync", getFakeDevice(), new BigDecimal("12.5"));
-		return bs;
+		return udr;
 	}
 
 	@Test
 	public void testEncodeEmptyAttendees() throws Exception {
 		MSEvent event = getFakeMSEvent();
 		Document doc = DOMUtils.createDoc("test", "ApplicationData");
-		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
+		encoder.encode(getFakeUserDataRequest(), doc.getDocumentElement(),
 				event, true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, outputStream);
@@ -121,7 +121,7 @@ public class CalendarEncoderTest {
 				AttendeeStatus.NOT_RESPONDED, AttendeeType.REQUIRED);
 
 		Document doc = DOMUtils.createDoc("test", "ApplicationData");
-		encoder.encode(getFakeBackendSession(), doc.getDocumentElement(),
+		encoder.encode(getFakeUserDataRequest(), doc.getDocumentElement(),
 				event, true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, outputStream);

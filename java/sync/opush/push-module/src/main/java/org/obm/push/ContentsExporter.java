@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
@@ -61,26 +61,26 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType) 
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
-		return backend.getChanged(bs, state, filterType, collectionId);
+		return backend.getChanged(udr, state, filterType, collectionId);
 	}
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> fetchServerIds, PIMDataType dataType) 
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> fetchServerIds, PIMDataType dataType) 
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
 		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
-		changes.addAll(backend.fetch(bs, fetchServerIds));
+		changes.addAll(backend.fetch(udr, fetchServerIds));
 		return changes;
 	}
 
 	@Override
-	public int getItemEstimateSize(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType)
+	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException {
 		PIMBackend backend = backends.getBackend(dataType);
-		return backend.getItemEstimateSize(bs, filterType, collectionId, state);
+		return backend.getItemEstimateSize(udr, filterType, collectionId, state);
 	}
 	
 }

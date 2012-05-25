@@ -52,7 +52,7 @@ import org.minig.imap.MailboxFolders;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -84,7 +84,7 @@ public class ImapMailboxServiceTest {
 	@Inject ImapMailBoxUtils mailboxUtils;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
 
@@ -95,10 +95,10 @@ public class ImapMailboxServiceTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new ImapTestUtils(mailboxService, mailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new ImapTestUtils(mailboxService, mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -111,21 +111,21 @@ public class ImapMailboxServiceTest {
 		Date before = new Date();
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailboxPath(IMAP_INBOX_NAME), before);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailboxPath(IMAP_INBOX_NAME), before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
 	}
 	
 	@Test
 	public void testDefaultListFolders() throws Exception {
-		MailboxFolders emails = mailboxService.listAllFolders(bs);
+		MailboxFolders emails = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(emails).isNotNull().containsOnly(inbox());
 	}
 	
 	@Test
 	public void testListTwoFolders() throws Exception {
 		MailboxFolder newFolder = folder("NEW");
-		mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(),
 				newFolder);
@@ -134,8 +134,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testListInboxSubfolder() throws Exception {
 		MailboxFolder newFolder = folder("INBOX.NEW");
-		mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(),
 				newFolder);
@@ -144,8 +144,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testListInboxDeepSubfolder() throws Exception {
 		MailboxFolder newFolder = folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4");
-		mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(),
 				folder("INBOX.LEVEL1"),
@@ -157,8 +157,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testListToplevelFolder() throws Exception {
 		MailboxFolder newFolder = folder("TOP");
-		mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(),
 				folder("TOP"));
@@ -167,8 +167,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testListNestedToplevelFolder() throws Exception {
 		MailboxFolder newFolder = folder("TOP.LEVEL1");
-		mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(),
 				folder("TOP"),
@@ -178,8 +178,8 @@ public class ImapMailboxServiceTest {
 	@Test(expected=MailException.class)
 	public void testCreateCaseInsensitiveInbox() throws Exception {
 		MailboxFolder newFolder = folder("inBox");
-		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox());
@@ -188,8 +188,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testCreateSpecialNameMailbox() throws Exception {
 		MailboxFolder newFolder = folder("to&to");
-		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
@@ -198,8 +198,8 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testCreateUtf8Mailbox() throws Exception {
 		MailboxFolder newFolder = folder("éàêôï");
-		OpushImapFolder result = mailboxService.createFolder(bs, newFolder);
-		MailboxFolders after = mailboxService.listAllFolders(bs);
+		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
@@ -214,12 +214,12 @@ public class ImapMailboxServiceTest {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
 		
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		long uid = Iterables.getOnlyElement(emails).getUid();
 
-		mailboxService.updateMailFlag(bs, mailBoxPath, uid, Flags.Flag.DELETED, true);
-		mailboxService.expunge(bs,  mailBoxPath);
-		mailboxService.getMessage(bs, mailBoxPath, uid);
+		mailboxService.updateMailFlag(udr, mailBoxPath, uid, Flags.Flag.DELETED, true);
+		mailboxService.expunge(udr,  mailBoxPath);
+		mailboxService.getMessage(udr, mailBoxPath, uid);
 	}
 	
 	@Test
@@ -231,10 +231,10 @@ public class ImapMailboxServiceTest {
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
 		
-		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(bs, mailBoxPath, date));
+		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(udr, mailBoxPath, date));
 		
-		mailboxService.updateMailFlag(bs, mailBoxPath, email.getUid(), Flags.Flag.SEEN, true);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		mailboxService.updateMailFlag(udr, mailBoxPath, email.getUid(), Flags.Flag.SEEN, true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
 	}
@@ -242,7 +242,7 @@ public class ImapMailboxServiceTest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testUpdateMailFlagWithBadUID() throws Exception {
 		long mailUIDNotExist = 1l;
-		mailboxService.updateMailFlag(bs, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, Flags.Flag.SEEN, true);
+		mailboxService.updateMailFlag(udr, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, Flags.Flag.SEEN, true);
 	}
 	
 	@Test
@@ -253,12 +253,12 @@ public class ImapMailboxServiceTest {
 		
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Email emailNotRead = Iterables.getOnlyElement(emails);
-		mailboxService.updateReadFlag(bs, mailBoxPath, emailNotRead.getUid(), true);
+		mailboxService.updateReadFlag(udr, mailBoxPath, emailNotRead.getUid(), true);
 		
-		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email emailHasRead = Iterables.getOnlyElement(emailsAfterToReadMail);
 		
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
@@ -276,12 +276,12 @@ public class ImapMailboxServiceTest {
 		
 		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
 		greenMail.waitForIncomingEmail(1);
-		Set<Email> emails = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Email email = Iterables.getOnlyElement(emails);
-		mailboxService.setAnsweredFlag(bs, mailBoxPath, email.getUid());
+		mailboxService.setAnsweredFlag(udr, mailBoxPath, email.getUid());
 		
-		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(bs, mailBoxPath, date);
+		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email answeredEmail = Iterables.getOnlyElement(emailsAfterToSetAnsweredFlag);
 		
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
@@ -295,9 +295,9 @@ public class ImapMailboxServiceTest {
 	public void testStoreInInbox() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
-		mailboxService.storeInInbox(bs, tinyInputStream, true);
+		mailboxService.storeInInbox(udr, tinyInputStream, true);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(IMAP_INBOX_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -306,9 +306,9 @@ public class ImapMailboxServiceTest {
 	public void testStoreInInboxStream() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
-		mailboxService.storeInInbox(bs, tinyInputStream, 4, true);
+		mailboxService.storeInInbox(udr, tinyInputStream, 4, true);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(IMAP_INBOX_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -316,12 +316,12 @@ public class ImapMailboxServiceTest {
 	@Test
 	public void testStoreInSentBox() throws MailException {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
-		mailboxService.createFolder(bs, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
-		mailboxService.storeInSent(bs, inputStream);
+		mailboxService.storeInSent(udr, inputStream);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
@@ -330,16 +330,16 @@ public class ImapMailboxServiceTest {
 	@Test(expected=MailException.class)
 	public void testStoreInSentBoxWithNullInputStream() throws MailException {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
-		mailboxService.createFolder(bs, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 
 		InputStream inputStream = null;
-		mailboxService.storeInSent(bs, inputStream);
+		mailboxService.storeInSent(udr, inputStream);
 	}
 
 	@Test
 	public void testStoreInSentBoxWithNoDirectlyResetableInputStream() throws MailException {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
-		mailboxService.createFolder(bs, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 
 		InputStream emailData = getInputStreamFromFile("plainText.eml");
 		boolean isResetable = true;
@@ -349,21 +349,21 @@ public class ImapMailboxServiceTest {
 			isResetable = false;
 		}
 
-		mailboxService.storeInSent(bs, emailData);
+		mailboxService.storeInSent(udr, emailData);
 		Assertions.assertThat(isResetable).isFalse();
 	}
 
 	@Test
 	public void testStoreInSentBoxAfterToConsumeIt() throws MailException, IOException {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
-		mailboxService.createFolder(bs, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 		consumeInputStream(inputStream);
 
-		mailboxService.storeInSent(bs, inputStream);
+		mailboxService.storeInSent(udr, inputStream);
 
-		InputStream fetchMailStream = mailboxService.fetchMailStream(bs, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
+		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);

@@ -34,7 +34,7 @@ package org.obm.push.search;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
 import org.obm.push.contacts.ContactConverter;
@@ -70,11 +70,11 @@ public class ObmSearchContact implements ISearchSource {
 	}
 
 	@Override
-	public List<SearchResult> search(BackendSession bs, String query, Integer limit) {
+	public List<SearchResult> search(UserDataRequest udr, String query, Integer limit) {
 		IAddressBook bc = getBookClient();
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		try {
-			AccessToken token = login.login(bs.getUser().getLoginAtDomain(), bs.getPassword());
+			AccessToken token = login.login(udr.getUser().getLoginAtDomain(), udr.getPassword());
 			ContactConverter cc = new ContactConverter();
 			try {
 				List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit);

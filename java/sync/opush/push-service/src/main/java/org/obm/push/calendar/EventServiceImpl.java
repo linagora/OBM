@@ -40,7 +40,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
@@ -87,9 +87,9 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional
-	public MSEvent convertEventToMSEvent(BackendSession bs, Event event) throws DaoException, ConversionException {
-		MSEventUid msEventUid = getMSEventUidFor(event, bs.getDevice());
-		MSEvent msEvent = eventConverter.convert(event, msEventUid, bs.getCredentials().getUser());
+	public MSEvent convertEventToMSEvent(UserDataRequest udr, Event event) throws DaoException, ConversionException {
+		MSEventUid msEventUid = getMSEventUidFor(event, udr.getDevice());
+		MSEvent msEvent = eventConverter.convert(event, msEventUid, udr.getCredentials().getUser());
 		return msEvent;
 	}
 	
@@ -144,18 +144,18 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	@Transactional
-	public MSEvent parseEventFromICalendar(BackendSession bs, String ics) throws EventParsingException, ConversionException {
+	public MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException {
 		
-		Credentials credentials = bs.getCredentials();
+		Credentials credentials = udr.getCredentials();
 		AccessToken accessToken = null;
 		try {
 			accessToken = loginService.authenticate(credentials.getUser().getLoginAtDomain(), credentials.getPassword());
-			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(bs.getUser().getEmail(), accessToken.getDomain());
+			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
 			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser);
 			
 			if (!obmEvents.isEmpty()) {
 				final Event icsEvent = obmEvents.get(0);
-				return convertEventToMSEvent(bs, icsEvent);
+				return convertEventToMSEvent(udr, icsEvent);
 			}
 			return null;
 		} catch (DaoException e) {

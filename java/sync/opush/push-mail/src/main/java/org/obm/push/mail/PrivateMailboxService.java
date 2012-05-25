@@ -42,30 +42,30 @@ import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.MimeMessage;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.EmailHeaders;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.OpushImapFolder;
 
 public interface PrivateMailboxService {
 
-	MailboxFolders listAllFolders(BackendSession bs) throws MailException;
+	MailboxFolders listAllFolders(UserDataRequest udr) throws MailException;
 	
-	OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException;
+	OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException;
 	
-	Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException;
+	Collection<Long> uidSearch(UserDataRequest udr, String collectionName, SearchQuery sq) throws MailException;
 
-	Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+	Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
-	MimeMessage fetchBodyStructure(BackendSession bs, String collectionPath, long uid) throws MailException;
+	MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 	
-	Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException;
+	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
-	Collection<Flag> fetchFlags(BackendSession bs, String inbox, long uid) throws MailException;
+	Collection<Flag> fetchFlags(UserDataRequest udr, String inbox, long uid) throws MailException;
 
-	IMAPHeaders fetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
+	IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
 
-	InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, FetchInstructions fetchInstructions) 
+	InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, FetchInstructions fetchInstructions) 
 			throws MailException;
 
-	UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException;
+	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 }

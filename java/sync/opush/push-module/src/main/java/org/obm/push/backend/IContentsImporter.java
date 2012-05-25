@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.CollectionPathException;
@@ -46,17 +46,17 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface IContentsImporter {
 
-	String importMessageChange(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
+	String importMessageChange(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException;
 
-	void importMessageDeletion(BackendSession bs, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
+	void importMessageDeletion(UserDataRequest udr, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException,
 			ItemNotFoundException, UnsupportedBackendFunctionException;
 
-	String importMoveItem(BackendSession bs, PIMDataType type, String srcFolder, String dstFolder, String messageId)
+	String importMoveItem(UserDataRequest udr, PIMDataType type, String srcFolder, String dstFolder, String messageId)
 			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnsupportedBackendFunctionException;
 
-	void emptyFolderContent(BackendSession bs, String collectionPath, boolean deleteSubFolder) 
+	void emptyFolderContent(UserDataRequest udr, String collectionPath, boolean deleteSubFolder) 
 			throws CollectionNotFoundException, NotAllowedException, DaoException, ProcessingEmailException, CollectionPathException;
 	
 }

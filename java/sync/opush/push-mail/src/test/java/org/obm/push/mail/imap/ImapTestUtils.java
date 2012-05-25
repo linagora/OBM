@@ -39,7 +39,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
@@ -58,18 +58,18 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 public class ImapTestUtils {
 
 	private final MailboxService mailboxService;
-	private final BackendSession bs;
+	private final UserDataRequest udr;
 	private final String mailbox;
 	private final Date beforeTest;
 	private final PrivateMailboxService privateMailboxService;
 	private final CollectionPathHelper collectionPathHelper;
 
 	public ImapTestUtils(MailboxService mailboxService, PrivateMailboxService privateMailboxService,
-			BackendSession bs, String mailbox, Date beforeTest, CollectionPathHelper collectionPathHelper) {
+			UserDataRequest udr, String mailbox, Date beforeTest, CollectionPathHelper collectionPathHelper) {
 		
 		this.mailboxService = mailboxService;
 		this.privateMailboxService = privateMailboxService;
-		this.bs = bs;
+		this.udr = udr;
 		this.mailbox = mailbox;
 		this.beforeTest = beforeTest;
 		this.collectionPathHelper = collectionPathHelper;
@@ -81,7 +81,7 @@ public class ImapTestUtils {
 	}
 
 	public Email sendEmailToInbox(InputStream email) throws MailException {
-		mailboxService.storeInInbox(bs, email, false);
+		mailboxService.storeInInbox(udr, email, false);
 		return emailInInbox();
 	}
 	
@@ -94,7 +94,7 @@ public class ImapTestUtils {
 		
 		Email sentEmail = sendEmailToInbox();
 		String inboxPath = mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		mailboxService.moveItem(bs, inboxPath, mailboxPath(mailbox), sentEmail.getUid());
+		mailboxService.moveItem(udr, inboxPath, mailboxPath(mailbox), sentEmail.getUid());
 		return emailInMailbox(mailbox);
 	}
 
@@ -108,17 +108,17 @@ public class ImapTestUtils {
 	}
 	
 	public Set<Email> mailboxEmails(String mailboxName) throws MailException {
-		return mailboxService.fetchEmails(bs, mailboxPath(mailboxName), beforeTest);
+		return mailboxService.fetchEmails(udr, mailboxPath(mailboxName), beforeTest);
 	}
 
 	public void createFolders(String...folderNames) throws MailException {
 		for (String folderName : folderNames) {
-			privateMailboxService.createFolder(bs, folder(folderName));
+			privateMailboxService.createFolder(udr, folder(folderName));
 		}
 	}
 
 	public String mailboxPath(String mailboxName) {
-		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, mailboxName);
+		return collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, mailboxName);
 	}
 	
 	public MailboxFolder folder(String name) {

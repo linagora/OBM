@@ -39,7 +39,7 @@ import java.util.Set;
 import org.columba.ristretto.smtp.SMTPException;
 import org.columba.ristretto.smtp.SMTPProtocol;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpLocatorException;
 import org.slf4j.Logger;
@@ -60,21 +60,21 @@ public class SmtpSender {
 		this.locator = locator;
 	}
 
-	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, 
+	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, 
 			InputStream mimeMail) throws SendEmailException, SMTPException {
 		
-		smtpSendMail(bs, 
+		smtpSendMail(udr, 
 				getCleanedAddress(from), 
 				getAllRistrettoRecipients(setTo, setCc, setCci), 
 				mimeMail);
 	}
 	
-	private void smtpSendMail(BackendSession bs, org.columba.ristretto.message.Address from, 
+	private void smtpSendMail(UserDataRequest udr, org.columba.ristretto.message.Address from, 
 			org.columba.ristretto.message.Address[] rcpts, InputStream data) throws SendEmailException, SMTPException {
 		
 		SMTPProtocol smtp = null;
 		try {
-			smtp = locator.getSmtpClient(bs);
+			smtp = locator.getSmtpClient(udr);
 			smtp.openPort();
 			smtp.ehlo(InetAddress.getLocalHost());
 			setSmtpFrom(smtp, from);

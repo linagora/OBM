@@ -34,7 +34,7 @@ package org.obm.push.handler;
 import java.io.IOException;
 
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 
@@ -43,7 +43,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
  */
 public interface IRequestHandler {
 
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			ActiveSyncRequest request, Responder responder) throws IOException;
 
 }

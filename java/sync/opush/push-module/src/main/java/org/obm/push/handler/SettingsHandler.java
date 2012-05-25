@@ -35,7 +35,7 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.data.EncoderFactory;
@@ -62,7 +62,7 @@ public class SettingsHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
 		try {

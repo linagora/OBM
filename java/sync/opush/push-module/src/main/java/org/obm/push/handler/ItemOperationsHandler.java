@@ -38,7 +38,7 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemChange;
@@ -107,13 +107,13 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
 		try {
 			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
-			ItemOperationsResponse response = doTheJob(bs, itemOperationRequest);
-			Document document = protocol.encodeResponse(response, bs);
+			ItemOperationsResponse response = doTheJob(udr, itemOperationRequest);
+			Document document = protocol.encodeResponse(response, udr);
 			sendResponse(responder, document, response);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
@@ -139,16 +139,16 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	private ItemOperationsResponse doTheJob(BackendSession bs, ItemOperationsRequest itemOperationRequest)
+	private ItemOperationsResponse doTheJob(UserDataRequest udr, ItemOperationsRequest itemOperationRequest)
 			throws CollectionNotFoundException, UnsupportedStoreException, ProcessingEmailException {
 		
 		ItemOperationsResponse response = new ItemOperationsResponse();
 		Fetch fetch = itemOperationRequest.getFetch();
 		EmptyFolderContentsRequest emptyFolderContents = itemOperationRequest.getEmptyFolderContents();
 		if (fetch != null) {
-			response.setMailboxFetchResult(fetchOperation(bs, fetch));
+			response.setMailboxFetchResult(fetchOperation(udr, fetch));
 		} else if (emptyFolderContents != null) {
-			EmptyFolderContentsResult result = emptyFolderOperation(bs, emptyFolderContents);
+			EmptyFolderContentsResult result = emptyFolderOperation(udr, emptyFolderContents);
 			response.setEmptyFolderContentsResult(result);
 		}
 		response.setMultipart(itemOperationRequest.isMultipart());
@@ -156,30 +156,30 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return response;
 	}
 
-	private MailboxFetchResult fetchOperation(BackendSession bs, Fetch fetch)
+	private MailboxFetchResult fetchOperation(UserDataRequest udr, Fetch fetch)
 			throws CollectionNotFoundException, UnsupportedStoreException, ProcessingEmailException {
 		
 		final StoreName store = fetch.getStoreName();
 		if (StoreName.Mailbox.equals(store)) {
-			return processMailboxFetch(bs, fetch);
+			return processMailboxFetch(udr, fetch);
 		} else {
 			throw new UnsupportedStoreException();
 		}
 	}
 
-	private MailboxFetchResult processMailboxFetch(BackendSession bs, Fetch fetch)
+	private MailboxFetchResult processMailboxFetch(UserDataRequest udr, Fetch fetch)
 			throws CollectionNotFoundException, ProcessingEmailException {
 		
 		MailboxFetchResult mailboxFetchResponse = new MailboxFetchResult();
 		if (fetch.getFileReference() != null) {
 			
-			FetchAttachmentResult fileReferenceFetch = processFileReferenceFetch(bs, fetch.getFileReference());
+			FetchAttachmentResult fileReferenceFetch = processFileReferenceFetch(udr, fetch.getFileReference());
 			mailboxFetchResponse.setFetchAttachmentResult(fileReferenceFetch);
 			
 		} else if (fetch.getCollectionId() != null && fetch.getServerId() != null) {
 			try {
 				Integer collectionId = Integer.valueOf(fetch.getCollectionId());
-				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), bs));
+				mailboxFetchResponse.setFetchItemResult(fetchItem(fetch.getServerId(), collectionId, fetch.getType(), udr));
 			} catch (NumberFormatException e) {
 				throw new CollectionNotFoundException(e);
 			}
@@ -187,21 +187,21 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return mailboxFetchResponse;
 	}
 
-	private FetchAttachmentResult processFileReferenceFetch(BackendSession bs, String reference) throws CollectionNotFoundException, ProcessingEmailException {
+	private FetchAttachmentResult processFileReferenceFetch(UserDataRequest udr, String reference) throws CollectionNotFoundException, ProcessingEmailException {
 
-		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(bs, reference);
+		FetchAttachmentResult fetchAttachmentResult = fetchAttachment(udr, reference);
 		if (ItemOperationsStatus.SUCCESS.equals(fetchAttachmentResult.getStatus())) {
 			fetchAttachmentResult.setReference(reference);
 		}
 		return fetchAttachmentResult;
 	}
 
-	private FetchAttachmentResult fetchAttachment(BackendSession bs, String reference) throws CollectionNotFoundException, 
+	private FetchAttachmentResult fetchAttachment(UserDataRequest udr, String reference) throws CollectionNotFoundException, 
 		ProcessingEmailException {
 
 		FetchAttachmentResult fetchResult = new FetchAttachmentResult();
 		try {
-			MSAttachementData data = mailBackend.getAttachment(bs, reference);
+			MSAttachementData data = mailBackend.getAttachment(udr, reference);
 			fetchResult.setContentType(data.getContentType());
 			try {
 				fetchResult.setAttch(FileUtils.streamBytes(data.getFile(), true));
@@ -216,7 +216,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchResult;
 	}
 
-	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, BackendSession bs) {
+	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, UserDataRequest udr) {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
 		fetchResult.setServerId(serverId);
@@ -224,7 +224,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			
-			List<ItemChange> itemChanges = contentsExporter.fetch(bs, ImmutableList.of(serverId), dataType);
+			List<ItemChange> itemChanges = contentsExporter.fetch(udr, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 			} else {
@@ -255,12 +255,12 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	}
 	
 	private EmptyFolderContentsResult emptyFolderOperation(
-			BackendSession bs, EmptyFolderContentsRequest request) {
+			UserDataRequest udr, EmptyFolderContentsRequest request) {
 		
 		EmptyFolderContentsResult emptyFolderContentsResult = new EmptyFolderContentsResult();
 		try {
 			String collectionPath = collectionDao.getCollectionPath(request.getCollectionId());
-			contentsImporter.emptyFolderContent(bs, collectionPath, request.isDeleteSubFolderElem());
+			contentsImporter.emptyFolderContent(udr, collectionPath, request.isDeleteSubFolderElem());
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SUCCESS);
 		} catch (CollectionNotFoundException e) {
 			emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.BLOCKED_ACCESS);

@@ -33,7 +33,7 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
 
@@ -46,7 +46,7 @@ public interface ICollectionChangeListener {
 
 	Set<SyncCollection> getMonitoredCollections();
 
-	BackendSession getSession();
+	UserDataRequest getSession();
 
 	IContinuation getContinuation();
 

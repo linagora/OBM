@@ -56,7 +56,7 @@ import org.obm.mail.conversation.MessageId;
 import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
 import org.obm.mail.message.MessageLoader;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;
@@ -93,7 +93,7 @@ public class MailMessageLoader {
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain");
 	}
 
-	public MSEmail fetch(final Integer collectionId, final long messageId, final BackendSession bs) {
+	public MSEmail fetch(final Integer collectionId, final long messageId, final UserDataRequest udr) {
 		MSEmail msEmail = null;
 		try {
 			
@@ -109,7 +109,7 @@ public class MailMessageLoader {
 				final MessageLoader helper = new MessageLoader(messageFetcherImpl, htmlMimeSubtypePriority, false, mimeMessage);
 				final MailMessage message = helper.fetch();
 				
-				msEmail = convertMailMessageToMSEmail(message, bs, mimeMessage.getUid(), collectionId, messageId);
+				msEmail = convertMailMessageToMSEmail(message, udr, mimeMessage.getUid(), collectionId, messageId);
 				setMsEmailFlags(msEmail, messageIdAsList);
 				fetchMimeData(msEmail, messageId);
 				msEmail.setSmtpId(envelopes.iterator().next().getEnvelope().getMessageId());
@@ -148,7 +148,7 @@ public class MailMessageLoader {
 		mm.setMimeData(mimeData);
 	}
 
-	private MSEmail convertMailMessageToMSEmail(final MailMessage mailMessage, final BackendSession bs, 
+	private MSEmail convertMailMessageToMSEmail(final MailMessage mailMessage, final UserDataRequest udr, 
 			final long uid, final Integer collectionId, long messageId) throws ConversionException {
 		
 		final MSEmail msEmail = new MSEmail();
@@ -157,7 +157,7 @@ public class MailMessageLoader {
 		msEmail.setFrom(convertAdressToMSAddress(mailMessage.getSender()));
 		msEmail.setDate(mailMessage.getDate());
 		msEmail.setHeaders(mailMessage.getHeaders());
-		msEmail.setForwardMessage(convertAllMailMessageToMSEmail(mailMessage.getForwardMessage(), bs, uid, collectionId, messageId));
+		msEmail.setForwardMessage(convertAllMailMessageToMSEmail(mailMessage.getForwardMessage(), udr, uid, collectionId, messageId));
 		msEmail.setAttachements(convertMailMessageAttachmentToMSAttachment(mailMessage, uid, collectionId, messageId));	
 		msEmail.setUid(mailMessage.getUid());
 		
@@ -166,18 +166,18 @@ public class MailMessageLoader {
 		msEmail.setCc(convertAllAdressToMSAddress(mailMessage.getCc()));
 		
 		if (mailMessage.getInvitation() != null) {
-			setInvitation(msEmail, bs, mailMessage.getInvitation(), uid, messageId);
+			setInvitation(msEmail, udr, mailMessage.getInvitation(), uid, messageId);
 		}
 		
 		return msEmail;
 	}
 
-	private void setInvitation(final MSEmail msEmail, final BackendSession bs, final IMimePart mimePart, final long uid, 
+	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final long uid, 
 			final long messageId) throws ConversionException {
 		
 		try {	
 			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
-			final MSEvent event = getInvitation(bs, inputStreamInvitation);
+			final MSEvent event = getInvitation(udr, inputStreamInvitation);
 			if (mimePart.isInvitation()) {
 				msEmail.setInvitation(event, MSMessageClass.SCHEDULE_MEETING_REQUEST);
 			} else if (mimePart.isCancelInvitation()) {
@@ -198,11 +198,11 @@ public class MailMessageLoader {
 		return null;
 	}
 	
-	private MSEvent getInvitation(BackendSession bs, InputStream invitation) throws IOException, ConversionException {
+	private MSEvent getInvitation(UserDataRequest udr, InputStream invitation) throws IOException, ConversionException {
 		final String ics = FileUtils.streamString(invitation, true);
 		if (ics != null && !"".equals(ics) && ics.startsWith("BEGIN")) {
 			try {
-				return eventService.parseEventFromICalendar(bs, ics);
+				return eventService.parseEventFromICalendar(udr, ics);
 			} catch (EventParsingException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -238,11 +238,11 @@ public class MailMessageLoader {
 		return false;
 	}
 	
-	private Set<MSEmail> convertAllMailMessageToMSEmail(final Set<MailMessage> set, final BackendSession bs, 
+	private Set<MSEmail> convertAllMailMessageToMSEmail(final Set<MailMessage> set, final UserDataRequest udr, 
 			final long uid, final Integer collectionId, final long messageId) throws ConversionException {
 		final Set<MSEmail> msEmails = new HashSet<MSEmail>();
 		for (final MailMessage mailMessage: set) {
-			msEmails.add(convertMailMessageToMSEmail(mailMessage, bs, uid, collectionId, messageId));
+			msEmails.add(convertMailMessageToMSEmail(mailMessage, udr, uid, collectionId, messageId));
 		}
 		return msEmails;
 	}

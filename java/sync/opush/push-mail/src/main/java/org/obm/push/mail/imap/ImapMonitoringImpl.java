@@ -40,7 +40,7 @@ import org.minig.imap.IMAPException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PushMonitoringManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailBackend;
@@ -100,7 +100,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	}
 	
 	@Override
-	public void startMonitoringCollection(BackendSession bs, Integer collectionId,
+	public void startMonitoringCollection(UserDataRequest udr, Integer collectionId,
 			Set<ICollectionChangeListener> registeredListeners) throws CollectionNotFoundException, DaoException {
 		
 		String collectionName = mappingService.getCollectionPathFor(collectionId);
@@ -114,7 +114,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 				emt.stopIdle();
 			} else {
 				emt = new EmailMonitoringThread(
-						new Manager(registeredListeners), bs, collectionName, emailManager, imapClientProvider);
+						new Manager(registeredListeners), udr, collectionName, emailManager, imapClientProvider);
 			}
 
 			emt.startIdle();

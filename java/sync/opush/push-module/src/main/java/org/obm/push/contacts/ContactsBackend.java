@@ -42,7 +42,7 @@ import javax.naming.NoPermissionException;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
@@ -98,20 +98,20 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return PIMDataType.CONTACTS;
 	}
 	
-	public HierarchyItemsChanges getHierarchyChanges(BackendSession bs, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException, UnexpectedObmSyncServerException {
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
 			
-		FolderChanges folderChanges = listAddressBooksChanged(bs, lastSync);
+		FolderChanges folderChanges = listAddressBooksChanged(udr, lastSync);
 		
 		Iterator<Folder> folderChangesSorted = 
 				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
 		while (folderChangesSorted.hasNext()) {
-			itemsChanged.add( createItemChange(bs, folderChangesSorted.next()) );
+			itemsChanged.add( createItemChange(udr, folderChangesSorted.next()) );
 		}
 		
 		for (Folder folder: folderChanges.getRemoved()) {
-			ItemChange item = createItemDelete(bs, folder);
+			ItemChange item = createItemDelete(udr, folder);
 			if (item != null) {
 				itemsDeleted.add( item );
 			}
@@ -126,8 +126,8 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return treeSet.iterator();
 	}
 
-	private FolderChanges listAddressBooksChanged(BackendSession bs, Date lastSync) throws UnexpectedObmSyncServerException {
-		AccessToken token = login(bs);
+	private FolderChanges listAddressBooksChanged(UserDataRequest udr, Date lastSync) throws UnexpectedObmSyncServerException {
+		AccessToken token = login(udr);
 		try {
 			return bookClient.listAddressBooksChanged(token, lastSync);
 		} catch (ServerFault e) {
@@ -137,52 +137,52 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private ItemChange createItemChange(BackendSession bs, Folder folder) throws DaoException {
+	private ItemChange createItemChange(UserDataRequest udr, Folder folder) throws DaoException {
 		boolean isNew = false;
-		String collectionPath = getCollectionPath(bs, folder.getName());
-		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+		String collectionPath = getCollectionPath(udr, folder.getName());
+		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
 		if (serverId == null) {
-			serverId = mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
+			serverId = mappingService.createCollectionMapping(udr.getDevice(), collectionPath);
 			isNew = true;
 		}
-		String parentId = getParentId(bs, folder);
+		String parentId = getParentId(udr, folder);
 		FolderType itemType = getItemType(folder);
 		return new ItemChange(serverId, parentId, folder.getName(), itemType, isNew);
 	}
 
-	private ItemChange createItemDelete(BackendSession bs, Folder folder) throws DaoException {
-		String collectionPath = getCollectionPath(bs, folder.getName());
-		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+	private ItemChange createItemDelete(UserDataRequest udr, Folder folder) throws DaoException {
+		String collectionPath = getCollectionPath(udr, folder.getName());
+		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
 		if (serverId != null) {
 			return new ItemChange(serverId);
 		}
 		return null;
 	}
 	
-	private String getCollectionPath(BackendSession bs, String folderName)  {
+	private String getCollectionPath(UserDataRequest udr, String folderName)  {
 		
 		if (isDefaultFolder(folderName)) {
-			return collectionPathHelper.buildCollectionPath(bs, PIMDataType.CONTACTS, folderName);
+			return collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS, folderName);
 		} else {
-			return collectionPathHelper.buildCollectionPath(bs, PIMDataType.CONTACTS, 
+			return collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS, 
 					contactConfiguration.getDefaultAddressBookName(), folderName);
 		}
 	}
 	
-	private String getServerIdFromCollectionPath(BackendSession bs, String collectionPath) throws DaoException {
+	private String getServerIdFromCollectionPath(UserDataRequest udr, String collectionPath) throws DaoException {
 		try {
-			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), collectionPath);
+			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 			return mappingService.collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
 			return null;
 		}	
 	}
 	
-	private String getParentId(BackendSession bs, Folder folder) throws DaoException {
+	private String getParentId(UserDataRequest udr, Folder folder) throws DaoException {
 		String defaultParentId = contactConfiguration.getDefaultParentId();
 		if (!isDefaultFolder(folder.getName())) {
-			String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
-			String parentId = getServerIdFromCollectionPath(bs, collectionPath);
+			String collectionPath = getCollectionPath(udr, contactConfiguration.getDefaultAddressBookName());
+			String parentId = getServerIdFromCollectionPath(udr, collectionPath);
 			if (parentId != null) {
 				return parentId;
 			}
@@ -206,27 +206,27 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException {
-		DataDelta dataDelta = getChanged(bs, state, filterType, collectionId);
+		DataDelta dataDelta = getChanged(udr, state, filterType, collectionId);
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state,
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
-		return getChanged(bs, state, collectionId);
+		return getChanged(udr, state, collectionId);
 	}
 	
-	public DataDelta getChanged(BackendSession bs, SyncState state, Integer collectionId) 
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId) 
 			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 		
-		Integer addressBookId = findAddressBookIdFromCollectionId(bs,collectionId);
-		ContactChanges contactChanges = listContactsChanged(bs,state.getLastSync(), addressBookId);
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr,collectionId);
+		ContactChanges contactChanges = listContactsChanged(udr,state.getLastSync(), addressBookId);
 
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
@@ -242,14 +242,14 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return new DataDelta(addUpd, deletions, contactChanges.getLastSync());
 	}
 
-	private Integer findAddressBookIdFromCollectionId(BackendSession bs, Integer collectionId) 
+	private Integer findAddressBookIdFromCollectionId(UserDataRequest udr, Integer collectionId) 
 			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 		
-		List<AddressBook> addressBooks = listAddressBooks(bs);
+		List<AddressBook> addressBooks = listAddressBooks(udr);
 		for (AddressBook addressBook: addressBooks) {
-			String colllectionPath = getCollectionPath(bs, addressBook.getName());
+			String colllectionPath = getCollectionPath(udr, addressBook.getName());
 			try {
-				Integer addressBookCollectionId = mappingService.getCollectionIdFor(bs.getDevice(), colllectionPath);
+				Integer addressBookCollectionId = mappingService.getCollectionIdFor(udr.getDevice(), colllectionPath);
 				if (addressBookCollectionId.intValue() == collectionId.intValue()) {
 					return addressBook.getUid();
 				}
@@ -260,8 +260,8 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		throw new CollectionNotFoundException(collectionId);
 	}
 	
-	private List<AddressBook> listAddressBooks(BackendSession bs) throws UnexpectedObmSyncServerException {
-		AccessToken token = login(bs);
+	private List<AddressBook> listAddressBooks(UserDataRequest udr) throws UnexpectedObmSyncServerException {
+		AccessToken token = login(udr);
 		try {
 			return bookClient.listAllBooks(token);
 		} catch (ServerFault e) {
@@ -271,8 +271,8 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private ContactChanges listContactsChanged(BackendSession bs, Date lastSync, Integer addressBookId) throws UnexpectedObmSyncServerException {
-		AccessToken token = login(bs);
+	private ContactChanges listContactsChanged(UserDataRequest udr, Date lastSync, Integer addressBookId) throws UnexpectedObmSyncServerException {
+		AccessToken token = login(udr);
 		try {
 			return bookClient.listContactsChanged(token, lastSync, addressBookId);
 		} catch (ServerFault e) {
@@ -290,7 +290,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public String createOrUpdate(BackendSession bs, Integer collectionId,
+	public String createOrUpdate(UserDataRequest udr, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
@@ -298,15 +298,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 		MSContact contact = (MSContact) data;
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
-		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
 		try {
 
 			if (serverId != null) {
 				Contact convertedContact = new ContactConverter().contact(contact);
 				convertedContact.setUid(contactId);
-				modifyContact(bs, addressBookId, convertedContact);
+				modifyContact(udr, addressBookId, convertedContact);
 			} else {
-				Contact createdContact = createContact(bs, addressBookId, new ContactConverter().contact(contact));
+				Contact createdContact = createContact(udr, addressBookId, new ContactConverter().contact(contact));
 				contactId = createdContact.getUid();
 			}
 
@@ -323,10 +323,10 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return mappingService.getServerIdFor(collectionId, String.valueOf(contactId));
 	}
 
-	private Contact modifyContact(BackendSession bs, Integer addressBookId, Contact contact) 
+	private Contact modifyContact(UserDataRequest udr, Integer addressBookId, Contact contact) 
 			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
-		AccessToken token = login(bs);
+		AccessToken token = login(udr);
 		try {
 			return bookClient.modifyContact(token, addressBookId, contact);
 		} catch (ServerFault e) {
@@ -336,10 +336,10 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 	
-	private Contact createContact(BackendSession bs, Integer addressBookId, Contact contact) 
+	private Contact createContact(UserDataRequest udr, Integer addressBookId, Contact contact) 
 			throws UnexpectedObmSyncServerException, NoPermissionException, ContactAlreadyExistException {
 		
-		AccessToken token = login(bs);
+		AccessToken token = login(udr);
 		try {
 			return bookClient.createContact(token, addressBookId, contact);
 		} catch (ServerFault e) {
@@ -350,14 +350,14 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
+	public void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ItemNotFoundException {
 		
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
-		Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
 		try {
-			removeContact(bs, addressBookId, contactId);
+			removeContact(udr, addressBookId, contactId);
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
 		} catch (ContactNotFoundException e) {
@@ -365,10 +365,10 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private Contact removeContact(BackendSession bs, Integer addressBookId, Integer contactId) 
+	private Contact removeContact(UserDataRequest udr, Integer addressBookId, Integer contactId) 
 			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
-		AccessToken token = login(bs);
+		AccessToken token = login(udr);
 		try {
 			return bookClient.removeContact(token, addressBookId, contactId);
 		} catch (ServerFault e) {
@@ -379,7 +379,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
@@ -388,9 +388,9 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 				Integer contactId = mappingService.getItemIdFromServerId(serverId);
 				Integer collectionId = mappingService.getCollectionIdFromServerId(serverId);
-				Integer addressBookId = findAddressBookIdFromCollectionId(bs, collectionId);
+				Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
 				
-				Contact contact = getContactFromId(bs, addressBookId, contactId);
+				Contact contact = getContactFromId(udr, addressBookId, contactId);
 				ret.add( convertContactToItemChange(collectionId, contact) );
 				
 			} catch (ContactNotFoundException e) {
@@ -400,10 +400,10 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return ret;
 	}
 
-	private Contact getContactFromId(BackendSession bs, Integer addressBookId, Integer contactId) 
+	private Contact getContactFromId(UserDataRequest udr, Integer addressBookId, Integer contactId) 
 			throws UnexpectedObmSyncServerException, ContactNotFoundException {
 		
-		AccessToken token = login(bs);
+		AccessToken token = login(udr);
 		try {
 			return bookClient.getContactFromId(token, addressBookId, contactId);
 		} catch (ServerFault e) {
@@ -413,24 +413,24 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	public void createDefaultContactFolder(BackendSession bs) throws DaoException {
-		String collectionPath = getCollectionPath(bs, contactConfiguration.getDefaultAddressBookName());
-		String serverId = getServerIdFromCollectionPath(bs, collectionPath);
+	public void createDefaultContactFolder(UserDataRequest udr) throws DaoException {
+		String collectionPath = getCollectionPath(udr, contactConfiguration.getDefaultAddressBookName());
+		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
 		if (serverId == null) {
-			mappingService.createCollectionMapping(bs.getDevice(), collectionPath);
+			mappingService.createCollectionMapping(udr.getDevice(), collectionPath);
 		}
 	}
 
 
 	@Override
-	public String move(BackendSession bs, String srcFolder, String dstFolder,
+	public String move(UserDataRequest udr, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,
 			ProcessingEmailException {
 		return null;
 	}
 
 	@Override
-	public void emptyFolderContent(BackendSession bs, String collectionPath,
+	public void emptyFolderContent(UserDataRequest udr, String collectionPath,
 			boolean deleteSubFolder) throws NotAllowedException {
 		throw new NotAllowedException(
 				"emptyFolderContent is only supported for emails, collection was "

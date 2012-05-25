@@ -37,10 +37,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -68,12 +68,12 @@ public class SyncProtocol {
 		this.syncDecoder = syncDecoder;
 	}
 	
-	public SyncRequest getRequest(Document doc, BackendSession backendSession) 
+	public SyncRequest getRequest(Document doc, UserDataRequest userDataRequest) 
 			throws NoDocumentException, PartialException, ProtocolException, DaoException, CollectionPathException {
 		if (doc == null) {
 			throw new NoDocumentException("Document of Sync request is null.");
 		}
-		return new SyncRequest( syncDecoder.decodeSync(doc, backendSession) );
+		return new SyncRequest( syncDecoder.decodeSync(doc, userDataRequest) );
 	}
 
 	public Document endcodeResponse(SyncResponse syncResponse) {
@@ -99,10 +99,10 @@ public class SyncProtocol {
 
 				if (!collectionResponse.getSyncCollection().getSyncKey().equals("0")) {
 					if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
-						buildUpdateItemChange(syncResponse.getBackendSession(), collectionResponse, 
+						buildUpdateItemChange(syncResponse.getUserDataRequest(), collectionResponse, 
 								syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
 					} else {
-						buildFetchItemChange(syncResponse.getBackendSession(), collectionResponse, ce, 
+						buildFetchItemChange(syncResponse.getUserDataRequest(), collectionResponse, ce, 
 								syncResponse.getEncoderFactory());
 					}
 				}
@@ -133,7 +133,7 @@ public class SyncProtocol {
 		return ret;
 	}
 
-	private void buildFetchItemChange(BackendSession bs, SyncCollectionResponse c, Element ce, EncoderFactory encoderFactory) {
+	private void buildFetchItemChange(UserDataRequest udr, SyncCollectionResponse c, Element ce, EncoderFactory encoderFactory) {
 		Element commands = DOMUtils.createElement(ce, "Responses");
 		for (ItemChange ic : c.getItemChanges()) {
 			Element add = DOMUtils.createElement(commands, "Fetch");
@@ -141,18 +141,18 @@ public class SyncProtocol {
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asXmlValue());
 			c.getSyncCollection().getOptions().initTruncation();
-			serializeChange(bs, add, c.getSyncCollection(), ic, encoderFactory);
+			serializeChange(udr, add, c.getSyncCollection(), ic, encoderFactory);
 		}
 	}
 	
-	private void serializeChange(BackendSession bs, Element col,
+	private void serializeChange(UserDataRequest udr, Element col,
 			SyncCollection c, ItemChange ic, EncoderFactory encoderFactory) {
 		
 		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoderFactory.encode(bs, apData, ic.getData(), c, true);
+		encoderFactory.encode(udr, apData, ic.getData(), c, true);
 	}
 	
-	private void buildUpdateItemChange(BackendSession bs, SyncCollectionResponse c,	Map<String, String> processedClientIds, 
+	private void buildUpdateItemChange(UserDataRequest udr, SyncCollectionResponse c, Map<String, String> processedClientIds, 
 			Element ce, EncoderFactory encoderFactory) {
 		
 		Element responses = DOMUtils.createElement(ce, "Responses");
@@ -184,7 +184,7 @@ public class SyncProtocol {
 				String commandName = selectCommandName(ic);
 				Element command = DOMUtils.createElement(commands, commandName);
 				DOMUtils.createElementAndText(command, "ServerId", ic.getServerId());
-				serializeChange(bs, command, c.getSyncCollection(), ic, encoderFactory);
+				serializeChange(udr, command, c.getSyncCollection(), ic, encoderFactory);
 			}
 			processedClientIds.remove(ic.getServerId());
 		}

@@ -51,7 +51,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -78,7 +78,7 @@ public class ManagedLifecycleImapStoreTest {
 	
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private Date beforeTest;
 	private ImapTestUtils testUtils;
 
@@ -89,10 +89,10 @@ public class ManagedLifecycleImapStoreTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -102,7 +102,7 @@ public class ManagedLifecycleImapStoreTest {
 
 	@Test
 	public void testIsConnected() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		imapStore.login();
 		
@@ -111,7 +111,7 @@ public class ManagedLifecycleImapStoreTest {
 
 	@Test
 	public void testCloseWhenNoOperation() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		imapStore.login();
 		imapStore.logout();
@@ -121,7 +121,7 @@ public class ManagedLifecycleImapStoreTest {
 
 	@Test
 	public void testCloseAfterNoStreamedOperations() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		String intoFolder = "afolder";
 		imapStore.login();
@@ -137,7 +137,7 @@ public class ManagedLifecycleImapStoreTest {
 	@Test
 	public void testCloseAfterStreamedOperation() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		imapStore.login();
 		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
@@ -150,7 +150,7 @@ public class ManagedLifecycleImapStoreTest {
 	@Test
 	public void testCloseAfterStreamedOperationButConsumed() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		imapStore.login();
 		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
@@ -164,7 +164,7 @@ public class ManagedLifecycleImapStoreTest {
 	@Test
 	public void testCloseAfterStreamedOperationWhenCloseOnStreamCalledAfter() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(bs);
+		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
 		
 		imapStore.login();
 		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);

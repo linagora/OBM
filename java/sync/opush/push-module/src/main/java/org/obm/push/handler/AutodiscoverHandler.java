@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
@@ -68,11 +68,11 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 	}
 
 	@Override
-	protected void process(BackendSession bs, Document doc, Responder responder) {
+	protected void process(UserDataRequest udr, Document doc, Responder responder) {
 		AutodiscoverRequest autodiscoverRequest = null;
 		try {
 			autodiscoverRequest = protocol.getRequest(doc);
-			AutodiscoverResponse autodiscoverResponse = doTheJob(bs, autodiscoverRequest);
+			AutodiscoverResponse autodiscoverResponse = doTheJob(udr, autodiscoverRequest);
 			Document ret = protocol.encodeResponse(autodiscoverResponse);
 			sendResponse(responder, ret);
 		} catch (NoDocumentException e) {
@@ -82,10 +82,10 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 		}
 	}
 
-	private AutodiscoverResponse doTheJob(BackendSession bs, AutodiscoverRequest autodiscoverRequest) {
+	private AutodiscoverResponse doTheJob(UserDataRequest udr, AutodiscoverRequest autodiscoverRequest) {
 		String culture = formatCultureParameter( Locale.getDefault() );
 
-		AutodiscoverResponseUser user = buildUserField(bs, autodiscoverRequest);
+		AutodiscoverResponseUser user = buildUserField(udr, autodiscoverRequest);
 		List<AutodiscoverResponseServer> actionsServer = buildActionsServer(); 
 
 		return new AutodiscoverResponse(culture, user, null, actionsServer, null, null);
@@ -102,9 +102,9 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 				locale.getCountry().toLowerCase() ;
 	}
 
-	private AutodiscoverResponseUser buildUserField(BackendSession bs, AutodiscoverRequest autodiscoverRequest) {
+	private AutodiscoverResponseUser buildUserField(UserDataRequest udr, AutodiscoverRequest autodiscoverRequest) {
 		String email = autodiscoverRequest.getEmailAddress();
-		String displayName = bs.getUser().getDisplayName();
+		String displayName = udr.getUser().getDisplayName();
 		return new AutodiscoverResponseUser(email, displayName);
 	}
 	

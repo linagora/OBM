@@ -33,7 +33,7 @@ package org.obm.push.handler;
 
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -57,10 +57,10 @@ public class SmartReplyHandler extends MailRequestHandler {
 	}
 
 	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) 
+	public void doTheJob(MailRequest mailRequest, UserDataRequest udr) 
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException {
 		
-		mailBackend.replyEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
+		mailBackend.replyEmail(udr, mailRequest.getMailContent(), mailRequest.isSaveInSent(),
 				Integer.valueOf(mailRequest.getCollectionId()), mailRequest.getServerId());
 	}
 

@@ -65,12 +65,12 @@ import org.minig.imap.mime.MimeMessage;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ImapCommandException;
@@ -137,18 +137,18 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public List<MSEmail> fetchMails(BackendSession bs, Integer collectionId, 
+	public List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
 			String collectionName, Collection<Long> uids) throws MailException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
-		final StoreClient store = imapClientProvider.getImapClient(bs);
+		final StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
 			login(store);
-			store.select(parseMailBoxName(bs, collectionName));
+			store.select(parseMailBoxName(udr, collectionName));
 			
 			final MailMessageLoader mailLoader = new MailMessageLoader(store, eventService);
 			for (final Long uid: uids) {
-				final MSEmail email = mailLoader.fetch(collectionId, uid, bs);
+				final MSEmail email = mailLoader.fetch(collectionId, uid, udr);
 				if (email != null) {
 					mails.add(email);
 				}
@@ -162,7 +162,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public IMAPHeaders fetchHeaders(BackendSession bs, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
+	public IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
 		Preconditions.checkNotNull(headersToFetch);
 		if (Iterables.isEmpty(headersToFetch)) {
 			return new IMAPHeaders();
@@ -170,9 +170,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			OpushImapFolder folder = store.select(parseMailBoxName(bs, collectionName));
+			OpushImapFolder folder = store.select(parseMailBoxName(udr, collectionName));
 			Message message = folder.fetchHeaders(uid, headersToFetch);
 			return toIMAPHeaders(message);
 		} catch (ImapLoginException e) {
@@ -201,12 +201,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Collection<Long> uidSearch(BackendSession bs, String collectionName, SearchQuery sq) throws MailException {
+	public Collection<Long> uidSearch(UserDataRequest udr, String collectionName, SearchQuery sq) throws MailException {
 		ImapStore store = null; 
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			OpushImapFolder folder = store.select(parseMailBoxName(bs, collectionName));
+			OpushImapFolder folder = store.select(parseMailBoxName(udr, collectionName));
 			return folder.uidSearch(sq);
 		} catch (ImapLoginException e) {
 			throw new MailException(e);
@@ -224,12 +224,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public Collection<Flag> fetchFlags(BackendSession bs, String collectionName, long uid) throws MailException {
+	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			OpushImapFolder imapFolder = store.select( parseMailBoxName(bs, collectionName) );
+			OpushImapFolder imapFolder = store.select( parseMailBoxName(udr, collectionName) );
 			return imapFolder.uidFetchFlags(uid);
 		} catch (MessagingException e) {
 			throw new MailException(e);
@@ -247,10 +247,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public MailboxFolders listAllFolders(BackendSession bs) throws MailException {
+	public MailboxFolders listAllFolders(UserDataRequest udr) throws MailException {
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			Folder[] folders = store.getDefaultFolder().list("*");
 			
@@ -274,10 +274,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public OpushImapFolder createFolder(BackendSession bs, MailboxFolder folder) throws MailException {
+	public OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			return store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
 		} catch (LocatorClientException e) {
@@ -302,20 +302,20 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) 
+	public void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		updateMailFlag(bs, collectionName, uid, Flags.Flag.SEEN, read);
+		updateMailFlag(udr, collectionName, uid, Flags.Flag.SEEN, read);
 	}
 
-	/* package */ void updateMailFlag(BackendSession bs, String collectionName, long uid, Flags.Flag flag, 
+	/* package */ void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flags.Flag flag, 
 			boolean status) throws MailException, ImapMessageNotFoundException {
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			IMAPMessage message = getMessage(store, bs, collectionName, uid);
+			IMAPMessage message = getMessage(store, udr, collectionName, uid);
 			message.setFlag(flag, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
 					new Object[] { uid, collectionName, imapMailBoxUtils.flagToString(flag), status });
@@ -332,10 +332,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
-	private IMAPMessage getMessage(ImapStore store, BackendSession bs, String collectionName, long uid) 
+	private IMAPMessage getMessage(ImapStore store, UserDataRequest udr, String collectionName, long uid) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		String mailBoxName = parseMailBoxName(bs, collectionName);
+		String mailBoxName = parseMailBoxName(udr, collectionName);
 		try {
 			OpushImapFolder folder = store.select(mailBoxName);
 			return folder.getMessageByUID(uid);
@@ -346,14 +346,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
-	/* package */ IMAPMessage getMessage(BackendSession bs, String collectionName, long uid) 
+	/* package */ IMAPMessage getMessage(UserDataRequest udr, String collectionName, long uid) 
 			throws MailException, ImapMessageNotFoundException {
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			return getMessage(store, bs, collectionName, uid);
+			return getMessage(store, udr, collectionName, uid);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (NoImapClientAvailableException e) {
@@ -365,12 +365,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}
 	
-	/* package */ void expunge(BackendSession bs, String collectionName) throws MailException {
+	/* package */ void expunge(UserDataRequest udr, String collectionName) throws MailException {
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			String mailBoxName = parseMailBoxName(bs, collectionName);
+			String mailBoxName = parseMailBoxName(udr, collectionName);
 			OpushImapFolder folder = store.select(mailBoxName);
 			folder.expunge();
 		} catch (MessagingException e) {
@@ -387,15 +387,15 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public String parseMailBoxName(BackendSession bs, String collectionName) throws MailException {
+	public String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException {
 		try {
-			String boxName = collectionPathHelper.extractFolder(bs, collectionName, PIMDataType.EMAIL);
+			String boxName = collectionPathHelper.extractFolder(udr, collectionName, PIMDataType.EMAIL);
 			
 			if (isINBOXSpecificCase(boxName)) {
 				return EmailConfiguration.IMAP_INBOX_NAME;
 			}
 			
-			final MailboxFolders lr = listAllFolders(bs);
+			final MailboxFolders lr = listAllFolders(udr);
 			for (final MailboxFolder i: lr) {
 				if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
 					return i.getName();
@@ -413,15 +413,15 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	 
 	@Override
-	public void delete(BackendSession bs, String collectionPath, long uid) 
+	public void delete(UserDataRequest udr, String collectionPath, long uid) 
 			throws MailException, ImapMessageNotFoundException {
 
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
-			String mailboxName = parseMailBoxName(bs, collectionPath);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
 			store.deleteMessage(mailboxName, uid);
 		} catch (MessagingException e) {
 			throw new MailException(e);
@@ -437,21 +437,21 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
+	public long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
 			assertMoveItemIsSupported(store);
 			
 			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
-					new Object[] {bs.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
+					new Object[] {udr.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
 			
-			String srcMailBox = parseMailBoxName(bs, srcFolder);
-			String dstMailBox = parseMailBoxName(bs, dstFolder);
+			String srcMailBox = parseMailBoxName(udr, srcFolder);
+			String dstMailBox = parseMailBoxName(udr, dstFolder);
 
 			return store.moveMessageUID(srcMailBox, dstMailBox, uid);
 		} catch (MessagingException e) {
@@ -472,18 +472,18 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException {
-		return getMessageInputStream(bs, collectionName, uid);
+	public InputStream fetchMailStream(UserDataRequest udr, String collectionName, long uid) throws MailException {
+		return getMessageInputStream(udr, collectionName, uid);
 	}
 
-	private InputStream getMessageInputStream(BackendSession bs, String collectionName, long messageUID) 
+	private InputStream getMessageInputStream(UserDataRequest udr, String collectionName, long messageUID) 
 			throws MailException {
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			IMAPMessage imapMessage = getMessage(store, bs, collectionName, messageUID);
+			IMAPMessage imapMessage = getMessage(store, udr, collectionName, messageUID);
 			IMAPInputStream imapInputStream = new IMAPInputStream(imapMessage, null, -1, true);
 			return imapInputStream;
 		} catch (ImapMessageNotFoundException e) {
@@ -502,12 +502,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(bs, collectionName, uid, Flags.Flag.ANSWERED, true);
+	public void setAnsweredFlag(UserDataRequest udr, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
+		updateMailFlag(udr, collectionName, uid, Flags.Flag.ANSWERED, true);
 	}
 
 	@Override
-	public void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
+	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
 		
 		InputStream streamMail = null;
@@ -515,9 +515,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
 			streamMail.mark(streamMail.available());
 			
-			smtpProvider.sendEmail(bs, from, setTo, setCc, setCci, streamMail);
+			smtpProvider.sendEmail(udr, from, setTo, setCc, setCci, streamMail);
 			if (saveInSent) {	
-				storeInSent(bs, streamMail);
+				storeInSent(udr, streamMail);
 			} else {
 				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
 			}
@@ -534,12 +534,12 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		}
 	}	
 	
-	@VisibleForTesting void storeInSent(BackendSession bs, InputStream mailContent) throws MailException {
+	@VisibleForTesting void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
 			String sentboxPath = 
-					collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
-			storeInFolder(bs, mailContent, true, sentboxPath);
+					collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+			storeInFolder(udr, mailContent, true, sentboxPath);
 		} else {
 			throw new MailException("The mail that user try to store in sent box is null.");
 		}
@@ -565,14 +565,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, MimeAddress mimePartAddress)
+	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress)
 			throws MailException {
 		
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			String mailBoxName = parseMailBoxName(bs, collectionName);
+			String mailBoxName = parseMailBoxName(udr, collectionName);
 			OpushImapFolder imapFolder = store.select(mailBoxName);
 			return imapFolder.uidFetchPart(mailUid, mimePartAddress);
 		} catch (LocatorClientException e) {
@@ -593,14 +593,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) 
+	public Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
 			throws DaoException, MailException {
 		
 		long time = System.currentTimeMillis();
-		StoreClient store = imapClientProvider.getImapClient(bs);
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
 			login(store);
-			String mailBoxName = parseMailBoxName(bs, collectionPath);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailBoxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
 			Collection<Long> uids = store.uidSearch(SearchQuery.MATCH_ALL);
@@ -620,10 +620,10 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public void storeInInbox(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) throws MailException {
+	public void storeInInbox(UserDataRequest udr, InputStream mailContent, int mailSize, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
 		try {
-			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
+			ImapStore store = imapClientProvider.getImapClientWithJM(udr);
 			try {
 				store.login();
 				Flags flags = new Flags();
@@ -645,24 +645,24 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 		
 	@Override
-	public void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException {
+	public void storeInInbox(UserDataRequest udr, InputStream mailContent, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
 		String inboxPath = 
-				collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
-		storeInFolder(bs, mailContent, isRead, inboxPath);
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		storeInFolder(udr, mailContent, isRead, inboxPath);
 	}
 	
-	private void storeInFolder(BackendSession bs, InputStream mailContent, boolean isRead, String collectionPath) 
+	private void storeInFolder(UserDataRequest udr, InputStream mailContent, boolean isRead, String collectionPath) 
 			throws MailException {
 		
 		try {
-			ImapStore store = imapClientProvider.getImapClientWithJM(bs);
+			ImapStore store = imapClientProvider.getImapClientWithJM(udr);
 			try {
 				store.login();
 				resetInputStream(mailContent);
 				Message message = store.createMessage(mailContent);
 				message.setFlag(Flags.Flag.SEEN, isRead);
-				String folderName = parseMailBoxName(bs, collectionPath);
+				String folderName = parseMailBoxName(udr, collectionPath);
 				store.appendMessage(folderName, message);
 			} catch (ImapCommandException e) {
 				throw new MailException(e.getMessage(), e);
@@ -692,8 +692,8 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 
 	@Override
-	public Collection<Email> fetchEmails(BackendSession bs, String collectionName, Collection<Long> uids) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(bs, collectionName, uids);
+	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionName, Collection<Long> uids) throws MailException {
+		Collection<FastFetch> fetch = fetchFast(udr, collectionName, uids);
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
@@ -704,14 +704,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public Set<Email> fetchEmails(BackendSession bs, String collectionName, Date windows) throws MailException {
-		StoreClient store = imapClientProvider.getImapClient(bs);
+	public Set<Email> fetchEmails(UserDataRequest udr, String collectionName, Date windows) throws MailException {
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
 			login(store);
-			store.select( parseMailBoxName(bs, collectionName) );
+			store.select( parseMailBoxName(udr, collectionName) );
 			SearchQuery query = new SearchQuery.Builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
-			Collection<FastFetch> mails = fetchFast(bs, collectionName, uids);
+			Collection<FastFetch> mails = fetchFast(udr, collectionName, uids);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -721,14 +721,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException {
+	public UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException {
 		ImapStore store = null;
 		IMAPMessage message = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
-			String mailboxName = parseMailBoxName(bs, collectionPath);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
 			message = (IMAPMessage) store.fetchEnvelope(mailboxName, uid);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -747,14 +747,14 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public Collection<FastFetch> fetchFast(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException {
+	public Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
 		ImapStore store = null;
 		Map<Long, IMAPMessage> imapMessages = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
-			String mailboxName = parseMailBoxName(bs, collectionPath);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
 			imapMessages = store.fetchFast(mailboxName, uids);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -774,19 +774,19 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public MimeMessage fetchBodyStructure(BackendSession bs, String collectionPath, long uid) throws MailException {
-		return Iterables.getOnlyElement(fetchBodyStructure(bs, collectionPath, ImmutableSet.<Long>of(uid)));
+	public MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException {
+		return Iterables.getOnlyElement(fetchBodyStructure(udr, collectionPath, ImmutableSet.<Long>of(uid)));
 	}
 	
 	@Override
-	public Collection<MimeMessage> fetchBodyStructure(BackendSession bs, String collectionPath, Collection<Long> uids) throws MailException {
+	public Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
 		ImapStore store = null;
 		Map<Long, IMAPMessage> imapMessages = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
-			String mailboxName = parseMailBoxName(bs, collectionPath);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
 			imapMessages = store.fetchBodyStructure(mailboxName, uids);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -805,16 +805,16 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 	}
 	
 	@Override
-	public InputStream fetchMimePartData(BackendSession bs, String collectionName, long uid, 
+	public InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, 
 			FetchInstructions fetchInstructions) throws MailException {
 
 		Preconditions.checkNotNull(fetchInstructions);
 		ImapStore store = null;
 		try {
-			store = imapClientProvider.getImapClientWithJM(bs);
+			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
 			
-			String mailBoxName = parseMailBoxName(bs, collectionName);
+			String mailBoxName = parseMailBoxName(udr, collectionName);
 			OpushImapFolder imapFolder = store.select(mailBoxName);
 			
 			MimeAddress address = fetchInstructions.getMimePart().getAddress();

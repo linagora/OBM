@@ -37,7 +37,7 @@ import java.io.InputStream;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -57,7 +57,7 @@ public abstract class XmlRequestHandler implements IRequestHandler {
 	}
 	
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			ActiveSyncRequest request, Responder responder) throws IOException {
 
 		InputStream in = request.getInputStream();
@@ -72,9 +72,9 @@ public abstract class XmlRequestHandler implements IRequestHandler {
 				logger.error("Error parsing command xml data.", e);
 			}
 		}
-		process(bs, doc, responder);
+		process(udr, doc, responder);
 	}
 
-	protected abstract void process(BackendSession bs, Document doc, Responder responder);
+	protected abstract void process(UserDataRequest udr, Document doc, Responder responder);
 
 }

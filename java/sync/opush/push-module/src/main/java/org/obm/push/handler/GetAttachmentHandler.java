@@ -34,7 +34,7 @@ package org.obm.push.handler;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -61,13 +61,13 @@ public class GetAttachmentHandler implements IRequestHandler {
 	}
 
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			ActiveSyncRequest request, Responder responder) {
 
 		String AttachmentName = request.getParameter("AttachmentName");
 
 		try {
-			MSAttachementData attachment = getAttachment(bs, AttachmentName);
+			MSAttachementData attachment = getAttachment(udr, AttachmentName);
 			responder.sendResponseFile(attachment.getContentType(),	attachment.getFile());
 		} catch (AttachementNotFoundException e) {
 			sendErrorResponse(responder, e);
@@ -83,9 +83,9 @@ public class GetAttachmentHandler implements IRequestHandler {
 		responder.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
-	private MSAttachementData getAttachment(BackendSession bs, String AttachmentName) 
+	private MSAttachementData getAttachment(UserDataRequest udr, String AttachmentName) 
 			throws AttachementNotFoundException, CollectionNotFoundException, ProcessingEmailException {
-		return mailBackend.getAttachment(bs, AttachmentName);
+		return mailBackend.getAttachment(udr, AttachmentName);
 	}
 	
 }

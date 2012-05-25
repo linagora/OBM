@@ -54,12 +54,12 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.EmailHeader;
 import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
@@ -89,7 +89,7 @@ public class UIDFetchHeadersTest {
 	
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
 	private GreenMailUser greenmailUser;
@@ -101,10 +101,10 @@ public class UIDFetchHeadersTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenmailUser = greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -230,7 +230,7 @@ public class UIDFetchHeadersTest {
 
 	private IMAPHeaders uidFetchHeaders(long uid, EmailHeaders headersToFetch) throws Exception {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return privateMailboxService.fetchHeaders(bs, inbox, uid, headersToFetch);
+		return privateMailboxService.fetchHeaders(udr, inbox, uid, headersToFetch);
 	}
 
 	private Address addr(String address) {

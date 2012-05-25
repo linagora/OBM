@@ -33,7 +33,7 @@ package org.obm.push.handler;
 
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
@@ -56,8 +56,8 @@ public class SmartForwardHandler extends MailRequestHandler {
 	}
 
 	@Override
-	public void doTheJob(MailRequest mailRequest, BackendSession bs) throws ProcessingEmailException, CollectionNotFoundException {
-		mailBackend.forwardEmail(bs, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
+	public void doTheJob(MailRequest mailRequest, UserDataRequest udr) throws ProcessingEmailException, CollectionNotFoundException {
+		mailBackend.forwardEmail(udr, mailRequest.getMailContent(), mailRequest.isSaveInSent(), 
 				mailRequest.getCollectionId(), mailRequest.getServerId());
 	}
 

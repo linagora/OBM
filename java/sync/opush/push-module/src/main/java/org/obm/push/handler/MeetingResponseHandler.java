@@ -39,7 +39,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
@@ -106,14 +106,14 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	// </MeetingResponse>
 
 	@Override
-	protected void process(IContinuation continuation, BackendSession bs,
+	protected void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
 		MeetingHandlerRequest meetingRequest;
 		try {
 			
 			meetingRequest = meetingProtocol.getRequest(doc);
-			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, bs);
+			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, udr);
 			Document document = meetingProtocol.encodeResponses(meetingResponse);
 			sendResponse(responder, document);
 			
@@ -138,27 +138,27 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse("MeetingResponse", document);
 	}
 
-	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, BackendSession bs) 
+	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, UserDataRequest udr) 
 			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
 		
 		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
-			ItemChangeMeetingResponse meetingResponse = handleSingleResponse(bs, item);
+			ItemChangeMeetingResponse meetingResponse = handleSingleResponse(udr, item);
 			meetingResponses.add(meetingResponse);
 		}
 		return new MeetingHandlerResponse(meetingResponses);
 	}
 
-	private ItemChangeMeetingResponse handleSingleResponse(BackendSession bs, MeetingResponse item) 
+	private ItemChangeMeetingResponse handleSingleResponse(UserDataRequest udr, MeetingResponse item) 
 			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
 		
-		MSEmail email = retrieveMailWithMeetingRequest(bs, item);
+		MSEmail email = retrieveMailWithMeetingRequest(udr, item);
 	
 		ItemChangeMeetingResponse meetingResponse = new ItemChangeMeetingResponse();
 		
 		if (email != null) {
-			handle(meetingResponse, bs, email, item.getUserResponse());
-			deleteInvitationEmail(bs, item);
+			handle(meetingResponse, udr, email, item.getUserResponse());
+			deleteInvitationEmail(udr, item);
 		} else {
 			meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 		}
@@ -167,12 +167,12 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		return meetingResponse;
 	}
 
-	private void handle(ItemChangeMeetingResponse meetingResponse, BackendSession bs, MSEmail email,
+	private void handle(ItemChangeMeetingResponse meetingResponse, UserDataRequest udr, MSEmail email,
 			AttendeeStatus userResponse) throws ConversionException {
 		
 		meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
 		try {
-			String calId = calendarBackend.handleMeetingResponse(bs, email,	userResponse);
+			String calId = calendarBackend.handleMeetingResponse(udr, email,	userResponse);
 			if (!AttendeeStatus.DECLINE.equals(userResponse)) {
 				meetingResponse.setCalId(calId);
 			}
@@ -191,10 +191,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		}		
 	}
 
-	private void deleteInvitationEmail(BackendSession bs, MeetingResponse item) {
+	private void deleteInvitationEmail(UserDataRequest udr, MeetingResponse item) {
 
 		try {
-			contentsImporter.importMessageDeletion(bs, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
+			contentsImporter.importMessageDeletion(udr, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
 		} catch (ItemNotFoundException e) {
 			logger.warn(e.getMessage(), e);
 		} catch (UnexpectedObmSyncServerException e) {
@@ -210,10 +210,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	private MSEmail retrieveMailWithMeetingRequest(BackendSession bs, MeetingResponse item)
+	private MSEmail retrieveMailWithMeetingRequest(UserDataRequest udr, MeetingResponse item)
 		throws CollectionNotFoundException, ProcessingEmailException {
 
-		MSEmail email = mailBackend.getEmail(bs, item.getCollectionId(), item.getReqId());
+		MSEmail email = mailBackend.getEmail(udr, item.getCollectionId(), item.getReqId());
 		return email;
 	}
 	

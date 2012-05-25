@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -48,8 +48,8 @@ public interface EventService {
 	
 	EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException;
 	
-	MSEvent convertEventToMSEvent(BackendSession bs, Event event)  throws DaoException, ConversionException;
+	MSEvent convertEventToMSEvent(UserDataRequest udr, Event event)  throws DaoException, ConversionException;
 
-	MSEvent parseEventFromICalendar(BackendSession bs, String ics) throws EventParsingException, ConversionException;
+	MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException;
 	
 }

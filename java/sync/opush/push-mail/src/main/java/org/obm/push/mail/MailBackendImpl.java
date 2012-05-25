@@ -55,9 +55,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BackendSession;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -68,6 +67,7 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -146,26 +146,26 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException {
+	public List<ItemChange> getHierarchyChanges(UserDataRequest udr) throws DaoException {
 		return ImmutableList.of(
-				genItemChange(bs, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER),
-				genItemChange(bs, EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS),
-				genItemChange(bs, EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER),
-				genItemChange(bs, EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
+				genItemChange(udr, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER),
+				genItemChange(udr, EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS),
+				genItemChange(udr, EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER),
+				genItemChange(udr, EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
 	}
 
-	private ItemChange genItemChange(BackendSession bs, String imapFolder,
+	private ItemChange genItemChange(UserDataRequest udr, String imapFolder,
 			FolderType type) throws DaoException {
 		
 		ItemChange ic = new ItemChangeBuilder().parentId("0").displayName(imapFolder).itemType(type).build();
 
-		String imapPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, imapFolder);
+		String imapPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, imapFolder);
 		String serverId;
 		try {
-			Integer collectionId = mappingService.getCollectionIdFor(bs.getDevice(), imapPath);
+			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapPath);
 			serverId = mappingService.collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
-			serverId = mappingService.createCollectionMapping(bs.getDevice(), imapPath);
+			serverId = mappingService.createCollectionMapping(udr.getDevice(), imapPath);
 			ic.setIsNew(true);
 		}
 
@@ -173,17 +173,17 @@ public class MailBackendImpl implements MailBackend {
 		return ic;
 	}
 
-	private String getWasteBasketPath(BackendSession bs) {
-		return collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_TRASH_NAME);
+	private String getWasteBasketPath(UserDataRequest udr) {
+		return collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_TRASH_NAME);
 	}
 
-	private MailChanges getSync(BackendSession bs, SyncState state, Integer collectionId, FilterType filterType) 
+	private MailChanges getSync(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			state.updatingLastSync(filterType);
-			return emailSync.getSync(bs, mailboxService, state, collectionPath, collectionId);
+			return emailSync.getSync(udr, mailboxService, state, collectionPath, collectionId);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MailException e) {
@@ -194,26 +194,26 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException {
-		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
-		DataDelta dataDelta = getDataDelta(bs, collectionId, mailChanges);
+		MailChanges mailChanges = getSync(udr, state, collectionId, filterType);
+		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges);
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state,
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
 		
-		MailChanges mailChanges = getSync(bs, state, collectionId, filterType);
+		MailChanges mailChanges = getSync(udr, state, collectionId, filterType);
 		try {
-			updateData(bs.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
+			updateData(udr.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
 					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
-			return getDataDelta(bs, collectionId, mailChanges);
+			return getDataDelta(udr, collectionId, mailChanges);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		}
@@ -231,23 +231,23 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 	
-	private DataDelta getDataDelta(BackendSession bs, Integer collectionId, MailChanges mailChanges) 
+	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges) 
 			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
-		List<ItemChange> itemChanges = fetchMails(bs, collectionId, 
+		List<ItemChange> itemChanges = fetchMails(udr, collectionId, 
 				mappingService.getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids());
 		List<ItemChange> itemsToDelete = mappingService.buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
 		return new DataDelta(itemChanges, itemsToDelete, mailChanges.getLastSync());
 	}
 	
 	private List<ItemChange> fetchMails(
-			BackendSession bs, Integer collectionId, String collection, 
+			UserDataRequest udr, Integer collectionId, String collection, 
 			Collection<Long> emailsUids) throws ProcessingEmailException {
 		
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
 			List<MSEmail> msMails = 
-					mailboxService.fetchMails(bs, collectionId, collection, emailsUids);
+					mailboxService.fetchMails(udr, collectionId, collection, emailsUids);
 			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -267,7 +267,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
 			ProcessingEmailException, UnexpectedObmSyncServerException {
 	
@@ -277,7 +277,7 @@ public class MailBackendImpl implements MailBackend {
 			Integer collectionId = entry.getKey();
 			Collection<Long> uids = entry.getValue();
 			try {
-				ret.addAll(fetchItems(bs, collectionId, uids));
+				ret.addAll(fetchItems(udr, collectionId, uids));
 			} catch (CollectionNotFoundException e) {
 				logger.error("fetchItems : collection {} not found !", collectionId);
 			}
@@ -299,13 +299,13 @@ public class MailBackendImpl implements MailBackend {
 		return ret;
 	}
 
-	private List<ItemChange> fetchItems(BackendSession bs, Integer collectionId, Collection<Long> uids) 
+	private List<ItemChange> fetchItems(UserDataRequest udr, Integer collectionId, Collection<Long> uids) 
 			throws CollectionNotFoundException, ProcessingEmailException {
 		
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<MSEmail> emails = mailboxService.fetchMails(bs, collectionId, collectionPath, uids);
+			final List<MSEmail> emails = mailboxService.fetchMails(udr, collectionId, collectionPath, uids);
 			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(mappingService.getServerIdFor(collectionId, String.valueOf(email.getUid())));
@@ -323,7 +323,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
+	public void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ItemNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		try {
@@ -336,16 +336,16 @@ public class MailBackendImpl implements MailBackend {
 			if (serverId != null) {
 				final Long uid = getEmailUidFromServerId(serverId);
 				final String collectionName = mappingService.getCollectionPathFor(collectionId);
-				final Integer devDbId = bs.getDevice().getDatabaseId();
+				final Integer devDbId = udr.getDevice().getDatabaseId();
 
 				if (trash) {
-					String wasteBasketPath = getWasteBasketPath(bs);
-					Integer wasteBasketId = mappingService.getCollectionIdFor(bs.getDevice(), wasteBasketPath);
-					mailboxService.moveItem(bs, collectionName, wasteBasketPath, uid);
+					String wasteBasketPath = getWasteBasketPath(udr);
+					Integer wasteBasketId = mappingService.getCollectionIdFor(udr.getDevice(), wasteBasketPath);
+					mailboxService.moveItem(udr, collectionName, wasteBasketPath, uid);
 					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
-					addMessageInCache(bs, devDbId, wasteBasketId, uid, wasteBasketPath);
+					addMessageInCache(udr, devDbId, wasteBasketId, uid, wasteBasketPath);
 				} else {
-					mailboxService.delete(bs, collectionName, uid);
+					mailboxService.delete(udr, collectionName, uid);
 				}
 			}	
 		} catch (MailException e) {
@@ -360,13 +360,13 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 
-	protected String getDefaultCalendarName(BackendSession bs) {
-		return "obm:\\\\" + bs.getUser().getLoginAtDomain() + "\\calendar\\"
-				+ bs.getUser().getLoginAtDomain();
+	protected String getDefaultCalendarName(UserDataRequest udr) {
+		return "obm:\\\\" + udr.getUser().getLoginAtDomain() + "\\calendar\\"
+				+ udr.getUser().getLoginAtDomain();
 	}
 	
 	@Override
-	public String createOrUpdate(BackendSession bs, Integer collectionId, String serverId, String clientId, IApplicationData data)
+	public String createOrUpdate(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, ItemNotFoundException {
 		
 		MSEmail email = (MSEmail) data;
@@ -375,7 +375,7 @@ public class MailBackendImpl implements MailBackend {
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
 			if (serverId != null) {
 				Long mailUid = getEmailUidFromServerId(serverId);
-				mailboxService.updateReadFlag(bs, collectionPath, mailUid, email.isRead());
+				mailboxService.updateReadFlag(udr, collectionPath, mailUid, email.isRead());
 			}
 			return serverId;
 		} catch (MailException e) {
@@ -388,18 +388,18 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public String move(BackendSession bs, String srcFolder, String dstFolder, String messageId) 
+	public String move(UserDataRequest udr, String srcFolder, String dstFolder, String messageId) 
 			throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		
 		try {
 			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
-			final Integer srcFolderId = mappingService.getCollectionIdFor(bs.getDevice(), srcFolder);
-			final Integer dstFolderId = mappingService.getCollectionIdFor(bs.getDevice(), dstFolder);
-			final Integer devDbId = bs.getDevice().getDatabaseId();
-			Long newUidMail = mailboxService.moveItem(bs, srcFolder, dstFolder, currentMailUid);
+			final Integer srcFolderId = mappingService.getCollectionIdFor(udr.getDevice(), srcFolder);
+			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
+			final Integer devDbId = udr.getDevice().getDatabaseId();
+			Long newUidMail = mailboxService.moveItem(udr, srcFolder, dstFolder, currentMailUid);
 			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
-			addMessageInCache(bs, devDbId, dstFolderId, newUidMail, dstFolder);
+			addMessageInCache(udr, devDbId, dstFolderId, newUidMail, dstFolder);
 			return dstFolderId + ":" + newUidMail;	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
@@ -414,11 +414,11 @@ public class MailBackendImpl implements MailBackend {
 
 
 	@Override
-	public void sendEmail(BackendSession bs, byte[] mailContent, boolean saveInSent) throws ProcessingEmailException {
+	public void sendEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent) throws ProcessingEmailException {
 		try {
 			Message message = mime4jUtils.parseMessage(mailContent);
-			SendEmail sendEmail = new SendEmail(getUserEmail(bs), message);
-			send(bs, sendEmail, saveInSent);
+			SendEmail sendEmail = new SendEmail(getUserEmail(udr), message);
+			send(udr, sendEmail, saveInSent);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
@@ -431,7 +431,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void replyEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
+	public void replyEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException {
 		
 		try {
@@ -448,16 +448,16 @@ public class MailBackendImpl implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionId, collectionPath, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(udr, collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(bs), mail.get(0), message,
+				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(udr), mail.get(0), message,
 						ImmutableMap.<String, MSAttachementData>of());
-				send(bs, replyEmail, saveInSent);
-				mailboxService.setAnsweredFlag(bs, collectionPath, uid);
+				send(udr, replyEmail, saveInSent);
+				mailboxService.setAnsweredFlag(udr, collectionPath, uid);
 			} else {
-				sendEmail(bs, mailContent, saveInSent);
+				sendEmail(udr, mailContent, saveInSent);
 			}
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
@@ -479,7 +479,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void forwardEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, String collectionId, String serverId) 
+	public void forwardEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent, String collectionId, String serverId) 
 			throws ProcessingEmailException, CollectionNotFoundException {
 		
 		try {
@@ -489,26 +489,26 @@ public class MailBackendImpl implements MailBackend {
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 
-			List<MSEmail> mail = mailboxService.fetchMails(bs, collectionIdInt, collectionName, uids);
+			List<MSEmail> mail = mailboxService.fetchMails(udr, collectionIdInt, collectionName, uids);
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
 				MSEmail originMail = mail.get(0);
 				
 				Map<String, MSAttachementData> originalMailAttachments = new HashMap<String, MSAttachementData>();
 				if (!mime4jUtils.isAttachmentsExist(message)) {
-					loadAttachments(originalMailAttachments, bs, originMail);
+					loadAttachments(originalMailAttachments, udr, originMail);
 				}
 				
 				ForwardEmail forwardEmail = 
-						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(bs), originMail, message, originalMailAttachments);
-				send(bs, forwardEmail, saveInSent);
+						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), originMail, message, originalMailAttachments);
+				send(udr, forwardEmail, saveInSent);
 				try{
-					mailboxService.setAnsweredFlag(bs, collectionName, uid);
+					mailboxService.setAnsweredFlag(udr, collectionName, uid);
 				} catch (Throwable e) {
 					logger.info("Can't set Answered Flag to mail["+uid+"]");
 				}
 			} else {
-				sendEmail(bs, mailContent, saveInSent);
+				sendEmail(udr, mailContent, saveInSent);
 			}
 		} catch (NumberFormatException e) {
 			throw new ProcessingEmailException(e);
@@ -530,11 +530,11 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	private void loadAttachments(Map<String, MSAttachementData> attachments, 
-			BackendSession bs, MSEmail originMail) throws ProcessingEmailException {
+			UserDataRequest udr, MSEmail originMail) throws ProcessingEmailException {
 		
 		for (MSAttachement msAttachement: originMail.getAttachements()) {
 			try {
-				MSAttachementData msAttachementData = getAttachment(bs, msAttachement.getFileReference());
+				MSAttachementData msAttachementData = getAttachment(udr, msAttachement.getFileReference());
 				attachments.put(msAttachement.getDisplayName(), msAttachementData);
 			} catch (AttachementNotFoundException e) {
 				throw new ProcessingEmailException(e);
@@ -544,13 +544,13 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private AccessToken login(BackendSession session) throws AuthFault {
+	private AccessToken login(UserDataRequest session) throws AuthFault {
 		return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
 	}
 	
-	private String getUserEmail(BackendSession bs) throws UnexpectedObmSyncServerException, AuthFault {
+	private String getUserEmail(UserDataRequest udr) throws UnexpectedObmSyncServerException, AuthFault {
 		ICalendar cal = calendarClient;
-		AccessToken at = login(bs);
+		AccessToken at = login(udr);
 		try {
 			return cal.getUserEmail(at);
 		} catch (ServerFault e) {
@@ -560,13 +560,13 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private void send(BackendSession bs, SendEmail sendEmail, boolean saveInSent) throws ProcessingEmailException {
+	private void send(UserDataRequest udr, SendEmail sendEmail, boolean saveInSent) throws ProcessingEmailException {
 		try {
 			boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
 
 			Address from = getAddress(sendEmail.getFrom());
 			if (!sendEmail.isInvitation() && isScheduleMeeting) {
-				mailboxService.sendEmail(bs, from, sendEmail.getTo(),
+				mailboxService.sendEmail(udr, from, sendEmail.getTo(),
 						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
@@ -590,13 +590,13 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException {
+	public MSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException {
 		try {
 			String collectionName = mappingService.getCollectionPathFor(collectionId);
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = mailboxService.fetchMails(bs, collectionId, collectionName, uids);
+			List<MSEmail> emails = mailboxService.fetchMails(udr, collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
@@ -611,7 +611,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public MSAttachementData getAttachment(BackendSession bs, String attachmentId) 
+	public MSAttachementData getAttachment(UserDataRequest udr, String attachmentId) 
 			throws AttachementNotFoundException, CollectionNotFoundException, ProcessingEmailException {
 		
 		if (attachmentId != null && !attachmentId.isEmpty()) {
@@ -634,7 +634,7 @@ public class MailBackendImpl implements MailBackend {
 
 				String collectionName = mappingService.getCollectionPathFor(Integer
 						.parseInt(collectionId));
-				InputStream is = mailboxService.findAttachment(bs,
+				InputStream is = mailboxService.findAttachment(udr,
 						collectionName, Long.parseLong(messageId),
 						new MimeAddress(mimePartAddress));
 
@@ -671,18 +671,18 @@ public class MailBackendImpl implements MailBackend {
 	}
 
 	@Override
-	public void emptyFolderContent(BackendSession bs, String collectionPath,
+	public void emptyFolderContent(UserDataRequest udr, String collectionPath,
 			boolean deleteSubFolder) throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException {
 		
 		try {
-			String wasteBasketPath = getWasteBasketPath(bs);
+			String wasteBasketPath = getWasteBasketPath(udr);
 			if (!wasteBasketPath.equals(collectionPath)) {
 				throw new NotAllowedException(
 						"Only the Trash folder can be purged.");
 			}
-			final Integer devDbId = bs.getDevice().getDatabaseId();
-			int collectionId = mappingService.getCollectionIdFor(bs.getDevice(), collectionPath);
-			Collection<Long> uids = mailboxService.purgeFolder(bs, devDbId, collectionPath, collectionId);
+			final Integer devDbId = udr.getDevice().getDatabaseId();
+			int collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
+			Collection<Long> uids = mailboxService.purgeFolder(udr, devDbId, collectionPath, collectionId);
 			deleteEmails(devDbId, collectionId, uids);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
@@ -706,8 +706,8 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private void addMessageInCache(BackendSession bs, Integer devId, Integer collectionId, Long mailUids, String collectionName) throws DaoException, MailException {
-		Collection<Email> emails = mailboxService.fetchEmails(bs, collectionName, ImmutableList.of(mailUids));
+	private void addMessageInCache(UserDataRequest udr, Integer devId, Integer collectionId, Long mailUids, String collectionName) throws DaoException, MailException {
+		Collection<Email> emails = mailboxService.fetchEmails(udr, collectionName, ImmutableList.of(mailUids));
 		try {
 			markEmailsAsSynced(devId, collectionId, emails);
 		} catch (DaoException e) {

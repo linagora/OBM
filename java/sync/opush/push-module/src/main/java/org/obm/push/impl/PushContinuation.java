@@ -41,7 +41,7 @@ import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.handler.IContinuationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +97,9 @@ public class PushContinuation implements IContinuation {
 	}
 
 	@Override
-	public void suspend(BackendSession bs, long secondsTimeout) {
+	public void suspend(UserDataRequest udr, long secondsTimeout) {
 		logger.info("suspend for {} seconds", secondsTimeout);
-		setBackendSession(bs);
+		setUserDataRequest(udr);
 		c.setTimeout(secondsTimeout * 1000);
 		c.suspend();
 	}
@@ -111,12 +111,12 @@ public class PushContinuation implements IContinuation {
 	}
 
 	@Override
-	public BackendSession getBackendSession() {
-		return (BackendSession) c.getAttribute(KEY_BACKEND_SESSION);
+	public UserDataRequest getUserDataRequest() {
+		return (UserDataRequest) c.getAttribute(KEY_BACKEND_SESSION);
 	}
 
-	private void setBackendSession(BackendSession bs) {
-		c.setAttribute(KEY_BACKEND_SESSION, bs);
+	private void setUserDataRequest(UserDataRequest udr) {
+		c.setAttribute(KEY_BACKEND_SESSION, udr);
 	}
 
 	@Override

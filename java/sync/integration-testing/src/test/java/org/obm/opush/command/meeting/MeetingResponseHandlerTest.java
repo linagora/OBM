@@ -58,7 +58,7 @@ import org.obm.opush.PortNumber;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEmail;
@@ -306,14 +306,14 @@ public class MeetingResponseHandlerTest {
 	
 	private void expectMailbackendDeleteInvitationProcessCorrectly(MailBackend mailBackend) throws Exception {
 		
-		mailBackend.delete(anyObject(BackendSession.class), anyInt(), anyObject(String.class), anyBoolean());
+		mailBackend.delete(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class), anyBoolean());
 		EasyMock.expectLastCall().once();
 	}
 	
 	private void expectMailbackendDeleteInvitationTriggersException(MailBackend mailBackend, Exception triggeredException)
 			throws Exception {
 		
-		mailBackend.delete(anyObject(BackendSession.class), anyInt(), anyObject(String.class), anyBoolean());
+		mailBackend.delete(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class), anyBoolean());
 		EasyMock.expectLastCall().andThrow(triggeredException);
 	}
 
@@ -321,7 +321,7 @@ public class MeetingResponseHandlerTest {
 			throws Exception {
 		
 		expect(calendarBackend.handleMeetingResponse(
-				anyObject(BackendSession.class),
+				anyObject(UserDataRequest.class),
 				anyObject(MSEmail.class),
 				anyObject(AttendeeStatus.class)))
 			.andReturn(serverId(meetingCollectionId, meetingItemId));
@@ -331,7 +331,7 @@ public class MeetingResponseHandlerTest {
 			throws Exception {
 		
 		expect(calendarBackend.handleMeetingResponse(
-				anyObject(BackendSession.class),
+				anyObject(UserDataRequest.class),
 				anyObject(MSEmail.class),
 				anyObject(AttendeeStatus.class)))
 			.andThrow(triggeredException);
@@ -340,7 +340,7 @@ public class MeetingResponseHandlerTest {
 	private void expectMailbackendGiveEmailForAnyIds(MailBackend mailBackend)
 			throws CollectionNotFoundException, ProcessingEmailException {
 		
-		expect(mailBackend.getEmail(anyObject(BackendSession.class), anyInt(), anyObject(String.class)))
+		expect(mailBackend.getEmail(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class)))
 			.andReturn(new MSEmail());
 	}
 

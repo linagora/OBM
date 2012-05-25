@@ -52,7 +52,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
@@ -95,10 +95,10 @@ public class EventConverterTest {
 	public void testAttendeesWithNoOrganizerInNewEventStream() 
 			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String loginAtDomain = "jribiera@obm.lng.org";
-		BackendSession backendSession = buildBackendSession(loginAtDomain);
+		UserDataRequest userDataRequest = buildUserDataRequest(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("HTC-Windows-Mobile-6.1-new_event.xml");
-		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
+		Event event = eventConverter.convert(userDataRequest.getUser(), null, (MSEvent) data, true);
 		
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event);  
@@ -106,7 +106,7 @@ public class EventConverterTest {
 		assertNotNull(event);
 		assertEquals("Windows Mobile 6.1 - HTC", event.getTitle());
 		
-		checkOrganizer(backendSession.getCredentials().getUser().getEmail(), organizer);
+		checkOrganizer(userDataRequest.getCredentials().getUser().getEmail(), organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).doesNotContain(organizer);
@@ -117,10 +117,10 @@ public class EventConverterTest {
 	public void testAttendeesWithOrganizerEmailInNewEventStream()
 			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String loginAtDomain = "jribier@obm.lng.org";
-		BackendSession backendSession = buildBackendSession(loginAtDomain);
+		UserDataRequest userDataRequest = buildUserDataRequest(loginAtDomain);
 		
 		IApplicationData data = getApplicationData("Galaxy-S-Android-2.3.4-new_event.xml");
-		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
+		Event event = eventConverter.convert(userDataRequest.getUser(), null, (MSEvent) data, true);
 
 		Attendee organizer = event.findOrganizer();
 		List<Attendee> attendees = listAttendeesWithoutOrganizer(organizer, event); 
@@ -141,11 +141,11 @@ public class EventConverterTest {
 			throws SAXException, IOException, FactoryConfigurationError, ConversionException {
 		String UID = "cfe4645e-4168-102f-be5e-0015176f7922";
 		IApplicationData  oldData = getApplicationData("samecase/new-event-with-exception.xml");
-		Event oldEvent = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org").getUser(), null, (MSEvent) oldData, true);
+		Event oldEvent = eventConverter.convert(buildUserDataRequest("jribiera@obm.lng.org").getUser(), null, (MSEvent) oldData, true);
 		
 		IApplicationData  data = getApplicationData("samecase/update-one-exception-of-same-event.xml");
 
-		Event event = eventConverter.convert(buildBackendSession("jribiera@obm.lng.org").getUser(), oldEvent, (MSEvent) data, true);
+		Event event = eventConverter.convert(buildUserDataRequest("jribiera@obm.lng.org").getUser(), oldEvent, (MSEvent) data, true);
 		Event excptEvtUpd = event.getRecurrence().getEventExceptions().get(0);
 
 		
@@ -169,10 +169,10 @@ public class EventConverterTest {
 
 		Credentials credentials = new Credentials( 
 				Factory.create().createUser(loginAtDomain, email, displayName), "password");
-		BackendSession backendSession = buildBackendSession(credentials);
+		UserDataRequest userDataRequest = buildUserDataRequest(credentials);
 		
 		IApplicationData data = getApplicationData("OBMFULL-2907.xml");
-		Event event = eventConverter.convert(backendSession.getUser(), null, (MSEvent) data, true);
+		Event event = eventConverter.convert(userDataRequest.getUser(), null, (MSEvent) data, true);
 		
 		Attendee organizer = event.findOrganizer();
 		
@@ -211,15 +211,15 @@ public class EventConverterTest {
 		return decoder.decode(document.getDocumentElement()); 
 	}
 	
-	private BackendSession buildBackendSession(String userId) {
+	private UserDataRequest buildUserDataRequest(String userId) {
 		User user = Factory.create().createUser(userId, "email@domain", "displayName");
-		return buildBackendSession(new Credentials(user, "test"));
+		return buildUserDataRequest(new Credentials(user, "test"));
 	}
 	
-	private BackendSession buildBackendSession(Credentials credentials) {
-		BackendSession bs = new BackendSession(credentials,
+	private UserDataRequest buildUserDataRequest(Credentials credentials) {
+		UserDataRequest udr = new UserDataRequest(credentials,
 				"Sync", new Device(1, "devType", "devId", new Properties()), new BigDecimal("12.5"));
-		return bs;
+		return udr;
 	}
 	
 }

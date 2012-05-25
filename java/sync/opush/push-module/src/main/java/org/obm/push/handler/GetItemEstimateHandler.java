@@ -38,12 +38,12 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -92,12 +92,12 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
 		try {
 			GetItemEstimateRequest estimateRequest = protocol.getRequest(doc);
-			GetItemEstimateResponse response = doTheJob(bs, estimateRequest);
+			GetItemEstimateResponse response = doTheJob(udr, estimateRequest);
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);
 
@@ -128,7 +128,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse("GetItemEstimate", document);
 	}
 
-	private GetItemEstimateResponse doTheJob(BackendSession bs, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
+	private GetItemEstimateResponse doTheJob(UserDataRequest udr, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException, CollectionNotFoundException, ConversionException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
@@ -147,8 +147,8 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 					throw new InvalidSyncKeyException(syncKey);
 				}
 				
-				int unSynchronizedItemNb = listItemToAddSize(bs, syncCollection);
-				int count = contentsExporter.getItemEstimateSize(bs, state, collectionId, syncCollection.getOptions().getFilterType(), 
+				int unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);
+				int count = contentsExporter.getItemEstimateSize(udr, state, collectionId, syncCollection.getOptions().getFilterType(), 
 						syncCollection.getDataType());
 			
 				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
@@ -161,9 +161,9 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		return new GetItemEstimateResponse(estimates);
 	}
 
-	private int listItemToAddSize(BackendSession bs, SyncCollection syncCollection) {
-		Collection<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), 
-				bs.getDevice(), syncCollection.getCollectionId());
+	private int listItemToAddSize(UserDataRequest udr, SyncCollection syncCollection) {
+		Collection<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), 
+				udr.getDevice(), syncCollection.getCollectionId());
 		return listItemToAdd.size();
 	}
 

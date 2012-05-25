@@ -47,7 +47,7 @@ import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
@@ -194,7 +194,7 @@ public class EmailSyncTestUtils {
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException {
 
 		expect(contentsExporter.getChanged(
-				anyObject(BackendSession.class), 
+				anyObject(UserDataRequest.class), 
 				anyObject(SyncState.class),
 				anyInt(),
 				anyObject(FilterType.class),

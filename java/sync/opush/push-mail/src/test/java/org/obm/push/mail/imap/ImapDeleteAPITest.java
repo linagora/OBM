@@ -43,7 +43,7 @@ import org.junit.runner.RunWith;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -80,7 +80,7 @@ public class ImapDeleteAPITest {
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	
 	private Date beforeTest;
 	private ImapTestUtils testUtils;
@@ -92,11 +92,11 @@ public class ImapDeleteAPITest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 
-	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	    testUtils.createFolders(TRASH);
 	}
 	
@@ -110,7 +110,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -123,7 +123,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(DRAFT);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(DRAFT);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(DRAFT), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(DRAFT), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(DRAFT);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -136,7 +136,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(SENTBOX);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(SENTBOX);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(SENTBOX), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(SENTBOX), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(SENTBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -148,7 +148,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(TRASH);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(TRASH);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(TRASH), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(TRASH), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(TRASH);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -162,7 +162,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(otherFolder);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(otherFolder);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(otherFolder);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -178,7 +178,7 @@ public class ImapDeleteAPITest {
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		Email anEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), anEmailFromMailbox.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), anEmailFromMailbox.getUid());
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(3);
@@ -191,7 +191,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		long nonExistingEmailUid = sentEmail.getUid() + 1;
 
-		mailboxService.delete(bs, testUtils.mailboxPath(INBOX), nonExistingEmailUid);
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), nonExistingEmailUid);
 	}
 
 	@Test(expected=ImapMessageNotFoundException.class)
@@ -200,7 +200,7 @@ public class ImapDeleteAPITest {
 		String otherFolder = "ANYFOLDER";
 		testUtils.createFolders(otherFolder);
 		
-		mailboxService.delete(bs, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
 	}
 
 	@Test(expected=ImapMessageNotFoundException.class)
@@ -208,7 +208,7 @@ public class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		String inboxPath = testUtils.mailboxPath(INBOX);
 		
-		mailboxService.delete(bs, inboxPath, sentEmail.getUid());
-		mailboxService.delete(bs, inboxPath, sentEmail.getUid());
+		mailboxService.delete(udr, inboxPath, sentEmail.getUid());
+		mailboxService.delete(udr, inboxPath, sentEmail.getUid());
 	}
 }

@@ -52,7 +52,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -94,7 +94,7 @@ public class UIDFetchPartTest {
 	@Inject Mime4jUtils mime4jUtils;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
 
@@ -105,10 +105,10 @@ public class UIDFetchPartTest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, bs, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -281,9 +281,9 @@ public class UIDFetchPartTest {
 	@Test
 	public void testUidFetchPartFindAttachment() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
-		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
-		InputStream attachment = mailboxService.findAttachment(bs, inbox, sentEmail.getUid(), new MimeAddress("3"));
+		InputStream attachment = mailboxService.findAttachment(udr, inbox, sentEmail.getUid(), new MimeAddress("3"));
 		
 		Assertions.assertThat(attachment).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
 	}
@@ -291,10 +291,10 @@ public class UIDFetchPartTest {
 	@Test
 	public void testFetchMimePartData() throws MailException, IOException {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
-		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(bs, inbox, Lists.newArrayList(sentEmail.getUid()));
+				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -302,7 +302,7 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(bs, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).hasSize(fetchInstructions.getMimePart().getSize());
@@ -314,10 +314,10 @@ public class UIDFetchPartTest {
 		final int truncationSize = 5;
 		
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
-		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(bs, inbox, Lists.newArrayList(sentEmail.getUid()));
+				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -325,7 +325,7 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(bs, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).hasSize(truncationSize);
@@ -335,10 +335,10 @@ public class UIDFetchPartTest {
 	@Test(expected=NullPointerException.class)
 	public void testFetchMimePartDataWithNullMimePart() throws MailException {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
-		String inbox = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(bs, inbox, Lists.newArrayList(sentEmail.getUid()));
+				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.RTF).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -346,7 +346,7 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		privateMailboxService.fetchMimePartData(bs, inbox, sentEmail.getUid(), fetchInstructions);
+		privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
 	}
 	
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
@@ -356,7 +356,7 @@ public class UIDFetchPartTest {
 	}
 	
 	private ImapStore loggedClient() throws Exception {
-		ImapStore client = clientProvider.getImapClientWithJM(bs);
+		ImapStore client = clientProvider.getImapClientWithJM(udr);
 		client.login();
 		return client;
 	}

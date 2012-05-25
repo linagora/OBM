@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.collection.Sets;
 import org.slf4j.Logger;
@@ -164,9 +164,9 @@ public class ResponseWindowingService {
 	}
 	
 	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
-			BackendSession backendSession, Map<String, String> processedClientIds) {
-		final Credentials credentials = backendSession.getCredentials();
-		final Device device = backendSession.getDevice();
+			UserDataRequest userDataRequest, Map<String, String> processedClientIds) {
+		final Credentials credentials = userDataRequest.getCredentials();
+		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();
 		
 		return new WindowLogic(new Store() {
@@ -186,9 +186,9 @@ public class ResponseWindowingService {
 		}).window(c, delta.getChanges(), processedClientIds);
 	}
 
-	public List<ItemChange> windowDeletions(final SyncCollection c, DataDelta delta, final BackendSession backendSession, Map<String, String> processedClientIds) {
-		final Credentials credentials = backendSession.getCredentials();
-		final Device device = backendSession.getDevice();
+	public List<ItemChange> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, Map<String, String> processedClientIds) {
+		final Credentials credentials = userDataRequest.getCredentials();
+		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();
 		
 		return new WindowLogic(new Store() {

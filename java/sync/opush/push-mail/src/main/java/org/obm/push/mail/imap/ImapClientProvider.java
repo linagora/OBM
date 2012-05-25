@@ -34,14 +34,14 @@ package org.obm.push.mail.imap;
 import org.minig.imap.IdleClient;
 import org.minig.imap.StoreClient;
 import org.obm.locator.LocatorClientException;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.NoImapClientAvailableException;
 
 public interface ImapClientProvider {
 
-	String locateImap(BackendSession bs) throws LocatorClientException;
-	StoreClient getImapClient(BackendSession bs) throws LocatorClientException;
-	ImapStore getImapClientWithJM(BackendSession bs) throws LocatorClientException, NoImapClientAvailableException;
-	IdleClient getImapIdleClient(BackendSession bs) throws LocatorClientException;
+	String locateImap(UserDataRequest udr) throws LocatorClientException;
+	StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException;
+	ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException;
+	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
 	
 }

@@ -49,7 +49,7 @@ import org.junit.runner.RunWith;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
@@ -70,13 +70,13 @@ import org.obm.filter.SlowFilterRunner;
 @RunWith(SlowFilterRunner.class)
 public class MockBasedImapMailboxServiceTest {
 
-	private BackendSession bs;
+	private UserDataRequest udr;
 	
 	@Before
 	public void setUp() {
 		String mailbox = "user@domain";
 		String password = "password";
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
@@ -88,7 +88,7 @@ public class MockBasedImapMailboxServiceTest {
 		
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 		Set<Address> addrs = Sets.newHashSet();
-		smtpSender.sendEmail(EasyMock.anyObject(BackendSession.class), EasyMock.anyObject(Address.class),
+		smtpSender.sendEmail(EasyMock.anyObject(UserDataRequest.class), EasyMock.anyObject(Address.class),
 				EasyMock.anyObject(addrs.getClass()),
 				EasyMock.anyObject(addrs.getClass()),
 				EasyMock.anyObject(addrs.getClass()), EasyMock.anyObject(InputStream.class));
@@ -99,7 +99,7 @@ public class MockBasedImapMailboxServiceTest {
 		ImapMailboxService emailManager = 
 				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null);
 
-		emailManager.sendEmail(bs,
+		emailManager.sendEmail(udr,
 				new Address("test@test.fr"),
 				addrs,
 				addrs,
@@ -118,7 +118,7 @@ public class MockBasedImapMailboxServiceTest {
 		ImapMailboxService emailManager = new ImapMailboxService(
 				emailConfiguration, null, null, null, null, collectionPathHelper);
 
-		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(userINBOXFolder));
+		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
@@ -131,7 +131,7 @@ public class MockBasedImapMailboxServiceTest {
 		ImapMailboxService emailManager = new ImapMailboxService(
 				emailConfiguration, null, null, null, null, collectionPathHelper);
 
-		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(userINBOXFolder));
+		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
@@ -146,7 +146,7 @@ public class MockBasedImapMailboxServiceTest {
 		ImapMailboxService emailManager = new ImapMailboxService(
 				emailConfiguration, null, null, imapClientProvider, null, collectionPathHelper);
 
-		String parsedMailbox = emailManager.parseMailBoxName(bs, collectionPath(folderEndingByINBOX));
+		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(folderEndingByINBOX));
 		Assertions.assertThat(parsedMailbox).isEqualTo(folderEndingByINBOX);
 	}
 
@@ -154,7 +154,7 @@ public class MockBasedImapMailboxServiceTest {
 		OpushImapFolder imapFolder = newImapFolderMock(allUserFolders);
 		ImapStore imapStore = newImapStoreMock(imapFolder);
 		ImapClientProvider imapClientProvider = EasyMock.createMock(ImapClientProvider.class);
-		EasyMock.expect(imapClientProvider.getImapClientWithJM(bs)).andReturn(imapStore);
+		EasyMock.expect(imapClientProvider.getImapClientWithJM(udr)).andReturn(imapStore);
 		
 		EasyMock.replay(imapFolder, imapStore, imapClientProvider);
 		return imapClientProvider;
@@ -199,7 +199,7 @@ public class MockBasedImapMailboxServiceTest {
 	
 	private CollectionPathHelper mockCollectionPathHelperExtractFolder(String expectedFolder) throws CollectionPathException {
 		CollectionPathHelper helper = EasyMock.createMock(CollectionPathHelper.class);
-		EasyMock.expect(helper.extractFolder(bs, collectionPath(expectedFolder), PIMDataType.EMAIL))
+		EasyMock.expect(helper.extractFolder(udr, collectionPath(expectedFolder), PIMDataType.EMAIL))
 			.andReturn(expectedFolder).anyTimes();
 		EasyMock.replay(helper);
 		return helper;

@@ -39,7 +39,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
@@ -98,11 +98,11 @@ public class PingHandler extends WbxmlRequestHandler implements
 	}
 
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			PingRequest pingRequest = protocol.getRequest(doc);
-			doTheJob(continuation, bs, pingRequest);
+			doTheJob(continuation, udr, pingRequest);
 
 		} catch (MissingRequestParameterException e) {
 			sendError(responder, PingStatus.MISSING_REQUEST_PARAMS);
@@ -117,20 +117,20 @@ public class PingHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	private void doTheJob(IContinuation continuation, BackendSession bs, PingRequest pingRequest) 
+	private void doTheJob(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) 
 			throws MissingRequestParameterException, DaoException, CollectionNotFoundException, CollectionPathException {
 		
-		checkHeartbeatInterval(bs, pingRequest);
-		checkSyncCollections(bs, pingRequest);
-		startEmailMonitoringThreadIfNeeded(bs, pingRequest);
-		suspendContinuation(continuation, bs, pingRequest);
+		checkHeartbeatInterval(udr, pingRequest);
+		checkSyncCollections(udr, pingRequest);
+		startEmailMonitoringThreadIfNeeded(udr, pingRequest);
+		suspendContinuation(continuation, udr, pingRequest);
 	}
 
-	private void checkHeartbeatInterval(BackendSession bs, PingRequest pingRequest) 
+	private void checkHeartbeatInterval(UserDataRequest udr, PingRequest pingRequest) 
 			throws DaoException, MissingRequestParameterException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
-			Long heartbeatInterval = hearbeatDao.findLastHearbeat(bs.getDevice());
+			Long heartbeatInterval = hearbeatDao.findLastHearbeat(udr.getDevice());
 			if (heartbeatInterval == null) {
 				throw new MissingRequestParameterException();
 			}
@@ -138,34 +138,34 @@ public class PingHandler extends WbxmlRequestHandler implements
 		} else {
 			long heartbeatInterval = Math.max(MIN_SANE_HEARTBEAT_VALUE, pingRequest.getHeartbeatInterval());
 			pingRequest.setHeartbeatInterval(heartbeatInterval);
-			hearbeatDao.updateLastHearbeat(bs.getDevice(), pingRequest.getHeartbeatInterval());
+			hearbeatDao.updateLastHearbeat(udr.getDevice(), pingRequest.getHeartbeatInterval());
 		}
 	}
 	
-	private void checkSyncCollections(BackendSession bs, PingRequest pingRequest)
+	private void checkSyncCollections(UserDataRequest udr, PingRequest pingRequest)
 			throws MissingRequestParameterException, CollectionNotFoundException, DaoException, CollectionPathException {
 		
 		Set<SyncCollection> syncCollections = pingRequest.getSyncCollections();
 		if (syncCollections == null || syncCollections.isEmpty()) {
-			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(bs.getCredentials(), bs.getDevice());
+			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(udr.getCredentials(), udr.getDevice());
 			if (lastMonitoredCollection.isEmpty()) {
 				throw new MissingRequestParameterException();
 			}
 			pingRequest.setSyncCollections(lastMonitoredCollection);
 		} else {
-			monitoredCollectionDao.put(bs.getCredentials(), bs.getDevice(), syncCollections);
+			monitoredCollectionDao.put(udr.getCredentials(), udr.getDevice(), syncCollections);
 		}
-		loadSyncKeys(bs, pingRequest.getSyncCollections());
+		loadSyncKeys(udr, pingRequest.getSyncCollections());
 	}
 
-	private void loadSyncKeys(BackendSession bs, Set<SyncCollection> syncCollections) 
+	private void loadSyncKeys(UserDataRequest udr, Set<SyncCollection> syncCollections) 
 			throws CollectionNotFoundException, DaoException, CollectionPathException {
 		
 		for (SyncCollection collection: syncCollections) {
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
 			collection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath));
-			SyncState lastKnownState = stMachine.lastKnownState(bs.getDevice(), collection.getCollectionId());
+			SyncState lastKnownState = stMachine.lastKnownState(udr.getDevice(), collection.getCollectionId());
 			if (lastKnownState != null) {
 				collection.setSyncState(lastKnownState);
 			} else {
@@ -174,33 +174,33 @@ public class PingHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	private void startEmailMonitoringThreadIfNeeded(BackendSession bs,
+	private void startEmailMonitoringThreadIfNeeded(UserDataRequest udr,
 			PingRequest pingRequest) throws CollectionNotFoundException, DaoException {
 		for (SyncCollection syncCollection: pingRequest.getSyncCollections()) {
 			if ("email".equalsIgnoreCase(syncCollection.getDataClass())) {
-				backend.startEmailMonitoring(bs, syncCollection.getCollectionId());
+				backend.startEmailMonitoring(udr, syncCollection.getCollectionId());
 			}
 		}
 	}
 
 	private void suspendContinuation(IContinuation continuation,
-			BackendSession bs, PingRequest pingRequest) {
+			UserDataRequest udr, PingRequest pingRequest) {
 		continuation.setLastContinuationHandler(this);
-		CollectionChangeListener l = new CollectionChangeListener(bs, continuation, pingRequest.getSyncCollections());
+		CollectionChangeListener l = new CollectionChangeListener(udr, continuation, pingRequest.getSyncCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
-		continuation.suspend(bs, pingRequest.getHeartbeatInterval());
+		continuation.suspend(udr, pingRequest.getHeartbeatInterval());
 	}
 	
 	@Override
-	public void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder,
+	public void sendResponseWithoutHierarchyChanges(UserDataRequest udr, Responder responder,
 			IContinuation continuation) {
-		sendResponse(bs, responder, false, continuation);
+		sendResponse(udr, responder, false, continuation);
 	}
 	
 	@Override
-	public void sendResponse(BackendSession bs, Responder responder,
+	public void sendResponse(UserDataRequest udr, Responder responder,
 			boolean sendHierarchyChange, IContinuation continuation) {
 		
 		try {

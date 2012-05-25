@@ -35,7 +35,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
 
@@ -45,13 +45,13 @@ import com.google.common.collect.Sets;
 public class CollectionChangeListener implements
 		ICollectionChangeListener {
 
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private Set<SyncCollection> monitoredCollections;
 	private IContinuation continuation;
 
-	public CollectionChangeListener(BackendSession bs,
+	public CollectionChangeListener(UserDataRequest udr,
 			IContinuation c, Set<SyncCollection> monitoredCollections) {
-		this.bs = bs;
+		this.udr = udr;
 		this.monitoredCollections = monitoredCollections;
 		this.continuation = c;
 	}
@@ -67,8 +67,8 @@ public class CollectionChangeListener implements
 	}
 
 	@Override
-	public BackendSession getSession() {
-		return bs;
+	public UserDataRequest getSession() {
+		return udr;
 	}
 	
 	public void changesDetected() {

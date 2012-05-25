@@ -39,7 +39,7 @@ import java.util.Set;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -98,13 +98,13 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 				final Collection<SyncCollection> monitoredCollections = ccl
 						.getMonitoredCollections();
 
-				final BackendSession backendSession = ccl.getSession();
+				final UserDataRequest userDataRequest = ccl.getSession();
 				for (SyncCollection syncCollection : monitoredCollections) {
 
 					if (syncCollection.getDataType().equals(backend.getPIMDataType())) {
 						try {
 							int count = backend.getItemEstimateSize(
-									backendSession, 
+									userDataRequest, 
 									syncCollection.getOptions().getFilterType(),
 									syncCollection.getCollectionId(),
 									syncCollection.getSyncState());

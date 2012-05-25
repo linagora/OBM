@@ -34,7 +34,7 @@ package org.obm.push.mail;
 import java.util.List;
 
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -46,22 +46,22 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface MailBackend extends PIMBackend {
 
-	List<ItemChange> getHierarchyChanges(BackendSession bs) throws DaoException;
+	List<ItemChange> getHierarchyChanges(UserDataRequest udr) throws DaoException;
 
-	void sendEmail(BackendSession bs, byte[] mailContent, boolean saveInSent)
+	void sendEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent)
 			throws ProcessingEmailException;
 
-	void replyEmail(BackendSession bs, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
+	void replyEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent, Integer collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 
-	void forwardEmail(BackendSession bs, byte[] mailContent,
+	void forwardEmail(UserDataRequest udr, byte[] mailContent,
 			boolean saveInSent, String collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException;
 
-	MSEmail getEmail(BackendSession bs, Integer collectionId, String serverId)
+	MSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId)
 			throws CollectionNotFoundException, ProcessingEmailException;
 
-	MSAttachementData getAttachment(BackendSession bs, String attachmentId)
+	MSAttachementData getAttachment(UserDataRequest udr, String attachmentId)
 			throws AttachementNotFoundException, CollectionNotFoundException,
 			ProcessingEmailException;
 

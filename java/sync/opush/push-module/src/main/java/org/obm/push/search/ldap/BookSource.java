@@ -38,7 +38,7 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
 import org.obm.push.search.ISearchSource;
@@ -75,12 +75,12 @@ public class BookSource implements ISearchSource {
 	}
 
 	@Override
-	public List<SearchResult> search(BackendSession bs, String query,
+	public List<SearchResult> search(UserDataRequest udr, String query,
 			Integer limit) {
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		if (conf.isValid()) {
 			DirContext ctx = null;
-			String domain = bs.getUser().getDomain();
+			String domain = udr.getUser().getDomain();
 			try {
 				ctx = conf.getConnection();
 				LdapUtils u = new LdapUtils(ctx, conf.getBaseDn().replaceAll(

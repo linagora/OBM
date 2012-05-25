@@ -67,7 +67,7 @@ import org.junit.runner.RunWith;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
@@ -309,7 +309,7 @@ public class PingHandlerTest {
 		
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(BackendSession.class), 
+				anyObject(UserDataRequest.class), 
 				anyObject(FilterType.class),
 				anyInt(),
 				anyObject(SyncState.class)))
@@ -321,7 +321,7 @@ public class PingHandlerTest {
 			ProcessingEmailException, ConversionException {
 		
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(BackendSession.class), 
+				anyObject(UserDataRequest.class), 
 				anyObject(FilterType.class),
 				anyInt(),
 				anyObject(SyncState.class)))

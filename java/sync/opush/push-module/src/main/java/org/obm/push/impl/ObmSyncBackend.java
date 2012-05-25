@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.impl;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
@@ -53,7 +53,7 @@ public class ObmSyncBackend {
 		this.login = login;
 	}
 
-	protected AccessToken login(BackendSession session) throws UnexpectedObmSyncServerException {
+	protected AccessToken login(UserDataRequest session) throws UnexpectedObmSyncServerException {
 		try {
 			return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
 		} catch (AuthFault e) {

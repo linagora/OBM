@@ -49,7 +49,7 @@ public class SpecificCollectionPathHelperTest {
 	private static final String SPECIFIC_MAILBOX_DRAFT = "specific\\mydraft";
 	private static final String SPECIFIC_MAILBOX_SENT = "specific\\mysent";
 	private static final String SPECIFIC_MAILBOX_TRASH = "specific\\bin";
-	private BackendSession bs;
+	private UserDataRequest udr;
 	private CollectionPathHelper collectionPathHelper;
 	
 	@Before
@@ -57,7 +57,7 @@ public class SpecificCollectionPathHelperTest {
 		EmailConfiguration emailConfiguration = mockEmailConfiguration();
 		collectionPathHelper = new CollectionPathHelper(emailConfiguration);
 		User user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
-		bs = new BackendSession(new Credentials(user, "test"),
+		udr = new UserDataRequest(new Credentials(user, "test"),
 				null, null, null);
 	}
 	
@@ -73,28 +73,28 @@ public class SpecificCollectionPathHelperTest {
 	@Test
 	public void testParseSpecificFolderINBOX() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
 	}
 	
 	@Test
 	public void testParseSpecificFolderDraft() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Drafts";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo(SPECIFIC_MAILBOX_DRAFT);
 	}
 	
 	@Test
 	public void testParseSpecificFolderSent() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Sent";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo(SPECIFIC_MAILBOX_SENT);
 	}
 	
 	@Test
 	public void testParseSpecificFolderTrash() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Trash";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo(SPECIFIC_MAILBOX_TRASH);
 	}
 
@@ -102,56 +102,56 @@ public class SpecificCollectionPathHelperTest {
 	@Test
 	public void testParseSpecificFolderINBOXNonMatchingCase() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INbOX";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("INbOX");
 	}
 	
 	@Test
 	public void testParseSpecificFolderDraftNonMatchingCase() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\DraftS";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("DraftS");
 	}
 	
 	@Test
 	public void testParseSpecificFolderSentNonMatchingCase() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\sent";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("sent");
 	}
 	
 	@Test
 	public void testParseSpecificFolderTrashNonMatchingCase() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\trash";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("trash");
 	}
 	
 	@Test
 	public void testParseSubSpecificFolderINBOXDoesntMatchAsSpecific() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\INBOX\\subfolder";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("INBOX\\subfolder");
 	}
 	
 	@Test
 	public void testParseSubSpecificFolderDraftDoesntMatchAsSpecific() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Drafts\\subfolder";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("Drafts\\subfolder");
 	}
 	
 	@Test
 	public void testParseSubSpecificFolderSentDoesntMatchAsSpecific() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Sent\\subfolder";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("Sent\\subfolder");
 	}
 	
 	@Test
 	public void testParseSubSpecificFolderTrashDoesntMatchAsSpecific() throws CollectionPathException {
 		String collectionPath = "obm:\\\\user@domain\\email\\Trash\\subfolder";
-		String parsedFolder = collectionPathHelper.extractFolder(bs, collectionPath, PIMDataType.EMAIL);
+		String parsedFolder = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		Assertions.assertThat(parsedFolder).isEqualTo("Trash\\subfolder");
 	}
 }

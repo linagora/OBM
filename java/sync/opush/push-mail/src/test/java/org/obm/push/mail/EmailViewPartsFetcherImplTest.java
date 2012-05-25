@@ -31,7 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
@@ -54,11 +59,11 @@ import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.ImapMailboxService;
 
 import com.google.common.base.Charsets;
@@ -94,13 +99,13 @@ public class EmailViewPartsFetcherImplTest {
 	private String messageCollectionName;
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 
 	@Before
 	public void setUp() {
 		mailbox = "to@localhost.com";
 		password = "password";
-		bs = new BackendSession(
+		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		
@@ -467,7 +472,7 @@ public class EmailViewPartsFetcherImplTest {
 		if (messageFixture.starred) {
 			flagsListBuilder.add(Flag.FLAGGED);
 		}
-		expect(mailboxService.fetchFlags(bs, messageCollectionName, messageFixture.uid))
+		expect(mailboxService.fetchFlags(udr, messageCollectionName, messageFixture.uid))
 				.andReturn(flagsListBuilder.build()).once();
 	}
 
@@ -480,16 +485,16 @@ public class EmailViewPartsFetcherImplTest {
 			.date(messageFixture.date)
 			.build();
 		
-		expect(mailboxService.fetchEnvelope(bs, messageCollectionName, messageFixture.uid))
+		expect(mailboxService.fetchEnvelope(udr, messageCollectionName, messageFixture.uid))
 			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
 	}
 	
 	private void mockMailboxServiceBody(ImapMailboxService mailboxService) throws MailException {
-		expect(mailboxService.fetchBodyStructure(bs, messageCollectionName, messageFixture.uid))
+		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, messageFixture.uid))
 			.andReturn(mockAggregateMimeMessage()).once();
 
 		expect(mailboxService.fetchMimePartData(
-				anyObject(BackendSession.class),
+				anyObject(UserDataRequest.class),
 				anyObject(String.class),
 				anyLong(),
 				anyObject(FetchInstructions.class)))
@@ -512,7 +517,7 @@ public class EmailViewPartsFetcherImplTest {
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
 		return new EmailViewPartsFetcherImpl(
 				messageFixtureToMailboxServiceMock(), bodyPreferences(),
-				bs, messageCollectionName, messageFixture.uid);
+				udr, messageCollectionName, messageFixture.uid);
 	}
 
 	public Address newEmptyAddress() {

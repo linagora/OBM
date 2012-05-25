@@ -32,14 +32,14 @@
 package org.obm.push.handler;
 
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.impl.Responder;
 
 public interface IContinuationHandler {
-	void sendResponse(BackendSession bs, Responder responder,
+	void sendResponse(UserDataRequest udr, Responder responder,
 			boolean sendHierarchyChanges, IContinuation continuation);
 	
-	void sendResponseWithoutHierarchyChanges(BackendSession bs, Responder responder,
+	void sendResponseWithoutHierarchyChanges(UserDataRequest udr, Responder responder,
 			IContinuation continuation);
 	
 	void sendError(Responder responder, String errorStatus, IContinuation continuation);

@@ -51,7 +51,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -78,7 +78,7 @@ public class ImapTimeoutAPITest {
 	
 	private String mailbox;
 	private String password;
-	private BackendSession bs;
+	private UserDataRequest udr;
 
 	@Before
 	public void setUp() {
@@ -86,7 +86,7 @@ public class ImapTimeoutAPITest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);
-	    bs = new BackendSession(
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 	}
@@ -104,7 +104,7 @@ public class ImapTimeoutAPITest {
 		
 		Stopwatch stopWatch = new Stopwatch().start();
 		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
+			mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
 			int acceptedTimeoutDeltaInMs = 500;
 			assertTimeoutIsInAcceptedDelta(stopWatch, acceptedTimeoutDeltaInMs);
@@ -127,7 +127,7 @@ public class ImapTimeoutAPITest {
 		int emailGivenSize = 60;
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
 		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
+			mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
 			MailTestsUtils.assertThatIsJavaSocketTimeoutException(e);
 			throw e;
@@ -138,13 +138,13 @@ public class ImapTimeoutAPITest {
 	public void testStoreInInboxRollbackWhenGivenMessageSizeIsLonger() throws Exception {
 		int emailGivenSize = 60;
 		Date before = DateUtils.date("1970-01-01T12:00:00");
-		String inboxPath = collectionPathHelper.buildCollectionPath(bs, PIMDataType.EMAIL, IMAP_INBOX_NAME);
+		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
 
 		try {
-			mailboxService.storeInInbox(bs, emailStream, emailGivenSize, true);
+			mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
 		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(bs, inboxPath, before);
+			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
 			throw e;
 		}

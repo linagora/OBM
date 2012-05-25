@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ServerId;
@@ -75,12 +75,12 @@ public class StateMachine {
 		return collectionDao.findStateForKey(syncKey);
 	}
 
-	public String allocateNewSyncKey(BackendSession bs, Integer collectionId, Date lastSync, 
+	public String allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
 		
 		String newSk = UUID.randomUUID().toString();
 		SyncState newState = new SyncState(newSk, lastSync);
-		int syncStateId = collectionDao.updateState(bs.getDevice(), collectionId, newState);
+		int syncStateId = collectionDao.updateState(udr.getDevice(), collectionId, newState);
 		newState.setId(syncStateId);
 		
 		if (changes != null && !changes.isEmpty()) {
@@ -90,7 +90,7 @@ public class StateMachine {
 			itemTrackingDao.markAsDeleted(newState, itemChangesAsServerIdSet(deletedItems));
 		}
 		
-		log(bs, newState);
+		log(udr, newState);
 		return newSk;
 	}
 
@@ -119,8 +119,8 @@ public class StateMachine {
 		}
 	}
 	
-	private void log(BackendSession bs, SyncState newState) {
-		String collectionPath = "obm:\\\\" + bs.getUser().getLoginAtDomain();
+	private void log(UserDataRequest udr, SyncState newState) {
+		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
 				new Object[]{newState.getKey(), collectionPath, newState.getLastSync()});
 	}

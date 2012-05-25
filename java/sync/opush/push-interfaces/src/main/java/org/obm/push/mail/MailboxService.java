@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.exception.DaoException;
@@ -50,47 +50,47 @@ import org.obm.push.exception.activesync.StoreEmailException;
 
 public interface MailboxService {
 
-	List<MSEmail> fetchMails(BackendSession bs, Integer collectionId, String collectionName, 
+	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws MailException;
 
-	void updateReadFlag(BackendSession bs, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
+	void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 
-	String parseMailBoxName(BackendSession bs, String collectionName) throws MailException;
+	String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException;
 
-	void delete(BackendSession bs, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
+	void delete(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
 
-	long moveItem(BackendSession bs, String srcFolder, String dstFolder, long uid)
+	long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
 			throws MailException, DaoException, ImapMessageNotFoundException, UnsupportedBackendFunctionException;
 
-	InputStream fetchMailStream(BackendSession bs, String collectionName, long uid) throws MailException;
+	InputStream fetchMailStream(UserDataRequest udr, String collectionName, long uid) throws MailException;
 
-	void setAnsweredFlag(BackendSession bs, String collectionName, long uid) throws MailException, ImapMessageNotFoundException;
+	void setAnsweredFlag(UserDataRequest udr, String collectionName, long uid) throws MailException, ImapMessageNotFoundException;
 
-	void sendEmail(BackendSession bs, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
+	void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;
 
-	InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
+	InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 
-	Collection<Long> purgeFolder(BackendSession bs, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
+	Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 
 	/**
 	 * Store the mail's inputstream in INBOX.
 	 * The mailContent is only guaranteed to be streamed if it's a SharedInputStream.
 	 */
-	void storeInInbox(BackendSession bs, InputStream mailContent, boolean isRead) throws MailException;
+	void storeInInbox(UserDataRequest udr, InputStream mailContent, boolean isRead) throws MailException;
 
 	/**
 	 * Store the mail's inputstream in INBOX.
 	 * The mailContent is guaranteed to be streamed.
 	 */
-	void storeInInbox(BackendSession bs, InputStream mailContent, int mailSize, boolean isRead) throws MailException;
+	void storeInInbox(UserDataRequest udr, InputStream mailContent, int mailSize, boolean isRead) throws MailException;
 	
 	boolean getLoginWithDomain();
 
 	boolean getActivateTLS();
 	
-	Collection<Email> fetchEmails(BackendSession bs, String collectionName, Collection<Long> uids) throws MailException;
+	Collection<Email> fetchEmails(UserDataRequest udr, String collectionName, Collection<Long> uids) throws MailException;
 
-	Set<Email> fetchEmails(BackendSession bs, String collectionName, Date windows) throws MailException;
+	Set<Email> fetchEmails(UserDataRequest udr, String collectionName, Date windows) throws MailException;
 
 }

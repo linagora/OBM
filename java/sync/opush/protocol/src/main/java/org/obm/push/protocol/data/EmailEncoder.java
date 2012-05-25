@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.push.bean.BackendSession;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttachement;
@@ -50,6 +49,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class EmailEncoder {
 		plainFormatter = new PlainBodyFormatter();
 	}
 
-	public void encode(BackendSession bs, Element parent,
+	public void encode(UserDataRequest udr, Element parent,
 			IApplicationData data, SyncCollection c) {
 		MSEmail mail = (MSEmail) data;
 
@@ -115,13 +115,13 @@ public class EmailEncoder {
 		DOMUtils.createElementAndText(parent, "Email:Read", mail.isRead() ? "1"
 				: "0");
 
-		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
+		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
 			appendBody25(parent, mail, c);
 		} else {
 			appendBody(parent, mail, c);
 		}
 
-		if (bs.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
+		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
 			appendAttachments25(parent, mail.getAttachements());
 		} else {
 			appendAttachments(parent, mail.getAttachements());

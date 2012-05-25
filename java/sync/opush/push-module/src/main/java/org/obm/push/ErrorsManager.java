@@ -54,7 +54,7 @@ import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.obm.push.backend.IErrorsManager;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.utils.Mime4jUtils;
@@ -88,7 +88,7 @@ public class ErrorsManager implements IErrorsManager {
 	 * TODO don't use static text
 	 */
 	@Override
-	public void sendMailHandlerError(BackendSession bs, byte[] errorMail, Throwable error) {
+	public void sendMailHandlerError(UserDataRequest udr, byte[] errorMail, Throwable error) {
 		String subject = "OPUSH - Error lors de l'envoi de mail";
 		StringBuilder body = new StringBuilder();
 		body.append("Le mail en pièce jointe n'a pas pu être envoyé. Si ce problème ce reproduit veuillez contacter votre administrateur\r\n\r\n");
@@ -99,16 +99,16 @@ public class ErrorsManager implements IErrorsManager {
 			body.append(error.getCause());
 		}
 		try {
-			Message mm = prepareMessage(bs, subject, body.toString(), new ByteArrayInputStream(errorMail));
+			Message mm = prepareMessage(udr, subject, body.toString(), new ByteArrayInputStream(errorMail));
 			InputStream in = mime4jUtils.toInputStream(mm);
-			manager.storeInInbox(bs, in, false);
+			manager.storeInInbox(udr, in, false);
 		} catch (Throwable e) {
 			logger.error("Error during storing error mail in the inbox folder", e);
 		}
 	}
 
-	/* package */ Message prepareMessage(BackendSession bs, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
-		MessageImpl mm = prepareMessageHeaders(bs, subject);
+	/* package */ Message prepareMessage(UserDataRequest udr, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
+		MessageImpl mm = prepareMessageHeaders(udr, subject);
 		
 		Multipart multipart = mime4jUtils.createMultipartMixed();
 
@@ -125,19 +125,19 @@ public class ErrorsManager implements IErrorsManager {
 		return mm;
 	}
 
-	private Message prepareMessage(BackendSession bs, String subject, String body) throws ParseException, UnsupportedEncodingException {
-		Message mm = prepareMessageHeaders(bs, subject);
+	private Message prepareMessage(UserDataRequest udr, String subject, String body) throws ParseException, UnsupportedEncodingException {
+		Message mm = prepareMessageHeaders(udr, subject);
 		TextBody part = mime4jUtils.createBody(body);
 		mm.setBody(part);
 		return mm;
 	}
 	
-	private MessageImpl prepareMessageHeaders(BackendSession bs, String subject) throws ParseException {
+	private MessageImpl prepareMessageHeaders(UserDataRequest udr, String subject) throws ParseException {
 		MessageImpl mm = mime4jUtils.createMessage();
 		mm.createMessageId(getHostname());
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));
-		mm.setTo(AddressBuilder.DEFAULT.parseMailbox(bs.getCredentials().getUser().getEmail()));
+		mm.setTo(AddressBuilder.DEFAULT.parseMailbox(udr.getCredentials().getUser().getEmail()));
 		return mm;
 	}
 
@@ -151,23 +151,23 @@ public class ErrorsManager implements IErrorsManager {
 	}
 
 	@Override
-	public void sendQuotaExceededError(BackendSession bs,
+	public void sendQuotaExceededError(UserDataRequest udr,
 			QuotaExceededException e) {
 		
 		try {
-			Message mm = buildErrorMessage(bs, e.getLoadedData(), e.getQuota());
+			Message mm = buildErrorMessage(udr, e.getLoadedData(), e.getQuota());
 			InputStream in = mime4jUtils.toInputStream(mm);
-			manager.storeInInbox(bs, in, false);
+			manager.storeInInbox(udr, in, false);
 		} catch (Throwable t) {
 			logger.error("Error during storing error mail in the inbox folder", t);
 		}
 	}
 
-	private Message buildErrorMessage(BackendSession bs, byte[] truncatedData, int maxSize) throws MimeIOException, IOException, MimeException {
+	private Message buildErrorMessage(UserDataRequest udr, byte[] truncatedData, int maxSize) throws MimeIOException, IOException, MimeException {
 		String subject = messages.mailTooLargeTitle();
 		String previousMessageReferenceText = buildPreviousMessageReferenceText(truncatedData);
 		String errorMessage = messages.mailTooLargeBodyStructure(maxSize, previousMessageReferenceText);
-		return prepareMessage(bs, subject, errorMessage);
+		return prepareMessage(udr, subject, errorMessage);
 	}
 	
 	private String buildPreviousMessageReferenceText(byte[] truncatedData) throws MimeIOException, IOException, MimeException {

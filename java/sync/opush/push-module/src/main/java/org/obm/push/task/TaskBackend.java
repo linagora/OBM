@@ -37,7 +37,7 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
@@ -55,14 +55,14 @@ import com.google.common.collect.ImmutableList;
 public class TaskBackend implements PIMBackend {
 
 	@Override
-	public List<ItemChange> fetch(BackendSession bs, List<String> itemIds)
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
 			throws CollectionNotFoundException, DaoException,
 			ProcessingEmailException, UnexpectedObmSyncServerException {
 		throw new CollectionNotFoundException();
 	}
 	
 	@Override
-	public DataDelta getChanged(BackendSession bs, SyncState state,
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
 			FilterType filterType, Integer collectionId) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException {
@@ -70,7 +70,7 @@ public class TaskBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(BackendSession bs, FilterType filterType,
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
 			Integer collectionId, SyncState state)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException {
@@ -83,7 +83,7 @@ public class TaskBackend implements PIMBackend {
 	}
 
 	@Override
-	public String createOrUpdate(BackendSession bs, Integer collectionId,
+	public String createOrUpdate(UserDataRequest udr, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
@@ -92,21 +92,21 @@ public class TaskBackend implements PIMBackend {
 	}
 
 	@Override
-	public String move(BackendSession bs, String srcFolder, String dstFolder,
+	public String move(UserDataRequest udr, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,
 			ProcessingEmailException {
 		return null;
 	}
 
 	@Override
-	public void delete(BackendSession bs, Integer collectionId, String serverId, Boolean moveToTrash)
+	public void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ItemNotFoundException {
 		
 	}
 
 	@Override
-	public void emptyFolderContent(BackendSession bs, String collectionPath,
+	public void emptyFolderContent(UserDataRequest udr, String collectionPath,
 			boolean deleteSubFolder) throws NotAllowedException {
 	}
 

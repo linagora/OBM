@@ -37,7 +37,7 @@ import java.util.TimeZone;
 
 import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSRecurrence;
@@ -151,7 +151,7 @@ public class TaskConverter {
 		return r;
 	}
 
-	public Event convert(BackendSession bs, Event oldEvent, MSTask task, Boolean isObmInternalEvent) {
+	public Event convert(UserDataRequest udr, Event oldEvent, MSTask task, Boolean isObmInternalEvent) {
 		Event e = new Event();
 		e.setInternalEvent(isObmInternalEvent);
 		if (oldEvent != null) {
@@ -165,7 +165,7 @@ public class TaskConverter {
 				e.addAttendee(att);
 			}
 		} else {
-			Attendee att = convertAttendee(bs, null);
+			Attendee att = convertAttendee(udr, null);
 			if (task.getComplete()) {
 				att.setPercent(100);
 			}
@@ -295,18 +295,18 @@ public class TaskConverter {
 		return or;
 	}
 
-	private Attendee convertAttendee(BackendSession bs, Event oldEvent) {
+	private Attendee convertAttendee(UserDataRequest udr, Event oldEvent) {
 		ParticipationState oldState = ParticipationState.NEEDSACTION;
 		if (oldEvent != null) {
 			for (Attendee oldAtt : oldEvent.getAttendees()) {
-				if (oldAtt.getEmail().equals(bs.getCredentials().getUser().getEmail())) {
+				if (oldAtt.getEmail().equals(udr.getCredentials().getUser().getEmail())) {
 					oldState = oldAtt.getState();
 					break;
 				}
 			}
 		}
 		Attendee ret = new Attendee();
-		ret.setEmail(bs.getCredentials().getUser().getEmail());
+		ret.setEmail(udr.getCredentials().getUser().getEmail());
 		ret.setParticipationRole(ParticipationRole.REQ);
 		ret.setState(status(oldState, AttendeeStatus.ACCEPT));
 		return ret;

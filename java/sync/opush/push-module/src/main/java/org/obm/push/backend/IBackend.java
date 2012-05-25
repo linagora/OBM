@@ -33,7 +33,7 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -48,7 +48,7 @@ public interface IBackend {
 
 	String getWasteBasket();
 
-	Policy getDevicePolicy(BackendSession bs);
+	Policy getDevicePolicy(UserDataRequest udr);
 
 	void startMonitoring();
 	
@@ -61,9 +61,9 @@ public interface IBackend {
 	 */
 	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
 
-	void startEmailMonitoring(BackendSession bs, Integer collectionId) throws CollectionNotFoundException, DaoException;
+	void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException;
 
-	void resetCollection(BackendSession bs, Integer collectionId) throws DaoException;
+	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
 
 	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
 

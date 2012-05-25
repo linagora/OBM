@@ -38,7 +38,7 @@ import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.BackendSession;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
@@ -86,11 +86,11 @@ public class SearchHandler extends WbxmlRequestHandler {
 	}
 	
 	@Override
-	public void process(IContinuation continuation, BackendSession bs,
+	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			SearchRequest searchRequest = protocol.getRequest(doc);
-			SearchResponse response = search(bs, searchRequest);
+			SearchResponse response = search(udr, searchRequest);
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);
 		} catch (XMLValidationException e) {
@@ -108,10 +108,10 @@ public class SearchHandler extends WbxmlRequestHandler {
 		sendResponse(responder, document);
 	}
 
-	private SearchResponse search(BackendSession bs, SearchRequest searchRequest) {
+	private SearchResponse search(UserDataRequest udr, SearchRequest searchRequest) {
 		final List<SearchResult> results = new LinkedList<SearchResult>();
 		for (final ISearchSource source: sources.get(searchRequest.getStoreName())) {
-			results.addAll(source.search(bs, searchRequest.getQuery(), 1000));
+			results.addAll(source.search(udr, searchRequest.getQuery(), 1000));
 		}
 		return new SearchResponse(results, searchRequest.getRangeLower(), searchRequest.getRangeUpper());
 	}

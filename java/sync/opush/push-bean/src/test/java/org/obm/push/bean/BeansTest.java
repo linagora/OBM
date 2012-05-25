@@ -62,7 +62,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(Address.class)
-					.add(BackendSession.class) 
+					.add(UserDataRequest.class) 
 					.add(BodyPreference.class)
 					.add(ChangedCollections.class)
 					.add(Credentials.class)
