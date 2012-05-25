@@ -41,9 +41,9 @@ import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
 import org.obm.icalendar.ICalendar;
+import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -109,16 +109,24 @@ public class EmailView {
 		}
 		
 		public EmailView build() {
-			Preconditions.checkState(uid != null, "The uid is required");
-			Preconditions.checkState(envelope != null, "The envelope is required");
-			Preconditions.checkState(bodyMimePartData != null, "The bodyMimePartData is required");
-			Preconditions.checkState(mimeType != null, "The mimeType is required");
-			ContentType contentType = new ContentType.Builder().contentType(mimeType).build();
-
+			if (uid == null) {
+				throw new EmailViewBuildException("The uid is required");
+			}
+			if (envelope == null) {
+				throw new EmailViewBuildException("The envelope is required");
+			}
+			if (bodyMimePartData == null) {
+				throw new EmailViewBuildException("The bodyMimePartData is required");
+			}
+			ContentType contentType = null;
+			if (mimeType == null) {
+				throw new EmailViewBuildException("The mimeType is required");
+			} else {
+				contentType = new ContentType.Builder().contentType(mimeType).build();
+			}
 			if (flags == null) {
 				this.flags = ImmutableSet.<Flag>of();
 			}
-			
 			return new EmailView(uid, flags, envelope, bodyMimePartData, 
 					bodyTruncation, attachments, iCalendar, invitationType, contentType);
 		}

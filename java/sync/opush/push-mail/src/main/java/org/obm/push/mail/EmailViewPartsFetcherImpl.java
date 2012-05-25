@@ -49,12 +49,17 @@ import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
+	private final static Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
+	
 	private final PrivateMailboxService privateMailboxService;
 	
 	private final UserDataRequest udr;
@@ -80,9 +85,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			
 			MimeMessage mimeMessage = getMimeMessage(uid);
 			FetchInstructions fetchInstructions = getFetchInstructions(mimeMessage);
-			
-			fetchBody(emailViewBuilder, fetchInstructions, uid);
-			fetchAttachments(emailViewBuilder, fetchInstructions, uid);
+			if (fetchInstructions != null) {
+				fetchBody(emailViewBuilder, fetchInstructions, uid);
+				fetchAttachments(emailViewBuilder, fetchInstructions, uid);
+			}
 			fetchInvitation(emailViewBuilder, mimeMessage, uid);
 			
 			return emailViewBuilder.build();
@@ -92,6 +98,9 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			throw new EmailViewPartsFetcherException(e);
 		} catch (ParserException e) {
 			throw new EmailViewPartsFetcherException(e);
+		} catch (EmailViewBuildException e) {
+			logger.error(e.getMessage(), e);
+			return null;
 		}
 	}
 
