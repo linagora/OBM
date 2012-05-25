@@ -124,7 +124,7 @@ public class SyncHandlerTest {
 			.addChanges(
 				new ItemChangesBuilder()
 					.addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
+						new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":0")
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
@@ -150,10 +150,10 @@ public class SyncHandlerTest {
 			.addChanges(
 				new ItemChangesBuilder()
 					.addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
+						new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":0")
 							.withApplicationData(new MSEmail()))
 					.addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":1")
+						new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":1")
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
@@ -180,7 +180,7 @@ public class SyncHandlerTest {
 		DataDelta delta = new DataDeltaBuilder()
 			.addDeletions(
 				new ItemChangesBuilder().addItemChange(
-					new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
+					new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":0")
 						.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
@@ -204,11 +204,11 @@ public class SyncHandlerTest {
 		DataDelta delta = new DataDeltaBuilder()
 			.addChanges(
 				new ItemChangesBuilder().addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123")
+						new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":123")
 							.withApplicationData(new MSEmail())))
 			.addDeletions(
 				new ItemChangesBuilder().addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":122")
+						new ItemChangeBuilder().withServerId(syncEmailCollectionId + ":122")
 							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
