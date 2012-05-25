@@ -122,7 +122,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
 	private final CollectionPathHelper collectionPathHelper;
-	private final ResponseWindowingService responseWindowingProcessor;
+	private final ResponseWindowingProcessor responseWindowingProcessor;
 
 	static {
 		waitContinuationCache = new HashMap<Integer, IContinuation>();
@@ -134,7 +134,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ResponseWindowingService responseWindowingProcessor) {
+			ResponseWindowingProcessor responseWindowingProcessor) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);

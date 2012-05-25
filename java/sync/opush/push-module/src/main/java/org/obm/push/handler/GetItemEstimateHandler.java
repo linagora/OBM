@@ -32,7 +32,7 @@
 package org.obm.push.handler;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
 
 import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
@@ -162,7 +162,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 
 	private int listItemToAddSize(BackendSession bs, SyncCollection syncCollection) {
-		Collection<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), 
+		Set<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(bs.getCredentials(), 
 				bs.getDevice(), syncCollection.getCollectionId());
 		return listItemToAdd.size();
 	}
