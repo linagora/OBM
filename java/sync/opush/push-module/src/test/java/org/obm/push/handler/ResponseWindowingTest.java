@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.verify;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
@@ -54,7 +53,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 
@@ -73,7 +71,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(5), deltas, user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -98,11 +96,11 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
 		List<ItemChange> firstCall = 
-				responseWindowingProcessor.window(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), inputDeltas, user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> secondCall = 
-				responseWindowingProcessor.window(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		List<ItemChange> thirdCall = 
-				responseWindowingProcessor.window(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(2), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -122,7 +120,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.processWindowSize(syncCollection(5), emptyDelta(), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -140,62 +138,13 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.window(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
-		
-		verify(unsynchronizedItemDao);
-		
-		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
-	}
-
-	@Test
-	public void processNewChangesAskedByClientAndUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
-		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltas(3).getChanges());
-		replay(unsynchronizedItemDao);
-		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		List<ItemChange> actual = 
-				responseWindowingProcessor.window(
-						syncCollection(2), deltasWithOffset(2, 3), 
-						user.backendSession, changesToMap(deltasWithOffset(2, 3)));
-		
-		verify(unsynchronizedItemDao);
-		
-		Assertions.assertThat(actual).isEqualTo(deltasWithOffset(2, 3).getChanges());
-	}
-
-	@Test
-	public void processNewChangesAskedByClientGreaterThanWindow() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
-		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.<ItemChange>newLinkedHashSet());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		replay(unsynchronizedItemDao);
-		
-		ResponseWindowingProcessor responseWindowingProcessor = new ResponseWindowingProcessor(unsynchronizedItemDao);
-		List<ItemChange> actual = 
-				responseWindowingProcessor.window(
-						syncCollection(2), deltas(5),
-						user.backendSession, changesToMap(deltas(5)));
+				responseWindowingProcessor.processWindowSize(syncCollection(5), deltasWithOffset(2, 3), user.backendSession, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
 		
 		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
 	}
 	
-	private Map<String, String> changesToMap(DataDelta deltasWithOffset) {
-		Map<String, String> map = Maps.newHashMap();
-		for (ItemChange change: deltasWithOffset.getChanges()) {
-			map.put(change.getServerId(), null);
-		}
-		return map;
-	}
-
 	private DataDelta emptyDelta() {
 		return new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), DateUtils.date("2012-01-01"));
 	}
