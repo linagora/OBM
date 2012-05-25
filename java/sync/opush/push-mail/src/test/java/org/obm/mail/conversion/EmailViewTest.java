@@ -49,12 +49,13 @@ import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
+import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.collect.Lists;
 
 public class EmailViewTest {
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=EmailViewBuildException.class)
 	public void testUidDefault() {
 		new EmailView.Builder()
 			.envelope(anyEnvelope())
@@ -87,7 +88,7 @@ public class EmailViewTest {
 		Assertions.assertThat(emailView.getUid()).isEqualTo(-115);
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=EmailViewBuildException.class)
 	public void testEnvelopeRequired() {
 		new EmailView.Builder().envelope(null)
 			.bodyMimePartData(anyBodyMimePartData())
@@ -96,7 +97,7 @@ public class EmailViewTest {
 			.build();
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=EmailViewBuildException.class)
 	public void testBodyMimePartDataRequired() {
 		new EmailView.Builder().bodyMimePartData(null)
 			.envelope(anyEnvelope())
@@ -239,7 +240,7 @@ public class EmailViewTest {
 	}
 	
 	@Test
-	public void testICalendar() throws IOException, ParserException {
+	public void testICalendar() throws IOException, ParserException, EmailViewBuildException {
 		ICalendar iCalendar = anyICalendar("attendee.ics");
 		
 		EmailView emailView = new EmailView.Builder()
@@ -270,7 +271,7 @@ public class EmailViewTest {
 		Assertions.assertThat(emailView.getInvitationType()).equals(invitationType);
 	}
 	
-	@Test(expected=IllegalStateException.class)
+	@Test(expected=EmailViewBuildException.class)
 	public void testMimeTypeRequired() {
 		new EmailView.Builder()
 			.envelope(anyEnvelope())

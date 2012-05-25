@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -359,11 +360,12 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailView.getBodyTruncation()).isEqualTo(1505);
 	}
 	
-	@Test(expected=IllegalStateException.class)
+	@Test
 	public void testBodyMimePartDataNull() throws Exception {
 		messageFixture.bodyData = null;
 
-		newFetcherFromExpectedFixture().fetch(messageFixture.uid);
+		Assertions.assertThat(newFetcherFromExpectedFixture()
+				.fetch(messageFixture.uid)).isNull();
 	}
 	
 	@Test

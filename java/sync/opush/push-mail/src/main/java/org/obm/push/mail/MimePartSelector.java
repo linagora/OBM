@@ -52,7 +52,7 @@ public class MimePartSelector {
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build()).build(); 
 	
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
-		if (bodyPreferences.isEmpty()) {
+		if (bodyPreferences == null || bodyPreferences.isEmpty()) {
 			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		} else {
 			return selectMimePart(bodyPreferences, mimeMessage);

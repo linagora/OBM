@@ -180,7 +180,9 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		
 		for (Long uid: uids) {
 			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
-			msEmails.add(msEmailConverter.convert(emailView));
+			if (emailView != null) {
+				msEmails.add(msEmailConverter.convert(emailView));
+			}
 		}
 		return msEmails;
 	}
