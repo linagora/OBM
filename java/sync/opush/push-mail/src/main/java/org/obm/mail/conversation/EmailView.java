@@ -40,7 +40,6 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
-import org.minig.imap.mime.IMimePart;
 import org.obm.icalendar.ICalendar;
 
 import com.google.common.base.Objects;
@@ -56,11 +55,11 @@ public class EmailView {
 		private Collection<Flag> flags;
 		private Envelope envelope;
 		private InputStream bodyMimePartData;
-		private IMimePart bodyMimePart;
 		private Integer bodyTruncation;
 		private List<EmailViewAttachment> attachments;
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
+		private String mimeType;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
@@ -79,11 +78,6 @@ public class EmailView {
 
 		public Builder bodyMimePartData(InputStream bodyMimePartData) {
 			this.bodyMimePartData = bodyMimePartData;
-			return this;
-		}
-
-		public Builder bodyMimePart(IMimePart bodyMimePart) {
-			this.bodyMimePart = bodyMimePart;
 			return this;
 		}
 
@@ -109,49 +103,50 @@ public class EmailView {
 			return this;
 		}
 		
+		public Builder mimeType(String mimeType) {
+			this.mimeType = mimeType;
+			return this;
+		}
+		
 		public EmailView build() {
 			Preconditions.checkState(uid != null, "The uid is required");
 			Preconditions.checkState(envelope != null, "The envelope is required");
 			Preconditions.checkState(bodyMimePartData != null, "The bodyMimePartData is required");
-			Preconditions.checkState(bodyMimePart != null, "The bodyMimePart is required");
+			Preconditions.checkState(mimeType != null, "The mimeType is required");
+			ContentType contentType = new ContentType.Builder().contentType(mimeType).build();
 
 			if (flags == null) {
 				this.flags = ImmutableSet.<Flag>of();
 			}
 			
-			return new EmailView(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation, attachments, iCalendar, invitationType);
+			return new EmailView(uid, flags, envelope, bodyMimePartData, 
+					bodyTruncation, attachments, iCalendar, invitationType, contentType);
 		}
-		
 	}
 	
 	private final long uid;
 	private final Collection<Flag> flags;
 	private final Envelope envelope;
 	private final InputStream bodyMimePartData;
-	private final IMimePart bodyMimePart;
 	private final Integer bodyTruncation;
-	private final ContentType bodyContentType;
+	private final ContentType contentType;
 	private final List<EmailViewAttachment> attachments;
 	private final ICalendar iCalendar;
 	private final EmailViewInvitationType invitationType;
 
 	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
-			InputStream bodyMimePartData, IMimePart bodyMimePart, Integer bodyTruncation, 
-			List<EmailViewAttachment> attachments, ICalendar iCalendar, EmailViewInvitationType invitationType) {
+			InputStream bodyMimePartData, Integer bodyTruncation, List<EmailViewAttachment> attachments, 
+			ICalendar iCalendar, EmailViewInvitationType invitationType, ContentType contentType) {
 		
 		this.uid = uid;
 		this.flags = flags;
 		this.envelope = envelope;
 		this.bodyMimePartData = bodyMimePartData;
-		this.bodyMimePart = bodyMimePart;
 		this.bodyTruncation = bodyTruncation;
 		this.attachments = attachments;
 		this.iCalendar = iCalendar;
 		this.invitationType = invitationType;
-		this.bodyContentType = new ContentType.Builder()
-			.primaryType(bodyMimePart.getPrimaryType())
-			.subType(bodyMimePart.getSubtype())
-			.build();
+		this.contentType = contentType;
 	}
 
 	public long getUid() {
@@ -194,18 +189,10 @@ public class EmailView {
 		return bodyMimePartData;
 	}
 
-	public IMimePart getBodyMimePart() {
-		return bodyMimePart;
-	}
-
 	public Integer getBodyTruncation() {
 		return bodyTruncation;
 	}
 	
-	public ContentType getBodyContentType() {
-		return bodyContentType;
-	}
-
 	public List<EmailViewAttachment> getAttachments() {
 		return attachments;
 	}
@@ -217,10 +204,15 @@ public class EmailView {
 	public EmailViewInvitationType getInvitationType() {
 		return invitationType;
 	}
+
+	public ContentType getContentType() {
+		return contentType;
+	}
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation, bodyContentType, attachments, iCalendar, invitationType);
+		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, 
+				bodyTruncation, attachments, iCalendar, invitationType, contentType);
 	}
 	
 	@Override
@@ -231,12 +223,11 @@ public class EmailView {
 				&& Objects.equal(this.flags, that.flags)
 				&& Objects.equal(this.envelope, that.envelope)
 				&& Objects.equal(this.bodyMimePartData, that.bodyMimePartData)
-				&& Objects.equal(this.bodyMimePart, that.bodyMimePart)
 				&& Objects.equal(this.bodyTruncation, that.bodyTruncation)
-				&& Objects.equal(this.bodyContentType, that.bodyContentType)
 				&& Objects.equal(this.attachments, that.attachments)
 				&& Objects.equal(this.iCalendar, that.iCalendar)
-				&& Objects.equal(this.invitationType, that.invitationType);
+				&& Objects.equal(this.invitationType, that.invitationType)
+				&& Objects.equal(this.contentType, that.contentType);
 		}
 		return false;
 	}
@@ -248,12 +239,11 @@ public class EmailView {
 			.add("flags", flags)
 			.add("envelope", envelope)
 			.add("bodyMimePartData", bodyMimePartData)
-			.add("bodyMimePart", bodyMimePart)
 			.add("bodyTruncation", bodyTruncation)
-			.add("bodyContentType", bodyContentType)
 			.add("attachments", attachments)
 			.add("iCalendar", iCalendar)
 			.add("invitationType", invitationType)
+			.add("contentType", contentType)
 			.toString();
 	}
 }

@@ -120,7 +120,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		InputStream bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
 		
 		emailViewBuilder.bodyMimePartData(bodyData);
-		emailViewBuilder.bodyMimePart(fetchInstructions.getMimePart());
+		emailViewBuilder.mimeType(fetchInstructions.getMimePart().getFullMimeType());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
 	}
 	

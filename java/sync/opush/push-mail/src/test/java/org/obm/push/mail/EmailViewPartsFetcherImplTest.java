@@ -98,6 +98,7 @@ public class EmailViewPartsFetcherImplTest {
 		MSEmailBodyType bodyType = MSEmailBodyType.PlainText;
 		String bodyPrimaryType = "text";
 		String bodySubType = "plain";
+		String fullMimeType = bodyPrimaryType + "/" + bodySubType;
 		String bodyCharset = Charsets.UTF_8.displayName();
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 		String contentId = "contentId";
@@ -376,96 +377,6 @@ public class EmailViewPartsFetcherImplTest {
 	}
 	
 	@Test
-	public void testBodyMimePartCharsetNull() throws Exception {
-		messageFixture.bodyCharset = null;
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-		
-		assertThat(emailView.getBodyMimePart().getCharset()).isNull();
-	}
-	
-	@Test
-	public void testBodyMimePartCharsetEmtpy() throws Exception {
-		messageFixture.bodyCharset = "";
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-		
-		assertThat(emailView.getBodyMimePart().getCharset()).isEmpty();
-	}
-
-	@Test
-	public void testBodyMimePartCharsetASCII() throws Exception {
-		String asciiCharsetName = Charsets.US_ASCII.displayName();
-		messageFixture.bodyCharset = asciiCharsetName;
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-		
-		assertThat(emailView.getBodyMimePart().getCharset()).isEqualTo(asciiCharsetName);
-	}
-
-	@Test
-	public void testBodyMimePartCharsetUTF8() throws Exception {
-		String utf8CharsetName = Charsets.UTF_8.displayName();
-		messageFixture.bodyCharset = utf8CharsetName;
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-		
-		assertThat(emailView.getBodyMimePart().getCharset()).isEqualTo(utf8CharsetName);
-	}
-
-	@Test(expected=NullPointerException.class)
-	public void testBodyMimePartContentTypeNull() throws Exception {
-		messageFixture.bodyPrimaryType = null;
-		messageFixture.bodySubType = null;
-		
-		newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-	}
-
-	@Test
-	public void testBodyMimePartContentTypeEmpty() throws Exception {
-		messageFixture.bodyPrimaryType = "";
-		messageFixture.bodySubType = "";
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEmpty();
-		assertThat(emailView.getBodyMimePart().getSubtype()).isEmpty();
-	}
-
-	@Test
-	public void testBodyMimePartContentTypePlainText() throws Exception {
-		messageFixture.bodyPrimaryType = "plain";
-		messageFixture.bodySubType = "text";
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("plain");
-		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("text");
-	}
-
-	@Test
-	public void testBodyMimePartContentTypeCalendar() throws Exception {
-		messageFixture.bodyPrimaryType = "plain";
-		messageFixture.bodySubType = "calendar";
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("plain");
-		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("calendar");
-	}
-
-	@Test
-	public void testBodyMimePartContentTypeAttachment() throws Exception {
-		messageFixture.bodyPrimaryType = "application";
-		messageFixture.bodySubType = "octet-stream";
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getBodyMimePart().getPrimaryType()).isEqualTo("application");
-		assertThat(emailView.getBodyMimePart().getSubtype()).isEqualTo("octet-stream");
-	}
-	
-	@Test
 	public void testWithoutAttachment() throws Exception {
 		messageFixture.isAttachment = false;
 		
@@ -500,6 +411,16 @@ public class EmailViewPartsFetcherImplTest {
 
 		assertThat(emailView.getICalendar()).isNotNull();
 		assertThat(emailView.getInvitationType()).equals(EmailViewInvitationType.REQUEST);
+	}
+	
+	@Test
+	public void testContentType() throws Exception {
+		String mimeType = "text/html";
+		messageFixture.fullMimeType = mimeType;
+		
+		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
+
+		assertThat(emailView.getContentType().getFullMimeType()).equals(mimeType);
 	}
 	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
@@ -565,7 +486,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.isAttachment()).andReturn(messageFixture.isAttachment);
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
-		expect(mimePart.getFullMimeType()).andReturn("plain/text");
+		expect(mimePart.getFullMimeType()).andReturn(messageFixture.fullMimeType).anyTimes();
 		expect(mimePart.getContentTransfertEncoding()).andReturn(null);
 		expect(mimePart.getSize()).andReturn(20);
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
