@@ -47,8 +47,6 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
@@ -419,12 +417,12 @@ public class MailViewToMSEmailConverterImplTest {
 			.uid(emailViewFixture.uid)
 			.flags(flagsListFromFixture())
 			.envelope(envelopeFromFixture())
-			.bodyMimePart(bodyMimePartFromFixture())
 			.bodyMimePartData(emailViewFixture.bodyData)
 			.bodyTruncation(emailViewFixture.bodyTruncationSize)
 			.attachments(emailViewFixture.attachments)
 			.iCalendar(emailViewFixture.iCalendar)
 			.invitationType(null)
+			.mimeType(emailViewFixture.bodyContentType.getFullMimeType())
 			.build();
 	}
 
@@ -450,12 +448,6 @@ public class MailViewToMSEmailConverterImplTest {
 			.subject(emailViewFixture.subject)
 			.date(emailViewFixture.date)
 			.build();
-	}
-
-	private IMimePart bodyMimePartFromFixture() {
-		MimePart mimePart = new MimePart();
-		mimePart.setContentType(emailViewFixture.bodyContentType);
-		return mimePart;
 	}
 
 	public Address newEmptyAddress() {
