@@ -214,23 +214,30 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			ActiveSyncRequest request, HttpServletResponse response)
 			throws IOException, DaoException {
 
-		UserDataRequest udr = sessionService.getSession(credentials, devId, request);
-		logger.debug("incoming query");
-		
-		if (udr.getCommand() == null) {
-			logger.warn("POST received without explicit command, aborting");
-			return;
+		UserDataRequest userDataRequest = null;
+		try {
+			userDataRequest = sessionService.getSession(credentials, devId, request);
+			logger.debug("incoming query");
+			
+			if (userDataRequest.getCommand() == null) {
+				logger.warn("POST received without explicit command, aborting");
+				return;
+			}
+	
+			IRequestHandler rh = getHandler(userDataRequest);
+			if (rh == null) {
+				noHandlerError(request, userDataRequest);
+				return;
+			}
+	
+			sendASHeaders(response);
+			Responder responder = responderFactory.createResponder(response);
+			rh.process(continuation, userDataRequest, request, responder);
+		} finally {
+			if (userDataRequest != null) {
+				userDataRequest.closeResources();
+			}
 		}
-
-		IRequestHandler rh = getHandler(udr);
-		if (rh == null) {
-			noHandlerError(request, udr);
-			return;
-		}
-
-		sendASHeaders(response);
-		Responder responder = responderFactory.createResponder(response);
-		rh.process(continuation, udr, request, responder);
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
@@ -294,6 +301,4 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 	private IRequestHandler getHandler(UserDataRequest p) {
 		return handlers.getHandler(p.getCommand());
 	}
-
-
 }

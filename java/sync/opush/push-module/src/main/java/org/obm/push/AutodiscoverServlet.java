@@ -62,15 +62,17 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 
 	private final AutodiscoverHandler autodiscoverHandler;
 	private final Factory responderFactory;
+	private final UserDataRequest.Factory userDataRequestFactory;
 	
 	@Inject
 	protected AutodiscoverServlet(LoginService loginService, AutodiscoverHandler autodiscoverHandler, 
 			User.Factory userFactory, LoggerService loggerService, ResponderImpl.Factory responderFactory, 
-			@Named(LoggerModule.AUTH)Logger authLogger) {
+			@Named(LoggerModule.AUTH)Logger authLogger, UserDataRequest.Factory userDataRequestFactory) {
 		
 		super(loginService, loggerService, userFactory, authLogger);
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
+		this.userDataRequestFactory = userDataRequestFactory;
 	}
 
 	@Override
@@ -78,11 +80,12 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
 
+		UserDataRequest userDataRequest = null;
 		try {
 			Credentials credentials = authentication(request);
 			getLoggerService().initSession(credentials.getUser(), 0, "autodiscover");
 			
-			UserDataRequest userDataRequest = new UserDataRequest(credentials, "autodiscover", null, null);
+			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null, null);
 			SimpleQueryString queryString = new SimpleQueryString(request);
 			Responder responder = responderFactory.createResponder(response);
 			
@@ -95,6 +98,10 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 			logger.warn(e.getMessage());
 			returnHttpUnauthorized(request, response);
 			return;
+		} finally {
+			if (userDataRequest != null) {
+				userDataRequest.closeResources();
+			}
 		}
 
 	}

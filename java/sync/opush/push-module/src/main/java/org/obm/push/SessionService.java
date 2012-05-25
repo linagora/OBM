@@ -42,6 +42,7 @@ import org.obm.push.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -50,10 +51,12 @@ public class SessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 	private final DeviceService deviceService;
+	private final UserDataRequest.Factory userDataRequestFactory;
 	
 	@Inject
-	private SessionService(DeviceService deviceService) {
+	@VisibleForTesting SessionService(DeviceService deviceService, UserDataRequest.Factory userDataRequestFactory) {
 		this.deviceService = deviceService;
+		this.userDataRequestFactory = userDataRequestFactory;
 	}
 	
 	public UserDataRequest getSession(
@@ -71,9 +74,8 @@ public class SessionService {
 		
 		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent);
 		
-		UserDataRequest udr = new UserDataRequest(credentials, 
+		UserDataRequest udr = userDataRequestFactory.createUserDataRequest(credentials, 
 				r.getCommand(), device, getProtocolVersion(r));
-		
 		
 		logger.debug("New session = {}", sessionId);
 		return udr;

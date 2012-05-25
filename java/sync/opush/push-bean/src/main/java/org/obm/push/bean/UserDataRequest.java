@@ -32,15 +32,31 @@
 package org.obm.push.bean;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.google.inject.Singleton;
 
 public class UserDataRequest {
 
+	@Singleton
+	public static class Factory {
+		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
+			return new UserDataRequest(credentials, command, device, protocolVersion);
+		}
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(UserDataRequest.class);
+	
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
 	private final BigDecimal protocolVersion;
+	private final Map<String, Resource> resources;
 
 	public UserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
 		super();
@@ -48,6 +64,7 @@ public class UserDataRequest {
 		this.command = command;
 		this.device = device;
 		this.protocolVersion = protocolVersion;
+		this.resources = new HashMap<String, Resource>();
 	}
 
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -86,9 +103,43 @@ public class UserDataRequest {
 		return device;
 	}
 
+	public void putResource(String key, Resource resource) {
+		if (key != null && resource != null) {
+			this.resources.put(key, resource);
+		}
+	}
+	
+	public void putAllResources(Map<String, Resource> resources) {
+		if (resources != null) {
+			this.resources.putAll(resources);
+		}
+	}
+	
+	public Resource getResource(String key) {
+		if (null != key) {
+			return resources.get(key);
+		}
+		return null;
+	}
+	
+	public Map<String, Resource> getResources() {
+		return resources;
+	}
+
+	public void closeResources() {
+		for (Resource resource : resources.values()) {
+			try {
+				resource.close();
+			}
+			catch (RuntimeException exception) {
+				logger.error("fail to close resource {}, exception occured {}", resource, exception);
+			}
+		}
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(credentials, device, command, protocolVersion);
+		return Objects.hashCode(credentials, device, command, protocolVersion, resources);
 	}
 	
 	@Override
@@ -98,7 +149,8 @@ public class UserDataRequest {
 			return Objects.equal(this.credentials, that.credentials)
 				&& Objects.equal(this.device, that.device)
 				&& Objects.equal(this.command, that.command)
-				&& Objects.equal(this.protocolVersion, that.protocolVersion);
+				&& Objects.equal(this.protocolVersion, that.protocolVersion)
+				&& Objects.equal(this.resources, that.resources);
 		}
 		return false;
 	}
@@ -110,7 +162,7 @@ public class UserDataRequest {
 			.add("device", device)
 			.add("command", command)
 			.add("protocolVersion", protocolVersion)
+			.add("resources", resources)
 			.toString();
 	}
-	
 }
