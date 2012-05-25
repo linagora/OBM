@@ -146,7 +146,12 @@ public class EmailSyncTestUtils {
 		expect(unsynchronizedItemDao.listItemsToRemove(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
-				anyInt())).andReturn(null).anyTimes();
+				anyInt())).andReturn(ImmutableList.<ItemChange>of()).anyTimes();
+		unsynchronizedItemDao.clearItemsToRemove(
+				anyObject(Credentials.class), 
+				anyObject(Device.class),
+				anyInt());
+		expectLastCall().anyTimes();
 		unsynchronizedItemDao.storeItemsToRemove(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
