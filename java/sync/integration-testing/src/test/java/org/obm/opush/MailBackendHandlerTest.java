@@ -61,19 +61,17 @@ import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
 import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
@@ -157,7 +155,7 @@ public class MailBackendHandlerTest {
 		mockDao(serverId, syncState);
 		
 		bindCollectionIdToPath(serverId);
-		bindChangedToDelta(delta, serverId, syncState);
+		bindChangedToDelta(delta);
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
@@ -183,13 +181,10 @@ public class MailBackendHandlerTest {
 		expectLastCall().anyTimes();
 	}
 
-	private void bindChangedToDelta(DataDelta delta, Integer collectionId, SyncState syncState) throws Exception {
+	private void bindChangedToDelta(DataDelta delta) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
-		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), eq(syncState), eq(collectionId), anyObject(FilterType.class), anyObject(PIMDataType.class)))
+		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), anyObject(SyncCollection.class)))
 			.andReturn(delta).once();
-		
-		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), eq(syncState), eq(collectionId), anyObject(FilterType.class), anyObject(PIMDataType.class)))
-			.andReturn(delta).anyTimes();
 	}
 
 	private void mockDao(int serverId, SyncState syncState) throws Exception {

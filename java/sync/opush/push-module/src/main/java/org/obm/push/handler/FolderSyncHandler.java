@@ -33,8 +33,8 @@ package org.obm.push.handler;
 
 import java.util.Date;
 
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;

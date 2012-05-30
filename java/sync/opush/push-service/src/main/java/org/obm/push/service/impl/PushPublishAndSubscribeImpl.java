@@ -37,10 +37,11 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -65,20 +66,23 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 		}
 		
 		@Override
-		public PushPublishAndSubscribe create(PIMBackend backend) {
-			return new PushPublishAndSubscribeImpl(backend);
+		public PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter contentsExporter) {
+			return new PushPublishAndSubscribeImpl(backend, contentsExporter);
 		}
+
 	}
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final PIMBackend backend;
 	private MonitoringService monitoringService;
+	private final IContentsExporter iContentsExporter;
 
-	private PushPublishAndSubscribeImpl(PIMBackend backend) {
+	public PushPublishAndSubscribeImpl(PIMBackend backend, IContentsExporter contentsExporter) {
 		this.backend = backend;
+		this.iContentsExporter = contentsExporter;
 	}
 
-	
+
 	@Override
 	public void emit(final Set<ICollectionChangeListener> ccls) {
 		final LinkedList<PushNotification> pushNotifyList = listPushNotification(ccls);
@@ -103,11 +107,8 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 
 					if (syncCollection.getDataType().equals(backend.getPIMDataType())) {
 						try {
-							int count = backend.getItemEstimateSize(
-									userDataRequest, 
-									syncCollection.getOptions().getFilterType(),
-									syncCollection.getCollectionId(),
-									syncCollection.getSyncState());
+							int count = iContentsExporter.getItemEstimateSize(
+									userDataRequest, backend.getPIMDataType(), syncCollection);
 
 							if (count > 0) {
 								addPushNotification(pushNotifyList, ccl);

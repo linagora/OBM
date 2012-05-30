@@ -29,16 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.backend;
 
 import java.util.List;
 
-import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -47,19 +46,22 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface IContentsExporter {
 
-	DataDelta getChanged(UserDataRequest udr, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
+	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
 
-	List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds,
-			PIMDataType dataType) throws CollectionNotFoundException,
-			DaoException, ProcessingEmailException,
-			UnexpectedObmSyncServerException, ConversionException;
+	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, 
+		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 
-	int getItemEstimateSize(UserDataRequest udr, SyncState state,
-			Integer collectionId, FilterType filterType, PIMDataType dataType)
+	int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException, ConversionException;
 
+	int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
+			UnexpectedObmSyncServerException, ConversionException;
+
+	int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
+			UnexpectedObmSyncServerException, ConversionException;
 }

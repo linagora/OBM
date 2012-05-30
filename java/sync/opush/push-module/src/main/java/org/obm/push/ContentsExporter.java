@@ -31,16 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -54,33 +54,57 @@ import com.google.inject.Singleton;
 public class ContentsExporter implements IContentsExporter {
 
 	private final Backends backends;
-
+	
 	@Inject
 	private ContentsExporter(Backends backends) {
 		this.backends = backends;
 	}
 
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
-		PIMBackend backend = backends.getBackend(dataType);
-		return backend.getChanged(udr, state, filterType, collectionId);
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection) 
+					throws DaoException, CollectionNotFoundException, 
+					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+
+		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
+		return backend.getChanged(udr, syncCollection.getSyncState(), 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> fetchServerIds, PIMDataType dataType) 
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
-		PIMBackend backend = backends.getBackend(dataType);
-		LinkedList<ItemChange> changes = new LinkedList<ItemChange>();
-		changes.addAll(backend.fetch(udr, fetchServerIds));
-		return changes;
+	public List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, DaoException, 
+			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
+		
+		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
+		return backend.fetch(udr, syncCollection.getFetchIds(), syncCollection.getOptions());
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType, PIMDataType dataType)
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException {
-		PIMBackend backend = backends.getBackend(dataType);
-		return backend.getItemEstimateSize(udr, filterType, collectionId, state);
+	public int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) 
+					throws CollectionNotFoundException, ProcessingEmailException, DaoException,
+					UnexpectedObmSyncServerException, ConversionException {
+
+		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
+		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
+				syncCollection.getSyncState(), syncCollection.getOptions());
 	}
-	
+
+	@Override
+	public int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
+			throws CollectionNotFoundException, ProcessingEmailException, 
+			DaoException, UnexpectedObmSyncServerException, ConversionException {
+		
+		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
+		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
+				state, syncCollection.getOptions());
+	}
+
+	@Override
+	public int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
+			UnexpectedObmSyncServerException, ConversionException {
+		
+		PIMBackend backend = backends.getBackend(pimDataType);
+		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
+				syncCollection.getSyncState(), syncCollection.getOptions());
+	}
 }

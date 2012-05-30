@@ -36,9 +36,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.push.IContentsExporter;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -186,12 +185,10 @@ public class OBMBackend implements IBackend {
 		return syncCollectionsChanged;
 	}
 	
-	private int getItemEstimateSize(UserDataRequest userDataRequest, SyncCollection syncCollection) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException {
+	private int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) throws DaoException,
+		CollectionNotFoundException, UnexpectedObmSyncServerException, 
+		ProcessingEmailException, ConversionException {
 		
-		return contentsExporter.getItemEstimateSize(userDataRequest, syncCollection.getSyncState(),
-				syncCollection.getCollectionId(), syncCollection.getOptions().getFilterType(), syncCollection.getDataType());
+		return contentsExporter.getItemEstimateSize(udr, syncCollection);
 	}
-	
 }
