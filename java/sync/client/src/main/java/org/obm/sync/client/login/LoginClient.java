@@ -38,7 +38,9 @@ import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,8 +58,8 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	@Inject
 	private LoginClient(@Named("origin")String origin,
-			SyncClientException syncClientException, Locator locator) {
-		super(syncClientException);
+			SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+		super(syncClientException, obmSyncLogger);
 		this.origin = origin;
 		this.locator = locator;
 	}

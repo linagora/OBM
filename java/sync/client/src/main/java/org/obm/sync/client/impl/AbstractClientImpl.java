@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -69,6 +70,7 @@ public abstract class AbstractClientImpl {
 	
 	private static final int MAX_CONNECTIONS = 8;
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger obmSyncLogger;
 	protected final SyncClientException exceptionFactory;
 	protected HttpClient hc;
 	
@@ -92,9 +94,10 @@ public abstract class AbstractClientImpl {
 		return ret;
 	}
 
-	public AbstractClientImpl(SyncClientException exceptionFactory) {
+	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger) {
 		super();
 		this.exceptionFactory = exceptionFactory;
+		this.obmSyncLogger = obmSyncLogger;
 		this.hc = createHttpClient();
 	}
 
@@ -102,9 +105,12 @@ public abstract class AbstractClientImpl {
 		PostMethod pm = null;
 		try {
 			pm = getPostMethod(token, action);
+			logRequest(action, parameters);
 			InputStream is = executePostAndGetResultStream(pm, parameters);
 			if (is != null) {
-				return DOMUtils.parse(is);
+				Document document = DOMUtils.parse(is);
+				logResponse(document);
+				return document;
 			} else {
 				throw new ObmSyncClientException("An error occurs: cannot get the request result stream");
 			}
@@ -122,6 +128,20 @@ public abstract class AbstractClientImpl {
 			throw new ObmSyncClientException(e.getMessage(), e);
 		} finally {
 			releaseConnection(pm);
+		}
+	}
+
+	private void logRequest(String action, Multimap<String, String> parameters) {
+		obmSyncLogger.debug("action {}, request {}", action, parameters);
+	}
+
+	private void logResponse(Document document) {
+		if (obmSyncLogger.isDebugEnabled()) {
+			try {
+				obmSyncLogger.debug("response {}", DOMUtils.prettySerialize(document));
+			} catch (TransformerException e) {
+				obmSyncLogger.debug("unparsable response");
+			}
 		}
 	}
 

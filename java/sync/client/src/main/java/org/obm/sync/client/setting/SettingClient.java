@@ -33,6 +33,7 @@ package org.obm.sync.client.setting;
 
 import java.util.Map;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -42,11 +43,13 @@ import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
 import org.obm.sync.setting.SettingItemsParser;
 import org.obm.sync.setting.VacationSettings;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class SettingClient extends AbstractClientImpl implements ISetting {
@@ -55,8 +58,8 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	private final Locator locator;
 
 	@Inject
-	private SettingClient(SyncClientException syncClientException, Locator locator) {
-		super(syncClientException);
+	private SettingClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+		super(syncClientException, obmSyncLogger);
 		this.locator = locator;
 		this.respParser = new SettingItemsParser();
 	}

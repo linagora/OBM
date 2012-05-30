@@ -31,18 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.calendar;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
+import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class TodoClient extends AbstractEventSyncClient {
 	
 	@Inject
-	private TodoClient(SyncClientException syncClientException, Locator locator) {
-		super("/todo", syncClientException, locator);
+	private TodoClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+		super("/todo", syncClientException, locator, obmSyncLogger);
 	}
 	
 }

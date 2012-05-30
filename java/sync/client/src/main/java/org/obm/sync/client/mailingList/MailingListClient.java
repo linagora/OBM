@@ -33,6 +33,7 @@ package org.obm.sync.client.mailingList;
 
 import java.util.List;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -43,11 +44,13 @@ import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.mailingList.MailingListItemsParser;
 import org.obm.sync.mailingList.MailingListItemsWriter;
 import org.obm.sync.services.IMailingList;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class MailingListClient extends AbstractClientImpl implements IMailingList {
@@ -57,8 +60,8 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 	private final Locator locator;
 
 	@Inject
-	private MailingListClient(SyncClientException syncClientException, Locator locator) {
-		super(syncClientException);
+	private MailingListClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+		super(syncClientException, obmSyncLogger);
 		this.locator = locator;
 		this.mlParser = new MailingListItemsParser();
 		this.mlWriter = new MailingListItemsWriter();

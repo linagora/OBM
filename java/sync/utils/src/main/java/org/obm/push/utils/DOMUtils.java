@@ -348,6 +348,13 @@ public final class DOMUtils {
 		return new String(byteArrayOutputStream.toByteArray());
 	}
 	
+	public static String prettySerialize(Document doc)
+			throws TransformerException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		serialize(doc, byteArrayOutputStream, true);
+		return new String(byteArrayOutputStream.toByteArray());
+	}
+	
 	public static void serialize(Document doc, OutputStream out, boolean pretty, XMLVersion xmlVersion) 
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();

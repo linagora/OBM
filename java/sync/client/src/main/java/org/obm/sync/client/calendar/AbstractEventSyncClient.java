@@ -65,6 +65,7 @@ import org.obm.sync.locators.Locator;
 import org.obm.sync.services.ICalendar;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Multimap;
@@ -77,8 +78,8 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	private final Locator locator;
 
 	public AbstractEventSyncClient(String type, SyncClientException syncClientException, 
-			Locator locator) {
-		super(syncClientException);
+			Locator locator, Logger obmSyncLogger) {
+		super(syncClientException, obmSyncLogger);
 		this.locator = locator;
 		respParser = new CalendarItemsParser();
 		this.type = type;

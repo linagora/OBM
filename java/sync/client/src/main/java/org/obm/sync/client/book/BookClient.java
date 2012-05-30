@@ -53,14 +53,17 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class BookClient extends AbstractClientImpl implements IAddressBook {
@@ -70,8 +73,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	private final Locator Locator;
 
 	@Inject
-	private BookClient(SyncClientException syncClientException, Locator Locator) {
-		super(syncClientException);
+	private BookClient(SyncClientException syncClientException, Locator Locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+		super(syncClientException, obmSyncLogger);
 		this.Locator = Locator;
 		this.respParser = new BookItemsParser();
 		this.biw = new BookItemsWriter();
