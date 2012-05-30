@@ -35,12 +35,13 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
 
 public interface PushPublishAndSubscribe {
 
 	public interface Factory {
-		PushPublishAndSubscribe create(PIMBackend backend);
+		PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter iContentsExporter);
 	}
 	
 	LinkedList<PushNotification> listPushNotification(

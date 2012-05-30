@@ -61,6 +61,7 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.User.Factory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import org.obm.filter.SlowFilterRunner;
@@ -79,7 +80,7 @@ public class SerializableTest {
 	@Test
 	public void testSyncCollectionOptions() throws IOException {
 		SyncCollectionOptions obj = new SyncCollectionOptions();
-		obj.addBodyPreference(new BodyPreference.Builder().build());
+		obj.setBodyPreferences(ImmutableList.of(new BodyPreference.Builder().build()));
 		objectOutputStream.writeObject(obj);
 	}
 	

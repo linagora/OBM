@@ -42,22 +42,22 @@ import javax.naming.NoPermissionException;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
@@ -206,27 +206,21 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
-			Integer collectionId, SyncState state)
-			throws CollectionNotFoundException, ProcessingEmailException,
+	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState state, 
+			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException {
-		DataDelta dataDelta = getChanged(udr, state, filterType, collectionId);
+		
+		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions);
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state,
-			FilterType filterType, Integer collectionId) throws DaoException,
-			CollectionNotFoundException, UnexpectedObmSyncServerException,
-			ProcessingEmailException {
-		return getChanged(udr, state, collectionId);
-	}
-	
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId) 
-			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
+			SyncCollectionOptions syncCollectionOptions) throws UnexpectedObmSyncServerException, 
+			DaoException, CollectionNotFoundException {
 		
-		Integer addressBookId = findAddressBookIdFromCollectionId(udr,collectionId);
-		ContactChanges contactChanges = listContactsChanged(udr,state.getLastSync(), addressBookId);
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
+		ContactChanges contactChanges = listContactsChanged(udr, state.getLastSync(), addressBookId);
 
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
@@ -379,7 +373,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds, SyncCollectionOptions options)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();

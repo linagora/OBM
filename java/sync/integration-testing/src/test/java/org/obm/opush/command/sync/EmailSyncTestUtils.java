@@ -45,16 +45,15 @@ import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -195,11 +194,8 @@ public class EmailSyncTestUtils {
 
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 
-				anyObject(SyncState.class),
-				anyInt(),
-				anyObject(FilterType.class),
-				anyObject(PIMDataType.class)))
-			.andReturn(delta).once();
+				anyObject(SyncCollection.class)))
+		.andReturn(delta).once();
 	}
 
 }

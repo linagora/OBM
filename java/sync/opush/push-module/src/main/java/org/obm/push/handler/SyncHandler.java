@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IBackend;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
@@ -236,8 +236,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(udr, c.getSyncState(), c.getCollectionId(), 
-					c.getOptions().getFilterType(), c.getDataType());
+			delta = contentsExporter.getChanged(udr, c);
 			
 			lastSync = delta.getSyncDate();
 		} else {
@@ -413,8 +412,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
 			} else {
-				List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection.getFetchIds(), syncCollection.getDataType());
-				syncCollectionResponse.setItemChanges(itemChanges);
+				syncCollectionResponse.setItemChanges(
+						contentsExporter.fetch(udr, syncCollection));
 			}
 			identifyNewItems(syncCollectionResponse, st);
 			String newSyncKey = 

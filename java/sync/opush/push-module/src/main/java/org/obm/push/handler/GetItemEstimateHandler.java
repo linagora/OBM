@@ -34,8 +34,8 @@ package org.obm.push.handler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.CollectionPathHelper;
@@ -148,8 +148,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				}
 				
 				int unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);
-				int count = contentsExporter.getItemEstimateSize(udr, state, collectionId, syncCollection.getOptions().getFilterType(), 
-						syncCollection.getDataType());
+				int count = contentsExporter.getItemEstimateSize(udr, state, syncCollection);
 			
 				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
 

@@ -33,12 +33,12 @@ package org.obm.push.backend;
 
 import java.util.List;
 
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -63,21 +63,20 @@ public interface PIMBackend {
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException,
 			ProcessingEmailException, UnsupportedBackendFunctionException;
 	
-	DataDelta getChanged(UserDataRequest udr, SyncState state, FilterType filterType, Integer collectionId) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException;
-
-	List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
-			throws CollectionNotFoundException, DaoException, ProcessingEmailException, UnexpectedObmSyncServerException,
-			ConversionException;
-
-	int getItemEstimateSize(UserDataRequest udr, FilterType filterType, Integer collectionId, SyncState state) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException,
-			ConversionException;
-
 	void emptyFolderContent(UserDataRequest udr, String collectionPath, boolean deleteSubFolder)
 			throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException;
 	
 	PIMDataType getPIMDataType();
+
+	List<ItemChange> fetch(UserDataRequest udr, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions) 
+			throws ProcessingEmailException, CollectionNotFoundException, 
+			DaoException, UnexpectedObmSyncServerException, ConversionException;
+
+	DataDelta getChanged(UserDataRequest udr, SyncState syncState, Integer collectionId,
+			SyncCollectionOptions options) throws DaoException, CollectionNotFoundException, 
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
 	
+	int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState syncState, 
+			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
+			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
 }

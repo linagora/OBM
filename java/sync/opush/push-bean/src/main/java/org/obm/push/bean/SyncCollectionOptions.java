@@ -32,11 +32,12 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class SyncCollectionOptions implements Serializable {
 	
@@ -48,13 +49,17 @@ public class SyncCollectionOptions implements Serializable {
 	private Integer conflict;
 	private Boolean deletesAsMoves;
 	private FilterType filterType;
-	private Map<MSEmailBodyType, BodyPreference> bodyPreferences;
+	private List<BodyPreference> bodyPreferences;
+	
+	public SyncCollectionOptions(List<BodyPreference> bodyPreferences) {
+		this.bodyPreferences = bodyPreferences;
+		this.conflict = 1;
+		this.truncation = SYNC_TRUNCATION_ALL;
+		this.deletesAsMoves = true;
+	}
 	
 	public SyncCollectionOptions() {
-		conflict = 1;
-		truncation = SYNC_TRUNCATION_ALL;
-		deletesAsMoves = true;
-		this.bodyPreferences = new HashMap<MSEmailBodyType, BodyPreference>();
+		this(Lists.<BodyPreference>newArrayList());
 	}
 	
 	public Integer getConflict() {
@@ -106,33 +111,25 @@ public class SyncCollectionOptions implements Serializable {
 		this.mimeTruncation = mimeTruncation;
 	}
 	
-	public Map<MSEmailBodyType,BodyPreference> getBodyPreferences() {
-		return bodyPreferences;
+	public void setBodyPreferences(List<BodyPreference> bodyPreferences) {
+		this.bodyPreferences = bodyPreferences;
 	}
 	
-	public BodyPreference getBodyPreference(MSEmailBodyType type) {
-		return bodyPreferences.get(type);
-	}
-
-	public void addBodyPreference(BodyPreference bodyPreference) {
-		this.bodyPreferences.put(bodyPreference.getType(), bodyPreference);
-	}
-
-	public void setBodyPreferences(List<BodyPreference> bodyPreferences) {
-		for (BodyPreference bodyPreference: bodyPreferences) {
-			addBodyPreference(bodyPreference);
-		}
+	public List<BodyPreference> getBodyPreferences() {
+		return bodyPreferences;
 	}
 	
 	public void initTruncation() {
 		setTruncation(null);
-		Map<MSEmailBodyType, BodyPreference> bodyPreferences = new HashMap<MSEmailBodyType, BodyPreference>();
-		for (BodyPreference bodyPreference: this.bodyPreferences.values()) {
-			MSEmailBodyType type = bodyPreference.getType();
-			bodyPreferences.put(type,
-					new BodyPreference.Builder().allOrNone(bodyPreference.isAllOrNone()).bodyType(type).build());
-		}
-		this.bodyPreferences = bodyPreferences;
+		Iterable<BodyPreference> bp = Iterables.transform(this.bodyPreferences, new Function<BodyPreference, BodyPreference>() {
+			@Override
+			public BodyPreference apply(BodyPreference input) {
+				return new BodyPreference.Builder()
+					.allOrNone(input.isAllOrNone())
+					.bodyType(input.getType()).build();
+			}
+		});
+		this.bodyPreferences = Lists.newArrayList(bp);
 	}
 	
 	@Override
