@@ -68,6 +68,4 @@ public interface PrivateMailboxService {
 			throws MailException;
 
 	UIDEnvelope fetchEnvelope(BackendSession bs, String collectionPath, long uid) throws MailException;
-	
-	public InputStream findAttachment(BackendSession bs, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 }

@@ -29,34 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.mail.conversion;
+package org.minig.imap;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import net.fortuna.ical4j.data.ParserException;
-
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
-import org.obm.icalendar.ICalendar;
-import org.obm.mail.conversation.EmailView;
-import org.obm.mail.conversation.EmailViewAttachment;
-import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
 
 import com.google.common.collect.Lists;
 
+
 public class EmailViewTest {
+
 
 	@Test(expected=IllegalStateException.class)
 	public void testUidDefault() {
@@ -199,98 +188,8 @@ public class EmailViewTest {
 		emailView.getFlags().add(Flag.DELETED);
 	}
 	
-	@Test
-	public void testAttachments() {
-		EmailViewAttachment emailViewAttachment = anyEmailViewAttachment("id");
-		List<EmailViewAttachment> attachments = Lists.newArrayList(emailViewAttachment);
-		
-		EmailView emailView = new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePart(anyBodyMimePart())
-			.bodyMimePartData(anyBodyMimePartData())
-			.flags(Lists.newArrayList(Flag.ANSWERED))
-			.uid(155)
-			.attachments(attachments)
-			.build();
-		
-		Assertions.assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
-	}
-	
-	@Test(expected=UnsupportedOperationException.class)
-	public void testAttachmentsIsImmutable() {
-		List<EmailViewAttachment> attachments = Lists.newArrayList(anyEmailViewAttachment("id"));
-		
-		EmailView emailView = new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePart(anyBodyMimePart())
-			.bodyMimePartData(anyBodyMimePartData())
-			.flags(Lists.newArrayList(Flag.ANSWERED))
-			.uid(155)
-			.attachments(attachments)
-			.build();
-		
-		emailView.getAttachments().add(anyEmailViewAttachment("id2"));
-	}
-	
-	@Test
-	public void testAttachmentsNotLinkedToCollectionArg() {
-		EmailViewAttachment emailViewAttachment = anyEmailViewAttachment("id");
-		List<EmailViewAttachment> attachments = Lists.newArrayList(emailViewAttachment);
-		
-		EmailView emailView = new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePart(anyBodyMimePart())
-			.bodyMimePartData(anyBodyMimePartData())
-			.flags(Lists.newArrayList(Flag.ANSWERED))
-			.uid(155)
-			.attachments(attachments)
-			.build();
-		
-		attachments.add(anyEmailViewAttachment("id2"));
-		
-		Assertions.assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
-	}
-	
-	@Test
-	public void testICalendar() throws IOException, ParserException {
-		ICalendar iCalendar = anyICalendar("attendee.ics");
-		
-		EmailView emailView = new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePart(anyBodyMimePart())
-			.bodyMimePartData(anyBodyMimePartData())
-			.flags(Lists.newArrayList(Flag.ANSWERED))
-			.uid(155)
-			.iCalendar(iCalendar)
-			.build();
-		
-		Assertions.assertThat(emailView.getICalendar()).equals(iCalendar);
-	}
-	
-	@Test
-	public void testInvitationType() {
-		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;
-		
-		EmailView emailView = new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePart(anyBodyMimePart())
-			.bodyMimePartData(anyBodyMimePartData())
-			.flags(Lists.newArrayList(Flag.ANSWERED))
-			.uid(155)
-			.invitationType(invitationType)
-			.build();
-		
-		Assertions.assertThat(emailView.getInvitationType()).equals(invitationType);
-	}
-	
-	private ContentType buildContentType(String contentType) {
-		return new ContentType.Builder().contentType(contentType).build();
-	}
-	
 	private IMimePart anyBodyMimePart() {
-		IMimePart mimePart = new MimePart();
-		mimePart.setContentType(buildContentType("text/plain;"));
-		return mimePart;
+		return new MimePart();
 	}
 	
 	private InputStream anyBodyMimePartData() {
@@ -305,17 +204,5 @@ public class EmailViewTest {
 			.date(DateUtils.date("2004-12-14T22:00:00"))
 			.build();
 		return envelope;
-	}
-	
-	private EmailViewAttachment anyEmailViewAttachment(String id) {
-		return new EmailViewAttachment(id, "Name", "/file", 20);
-	}
-	
-	private ICalendar anyICalendar(String filename) throws IOException, ParserException {
-		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFile/" + filename);
-		if (in == null) {
-			Assert.fail("Cannot load " + filename);
-		}
-		return new ICalendar.Builder().inputStream(in).build();	
 	}
 }

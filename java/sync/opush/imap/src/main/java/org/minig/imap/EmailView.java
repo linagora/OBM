@@ -29,26 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.mail.conversation;
+package org.minig.imap;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.Flag;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
-import org.obm.icalendar.ICalendar;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public class EmailView {
+
+	private final long uid;
+	private final Collection<Flag> flags;
+	private final Envelope envelope;
+	private final InputStream bodyMimePartData;
+	private final IMimePart bodyMimePart;
+	private final Integer bodyTruncation;
+	private final ContentType bodyContentType;
 
 	public static class Builder {
 
@@ -58,9 +62,6 @@ public class EmailView {
 		private InputStream bodyMimePartData;
 		private IMimePart bodyMimePart;
 		private Integer bodyTruncation;
-		private List<EmailViewAttachment> attachments;
-		private ICalendar iCalendar;
-		private EmailViewInvitationType invitationType;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
@@ -92,23 +93,6 @@ public class EmailView {
 			return this;
 		}
 		
-		public Builder attachments(List<EmailViewAttachment> attachments) {
-			if (attachments != null) {
-				this.attachments = ImmutableList.<EmailViewAttachment>builder().addAll(attachments).build();
-			}
-			return this;
-		}
-		
-		public Builder iCalendar(ICalendar iCalendar) {
-			this.iCalendar = iCalendar;
-			return this;
-		}
-		
-		public Builder invitationType(EmailViewInvitationType invitationType) {
-			this.invitationType = invitationType;
-			return this;
-		}
-		
 		public EmailView build() {
 			Preconditions.checkState(uid != null, "The uid is required");
 			Preconditions.checkState(envelope != null, "The envelope is required");
@@ -119,35 +103,19 @@ public class EmailView {
 				this.flags = ImmutableSet.<Flag>of();
 			}
 			
-			return new EmailView(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation, attachments, iCalendar, invitationType);
+			return new EmailView(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation);
 		}
 		
 	}
 	
-	private final long uid;
-	private final Collection<Flag> flags;
-	private final Envelope envelope;
-	private final InputStream bodyMimePartData;
-	private final IMimePart bodyMimePart;
-	private final Integer bodyTruncation;
-	private final ContentType bodyContentType;
-	private final List<EmailViewAttachment> attachments;
-	private final ICalendar iCalendar;
-	private final EmailViewInvitationType invitationType;
-
 	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
-			InputStream bodyMimePartData, IMimePart bodyMimePart, Integer bodyTruncation, 
-			List<EmailViewAttachment> attachments, ICalendar iCalendar, EmailViewInvitationType invitationType) {
-		
+			InputStream bodyMimePartData, IMimePart bodyMimePart, Integer bodyTruncation) {
 		this.uid = uid;
 		this.flags = flags;
 		this.envelope = envelope;
 		this.bodyMimePartData = bodyMimePartData;
 		this.bodyMimePart = bodyMimePart;
 		this.bodyTruncation = bodyTruncation;
-		this.attachments = attachments;
-		this.iCalendar = iCalendar;
-		this.invitationType = invitationType;
 		this.bodyContentType = new ContentType.Builder()
 			.primaryType(bodyMimePart.getPrimaryType())
 			.subType(bodyMimePart.getSubtype())
@@ -202,54 +170,31 @@ public class EmailView {
 		return bodyContentType;
 	}
 
-	public List<EmailViewAttachment> getAttachments() {
-		return attachments;
-	}
-
-	public ICalendar getICalendar() {
-		return iCalendar;
-	}
-
-	public EmailViewInvitationType getInvitationType() {
-		return invitationType;
-	}
-	
-	@Override
-	public int hashCode(){
-		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, bodyMimePart, bodyTruncation, bodyContentType, attachments, iCalendar, invitationType);
-	}
-	
-	@Override
-	public boolean equals(Object object){
-		if (object instanceof EmailView) {
-			EmailView that = (EmailView) object;
-			return Objects.equal(this.uid, that.uid)
-				&& Objects.equal(this.flags, that.flags)
-				&& Objects.equal(this.envelope, that.envelope)
-				&& Objects.equal(this.bodyMimePartData, that.bodyMimePartData)
-				&& Objects.equal(this.bodyMimePart, that.bodyMimePart)
-				&& Objects.equal(this.bodyTruncation, that.bodyTruncation)
-				&& Objects.equal(this.bodyContentType, that.bodyContentType)
-				&& Objects.equal(this.attachments, that.attachments)
-				&& Objects.equal(this.iCalendar, that.iCalendar)
-				&& Objects.equal(this.invitationType, that.invitationType);
-		}
-		return false;
-	}
-
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("uid", uid)
 			.add("flags", flags)
-			.add("envelope", envelope)
 			.add("bodyMimePartData", bodyMimePartData)
 			.add("bodyMimePart", bodyMimePart)
 			.add("bodyTruncation", bodyTruncation)
-			.add("bodyContentType", bodyContentType)
-			.add("attachments", attachments)
-			.add("iCalendar", iCalendar)
-			.add("invitationType", invitationType)
 			.toString();
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(flags, bodyMimePart, bodyTruncation);
+	}
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof EmailView) {
+			EmailView other = (EmailView) obj;
+			return new EqualsBuilder()
+				.append(flags, other.flags)
+				.append(bodyMimePart, other.bodyMimePart)
+				.append(bodyTruncation, other.bodyTruncation)
+				.isEquals();
+		}
+		return false;
 	}
 }

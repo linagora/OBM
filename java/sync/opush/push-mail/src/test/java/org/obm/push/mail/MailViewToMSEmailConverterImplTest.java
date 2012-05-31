@@ -33,37 +33,31 @@ package org.obm.push.mail;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import net.fortuna.ical4j.data.ParserException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.minig.imap.Address;
+import org.minig.imap.EmailView;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
-import org.obm.icalendar.ICalendar;
-import org.obm.mail.conversation.EmailView;
-import org.obm.mail.conversation.EmailViewAttachment;
-import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+
 
 public class MailViewToMSEmailConverterImplTest {
 
@@ -83,10 +77,6 @@ public class MailViewToMSEmailConverterImplTest {
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 		Integer bodyTruncationSize = null;
 		ContentType bodyContentType = new ContentType.Builder().contentType("text/plain").build();
-		List<EmailViewAttachment> attachments = ImmutableList.<EmailViewAttachment> of(new EmailViewAttachment("id", subject, "file", 20));
-		InputStream attachmentInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFile/attendee.ics");
-		ICalendar iCalendar = null;
-		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;
 	}
 
 	private EmailViewFixture emailViewFixture;
@@ -97,7 +87,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testFlagAnsweredPresent() throws IOException, ParserException {
+	public void testFlagAnsweredPresent() {
 		emailViewFixture.answered = true;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -106,7 +96,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testFlagAnsweredNotPresent() throws IOException, ParserException {
+	public void testFlagAnsweredNotPresent() {
 		emailViewFixture.answered = false;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -115,7 +105,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testFlagStarredPresent() throws IOException, ParserException {
+	public void testFlagStarredPresent() {
 		emailViewFixture.starred = true;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -124,7 +114,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testFlagStarredNotPresent() throws IOException, ParserException {
+	public void testFlagStarredNotPresent() {
 		emailViewFixture.starred = false;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -133,7 +123,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testFlagReadPresent() throws IOException, ParserException {
+	public void testFlagReadPresent() {
 		emailViewFixture.read = true;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -142,7 +132,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testFlagReadNotPresent() throws IOException, ParserException {
+	public void testFlagReadNotPresent() {
 		emailViewFixture.read = false;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -151,7 +141,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testUid() throws IOException, ParserException {
+	public void testUid() {
 		emailViewFixture.uid = 54;
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -160,7 +150,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderFromNull() throws IOException, ParserException {
+	public void testHeaderFromNull() {
 		emailViewFixture.from = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -169,7 +159,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderFromEmpty() throws IOException, ParserException {
+	public void testHeaderFromEmpty() {
 		emailViewFixture.from = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -178,7 +168,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderFromSingle() throws IOException, ParserException {
+	public void testHeaderFromSingle() {
 		emailViewFixture.from = ImmutableList.<Address>of(new Address("from@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -187,7 +177,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderFromMultiple() throws IOException, ParserException {
+	public void testHeaderFromMultiple() {
 		emailViewFixture.from = ImmutableList.<Address>of(
 				new Address("from@domain.test"), new Address("from2@domain.test")); 
 
@@ -198,7 +188,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderToNull() throws IOException, ParserException {
+	public void testHeaderToNull() {
 		emailViewFixture.to = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -207,7 +197,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderToEmpty() throws IOException, ParserException {
+	public void testHeaderToEmpty() {
 		emailViewFixture.to = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -216,7 +206,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderToSingle() throws IOException, ParserException {
+	public void testHeaderToSingle() {
 		emailViewFixture.to = ImmutableList.<Address>of(new Address("to@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -225,7 +215,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderToMultiple() throws IOException, ParserException {
+	public void testHeaderToMultiple() {
 		emailViewFixture.to = ImmutableList.<Address>of(
 				new Address("to@domain.test"), new Address("to2@domain.test")); 
 
@@ -236,7 +226,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderCcNull() throws IOException, ParserException {
+	public void testHeaderCcNull() {
 		emailViewFixture.cc = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -245,7 +235,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	@Test
-	public void testHeaderCcEmpty() throws IOException, ParserException {
+	public void testHeaderCcEmpty() {
 		emailViewFixture.cc = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -254,7 +244,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderCcSingle() throws IOException, ParserException {
+	public void testHeaderCcSingle() {
 		emailViewFixture.cc = ImmutableList.<Address>of(new Address("cc@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -263,7 +253,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderCcMultiple() throws IOException, ParserException {
+	public void testHeaderCcMultiple() {
 		emailViewFixture.cc = ImmutableList.<Address>of(
 				new Address("cc@domain.test"), new Address("cc2@domain.test")); 
 
@@ -274,7 +264,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderSubjectNull() throws IOException, ParserException {
+	public void testHeaderSubjectNull() {
 		emailViewFixture.subject = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -283,7 +273,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderSubjectEmpty() throws IOException, ParserException {
+	public void testHeaderSubjectEmpty() {
 		emailViewFixture.subject = "";
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -292,7 +282,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderSubject() throws IOException, ParserException {
+	public void testHeaderSubject() {
 		emailViewFixture.subject = "a subject";
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -301,7 +291,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderDateNull() throws IOException, ParserException {
+	public void testHeaderDateNull() {
 		emailViewFixture.date = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -310,7 +300,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testHeaderDate() throws IOException, ParserException {
+	public void testHeaderDate() {
 		emailViewFixture.date = DateUtils.date("2004-12-14T22:00:00");
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -319,7 +309,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testBodyNoTruncation() throws IOException, ParserException {
+	public void testBodyNoTruncation() {
 		emailViewFixture.bodyTruncationSize = null;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -328,7 +318,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testBodyTruncationValue() throws IOException, ParserException {
+	public void testBodyTruncationValue() {
 		emailViewFixture.bodyTruncationSize = 1512;
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -337,7 +327,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testBodyContentTypePlainText() throws IOException, ParserException {
+	public void testBodyContentTypePlainText() {
 		emailViewFixture.bodyContentType = new ContentType.Builder().contentType("text/plain").build();
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -345,72 +335,11 @@ public class MailViewToMSEmailConverterImplTest {
 		assertThat(convertedMSEmail.getBody().getBodyType()).isEqualTo(MSEmailBodyType.PlainText);
 	}
 
-	@Test
-	public void testWithoutAttachments() throws IOException, ParserException {
-		emailViewFixture.attachments = null;
-		
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getAttachements()).isEmpty();
-	}
-	
-	@Test
-	public void testAttachments() throws IOException, ParserException {
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getAttachements()).hasSize(1);
-	}
-
-	@Test
-	public void testWithoutMeetingRequest() throws IOException, ParserException {
-		emailViewFixture.attachmentInputStream = null;
-		
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getMeetingRequest()).isNull();
-	}
-	
-	@Test
-	public void testMeetingRequest() throws IOException, ParserException {
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getMeetingRequest()).isNotNull();
-	}
-	
-	@Test
-	public void testNoteMessageClass() throws IOException, ParserException {
-		emailViewFixture.attachmentInputStream = null;
-		
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.NOTE);
-	}
-	
-	@Test
-	public void testRequestedMessageClass() throws IOException, ParserException {
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.SCHEDULE_MEETING_REQUEST);
-	}
-	
-	@Test
-	public void testCanceledMessageClass() throws IOException, ParserException {
-		emailViewFixture.invitationType = EmailViewInvitationType.CANCELED;
-		
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.SCHEDULE_MEETING_REQUEST);
-	}
-	
-	private MSEmail makeConvertionFromEmailViewFixture() throws IOException, ParserException {
+	private MSEmail makeConvertionFromEmailViewFixture() {
 		return new MailViewToMSEmailConverterImpl().convert(newEmailViewFromFixture());
 	}
 	
-	private EmailView newEmailViewFromFixture() throws IOException, ParserException {
-		if (emailViewFixture.attachmentInputStream != null) {
-			emailViewFixture.iCalendar = new ICalendar.Builder().inputStream(emailViewFixture.attachmentInputStream).build();
-		}
-		
+	private EmailView newEmailViewFromFixture() {
 		return new EmailView.Builder()
 			.uid(emailViewFixture.uid)
 			.flags(flagsListFromFixture())
@@ -418,9 +347,6 @@ public class MailViewToMSEmailConverterImplTest {
 			.bodyMimePart(bodyMimePartFromFixture())
 			.bodyMimePartData(emailViewFixture.bodyData)
 			.bodyTruncation(emailViewFixture.bodyTruncationSize)
-			.attachments(emailViewFixture.attachments)
-			.iCalendar(emailViewFixture.iCalendar)
-			.invitationType(null)
 			.build();
 	}
 
