@@ -28,6 +28,8 @@ ALTER TABLE opush_event_mapping ADD COLUMN event_ext_id_hash binary(20);
 UPDATE opush_event_mapping SET event_ext_id_hash = UNHEX(SHA1(event_ext_id));
 ALTER TABLE opush_event_mapping MODIFY event_ext_id_hash binary(20) NOT NULL;
 CREATE UNIQUE INDEX opush_event_mapping_device_id_event_ext_id_fkey ON opush_event_mapping (device_id, event_ext_id_hash);
+CREATE TRIGGER opush_event_mapping_event_ext_id_hash_create_trigger BEFORE INSERT ON opush_event_mapping FOR EACH ROW SET NEW.event_ext_id_hash = UNHEX(SHA1(NEW.event_ext_id));
+CREATE TRIGGER opush_event_mapping_event_ext_id_hash_update_trigger BEFORE UPDATE ON opush_event_mapping FOR EACH ROW SET NEW.event_ext_id_hash = UNHEX(SHA1(NEW.event_ext_id));
 
 ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);
 
