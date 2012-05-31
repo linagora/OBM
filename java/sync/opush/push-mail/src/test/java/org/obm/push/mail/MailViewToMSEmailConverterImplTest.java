@@ -74,16 +74,16 @@ public class MailViewToMSEmailConverterImplTest {
 		boolean read = false;
 		boolean starred = false;
 		
-		List<Address> from = ImmutableList.of(new Address("from@domain.test")); 
-		List<Address> to = ImmutableList.of(new Address("to@domain.test")); 
-		List<Address> cc = ImmutableList.of(new Address("cc@domain.test"));
+		List<Address> from = ImmutableList.<Address>of(new Address("from@domain.test")); 
+		List<Address> to = ImmutableList.<Address>of(new Address("to@domain.test")); 
+		List<Address> cc = ImmutableList.<Address>of(new Address("cc@domain.test"));
 		String subject = "a subject";
 		Date date = DateUtils.date("2004-12-14T22:00:00");
 
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 		Integer bodyTruncationSize = null;
 		ContentType bodyContentType = new ContentType.Builder().contentType("text/plain").build();
-		List<EmailViewAttachment> attachments = ImmutableList.of(new EmailViewAttachment("id", subject, "file", 20));
+		List<EmailViewAttachment> attachments = ImmutableList.<EmailViewAttachment> of(new EmailViewAttachment("id", subject, "file", 20));
 		InputStream attachmentInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFile/attendee.ics");
 		ICalendar iCalendar = null;
 		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;
@@ -170,7 +170,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 	@Test
 	public void testHeaderFromEmpty() throws IOException, ParserException {
-		emailViewFixture.from = ImmutableList.of(newEmptyAddress());
+		emailViewFixture.from = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -179,7 +179,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderFromSingle() throws IOException, ParserException {
-		emailViewFixture.from = ImmutableList.of(new Address("from@domain.test")); 
+		emailViewFixture.from = ImmutableList.<Address>of(new Address("from@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -188,7 +188,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderFromMultiple() throws IOException, ParserException {
-		emailViewFixture.from = ImmutableList.of(
+		emailViewFixture.from = ImmutableList.<Address>of(
 				new Address("from@domain.test"), new Address("from2@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -208,7 +208,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 	@Test
 	public void testHeaderToEmpty() throws IOException, ParserException {
-		emailViewFixture.to = ImmutableList.of(newEmptyAddress());
+		emailViewFixture.to = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -217,7 +217,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderToSingle() throws IOException, ParserException {
-		emailViewFixture.to = ImmutableList.of(new Address("to@domain.test")); 
+		emailViewFixture.to = ImmutableList.<Address>of(new Address("to@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -226,7 +226,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderToMultiple() throws IOException, ParserException {
-		emailViewFixture.to = ImmutableList.of(
+		emailViewFixture.to = ImmutableList.<Address>of(
 				new Address("to@domain.test"), new Address("to2@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
@@ -246,7 +246,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 	@Test
 	public void testHeaderCcEmpty() throws IOException, ParserException {
-		emailViewFixture.cc = ImmutableList.of(newEmptyAddress());
+		emailViewFixture.cc = ImmutableList.<Address>of(newEmptyAddress());
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -255,7 +255,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderCcSingle() throws IOException, ParserException {
-		emailViewFixture.cc = ImmutableList.of(new Address("cc@domain.test")); 
+		emailViewFixture.cc = ImmutableList.<Address>of(new Address("cc@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
@@ -264,7 +264,7 @@ public class MailViewToMSEmailConverterImplTest {
 	
 	@Test
 	public void testHeaderCcMultiple() throws IOException, ParserException {
-		emailViewFixture.cc = ImmutableList.of(
+		emailViewFixture.cc = ImmutableList.<Address>of(
 				new Address("cc@domain.test"), new Address("cc2@domain.test")); 
 
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();

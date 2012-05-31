@@ -40,7 +40,6 @@ import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,13 +74,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.io.Resources;
 
 @RunWith(SlowFilterRunner.class)
 public class EmailViewPartsFetcherImplTest {
 
 	public static class MessageFixture {
-
 		long uid = 1l;
 		
 		boolean answered = false;
@@ -103,7 +100,7 @@ public class EmailViewPartsFetcherImplTest {
 		String contentId = "contentId";
 		boolean isAttachment = true;
 		boolean isInvitation = true;
-		InputStream attachmentInputStream;
+		InputStream attachmentInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFile/attendee.ics");
 	}
 	
 	private MessageFixture messageFixture;
@@ -115,7 +112,7 @@ public class EmailViewPartsFetcherImplTest {
 	private MimeAddress mimeAddress;
 
 	@Before
-	public void setUp() throws IOException {
+	public void setUp() {
 		mailbox = "to@localhost.com";
 		password = "password";
 		bs = new BackendSession(
@@ -123,7 +120,6 @@ public class EmailViewPartsFetcherImplTest {
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		
 		messageFixture = new MessageFixture();
-		messageFixture.attachmentInputStream = Resources.getResource("ics/attendee.ics").openStream();
 		messageCollectionName = IMAP_INBOX_NAME;
 		messageCollectionId = 1;
 		mimeAddress = new MimeAddress("address");
