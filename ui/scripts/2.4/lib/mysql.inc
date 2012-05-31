@@ -71,18 +71,19 @@ class DB {
     
       $this->link=mysql_pconnect($this->object->host, $this->object->user, $this->object->password);
       if (!$this->link) {
-        throw new MySQLException("PConnect(".$this->object->host.", ".$this->object->user.", ".$this->object->password.") failed.");
+        $this->halt("pconnect(".$this->object->host.", ".$this->object->user.", ".$this->object->password.") failed.");
+        return 0;
       }
 
       if (!@mysql_select_db($this->object->database,$this->link)) {
-        throw new MySQLException("Cannot use database ".$this->object->database);
+        $this->halt("cannot use database ".$this->object->database);
         return 0;
       }
     }
     return $this->link;
   }
 
-  function query($Query_String) {
+  function query($Query_String, $hide_error="") {
     if ($Query_String == "")
       return 0;
     if (!$this->connect()) {
@@ -100,7 +101,12 @@ class DB {
     $this->error = mysql_error();
 
     if (!$this->queryId) {
-      throw new MySQLQueryException($Query_String.": ".$this->errno." (".$this->error.")");
+      // Added test (! $hide_error) - Aliacom - PB
+      if ($hide_error) {
+	return "obm:".$this->error;
+      } else {
+	$this->halt("Invalid SQL: ".$Query_String);
+      }
     }
 
     # Will return nada if it fails. That's fine.
@@ -110,7 +116,8 @@ class DB {
   /* public: walk result set */
   function next_record() {
     if (!$this->queryId) {
-      throw new MySQLException("next_record called with no query pending.");
+      $this->halt("next_record called with no query pending.");
+      return 0;
     }
     $this->record = @mysql_fetch_array($this->queryId, MYSQL_BOTH);
     $this->current   += 1;
@@ -161,6 +168,20 @@ class DB {
     $this->query('SELECT LAST_INSERT_ID() as id');
     $this->next_record();
     return $this->f('id');
+  }
+
+  /* private: error handling */
+  function halt($msg) {
+    $this->error = @mysql_error($this->link);
+    $this->errno = @mysql_errno($this->link);
+    $this->haltmsg($msg);
+  }
+
+  function haltmsg($msg) {
+    printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
+    printf("<b>MySQL error</b>: %s (%s)<br>\n",
+      $this->errno,
+      $this->error);
   }
 
   function begin() {
@@ -334,11 +355,5 @@ class DB {
     $int = current($args);
     return (is_numeric($int))?(int)$int:'NULL';
   }
-}
-
-class MySQLException extends Exception {
-}
-
-class MySQLQueryException extends MySQLException {
 }
 ?>
