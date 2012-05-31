@@ -38,6 +38,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.DatabaseConnectionProvider;
 
@@ -68,6 +70,7 @@ public class GuiceServletContextListener implements ServletContextListener{
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
+               bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
                bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
             }
         }, new TransactionalModule());
