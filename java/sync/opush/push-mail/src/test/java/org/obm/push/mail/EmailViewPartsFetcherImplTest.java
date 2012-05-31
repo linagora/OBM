@@ -103,9 +103,11 @@ public class EmailViewPartsFetcherImplTest {
 		String bodyCharset = Charsets.UTF_8.displayName();
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 		String contentId = "contentId";
-		boolean isAttachment = true;
-		boolean isInvitation = true;
 		InputStream attachmentInputStream;
+		boolean isAttachment = false;
+		boolean isInvitation = false;
+
+		String encoding = null;
 	}
 	
 	private MessageFixture messageFixture;
@@ -389,6 +391,7 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testAttachment() throws Exception {
+		messageFixture.isAttachment = true;
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
 		assertThat(emailView.getAttachments()).hasSize(1);
@@ -397,18 +400,10 @@ public class EmailViewPartsFetcherImplTest {
 	}
 	
 	@Test
-	public void testWithoutInvitation() throws Exception {
-		messageFixture.attachmentInputStream = null;
-		messageFixture.isInvitation = false;
-		
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getICalendar()).isNull();
-		assertThat(emailView.getInvitationType()).isNull();
-	}
-	
-	@Test
 	public void testInvitation() throws Exception {
+		messageFixture.isAttachment = true;
+		messageFixture.isInvitation = true;
+		
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
 		assertThat(emailView.getICalendar()).isNotNull();
@@ -423,6 +418,32 @@ public class EmailViewPartsFetcherImplTest {
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
 		assertThat(emailView.getContentType().getFullMimeType()).equals(mimeType);
+	}
+
+	@Test
+	public void testInvitationInBASE64() throws Exception {
+		messageFixture.isAttachment = true;
+		messageFixture.isInvitation = true;
+		messageFixture.encoding = "BASE64";
+		messageFixture.attachmentInputStream = Resources.getResource("ics/base64.ics").openStream();
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
+
+		assertThat(emailView.getICalendar()).isNotNull();
+		assertThat(emailView.getICalendar().getICalendar()).contains("DESCRIPTION:Encoding Invitation to BASE64 !");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testInvitationInBadEncodingFormat() throws Exception {
+		messageFixture.isAttachment = true;
+		messageFixture.isInvitation = true;
+		messageFixture.encoding = "Bit7";
+		messageFixture.attachmentInputStream = Resources.getResource("ics/base64.ics").openStream();
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
+
+		assertThat(emailView.getICalendar()).isNotNull();
+		assertThat(emailView.getICalendar().getICalendar()).contains("DESCRIPTION:Encoding Invitation to BASE64 !");
 	}
 	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
@@ -489,7 +510,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
 		expect(mimePart.getFullMimeType()).andReturn(messageFixture.fullMimeType).anyTimes();
-		expect(mimePart.getContentTransfertEncoding()).andReturn(null);
+		expect(mimePart.getContentTransfertEncoding()).andReturn(messageFixture.encoding).anyTimes();
 		expect(mimePart.getSize()).andReturn(20);
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
 		expect(mimePart.isCancelInvitation()).andReturn(false);
