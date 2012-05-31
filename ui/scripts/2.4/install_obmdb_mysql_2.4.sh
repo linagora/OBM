@@ -64,7 +64,7 @@ test $? -eq 0 || {
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db 
 
 
-mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+mysql -u ${user} -p$pw ${db} \
   < "updates/update-2.4.1~alpha6.mysql.sql" >> /tmp/data_insert.log 2>&1
 
 ./update-2.4.0-2.4.1~alpha9+git.mysql.sh
