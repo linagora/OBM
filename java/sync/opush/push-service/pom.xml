@@ -88,9 +88,5 @@
 			<artifactId>locator</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert-core</artifactId>
-		</dependency>
 	</dependencies>
 </project>

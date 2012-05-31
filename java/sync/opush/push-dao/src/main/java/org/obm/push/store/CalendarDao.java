@@ -39,7 +39,7 @@ import org.obm.sync.calendar.EventExtId;
 
 public interface CalendarDao {
 	
-	void insertExtIdMSEventUidMapping(EventExtId eventExtId, MSEventUid msEventUid, Device device, byte[] hashedExtId) throws DaoException;
+	void insertExtIdMSEventUidMapping(EventExtId eventExtId, MSEventUid msEventUid, Device device) throws DaoException;
 	
 	EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException;
 	
