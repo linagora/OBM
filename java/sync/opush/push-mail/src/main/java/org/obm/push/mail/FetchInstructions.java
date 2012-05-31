@@ -53,13 +53,12 @@ public class FetchInstructions {
 			this.truncation = truncation;
 			return this;
 		}
-
+		
 		public FetchInstructions build() {
 			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
 			return new FetchInstructions(
 					this.mimePart, this.truncation);
 		}
-
 	}
 	
 	private final IMimePart mimePart;

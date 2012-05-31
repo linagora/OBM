@@ -33,18 +33,15 @@ package org.obm.push.bean;
 
 import java.util.Map;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 
 public enum MSEmailBodyType {
 	
-	PlainText(1, "text/plain"), HTML(2, "text/html"), RTF(3, "text/rtf"), MIME(4, "message/rfc822");
+	PlainText(1), HTML(2), RTF(3), MIME(4);
 
 	private final int xmlValue;
-	private final String mimeType;
-	
 	private static Map<Integer, MSEmailBodyType> values;
 	static {
 		Builder<Integer, MSEmailBodyType> builder = ImmutableMap.builder();
@@ -54,37 +51,18 @@ public enum MSEmailBodyType {
 		values = builder.build();
 	}
 	
-	private static Map<String, MSEmailBodyType> mimeTypeMap;
-	static {
-		Builder<String, MSEmailBodyType> builder = ImmutableMap.builder();
-		for (MSEmailBodyType type: values()) {
-			builder.put(type.getMimeType(), type);
-		}
-		mimeTypeMap = builder.build();
-	}
-	
-	private MSEmailBodyType(int xmlValue, String mimeType) {
+	private MSEmailBodyType(int xmlValue) {
 		this.xmlValue = xmlValue;
-		this.mimeType = mimeType;
 	}
 	
 	public int asXmlValue() {
 		return xmlValue;
 	}
 	
-	public String getMimeType() {
-		return mimeType;
-	}
-
 	public static final MSEmailBodyType getValueOf(Integer xmlValue) {
 		if (xmlValue == null) {
 			return null;
 		}
 		return values.get(xmlValue);
-	}
-	
-	public static final MSEmailBodyType fromMimeType(String mimeType) {
-		Preconditions.checkNotNull(mimeType);
-		return mimeTypeMap.get(mimeType);
 	}
 }

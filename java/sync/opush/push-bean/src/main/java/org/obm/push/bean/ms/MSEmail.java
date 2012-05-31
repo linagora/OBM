@@ -45,6 +45,7 @@ import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
+import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -62,6 +63,8 @@ public class MSEmail implements IApplicationData, Serializable {
 		private MSMeetingRequest meetingRequest;
 		private MSMessageClass messageClass;
 		private MSImportance importance;
+
+		private SerializableInputStream mimeData;
 		
 		private boolean read;
 		private boolean starred;
@@ -113,6 +116,11 @@ public class MSEmail implements IApplicationData, Serializable {
 			return this;
 		}
 		
+		public MSEmailBuilder mimeData(SerializableInputStream mimeData) {
+			this.mimeData = mimeData;
+			return this;
+		}
+		
 		public MSEmailBuilder read(boolean read) {
 			this.read = read;
 			return this;
@@ -138,7 +146,7 @@ public class MSEmail implements IApplicationData, Serializable {
 				importance = MSImportance.NORMAL;
 			}
 			return new MSEmail(uid, header, body, attachements, meetingRequest, messageClass,
-					importance, forwardMessage, read, starred, answered);
+					importance, forwardMessage, mimeData, read, starred, answered);
 		}
 	}
 	
@@ -156,6 +164,8 @@ public class MSEmail implements IApplicationData, Serializable {
 	private final MSMeetingRequest meetingRequest;
 	private final MSMessageClass messageClass;
 	private final MSImportance importance;
+
+	private final SerializableInputStream mimeData;
 	
 	private final boolean read;
 	private final boolean starred;
@@ -163,7 +173,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachements,
 			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
-			Set<MSEmail> forwardMessage,
+			Set<MSEmail> forwardMessage, SerializableInputStream mimeData,
 			boolean read, boolean starred, boolean answered) {
 		this.uid = uid;
 		this.header = header;
@@ -173,6 +183,7 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.messageClass = messageClass;
 		this.importance = importance;
 		this.forwardMessage = forwardMessage;
+		this.mimeData = mimeData;
 		this.read = read;
 		this.starred = starred;
 		this.answered = answered;
@@ -230,6 +241,10 @@ public class MSEmail implements IApplicationData, Serializable {
 		return importance;
 	}
 
+	public SerializableInputStream getMimeData() {
+		return mimeData;
+	}
+
 	public boolean isRead() {
 		return read;
 	}
@@ -246,7 +261,7 @@ public class MSEmail implements IApplicationData, Serializable {
 	public final int hashCode() {
 		return Objects.hashCode(answered, attachements, header, body, 
 				forwardMessage, importance, meetingRequest, messageClass,
-				read, starred, uid);
+				mimeData, read, starred, uid);
 	}
 	
 	@Override
@@ -262,6 +277,7 @@ public class MSEmail implements IApplicationData, Serializable {
 				.append(importance, other.importance)
 				.append(meetingRequest, other.meetingRequest)
 				.append(messageClass, other.messageClass)
+				.append(mimeData, other.mimeData)
 				.append(read, other.read)
 				.append(starred, other.starred)
 				.append(uid, other.uid)

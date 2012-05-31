@@ -44,13 +44,11 @@ import org.minig.imap.Address;
 import org.minig.imap.EmailView;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.MSAddress;
-import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 
@@ -75,8 +73,6 @@ public class MailViewToMSEmailConverterImplTest {
 		Date date = DateUtils.date("2004-12-14T22:00:00");
 
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
-		Integer bodyTruncationSize = null;
-		ContentType bodyContentType = new ContentType.Builder().contentType("text/plain").build();
 	}
 
 	private EmailViewFixture emailViewFixture;
@@ -307,33 +303,6 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		assertThat(convertedMSEmail.getDate()).isEqualTo(DateUtils.date("2004-12-14T22:00:00"));
 	}
-	
-	@Test
-	public void testBodyNoTruncation() {
-		emailViewFixture.bodyTruncationSize = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getBody().getTruncationSize()).isNull();
-	}
-	
-	@Test
-	public void testBodyTruncationValue() {
-		emailViewFixture.bodyTruncationSize = 1512;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getBody().getTruncationSize()).isEqualTo(1512);
-	}
-	
-	@Test
-	public void testBodyContentTypePlainText() {
-		emailViewFixture.bodyContentType = new ContentType.Builder().contentType("text/plain").build();
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getBody().getBodyType()).isEqualTo(MSEmailBodyType.PlainText);
-	}
 
 	private MSEmail makeConvertionFromEmailViewFixture() {
 		return new MailViewToMSEmailConverterImpl().convert(newEmailViewFromFixture());
@@ -346,7 +315,6 @@ public class MailViewToMSEmailConverterImplTest {
 			.envelope(envelopeFromFixture())
 			.bodyMimePart(bodyMimePartFromFixture())
 			.bodyMimePartData(emailViewFixture.bodyData)
-			.bodyTruncation(emailViewFixture.bodyTruncationSize)
 			.build();
 	}
 
@@ -375,9 +343,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	private IMimePart bodyMimePartFromFixture() {
-		MimePart mimePart = new MimePart();
-		mimePart.setContentType(emailViewFixture.bodyContentType);
-		return mimePart;
+		return new MimePart();
 	}
 
 	public Address newEmptyAddress() {
