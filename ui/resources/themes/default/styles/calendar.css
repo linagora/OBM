@@ -109,6 +109,15 @@
   padding-right: 4px;
 }
 
+.dayMonthLabel > .week {
+  float: left;
+  margin: 1px 0 0 4px;
+  background-color: white;
+  border-radius: 1em;
+  padding: 0 2px;
+  font-size: 0.8em;
+}
+
 .hourPanel {
   width: 4.5em;
 }

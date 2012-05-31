@@ -1511,6 +1511,12 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       $tip_title = $current->localize(Of_Date::OBM_DATE_DAY);
       $date_iso = $current->getDateIso();
       $ts = $current->getTimestamp();
+      $day_number = $current->format("N");
+      $week_widget = "";
+      if ( $day_number == 1 ) { // monday https://obmhost/calendar/calendar_index.php?cal_range=week&date=2012-04-30
+	$week_url = basename($_SERVER['SCRIPT_NAME'])."?cal_range=week&date=".$current->format("Y-m-d");
+	$week_widget = "<span class=\"week\"><a href=\"".$week_url."\">".$current->format("W")."</a></span>";
+      }
       $div_id = "dayContainer_{$d}_{$date_iso}";
       array_push($dayContainer, $div_id); 
       $week_day_left = $step*$width;
@@ -1522,7 +1528,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
       }
       $week_day_event_list .= "
         <div id='$div_id' class='alldayContainer $klass' style='height:$weeks%;width:$width%;left:$week_day_left%;$today'>
-          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'>$day</div>
+          <div id='dayMonthLabel_$date_iso' class='dayMonthLabel'>".$week_widget.$day."</div>
           <div id='allday_$date_iso' class='alldayCell'>
             <div id='more_{$date_iso}' class='calTip' title='$more_title' 
               style='text-align:center;position:absolute;display:none;width:100%;'></div>
