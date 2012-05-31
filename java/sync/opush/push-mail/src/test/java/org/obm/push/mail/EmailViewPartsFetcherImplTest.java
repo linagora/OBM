@@ -446,6 +446,17 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailView.getICalendar().getICalendar()).contains("DESCRIPTION:Encoding Invitation to BASE64 !");
 	}
 	
+	@Test
+	public void testBodyDataInBASE64() throws Exception {
+		messageFixture.encoding = "BASE64";
+		messageFixture.bodyData = StreamMailTestsUtils.newInputStreamFromString("RW5jb2RpbmcgYm9keURhdGEgdG8gQkFTRTY0ICE=");
+
+		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
+
+		assertThat(emailView.getBodyMimePartData()).equals(
+				StreamMailTestsUtils.newInputStreamFromString("Encoding bodyData to BASE64 !"));
+	}
+	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
 		ImapMailboxService mailboxService = createStrictMock(ImapMailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
