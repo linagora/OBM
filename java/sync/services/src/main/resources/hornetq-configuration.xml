@@ -5,10 +5,6 @@
 	<persistence-enabled>true</persistence-enabled>
 	<security-enabled>false</security-enabled>
 
-    <large-messages-directory>/var/lib/obm-sync/jms/data/large-messages</large-messages-directory>
-    <bindings-directory>/var/lib/obm-sync/jms/data/bindings</bindings-directory>
-    <journal-directory>/var/lib/obm-sync/jms/data/journal</journal-directory>
-
 	<connectors>
 		<connector name="in-vm">
 			<factory-class>org.hornetq.core.remoting.impl.invm.InVMConnectorFactory
