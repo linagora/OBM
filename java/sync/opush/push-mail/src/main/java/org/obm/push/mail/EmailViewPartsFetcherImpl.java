@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.IMimePart;
@@ -55,13 +56,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.sun.mail.util.QPDecoderStream;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
-	private final static Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
+	private static final String BASE64 = "BASE64";
+	private static final String QUOTED_PRINTABLE = "QUOTED-PRINTABLE";
+
 	private final PrivateMailboxService privateMailboxService;
-	
 	private final UserDataRequest udr;
 	private final String collectionName;
 	private final Integer collectionId;
@@ -184,8 +187,19 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid)
 			throws MailException, IOException, ParserException {
 
-		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
+		InputStream inputStream = getInvitationInputStream(mp, uid);
 		ICalendar iCalendar = new ICalendar.Builder().inputStream(inputStream).build();
 		emailViewBuilder.iCalendar(iCalendar);
+	}
+
+	private InputStream getInvitationInputStream(IMimePart mp, long uid) throws MailException {
+		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
+		if (QUOTED_PRINTABLE.equals(mp.getContentTransfertEncoding())) {
+			return new QPDecoderStream(inputStream);
+		} else if (BASE64.equals(mp.getContentTransfertEncoding())) {
+			return new Base64InputStream(inputStream);
+		} else {
+			return inputStream;
+		}
 	}
 }
