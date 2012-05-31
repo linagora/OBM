@@ -71,19 +71,8 @@ invoke-rc.d jetty status 3>1
 jetty_status=$?
 
 if [ -d /var/log/opush ]; then 
-    chown -R jetty:adm /var/log/opush
-else
-    echo "error : /var/log/opush must exist."
-    exit 1
+     chown -R jetty:adm /var/log/opush
 fi 
-
-if [ -d /var/lib/opush ]; then
-    chown -R jetty:adm /var/lib/opush
-else
-    echo "error : /var/lib/opush must exist."
-    exit 1
-fi
-
 
 if [ $jetty_status -eq 0 ]; then
 	invoke-rc.d jetty restart	 3>1
