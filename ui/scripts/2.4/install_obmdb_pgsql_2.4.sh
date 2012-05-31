@@ -91,9 +91,23 @@ UPDATE UserObmPref SET userobmpref_value='${obm_lang}' WHERE userobmpref_option=
 \q
 EOF
 
-psql -U ${user} -h ${host} ${db} -f \
-  "updates/update-2.4.1~alpha6.pgsql.sql" >> /tmp/data_insert.log 2>&1
+if [ -d updates ]; then
+  pushd updates
+  for i in `ls -v1 *pgsql.sql`; do
+    echo " Insert Update sql file ${i}"
+    phpfile=`echo $i | sed 's/pgsql.sql/pre.php/g'`
+    if test -f "$phpfile"; then
+      $PHP "$phpfile"
+    fi    
+    psql -U ${user} -h ${host} ${db} -f \
+      $i >> /tmp/data_insert.log 2>&1
+    phpfile=`echo $i | sed 's/pgsql.sql/post.php/g'`
+    if test -f "$phpfile"; then
+      $PHP "$phpfile"
+    fi      
+  done
+  popd
+fi
 
-./update-2.4.0-2.4.1~alpha9+git.pgsql.sh
 
 echo "DONE."
