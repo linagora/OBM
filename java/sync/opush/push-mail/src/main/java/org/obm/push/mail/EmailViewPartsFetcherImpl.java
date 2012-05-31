@@ -131,7 +131,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		
 		InputStream bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
 		
-		emailViewBuilder.bodyMimePartData(bodyData);
+		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
 		emailViewBuilder.mimeType(fetchInstructions.getMimePart().getFullMimeType());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
 	}
@@ -187,13 +187,13 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid)
 			throws MailException, IOException, ParserException {
 
-		InputStream inputStream = getInvitationInputStream(mp, uid);
-		ICalendar iCalendar = new ICalendar.Builder().inputStream(inputStream).build();
+		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
+		ICalendar iCalendar = new ICalendar.Builder()
+			.inputStream(chooseInputStreamFormater(mp, inputStream)).build();
 		emailViewBuilder.iCalendar(iCalendar);
 	}
 
-	private InputStream getInvitationInputStream(IMimePart mp, long uid) throws MailException {
-		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
+	private InputStream chooseInputStreamFormater(IMimePart mp, InputStream inputStream) {
 		if (QUOTED_PRINTABLE.equals(mp.getContentTransfertEncoding())) {
 			return new QPDecoderStream(inputStream);
 		} else if (BASE64.equals(mp.getContentTransfertEncoding())) {
