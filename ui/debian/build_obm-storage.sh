@@ -14,8 +14,6 @@ UPGRADE_SCRIPTS_DIR_PGSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/sc
 UPGRADE_SQL_DIR_MYSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/obm-storage/upgrade/mysql"
 UPGRADE_SQL_DIR_PGSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/obm-storage/upgrade/pgsql"
 
-OBM_UPDATE_SCRIPTS_24=${CURDIR}/scripts/2.4/updates
-
 ##Mysql OBM Installation
 cp ${CURDIR}/debian/misc/db/mysql/mysql.sh ${INSTALL_DIR_SCRIPT}/mysql
 BUILD_DEB_DIR_STORAGE_SCRIPTS="${BUILD_DEB_DIR_STORAGE}/usr/share/obm-storage/update-install"
@@ -92,7 +90,8 @@ cp ${OBM_UPDATE_SCRIPTS_23}/update-2.3.18-2.3.19.mysql.sql ${UPGRADE_SQL_DIR_MYS
 cp ${OBM_UPDATE_SCRIPTS_23}/update-2.3.19-2.3.20.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.3.20-1
 #upgrade Mysql OBM 2.4.0
 cp ${CURDIR}/debian/misc/db/update-2.3-2.4.sh ${UPGRADE_SCRIPTS_DIR_MYSQL}/2.4.0-1
-cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha6.mysql.sql ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.1~alpha6
+OBM_UPDATE_SCRIPTS_24=${CURDIR}/scripts/2.4/updates
+
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -150,8 +149,6 @@ cp ${OBM_UPDATE_SCRIPTS_23}/update-2.3.18-2.3.19.pgsql.sql ${UPGRADE_SQL_DIR_PGS
 cp ${OBM_UPDATE_SCRIPTS_23}/update-2.3.19-2.3.20.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.3.20-1
 #upgrade Mysql OBM 2.4.0
 cp ${CURDIR}/debian/misc/db/update-2.3-2.4.sh ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.0-1
-cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha6.pgsql.sql ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.1~alpha6
-
 
 exit 0
 
