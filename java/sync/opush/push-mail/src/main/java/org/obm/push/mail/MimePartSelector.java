@@ -82,7 +82,7 @@ public class MimePartSelector {
 					return buildFetchInstructions(mimePart, bodyPreference);
 				}
 			} else {
-				return buildFetchInstructions(mimeMessage, bodyPreference);
+				return buildFetchInstructions(mimeMessage.getMimePart(), bodyPreference);
 			}
 		}
 		return null;
