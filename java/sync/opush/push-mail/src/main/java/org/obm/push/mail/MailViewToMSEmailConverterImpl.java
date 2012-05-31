@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.minig.imap.Flag;
@@ -48,7 +49,6 @@ import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.utils.SerializableInputStream;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -92,7 +92,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 
 	private Set<MSAttachement> convertAttachment(EmailView emailView) {
-		Set<MSAttachement> msAttachments = Sets.newHashSet();
+		Set<MSAttachement> msAttachments = new HashSet<MSAttachement>();
 		if (emailView.getAttachments() != null) {
 			for (EmailViewAttachment attachment : emailView.getAttachments()) {
 				MSAttachement msAttachment = new MSAttachement();

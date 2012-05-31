@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +73,6 @@ import org.obm.push.mail.imap.ImapMailboxService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class)
@@ -109,7 +109,6 @@ public class EmailViewPartsFetcherImplTest {
 	private String mailbox;
 	private String password;
 	private BackendSession bs;
-	private MimeAddress mimeAddress;
 
 	@Before
 	public void setUp() {
@@ -122,7 +121,6 @@ public class EmailViewPartsFetcherImplTest {
 		messageFixture = new MessageFixture();
 		messageCollectionName = IMAP_INBOX_NAME;
 		messageCollectionId = 1;
-		mimeAddress = new MimeAddress("address");
 	}
 	
 	@Test
@@ -474,9 +472,9 @@ public class EmailViewPartsFetcherImplTest {
 	public void testAttachment() throws Exception {
 		EmailView emailView = newFetcherFromExpectedFixture().fetch();
 
-		assertThat(emailView.getAttachments()).hasSize(1);
-		EmailViewAttachment emailViewAttachment = Iterables.getOnlyElement(emailView.getAttachments());
-		assertThat(emailViewAttachment.getId()).equals(messageFixture.contentId);
+		Assertions.assertThat(emailView.getAttachments()).hasSize(1);
+		EmailViewAttachment emailViewAttachment = emailView.getAttachments().iterator().next();
+		Assertions.assertThat(emailViewAttachment.getId()).equals(messageFixture.contentId);
 	}
 	
 	@Test
@@ -546,10 +544,16 @@ public class EmailViewPartsFetcherImplTest {
 				anyObject(FetchInstructions.class)))
 			.andReturn(messageFixture.bodyData).once();
 		
-		expect(mailboxService.findAttachment(bs, messageCollectionName, messageFixture.uid, mimeAddress))
+		expect(mailboxService.findAttachment(bs, messageCollectionName, messageFixture.uid, mockMimeAddress()))
 			.andReturn(messageFixture.attachmentInputStream);
 	}
 
+	private MimeAddress mockMimeAddress() {
+		MimeAddress mimeAddress = createMock(MimeAddress.class);
+		expect(mimeAddress.getAddress()).andReturn("address");
+		return mimeAddress;
+	}
+	
 	private MimeMessage mockAggregateMimeMessage() {
 		
 		MimePart mimePart = createMock(MimePart.class);
@@ -560,7 +564,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));
 		expect(mimePart.isAttachment()).andReturn(messageFixture.isAttachment);
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
-		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
+		expect(mimePart.getAddress()).andReturn(mockMimeAddress()).anyTimes();
 		expect(mimePart.getFullMimeType()).andReturn("plain/text");
 		expect(mimePart.getContentTransfertEncoding()).andReturn(null);
 		expect(mimePart.getSize()).andReturn(20);
