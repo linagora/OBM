@@ -54,7 +54,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	public static class MSEmailBuilder {
 
-		private Long uid;
+		private long uid;
 		
 		private MSEmailHeader header;
 		private MSEmailBody body;
@@ -137,8 +137,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmail build() {
-			Preconditions.checkState(uid != null, "The uid is required");
-			
 			if (messageClass == null) {
 				messageClass = MSMessageClass.NOTE;
 			}

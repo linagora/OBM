@@ -133,15 +133,6 @@ public class MailViewToMSEmailConverterImplTest {
 		Assertions.assertThat(convertedMSEmail.isRead()).isFalse();
 	}
 
-	@Test
-	public void testUid() {
-		emailViewFixture.uid = 54;
-		
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		Assertions.assertThat(convertedMSEmail.getUid()).isEqualTo(54);
-	}
-
 	private MSEmail makeConvertionFromEmailViewFixture() {
 		return new MailViewToMSEmailConverterImpl().convert(newEmailViewFromFixture());
 	}

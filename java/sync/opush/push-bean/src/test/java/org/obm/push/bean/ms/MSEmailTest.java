@@ -45,23 +45,9 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 @RunWith(SlowFilterRunner.class)
 public class MSEmailTest {
 
-	@Test(expected=IllegalStateException.class)
-	public void testMSEmailBuilderRequireUid() {
-		new MSEmail.MSEmailBuilder().build();
-	}
-	
-	@Test
-	public void testMSEmailBuilderWithUid() {
-		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
-		
-		MSEmail msEmail = msEmailBuilder.uid(34).build();
-	
-		Assertions.assertThat(msEmail.getUid()).isEqualTo(34);
-	}
-	
 	@Test
 	public void testMSEmailBuilderDefaultImportanceValue() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.build();
@@ -71,7 +57,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderDefaultMessageClassValue() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest())
@@ -82,7 +68,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderMessageClassCanceled() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), MSMessageClass.SCHEDULE_MEETING_CANCELED)
@@ -93,18 +79,13 @@ public class MSEmailTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMSEmailBuilderPreconditionOnMessageClass() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), null)
 				.build();
 	
 		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
-	}
-
-	private MSEmailBuilder requirementsInitializedBuilder() {
-		return new MSEmail.MSEmailBuilder()
-			.uid(1l);
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {
