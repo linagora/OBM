@@ -31,13 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.minig.imap.Address;
@@ -48,8 +47,6 @@ import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.MSAddress;
-import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 
 import com.google.common.collect.ImmutableList;
@@ -88,7 +85,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isAnswered()).isTrue();
+		Assertions.assertThat(convertedMSEmail.isAnswered()).isTrue();
 	}
 
 	@Test
@@ -97,7 +94,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isAnswered()).isFalse();
+		Assertions.assertThat(convertedMSEmail.isAnswered()).isFalse();
 	}
 	
 	@Test
@@ -106,7 +103,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isStarred()).isTrue();
+		Assertions.assertThat(convertedMSEmail.isStarred()).isTrue();
 	}
 
 	@Test
@@ -115,7 +112,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isStarred()).isFalse();
+		Assertions.assertThat(convertedMSEmail.isStarred()).isFalse();
 	}
 	
 	@Test
@@ -124,7 +121,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isRead()).isTrue();
+		Assertions.assertThat(convertedMSEmail.isRead()).isTrue();
 	}
 
 	@Test
@@ -133,7 +130,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.isRead()).isFalse();
+		Assertions.assertThat(convertedMSEmail.isRead()).isFalse();
 	}
 
 	@Test
@@ -142,166 +139,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getUid()).isEqualTo(54);
-	}
-
-	@Test
-	public void testHeaderFromNull() {
-		emailViewFixture.from = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(MSEmailHeader.DEFAULT_FROM_ADDRESS);
-	}
-
-	@Test
-	public void testHeaderFromEmpty() {
-		emailViewFixture.from = ImmutableList.<Address>of(newEmptyAddress());
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(newEmptyMSAddress());
-	}
-	
-	@Test
-	public void testHeaderFromSingle() {
-		emailViewFixture.from = ImmutableList.<Address>of(new Address("from@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(new MSAddress("from@domain.test"));
-	}
-	
-	@Test
-	public void testHeaderFromMultiple() {
-		emailViewFixture.from = ImmutableList.<Address>of(
-				new Address("from@domain.test"), new Address("from2@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(
-				new MSAddress("from@domain.test"), new MSAddress("from2@domain.test"));
-	}
-
-	@Test
-	public void testHeaderToNull() {
-		emailViewFixture.to = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getTo()).isEmpty();
-	}
-
-	@Test
-	public void testHeaderToEmpty() {
-		emailViewFixture.to = ImmutableList.<Address>of(newEmptyAddress());
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getTo()).containsOnly(newEmptyMSAddress());
-	}
-	
-	@Test
-	public void testHeaderToSingle() {
-		emailViewFixture.to = ImmutableList.<Address>of(new Address("to@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getTo()).containsOnly(new MSAddress("to@domain.test"));
-	}
-	
-	@Test
-	public void testHeaderToMultiple() {
-		emailViewFixture.to = ImmutableList.<Address>of(
-				new Address("to@domain.test"), new Address("to2@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getTo()).containsOnly(
-				new MSAddress("to@domain.test"), new MSAddress("to2@domain.test"));
-	}
-
-	@Test
-	public void testHeaderCcNull() {
-		emailViewFixture.cc = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getCc()).isEmpty();
-	}
-
-	@Test
-	public void testHeaderCcEmpty() {
-		emailViewFixture.cc = ImmutableList.<Address>of(newEmptyAddress());
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getCc()).containsOnly(newEmptyMSAddress());
-	}
-	
-	@Test
-	public void testHeaderCcSingle() {
-		emailViewFixture.cc = ImmutableList.<Address>of(new Address("cc@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getCc()).containsOnly(new MSAddress("cc@domain.test"));
-	}
-	
-	@Test
-	public void testHeaderCcMultiple() {
-		emailViewFixture.cc = ImmutableList.<Address>of(
-				new Address("cc@domain.test"), new Address("cc2@domain.test")); 
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getCc()).containsOnly(
-				new MSAddress("cc@domain.test"), new MSAddress("cc2@domain.test"));
-	}
-	
-	@Test
-	public void testHeaderSubjectNull() {
-		emailViewFixture.subject = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getSubject()).isEqualTo(MSEmailHeader.DEFAULT_SUBJECT);
-	}
-	
-	@Test
-	public void testHeaderSubjectEmpty() {
-		emailViewFixture.subject = "";
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-
-		assertThat(convertedMSEmail.getSubject()).isEqualTo(MSEmailHeader.DEFAULT_SUBJECT);
-	}
-	
-	@Test
-	public void testHeaderSubject() {
-		emailViewFixture.subject = "a subject";
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getSubject()).isEqualTo("a subject");
-	}
-	
-	@Test
-	public void testHeaderDateNull() {
-		emailViewFixture.date = null;
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getDate()).isNull();
-	}
-	
-	@Test
-	public void testHeaderDate() {
-		emailViewFixture.date = DateUtils.date("2004-12-14T22:00:00");
-
-		MSEmail convertedMSEmail = makeConvertionFromEmailViewFixture();
-		
-		assertThat(convertedMSEmail.getDate()).isEqualTo(DateUtils.date("2004-12-14T22:00:00"));
+		Assertions.assertThat(convertedMSEmail.getUid()).isEqualTo(54);
 	}
 
 	private MSEmail makeConvertionFromEmailViewFixture() {
@@ -344,13 +182,5 @@ public class MailViewToMSEmailConverterImplTest {
 
 	private IMimePart bodyMimePartFromFixture() {
 		return new MimePart();
-	}
-
-	public Address newEmptyAddress() {
-		return new Address("");
-	}
-	
-	public MSAddress newEmptyMSAddress() {
-		return new MSAddress("");
 	}
 }

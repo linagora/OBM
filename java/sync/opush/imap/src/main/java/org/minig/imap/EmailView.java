@@ -124,7 +124,7 @@ public class EmailView {
 		return flags;
 	}
 
-	public Envelope getEnvelope() {
+	public Envelope getHeaders() {
 		return envelope;
 	}
 	
