@@ -4775,7 +4775,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
-  if ($current_view->users_count() + $current_view->contacts_count() > 1) {
+  if ($current_view->users_count() + $current_view->contacts_count() > 0) {
     
     $u = array();
     $displayedPeople = array();
@@ -4867,7 +4867,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       ".__("Organizer")."
     </th>
     <td>";
-      if(!$displayedPeople){
+      if( count($displayedPeople) == 1 && $organizer_id == $uid){
         $block_organizer .= "
         <span>$organizer_name</span>
         <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizer_id."\" />";
@@ -4875,15 +4875,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       else{
         $block_organizer .= "
         <select name=\"sel_organizer\">";
+        $uid_is_displayed = false;
         foreach($possible_organizers as $displayed_person_id=>$displayed_person_name){
+          if( $displayed_person_id == $uid ){ $uid_is_displayed = true; }
           $selected_person = $displayed_person_id == $organizer_id ? "selected=selected" : "";
           $block_organizer .= "<option $selected_person
                                       value=\"".$displayed_person_id."\">".
                                 $displayed_person_name.
-                             "</option>";
+                              "</option>";
         }
-        $block_organizer .=
-        "</select>";
+        if ( !$uid_is_displayed ) {
+          $uid_infos = get_user_info($uid);
+          $uid_name = htmlspecialchars($uid_infos['lastname'].' '.$uid_infos['firstname']);
+          $block_organizer .=" <option value=\"".$uid."\">".$uid_name."</option></select>";
+        }
       }
       $block_organizer .=
   "</td>";
