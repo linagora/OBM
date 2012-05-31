@@ -28,14 +28,28 @@
 # applicable to the OBM software.
 
 
-FIC_PERM_PG="/var/lib/pgsql/data/pg_hba.conf"
-FIC_CONF_PG="/var/lib/pgsql/data/postgresql.conf"
+# Default parameters
+PGPORT=5432
+PGDATA=/var/lib/pgsql/data
+PGLOG=/var/lib/pgsql/pgstartup.log
+# Can be overrided in this file in EL
+[ -f /etc/sysconfig/pgsql/postgresql ] && ./etc/sysconfig/pgsql/postgresql
+FIC_PERM_PG="${PGDATA}/pg_hba.conf"
+FIC_CONF_PG="${PGDATA}/postgresql.conf"
+
+
+function check_pg_xa_init {
+	# Only modified on a new local database
+	PG_MAX_CONNECTION=`grep '^max_connections\b' $FIC_CONF_PG | awk '{print $3}'`
+	sed -i -e "s|#max_prepared_transactions = 0|max_prepared_transactions = ${PG_MAX_CONNECTION}|"  $FIC_CONF_PG
+}
 
 function check_pg_init {
 	if [ ! -s $FIC_PERM_PG ]; then
 		echo "Initilise postgres"
                 /etc/init.d/postgresql initdb
 		if [ $? -eq 0 ]; then
+			check_pg_xa_init
 			return 0
 		else
 			return 1
@@ -50,7 +64,7 @@ function check_pg_status {
 	/etc/init.d/postgresql status 1>/dev/null 2>&1
         if [ $? -ne 0 ]; then
                 /etc/init.d/postgresql start
-                while [ ! -S /tmp/.s.PGSQL.5432 ];do
+                while [ ! -S /tmp/.s.PGSQL.${PGPORT} ];do
                         echo "Attente de PostgreSQL"
                         sleep 2
                 done
