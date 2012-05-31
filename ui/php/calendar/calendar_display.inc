@@ -48,6 +48,9 @@ applicable to the OBM software.
 //     by reference as it can restrict the user selection
 //   - $current_view        : CalendarView
 ///////////////////////////////////////////////////////////////////////////////
+
+require_once(dirname(__file__)."/../document/document_display.inc");
+
 function dis_calendar_calendar_view($calendar, &$current_view) {
   global $display, $path, $ccalendar_max_users, $obm;
   global $l_module_calendar;
@@ -10040,14 +10043,17 @@ function html_calendar_template_name_popup() {
  * @return string
  */
 function html_calendar_file_block() {
-  $nbdocs = $GLOBALS['c_quota_private_document'] - $nb_private;
+  global $c_quota_private_document, $l_space_left, $obm;
+
+  $nbdocs = $c_quota_private_document - $nb_private;
   $GLOBALS['js']['vars']['consts']['nbdocs'] = $nbdocs-1;
   $style = "";
   if ($nbdocs <= 1) {
     $style = "style='display:none;'";
   }
 
-  $ini_max_filesize = ini_get('upload_max_filesize');
+  $ini_max_filesize = upload_max_filesize_to_bytes(ini_get('upload_max_filesize'));
+  $space_left_in_bytes = $c_quota_private_document - run_query_calendar_user_quota($obm['uid']);
 
   return "<th class='' id='calendarFileBlock'>
     $GLOBALS[l_other_files]
@@ -10058,7 +10064,7 @@ function html_calendar_file_block() {
 
   <td id='calendarFileHome'>
     <div>
-       $GLOBALS[l_other_files_maxsize] $ini_max_filesize
+       $GLOBALS[l_other_files_maxsize]" . dis_filesize(min($ini_max_filesize, $c_quota_private_document)) . " (" . dis_filesize($space_left_in_bytes) . " $l_space_left) $test
     </div>
     <div class=\"multiple\">
       <a onclick=\"remove_element(this.parentNode,'calendarFileHome');obm.vars.consts.nbdocs++;$('addFileButton').style.display = '';return false\" href=\"\">

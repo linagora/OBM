@@ -409,6 +409,8 @@ $l_fontSize_small = "Petite";
 $l_fontSize_medium = "Moyenne";
 $l_fontSize_big = "Grande";
 
+$l_filesize_units = array('Octets','Ko','Mo','Go','To','Po');
+$l_space_left = "restant";
 
 // additional obm event description informations
 $l_obm_reserved_event_data_attachment_begin = "// PIECES JOINTES (DONNEES RESERVEES OBM, NE PAS EDITER) ";

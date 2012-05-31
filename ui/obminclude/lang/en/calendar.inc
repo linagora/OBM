@@ -535,6 +535,8 @@ $l_fontSize_small = "Small";
 $l_fontSize_medium = "Medium";
 $l_fontSize_big = "Large";
 
+$l_filesize_units = array('Bytes','Kb','Mb','Gb','Tb','Pb');
+$l_space_left = "left";
 
 // additional obm event description informations
 $l_obm_reserved_event_data_attachment_begin = "// ATTACHED DOCUMENTS LIST (OBM RESERVED DATA, DO NOT EDIT CONTENTS) ";

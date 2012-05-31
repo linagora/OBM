@@ -2280,10 +2280,11 @@ function check_upload_errors() {
 
 function add_upload_error_message_too_big()
 {
-	global $l_other_files_upload_error;
+	global $l_other_files_upload_error, $c_quota_private_document;;
 
 	$result = '';
 	$filename_list = array();
+	$ini_max_filesize = upload_max_filesize_to_bytes(ini_get('upload_max_filesize'));
 
 	if (isset($_FILES['fi_other_files']['name']) && !empty($_FILES['fi_other_files']['name']) && is_array($_FILES['fi_other_files']['name'])) {
 		$is_error = false;
@@ -2294,7 +2295,7 @@ function add_upload_error_message_too_big()
 			}
 		}
 		if ($is_error) {
-			$result .= display_err_msg("$l_other_files_upload_error (" . ini_get('upload_max_filesize') . ") :");
+			$result .= display_err_msg("$l_other_files_upload_error (" . dis_filesize(min($ini_max_filesize, $c_quota_private_document)) . ") :");
 			$result .= "<strong>" . display_err_msg(implode(", ", $filename_list)) . "</strong>";
 		}
 	}

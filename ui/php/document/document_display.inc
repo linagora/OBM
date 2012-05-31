@@ -85,6 +85,19 @@ function dis_filesize($filesize) {
     return round($filesize, 2).' '.$l_filesize_units[$step];
 }
 
+function upload_max_filesize_to_bytes($upload_max_filesize) {
+	switch(strtolower(substr ($upload_max_filesize, -1))) {
+		case 'g':
+			return (int)$upload_max_filesize*1024*1024*1024;
+		case 'm':
+			return (int)$upload_max_filesize*1024*1024;
+		case 'k':
+			return (int)$upload_max_filesize*1024;
+		default:
+			return $upload_max_filesize;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Document specific dataset fields
 // Parameters:

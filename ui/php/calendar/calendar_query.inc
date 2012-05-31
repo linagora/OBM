@@ -7377,4 +7377,23 @@ function get_userid_from_mail($mail){
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Retrieve user quota
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_user_quota($u_id) {
+	global $cdg_sql;
+	$obm_q = new DB_OBM;
+
+    // document_privacy = 1 because every document attached to an event is private.
+    // ATM quota is only related to private document in OBM (OBMFULL-3795).
+	$query = "SELECT SUM(document_size)
+			AS sum_size
+			FROM Document
+			WHERE document_usercreate = '".$obm_q->escape($u_id)."'
+			AND document_privacy = 1";
+	display_debug_msg($query, $cdg_sql, 'run_query_document_user_quota()');
+	$obm_q->query($query);
+	$obm_q->next_record();
+	return $obm_q->f('sum_size');
+}
 ?>
