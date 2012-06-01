@@ -81,7 +81,7 @@ function check_pg_status {
 
 function check_args {
 	if [ $# -lt "3" -o $# -gt "4" ]; then
-		echo "Erreur de paramètres pour les fonctions check_pg_perms"
+		echo "Parameter error for the check_pg_perms functions"
 		echo "ou fix_pg_perms"
 		exit 1
 	fi
