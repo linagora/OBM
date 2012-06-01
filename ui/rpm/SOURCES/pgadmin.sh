@@ -59,7 +59,7 @@ function check_pg_init {
 			return 1
 		fi
 	else
-		echo "postgres already initialized"
+		echo "PostgreSQL already initialized"
 		return 0
 	fi
 }
