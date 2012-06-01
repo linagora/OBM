@@ -136,7 +136,7 @@ function fix_pg_perms {
 function check_listen_adress {
 	LISTEN_HOST=$1
 	if [ $# -ne 1 ]; then
-		echo "Erreur de parametre dans la function check_listen_adress"
+		echo "Parameter error for the check_listen_adress function"
 		return 1
 	fi
 	LISTEN=`grep  "^listen_addresses = \'${LISTEN_HOST}\'" $FIC_CONF_PG`
@@ -150,7 +150,7 @@ function check_listen_adress {
 function fix_listen_adress {
 	LISTEN_HOST=$1
         if [ $# -ne 1 ]; then
-                echo "Erreur de parametre dans la function check_listen_adress"
+                echo "Parameter error for the check_listen_adress function"
                 return 1
         fi
 	sed -i -e "/^#listen_addresses.*$/ a\listen_addresses = \'${LISTEN_HOST}\'" $FIC_CONF_PG
