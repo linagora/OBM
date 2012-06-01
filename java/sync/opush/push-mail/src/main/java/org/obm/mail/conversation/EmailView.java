@@ -60,6 +60,7 @@ public class EmailView {
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
 		private String mimeType;
+		private String charset;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
@@ -108,6 +109,11 @@ public class EmailView {
 			return this;
 		}
 		
+		public Builder charset(String charset) {
+			this.charset = charset;
+			return this;
+		}
+
 		public EmailView build() {
 			if (uid == null) {
 				throw new EmailViewBuildException("The uid is required");
@@ -128,7 +134,7 @@ public class EmailView {
 				this.flags = ImmutableSet.<Flag>of();
 			}
 			return new EmailView(uid, flags, envelope, bodyMimePartData, 
-					bodyTruncation, attachments, iCalendar, invitationType, contentType);
+					bodyTruncation, attachments, iCalendar, invitationType, contentType, charset);
 		}
 	}
 	
@@ -141,10 +147,11 @@ public class EmailView {
 	private final List<EmailViewAttachment> attachments;
 	private final ICalendar iCalendar;
 	private final EmailViewInvitationType invitationType;
+	private final String charset;
 
 	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
 			InputStream bodyMimePartData, Integer bodyTruncation, List<EmailViewAttachment> attachments, 
-			ICalendar iCalendar, EmailViewInvitationType invitationType, ContentType contentType) {
+			ICalendar iCalendar, EmailViewInvitationType invitationType, ContentType contentType, String charset) {
 		
 		this.uid = uid;
 		this.flags = flags;
@@ -155,6 +162,7 @@ public class EmailView {
 		this.iCalendar = iCalendar;
 		this.invitationType = invitationType;
 		this.contentType = contentType;
+		this.charset = charset;
 	}
 
 	public long getUid() {
@@ -217,10 +225,14 @@ public class EmailView {
 		return contentType;
 	}
 	
+	public String getCharset() {
+		return charset;
+	}
+	
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, 
-				bodyTruncation, attachments, iCalendar, invitationType, contentType);
+				bodyTruncation, attachments, iCalendar, invitationType, contentType, charset);
 	}
 	
 	@Override
@@ -235,7 +247,8 @@ public class EmailView {
 				&& Objects.equal(this.attachments, that.attachments)
 				&& Objects.equal(this.iCalendar, that.iCalendar)
 				&& Objects.equal(this.invitationType, that.invitationType)
-				&& Objects.equal(this.contentType, that.contentType);
+				&& Objects.equal(this.contentType, that.contentType)
+				&& Objects.equal(this.charset, that.charset);
 		}
 		return false;
 	}
@@ -252,6 +265,7 @@ public class EmailView {
 			.add("iCalendar", iCalendar)
 			.add("invitationType", invitationType)
 			.add("contentType", contentType)
+			.add("charset", charset)
 			.toString();
 	}
 }

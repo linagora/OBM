@@ -74,6 +74,7 @@ import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
 
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -234,7 +235,7 @@ public class SyncHandlerTest {
 			.uid(1l)
 			.header(new MSEmailHeader.Builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), emailBodyType, null)).build();
+					new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8)).build();
 	}
 
 }

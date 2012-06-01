@@ -134,6 +134,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
 		emailViewBuilder.mimeType(fetchInstructions.getMimePart().getFullMimeType());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
+		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
 	}
 	
 	private void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions, long uid) {

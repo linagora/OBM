@@ -40,14 +40,13 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.junit.internal.matchers.StringContains;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
-import org.obm.filter.SlowFilterRunner;
+import com.google.common.base.Charsets;
 
 @RunWith(SlowFilterRunner.class)
 public class DOMUtilsTest {
@@ -73,7 +72,7 @@ public class DOMUtilsTest {
 
 		String expectedString = " \" ' éàâ";
 		DOMUtils.createElementAndCDataText(root, 
-				"CDataSection",  new ByteArrayInputStream(expectedString.getBytes()));
+				"CDataSection",  new ByteArrayInputStream(expectedString.getBytes()), Charsets.UTF_8);
 		
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
