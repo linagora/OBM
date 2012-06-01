@@ -47,7 +47,11 @@ function check_pg_xa_init {
 function check_pg_init {
 	if [ ! -s $FIC_PERM_PG ]; then
 		echo "Initilise postgres"
-                /etc/init.d/postgresql initdb
+		if [ -e /usr/bin/postgresql-setup ] ; then
+			/usr/bin/postgresql-setup initdb
+		else
+			/etc/init.d/postgresql initdb
+		fi
 		if [ $? -eq 0 ]; then
 			check_pg_xa_init
 			return 0
@@ -61,9 +65,9 @@ function check_pg_init {
 }
 
 function check_pg_status {
-	/etc/init.d/postgresql status 1>/dev/null 2>&1
+	service postgresql status 1>/dev/null 2>&1
         if [ $? -ne 0 ]; then
-                /etc/init.d/postgresql start
+                service postgresql start
                 while [ ! -S /tmp/.s.PGSQL.${PGPORT} ];do
                         echo "Attente de PostgreSQL"
                         sleep 2
