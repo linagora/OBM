@@ -47,6 +47,8 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.utils.SerializableInputStream;
 
+import com.google.common.base.Charsets;
+
 @RunWith(SlowFilterRunner.class)
 public class MSEmailTest {
 
@@ -105,7 +107,7 @@ public class MSEmailTest {
 				.uid(1l)
 				.header(new MSEmailHeader.Builder().build())
 					.body(new MSEmailBody(new SerializableInputStream(
-							new ByteArrayInputStream(message.getBytes())), emailBodyType, null));
+							new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8));
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {
