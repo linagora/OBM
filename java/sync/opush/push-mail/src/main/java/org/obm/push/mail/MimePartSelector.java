@@ -38,10 +38,15 @@ import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.exception.activesync.UnsupportedMSEmailBodyTypeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class MimePartSelector {
+
+	private final static Logger logger = LoggerFactory.getLogger(MimePartSelector.class);
 	
 	private static final int DEFAULT_TRUNCATION_SIZE = 32*1024;
 	private static final ImmutableList<BodyPreference> DEFAULT_BODY_PREFERENCES = 
@@ -76,13 +81,9 @@ public class MimePartSelector {
 	
 	private FetchInstructions selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		for (BodyPreference bodyPreference: bodyPreferences) {
-			if (isContentType(bodyPreference)) {
-				IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
-				if (isMatching(mimePart, bodyPreference)) {
-					return buildFetchInstructions(mimePart, bodyPreference);
-				}
-			} else {
-				return buildFetchInstructions(mimeMessage.getMimePart(), bodyPreference);
+			IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
+			if (isMatching(mimePart, bodyPreference)) {
+				return buildFetchInstructions(mimePart, bodyPreference);
 			}
 		}
 		return null;
@@ -114,20 +115,21 @@ public class MimePartSelector {
 	}
 
 	private IMimePart findMimePartMatching(MimeMessage mimeMessage, BodyPreference bodyPreference) {
-		ContentType contentType = toContentType(bodyPreference.getType());
-		return mimeMessage.findMainMessage(contentType);
+		try {
+			ContentType contentType = toContentType(bodyPreference.getType());
+			return mimeMessage.findMainMessage(contentType);
+		} catch (UnsupportedMSEmailBodyTypeException e) {
+			logger.warn(e.getMessage());
+			return null;
+		}
 	}
 
-	private boolean isContentType(BodyPreference bodyPreference) {
-		return bodyPreference.getType() != MSEmailBodyType.MIME;
-	}
-	
-	private ContentType toContentType(MSEmailBodyType bodyType) {
+	private ContentType toContentType(MSEmailBodyType bodyType) throws UnsupportedMSEmailBodyTypeException {
 		String contentType = toMimeType(bodyType);
 		return new ContentType.Builder().contentType(contentType).build();
 	}
 	
-	private String toMimeType(MSEmailBodyType bodyType) {
+	private String toMimeType(MSEmailBodyType bodyType) throws UnsupportedMSEmailBodyTypeException {
 		switch (bodyType) {
 		case PlainText:
 			return "text/plain";
@@ -135,6 +137,8 @@ public class MimePartSelector {
 			return "text/html";
 		case RTF:
 			return "text/rtf";
+		case MIME:
+			throw new UnsupportedMSEmailBodyTypeException("Unsupported [MIME] Type");
 		default:
 			throw new IllegalArgumentException("Unexpected MSEmailBodyType");
 		}
