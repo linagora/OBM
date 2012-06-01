@@ -100,7 +100,7 @@ function check_args {
 
 function check_pg_perms {
 	check_args $@
-	echo "Checking permission on Postgres"
+	echo "Checking permission on PostgreSQL"
 	if [ "x${CIDR_ADDRESS}" == "x" ]; then
 		# Nous somme en mode local
 		LOCAL=`grep "local ${DATABASE} ${USER} ${METHOD}" $FIC_PERM_PG`
