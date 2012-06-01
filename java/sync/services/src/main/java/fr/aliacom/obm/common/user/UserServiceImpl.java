@@ -37,6 +37,7 @@ import org.obm.sync.calendar.Attendee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -86,32 +87,24 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ObmUser getUserFromCalendar(String calendar, String domainName) throws FindException {
-		String username = getUsernameFromString(calendar);
-		if (username == null) {
-			throw new FindException("invalid calendar string : " + calendar);
-		}
+		Preconditions.checkArgument(isValidCalendarString(calendar), "Invalid calendar string : " + calendar);
 		ObmDomain domain = domainService.findDomainByName(domainName);
 		if(domain == null){
-			logger.info("domain :" + domainName
-					+ " not found");
-			throw new FindException("Domain["+domainName+"] not exist or not valid");
+			logger.info("domain : {} not found", domainName);
+			throw new FindException("The domain [" + domainName + "] does not exist or is not valid");
 		}
-		// Lowercase the username, we're going to attempt to match it against the
-		// login, and all logins in the DB are lowercase, while usernames might not be so,
-		// especially if provisioning from LDAP is involved (OBMFULL-2553)
-		String lcUsername = username.toLowerCase();
-		ObmUser user = userDao.findUserByLogin(lcUsername, domain);
+		ObmUser user = userDao.findUser(calendar.toLowerCase(), domain);
 		if (user == null || StringUtils.isEmpty(user.getEmail())) {
-			logger.info("user :" + calendar	+ " not found, archived or have no email");
-			throw new FindException("Calendar not exist or not valid");
+			logger.info("calendar : {} not found, archived or have no email", calendar);
+			throw new FindException("The calendar [" + calendar + "] does not exist or is not valid (it was archived or no email was associated)");
 		}
 		return user;
 	}
 
-	private String getUsernameFromString(String calendar) {
+	private boolean isValidCalendarString(String calendar) {
 		String username = Iterables.getFirst(
 				Splitter.on('@').omitEmptyStrings().split(calendar), null);
-		return username;
+		return (username != null);
 	}
 	
 	@Override

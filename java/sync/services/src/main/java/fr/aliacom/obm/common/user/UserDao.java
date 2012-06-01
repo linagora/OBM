@@ -102,7 +102,7 @@ public class UserDao {
 			String request = "SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
 					"INNER JOIN Domain ON domain_id = userobm_domain_id " +
-					"WHERE UPPER(userobm_email) like UPPER('%" + mail + "%')";
+					"WHERE UPPER(userobm_email) like UPPER('%" + mail + "%') AND userobm_archive != 1";
 			
 			rs = st.executeQuery(request);
 			if (rs.next()) {

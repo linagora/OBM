@@ -47,8 +47,52 @@ import org.obm.filter.SlowFilterRunner;
 @RunWith(SlowFilterRunner.class)
 public class UserServiceImplTest {
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetUserFromInvalidCalendar() throws FindException {
+		String domainName = "aDomain";
+
+		DomainService domainService = EasyMock.createMock(DomainService.class);
+		UserDao userDao = EasyMock.createMock(UserDao.class);
+
+		EasyMock.replay(domainService, userDao);
+
+		new UserServiceImpl(domainService, userDao).getUserFromCalendar("@@", domainName);
+	}
+
+	@Test(expected=FindException.class)
+	public void testGetUserFromCalendarWithNoDomainFound() throws FindException {
+		String domainName = "aDomain";
+		String calendar = "aCalendar";
+
+		DomainService domainService = EasyMock.createMock(DomainService.class);
+		expect(domainService.findDomainByName(domainName)).andReturn(null).once();
+
+		UserDao userDao = EasyMock.createMock(UserDao.class);
+
+		EasyMock.replay(domainService, userDao);
+
+		new UserServiceImpl(domainService, userDao).getUserFromCalendar(calendar, domainName);
+	}
+
+	@Test(expected=FindException.class)
+	public void testGetNullUserFromCalendar() throws FindException {
+		String domainName = "aDomain";
+		String calendar = "aCalendar";
+		ObmDomain obmDomain = new ObmDomain();
+
+		DomainService domainService = EasyMock.createMock(DomainService.class);
+		expect(domainService.findDomainByName(domainName)).andReturn(obmDomain).once();
+
+		UserDao userDao = EasyMock.createMock(UserDao.class);
+		expect(userDao.findUser("acalendar", obmDomain)).andReturn(null).once();
+
+		EasyMock.replay(domainService, userDao);
+
+		new UserServiceImpl(domainService, userDao).getUserFromCalendar(calendar, domainName);
+	}
+
 	@Test
-	public void getUserFromCalendarTest() throws FindException {
+	public void testGetUserFromCalendar() throws FindException {
 		String userEmail = "User@domain";
 		String domainName = "domain";
 		ObmDomain obmDomain = new ObmDomain();
@@ -59,8 +103,7 @@ public class UserServiceImplTest {
 		expect(domainService.findDomainByName(domainName)).andReturn(obmDomain).once();
 
 		UserDao userDao = EasyMock.createMock(UserDao.class);
-		// Validate that the login of the user extract from the email is set to lowercase
-		expect(userDao.findUserByLogin("user", obmDomain)).andReturn(obmUser).once();
+		expect(userDao.findUser("user@domain", obmDomain)).andReturn(obmUser).once();
 		
 		EasyMock.replay(domainService, userDao);
 
