@@ -79,6 +79,17 @@
 			<version>6.1.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>greenmail</groupId>
+			<artifactId>greenmail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-mail</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>

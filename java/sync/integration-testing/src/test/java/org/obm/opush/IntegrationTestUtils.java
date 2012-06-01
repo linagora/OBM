@@ -128,14 +128,14 @@ public class IntegrationTestUtils {
 	}
 
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {
-		return buildCollectionPath(opushUser, "calendar");
+		return buildCollectionPath(opushUser, "calendar", opushUser.user.getLoginAtDomain());
 	}
 	
-	public static String buildMailCollectionPath(OpushUser opushUser) {
-		return buildCollectionPath(opushUser, "mail");
+	public static String buildEmailInboxCollectionPath(OpushUser opushUser) {
+		return buildCollectionPath(opushUser, "email", "INBOX");
 	}
 	
-	private static String buildCollectionPath(OpushUser opushUser, String dataType) {
-		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + opushUser.user.getLoginAtDomain();
+	private static String buildCollectionPath(OpushUser opushUser, String dataType, String relativePath) {
+		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + relativePath;
 	}
 }

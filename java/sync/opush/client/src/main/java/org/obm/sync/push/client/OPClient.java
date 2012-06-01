@@ -47,6 +47,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
@@ -117,6 +118,10 @@ public abstract class OPClient {
 		return run(new Sync(doc));
 	}
 
+	public SyncResponse deleteEmail(String key, int collectionId, String uid) throws Exception {
+		return run(new EmailDeleteSyncRequest(key, collectionId, uid));
+	}
+	
 	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, String collectionId) throws Exception {
 		return run(new GetItemEstimateEmailFolderCommand(key, collectionId));
 	}

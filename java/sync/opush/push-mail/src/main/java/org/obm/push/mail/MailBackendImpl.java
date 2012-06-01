@@ -341,9 +341,9 @@ public class MailBackendImpl implements MailBackend {
 				if (trash) {
 					String wasteBasketPath = getWasteBasketPath(udr);
 					Integer wasteBasketId = mappingService.getCollectionIdFor(udr.getDevice(), wasteBasketPath);
-					mailboxService.moveItem(udr, collectionName, wasteBasketPath, uid);
-					deleteEmails(devDbId, collectionId, Arrays.asList(uid));
-					addMessageInCache(udr, devDbId, wasteBasketId, uid, wasteBasketPath);
+					long newUID = mailboxService.moveItem(udr, collectionName, wasteBasketPath, uid);
+					deleteEmails(devDbId, collectionId, Arrays.asList(newUID));
+					addMessageInCache(udr, devDbId, wasteBasketId, newUID, wasteBasketPath);
 				} else {
 					mailboxService.delete(udr, collectionName, uid);
 				}
