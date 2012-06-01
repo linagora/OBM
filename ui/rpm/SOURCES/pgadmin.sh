@@ -69,7 +69,7 @@ function check_pg_status {
         if [ $? -ne 0 ]; then
                 service postgresql start
                 while [ ! -S /tmp/.s.PGSQL.${PGPORT} ];do
-                        echo "Attente de PostgreSQL"
+                        echo "Waiting for PostgreSQL"
                         sleep 2
                 done
 		return 0
