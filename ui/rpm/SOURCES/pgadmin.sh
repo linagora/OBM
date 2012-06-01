@@ -123,7 +123,7 @@ function check_pg_perms {
 
 function fix_pg_perms {
 	check_args $@ 
-	echo "Fix permission on Postgres"
+	echo "Fix permission on PostgreSQL"
 	if  [ "x${CIDR_ADDRESS}" == "x" ]; then
                 # Nous somme en mode local
 		 sed -i -e "1,/^local.*$/s/^\(local.*\)$/local ${DATABASE} ${USER} ${METHOD}\n\1/" $FIC_PERM_PG
