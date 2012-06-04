@@ -58,6 +58,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -172,7 +173,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(newEmptyMSAddress());
+		assertThat(convertedMSEmail.getFrom()).containsOnly(MSEmailHeader.DEFAULT_FROM_ADDRESS);
 	}
 	
 	@Test
@@ -210,7 +211,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getTo()).containsOnly(newEmptyMSAddress());
+		assertThat(convertedMSEmail.getTo()).isEmpty();
 	}
 	
 	@Test
@@ -248,7 +249,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getCc()).containsOnly(newEmptyMSAddress());
+		assertThat(convertedMSEmail.getCc()).isEmpty();
 	}
 	
 	@Test
@@ -401,7 +402,8 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException {
-		return new MailViewToMSEmailConverterImpl().convert(newEmailViewFromFixture());
+		return new MailViewToMSEmailConverterImpl(
+				new MSEmailHeaderConverter(new UserEmailParserUtils())).convert(newEmailViewFromFixture());
 	}
 
 	private void buildICalendar() throws IOException, ParserException {

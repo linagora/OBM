@@ -39,6 +39,7 @@ import org.minig.imap.Envelope;
 import org.obm.DateUtils;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.collect.Lists;
 
@@ -56,7 +57,7 @@ public class MSEmailHeaderConverterTest {
 
 	@Before
 	public void before() {
-		msEmailHeaderConverter = new MSEmailHeaderConverter();
+		msEmailHeaderConverter = new MSEmailHeaderConverter(new UserEmailParserUtils());
 	}
 	
 	@Test

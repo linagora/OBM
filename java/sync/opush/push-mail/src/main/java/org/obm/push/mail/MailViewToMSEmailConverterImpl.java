@@ -53,9 +53,11 @@ import org.obm.push.utils.SerializableInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -63,6 +65,13 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	private static final Logger logger = LoggerFactory.getLogger(MailViewToMSEmailConverterImpl.class);
 	private static final Charset DEFAULT_CHARSET = Charsets.ISO_8859_1;
+
+	private final MSEmailHeaderConverter emailHeaderConverter;
+
+	@Inject
+	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter) {
+		this.emailHeaderConverter = emailHeaderConverter;
+	}
 	
 	@Override
 	public MSEmail convert(EmailView emailView) {
@@ -86,7 +95,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 	
 	private MSEmailHeader convertHeader(EmailView emailView) {
-		return new MSEmailHeaderConverter().convertToMSEmailHeader(emailView.getEnvelope());
+		return emailHeaderConverter.convertToMSEmailHeader(emailView.getEnvelope());
 	}
 
 	private MSEmailBody convertBody(EmailView emailView) {

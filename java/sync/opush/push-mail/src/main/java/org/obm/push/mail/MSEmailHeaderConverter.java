@@ -38,12 +38,26 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.utils.UserEmailParserUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class MSEmailHeaderConverter {
+	
+	private final static Logger logger = LoggerFactory.getLogger(MSEmailHeaderConverter.class);
+	
+	private final UserEmailParserUtils emailParserUtils;
+
+	@Inject
+	@VisibleForTesting MSEmailHeaderConverter(UserEmailParserUtils emailParserUtils) {
+		this.emailParserUtils = emailParserUtils;
+	}
 	
 	public MSEmailHeader convertToMSEmailHeader(Envelope envelope) {
 		Preconditions.checkNotNull(envelope);
@@ -61,7 +75,10 @@ public class MSEmailHeaderConverter {
 		List<MSAddress> msAddresses = new ArrayList<MSAddress>();
 		if (addresses != null) {
 			for (Address address: addresses) {
-				msAddresses.add(toMSAddress(address));
+				MSAddress msAddress = toMSAddress(address);
+				if (msAddress != null) {
+					msAddresses.add(msAddress);
+				}
 			}
 		}
 		return msAddresses;
@@ -69,9 +86,15 @@ public class MSEmailHeaderConverter {
 
 	private MSAddress toMSAddress(Address address) {
 		if (address != null) {
-			return new MSAddress(address.getDisplayName(), address.getMail());
-		} else {
-			return null;
+			try {
+				if (emailParserUtils.isAddress(address.getMail())) {
+					return new MSAddress(address.getDisplayName(), address.getMail());
+				}
+			} catch (IllegalArgumentException e) {
+				logger.warn(
+						String.format("[%s] is an invalid email format.", address.getMail()));
+			}
 		}
+		return null;
 	}
 }
