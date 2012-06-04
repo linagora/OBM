@@ -483,6 +483,26 @@ public class ICalendarConverterTest {
 				msMeetingRequest.getTimeZoneInBase64()).isEqualTo(MSMeetingRequest.MsMeetingRequestBuilder.DEFAULT_TIME_ZONE);
 	}
 	
+	@Test
+	public void testICalendarConverterSingleAllDayEventFromOBMUI() throws IOException, ParserException {
+		ICalendar icalendar = icalendar("single_event_allDay.obmui.ics");
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		
+		Assertions.assertThat(msMeetingRequest).isEqualTo(
+				new MSMeetingRequest.MsMeetingRequestBuilder()
+					.startTime(new DateTime("2012-06-15").toDate())
+					.dtStamp(new DateTime("2012-06-04T12:59:20").toDate())
+					.allDayEvent(true)
+					.organizer("xavier.niel@jri.obm.lng.org")
+					.location("Lyon")
+					.instanceType(MSMeetingRequestInstanceType.SINGLE)
+					.globalObjId("4ca827c0eb819956ede718d75cd4c7239f43950a1762a8a2d1378e9061bf2a" +
+							"ba3fabf0ed4247ad4d3068078724708ada16134995df87089a0250bfa0f7ff88cd3da9ee5ebc750260")
+					.reponseRequested(true)
+					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
+					.build());
+	}
+	
 	private ICalendar icalendar(String filename) throws IOException, ParserException {
 		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("ics/" + filename);
 		if (in == null) {

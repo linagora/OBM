@@ -66,6 +66,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ICalendarConverter {
 	
+	private static final String X_OBM_ALL_DAY = "X-OBM-ALL-DAY";
 	private static final String X_MICROSOFT_CDO_INTENDEDSTATUS = "X-MICROSOFT-CDO-INTENDEDSTATUS";
 	private static final Map<String, MSMeetingRequestRecurrenceDayOfWeek> RECUR_DAY_LIST = 
 				new ImmutableMap.Builder<String, MSMeetingRequestRecurrenceDayOfWeek>()
@@ -127,7 +128,7 @@ public class ICalendarConverter {
 		msMeetingRequestBuilder
 			.startTime(startDate)
 			.endTime(endDate)
-			.allDayEvent(isAllDay(startDate, endDate))
+			.allDayEvent(isAllDay(iCalendarEvent, startDate, endDate))
 			.dtStamp(utcDate(iCalendarEvent.dtStamp()))
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.location(iCalendarEvent.location())
@@ -164,12 +165,13 @@ public class ICalendarConverter {
 		return date(time, null);
 	}
 	
-	private boolean isAllDay(Date startDate, Date endDate) {
+	private boolean isAllDay(ICalendarEvent iCalendarEvent, Date startDate, Date endDate) {
 		if (startDate != null && endDate != null) {
 			DateTime plusDays = new DateTime(startDate).plusDays(1);
 			return plusDays.toDate().getTime() == endDate.getTime();
+		} else {
+			return "1".equals(iCalendarEvent.property(X_OBM_ALL_DAY));
 		}
-		return false;
 	}
 
 	private Long reminder(ICalendarEvent iCalendarEvent, Date startDate) {
