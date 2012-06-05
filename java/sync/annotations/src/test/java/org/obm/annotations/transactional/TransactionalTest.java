@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -52,6 +53,8 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.matcher.Matchers;
 
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
@@ -164,7 +167,7 @@ public class TransactionalTest {
 			protected void configure() {
 				bind(TransactionManager.class).toProvider(provider);
 				bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
-				bind(TransactionConfiguration.class).to(TransactionConfigurationStaticImpl.class);
+				bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), 
 						Matchers.annotatedWith(Transactional.class), 

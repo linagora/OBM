@@ -29,9 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.annotations.transactional;
+package org.obm.configuration;
 
-public interface TransactionConfiguration {
+import com.google.inject.AbstractModule;
 
-	int getTimeOutInSecond();
+
+public class TestConfigurationModule extends AbstractModule {
+	
+	@Override
+	protected void configure() {
+		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+	}
+
 }

@@ -29,37 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.configuration;
 
-import java.io.InputStream;
+import java.io.File;
 
-import javax.servlet.ServletContext;
+public interface TransactionConfiguration {
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.store.StoreNotFoundException;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-@Singleton
-public class OpushConfigurationService extends ConfigurationServiceImpl implements ConfigurationService {
-	
-	private final ServletContext servletContext;
-	
-	@Inject
-	private OpushConfigurationService(ServletContext servletContext) {
-		super();
-		this.servletContext = servletContext;
-	}
-	
-	@Override
-	public InputStream getStoreConfiguration() throws StoreNotFoundException {
-		InputStream storeConfigurations = servletContext.getResourceAsStream("/WEB-INF/objectStoreManager.xml");
-		if (storeConfigurations == null) {
-			throw new StoreNotFoundException("/WEB-INF/objectStoreManager.xml not found !");
-		}
-		return storeConfigurations;
-	}
+	int getTimeOutInSecond();
+	File getJournalPart1Path();
+	File getJournalPart2Path();
 	
 }

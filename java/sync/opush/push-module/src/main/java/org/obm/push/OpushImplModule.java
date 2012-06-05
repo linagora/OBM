@@ -33,7 +33,10 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.IBackend;
@@ -74,6 +77,9 @@ import com.google.inject.name.Names;
 
 public class OpushImplModule extends AbstractModule {
 
+	private static final String APPLICATION_NAME = "opush";
+	private static final String APPLICATION_ORIGIN = "o-push";
+
 	@Override
 	protected void configure() {
 		install(new TransactionalModule());
@@ -82,7 +88,8 @@ public class OpushImplModule extends AbstractModule {
 		install(new ObmSyncHttpClientModule());
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
-		bind(ConfigurationService.class).to(OpushConfigurationService.class);
+		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(IBackend.class).to(OBMBackend.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);
@@ -97,7 +104,8 @@ public class OpushImplModule extends AbstractModule {
 		bind(EventConverter.class).to(EventConverterImpl.class);
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
-		bind(String.class).annotatedWith(Names.named("origin")).toInstance("o-push");
+		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
+		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);

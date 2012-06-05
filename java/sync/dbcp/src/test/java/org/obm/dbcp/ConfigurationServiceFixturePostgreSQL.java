@@ -30,9 +30,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.fixtures;
+package org.obm.dbcp;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -43,7 +42,6 @@ import javax.naming.ConfigurationException;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseSystem;
 import org.obm.configuration.resourcebundle.Control;
-import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.common.base.Charsets;
 
@@ -57,11 +55,6 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 	@Override
 	public String getObmUIBaseUrl() {
 		return "http://" + getExternalUrl();
-	}
-
-	@Override
-	public InputStream getStoreConfiguration() throws StoreNotFoundException {
-		throw new StoreNotFoundException("Store not found for " + getClass() + " configuration.");
 	}
 
 	@Override
@@ -99,16 +92,6 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 	}
 
 	@Override
-	public int getTransactionTimeout() {
-		return 1;
-	}
-
-	@Override
-	public TimeUnit getTransactionTimeoutUnit() {
-		return TimeUnit.MINUTES;
-	}
-
-	@Override
 	public Integer getDataBaseMaxConnectionPoolSize() {
 		return 10;
 	}
@@ -137,4 +120,10 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 	public String getDatabasePassword() {
 		return "obm";
 	}
+
+	@Override
+	public int transactionTimeoutInSeconds() {
+		return 60;
+	}
+	
 }

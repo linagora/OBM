@@ -39,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.ObjectStoreManager;
@@ -55,7 +54,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	}
 	
 	@Before
-	public void init() throws StoreNotFoundException {
+	public void init() {
 		// by default, loading one store in objectStoreManager.xml
 		this.opushCacheManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 	}

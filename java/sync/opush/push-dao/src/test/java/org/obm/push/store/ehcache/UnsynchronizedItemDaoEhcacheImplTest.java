@@ -43,7 +43,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
@@ -69,7 +68,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	}
 	
 	@Before
-	public void init() throws StoreNotFoundException, NotSupportedException, SystemException {
+	public void init() throws NotSupportedException, SystemException {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
@@ -81,6 +80,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

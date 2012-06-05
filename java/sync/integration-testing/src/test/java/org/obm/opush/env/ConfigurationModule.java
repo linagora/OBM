@@ -40,6 +40,8 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 
 public final class ConfigurationModule extends AbstractOverrideModule {
 
@@ -52,6 +54,7 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 	
 	@Override
 	protected void configureImpl() {
+		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
 		bindWithMock(ConfigurationService.class);
 		bindWithMock(EmailConfigurationImpl.class);
 		bindWithMock(SyncPermsConfigurationService.class);

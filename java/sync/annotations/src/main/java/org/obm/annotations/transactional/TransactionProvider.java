@@ -34,6 +34,9 @@ package org.obm.annotations.transactional;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
+import org.obm.configuration.TransactionConfiguration;
+
+import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.inject.Inject;
@@ -47,8 +50,16 @@ public class TransactionProvider implements Provider<TransactionManager> {
 
 	@Inject
 	public TransactionProvider(TransactionConfiguration configuration) throws SystemException {
+		configureBitronix(configuration);
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.setTransactionTimeout(configuration.getTimeOutInSecond());
+	}
+
+	private void configureBitronix(TransactionConfiguration configuration) {
+		Configuration btConfiguration = TransactionManagerServices.getConfiguration();
+		btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
+		btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());
+		btConfiguration.setDefaultTransactionTimeout(configuration.getTimeOutInSecond());
 	}
 	
 	@Override

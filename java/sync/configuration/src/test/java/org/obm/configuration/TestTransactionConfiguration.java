@@ -29,21 +29,28 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.annotations.transactional;
+package org.obm.configuration;
 
-import com.google.inject.Singleton;
+import java.io.File;
 
-@Singleton
-public class TransactionConfigurationStaticImpl implements TransactionConfiguration{
+import org.obm.configuration.TransactionConfiguration;
 
-	protected TransactionConfigurationStaticImpl() {
-		
+import com.google.common.io.Files;
+
+public class TestTransactionConfiguration implements TransactionConfiguration {
+
+	@Override
+	public int getTimeOutInSecond() {
+		return 3600;
 	}
-	
-	private static int TIMEOUT_DURATION_IN_SECOND = 3600;
-	
-	public int getTimeOutInSecond(){
-		return TIMEOUT_DURATION_IN_SECOND;
+
+	@Override
+	public File getJournalPart2Path() {
+		return new File(Files.createTempDir().getAbsoluteFile() + File.pathSeparator + "btm2");
 	}
-	
+
+	@Override
+	public File getJournalPart1Path() {
+		return new File(Files.createTempDir().getAbsoluteFile() + File.pathSeparator + "btm2");
+	}
 }

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -40,14 +39,16 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.resourcebundle.Control;
-import org.obm.configuration.store.StoreNotFoundException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Ints;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ConfigurationServiceImpl extends AbstractConfigurationService implements ConfigurationService {
-
+	
     private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
     private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
@@ -105,11 +106,6 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	}
 
 	@Override
-	public InputStream getStoreConfiguration() throws StoreNotFoundException {
-		throw new StoreNotFoundException("Store not found for " + getClass() + " configuration.");
-	}
-	
-	@Override
 	public String getObmSyncUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
@@ -125,13 +121,11 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 	
-	@Override
-	public int getTransactionTimeout() {
+	private int getTransactionTimeout() {
 		return getIntValue(TRANSACTION_TIMEOUT_KEY, TRANSACTION_TIMEOUT_DEFAULT);
 	}
 	
-	@Override
-	public TimeUnit getTransactionTimeoutUnit() {
+	private TimeUnit getTransactionTimeoutUnit() {
 		String key = getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
@@ -144,6 +138,14 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 			}
 		}
 		return defaultUnit;
+	}
+	
+	@Override
+	public int transactionTimeoutInSeconds() {
+		TimeUnit transactionTimeoutUnit = getTransactionTimeoutUnit();
+		int transactionTimeout = getTransactionTimeout();
+		long transactionTimeoutInSeconds = transactionTimeoutUnit.toSeconds(transactionTimeout);
+		return Ints.checkedCast(transactionTimeoutInSeconds);
 	}
 	
 	@Override

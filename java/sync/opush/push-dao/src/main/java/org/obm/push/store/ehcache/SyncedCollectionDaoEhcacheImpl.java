@@ -48,8 +48,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implements SyncedCollectionDao {
 
-	private static final String STORE_NAME = "syncedCollectionStoreService";
-	
 	@Inject  SyncedCollectionDaoEhcacheImpl(
 			ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
@@ -57,7 +55,7 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 
 	@Override
 	protected String getStoreName() {
-		return STORE_NAME;
+		return ObjectStoreManager.SYNCED_COLLECTION_STORE;
 	}
 
 	@Override

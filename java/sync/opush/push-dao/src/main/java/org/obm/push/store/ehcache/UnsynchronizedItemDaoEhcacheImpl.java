@@ -50,15 +50,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao implements UnsynchronizedItemDao {
 
-	private static final String STORE_NAME = "unsynchronizedItemService";
-	
 	@Inject UnsynchronizedItemDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
 	
 	@Override
 	protected String getStoreName() {
-		return STORE_NAME;
+		return ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE;
 	}
 
 	@Override

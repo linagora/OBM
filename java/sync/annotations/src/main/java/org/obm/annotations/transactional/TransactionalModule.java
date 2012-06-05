@@ -45,7 +45,6 @@ public class TransactionalModule extends AbstractModule{
 
 		bind(TransactionManager.class).toProvider(TransactionProvider.class);
 		bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
-		bind(TransactionConfiguration.class).to(TransactionConfigurationStaticImpl.class);
 		
 		TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 

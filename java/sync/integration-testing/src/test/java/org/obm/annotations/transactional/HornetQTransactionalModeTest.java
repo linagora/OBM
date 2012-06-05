@@ -37,11 +37,14 @@ import javax.jms.TextMessage;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
+import bitronix.tm.TransactionManagerServices;
 
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.junit4.GuiceBerryRule;
@@ -49,10 +52,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
 
+import org.obm.configuration.TestConfigurationModule;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class HornetQTransactionalModeTest {
 
 	public static class Module extends AbstractModule {
@@ -68,6 +72,7 @@ public class HornetQTransactionalModeTest {
 			install(new TransactionalModule());
 			install(messageQueueModule);
 			install(new GuiceBerryModule());
+			install(new TestConfigurationModule());
 		}
 	}
 	
@@ -98,7 +103,12 @@ public class HornetQTransactionalModeTest {
 		
 	}
 	
-	@Test @Slow
+	@After
+	public void shutdown() {
+		TransactionManagerServices.getTransactionManager().shutdown();
+	}
+	
+	@Test
 	public void testSimple() throws Exception {
 		String testText = "test text";
 		xaMessageQueueInstance.put(testText);

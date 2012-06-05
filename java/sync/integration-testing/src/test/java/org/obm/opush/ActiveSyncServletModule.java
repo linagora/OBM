@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import net.sf.ehcache.CacheManager;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -39,6 +44,8 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
+
+import bitronix.tm.TransactionManagerServices;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -86,6 +93,18 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			Context root = new Context(server, "/", Context.SESSIONS);
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/");
+			root.addEventListener(new ServletContextListener() {
+				
+				@Override
+				public void contextInitialized(ServletContextEvent sce) {
+				}
+				
+				@Override
+				public void contextDestroyed(ServletContextEvent sce) {
+			    	CacheManager.getInstance().shutdown();
+			    	TransactionManagerServices.getTransactionManager().shutdown();
+				}
+			});
 		}
 
 		public void start() throws Exception {

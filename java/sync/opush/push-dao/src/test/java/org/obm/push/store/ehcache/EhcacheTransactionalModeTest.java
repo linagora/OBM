@@ -54,18 +54,21 @@ import org.junit.runner.RunWith;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.TestConfigurationModule;
+import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.EhcacheRollbackException;
+
+import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 import com.google.guiceberry.GuiceBerryModule;
-import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class EhcacheTransactionalModeTest {
 
 	public static class Module extends AbstractModule {
@@ -73,11 +76,11 @@ public class EhcacheTransactionalModeTest {
 		protected void configure() {
 			install(new TransactionalModule());
 			install(new GuiceBerryModule());
+			install(new TestConfigurationModule());
 		}
 	}
 	
-	@Rule public final GuiceBerryRule guiceBerry =
-			new GuiceBerryRule(Module.class);
+	@Rule public final JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Module.class);
 
 	@Inject private TestClass xaCacheInstance;
 	
@@ -126,7 +129,8 @@ public class EhcacheTransactionalModeTest {
 	
 	@After
 	public void removeCache() {
-		manager.removalAll();
+		manager.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

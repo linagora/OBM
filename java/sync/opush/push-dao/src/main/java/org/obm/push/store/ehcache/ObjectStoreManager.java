@@ -31,44 +31,57 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.store.StoreNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class ObjectStoreManager {
 
+	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
+	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
+	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
+	
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final CacheManager singletonManager;
 
-	@Inject ObjectStoreManager(ConfigurationService configurationService) throws StoreNotFoundException {
-		InputStream storeConfiguration = configurationService.getStoreConfiguration();
-		this.singletonManager = new CacheManager(storeConfiguration);
-		int transactionTimeoutInSeconds = transactionTimeoutInSeconds(configurationService); 
-		this.singletonManager.getTransactionController().setDefaultTransactionTimeout(transactionTimeoutInSeconds);
+	@Inject ObjectStoreManager(ConfigurationService configurationService) {
+		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds(); 
+		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds));
 		logger.info("initializing ehcache with transaction timeout = {} seconds", transactionTimeoutInSeconds);
 	}
-
-	private static int transactionTimeoutInSeconds(ConfigurationService configurationService) {
-		TimeUnit transactionTimeoutUnit = configurationService.getTransactionTimeoutUnit();
-		int transactionTimeout = configurationService.getTransactionTimeout();
-		long transactionTimeoutInSeconds = transactionTimeoutUnit.toSeconds(transactionTimeout);
-		return Ints.checkedCast(transactionTimeoutInSeconds);
+	
+	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds) {
+		Configuration configuration = new Configuration();
+		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE));
+		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE));
+		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE));
+		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
+		return configuration;
+	}
+	
+	private CacheConfiguration defaultCacheConfiguration() {
+		return new CacheConfiguration()
+			.maxElementsInMemory(1000)
+			.maxElementsOnDisk(100000)
+			.eternal(true)
+			.overflowToDisk(true)
+			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
+			.transactionalMode(TransactionalMode.XA);
 	}
 	
 	public Cache createNewStore(String storeName) {

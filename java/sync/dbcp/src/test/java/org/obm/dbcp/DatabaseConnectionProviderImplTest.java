@@ -44,7 +44,6 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ConfigurationService;
-import org.obm.fixtures.ConfigurationServiceFixturePostgreSQL;
 
 
 public class DatabaseConnectionProviderImplTest {

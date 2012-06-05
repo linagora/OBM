@@ -44,6 +44,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.locator.store.LocatorService;
@@ -55,6 +57,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
@@ -78,6 +81,7 @@ import fr.aliacom.obm.utils.HelperServiceImpl;
 public class GuiceServletContextListener implements ServletContextListener { 
 
 	public static final String ATTRIBUTE_NAME = "GuiceInjecter";
+	private static final String APPLICATION_NAME = "obm-sync";
 	
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	XTrustProvider.install();
@@ -111,6 +115,7 @@ public class GuiceServletContextListener implements ServletContextListener {
                 bind(LocatorService.class).to(LocatorCache.class);
                 bind(HelperService.class).to(HelperServiceImpl.class);
                 bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+                bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
                 bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
                 bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
 
@@ -126,6 +131,8 @@ public class GuiceServletContextListener implements ServletContextListener {
                 for (FreeBusyPluginModule pluginModule : pluginModulesList) {
                     this.install(pluginModule);
                 }
+                
+        		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
             }
         }, new MessageQueueModule(), new TransactionalModule());
     }

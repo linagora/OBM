@@ -29,20 +29,38 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.configuration;
 
-import org.easymock.EasyMock;
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
+import java.io.File;
 
-public class StoreManagerConfigurationTest {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
-	protected ConfigurationService initConfigurationServiceMock() {
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationServiceImpl.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+@Singleton
+public class DefaultTransactionConfiguration implements TransactionConfiguration {
+
+	private final String applicationName;
+	private final ConfigurationService configurationService;
+
+	@Inject
+	private DefaultTransactionConfiguration(final @Named("application-name")String applicationName, ConfigurationService configurationService) {
+		this.applicationName = applicationName;
+		this.configurationService = configurationService;
 	}
 
+	@Override
+	public File getJournalPart1Path() {
+		return new File(String.format("/var/lib/%1$s/%1$s-btm1.tlog", applicationName));
+	}
+
+	@Override
+	public File getJournalPart2Path() {
+		return new File(String.format("/var/lib/%1$s/%1$s-btm2.tlog", applicationName));
+	}
+
+	@Override
+	public int getTimeOutInSecond() {
+		return configurationService.transactionTimeoutInSeconds();
+	}
 }
