@@ -54,7 +54,7 @@ class HashEventExtId extends UpdateObject {
             }
 
             $con->query('ALTER TABLE opush_event_mapping '.
-                'ALTER COLUMN event_ext_id_hash SET NOT NLL');
+                'ALTER COLUMN event_ext_id_hash SET NOT NULL');
 
             $con->query('CREATE UNIQUE INDEX '.
                 'opush_event_mapping_device_id_event_ext_id_fkey '.
