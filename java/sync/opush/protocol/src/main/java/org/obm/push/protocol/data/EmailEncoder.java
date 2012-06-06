@@ -128,7 +128,7 @@ public class EmailEncoder {
 		}
 
 		DOMUtils.createElementAndText(parent, "Email:MessageClass", mail
-				.getMessageClass().toString());
+				.getMessageClass().specificationValue());
 		if (mail.getInvitation() != null) {
 			appendMeetingRequest(parent, mail);
 		}
@@ -410,7 +410,7 @@ public class EmailEncoder {
 	
 	private String formatDate(Date date) {
 		if (date != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS''");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
 			return dateFormat.format(date);
 		} else {
 			return null;
