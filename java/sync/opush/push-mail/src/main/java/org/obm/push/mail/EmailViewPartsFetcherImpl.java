@@ -142,7 +142,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		IMimePart parentMessage = fetchInstructions.getMimePart().findRootMimePartInTree();
 		int nbAttachments = 0;
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
-			if (mp.isAttachment()) {
+			if (mp.isAttachment() && !mp.isICSAttachment()) {
 				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, nbAttachments++, uid);
 				if (emailViewAttachment != null) {
 					attachments.add(emailViewAttachment);

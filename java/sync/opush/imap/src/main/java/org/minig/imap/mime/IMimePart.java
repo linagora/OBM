@@ -107,4 +107,6 @@ public interface IMimePart {
 	boolean isFirstElementInParent();
 
 	boolean hasMimePart(ContentType contentType);
+	
+	boolean isICSAttachment();
 }
