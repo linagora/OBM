@@ -70,7 +70,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T12:26:16").toDate())
+					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -90,7 +90,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T12:26:16").toDate())
+					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -110,7 +110,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T12:26:16").toDate())
+					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -130,7 +130,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T12:26:16").toDate())
+					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -156,7 +156,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T07:57:33").toDate())
+					.dtStamp(new DateTime("2012-04-23T07:57:33Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -176,9 +176,9 @@ public class ICalendarConverterTest {
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
-					.startTime(new DateTime("2012-04-24").toDate())
-					.dtStamp(new DateTime("2012-04-23T09:44:07").toDate())
-					.endTime(new DateTime("2012-04-25").toDate())
+					.startTime(new DateTime("2012-04-24T02:00:00").toDate())
+					.dtStamp(new DateTime("2012-04-23T09:44:07Z").toDate())
+					.endTime(new DateTime("2012-04-25T02:00:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
@@ -198,7 +198,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T13:04:28").toDate())
+					.dtStamp(new DateTime("2012-04-23T13:04:28Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -223,7 +223,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T13:32:54").toDate())
+					.dtStamp(new DateTime("2012-04-23T13:32:54Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -249,7 +249,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T15:04:23").toDate())
+					.dtStamp(new DateTime("2012-04-23T15:04:23Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -280,7 +280,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T15:18:17").toDate())
+					.dtStamp(new DateTime("2012-04-23T15:18:17Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -312,7 +312,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T15:25:04").toDate())
+					.dtStamp(new DateTime("2012-04-23T15:25:04Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -340,7 +340,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T15:28:46").toDate())
+					.dtStamp(new DateTime("2012-04-23T15:28:46Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -366,7 +366,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-05-12T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-23T15:51:05").toDate())
+					.dtStamp(new DateTime("2012-04-23T15:51:05Z").toDate())
 					.endTime(new DateTime("2012-05-12T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -395,7 +395,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-24T07:57:07").toDate())
+					.dtStamp(new DateTime("2012-04-24T07:57:07Z").toDate())
 					.endTime(new DateTime("2012-07-10T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -423,7 +423,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-24T08:08:09").toDate())
+					.dtStamp(new DateTime("2012-04-24T08:08:09Z").toDate())
 					.endTime(new DateTime("2012-07-10T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -450,7 +450,7 @@ public class ICalendarConverterTest {
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
 					.startTime(new DateTime("2013-10-01T07:00:00").toDate())
-					.dtStamp(new DateTime("2012-04-24T08:19:39").toDate())
+					.dtStamp(new DateTime("2012-04-24T08:19:39Z").toDate())
 					.endTime(new DateTime("2013-10-01T07:15:00").toDate())
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
@@ -490,8 +490,8 @@ public class ICalendarConverterTest {
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
 				new MSMeetingRequest.MsMeetingRequestBuilder()
-					.startTime(new DateTime("2012-06-15").toDate())
-					.dtStamp(new DateTime("2012-06-04T12:59:20").toDate())
+					.startTime(new DateTime("2012-06-15T02:00:00").toDate())
+					.dtStamp(new DateTime("2012-06-04T12:59:20Z").toDate())
 					.allDayEvent(true)
 					.organizer("xavier.niel@jri.obm.lng.org")
 					.location("Lyon")

@@ -32,6 +32,7 @@
 package org.obm.icalendar.ical4jwrapper;
 
 import java.util.Collection;
+import java.util.Date;
 
 import com.google.common.collect.Iterables;
 
@@ -70,11 +71,11 @@ public class ICalendarRule {
 		return null;
 	}
 
-	public Long until() {
+	public Date until() {
 		if (rRule != null) {
 			Recur recur = rRule.getRecur();
 			if (recur != null && recur.getUntil() != null) {
-				return recur.getUntil().getTime();
+				return recur.getUntil();
 			}
 		}
 		return null;

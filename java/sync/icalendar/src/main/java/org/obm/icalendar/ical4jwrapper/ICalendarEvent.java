@@ -62,36 +62,36 @@ public class ICalendarEvent {
 		this.iCalendarRule = new ICalendarRule(vEvent);
 	}
 	
-	public Long endDate(Date startDate) {
+	public Date endDate(Date startDate) {
 		if (vEvent != null) {
 			DtEnd dtEnd = vEvent.getEndDate();
 			Duration duration = vEvent.getDuration();
 			if (dtEnd != null) {
-				return dtEnd.getDate().getTime();
+				return dtEnd.getDate();
 			}
 			if (duration != null) {			
 				Dur dur = duration.getDuration();
-				return dur.getTime(startDate).getTime();
+				return dur.getTime(startDate);
 			}
 		}
 		return null;
 	}
 	
-	public Long startDate() {
+	public Date startDate() {
 		if (vEvent != null) {
 			DtStart startDate = vEvent.getStartDate();
 			if (startDate != null) {
-				return startDate.getDate().getTime();
+				return startDate.getDate();
 			}
 		}
 		return null;
 	}
 
-	public Long dtStamp() {
+	public Date dtStamp() {
 		if (vEvent != null) {
 			DtStamp dateStamp = vEvent.getDateStamp();
 			if (dateStamp != null) {
-				return dateStamp.getDate().getTime();
+				return dateStamp.getDate();
 			}
 		}
 		return null;
@@ -148,11 +148,11 @@ public class ICalendarEvent {
 		return null;
 	}
 
-	public Long reccurenceId() {
+	public Date reccurenceId() {
 		if (vEvent != null) {
 			RecurrenceId recurrenceId = vEvent.getRecurrenceId();
 			if (recurrenceId != null) {
-				return recurrenceId.getDate().getTime();
+				return recurrenceId.getDate();
 			}
 		}
 		return null;

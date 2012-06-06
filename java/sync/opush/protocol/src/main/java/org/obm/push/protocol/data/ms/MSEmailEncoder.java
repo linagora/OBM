@@ -55,6 +55,8 @@ import com.google.inject.Inject;
 
 public class MSEmailEncoder {
 
+	public final static String UTC_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.000'Z'";
+	
 	private final static String MESSAGE_CLASS = "urn:content-classes:message";
 	private final static String CALENDAR_CLASS = "urn:content-classes:calendarmessage";
 	private final static String CPID_DEFAULT = "65001";

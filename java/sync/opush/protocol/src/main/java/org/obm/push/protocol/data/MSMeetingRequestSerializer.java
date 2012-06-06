@@ -40,6 +40,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
+import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -219,7 +220,7 @@ public class MSMeetingRequestSerializer {
 	
 	private String formatDate(Date date) {
 		if (date != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS''");
+			SimpleDateFormat dateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
 			return dateFormat.format(date);
 		} else {
 			return null;
