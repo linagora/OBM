@@ -298,7 +298,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.UNTIL)).isEqualTo("1970-01-01T12:00:00.000'");
+		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.UNTIL)).isEqualTo("1970-01-01T12:00:00.000Z");
 	}
 
 	private Builder initializedRequiredFieldsRecurrenceBuilder() {

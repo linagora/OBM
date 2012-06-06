@@ -42,7 +42,6 @@ import net.fortuna.ical4j.model.WeekDay;
 import net.fortuna.ical4j.model.property.Clazz;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
@@ -99,13 +98,13 @@ public class ICalendarConverter {
 		if (iCalendarEvent.isVEvent()) {
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
-			fillMsMeetingRequestFromVEvent(iCalendarEvent, timeZone, builder);
+			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);
 			
 			ICalendarRule iCalendarRule = iCalendarEvent.getICalendarRule();
 			if (iCalendarRule.isRRule()) {
-				builder.recurrenceId(date(recurrenceId(iCalendarEvent), timeZone));
+				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
-				fillMsMeetingRequestFromRRule(iCalendarRule, timeZone, builder);
+				fillMsMeetingRequestFromRRule(iCalendarRule, builder);
 			}
 			
 			builder.timeZone(timeZone);
@@ -120,16 +119,16 @@ public class ICalendarConverter {
 		return null;
 	}
 	
-	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, TimeZone timeZone, 
+	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, 
 			MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
-		Date startDate = date(iCalendarEvent.startDate(), timeZone);
-		Date endDate = date(iCalendarEvent.endDate(startDate), timeZone);
+		Date startDate = iCalendarEvent.startDate();
+		Date endDate = iCalendarEvent.endDate(startDate);
 		msMeetingRequestBuilder
 			.startTime(startDate)
 			.endTime(endDate)
 			.allDayEvent(isAllDay(iCalendarEvent, startDate, endDate))
-			.dtStamp(utcDate(iCalendarEvent.dtStamp()))
+			.dtStamp(iCalendarEvent.dtStamp())
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.location(iCalendarEvent.location())
 			.organizer(iCalendarEvent.organizer())
@@ -140,29 +139,12 @@ public class ICalendarConverter {
 			.globalObjId(iCalendarEvent.uid());
 	}
 	
-	private Long recurrenceId(ICalendarEvent iCalendarEvent) {
-		Long recurrenceId = iCalendarEvent.reccurenceId();
+	private Date recurrenceId(ICalendarEvent iCalendarEvent) {
+		Date recurrenceId = iCalendarEvent.reccurenceId();
 		if (recurrenceId == null) {
 			return iCalendarEvent.startDate();
 		}
 		return recurrenceId;
-	}
-	
-	private Date date(Long time, TimeZone timeZone) {
-		if (time != null) {
-			DateTime dateTime = new DateTime(time);
-			if (timeZone != null) {
-				return dateTime.toDate();
-			} else {
-				dateTime = dateTime.withZone(DateTimeZone.UTC);
-				return dateTime.toLocalDateTime().toDateTime().toDate();
-			}
-		}
-		return null;
-	}
-	
-	private Date utcDate(Long time) {
-		return date(time, null);
 	}
 	
 	private boolean isAllDay(ICalendarEvent iCalendarEvent, Date startDate, Date endDate) {
@@ -217,7 +199,7 @@ public class ICalendarConverter {
 		return MSMeetingRequestIntDBusyStatus.BUSY;
 	}
 	
-	private void fillMsMeetingRequestFromRRule(ICalendarRule iCalendarRule, TimeZone timeZone, 
+	private void fillMsMeetingRequestFromRRule(ICalendarRule iCalendarRule, 
 			MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
 		List<MSMeetingRequestRecurrence> meetingRequestRecurrences = Lists.newArrayList();
@@ -229,7 +211,7 @@ public class ICalendarConverter {
 		meetingRequestRecurrences.add(
 				new MSMeetingRequestRecurrence.Builder()
 				.interval(iCalendarRule.interval())
-				.until(date(iCalendarRule.until(), timeZone))
+				.until(iCalendarRule.until())
 				.dayOfWeek(dayList)
 				.type(type(frequency, dayList))
 				.dayOfMonth(dayOfMonth)
