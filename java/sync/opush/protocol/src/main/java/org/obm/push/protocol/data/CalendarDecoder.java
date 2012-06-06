@@ -53,9 +53,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 
 public class CalendarDecoder extends Decoder implements IDataDecoder {
 
+	@Inject
+	public CalendarDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(asTimeZoneDecoder, asTimeZoneConverter);
+	}
+	
 	@Override
 	public IApplicationData decode(Element syncData) {
 		Element containerNode;
@@ -69,8 +75,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		calendar.setUid(
 				new MSEventUid(parseDOMString(DOMUtils.getUniqueElement(syncData, "UID"))));
 		
-		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(
-				syncData, "TimeZone")));
+		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(syncData, "TimeZone")));
 
 		setEventCalendar(calendar, syncData);
 

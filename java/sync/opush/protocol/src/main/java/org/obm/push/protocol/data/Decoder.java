@@ -36,14 +36,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.codec.binary.Base64;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 public class Decoder {
+	
+	private final ASTimeZoneDecoder asTimeZoneDecoder;
+	private final ASTimeZoneConverter asTimeZoneConverter;
+	
+	@Inject
+	public Decoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		this.asTimeZoneDecoder = asTimeZoneDecoder;
+		this.asTimeZoneConverter = asTimeZoneConverter;
+	}
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -114,7 +128,10 @@ public class Decoder {
 
 	public TimeZone parseDOMTimeZone(Element node, TimeZone default_value) {
 		if (node != null) {
-			return parseTimeZone(node.getTextContent());
+			byte[] nodeInBase64 = node.getTextContent().getBytes();
+			byte[] nodeInOctets = Base64.decodeBase64(nodeInBase64);
+			ASTimeZone asTimeZone = asTimeZoneDecoder.decode(nodeInOctets);
+			return asTimeZoneConverter.convert(asTimeZone, Locale.getDefault());
 		}
 		return default_value;
 	}

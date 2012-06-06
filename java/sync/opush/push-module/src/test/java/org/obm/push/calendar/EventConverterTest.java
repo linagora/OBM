@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,16 +51,18 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
+import org.obm.push.protocol.data.ASTimeZoneConverter;
+import org.obm.push.protocol.data.ASTimeZoneDecoder;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -73,8 +76,6 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
-import org.obm.filter.SlowFilterRunner;
-
 @RunWith(SlowFilterRunner.class)
 public class EventConverterTest {
 
@@ -83,12 +84,16 @@ public class EventConverterTest {
 
 	@Inject EventConverterImpl eventConverter;
 	private CalendarDecoder decoder;
+	private ASTimeZoneDecoder asTimeZoneDecoder;
+	private ASTimeZoneConverter asTimeZoneConverter;
 	
 	@Before
 	public void init() {
 		this.eventConverter = new EventConverterImpl(
 				new MSEventToObmEventConverterImpl(), new ObmEventToMSEventConverterImpl());
-		this.decoder = new CalendarDecoder();
+		asTimeZoneDecoder = createMock(ASTimeZoneDecoder.class);
+		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
+		this.decoder = new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter);
 	}
 
 	@Test

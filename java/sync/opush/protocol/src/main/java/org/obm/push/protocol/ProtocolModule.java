@@ -29,24 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.protocol;
 
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ms.MSRead;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.protocol.data.ASTimeZoneConverter;
+import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
+import org.obm.push.protocol.data.ASTimeZoneDecoder;
+import org.obm.push.protocol.data.ASTimeZoneDecoderImpl;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneConverterImpl;
+import org.obm.push.protocol.data.TimeZoneEncoder;
+import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 
-import com.google.inject.Inject;
+import com.google.inject.AbstractModule;
 
-public class EmailDecoder extends Decoder implements IDataDecoder {
+public class ProtocolModule extends AbstractModule{
 
-	@Inject
-	public EmailDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
-	}
-	
 	@Override
-	public IApplicationData decode(Element syncData) {
-		return new MSRead(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
+	protected void configure() {
+		bind(TimeZoneEncoder.class).to(TimeZoneEncoderImpl.class);
+		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
+		bind(ASTimeZoneDecoder.class).to(ASTimeZoneDecoderImpl.class);
+		bind(ASTimeZoneConverter.class).to(ASTimeZoneConverterImpl.class);
 	}
 }

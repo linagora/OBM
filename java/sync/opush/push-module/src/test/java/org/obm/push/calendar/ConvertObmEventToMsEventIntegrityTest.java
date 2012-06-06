@@ -43,7 +43,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -131,6 +130,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		return User.Factory.create().createUser("jaures@domain", "jaures@sfio.fr", "Jean Jaures");
 	}
 
+	@Ignore("OBMFULL-3787")
 	@Test
 	public void testSimpleObmEvent() throws ConversionException {
 		Event event = basicEvent();
@@ -337,5 +337,14 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 				.withType(AttendeeType.REQUIRED).build());
 	}
 	
-	
+	@Test
+	public void testTimeZoneConversion() throws ConversionException {
+		Event event = basicEvent();
+		
+		TimeZone timeZone = TimeZone.getTimeZone("Pacific/Auckland");
+		event.setTimezoneName(timeZone.getDisplayName());
+		
+		MSEvent msEvent = converter.convert(event, new MSEventUid("mseventuid"), jauresUser());
+		assertThat(msEvent.getTimeZone()).equals(timeZone);
+	}
 }

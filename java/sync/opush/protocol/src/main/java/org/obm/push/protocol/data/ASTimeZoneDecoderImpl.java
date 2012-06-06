@@ -31,22 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ms.MSRead;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.protocol.bean.ASTimeZone;
 
-import com.google.inject.Inject;
+public class ASTimeZoneDecoderImpl implements ASTimeZoneDecoder {
 
-public class EmailDecoder extends Decoder implements IDataDecoder {
-
-	@Inject
-	public EmailDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
-	}
-	
+	// Waiting for OBMFULL-3785
 	@Override
-	public IApplicationData decode(Element syncData) {
-		return new MSRead(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
+	public ASTimeZone decode(byte[] asTZ) {
+		return null;
 	}
 }

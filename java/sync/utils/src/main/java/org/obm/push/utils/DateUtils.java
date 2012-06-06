@@ -51,6 +51,16 @@ public class DateUtils {
 		return calendar;
 	}
 	
+	public static Calendar getEpochCalendar(TimeZone timeZone) {
+		if (null == timeZone) {
+			return getEpochCalendar();
+		}
+		
+		Calendar calendar = Calendar.getInstance(timeZone);
+		calendar.setTimeInMillis(0);
+		return calendar;
+	}
+	
 	public static Calendar getEpochPlusOneSecondCalendar() {
 		Calendar calendar = getEpochCalendar();
 		//We don't use zero timestamp to avoid broken handling of MYSQL

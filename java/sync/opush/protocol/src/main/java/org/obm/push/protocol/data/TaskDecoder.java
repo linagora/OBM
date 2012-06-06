@@ -33,16 +33,23 @@ package org.obm.push.protocol.data;
 
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSTask;
 import org.obm.push.bean.MSRecurrence;
+import org.obm.push.bean.MSTask;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 public class TaskDecoder extends Decoder implements IDataDecoder {
 
+	@Inject
+	public TaskDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(asTimeZoneDecoder, asTimeZoneConverter);
+	}
+	
 	@Override
 	public IApplicationData decode(Element syncData) {
 		MSTask task = new MSTask();

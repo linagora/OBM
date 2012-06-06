@@ -42,8 +42,9 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.ConfigurationService;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.AbstractOpushEnv;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -61,9 +62,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class AutodiscoverHandlerTest {

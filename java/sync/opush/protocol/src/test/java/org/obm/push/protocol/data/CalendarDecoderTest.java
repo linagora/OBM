@@ -32,38 +32,59 @@
 
 package org.obm.push.protocol.data;
 
+import static org.easymock.EasyMock.aryEq;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
-import org.junit.Assert;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.apache.commons.codec.binary.Base64;
+import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.GregorianChronology;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
-import org.obm.push.protocol.data.CalendarDecoder;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.utils.type.UnsignedShort;
 import org.w3c.dom.Document;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class CalendarDecoderTest {
 	
 	private CalendarDecoder decoder;
-	
+	private ASTimeZoneDecoder asTimeZoneDecoder;
+	private ASTimeZoneConverter asTimeZoneConverter;
+	private Locale defaultLocale;
+
 	@Before
 	public void prepareEventConverter(){
-		decoder = new CalendarDecoder();
+		// Locale should be inherited in future from UserSettings
+		// standardName & dayLightName are locale dependent  
+		Locale.setDefault(Locale.US);
+		defaultLocale = Locale.getDefault();
+		
+		asTimeZoneDecoder = createMock(ASTimeZoneDecoder.class);
+		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
+		decoder = new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Test
 	public void testDecodeAttendees() throws Exception{
 		StringBuilder builder = new StringBuilder();
 		builder.append("<ApplicationData>");
-		builder.append("<TimeZone>xP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</TimeZone>");
 		builder.append("<AllDayEvent>0</AllDayEvent>");
 		builder.append("<BusyStatus>2</BusyStatus>");
 		builder.append("<DTStamp>20110228T144758Z</DTStamp>");
@@ -98,9 +119,9 @@ public class CalendarDecoderTest {
 		Document doc = getXml(builder.toString());
 		
 		IApplicationData  data = decoder.decode(doc.getDocumentElement());
-		Assert.assertTrue(data instanceof MSEvent);
+		assertThat(data).isInstanceOf(MSEvent.class);
 		MSEvent event = (MSEvent)data;
-		Assert.assertEquals(3, event.getAttendees().size());
+		assertThat(event.getAttendees().size()).isEqualTo(3);
 		MSAttendee adrien = null;
 		MSAttendee administrator = null;
 		MSAttendee sara = null;
@@ -117,17 +138,187 @@ public class CalendarDecoderTest {
 		checkAttendee(adrien, "Poupard Adrien", "adrien@test.tlse.lng", AttendeeStatus.ACCEPT, AttendeeType.REQUIRED);
 		checkAttendee(administrator, "Admin instrator", "administrator@test.tlse.lng", AttendeeStatus.NOT_RESPONDED, AttendeeType.OPTIONAL);
 		checkAttendee(sara, "Sara Connor", "sara@test.tlse.lng", AttendeeStatus.DECLINE, AttendeeType.REQUIRED);
-		
-		
 	}
 	
 	private void checkAttendee(MSAttendee att, String name,
 			String email, AttendeeStatus status, AttendeeType type) {
-		Assert.assertNotNull(att);
-		Assert.assertEquals(name, att.getName());
-		Assert.assertEquals(email, att.getEmail());
-		Assert.assertEquals(status, att.getAttendeeStatus());
-		Assert.assertEquals(type, att.getAttendeeType());
+		assertThat(att).isNotNull();
+		assertThat(att.getName()).isEqualTo(name);
+		assertThat(att.getEmail()).isEqualTo(email);
+		assertThat(att.getAttendeeStatus()).isEqualTo(status);
+		assertThat(att.getAttendeeType()).isEqualTo(type);
 	}
 	
+	private UnsignedShort zeroUnsignedShort() {
+		return UnsignedShort.checkedCast(0);
+	}
+	
+	private ASSystemTime zeroSystemTime() {
+		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		asSystemTimeBuilder.year(zeroUnsignedShort())
+			.month(zeroUnsignedShort())
+			.dayOfWeek(zeroUnsignedShort())
+			.weekOfMonth(zeroUnsignedShort())
+			.hour(zeroUnsignedShort())
+			.minute(zeroUnsignedShort())
+			.second(zeroUnsignedShort())
+			.milliseconds(zeroUnsignedShort());
+		return asSystemTimeBuilder.build();
+	}
+
+	private ASTimeZone gmtTimeZone() {
+		String gmtName = "Greenwich Mean Time";
+		
+		ASTimeZone.Builder asTimeZoneBuilder = new ASTimeZone.Builder();
+		asTimeZoneBuilder.bias(0)
+			.standardName(gmtName)
+			.standardDate(zeroSystemTime())
+			.standardBias(0)
+			.dayLightName(gmtName)
+			.dayLightDate(zeroSystemTime())
+			.dayLightBias(0);
+		return asTimeZoneBuilder.build();
+	}
+	
+	private void mockTimeZoneConversion(TimeZone timeZone, String asEncryptedTimeZone, ASTimeZone asTimeZone) {
+		expect(asTimeZoneDecoder.decode(aryEq(Base64.decodeBase64(asEncryptedTimeZone.getBytes()))))
+			.andReturn(asTimeZone).anyTimes();
+		
+		expect(asTimeZoneConverter.convert(eq(asTimeZone), eq(defaultLocale)))
+			.andReturn(timeZone).anyTimes();
+		
+		replay(asTimeZoneDecoder, asTimeZoneConverter);
+	}
+	
+	@Test
+	public void testGMTTimeZone() throws Exception{
+		TimeZone timeZone = TimeZone.getTimeZone("GMT");
+		String gmt = "AAAAAEcAcgBlAGUAbgB3AGkAYwBoACAATQBlAGEAbgAgAFQAaQBtAGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEcAcgBlAGUAbgB3AGkAYwBoACAATQBlAGEAbgAgAFQAaQBtAGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+		
+		mockTimeZoneConversion(timeZone, gmt, gmtTimeZone());
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<TimeZone>" + gmt + "</TimeZone>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		assertThat(event.getTimeZone()).isNotNull().isEqualTo(timeZone);
+	}
+	
+	private Date dateForTimeZone(DateTimeZone dateTimeZone, int year, int month, int dayOfMonth, int hour, int minute, int second, int milliseconds) {
+		GregorianChronology gregorianChronology = GregorianChronology.getInstance(dateTimeZone);
+		long millis = gregorianChronology.getDateTimeMillis(year, month, dayOfMonth, hour, minute, second, milliseconds);
+		return new Date(millis);
+	}
+	
+	@Test
+	public void testGMTDateTime() throws Exception{
+		String gmt = "AAAAAEcAcgBlAGUAbgB3AGkAYwBoACAATQBlAGEAbgAgAFQAaQBtAGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEcAcgBlAGUAbgB3AGkAYwBoACAATQBlAGEAbgAgAFQAaQBtAGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+		
+		mockTimeZoneConversion(TimeZone.getTimeZone("GMT"), gmt, gmtTimeZone());
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<TimeZone>" + gmt + "</TimeZone>");
+		builder.append("<DTStamp>20110228T144758Z</DTStamp>");
+		builder.append("<EndTime>20110306T120000Z</EndTime>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		Date startTime = dateForTimeZone(DateTimeZone.UTC, 2011, 2, 28, 14, 47, 58, 0);
+		assertThat(event.getDtStamp()).isEqualTo(startTime);
+		
+		Date endTime = dateForTimeZone(DateTimeZone.UTC, 2011, 3, 6, 12, 0, 0, 0);
+		assertThat(event.getEndTime()).isEqualTo(endTime);
+	}
+	
+	private ASSystemTime asSummerTime() {
+		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		asSystemTimeBuilder.year(UnsignedShort.checkedCast(2012))
+			.month(UnsignedShort.checkedCast(10))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.weekOfMonth(UnsignedShort.checkedCast(5))
+			.hour(UnsignedShort.checkedCast(3))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0));
+		return asSystemTimeBuilder.build();
+	}
+	
+	private ASSystemTime asWinterTime() {
+		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		asSystemTimeBuilder.year(UnsignedShort.checkedCast(2012))
+			.month(UnsignedShort.checkedCast(03))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.weekOfMonth(UnsignedShort.checkedCast(5))
+			.hour(UnsignedShort.checkedCast(2))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0));
+		return asSystemTimeBuilder.build();
+	}
+	
+	private ASTimeZone parisTimeZone() {
+		ASTimeZone.Builder asTimeZoneBuilder = new ASTimeZone.Builder();
+		asTimeZoneBuilder.bias(1)
+			.standardName("Central European Summer Time")
+			.standardDate(asSummerTime())
+			.standardBias(3)
+			.dayLightName("Central European Time")
+			.dayLightDate(asWinterTime())
+			.dayLightBias(2);
+		return asTimeZoneBuilder.build();
+	}
+	
+	@Test
+	public void testParisTimeZone() throws Exception{
+		String paris = "xP///0MAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAEMAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABTAHUAbQBtAGUAcgAgAFQAaQBtAGUAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
+		TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+		
+		mockTimeZoneConversion(timeZone, paris, parisTimeZone());
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<TimeZone>" + paris + "</TimeZone>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		assertThat(event.getTimeZone()).isNotNull().isEqualTo(timeZone);
+	}
+	
+	@Test
+	public void testParisDateTime() throws Exception{
+		String paris = "xP///0MAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAEMAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABTAHUAbQBtAGUAcgAgAFQAaQBtAGUAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
+		
+		mockTimeZoneConversion(TimeZone.getTimeZone("Europe/Paris"), paris, parisTimeZone());
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<TimeZone>" + paris + "</TimeZone>");
+		builder.append("<DTStamp>20110228T144758Z</DTStamp>");
+		builder.append("<EndTime>20110306T120000Z</EndTime>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		Date startTime = dateForTimeZone(DateTimeZone.forID("Europe/Paris"), 2011, 2, 28, 15, 47, 58, 0); 
+		assertThat(event.getDtStamp()).isEqualTo(startTime);
+		
+		Date endTime = dateForTimeZone(DateTimeZone.forID("Europe/Paris"), 2011, 3, 6, 13, 0, 0, 0);
+		assertThat(event.getEndTime()).isEqualTo(endTime);
+	}
 }

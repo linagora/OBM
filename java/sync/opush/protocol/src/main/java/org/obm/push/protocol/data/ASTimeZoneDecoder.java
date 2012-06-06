@@ -31,22 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ms.MSRead;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.protocol.bean.ASTimeZone;
 
-import com.google.inject.Inject;
+public interface ASTimeZoneDecoder {
 
-public class EmailDecoder extends Decoder implements IDataDecoder {
+	ASTimeZone decode(byte[] asTZ);
 
-	@Inject
-	public EmailDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
-	}
-	
-	@Override
-	public IApplicationData decode(Element syncData) {
-		return new MSRead(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
-	}
 }

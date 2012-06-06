@@ -31,39 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Calendar;
+import java.util.TimeZone;
 
-import junit.framework.Assert;
-
-import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-
 import org.obm.filter.SlowFilterRunner;
-
 @RunWith(SlowFilterRunner.class)
 public class DateUtilsTest {
 
 	@Test
 	public void getGeneseDate() {
 		Calendar currentGMTCalendar = DateUtils.getEpochPlusOneSecondCalendar();
-		Assert.assertEquals(1970, currentGMTCalendar.get(Calendar.YEAR));
-		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.MONTH));
-		Assert.assertEquals(1, currentGMTCalendar.get(Calendar.DAY_OF_MONTH));
-		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.HOUR));
-		Assert.assertEquals(0, currentGMTCalendar.get(Calendar.MINUTE));
-		Assert.assertEquals(1, currentGMTCalendar.get(Calendar.SECOND));
+		assertThat(currentGMTCalendar.get(Calendar.YEAR)).isEqualTo(1970);
+		assertThat(currentGMTCalendar.get(Calendar.MONTH)).isEqualTo(0);
+		assertThat(currentGMTCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
+		assertThat(currentGMTCalendar.get(Calendar.HOUR)).isEqualTo(0);
+		assertThat(currentGMTCalendar.get(Calendar.MINUTE)).isEqualTo(0);
+		assertThat(currentGMTCalendar.get(Calendar.SECOND)).isEqualTo(1);
 	}
 	
 	@Test
 	public void getMidnightCalendar() {
 		Calendar currentGMTCalendar = DateUtils.getCurrentGMTCalendar();
 		Calendar twoHoursAMCalendar = DateUtils.getMidnightCalendar();
-		Assert.assertEquals(currentGMTCalendar.get(Calendar.YEAR), twoHoursAMCalendar.get(Calendar.YEAR));
-		Assert.assertEquals(currentGMTCalendar.get(Calendar.MONTH), twoHoursAMCalendar.get(Calendar.MONTH));
-		Assert.assertEquals(currentGMTCalendar.get(Calendar.DAY_OF_MONTH), twoHoursAMCalendar.get(Calendar.DAY_OF_MONTH));
-		Assert.assertEquals(0, twoHoursAMCalendar.get(Calendar.HOUR));
+		int year = currentGMTCalendar.get(Calendar.YEAR);
+		assertThat(twoHoursAMCalendar.get(Calendar.YEAR)).isEqualTo(year);
+		int month = currentGMTCalendar.get(Calendar.MONDAY);
+		assertThat(twoHoursAMCalendar.get(Calendar.MONTH)).isEqualTo(month);
+		int dayOfMonth = currentGMTCalendar.get(Calendar.DAY_OF_MONTH);
+		assertThat(twoHoursAMCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(dayOfMonth);
+		assertThat(twoHoursAMCalendar.get(Calendar.HOUR)).isEqualTo(0);
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2011, 12, 7);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(1);
+		assertThat(weekWithoutStartShift).isEqualTo(1);
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2011, 11, 11);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
+		assertThat(weekWithoutStartShift).isEqualTo(2);
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2011, 11, 1);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(1);
+		assertThat(weekWithoutStartShift).isEqualTo(1);
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2011, 11, 8);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(2);
+		assertThat(weekWithoutStartShift).isEqualTo(2);
 	}
 	
 	@Test
@@ -103,7 +103,7 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2011, 11, 30);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(5);
+		assertThat(weekWithoutStartShift).isEqualTo(5);
 	}
 	
 	@Test
@@ -111,6 +111,30 @@ public class DateUtilsTest {
 		Calendar calendar = DateUtils.getCurrentGMTCalendar();
 		calendar.set(2012, 0, 18);
 		int weekWithoutStartShift = DateUtils.getWeekOfCurrentDayWithoutStartShift(calendar);
-		Assertions.assertThat(weekWithoutStartShift).isEqualTo(3);
+		assertThat(weekWithoutStartShift).isEqualTo(3);
+	}
+	
+	@Test
+	public void testGetEpochCalendar() {
+		Calendar calendar = DateUtils.getEpochCalendar();
+		assertThat(calendar).isNotNull();
+		assertThat(calendar.getTimeInMillis()).isEqualTo(0);
+	}
+	
+	@Test
+	public void testGetEpochCalendarWithNullParameter() {
+		Calendar calendar = DateUtils.getEpochCalendar(null);
+		assertThat(calendar).isNotNull();
+		assertThat(calendar.getTimeZone()).isEqualTo(TimeZone.getTimeZone("GMT"));
+		assertThat(calendar.getTimeInMillis()).isEqualTo(0);
+	}
+	
+	@Test
+	public void testGetEpochCalendarWithSpecifiedTimeZone() {
+		TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+		Calendar calendar = DateUtils.getEpochCalendar(timeZone);
+		assertThat(calendar).isNotNull();
+		assertThat(calendar.getTimeZone()).isEqualTo(timeZone);
+		assertThat(calendar.getTimeInMillis()).isEqualTo(0);
 	}
 }

@@ -76,7 +76,7 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 
 		fillEventCommonProperties(e, mse);
 		
-		mse.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+		mse.setTimeZone(TimeZone.getTimeZone(e.getTimezoneName()));
 		appendAttendeesAndOrganizer(e, mse, user);
 		mse.setUid(uid);
 		mse.setRecurrence(getRecurrence(e));

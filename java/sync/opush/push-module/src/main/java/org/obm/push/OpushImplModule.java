@@ -51,6 +51,15 @@ import org.obm.push.calendar.EventConverter;
 import org.obm.push.calendar.EventConverterImpl;
 import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.protocol.ProtocolModule;
+import org.obm.push.protocol.data.ASTimeZoneConverter;
+import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
+import org.obm.push.protocol.data.ASTimeZoneDecoder;
+import org.obm.push.protocol.data.ASTimeZoneDecoderImpl;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneConverterImpl;
+import org.obm.push.protocol.data.TimeZoneEncoder;
+import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 import org.obm.push.service.DeviceService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
@@ -87,6 +96,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new DaoModule());
 		install(new OpushServletModule());
 		install(new ObmSyncHttpClientModule());
+		install(new ProtocolModule());
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
@@ -107,6 +117,10 @@ public class OpushImplModule extends AbstractModule {
 		bind(MappingService.class).to(MappingServiceImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+		bind(TimeZoneEncoder.class).to(TimeZoneEncoderImpl.class);
+		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
+		bind(ASTimeZoneDecoder.class).to(ASTimeZoneDecoderImpl.class);
+		bind(ASTimeZoneConverter.class).to(ASTimeZoneConverterImpl.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);

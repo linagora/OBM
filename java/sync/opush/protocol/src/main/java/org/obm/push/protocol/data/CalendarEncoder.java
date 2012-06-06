@@ -37,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -48,6 +49,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
@@ -58,15 +60,16 @@ import com.google.inject.Inject;
 public class CalendarEncoder extends Encoder {
 
 	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
-	private SimpleDateFormat sdf;
+	private final TimeZoneEncoder timeZoneEncoder;
+	private final TimeZoneConverter timeZoneConverter;
 	
 	@Inject
-	/* package */ CalendarEncoder() {
+	/* package */ CalendarEncoder(TimeZoneEncoder timeZoneEncoder, TimeZoneConverter timeZoneConverter) {
 		super();
-		this.sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-		this.sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		this.timeZoneEncoder = timeZoneEncoder;
+		this.timeZoneConverter = timeZoneConverter;
 	}
-
+	
 	// <TimeZone>xP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</TimeZone>
 	// <AllDayEvent>0</AllDayEvent>
 	// <BusyStatus>2</BusyStatus>
@@ -80,10 +83,15 @@ public class CalendarEncoder extends Encoder {
 
 		MSEvent ev = (MSEvent) data;
 
-		Element tz = DOMUtils.createElement(p, "Calendar:TimeZone");
-		// taken from exchange 2k7 : eastern greenland, gmt+0, no dst
-		tz
-				.setTextContent("xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==");
+		TimeZone timeZone = ev.getTimeZone();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+		
+		if (null != timeZone) {
+			sdf.setTimeZone(timeZone);
+		
+			s(p, "Calendar:TimeZone", encodedTimeZoneAsString(timeZone, Locale.getDefault()));
+		}
 
 		s(p, "Calendar:DTStamp", ev.getDtStamp() != null ? ev.getDtStamp()
 				: new Date(),sdf);
@@ -139,8 +147,8 @@ public class CalendarEncoder extends Encoder {
 		encodeBody(udr, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
-			encodeRecurrence(p, ev);
-			encodeExceptions(udr, ev, p, ev.getExceptions());
+			encodeRecurrence(p, ev, sdf);
+			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf);
 		}
 
 		s(p, "Calendar:Sensitivity", ev.getSensitivity().asIntString());
@@ -173,9 +181,21 @@ public class CalendarEncoder extends Encoder {
 
 	}
 
+	private String encodedTimeZoneAsString(TimeZone TimeZone, Locale locale) {
+		return new String(encodedTimeZone(TimeZone, locale));
+	}
+	
+	private byte[] encodedTimeZone(TimeZone timeZone, Locale locale) {
+		ASTimeZone asTimeZone = timeZoneConverter.convert(timeZone, locale);
+		return timeZoneEncoder.encode(asTimeZone);
+	}
+
 	private void encodeExceptions(UserDataRequest udr,
 			MSEvent parent,
-			Element p, List<MSEventException> excepts) {
+			Element p,
+			List<MSEventException> excepts,
+			SimpleDateFormat sdf) {
+		
 		// Exceptions.Exception
 		if(excepts.size()>0){
 			Element es = DOMUtils.createElement(p, "Calendar:Exceptions");
@@ -231,7 +251,10 @@ public class CalendarEncoder extends Encoder {
 		}
 	}
 
-	private void encodeRecurrence(Element p, MSEvent ev) {
+	private void encodeRecurrence(Element p,
+			MSEvent ev,
+			SimpleDateFormat sdf) {
+		
 		Element r = DOMUtils.createElement(p, "Calendar:Recurrence");
 		DOMUtils.createElementAndText(r, "Calendar:RecurrenceType", rec(ev)
 				.getType().asIntString());

@@ -37,6 +37,8 @@ import org.obm.push.tnefconverter.RTFUtils;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
+import com.google.inject.Inject;
+
 // Nouveau contact
 //<Commands>
 //<Add>
@@ -51,6 +53,11 @@ import org.w3c.dom.Element;
 
 public class ContactDecoder extends Decoder implements IDataDecoder {
 
+	@Inject
+	public ContactDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(asTimeZoneDecoder, asTimeZoneConverter);
+	}
+	
 	@Override
 	public IApplicationData decode(Element syncData) {
 		MSContact contact = new MSContact();

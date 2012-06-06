@@ -36,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FilterType;
@@ -48,6 +47,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -79,15 +79,16 @@ public class SyncDecoder {
 
 	@Inject
 	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
-			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper) {
+			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper,
+			ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
 		this.collectionDao = collectionDao;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.collectionPathHelper = collectionPathHelper;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
-				.put(PIMDataType.CONTACTS, new ContactDecoder())
-				.put(PIMDataType.CALENDAR, new CalendarDecoder())
-				.put(PIMDataType.EMAIL, new EmailDecoder())
-				.put(PIMDataType.TASKS, new TaskDecoder())
+				.put(PIMDataType.CONTACTS, new ContactDecoder(asTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.CALENDAR, new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.EMAIL, new EmailDecoder(asTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.TASKS, new TaskDecoder(asTimeZoneDecoder, asTimeZoneConverter))
 				.build();
 	}
 
