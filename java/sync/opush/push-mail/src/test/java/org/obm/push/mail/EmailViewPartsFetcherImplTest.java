@@ -106,7 +106,7 @@ public class EmailViewPartsFetcherImplTest {
 		InputStream attachmentInputStream;
 		boolean isAttachment = false;
 		boolean isInvitation = false;
-
+		boolean isICSAttachment = false;
 		String encoding = null;
 	}
 	
@@ -526,6 +526,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId);
+		expect(mimePart.isICSAttachment()).andReturn(messageFixture.isICSAttachment);
 
 		MimeMessage mimeMessage = createMock(MimeMessage.class);
 		expect(mimeMessage.findMainMessage(anyObject(ContentType.class))).andReturn(mimePart).anyTimes();
