@@ -239,6 +239,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = delta.getSyncDate();
 		} else {
 			lastSync = c.getSyncState().getLastSync();
+			delta = new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), lastSync);
 		}
 
 		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, processedClientIds);

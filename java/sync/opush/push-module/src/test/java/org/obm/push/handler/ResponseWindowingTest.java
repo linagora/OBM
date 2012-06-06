@@ -60,6 +60,38 @@ import com.google.common.collect.Sets;
 
 public class ResponseWindowingTest {
 
+	@Test(expected=NullPointerException.class)
+	public void processWindowSizeDeltaIsNull() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		responseWindowingProcessor.windowChanges(syncCollection(5), null, user.userDataRequest, ImmutableMap.<String, String>of());
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void processWindowSizeSyncCollectionIsNull() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		responseWindowingProcessor.windowChanges(null, deltas(2), user.userDataRequest, ImmutableMap.<String, String>of());
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void processWindowSizeUserDataRequestIsNull() {
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), null, ImmutableMap.<String, String>of());
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void processWindowSizeProcessedClientIdsIsNull() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), user.userDataRequest, null);
+	}
+
+	
 	@Test
 	public void processWindowSizeChangesFitTheWindow() {
 		OpushUser user = OpushUser.create("usera@domain", "pw");

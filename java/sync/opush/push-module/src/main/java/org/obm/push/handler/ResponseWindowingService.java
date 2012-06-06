@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -165,6 +166,11 @@ public class ResponseWindowingService {
 	
 	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
 			UserDataRequest userDataRequest, Map<String, String> processedClientIds) {
+		Preconditions.checkNotNull(delta);
+		Preconditions.checkNotNull(c);
+		Preconditions.checkNotNull(userDataRequest);
+		Preconditions.checkNotNull(processedClientIds);
+		
 		final Credentials credentials = userDataRequest.getCredentials();
 		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();
