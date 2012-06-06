@@ -34,15 +34,15 @@ package org.obm.push.protocol.data;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
@@ -50,7 +50,6 @@ import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Shorts;
 
 @RunWith(SlowFilterRunner.class)
 public class TimeZoneEncoderImplTest {
@@ -73,6 +72,7 @@ public class TimeZoneEncoderImplTest {
 	
 	@Before
 	public void setUp() {
+		Locale.setDefault(Locale.US);
 		serializer = new TimeZoneEncoderImpl(
 				new IntEncoder(), new WCHAREncoder(), new SystemTimeEncoder());
 		intEncoder = new IntEncoder();
@@ -175,7 +175,7 @@ public class TimeZoneEncoderImplTest {
 	
 	@Test
 	public void testEncodeDateAtZero() {
-		ASSystemTime systemTime = new ASSystemTime.FromDateBuilder().date(new Date(0)).build();
+		ASSystemTime systemTime = new ASSystemTime.FromDateBuilder().dateTime(new DateTime(0)).build();
 		byte[] expectedValue = systemTimeEncoder.toByteArray(systemTime);
 
 		byte[] standardDate = serializer.encodeDate(systemTime);
@@ -186,7 +186,7 @@ public class TimeZoneEncoderImplTest {
 	@Test
 	public void testEncodeLastTimeOf2016() {
 		ASSystemTime systemTime = new ASSystemTime.FromDateBuilder()
-			.date(DateUtils.date("2016-12-31T23:59:59.999+00")).build();
+			.dateTime(DateTime.parse("2016-12-31T23:59:59.999+00")).build();
 		byte[] expectedValue = systemTimeEncoder.toByteArray(systemTime);
 
 		byte[] standardDate = serializer.encodeDate(systemTime);
@@ -197,7 +197,7 @@ public class TimeZoneEncoderImplTest {
 	@Test
 	public void testEncodeEarlyTimeOf2222() {
 		ASSystemTime systemTime = new ASSystemTime.FromDateBuilder()
-			.date(DateUtils.date("2222-01-01T00:00:00.000+00")).build();
+			.dateTime(DateTime.parse("2222-01-01T00:00:00.000+00")).build();
 		byte[] expectedValue = systemTimeEncoder.toByteArray(systemTime);
 
 		byte[] standardDate = serializer.encodeDate(systemTime);
@@ -213,9 +213,7 @@ public class TimeZoneEncoderImplTest {
 				"ACgAVQBUAEMAKwAwADEAOgAwADAAKQAgAEIAcgB1AHgAZQBsAGwAZQBzAC" +
 				"wAIABDAG8AcABlAG4AaABhAGcAdQAAAAMAAAAFAAIAAAAAAAAAxP///w==");
 		
-		System.out.println(Shorts.fromBytes((byte)0,(byte) 10));
-		System.out.println(Shorts.fromBytes((byte)7,(byte) -72));
-		
+
 		byte[] opushTzBinary = serializer.encodeTimeZoneAsBinary(asTimeZoneOf("Europe/Paris"));
 
 		byte[][] exchangeTzBinaryFields = binaryTimeZoneAsArrayOfByteArray(exchangeTzBinary);
@@ -276,26 +274,9 @@ public class TimeZoneEncoderImplTest {
 		assertThat(opushTzBinaryFields).isEqualTo(exchangeTzBinaryFields);
 	}
 	
-	@Test
-	public void testEncodeAmericaTijuanaAsExchangeDoes() {
-		byte[] exchangeTzBinary = Base64.decodeBase64(
-				"4AEAACgAVQBUAEMALQAwADgAOgAwADAAKQAgAFQAaQBqAHUAYQBuAGEALA" +
-				"AgAEIAYQBzAHMAZQAgAEMAYQBsAGkAZgAAAAoAAAAFAAIAAAAAAAAAAAAA" +
-				"ACgAVQBUAEMALQAwADgAOgAwADAAKQAgAFQAaQBqAHUAYQBuAGEALAAgAE" +
-				"IAYQBzAHMAZQAgAEMAYQBsAGkAZgAAAAQAAAABAAIAAAAAAAAAxP///w==");
-		
-		byte[] opushTzBinary = serializer.encodeTimeZoneAsBinary(asTimeZoneOf("America/Tijuana"));
-
-		byte[][] exchangeTzBinaryFields = binaryTimeZoneAsArrayOfByteArray(exchangeTzBinary);
-		byte[][] opushTzBinaryFields = binaryTimeZoneAsArrayOfByteArray(opushTzBinary);
-		
-		assertThat(opushTzBinary).hasSize(SPEC_TIMEZONE_LENGHT);
-		assertThat(opushTzBinaryFields).isEqualTo(exchangeTzBinaryFields);
-	}
-	
 	private ASTimeZone asTimeZoneOf(String timeZoneID) {
-		TimeZone parisTimeZone = TimeZone.getTimeZone(timeZoneID);
-		ASTimeZone asTimeZone = new TimeZoneConverterImpl().convert(parisTimeZone);
+		TimeZone timeZone = TimeZone.getTimeZone(timeZoneID);
+		ASTimeZone asTimeZone = new TimeZoneConverterImpl().convert(timeZone, Locale.US);
 		return asTimeZone;
 	}
 

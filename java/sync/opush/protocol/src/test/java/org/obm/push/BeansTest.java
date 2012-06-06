@@ -29,54 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.utils.type;
+package org.obm.push;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
-public final class UnsignedShort {
+@RunWith(SlowFilterRunner.class)
+public class BeansTest {
 
-	public static final int MIN_VALUE = 0;
-	public static final int MAX_VALUE = 65535;
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
 	
-	private final int value;
-	
-	private UnsignedShort(int value) {
-		this.value = value;
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
 	
-	public int getValue() {
-		return value;
+	@Test
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(ASSystemTime.class)
+					.add(ASTimeZone.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
 	}
 	
-	public byte[] toByteArray() {
-		return new byte[] {
-		        (byte) value,
-		        (byte) (value >> 8)};
-	}
-	
-	public static UnsignedShort checkedCast(int value) {
-	    checkArgument(value >= MIN_VALUE && value <= MAX_VALUE, "Out of range: %s", value);
-		return new UnsignedShort(value);
-	}
-	
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(value);
-	}
-	
-	@Override
-	public boolean equals(Object object) {
-		if (object instanceof UnsignedShort) {
-			UnsignedShort that = (UnsignedShort) object;
-			return Objects.equal(this.value, that.value);
-		}
-		return false;
-	}
 }

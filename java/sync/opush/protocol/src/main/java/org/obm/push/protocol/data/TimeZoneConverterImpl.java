@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.obm.push.protocol.bean.ASSystemTime;
@@ -45,81 +48,105 @@ import com.google.common.base.Preconditions;
 
 public class TimeZoneConverterImpl implements TimeZoneConverter {
 
-	private static final long INSTANT_USED_FOR_DST_DATES = org.obm.DateUtils.date("2012-01-01T00:00:00.000+00").getTime();
 	private static final int TIMEZONE_DISPLAY_NAME_STYLE = TimeZone.LONG;
 	private static final int TIMEZONE_EACH_YEARS_SPEC_VALUE = 0;
 
 	@Override
-	public ASTimeZone convert(TimeZone timezone) {
-		Preconditions.checkNotNull(timezone);
+	public ASTimeZone convert(TimeZone timeZone, Locale locale) {
+		Preconditions.checkNotNull(timeZone);
 		
 		Builder asTimeZoneBuilder = new ASTimeZone.Builder();
 		
-		appendBias(asTimeZoneBuilder, timezone);
-		appendDSTBias(asTimeZoneBuilder, timezone);
-		appendDSTTransitionDates(asTimeZoneBuilder, timezone);
-		appendTimeZoneNames(asTimeZoneBuilder, timezone);
+		asTimeZoneBuilder
+			.bias(biasInMinutes(timeZone))
+			.standardBias(standardBiasInMinute(timeZone.getDSTSavings()))
+			.dayLightBias(dayLightBiasInMinute(timeZone.getDSTSavings()))
+			.standardDate(standardDate(timeZone))
+			.dayLightDate(dayLightDate(timeZone))
+			.standardName(standardName(timeZone, locale))
+			.dayLightName(dayLightName(timeZone, locale));
 		
 		return asTimeZoneBuilder.build();
 	}
 
-	private void appendDSTTransitionDates(Builder asTimeZoneBuilder, TimeZone timezone) {
-		DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timezone);
-		
-//		long firstDSTTransitionInstant = dateTimeZone.convertUTCToLocal(dateTimeZone.nextTransition(INSTANT_USED_FOR_DST_DATES));
-//		long secondDSTTransitionInstant = dateTimeZone.convertUTCToLocal(dateTimeZone.nextTransition(firstDSTTransitionInstant));
-		long firstDSTTransitionInstant = dateTimeZone.nextTransition(INSTANT_USED_FOR_DST_DATES);
-		long secondDSTTransitionInstant = dateTimeZone.nextTransition(firstDSTTransitionInstant);
+	private ASSystemTime standardDate(TimeZone timeZone) {
+		DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
 
-		if (dateTimeZone.isStandardOffset(INSTANT_USED_FOR_DST_DATES)) {
-			asTimeZoneBuilder.standardDate(systemTimeFromInstant(secondDSTTransitionInstant));
-			asTimeZoneBuilder.dayLightDate(systemTimeFromInstant(firstDSTTransitionInstant));
-		} else {
-			asTimeZoneBuilder.standardDate(systemTimeFromInstant(firstDSTTransitionInstant));
-			asTimeZoneBuilder.dayLightDate(systemTimeFromInstant(secondDSTTransitionInstant));
+		DateMidnight dateMidnight = new DateMidnight(DateTimeUtils.getInstantMillis(null), dateTimeZone);
+		
+		long firstDSTTransitionInstant = dateTimeZone.nextTransition(dateMidnight.getMillis());
+		long secondDSTTransitionInstant = dateTimeZone.nextTransition(firstDSTTransitionInstant);
+		
+		if (firstDSTTransitionInstant == secondDSTTransitionInstant) {
+			return systemTimeFromInstant(0, DateTimeZone.UTC);
 		}
+		
+		if (dateTimeZone.isStandardOffset(firstDSTTransitionInstant)) {
+			return systemTimeFromInstant(firstDSTTransitionInstant, dateTimeZone);
+		} 
+		return systemTimeFromInstant(secondDSTTransitionInstant, dateTimeZone);
 	}
 
-	private ASSystemTime systemTimeFromInstant(long instant) {
+	private ASSystemTime dayLightDate(TimeZone timeZone) {
+		DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
+
+		DateMidnight dateMidnight = new DateMidnight(DateTimeUtils.getInstantMillis(null), dateTimeZone);
+		
+		long firstDSTTransitionInstant = dateTimeZone.nextTransition(dateMidnight.getMillis());
+		long secondDSTTransitionInstant = dateTimeZone.nextTransition(firstDSTTransitionInstant);
+		
+		if (firstDSTTransitionInstant == secondDSTTransitionInstant) {
+			return systemTimeFromInstant(0, DateTimeZone.UTC);
+		}
+		
+		if (dateTimeZone.isStandardOffset(firstDSTTransitionInstant)) {
+			return systemTimeFromInstant(secondDSTTransitionInstant, dateTimeZone);
+		} 
+		return systemTimeFromInstant(firstDSTTransitionInstant, dateTimeZone);
+	}
+
+	private ASSystemTime systemTimeFromInstant(long instant, DateTimeZone dateTimeZone) {
+		DateTime dateTime = new DateTime(instant, dateTimeZone);
 		return new ASSystemTime.FromDateBuilder()
-			.date(new Date(instant))
+			.dateTime(dateTime)
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build();
 	}
 
-	private void appendTimeZoneNames(Builder asTimeZoneBuilder, TimeZone timezone) {
-		boolean useDayLightName = true;
-		asTimeZoneBuilder.standardName(timeZoneDisplayName(timezone, !useDayLightName));
-		asTimeZoneBuilder.dayLightName(timeZoneDisplayName(timezone, useDayLightName));
+	private String standardName(TimeZone timeZone, Locale locale) {
+		return timeZoneDisplayName(timeZone, false, locale);
+	}
+	
+	private String dayLightName(TimeZone timeZone, Locale locale) {
+		return timeZoneDisplayName(timeZone, true, locale);
 	}
 
-	private String timeZoneDisplayName(TimeZone timezone, boolean useDayLightName) {
-		return timezone.getDisplayName(useDayLightName, TIMEZONE_DISPLAY_NAME_STYLE);
+	private String timeZoneDisplayName(TimeZone timezone, boolean useDayLightName, Locale locale) {
+		return timezone.getDisplayName(useDayLightName, TIMEZONE_DISPLAY_NAME_STYLE, locale);
 	}
 
-	private void appendDSTBias(Builder asTimeZoneBuilder, TimeZone timezone) {
-		int standardBiasInMinutes = 0;
-		int dayLightBiasInMinutes = 0;
-
-		int dayLightSavingTimesInMillis = timezone.getDSTSavings();
-		if (dayLightSavingTimesInMillis > 0) {
-			dayLightBiasInMinutes = millisToMinutes(-dayLightSavingTimesInMillis);
-		} else {
-			standardBiasInMinutes = millisToMinutes(dayLightSavingTimesInMillis);
+	private int standardBiasInMinute(int dstSavings) {
+		if (dstSavings > 0) {
+			return 0;
 		}
 		
-		asTimeZoneBuilder.standardBias(standardBiasInMinutes);
-		asTimeZoneBuilder.dayLightBias(dayLightBiasInMinutes);
+		int standardBiasInMinute = millisToMinutes(dstSavings);
+		return -standardBiasInMinute;
 	}
-
-	private void appendBias(Builder asTimeZoneBuilder, TimeZone timezone) {
-		int biasInMinutes = offsetFromUtcToLocalInMinutes(timezone);
-		asTimeZoneBuilder.bias(-biasInMinutes);
+	
+	private int dayLightBiasInMinute(int dstSavings) {
+		if (dstSavings > 0) {
+			int dayLightBiasInMinute = millisToMinutes(dstSavings);
+			return -dayLightBiasInMinute;
+		}
+		
+		return 0;
 	}
-
-	private int offsetFromUtcToLocalInMinutes(TimeZone timezone) {
+	
+	private int biasInMinutes(TimeZone timezone) {
 		int offsetFromUtcToLocalInMillis = timezone.getRawOffset();
-		return millisToMinutes(offsetFromUtcToLocalInMillis);
+		int biasInMinute = -millisToMinutes(offsetFromUtcToLocalInMillis);
+		return biasInMinute;
 	}
 
 	private int millisToMinutes(int millis) {

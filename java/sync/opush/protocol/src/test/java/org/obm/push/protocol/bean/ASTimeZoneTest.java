@@ -39,7 +39,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.type.UnsignedShort;
 
 @RunWith(SlowFilterRunner.class)
-public class TimeZoneTest {
+public class ASTimeZoneTest {
 
 	private int defaultBiasInMinutes;
 	private int defaultStandardBiasInMinutes;
@@ -69,7 +69,7 @@ public class TimeZoneTest {
 			.build();
 	}
 	
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsBias() {
 		new ASTimeZone.Builder()
 			.standardBias(defaultStandardBiasInMinutes)
@@ -79,7 +79,7 @@ public class TimeZoneTest {
 			.build();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsStandardBias() {
 		new ASTimeZone.Builder()
 			.bias(defaultBiasInMinutes)
@@ -89,7 +89,7 @@ public class TimeZoneTest {
 			.build();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsStandardDate() {
 		new ASTimeZone.Builder()
 			.bias(defaultBiasInMinutes)
@@ -99,7 +99,7 @@ public class TimeZoneTest {
 			.build();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsDayLightBias() {
 		new ASTimeZone.Builder()
 			.bias(defaultBiasInMinutes)
@@ -109,7 +109,7 @@ public class TimeZoneTest {
 			.build();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsDayLightDate() {
 		new ASTimeZone.Builder()
 			.bias(defaultBiasInMinutes)

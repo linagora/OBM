@@ -31,11 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.obm.push.protocol.bean.ASTimeZone;
 
 public interface TimeZoneConverter {
 
-	ASTimeZone convert(TimeZone timezone);
+	ASTimeZone convert(TimeZone timezone, Locale locale);
 }

@@ -31,10 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Weeks;
 import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -69,49 +68,56 @@ public class ASSystemTime {
 		}
 
 		public Builder month(UnsignedShort month) {
+			Preconditions.checkState(month.getValue() <= 12);
 			this.month = month;
 			return this;
 		}
 
 		public Builder dayOfWeek(UnsignedShort dayOfWeek) {
+			Preconditions.checkState(dayOfWeek.getValue() <= 6);
 			this.dayOfWeek = dayOfWeek;
 			return this;
 		}
 
 		public Builder weekOfMonth(UnsignedShort weekOfMonth) {
+			Preconditions.checkState(weekOfMonth.getValue() <= 5);
 			this.weekOfMonth = weekOfMonth;
 			return this;
 		}
 
 		public Builder hour(UnsignedShort hour) {
+			Preconditions.checkState(hour.getValue() <= 23);
 			this.hour = hour;
 			return this;
 		}
 
 		public Builder minute(UnsignedShort minute) {
+			Preconditions.checkState(minute.getValue() <= 59);
 			this.minute = minute;
 			return this;
 		}
 
 		public Builder second(UnsignedShort second) {
+			Preconditions.checkState(second.getValue() <= 59);
 			this.second = second;
 			return this;
 		}
 
 		public Builder milliseconds(UnsignedShort milliseconds) {
+			Preconditions.checkState(milliseconds.getValue() <= 999);
 			this.milliseconds = milliseconds;
 			return this;
 		}
 
 		public ASSystemTime build() {
-			Preconditions.checkNotNull(year);
-			Preconditions.checkNotNull(month);
-			Preconditions.checkNotNull(dayOfWeek);
-			Preconditions.checkNotNull(weekOfMonth);
-			Preconditions.checkNotNull(hour);
-			Preconditions.checkNotNull(minute);
-			Preconditions.checkNotNull(second);
-			Preconditions.checkNotNull(milliseconds);
+			Preconditions.checkState(year != null);
+			Preconditions.checkState(month != null);
+			Preconditions.checkState(dayOfWeek != null);
+			Preconditions.checkState(weekOfMonth != null);
+			Preconditions.checkState(hour != null);
+			Preconditions.checkState(minute != null);
+			Preconditions.checkState(second != null);
+			Preconditions.checkState(milliseconds != null);
 			
 			return new ASSystemTime(year, month, dayOfWeek,
 					weekOfMonth, hour, minute, second, milliseconds);
@@ -124,11 +130,11 @@ public class ASSystemTime {
 		@VisibleForTesting static final int JAVA_TO_MS_API_DAYOFWEEK_OFFSET = -1;
 		@VisibleForTesting static final int JAVA_TO_MS_API_WEEKOFMONTH_LAST = 5;
 
-		private Date date;
+		private DateTime dateTime;
 		private UnsignedShort overridingYear;
 
-		public FromDateBuilder date(Date date) {
-			this.date = date;
+		public FromDateBuilder dateTime(DateTime dateTime) {
+			this.dateTime = dateTime;
 			return this;
 		}
 
@@ -138,27 +144,16 @@ public class ASSystemTime {
 		}
 
 		public ASSystemTime build() {
-			Preconditions.checkNotNull(date);
+			Preconditions.checkState(dateTime != null);
 
-			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-			calendar.setTime(date);
-			
-			UnsignedShort month = monthFieldAsUnsignedShort(calendar);
-			UnsignedShort weekOfMonth = calendarFieldAsUnsignedShort(calendar, Calendar.WEEK_OF_MONTH);
-			UnsignedShort dayOfWeek = dayOfWeekFieldAsBinary(calendar);
-			UnsignedShort hour = calendarFieldAsUnsignedShort(calendar, Calendar.HOUR_OF_DAY);
-			UnsignedShort minute = calendarFieldAsUnsignedShort(calendar, Calendar.MINUTE);
-			UnsignedShort second = calendarFieldAsUnsignedShort(calendar, Calendar.SECOND);
-			UnsignedShort milliseconds = calendarFieldAsUnsignedShort(calendar, Calendar.MILLISECOND);
-			
-			UnsignedShort year = overridingYear;
-			if (year == null) {
-				year = calendarFieldAsUnsignedShort(calendar, Calendar.YEAR);
-			}
-
-			if (weekOfMonth.getValue() > JAVA_TO_MS_API_WEEKOFMONTH_LAST) {
-				weekOfMonth = UnsignedShort.checkedCast(JAVA_TO_MS_API_WEEKOFMONTH_LAST);
-			}
+			UnsignedShort year = year(dateTime);
+			UnsignedShort month = month(dateTime);
+			UnsignedShort weekOfMonth = weekOfMonth(dateTime);
+			UnsignedShort dayOfWeek = dayOfWeek(dateTime);
+			UnsignedShort hour = hour(dateTime);
+			UnsignedShort minute = minute(dateTime);
+			UnsignedShort second = second(dateTime);
+			UnsignedShort milliseconds = milliseconds(dateTime);
 			
 			return new Builder()
 					.year(year).month(month).dayOfWeek(dayOfWeek).weekOfMonth(weekOfMonth)
@@ -166,19 +161,73 @@ public class ASSystemTime {
 					.build();
 		}
 		
-		@VisibleForTesting UnsignedShort calendarFieldAsUnsignedShort(Calendar calendar, int calendarField) {
-			int calendarFieldValue = calendar.get(calendarField);
-			return unsignedShortOf(calendarFieldValue);
+		@VisibleForTesting UnsignedShort year(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return Objects.firstNonNull(overridingYear, unsignedShortOf(dateTime.getYear()));
+			}
+			return unsignedShortOf(0);
 		}
 		
-		@VisibleForTesting UnsignedShort monthFieldAsUnsignedShort(Calendar calendar) {
-			int monthFieldValue = calendar.get(Calendar.MONTH) + JAVA_TO_MS_API_MONTH_OFFSET;
-			return unsignedShortOf(monthFieldValue);
+		@VisibleForTesting UnsignedShort month(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(dateTime.getMonthOfYear());
+			}
+			return unsignedShortOf(0);
 		}
 		
-		@VisibleForTesting UnsignedShort dayOfWeekFieldAsBinary(Calendar calendar) {
-			int dayFieldValue = calendar.get(Calendar.DAY_OF_WEEK) + JAVA_TO_MS_API_DAYOFWEEK_OFFSET;
-			return unsignedShortOf(dayFieldValue);
+		@VisibleForTesting UnsignedShort weekOfMonth(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(Math.min(weekOfMonthAsUnsignedShort(dateTime), JAVA_TO_MS_API_WEEKOFMONTH_LAST));
+			}
+			return unsignedShortOf(0);
+		}
+		
+		@VisibleForTesting int weekOfMonthAsUnsignedShort(DateTime dateTime) {
+			DateTime firstDayOfMonth = new DateTime(dateTime).withDayOfMonth(1);
+			Weeks weeksBetweenDateAndFirstDateOfMonth = Weeks.weeksBetween(firstDayOfMonth, dateTime);
+			int weekOfMonth = weeksBetweenDateAndFirstDateOfMonth.getWeeks() + JAVA_TO_MS_API_MONTH_OFFSET;
+			
+			DateTime lastDayOfMonth = new DateTime(dateTime).plusMonths(1).withDayOfMonth(1).minusDays(1);
+			Weeks weeksBetweenDateAndLastDateOfMonth = Weeks.weeksBetween(dateTime, lastDayOfMonth);
+			if (weeksBetweenDateAndLastDateOfMonth.getWeeks() == 0) {
+				weekOfMonth = JAVA_TO_MS_API_WEEKOFMONTH_LAST;
+			}
+			return weekOfMonth;
+		}
+		
+		@VisibleForTesting UnsignedShort dayOfWeek(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(dateTime.getDayOfWeek() % 7);
+			}
+			return unsignedShortOf(0);
+		}
+		
+		@VisibleForTesting UnsignedShort hour(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC)) && dateTime.getHourOfDay() != 0) {
+				return unsignedShortOf(dateTime.minusHours(1).getHourOfDay() + 1);
+			}
+			return unsignedShortOf(0);
+		}
+		
+		@VisibleForTesting UnsignedShort minute(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(dateTime.getMinuteOfHour());
+			}
+			return unsignedShortOf(0);
+		}
+		
+		@VisibleForTesting UnsignedShort second(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(dateTime.getSecondOfMinute());
+			}
+			return unsignedShortOf(0);
+		}
+		
+		@VisibleForTesting UnsignedShort milliseconds(DateTime dateTime) {
+			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC))) {
+				return unsignedShortOf(dateTime.getMillisOfSecond());
+			}
+			return unsignedShortOf(0);
 		}
 		
 		private UnsignedShort unsignedShortOf(int value) {
@@ -236,12 +285,12 @@ public class ASSystemTime {
 
 	
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return Objects.hashCode(year, month, dayOfWeek, weekOfMonth, hour, minute, second, milliseconds);
 	}
 	
 	@Override
-	public boolean equals(Object object) {
+	public final boolean equals(Object object) {
 		if (object instanceof ASSystemTime) {
 			ASSystemTime that = (ASSystemTime) object;
 			return Objects.equal(this.year, that.year) &&
@@ -254,5 +303,17 @@ public class ASSystemTime {
 					Objects.equal(this.milliseconds, that.milliseconds);
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s-%s-%s/%sT%s:%s:%s", 
+				year, 
+				month, 
+				weekOfMonth, 
+				dayOfWeek, 
+				hour, 
+				minute, 
+				second);
 	}
 }

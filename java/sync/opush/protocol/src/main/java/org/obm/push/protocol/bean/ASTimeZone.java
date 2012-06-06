@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class ASTimeZone {
@@ -89,11 +90,11 @@ public class ASTimeZone {
 		}
 		
 		public ASTimeZone build() {
-			Preconditions.checkNotNull(bias);
-			Preconditions.checkNotNull(standardBias);
-			Preconditions.checkNotNull(standardDate);
-			Preconditions.checkNotNull(dayLightBias);
-			Preconditions.checkNotNull(dayLightDate);
+			Preconditions.checkState(bias != null);
+			Preconditions.checkState(standardBias != null);
+			Preconditions.checkState(standardDate != null);
+			Preconditions.checkState(dayLightBias != null);
+			Preconditions.checkState(dayLightDate != null);
 			
 			return new ASTimeZone(bias,
 					standardName, standardDate, standardBias,
@@ -142,4 +143,36 @@ public class ASTimeZone {
 		return dayLightBias;
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(bias, standardName, standardDate, standardBias, dayLightName, dayLightDate, dayLightBias);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ASTimeZone) {
+			ASTimeZone that = (ASTimeZone) object;
+			return Objects.equal(this.bias, that.bias)
+				&& Objects.equal(this.standardName, that.standardName)
+				&& Objects.equal(this.standardDate, that.standardDate)
+				&& Objects.equal(this.standardBias, that.standardBias)
+				&& Objects.equal(this.dayLightName, that.dayLightName)
+				&& Objects.equal(this.dayLightDate, that.dayLightDate)
+				&& Objects.equal(this.dayLightBias, that.dayLightBias);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("bias", bias)
+			.add("standardName", standardName)
+			.add("standardDate", standardDate)
+			.add("standardBias", standardBias)
+			.add("dayLightName", dayLightName)
+			.add("dayLightDate", dayLightDate)
+			.add("dayLightBias", dayLightBias)
+			.toString();
+	}
 }

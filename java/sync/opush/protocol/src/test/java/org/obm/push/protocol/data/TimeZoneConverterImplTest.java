@@ -32,16 +32,16 @@
 package org.obm.push.protocol.data;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.DateUtils.date;
 
+import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.utils.type.UnsignedShort;
 
 @RunWith(SlowFilterRunner.class)
@@ -76,13 +76,13 @@ public class TimeZoneConverterImplTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void testTimezoneIsRequired() {
-		new TimeZoneConverterImpl().convert(null);
+		new TimeZoneConverterImpl().convert(null, null);
 	}
 	
 	@Test
 	public void testLisbonConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Europe/Lisbon"));
+			.convert(TimeZone.getTimeZone("Europe/Lisbon"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(LISBON_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(LISBON_STANDARD_OFFSET);
@@ -90,11 +90,11 @@ public class TimeZoneConverterImplTest {
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(LISBON_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("Western European Summer Time");
 		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2016-10-30T01:00:00+00"))
+			.dateTime(DateTime.parse("2012-10-28T02:00:00+00"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2016-03-27T01:00:00+00"))
+			.dateTime(DateTime.parse("2012-03-25T01:00:00+00"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 	}
@@ -102,7 +102,7 @@ public class TimeZoneConverterImplTest {
 	@Test
 	public void testParisConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Europe/Paris"));
+			.convert(TimeZone.getTimeZone("Europe/Paris"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(PARIS_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(PARIS_STANDARD_OFFSET);
@@ -110,11 +110,31 @@ public class TimeZoneConverterImplTest {
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(PARIS_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("Central European Summer Time");
 		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2012-10-28T02:00:00+01"))
+			.dateTime(DateTime.parse("2012-10-28T03:00+01"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2012-03-25T02:00:00+01"))
+			.dateTime(DateTime.parse("2012-03-25T02:00:00+01"))
+			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
+			.build());
+	}
+	
+	@Test
+	public void testParisConversionFrenchLocale() {
+		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
+			.convert(TimeZone.getTimeZone("Europe/Paris"), Locale.FRANCE);
+		
+		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(PARIS_GMT));
+		assertThat(asTimeZone.getStandardBias()).isEqualTo(PARIS_STANDARD_OFFSET);
+		assertThat(asTimeZone.getStandardName()).isEqualTo("Heure d'Europe centrale");
+		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(PARIS_DST_OFFSET));
+		assertThat(asTimeZone.getDayLightName()).isEqualTo("Heure d'été d'Europe centrale");
+		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
+			.dateTime(DateTime.parse("2012-10-28T03:00:00+01"))
+			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
+			.build());
+		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
+			.dateTime(DateTime.parse("2012-03-25T02:00:00+01"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 	}
@@ -122,7 +142,7 @@ public class TimeZoneConverterImplTest {
 	@Test
 	public void testRigaConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Europe/Riga"));
+			.convert(TimeZone.getTimeZone("Europe/Riga"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(RIGA_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(RIGA_STANDARD_OFFSET);
@@ -130,11 +150,11 @@ public class TimeZoneConverterImplTest {
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(RIGA_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("Eastern European Summer Time");
 		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2002-10-27T03:00:00+02"))
+			.dateTime(DateTime.parse("2012-10-28T04:00:00+02"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2002-03-31T03:00:00+02"))
+			.dateTime(DateTime.parse("2012-03-25T03:00:00+02"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 	}
@@ -142,7 +162,7 @@ public class TimeZoneConverterImplTest {
 	@Test
 	public void testSydneyConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Australia/Sydney"));
+			.convert(TimeZone.getTimeZone("Australia/Sydney"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(SYDNEY_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(SYDNEY_STANDARD_OFFSET);
@@ -150,11 +170,11 @@ public class TimeZoneConverterImplTest {
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(SYDNEY_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("Eastern Summer Time (New South Wales)");
 		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2015-04-05T02:00:00+10"))
+			.dateTime(DateTime.parse("2013-04-07T03:00:00+11"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2015-10-04T02:00:00+10"))
+			.dateTime(DateTime.parse("2012-10-07T02:00:00+10"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 	}
@@ -162,7 +182,7 @@ public class TimeZoneConverterImplTest {
 	@Test
 	public void testAucklandConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Pacific/Auckland"));
+			.convert(TimeZone.getTimeZone("Pacific/Auckland"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(AUCKLAND_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(AUCKLAND_STANDARD_OFFSET);
@@ -170,11 +190,11 @@ public class TimeZoneConverterImplTest {
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(AUCKLAND_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("New Zealand Daylight Time");
 		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2012-09-30T02:00:00+12"))
+			.dateTime(DateTime.parse("2013-04-07T03:00:00+13"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2012-04-01T02:00:00+12"))
+			.dateTime(DateTime.parse("2012-09-30T02:00:00+12"))
 			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
 			.build());
 	}
@@ -182,21 +202,16 @@ public class TimeZoneConverterImplTest {
 	@Test
 	public void testHonoluluConversion() {
 		ASTimeZone asTimeZone = new TimeZoneConverterImpl()
-			.convert(TimeZone.getTimeZone("Pacific/Honolulu"));
+			.convert(TimeZone.getTimeZone("Pacific/Honolulu"), Locale.US);
 		
 		assertThat(asTimeZone.getBias()).isEqualTo(biasHourOffsetInMinutes(HONOLULU_GMT));
 		assertThat(asTimeZone.getStandardBias()).isEqualTo(HONOLULU_STANDARD_OFFSET);
 		assertThat(asTimeZone.getStandardName()).isEqualTo("Hawaii Standard Time");
 		assertThat(asTimeZone.getDayLightBias()).isEqualTo(biasHourOffsetInMinutes(HONOLULU_DST_OFFSET));
 		assertThat(asTimeZone.getDayLightName()).isEqualTo("Hawaii Daylight Time");
-		assertThat(asTimeZone.getStandardDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2011-12-31T13:00:00-10"))
-			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
-			.build());
-		assertThat(asTimeZone.getDayLightDate()).isEqualTo(new ASSystemTime.FromDateBuilder()
-			.date(date("2011-12-31T13:00:00-10"))
-			.overridingYear(UnsignedShort.checkedCast(TIMEZONE_EACH_YEARS_SPEC_VALUE))
-			.build());
+		String standardDate = asTimeZone.getStandardDate().toString();
+		String dayLightDate = asTimeZone.getDayLightDate().toString();
+		assertThat(standardDate).isEqualTo(dayLightDate);
 	}
 	
 	private int biasHourOffsetInMinutes(int hourOffset) {
