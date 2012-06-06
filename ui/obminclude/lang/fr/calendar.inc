@@ -98,7 +98,7 @@ $l_more = 'de plus';
 $l_search_my_calendar = "Rechercher dans mon agenda";
 $l_create_in_mine = "Nouvel évènement dans mon agenda";
 $l_search_result = "Résultat de recherche";
-$l_event_is_exception = "Cette évènement a été modifié et ne fait plus partie d'une série";
+$l_event_is_exception = "Cet évènement a été modifié et ne fait plus partie d'une série";
 $l_parent_event = "Evènement parent";
 $l_show_parent_event = "Consulter la série à laquelle il était rattaché";
 $l_eventexception_canceled = "annulé";
@@ -393,6 +393,13 @@ $l_delete_event_occurrence = 'Suppression d\'un rendez-vous récurrent';
 $l_delete_occurrence_message = 'Supprimer uniquement cet occurrence ou l\'ensemble de la série ?';
 $l_delete_occurrence = 'Supprimer l\'occurrence';
 $l_delete_all_occurrences = 'Supprimer la série';
+
+$l_edit_event_occurrence = 'Edition participation à un rendez-vous récurrent';
+$l_edit_occurrence_message = 'Changer votre participation à cette occurrence ou à l\'ensemble de la série ?';
+$l_edit_occurrence = 'Editer l\'occurrence';
+$l_edit_all_occurrences = 'Editer la série';
+$l_is_occurrence_of_parent_event = 'Cet évènement fait partie d\'une série : ';
+$l_exception_already_set = 'Problème de synchronisation apparu, veuillez rafraichir votre calendrier.';
 
 $l_toggle_public_access = "Ceci entrainera que tout le monde pourra inviter cette personne à un rendez-vous. Désirez-vous continuer?";
 $l_toggle_public_read = "Ceci entrainera que tout le monde pourra voir ce calendrier. Désirez-vous continuer?";

@@ -153,3 +153,11 @@ $l_confirm = "Confirmar";
 $l_cancel = "Cancelar";
 $l_update = "Actualizar el evento";
 $l_header_export = "Exportar";
+
+// Edit occurrence
+$l_edit_event_occurrence = 'Edit participation of this appointment';
+$l_edit_occurrence_message = 'Edit only this event or all events in the series ?';
+$l_edit_occurrence = 'Editer this event';
+$l_edit_all_occurrences = 'Edit all event in the series';
+$l_is_occurrence_of_parent_event = 'This event has part of a series';
+$l_exception_already_set = "This event is already set, return to clendar to refresh";

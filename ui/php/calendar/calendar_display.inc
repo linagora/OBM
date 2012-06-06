@@ -2878,7 +2878,7 @@ function html_calendar_conflict_form($calendar) {
 // Parameters:
 //   - $id : event id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_consult($id) {
+function dis_calendar_event_consult($id, $date_edit_occurrence = null) {
   global $display, $l_err_reference;
 
   if ($id > 0) {
@@ -2888,7 +2888,7 @@ function dis_calendar_event_consult($id) {
       $exception_q = run_query_get_one_event_exception($id);
       $alerts = get_one_event_user_alert($id);
       $display['detailInfo'] = display_record_info($eve_q);
-      $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
+      $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts, $date_edit_occurrence);
     } else {
       $display['msg'] .= display_err_msg($l_err_reference);
     }
@@ -3003,7 +3003,7 @@ function event_details_access_rights() {
 //   - $entities : entities linked to the event ['user'], ['resource']
 //   - $alerts   : alerts array
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts) {
+function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts, $date_edit_occurrence) {
   global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
@@ -3079,7 +3079,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   }
   $all_day = $event_q->f('event_allday');
-  $begin = new Of_Date($event_q->f('event_date'), 'GMT');
+  $begin = ( $date_edit_occurrence != null ) ? new Of_Date($date_edit_occurrence, 'GMT') : new Of_Date($event_q->f('event_date'), 'GMT');
   $end = clone $begin;
   $end->addSecond($event_q->f('event_duration'));
   if ($all_day) {
@@ -3119,7 +3119,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       </tr>
      </table>
     </div>";
-
   } elseif ($event_q->f('event_repeatkind') != 'none') {
     $kind = $GLOBALS['l_'.$event_q->f('event_repeatkind')];
     $kind_unit = $GLOBALS['l_'.$event_q->f('event_repeatkind').'_unit'];
@@ -3164,9 +3163,17 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       }
       $block_exception_detail .= $date->getOutputDate()." ($exception_desc)<br />";
     }
+
+    $fieldset_begin = $fieldset_end = '';
+    if( $date_edit_occurrence != null ){
+      $fieldset_begin = '<fieldset style="border:1px dashed #D2D2D2;padding-top:10px;"><legend>'.$GLOBALS[l_is_occurrence_of_parent_event].' </legend>';
+      $fieldset_end = '</fieldset>';
+    }
+
     $repeat_block = "
     <div class=\"detail infos\">
      <h1>$l_repeat</h1>
+     $fieldset_begin
      <table>   
       <tr>    
        <th>$l_repeatkind :</th> 
@@ -3186,6 +3193,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <td>$block_exception_detail</td>
       </tr>
      </table>
+     $fieldset_end
      </div>";
   }
 
@@ -3246,9 +3254,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 	"<tr>
 	 <td>$label</td>
 	 <td>
-	 <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'ACCEPTED', '$saved_checked', 'user', '$user_comment', '$escaped_title', '$l_decision_ACCEPTED', 'detailconsult')\" /><span> $l_accepted</span></label>
-	 <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'NEEDS-ACTION', '$saved_checked', 'user', '$user_comment', '$escaped_title', '$l_decision_NEEDS_ACTIONS', 'detailconsult')\" /><span> $l_needs_action</span></label>
-	 <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"DECLINED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'DECLINED', '$saved_checked', 'user', '$user_comment', '$escaped_title',  '$l_decision_DECLINED', 'detailconsult')\" /><span> $l_declined</span></label>
+	 <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'ACCEPTED', '$saved_checked', 'user', '$user_comment', '$escaped_title', '$l_decision_ACCEPTED', 'detailconsult', '$date_edit_occurrence')\" /><span> $l_accepted</span></label>
+	 <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'NEEDS-ACTION', '$saved_checked', 'user', '$user_comment', '$escaped_title', '$l_decision_NEEDS_ACTIONS', 'detailconsult', '$date_edit_occurrence')\" /><span> $l_needs_action</span></label>
+	 <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$u_id\" value=\"DECLINED\" onclick=\"obm.calendarDecisionPopup.compute($u_id, $id, 'DECLINED', '$saved_checked', 'user', '$user_comment', '$escaped_title',  '$l_decision_DECLINED', 'detailconsult', '$date_edit_occurrence')\" /><span> $l_declined</span></label>
 	 </td>
 	 <td style=\"$comment_style\"> <span>$user_comment_display</span> </td>
 	 <td style=\"text-align:center;\">$bell_alert_icon</td>
@@ -3387,9 +3395,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <tr>
           <td>$label $property[$r_id]</td>
           <td>
-          <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'ACCEPTED', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_ACCEPTED', 'detailconsult');\" /><span> $l_accepted</span></label>
-          <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'NEEDS-ACTION', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_NEEDS_ACTIONS', 'detailconsult');\" /><span> $l_needs_action</span></label>
-          <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"DECLINED\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'DECLINED', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_DECLINED', 'detailconsult');\" /><span> $l_declined</span></label>
+          <label style=\"display:inline-block;\"><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'ACCEPTED', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_ACCEPTED', 'detailconsult', '$date_edit_occurrence');\" /><span> $l_accepted</span></label>
+          <label style=\"display:inline-block;\"><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'NEEDS-ACTION', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_NEEDS_ACTIONS', 'detailconsult', '$date_edit_occurrence');\" /><span> $l_needs_action</span></label>
+          <label style=\"display:inline-block;\"><input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$r_id\" value=\"DECLINED\" onclick=\"obm.calendarDecisionPopup.compute($r_id, $id, 'DECLINED', '$saved_checked', 'resource', '$resource_comment', '$escaped_title' , '$l_decision_DECLINED', 'detailconsult', '$date_edit_occurrence');\" /><span> $l_declined</span></label>
           </td>
           <td style=\"$comment_style\">$resource_comment_display</td>
           </tr>";
@@ -4247,12 +4255,18 @@ function dis_calendar_conflict_popup() {
  * @return HTML
  */
 function dis_calendar_occurency_popup() {
+  $ico_popup_close = $GLOBALS['ico_popup_close'];
+  $l_edit_occurrence = $GLOBALS['l_edit_occurrence'];
+  $l_edit_event_occurrence = $GLOBALS['l_edit_event_occurrence'];
+  $l_edit_all_occurrences = $GLOBALS['l_edit_all_occurrences'];
+  $l_edit_occurrence_message = $GLOBALS['l_edit_occurrence_message'];
+  $l_cancel = $GLOBALS['l_cancel'];
 
   $block = "
     <div id=\"calendarConfirmDelete\" class=\"obmPopup\">
       <h1>
         <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
-          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+          <img src=\"$ico_popup_close\" alt=\"close\" />
         </a>
         <span>$GLOBALS[l_confirm]</span>
       </h1>
@@ -4268,7 +4282,7 @@ function dis_calendar_occurency_popup() {
     <div id=\"calendarOccurencyUpdate\" class=\"obmPopup\">
       <h1>
         <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
-          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+          <img src=\"$ico_popup_close\" alt=\"close\" />
         </a>
         <span>$GLOBALS[l_update_event_occurrence]</span>
       </h1>
@@ -4277,15 +4291,35 @@ function dis_calendar_occurency_popup() {
          <fieldset class=\"buttons\"> 
           <input type=\"button\" id=\"popup_update_one\" class=\"closeSticky\" value=\"$GLOBALS[l_update_occurrence]\" /><br/>
           <input type=\"button\" id=\"popup_update_all\" class=\"closeSticky\" value=\"$GLOBALS[l_update_all_occurrences]\" /><br/>
-          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$l_cancel\" />
          </fieldset>
       </div>
     </div>
 
+    <div id=\"calendarOccurenceEdit\" class=\"obmPopup\">
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$ico_popup_close\" alt=\"close\" />
+        </a>
+        <span>$l_edit_event_occurrence</span>
+      </h1>
+      <div class=\"content\">
+        <h2>$l_edit_occurrence_message</h2>
+         <fieldset class=\"buttons\">
+          <input type=\"button\" id=\"popup_edit_one\" class=\"closeSticky\" value=\"$l_edit_occurrence\" onclick=\"obm.calendarOccurenceEditPopup.editOne(null);\"/><br/>
+          <input type=\"button\" id=\"popup_consult_all\" class=\"closeSticky\" value=\"$l_edit_all_occurrences\" onclick=\"obm.calendarOccurenceEditPopup.editAll(null);\"/><br/>
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$l_cancel\" />
+         </fieldset>
+      </div>
+    </div>
+    <script type=\"text/javascript\">
+    obm.calendarOccurenceEditPopup = new Obm.calendarOccurenceEditPopup();
+    </script>
+
     <div id=\"calendarOccurencyDelete\" class=\"obmPopup\">
       <h1>
         <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
-          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+          <img src=\"$ico_popup_close\" alt=\"close\" />
         </a>
         <span>$GLOBALS[l_delete_event_occurrence]</span>
       </h1>
@@ -4294,7 +4328,7 @@ function dis_calendar_occurency_popup() {
          <fieldset class=\"buttons\"> 
           <input type=\"button\" id=\"popup_delete_one\" class=\"closeSticky\" value=\"$GLOBALS[l_delete_occurrence]\" /><br/>
           <input type=\"button\" id=\"popup_delete_all\" class=\"closeSticky\" value=\"$GLOBALS[l_delete_all_occurrences]\" /><br/>
-          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$l_cancel\" />
          </fieldset>
       </div>
     </div>";

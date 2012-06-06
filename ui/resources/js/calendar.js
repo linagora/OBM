@@ -1561,6 +1561,11 @@ Obm.CalendarInDayEvent = new Class({
       this.timeContainer.injectInside(this.dragHandler);
     } else {
       this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
+      if ( this.event.periodic )
+        this.timeContainer.addEvent('click', function(evt){
+          evt.preventDefault();
+          obm.calendarOccurenceEditPopup.compute(this.event, this.timeContainer);
+        }.bind(this));
       if (obm.vars.consts.action == 'portlet') this.timeContainer.setProperty('target', '_blank');
       this.timeContainer.injectInside(this.dragHandler);
 
@@ -2165,7 +2170,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
 		this.check_force = $('calendarDecisionPopup').getElementById('forceinsertion');
 	},
-	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, uriAction) {
+	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, uriAction,  dateEditOccurrence) {
 		this.uid = uid;
 		this.evtid = evtid;
 		this.decision = decision;
@@ -2178,6 +2183,7 @@ Obm.CalendarDecisionPopup = new Class({
 		this.yourDecision.set('text', this.choiceByLang);
 		this.eventTitlePlace.set('text', this.eventTitle);
 		this.uriAction = uriAction;
+    this.dateEditOccurrence = dateEditOccurrence;
 		this.show();
 	},
 	show: function() {
@@ -2196,7 +2202,12 @@ Obm.CalendarDecisionPopup = new Class({
 			onSuccess : function(message){
 				if(message.error == 0){
 					showMessage('ok', message.message);
-					window.location='../calendar/calendar_index.php?action='+encodeURIComponent(self.uriAction)+'&calendar_id='+self.evtid;
+          var redirectUrl = message.redirectUrl;
+          if (redirectUrl != null) {
+            window.location=redirectUrl;
+          } else {
+            window.location='../calendar/calendar_index.php?action='+encodeURIComponent(self.uriAction)+'&calendar_id='+self.evtid;
+          }
 				}else{
 					var redirectUrl = message.redirectUrl;
 					if (redirectUrl != null) {
@@ -2207,11 +2218,27 @@ Obm.CalendarDecisionPopup = new Class({
 					}
 				}
 			}
-		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, uriAction: this.uriAction});
+		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, uriAction: this.uriAction, date_edit_occurrence : this.dateEditOccurrence});
 	},
 	displayCharLimit: function(){
 		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
 	}
+});
+Obm.calendarOccurenceEditPopup = new Class({
+  compute: function (evt, location) {
+    this.event = evt;
+    this.location = location;
+    this.show();
+  },
+  show: function() {
+    obm.popup.show('calendarOccurenceEdit');
+  },
+  editOne: function() {
+    window.location=this.location+'&date_edit_occurrence='+encodeURIComponent(this.event.time);
+  },
+  editAll: function() {
+    window.location=this.location;
+  }
 });
 /******************************************************************************
  * Calendar Update and creation quick form

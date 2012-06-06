@@ -561,3 +561,11 @@ $l_comment_decision = "Comment your decision";
 $l_without_comment = "Respond without comment";
 $l_with_comment = "Respond with comment";
 $l_remainingChar= "characters remaining";
+
+// Edit occurrence
+$l_edit_event_occurrence = 'Change your participation to this appointment';
+$l_edit_occurrence_message = 'Edit only this event or all events in the series ?';
+$l_edit_occurrence = 'Edit this event';
+$l_edit_all_occurrences = 'Edit all event in the series';
+$l_is_occurrence_of_parent_event = 'This event is part of a series';
+$l_exception_already_set = "Synchronisation problem: please refresh your calendar";

@@ -372,9 +372,9 @@ if ($action == 'search') {
   if (check_calendar_access($params['calendar_id'], 'read')) {
     if($params['errormessage']){
       $display['msg'] .= display_err_msg($params['errormessage']);
-      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id'], $params['date_edit_occurrence']);
     }else{
-      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id'], $params['date_edit_occurrence']);
     }
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
@@ -694,7 +694,32 @@ if ($action == 'search') {
 
 } elseif ($action == 'update_decision_and_comment') {
 ///////////////////////////////////////////////////////////////////////////////
+  if ( $params['date_edit_occurrence'] ) {
+    try {
+      $exception_array = create_new_exception($params, $obm['uid']);
+    }
+    catch (AccessException $ex) {
+      json_error_msg("$l_event : $err[msg]");
+      echo "({".$display['json']."})";
+      exit();
+    }
+    catch (DBUpdateException $ex) {
+      json_error_msg("$l_event : $err[msg]");
+      echo "({".$display['json']."})";
+      exit();
+    }
+  }
   try {
+    if (isset($exception_array)) {
+      if ($exception_array['already_set']){
+        $l_exception_already_set = $GLOBALS['l_exception_already_set'];
+        json_error_msg( $l_event." : ".$l_exception_already_set );
+        echo "({".$display['json']."})";
+        exit();
+      } else {
+        $params['calendar_id'] = $exception_array['id'];
+      }
+    }
     $comment_and_decision_updated = update_decision_and_comment($params, $obm['uid']);
     if ($comment_and_decision_updated) {
       json_ok_msg("$l_event : $l_update_ok");
@@ -702,7 +727,7 @@ if ($action == 'search') {
   }
   catch (ConflictException $ex) {
     json_error_msg("$l_event : $l_conflicts");
-    
+      
     $obm_q = run_query_calendar_detail($params['calendar_id']);
     $begin = new Of_Date($obm_q->f('event_date'), 'GMT');
     $end = clone $begin;
@@ -711,19 +736,24 @@ if ($action == 'search') {
     $date_end = $end->getURL();
     $time_end = $end->getHour();
     $min_end = $end->getMinute();
-    
+      
     $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id'].
       "&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".
-      $date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".
-      $params['decision_event']."&uriAction=".$params['uriAction'];
+      $date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".$params['decision_event']."&uriAction=".$params['uriAction'];
     echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
     exit();
   }
   catch (Exception $ex) {
     json_error_msg("$l_event : $err[msg]");
   }
+  if( $params['date_edit_occurrence'] ){
+    $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=detailconsult&calendar_id=".$params['calendar_id'];
+    echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
+    exit();
+  }
   echo "({".$display['json']."})";
-  exit();  
+  exit();
+
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
@@ -1846,7 +1876,7 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
   );
-
+  
   // Update external decision
   $actions['calendar']['update_ext_decision'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update_ext_decision",
@@ -2365,6 +2395,23 @@ function update_decision_and_comment($params, $user_id) {
     throw new DBUpdateException();
   }
   return true;
+}
+
+function create_new_exception($params, $user_id) {
+  $reccurrence_q = run_query_calendar_detail($params['calendar_id']);
+  $event_id = $reccurrence_q->Record['event_id'];
+  if ( check_calendar_access( $event_id, 'read' ) ){
+    $calendar = $reccurrence_q->Record;
+    $date_occurrence = $params['date_edit_occurrence'];
+    $send_mail = false;
+    $exception_insert = run_query_calendar_event_exception_insert( $calendar, $reccurrence_q, $send_mail ,$date_occurrence);
+  } else {
+    throw new AccessException();
+  }
+  if ( !$exception_insert ) {
+    throw new DBUpdateException();
+  }
+  return $exception_insert;
 }
 
 class DBUpdateException extends Exception {}

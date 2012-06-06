@@ -1608,7 +1608,7 @@ form.button-to input {
   padding-right: 10px;
   padding-top: 10px;
   padding-bottom: 10px;
-  height:auto;
+  min-height:100px;
   width: 40em;
 }
 
@@ -1667,7 +1667,7 @@ form.button-to input {
   padding-right: 10px;
   padding-top: 10px;
   padding-bottom: 10px;
-  min-height: 100px;
+  min-height: 120px;
   width: 40em;
   margin-bottom: 5px;
 }

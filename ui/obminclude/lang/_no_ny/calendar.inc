@@ -151,3 +151,9 @@ $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses
 $l_j_category_create = "Please specify a label for the new category";
 $l_j_category_update = "Please specify a new label, and select a category for the update";
 $l_j_category_delete = "Please select a category to delete it";
+
+//occurence consultation
+$l_consult_occurrence = "Consult this event"; 
+$l_consult_occurrence_message = "Consult only this event or the series ?";
+$l_consult_event_occurrence = "Consult recurring event"; 
+$l_consult_all_occurrences = "Consult series"; 
