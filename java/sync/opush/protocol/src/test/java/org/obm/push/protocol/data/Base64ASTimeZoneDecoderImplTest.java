@@ -31,10 +31,50 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.fest.assertions.api.Assertions;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.utils.IntEncoder;
 
-public interface ASTimeZoneDecoder {
+@RunWith(SlowFilterRunner.class)
+public class Base64ASTimeZoneDecoderImplTest {
 
-	ASTimeZone decode(byte[] asTZ);
+	private Base64ASTimeZoneDecoderImpl base64asTimeZoneDecoder;
 
+	@Before
+	public void before() {
+		base64asTimeZoneDecoder = new Base64ASTimeZoneDecoderImpl(
+				new WCHAREncoder(), new IntEncoder(), new SystemTimeEncoder());
+	}
+	
+	@Test
+	public void testDecodeEuropeParisBase64ASTimeZone() {
+		ASTimeZone actualASTimeZone = toASTimeZone("Europe/Paris");
+		byte[] base64asTimeZone = toBase64(actualASTimeZone);
+
+		ASTimeZone expectedASTimeZone = base64asTimeZoneDecoder.decode(base64asTimeZone);
+		
+		Assertions.assertThat(actualASTimeZone.getBias()).isEqualTo(expectedASTimeZone.getBias());
+		Assertions.assertThat(actualASTimeZone.getStandardBias()).isEqualTo(expectedASTimeZone.getStandardBias());
+		Assertions.assertThat(actualASTimeZone.getDayLightBias()).isEqualTo(expectedASTimeZone.getDayLightBias());
+		Assertions.assertThat(actualASTimeZone.getDayLightDate()).isEqualTo(expectedASTimeZone.getDayLightDate());
+		Assertions.assertThat(actualASTimeZone.getStandardDate()).isEqualTo(expectedASTimeZone.getStandardDate());
+	}
+
+	private ASTimeZone toASTimeZone(String timeZoneID) {
+		return new TimeZoneConverterImpl().
+				convert(TimeZone.getTimeZone(timeZoneID), Locale.US);
+	}
+
+	private byte[] toBase64(ASTimeZone asTimeZone) {
+		TimeZoneEncoderImpl timeZoneEncoderImpl = 
+				new TimeZoneEncoderImpl(new IntEncoder(), new WCHAREncoder(), new SystemTimeEncoder());
+		return timeZoneEncoderImpl.encode(asTimeZone);
+	}
 }

@@ -54,8 +54,8 @@ import com.google.inject.Inject;
 public class ContactDecoder extends Decoder implements IDataDecoder {
 
 	@Inject
-	public ContactDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
+	public ContactDecoder(Base64ASTimeZoneDecoder base64AsTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Override

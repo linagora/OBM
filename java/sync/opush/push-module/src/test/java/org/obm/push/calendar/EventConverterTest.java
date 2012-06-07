@@ -62,7 +62,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
-import org.obm.push.protocol.data.ASTimeZoneDecoder;
+import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
 import org.obm.push.protocol.data.CalendarDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
@@ -84,16 +84,16 @@ public class EventConverterTest {
 
 	@Inject EventConverterImpl eventConverter;
 	private CalendarDecoder decoder;
-	private ASTimeZoneDecoder asTimeZoneDecoder;
+	private Base64ASTimeZoneDecoder base64AsTimeZoneDecoder;
 	private ASTimeZoneConverter asTimeZoneConverter;
 	
 	@Before
 	public void init() {
 		this.eventConverter = new EventConverterImpl(
 				new MSEventToObmEventConverterImpl(), new ObmEventToMSEventConverterImpl());
-		asTimeZoneDecoder = createMock(ASTimeZoneDecoder.class);
+		base64AsTimeZoneDecoder = createMock(Base64ASTimeZoneDecoder.class);
 		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
-		this.decoder = new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter);
+		this.decoder = new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 
 	@Test

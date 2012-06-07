@@ -48,14 +48,14 @@ import org.obm.filter.SlowFilterRunner;
 public class DecoderTest {
 	
 	private Decoder decoder;
-	private ASTimeZoneDecoder asTimeZoneDecoder;
+	private Base64ASTimeZoneDecoder base64AsTimeZoneDecoder;
 	private ASTimeZoneConverter asTimeZoneConverter;
 	
 	@Before
 	public void setUp() {
-		asTimeZoneDecoder = createMock(ASTimeZoneDecoder.class);
+		base64AsTimeZoneDecoder = createMock(Base64ASTimeZoneDecoder.class);
 		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
-		decoder = new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter);
+		decoder = new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 
 	@Test

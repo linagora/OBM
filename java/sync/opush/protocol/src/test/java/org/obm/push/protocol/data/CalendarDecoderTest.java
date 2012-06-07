@@ -32,7 +32,6 @@
 
 package org.obm.push.protocol.data;
 
-import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -44,7 +43,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.binary.Base64;
+import org.easymock.EasyMock;
 import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.GregorianChronology;
 import org.junit.Before;
@@ -65,7 +64,7 @@ import org.w3c.dom.Document;
 public class CalendarDecoderTest {
 	
 	private CalendarDecoder decoder;
-	private ASTimeZoneDecoder asTimeZoneDecoder;
+	private Base64ASTimeZoneDecoder base64AsTimeZoneDecoder;
 	private ASTimeZoneConverter asTimeZoneConverter;
 	private Locale defaultLocale;
 
@@ -76,9 +75,9 @@ public class CalendarDecoderTest {
 		Locale.setDefault(Locale.US);
 		defaultLocale = Locale.getDefault();
 		
-		asTimeZoneDecoder = createMock(ASTimeZoneDecoder.class);
+		base64AsTimeZoneDecoder = createMock(Base64ASTimeZoneDecoder.class);
 		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
-		decoder = new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter);
+		decoder = new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Test
@@ -181,13 +180,13 @@ public class CalendarDecoderTest {
 	}
 	
 	private void mockTimeZoneConversion(TimeZone timeZone, String asEncryptedTimeZone, ASTimeZone asTimeZone) {
-		expect(asTimeZoneDecoder.decode(aryEq(Base64.decodeBase64(asEncryptedTimeZone.getBytes()))))
+		expect(base64AsTimeZoneDecoder.decode(EasyMock.aryEq(asEncryptedTimeZone.getBytes())))
 			.andReturn(asTimeZone).anyTimes();
 		
 		expect(asTimeZoneConverter.convert(eq(asTimeZone), eq(defaultLocale)))
 			.andReturn(timeZone).anyTimes();
 		
-		replay(asTimeZoneDecoder, asTimeZoneConverter);
+		replay(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Test

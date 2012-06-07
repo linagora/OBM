@@ -46,8 +46,8 @@ import com.google.inject.Inject;
 public class TaskDecoder extends Decoder implements IDataDecoder {
 
 	@Inject
-	public TaskDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
+	public TaskDecoder(Base64ASTimeZoneDecoder base64AsTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(base64AsTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Override

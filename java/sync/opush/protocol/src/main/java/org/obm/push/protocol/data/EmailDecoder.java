@@ -41,7 +41,7 @@ import com.google.inject.Inject;
 public class EmailDecoder extends Decoder implements IDataDecoder {
 
 	@Inject
-	public EmailDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+	public EmailDecoder(Base64ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
 		super(asTimeZoneDecoder, asTimeZoneConverter);
 	}
 	

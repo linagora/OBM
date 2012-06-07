@@ -33,8 +33,8 @@ package org.obm.push.protocol;
 
 import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
-import org.obm.push.protocol.data.ASTimeZoneDecoder;
-import org.obm.push.protocol.data.ASTimeZoneDecoderImpl;
+import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
+import org.obm.push.protocol.data.Base64ASTimeZoneDecoderImpl;
 import org.obm.push.protocol.data.TimeZoneConverter;
 import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
@@ -48,7 +48,7 @@ public class ProtocolModule extends AbstractModule{
 	protected void configure() {
 		bind(TimeZoneEncoder.class).to(TimeZoneEncoderImpl.class);
 		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
-		bind(ASTimeZoneDecoder.class).to(ASTimeZoneDecoderImpl.class);
+		bind(Base64ASTimeZoneDecoder.class).to(Base64ASTimeZoneDecoderImpl.class);
 		bind(ASTimeZoneConverter.class).to(ASTimeZoneConverterImpl.class);
 	}
 }

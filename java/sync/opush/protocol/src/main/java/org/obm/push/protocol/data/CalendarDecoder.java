@@ -58,8 +58,8 @@ import com.google.inject.Inject;
 public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 	@Inject
-	public CalendarDecoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
+	public CalendarDecoder(Base64ASTimeZoneDecoder base64asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(base64asTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
 	@Override

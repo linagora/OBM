@@ -80,15 +80,15 @@ public class SyncDecoder {
 	@Inject
 	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
 			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper,
-			ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+			Base64ASTimeZoneDecoder base64AsTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
 		this.collectionDao = collectionDao;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.collectionPathHelper = collectionPathHelper;
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
-				.put(PIMDataType.CONTACTS, new ContactDecoder(asTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.CALENDAR, new CalendarDecoder(asTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.EMAIL, new EmailDecoder(asTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.TASKS, new TaskDecoder(asTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.CONTACTS, new ContactDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.CALENDAR, new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.EMAIL, new EmailDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.TASKS, new TaskDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
 				.build();
 	}
 

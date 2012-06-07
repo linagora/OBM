@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.binary.Base64;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
@@ -50,12 +49,12 @@ import com.google.inject.Inject;
 
 public class Decoder {
 	
-	private final ASTimeZoneDecoder asTimeZoneDecoder;
+	private final Base64ASTimeZoneDecoder base64asTimeZoneDecoder;
 	private final ASTimeZoneConverter asTimeZoneConverter;
 	
 	@Inject
-	public Decoder(ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		this.asTimeZoneDecoder = asTimeZoneDecoder;
+	public Decoder(Base64ASTimeZoneDecoder base64asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		this.base64asTimeZoneDecoder = base64asTimeZoneDecoder;
 		this.asTimeZoneConverter = asTimeZoneConverter;
 	}
 	
@@ -129,8 +128,7 @@ public class Decoder {
 	public TimeZone parseDOMTimeZone(Element node, TimeZone default_value) {
 		if (node != null) {
 			byte[] nodeInBase64 = node.getTextContent().getBytes();
-			byte[] nodeInOctets = Base64.decodeBase64(nodeInBase64);
-			ASTimeZone asTimeZone = asTimeZoneDecoder.decode(nodeInOctets);
+			ASTimeZone asTimeZone = base64asTimeZoneDecoder.decode(nodeInBase64);
 			return asTimeZoneConverter.convert(asTimeZone, Locale.getDefault());
 		}
 		return default_value;
