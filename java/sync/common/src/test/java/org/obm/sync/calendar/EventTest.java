@@ -140,7 +140,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedNullTimestamp() {
+	public void testModifiedSinceNullLastsync() {
 		Event event = new Event();
 		event.setTimeCreate(new Date());
 		boolean modified = event.modifiedSince(null);
@@ -148,7 +148,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedZeroTimestamp() {
+	public void testModifiedSinceZeroLastsync() {
 		Event event = new Event();
 		event.setTimeCreate(new Date());
 		boolean modified = event.modifiedSince(new Date(0));
@@ -156,7 +156,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedTimestampBeforeCreateTimestamp() {
+	public void testModifiedSinceLastsyncBeforeTimecreate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());
@@ -166,7 +166,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedTimestampAfterCreateTimestampBeforeUpdateTimestamp() {
+	public void testModifiedLastSyncAfterTimecreateBeforeTimeupdate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());
@@ -178,7 +178,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedTimestampAfterCreateTimestampAfterUpdateTimestamp() {
+	public void testModifiedSinceLastsyncAfterTimecreateAfterTimeupdate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());
@@ -190,7 +190,7 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testEventModifiedTimestampAfterCreateTimestamp() {
+	public void testModifiedSinceLastsyncAfterTimeCreate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());

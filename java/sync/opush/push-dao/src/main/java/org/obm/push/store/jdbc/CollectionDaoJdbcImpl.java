@@ -225,7 +225,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	private SyncState buildSyncState(ResultSet rs) throws SQLException {
-		Timestamp lastSync = rs.getTimestamp("last_sync");
+		Date lastSync = JDBCUtils.getDate(rs, "last_sync");
 		String syncKey = rs.getString("sync_key");
 		SyncState syncState = new SyncState(syncKey, lastSync);
 		syncState.setId(rs.getInt("id"));
@@ -332,7 +332,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		Date dbDate = lastSync;
 		while (rs.next()) {
 			final String email = getEmail(rs);
-			dbDate = new Date(rs.getTimestamp(3).getTime());
+			dbDate = JDBCUtils.getDate(rs, rs.getMetaData().getColumnName(3));
 			EventType type = EventType.valueOf(rs.getString(4));
 			
 			StringBuilder colPath = getBaseCollectionPath(email);
@@ -361,7 +361,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		Date dbDate = lastSync;
 		while (rs.next()) {
 			final String email = getEmail(rs);
-			dbDate = new Date(rs.getTimestamp(3).getTime());
+			dbDate = JDBCUtils.getDate(rs, rs.getMetaData().getColumnName(3));
 			
 			StringBuilder colPath = getBaseCollectionPath(email);
 			colPath.append("contacts");

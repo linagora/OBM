@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.transaction.UserTransaction;
@@ -49,7 +50,7 @@ public class JDBCUtils {
 
 	private final static Logger logger = LoggerFactory
 			.getLogger(JDBCUtils.class);
-	
+
 	public static final void rollback(Connection con) {
 		if (con != null) {
 			try {
@@ -124,12 +125,18 @@ public class JDBCUtils {
 		}
 	}
 
-	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
+	public static Date getDate(ResultSet rs, String fieldName)
+			throws SQLException {
 		Preconditions.checkNotNull(rs);
 		Preconditions.checkNotNull(fieldName);
-		return new Date(rs.getTimestamp(fieldName).getTime());
+		Timestamp timestamp = rs.getTimestamp(fieldName);
+		if (timestamp != null) {
+			return new Date(timestamp.getTime());
+		} else {
+			return null;
+		}
 	}
-	
+
 	public static java.sql.Date getDateWithoutTime(Date lastSync) {
 		return new java.sql.Date(lastSync.getTime());
 	}

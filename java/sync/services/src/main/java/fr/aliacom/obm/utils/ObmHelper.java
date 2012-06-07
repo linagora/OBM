@@ -39,6 +39,7 @@ import java.util.Date;
 
 import org.obm.configuration.DatabaseSystem;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +167,7 @@ public class ObmHelper {
 			st = con.createStatement();
 			rs = st.executeQuery("SELECT now()");
 			rs.next();
-			return rs.getTimestamp(1);
+			return JDBCUtils.getDate(rs, rs.getMetaData().getColumnName(1));
 		} finally {
 			cleanup(null, st, rs);
 		}

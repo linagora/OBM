@@ -56,6 +56,7 @@ import net.fortuna.ical4j.model.DateTime;
 
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.push.utils.DateUtils;
+import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
@@ -418,14 +419,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Event e = new Event();
 		int id = evrs.getInt("event_id");
 		e.setUid(new EventObmId(id));
-		e.setTimeUpdate(evrs.getTimestamp("event_timeupdate"));
-		e.setTimeCreate(evrs.getTimestamp("event_timecreate"));
+		e.setTimeUpdate(JDBCUtils.getDate(evrs, "event_timeupdate"));
+		e.setTimeCreate(JDBCUtils.getDate(evrs, "event_timecreate"));
 		e.setType(EventType.valueOf(evrs.getString("event_type")));
 		e.setExtId(new EventExtId(evrs.getString("event_ext_id")));
 		e.setOpacity(EventOpacity.getValueOf(evrs.getString("event_opacity")));
-		e.setCategory(evrs.getString("eventcategory1_label")); // cat as string
-		// in
-		// sync ??
+		e.setCategory(evrs.getString("eventcategory1_label"));
 		e.setTitle(evrs.getString("event_title"));
 		e.setLocation(evrs.getString("event_location"));
 		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
@@ -1049,7 +1048,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				boolean lastSyncSet = false;
 				while (evrs.next()) {
 					if (!lastSyncSet) {
-						ret.setLastSync(evrs.getTimestamp("last_sync"));
+						ret.setLastSync(JDBCUtils.getDate(evrs, "last_sync"));
 						lastSyncSet = true;
 					}
 
@@ -2465,8 +2464,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps.setString(1, calendar);
 			evrs = evps.executeQuery();
 			if (evrs.next()) {
-				lastUpdate = evrs.getTimestamp(1);
-				lastCreate = evrs.getTimestamp(2);
+				lastUpdate = JDBCUtils.getDate(evrs, evrs.getMetaData().getColumnName(1));
+				lastCreate = JDBCUtils.getDate(evrs, evrs.getMetaData().getColumnName(2));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -2490,11 +2489,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setUid("" + evrs.getInt("event_id"));
 		Date update = evrs.getTimestamp("event_timeupdate");
 		if (update == null) {
-			update = evrs.getTimestamp("event_timecreate");
+			update = JDBCUtils.getDate(evrs, "event_timecreate");
 		}
 		e.setTimeUpdate(update);
 		e.setExtId(evrs.getString("event_ext_id"));
-		e.setRecurrenceId(evrs.getTimestamp("recurrenceId"));
+		e.setRecurrenceId(JDBCUtils.getDate(evrs, "recurrenceId"));
 		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
 		e.setDate(cal.getTime());
 		return e;
