@@ -467,7 +467,6 @@ class Perm {
   function user_can_update_peer($user_entity_id, $user_profile, $peer_entity_id, $peer_profile) {
       $is_peer_self = ($user_entity_id === $peer_entity_id);
       $is_peer_self_or_new_entity = ($peer_entity_id === null);
-
       if (!$is_peer_self && !$is_peer_self_or_new_entity) {
         return self::user_profile_can_edit_peer_profile($user_profile, $peer_profile);
       }
@@ -478,9 +477,9 @@ class Perm {
 
 
   function user_profile_can_edit_peer_profile($user_profile, $peer_profile) {
-    $user_privilege = $user_profile['properties']['level'];
-    $user_manage_peers = $user_profile['properties']['level_managepeers'];
-    $peer_privilege = $peer_profile['properties']['level'];
+    $user_privilege = array_key_exists('level', $user_profile) ? $user_profile['level'] : $user_profile['properties']['level'];
+    $user_manage_peers = array_key_exists('level_managepeers', $user_profile) ? $user_profile['level_managepeers'] : $user_profile['properties']['level_managepeers'];
+    $peer_privilege = array_key_exists('level', $peer_profile) ? $peer_profile['level'] : $peer_profile['properties']['level'];
     return self::user_has_profile_privileges($user_privilege, $peer_privilege, $user_manage_peers);
   }
 
