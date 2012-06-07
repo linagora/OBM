@@ -42,10 +42,10 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.data.ASAirs;
 import org.obm.push.protocol.data.ASEmail;
-import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.protocol.data.MSEmailHeaderSerializer;
 import org.obm.push.protocol.data.MSMeetingRequestSerializer;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
 

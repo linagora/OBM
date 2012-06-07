@@ -47,9 +47,10 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.FileUtils;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.slf4j.Logger;
@@ -219,7 +220,7 @@ public class ResponderImpl implements Responder {
 	private int writeNbParts(OutputStream out, int nbDoc)
 			throws IOException {
 		
-		byte[] nbDocByte = intEncoder.toByteArray(nbDoc);
+		byte[] nbDocByte = intEncoder.capacity(Capacity.FOUR).toByteArray(nbDoc);
 		out.write(nbDocByte);
 		return nbDocByte.length;
 	}
@@ -232,9 +233,9 @@ public class ResponderImpl implements Responder {
 		fileStart += nbDoc * 8;
 		for (byte[] file : fileByte) {
 			// Start of document
-			out.write(intEncoder.toByteArray(fileStart));
+			out.write(intEncoder.capacity(Capacity.FOUR).toByteArray(fileStart));
 			// length of the document
-			out.write(intEncoder.toByteArray(file.length));
+			out.write(intEncoder.capacity(Capacity.FOUR).toByteArray(file.length));
 			fileStart += file.length;
 		}
 		return fileStart;

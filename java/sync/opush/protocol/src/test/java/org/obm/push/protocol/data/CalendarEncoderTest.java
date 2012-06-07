@@ -66,6 +66,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
+import org.obm.push.utils.IntEncoder;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Lists;

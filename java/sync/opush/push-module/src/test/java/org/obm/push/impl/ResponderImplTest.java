@@ -44,7 +44,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.obm.push.impl.ResponderImpl;
-import org.obm.push.protocol.data.IntEncoder;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
@@ -257,8 +258,12 @@ public class ResponderImplTest {
 
 	private void writeInt(ServletOutputStream servletOutputStream,
 			IntEncoder intEncoder, byte value) throws IOException {
+		
 		byte[] binaryEncoded = new byte[]{value, 0, 0, 0};
+		
+		EasyMock.expect(intEncoder.capacity(Capacity.FOUR)).andReturn(intEncoder);
 		EasyMock.expect(intEncoder.toByteArray(value)).andReturn(binaryEncoded);
+		
 		servletOutputStream.write(binaryEncoded);
 	}
 }

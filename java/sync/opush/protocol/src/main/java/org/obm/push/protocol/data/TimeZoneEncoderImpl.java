@@ -36,6 +36,8 @@ import java.util.Arrays;
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Bytes;
@@ -79,7 +81,7 @@ public class TimeZoneEncoderImpl implements TimeZoneEncoder {
 	}
 
 	@VisibleForTesting byte[] encodeBias(int biasToEncode) {
-		return intEncoder.toByteArray(biasToEncode);
+		return intEncoder.capacity(Capacity.FOUR).toByteArray(biasToEncode);
 	}
 
 	@VisibleForTesting byte[] encodeName(String nameToEncode) {

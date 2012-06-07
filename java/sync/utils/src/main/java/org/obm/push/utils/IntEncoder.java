@@ -29,24 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.utils;
 
-import com.google.inject.Inject;
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import com.google.inject.Singleton;
 
 @Singleton
 public class IntEncoder {
-
-	@Inject
-	/* package */ IntEncoder() {
+	public enum Capacity {
+		TWO, FOUR;
+	}
+	
+	private Capacity capacity;
+	
+	public IntEncoder capacity(Capacity capacity) {
+		this.capacity = capacity;
+		return this;
 	}
 	
 	public byte[] toByteArray(int value) {
-		return new byte[] {
-		        (byte) value,
-		        (byte) (value >> 8),
-		        (byte) (value >> 16),
-		        (byte) (value >> 24)};
+		Preconditions.checkNotNull(capacity, "The capacity is required");
+		
+		if (capacity == Capacity.FOUR) {
+			return new byte[] {
+					(byte) value,
+					(byte) (value >> 8),
+					(byte) (value >> 16),
+					(byte) (value >> 24) };
+		} else {
+			return new byte[] {
+					(byte) value,
+					(byte) (value >> 8) };
+		}
 	}
 	
+	public int toInt(byte[] value) {
+		return Ints.fromBytes(
+				value[3], value[2], value[1], value[0]);
+	}
 }

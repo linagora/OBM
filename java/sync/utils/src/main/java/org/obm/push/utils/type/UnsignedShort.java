@@ -33,6 +33,9 @@ package org.obm.push.utils.type;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
+
 import com.google.common.base.Objects;
 
 public final class UnsignedShort {
@@ -45,15 +48,14 @@ public final class UnsignedShort {
 	private UnsignedShort(int value) {
 		this.value = value;
 	}
-	
+
 	public int getValue() {
 		return value;
 	}
 	
 	public byte[] toByteArray() {
-		return new byte[] {
-		        (byte) value,
-		        (byte) (value >> 8)};
+		return new IntEncoder()
+			.capacity(Capacity.TWO).toByteArray(value);
 	}
 	
 	public static UnsignedShort checkedCast(int value) {

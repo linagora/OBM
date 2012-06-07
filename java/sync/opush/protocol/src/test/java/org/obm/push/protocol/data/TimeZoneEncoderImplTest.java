@@ -46,6 +46,8 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.base.Charsets;
@@ -102,21 +104,24 @@ public class TimeZoneEncoderImplTest {
 	public void testEncodeBiasAtZero() {
 		byte[] bias = serializer.encodeBias(0);
 		
-		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(intEncoder.toByteArray(0));
+		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(
+				intEncoder.capacity(Capacity.FOUR).toByteArray(0));
 	}
 	
 	@Test
 	public void testEncodeBiasAtPositiveValue() {
 		byte[] bias = serializer.encodeBias(128);
 		
-		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(intEncoder.toByteArray(128));
+		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(
+				intEncoder.capacity(Capacity.FOUR).toByteArray(128));
 	}
 	
 	@Test
 	public void testEncodeBiasAtNegativeValue() {
 		byte[] bias = serializer.encodeBias(-128);
 
-		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(intEncoder.toByteArray(-128));
+		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(
+				intEncoder.capacity(Capacity.FOUR).toByteArray(-128));
 	}
 	
 	@Test
@@ -124,7 +129,8 @@ public class TimeZoneEncoderImplTest {
 		int maxValue = Integer.MAX_VALUE;
 		byte[] bias = serializer.encodeBias(maxValue);
 		
-		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(intEncoder.toByteArray(maxValue));
+		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(
+				intEncoder.capacity(Capacity.FOUR).toByteArray(maxValue));
 	}
 	
 	@Test
@@ -132,7 +138,8 @@ public class TimeZoneEncoderImplTest {
 		int minValue = Integer.MIN_VALUE;
 		byte[] bias = serializer.encodeBias(minValue);
 
-		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(intEncoder.toByteArray(minValue));
+		assertThat(bias).hasSize(SPEC_BIAS_LENGHT).isEqualTo(
+				intEncoder.capacity(Capacity.FOUR).toByteArray(minValue));
 	}
 	
 	@Test

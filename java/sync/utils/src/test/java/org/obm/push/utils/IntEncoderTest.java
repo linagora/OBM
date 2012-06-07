@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.utils;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
@@ -38,6 +38,8 @@ import org.junit.runner.RunWith;
 
 
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 
 @RunWith(SlowFilterRunner.class)
 public class IntEncoderTest {
@@ -49,39 +51,73 @@ public class IntEncoderTest {
 		intEncoder = new IntEncoder();
 	}
 
-	private void testInt(int value, byte[] expected) {
-		byte[] byteArray = intEncoder.toByteArray(value);
-		Assertions.assertThat(byteArray).isEqualTo(expected);
+	private void testToByteArray(byte[] actual, int expected) {
+		byte[] byteArray = intEncoder.capacity(Capacity.FOUR).toByteArray(expected);
+		Assertions.assertThat(actual).isEqualTo(byteArray);
 	}
 
 	@Test
 	public void testZero() {
-		testInt(0, new byte[] {0, 0, 0, 0});
+		testToByteArray(new byte[] {0, 0, 0, 0}, 0);
 	}
 
 	@Test
 	public void testOne() {
-		testInt(1, new byte[] {1, 0, 0, 0});
+		testToByteArray(new byte[] {1, 0, 0, 0}, 1);
 	}
 	
 	@Test
 	public void test255() {
-		testInt(255, new byte[] {-1, 0, 0, 0});
+		testToByteArray(new byte[] {-1, 0, 0, 0}, 255);
 	}
 	
 	@Test
 	public void test256() {
-		testInt(256, new byte[] {0, 1, 0, 0});
+		testToByteArray(new byte[] {0, 1, 0, 0}, 256);
 	}
 	
 	@Test
 	public void testIntMax() {
-		testInt(Integer.MAX_VALUE, new byte[] {-1, -1, -1, 127});
+		testToByteArray(new byte[] {-1, -1, -1, 127}, Integer.MAX_VALUE);
 	}
 	
 	@Test
 	public void testIntMin() {
-		testInt(Integer.MIN_VALUE, new byte[] {0, 0, 0, -128});
+		testToByteArray(new byte[] {0, 0, 0, -128}, Integer.MIN_VALUE);
 	}
 
+	private void testToInt(int actual, byte[] expected) {
+		int toInt = intEncoder.toInt(expected);
+		Assertions.assertThat(actual).isEqualTo(toInt);
+	}
+	
+	@Test
+	public void testToIntZero() {
+		testToInt(0, new byte[] {0, 0, 0, 0});
+	}
+	
+	@Test
+	public void testToInt() {
+		testToInt(5, new byte[] {5, 0, 0, 0});
+	}
+
+	@Test
+	public void testToInt255() {
+		testToInt(255, new byte[] {-1, 0, 0, 0});
+	}
+	
+	@Test
+	public void testToInt256() {
+		testToInt(256, new byte[] {0, 1, 0, 0});
+	}
+	
+	@Test
+	public void testToIntMax() {
+		testToInt(Integer.MAX_VALUE, new byte[] {-1, -1, -1, 127});
+	}
+	
+	@Test
+	public void testToIntMin() {
+		testToInt(Integer.MIN_VALUE, new byte[] {0, 0, 0, -128});
+	}
 }

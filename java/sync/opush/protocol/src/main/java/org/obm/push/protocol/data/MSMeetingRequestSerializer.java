@@ -42,6 +42,8 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.IntEncoder.Capacity;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -237,8 +239,10 @@ public class MSMeetingRequestSerializer {
 		byte[] marker = "vCal-Uid".getBytes(Charsets.US_ASCII);
 		byte[] markerEnd = buildByteSequence(0x1, 0x0, 0x0, 0x0);
 		byte[] dataEnd = buildByteSequence(0x0);
-		byte[] length = intEncoder.toByteArray(
-				marker.length + markerEnd.length + eventUidAsBytes.length + dataEnd.length);
+		byte[] length = intEncoder
+				.capacity(Capacity.FOUR)
+				.toByteArray(marker.length + markerEnd.length + eventUidAsBytes.length + dataEnd.length);
+		
 		byte[] result = Bytes.concat(preambule, length, marker, markerEnd, eventUidAsBytes, dataEnd);
 		return Base64.encodeBase64String(result);
 	}
