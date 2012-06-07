@@ -930,9 +930,7 @@ if ($action == 'search') {
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
   $peer_profile_id = get_user_profile_id($params['entity_id']);
-  if ((Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin") || check_calendar_update_rights($params))
-    && Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']],
-         $params['entity_id'], $profiles[$peer_profile_id])) {
+  if (canUpdateCalendarRights($obm, $params, $profiles, $peer_profile_id)) {
     $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
   }
   else{
@@ -2432,4 +2430,10 @@ class DBUpdateException extends Exception {}
 class ConflictException extends Exception {}
 
 class AccessException extends Exception {}
+
+function canUpdateCalendarRights($obm, $params, $profiles, $peer_profile_id) {
+    return (Obm_Acl::isAllowed($obm['uid'], 'calendar', $params['entity_id'], "admin") ||
+        check_calendar_update_rights($params) ||
+        Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']], $params['entity_id'], $profiles[$peer_profile_id]));
+}
 ?>
