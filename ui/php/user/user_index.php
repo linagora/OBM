@@ -400,7 +400,9 @@ if ($action == 'ext_get_ids') {
   $display['search'] = html_batch_user_search_form($params);
   $setrows = $_SESSION['set_rows'];
   $_SESSION['set_rows'] = 250;   
-  $display['result'] = dis_user_search_list($params);
+
+  list($strongest_profile_level, $user_can_manage_peers) = get_user_profile_level($obm);
+  $display['result'] = dis_user_search_list($params, $strongest_profile_level, $user_can_manage_peers);
   $_SESSION['set_rows'] = $setrows;  
 } else if ($action == 'edit_batch_values') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -887,4 +889,11 @@ function update_user_action() {
   }
 }
 
+function get_user_profile_level($obm) {
+  $profiles = get_all_profiles(false);
+  $user_profile = $profiles[$obm['profile']];
+  $user_profile_level = array_key_exists('level', $user_profile) ? $user_profile['level'] : $user_profile['properties']['level'];
+  $user_can_manage_peers = array_key_exists('level_managepeers', $user_profile) ? $user_profile['level_managepeers'] : $user_profile['properties']['level_managepeers'];
+  return array($user_profile_level, $user_can_manage_peers);
+}
 ?>

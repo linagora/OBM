@@ -51,7 +51,7 @@ require_once($obminclude . '/of/of_session.inc');
 //   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $filter_entity : if and which filter_entity to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_search($user) {
+function run_query_user_search($user, $strongest_profile_level=null, $user_can_manage_peers=null) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
 
@@ -309,6 +309,25 @@ function run_query_user_search($user) {
     $join_userdata = $userdata['join'];
   }
 
+  $join_profile = null;
+  if ($strongest_profile_level != null) {
+    $join_profile = ' JOIN Profile p ON userobm_perms = p.profile_name '.
+      'JOIN ProfileProperty pp_level ON p.profile_id = pp_level.profileproperty_profile_id '.
+        "AND pp_level.profileproperty_name='level' ";
+
+    # Only list the users with a stronger profile level (the smaller values are
+    # stronger than the bigger values, hence the > or >=)
+    if ($user_can_manage_peers) {
+      $where .= " AND (#CAST(pp_level.profileproperty_value, INTEGER) >= $strongest_profile_level) ";
+    }
+    else {
+      $where .= " AND (#CAST(pp_level.profileproperty_value, INTEGER) > $strongest_profile_level) ";
+    }
+  }
+  else {
+    $join_profile = '';
+  }
+
   // User custom fields
   $customFields = new OBM_Form_Field('user');
   $custom = $customFields->buildQuery($user);
@@ -342,7 +361,8 @@ function run_query_user_search($user) {
     $join_grp
     $join_host
     $join_userdata
-    $join_custom";
+    $join_custom
+    $join_profile";
 
 
   // ORDER construction
@@ -360,7 +380,7 @@ function run_query_user_search($user) {
     $orderq
     $limit";
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_custom $join_domain $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_custom $join_domain $join_profile $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
