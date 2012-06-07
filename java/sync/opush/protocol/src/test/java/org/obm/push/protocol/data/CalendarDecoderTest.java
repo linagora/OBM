@@ -40,7 +40,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.easymock.EasyMock;
@@ -66,15 +65,9 @@ public class CalendarDecoderTest {
 	private CalendarDecoder decoder;
 	private Base64ASTimeZoneDecoder base64AsTimeZoneDecoder;
 	private ASTimeZoneConverter asTimeZoneConverter;
-	private Locale defaultLocale;
 
 	@Before
 	public void prepareEventConverter(){
-		// Locale should be inherited in future from UserSettings
-		// standardName & dayLightName are locale dependent  
-		Locale.setDefault(Locale.US);
-		defaultLocale = Locale.getDefault();
-		
 		base64AsTimeZoneDecoder = createMock(Base64ASTimeZoneDecoder.class);
 		asTimeZoneConverter = createMock(ASTimeZoneConverter.class);
 		decoder = new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter);
@@ -183,7 +176,7 @@ public class CalendarDecoderTest {
 		expect(base64AsTimeZoneDecoder.decode(EasyMock.aryEq(asEncryptedTimeZone.getBytes())))
 			.andReturn(asTimeZone).anyTimes();
 		
-		expect(asTimeZoneConverter.convert(eq(asTimeZone), eq(defaultLocale)))
+		expect(asTimeZoneConverter.convert(eq(asTimeZone)))
 			.andReturn(timeZone).anyTimes();
 		
 		replay(base64AsTimeZoneDecoder, asTimeZoneConverter);

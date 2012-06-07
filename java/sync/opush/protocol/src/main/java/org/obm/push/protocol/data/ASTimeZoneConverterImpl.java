@@ -31,16 +31,82 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import org.obm.push.protocol.bean.ASTimeZone;
 
-public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
-	// Waiting for OBMFULL-3785
+public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
+	
+	@VisibleForTesting static final Collection<String> TIME_ZONE_PREFERENCES =
+			Lists.newArrayList("Europe/Paris", "Europe/London",
+					"America/New_York", "America/Los_Angeles", "Australia/Sydney");
+	
+	private final TimeZoneConverter timeZoneConverter;
+	
+	@VisibleForTesting ASTimeZoneConverterImpl(TimeZoneConverter timeZoneConverter) {
+		this.timeZoneConverter = timeZoneConverter;
+	}
+	
 	@Override
-	public TimeZone convert(ASTimeZone asTimezone, Locale locale) {
-		return TimeZone.getDefault();
+	public TimeZone convert(ASTimeZone asTimeZone) {
+		Collection<String> availableIDs = getAvailableTimeZoneIDs(asTimeZone);
+		if (availableIDs != null) {
+			if (asTimeZone.useDaylightTime()) {
+				return findTimeZone(asTimeZone, availableIDs);
+			} else {
+				return getFirstTimeZoneWithoutDST(availableIDs);
+			}
+		}
+		return null;
+	}
+	
+	private Collection<String> getAvailableTimeZoneIDs(ASTimeZone asTimeZone) {
+		int rawOffset = -1 * toMillis(asTimeZone.getBias());
+		
+		String[] availableIDs = TimeZone.getAvailableIDs(rawOffset);
+		return orderByTimezonePreferences(availableIDs);
+	}
+	
+	private List<String> orderByTimezonePreferences(String[] timeZoneIDs) {
+		return Ordering.from(new Comparator<String>() {
+			@Override
+			public int compare(String left, String right) {
+				return TIME_ZONE_PREFERENCES.contains(right) ? 1 : 0;
+			}
+		}).sortedCopy(Lists.newArrayList(timeZoneIDs));
+	}
+
+	private int toMillis(int minutes) {
+		return minutes*60*1000;
+	}
+
+	private TimeZone findTimeZone(ASTimeZone asTimeZone,
+			Collection<String> availableIDs) {
+		for (String availableID : availableIDs) {
+			TimeZone timeZone = TimeZone.getTimeZone(availableID);
+			ASTimeZone timeZoneConverted = timeZoneConverter.convert(timeZone, Locale.US);
+			if (timeZoneConverted.equals(asTimeZone)) {
+				return timeZone;
+			}
+		}
+		return null;
+	}
+	
+	private TimeZone getFirstTimeZoneWithoutDST(Collection<String> availableIDs) {
+		for (String availableID : availableIDs) {
+			TimeZone timeZone = TimeZone.getTimeZone(availableID);
+			if (!timeZone.useDaylightTime()) {
+				return timeZone;
+			}
+		}
+		return null;
 	}
 }

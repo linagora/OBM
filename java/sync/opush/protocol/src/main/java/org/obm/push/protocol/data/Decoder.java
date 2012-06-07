@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.obm.push.protocol.bean.ASTimeZone;
@@ -129,7 +128,7 @@ public class Decoder {
 		if (node != null) {
 			byte[] nodeInBase64 = node.getTextContent().getBytes();
 			ASTimeZone asTimeZone = base64asTimeZoneDecoder.decode(nodeInBase64);
-			return asTimeZoneConverter.convert(asTimeZone, Locale.getDefault());
+			return asTimeZoneConverter.convert(asTimeZone);
 		}
 		return default_value;
 	}

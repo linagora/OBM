@@ -143,6 +143,10 @@ public class ASTimeZone {
 		return dayLightBias;
 	}
 
+	public boolean useDaylightTime() {
+		return getDayLightBias() != 0;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(bias, standardName, standardDate, standardBias, dayLightName, dayLightDate, dayLightBias);

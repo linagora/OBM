@@ -42,6 +42,11 @@ import com.google.common.base.Preconditions;
 
 public class ASSystemTime {
 
+	public static final int JAVA_TO_MS_API_MONTH_OFFSET = 1;
+	public static final int JAVA_TO_MS_API_DAYOFWEEK_OFFSET = -1;
+	public static final int JAVA_TO_MS_API_WEEKOFMONTH_LAST = 5;
+	private static final int MAX_HOUR = 23;
+	
 	private final UnsignedShort year;
 	private final UnsignedShort month;
 	private final UnsignedShort dayOfWeek;
@@ -86,7 +91,7 @@ public class ASSystemTime {
 		}
 
 		public Builder hour(UnsignedShort hour) {
-			Preconditions.checkState(hour.getValue() <= 23);
+			Preconditions.checkState(hour.getValue() <= MAX_HOUR);
 			this.hour = hour;
 			return this;
 		}
@@ -125,10 +130,6 @@ public class ASSystemTime {
 	}
 
 	public static class FromDateBuilder {
-
-		@VisibleForTesting static final int JAVA_TO_MS_API_MONTH_OFFSET = 1;
-		@VisibleForTesting static final int JAVA_TO_MS_API_DAYOFWEEK_OFFSET = -1;
-		@VisibleForTesting static final int JAVA_TO_MS_API_WEEKOFMONTH_LAST = 5;
 
 		private DateTime dateTime;
 		private UnsignedShort overridingYear;
@@ -204,7 +205,8 @@ public class ASSystemTime {
 		
 		@VisibleForTesting UnsignedShort hour(DateTime dateTime) {
 			if (!dateTime.isEqual(new DateTime(0, DateTimeZone.UTC)) && dateTime.getHourOfDay() != 0) {
-				return unsignedShortOf(dateTime.minusHours(1).getHourOfDay() + 1);
+				int hourOfDay = dateTime.minusHours(1).getHourOfDay();
+				return unsignedShortOf(Math.min(MAX_HOUR, hourOfDay+1));
 			}
 			return unsignedShortOf(0);
 		}
