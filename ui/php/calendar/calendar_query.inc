@@ -1767,14 +1767,20 @@ function check_calendar_update_rights($params) {
         $calendar_delegation = $obm_q->f("userobm_delegation");
   
         // Check delegation update right
+        if (empty($calendar_delegation)) {
+            return false;
+        }
         if (! of_delegation_check_update_rights($params, $calendar_delegation, $calendar_delegation)) {
 	        $err['msg'] .= $l_error_delegation;
 	        return false;
         }
+        else {
+            return true;
+        }
       }
     }
   }
-  return true;
+  return false;
 }
 
 
