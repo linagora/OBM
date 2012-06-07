@@ -41,13 +41,17 @@ import com.google.inject.Singleton;
 public class WCHAREncoder {
 
 	@Inject
-	@VisibleForTesting WCHAREncoder() {
-	}
+	@VisibleForTesting WCHAREncoder() {}
 	
 	public byte[] toByteArray(String toEncodeString) {
 		Preconditions.checkNotNull(toEncodeString);
 		
 		return toEncodeString.getBytes(Charsets.UTF_16LE);
 	}
-	
+
+	public String byteArrayToEncode(byte[] toEncodeByteArray) {
+		Preconditions.checkNotNull(toEncodeByteArray);
+		
+		return new String(toEncodeByteArray, Charsets.UTF_16LE);
+	}
 }

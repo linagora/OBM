@@ -59,4 +59,22 @@ public class WCHAREncoderTest {
 				new byte[]{104, 0, 101, 0, 108, 0, 108, 0, 111, 0});
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void testDecodeNull() {
+		new WCHAREncoder().byteArrayToEncode(null);
+	}
+	
+	@Test
+	public void testDecodeEmpty() {
+		String string = new WCHAREncoder().byteArrayToEncode(new byte[0]);
+
+		Assertions.assertThat(string).isEmpty();
+	}
+	
+	@Test
+	public void testDecodeRegularByteArray() {
+		String string = new WCHAREncoder().byteArrayToEncode(new byte[]{104, 0, 101, 0, 108, 0, 108, 0, 111, 0});
+
+		Assertions.assertThat(string).isEqualTo("hello");
+	}
 }
