@@ -941,9 +941,8 @@ if ($action == 'search') {
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $peer_profile_id = get_user_profile_id($params['entity_id']);
-  if (Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']],
-       $params['entity_id'], $profiles[$peer_profile_id])
-      && OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
+  if (canUpdateCalendarRights($obm, $params, $profiles, $peer_profile_id) &&
+      OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display['msg'] .= display_warn_msg($l_of_right_err_auth);
