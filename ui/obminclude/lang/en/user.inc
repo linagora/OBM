@@ -145,4 +145,4 @@ $l_change_password_confirm = "You will delete the present password. Do you want 
 $l_update_valid = "Update and validate user";
 $l_forbidden = "Forbidden";
 $l_email_nomad_error_loop = "Nomad email address must not correspond to the user's email address!"; 
-
+$l_users_not_updatable_error = "You may not update some of the selected users";

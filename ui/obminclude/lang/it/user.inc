@@ -141,4 +141,4 @@ $l_cant_delete = "L'utente non può essere elimimato!";
 $l_access_nomade = "Accesso nomade";
 $l_link_timetask = "L'utente è riferenziato nella gestione di tempo del progetto";
 $l_edit_users = "Edita le proprietà utenti";
-
+$l_users_not_updatable_error = "You may not update some of the selected users";

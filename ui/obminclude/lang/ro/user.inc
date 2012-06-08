@@ -139,4 +139,4 @@ $l_j_coord_same_phone_error = "Introduceți numere de telefon diferite!";
 $l_j_coord_same_fax_error = "Introduceți numere de fax diferite!";
 $l_change_password_confirm = "Veți șterge parola actuală. </br> Doriți să continuați?";
 $l_user_display = "Opțiuni de vizualizare a listelor de utilizatori";
-
+$l_users_not_updatable_error = "You may not update some of the selected users";

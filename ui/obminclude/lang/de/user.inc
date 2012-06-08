@@ -164,4 +164,4 @@ $l_cant_delete = "Der Benutzer kann nicht löschen werden !";
 $l_access_nomade = "Nomade Zugriff"; 
 $l_link_timetask = "Der Benutzer wird in Zeit-Management in Projekten referenziert"; 
 $l_edit_users = "Benutzer Eigenschaften"; 
-
+$l_users_not_updatable_error = "You may not update some of the selected users";

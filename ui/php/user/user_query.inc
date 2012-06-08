@@ -2372,11 +2372,10 @@ function run_query_user_delete_profile($user_id)  {
  * @param array $params
  * @return boolean
  */
-function check_batch_processing_data($params) {
-  
+function check_batch_processing_data($params, $user_id, $user_level, $user_can_manage_peers) {
   global $err;
   global $l_batch_no_user_error, $l_nomade_without_mail_perms, $l_nomade_perms_error, $l_nomade_local_copy_error, $l_quota_error;
-  global $l_user,$l_mail_server_error;
+  global $l_user,$l_mail_server_error, $l_users_not_updatable_error;
   global $php_regexp_quota, $php_regexp_phone, $php_regexp_fax, $php_regexp_zip,$php_regexp_number, $php_regexp_profile_name;
   global $l_phone_error, $l_fax_error, $l_zip_error, $l_expresspostal_error, $l_lname_error;
   
@@ -2490,9 +2489,19 @@ function check_batch_processing_data($params) {
       return false;
     }
   }
-
-  
+  $updatable_users = Perm::updatable_users($u_id, $user_id, $user_level, $user_can_manage_peers);
+  if (count($updatable_users) < count($u_id)) {
+    $err['msg'] = $l_users_not_updatable_error;
+    return false;
+  }
   return true;
+}
+
+function find_not_updatable_users($user_ids, $user_id, $user_can_manage_peers) {
+  $not_updatable_users = array();
+  foreach ($user_ids as $user_id) {
+  }
+  return $users_not_updatable;
 }
 
 /**

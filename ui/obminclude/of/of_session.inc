@@ -464,6 +464,35 @@ class Perm {
     }
   }
 
+  function updatable_users($user_ids, $current_user_id, $current_user_profile_level, $current_user_can_manage_peers) {
+    $obm_q = new DB_OBM;
+    $updatable_users = array();
+    foreach ($user_ids as $user_id) {
+      $query =
+        "SELECT DISTINCT u.userobm_id AS user_id, ".
+          "pp.profileproperty_value AS user_profile_level ".
+        "FROM UserObm u ".
+          "JOIN Profile p ON u.userobm_perms=p.profile_name ".
+          "JOIN ProfileProperty pp ON p.profile_id=pp.profileproperty_profile_id AND pp.profileproperty_name='level' ".
+        "WHERE u.userobm_id=$user_id";
+      $obm_q->query($query);
+      if ($obm_q->next_record()) {
+        list($user_id, $user_profile_level) = array($obm_q->f('user_id'),
+            $obm_q->f('user_profile_level'));
+        $is_user_current_user = ($user_id === $current_user_id);
+        if ($is_user_current_user || self::user_has_profile_privileges(
+            $current_user_profile_level, $user_profile_level, $current_user_can_manage_peers)) {
+          $updatable_users[] = $user_id;
+        }
+      }
+      else {
+        error_log("Couldn't find user of id=$user_id in UserObm");
+      }
+    }
+    return $updatable_users;
+  }
+
+
   function user_can_update_peer($user_entity_id, $user_profile, $peer_entity_id, $peer_profile) {
       $is_peer_self = ($user_entity_id === $peer_entity_id);
       $is_peer_self_or_new_entity = ($peer_entity_id === null);

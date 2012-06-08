@@ -159,3 +159,4 @@ $l_change_password_confirm = "Vous allez écraser le mot de passe déjà présen
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";
 
+$l_users_not_updatable_error = "Vous n'avez pas la permission de mettre à jour certains utilisateurs sélectionnés";

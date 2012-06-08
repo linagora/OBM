@@ -410,7 +410,8 @@ if ($action == 'ext_get_ids') {
   
 } else if ($action == 'batch_processing') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_batch_processing_data($params)) {
+  list($user_level, $user_can_manage_peers) = get_user_profile_level($obm);
+  if (check_batch_processing_data($params, $obm['uid'], $user_level, $user_can_manage_peers)) {
     $users_id_error = run_query_user_data_batch($params);
     $users_id = array_diff($params['data-user-id'], $users_id_error);    
     $retour = run_query_batch_processing_update($params, $users_id);
