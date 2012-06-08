@@ -64,7 +64,7 @@ else
 fi
 
 if [ -d /var/lib/obm-locator ]; then
-  chown -R jetty:adm /var/log/obm-locator
+  chown -R jetty:adm /var/lib/obm-locator
 else
   echo "error : /var/lib/obm-locator must exist."
   exit 1
