@@ -160,7 +160,7 @@ public class EhcacheTransactionalModeTest {
 		return new Element("key", "value");
 	}
 	
-	@Test @Slow
+	@Test
 	public void transactionIsShorterThanCacheTimeout() throws InterruptedException, ExecutionException {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		List<Future<Boolean>> futures = executeTwoPutInParallel(100);
@@ -175,7 +175,7 @@ public class EhcacheTransactionalModeTest {
 		}
 	}
 	
-	@Test(expected=DeadLockException.class) @Slow
+	@Test(expected=DeadLockException.class)
 	public void transactionIsGreaterThanCacheTimeout() throws Throwable {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		try {

@@ -43,12 +43,10 @@ import com.google.inject.Stage;
 @SuppressWarnings("deprecation")
 public class JUnitGuiceRule implements MethodRule {
 
-	private Injector injector;
+	private final Class<? extends Module> moduleClass;
 
 	public JUnitGuiceRule(Class<? extends Module> moduleClass) {
-		Injector metaInjector = Guice.createInjector();
-		Module module = metaInjector.getInstance(moduleClass);
-		injector = Guice.createInjector(Stage.DEVELOPMENT, module);
+		this.moduleClass = moduleClass;
 	}
 		
 	@Override
@@ -57,6 +55,9 @@ public class JUnitGuiceRule implements MethodRule {
 			
 			@Override
 			public void evaluate() throws Throwable {
+				Injector metaInjector = Guice.createInjector();
+				Module module = metaInjector.getInstance(moduleClass);
+				Injector injector = Guice.createInjector(Stage.DEVELOPMENT, module);
 				injector.injectMembers(target);
 				base.evaluate();
 			}
