@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang.mutable.MutableInt;
 import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Bytes;
@@ -41,9 +45,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class SystemTimeEncoder {
 
+	private static final int SHORT_SIZE = 2;
+
 	@Inject
-	@VisibleForTesting SystemTimeEncoder() {
-	}
+	@VisibleForTesting SystemTimeEncoder() {}
 	
 	public byte[] toByteArray(ASSystemTime toEncode) {
 
@@ -59,4 +64,23 @@ public class SystemTimeEncoder {
 		return Bytes.concat(year, month, dayOfWeek, day, hour, minute, second, millis);
 	}
 	
+	public ASSystemTime toASSystemTime(byte[] toEncode) {
+		MutableInt index = new MutableInt(0);
+		return new ASSystemTime.Builder()
+				.year(readBytes(index, toEncode))
+				.month(readBytes(index, toEncode))
+				.dayOfWeek(readBytes(index, toEncode))
+				.weekOfMonth(readBytes(index, toEncode))
+				.hour(readBytes(index, toEncode))
+				.minute(readBytes(index, toEncode))
+				.second(readBytes(index, toEncode))
+				.milliseconds(readBytes(index, toEncode)).build();
+	}
+
+	private UnsignedShort readBytes(MutableInt index, byte[] toEncode) {
+		int fromIndex = index.intValue();
+		index.add(SHORT_SIZE);
+		return new UnsignedShort(
+				Arrays.copyOfRange(toEncode, fromIndex, index.intValue()));
+	}
 }

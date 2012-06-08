@@ -49,6 +49,10 @@ public final class UnsignedShort {
 		this.value = value;
 	}
 
+	public UnsignedShort(byte... value) {
+		this(new IntEncoder().capacity(Capacity.TWO).toInt(value));
+	}
+	
 	public int getValue() {
 		return value;
 	}

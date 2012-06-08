@@ -33,6 +33,7 @@ package org.obm.push.protocol.data;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -119,4 +120,31 @@ public class SystemTimeEncoderTest {
 		return UnsignedShort.checkedCast(unsignedShortValue).toByteArray();
 	}
 
+	@Test
+	public void testEncodeByteToASSystemTime() {
+		UnsignedShort year = UnsignedShort.checkedCast(2015);
+		UnsignedShort month = UnsignedShort.checkedCast(1);
+		UnsignedShort dayOfWeek = UnsignedShort.checkedCast(4);
+		UnsignedShort weekOfMonth = UnsignedShort.checkedCast(1);
+		UnsignedShort hour = UnsignedShort.checkedCast(0);
+		UnsignedShort minute = UnsignedShort.checkedCast(0);
+		UnsignedShort second = UnsignedShort.checkedCast(0);
+		UnsignedShort millis = UnsignedShort.checkedCast(0);
+		
+		byte[] byteToEncode = 
+				Bytes.concat(year.toByteArray(), month.toByteArray(), dayOfWeek.toByteArray(), 
+						weekOfMonth.toByteArray(), hour.toByteArray(), minute.toByteArray(), 
+						second.toByteArray(), millis.toByteArray());
+
+		ASSystemTime asSystemTime = systemTimeEncoder.toASSystemTime(byteToEncode);
+		
+		Assertions.assertThat(year).isEqualTo(asSystemTime.getYear());
+		Assertions.assertThat(month).isEqualTo(asSystemTime.getMonth());
+		Assertions.assertThat(dayOfWeek).isEqualTo(asSystemTime.getDayOfWeek());
+		Assertions.assertThat(weekOfMonth).isEqualTo(asSystemTime.getWeekOfMonth());
+		Assertions.assertThat(hour).isEqualTo(asSystemTime.getHour());
+		Assertions.assertThat(minute).isEqualTo(asSystemTime.getMinute());
+		Assertions.assertThat(second).isEqualTo(asSystemTime.getSecond());
+		Assertions.assertThat(millis).isEqualTo(asSystemTime.getMilliseconds());
+	}
 }

@@ -65,7 +65,13 @@ public class IntEncoder {
 	}
 	
 	public int toInt(byte[] value) {
-		return Ints.fromBytes(
-				value[3], value[2], value[1], value[0]);
+		Preconditions.checkNotNull(capacity, "The capacity is required");
+		
+		if (capacity == Capacity.FOUR) {
+			return Ints.fromBytes(
+					value[3], value[2], value[1], value[0]);
+		} else {
+			return (value[1] & 0xFF) << 8 | (value[0] & 0xFF);
+		}
 	}
 }

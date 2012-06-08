@@ -87,7 +87,7 @@ public class IntEncoderTest {
 	}
 
 	private void testToInt(int actual, byte[] expected) {
-		int toInt = intEncoder.toInt(expected);
+		int toInt = intEncoder.capacity(Capacity.FOUR).toInt(expected);
 		Assertions.assertThat(actual).isEqualTo(toInt);
 	}
 	
