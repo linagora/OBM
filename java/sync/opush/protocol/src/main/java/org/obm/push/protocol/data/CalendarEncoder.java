@@ -90,33 +90,33 @@ public class CalendarEncoder extends Encoder {
 		if (null != timeZone) {
 			sdf.setTimeZone(timeZone);
 		
-			s(p, "Calendar:TimeZone", encodedTimeZoneAsString(timeZone, Locale.getDefault()));
+			s(p, ASCalendar.TIME_ZONE.asASValue(), encodedTimeZoneAsString(timeZone, Locale.getDefault()));
 		}
 
-		s(p, "Calendar:DTStamp", ev.getDtStamp() != null ? ev.getDtStamp()
+		s(p, ASCalendar.DTSTAMP.asASValue(), ev.getDtStamp() != null ? ev.getDtStamp()
 				: new Date(),sdf);
 
-		s(p, "Calendar:StartTime", ev.getStartTime(),sdf);
-		s(p, "Calendar:Subject", ev.getSubject());
+		s(p, ASCalendar.START_TIME.asASValue(), ev.getStartTime(),sdf);
+		s(p, ASCalendar.SUBJECT.asASValue(), ev.getSubject());
 
 		MSEventUid eventUid = ev.getUid();
 		if (eventUid != null) {
-			s(p, "Calendar:UID", eventUid.serializeToString());
+			s(p, ASCalendar.UID.asASValue(), eventUid.serializeToString());
 		} else {
 			throw new InvalidParameterException("a MSEvent must have an UID");
 		}
 		if (ev.getOrganizerEmail() != null) {
-			s(p, "Calendar:OrganizerName", ev.getOrganizerName());
-			s(p, "Calendar:OrganizerEmail", ev.getOrganizerEmail());
+			s(p, ASCalendar.ORGANIZER_NAME.asASValue(), ev.getOrganizerName());
+			s(p, ASCalendar.ORGANIZER_EMAIL.asASValue(), ev.getOrganizerEmail());
 		}
 
 		if (udr.checkHint("hint.loadAttendees", true)) {
 			if(ev.getAttendees().size()>0){
-				Element at = DOMUtils.createElement(p, "Calendar:Attendees");
+				Element at = DOMUtils.createElement(p, ASCalendar.ATTENDEES.asASValue());
 				for (MSAttendee ma : ev.getAttendees()) {
 					Element ae = DOMUtils
-						.createElement(at, "Calendar:Attendee");
-					s(ae, "Calendar:AttendeeEmail", ma.getEmail());
+						.createElement(at, ASCalendar.ATTENDEE.asASValue());
+					s(ae, ASCalendar.ATTENDEE_EMAIL.asASValue(), ma.getEmail());
 					
 					if (ma.getName() == null
 						|| ma.getName().trim().length() == 0) {
@@ -129,20 +129,20 @@ public class CalendarEncoder extends Encoder {
 						ma.setName(mail);
 					}
 					
-					s(ae, "Calendar:AttendeeName", ma.getName());
+					s(ae, ASCalendar.ATTENDEE_NAME.asASValue(), ma.getName());
 
 					if (udr.getProtocolVersion().compareTo(TWELVE) >= 0) {
-						s(ae, "Calendar:AttendeeStatus", ma.getAttendeeStatus()
+						s(ae, ASCalendar.ATTENDEE_STATUS.asASValue(), ma.getAttendeeStatus()
 							.asIntString());
-						s(ae, "Calendar:AttendeeType", ma.getAttendeeType()
+						s(ae, ASCalendar.ATTENDEE_TYPE.asASValue(), ma.getAttendeeType()
 							.getId());
 					}
 				}
 			}
 		}
 
-		s(p, "Calendar:Location", ev.getLocation());
-		s(p, "Calendar:EndTime", ev.getEndTime(),sdf);
+		s(p, ASCalendar.LOCATION.asASValue(), ev.getLocation());
+		s(p, ASCalendar.END_TIME.asASValue(), ev.getEndTime(),sdf);
 
 		encodeBody(udr, p, ev.getDescription());
 
@@ -151,21 +151,21 @@ public class CalendarEncoder extends Encoder {
 			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf);
 		}
 
-		s(p, "Calendar:Sensitivity", ev.getSensitivity().asIntString());
-		s(p, "Calendar:BusyStatus", ev.getBusyStatus().asIntString());
+		s(p, ASCalendar.SENSITIVITY.asASValue(), ev.getSensitivity().asIntString());
+		s(p, ASCalendar.BUSY_STATUS.asASValue(), ev.getBusyStatus().asIntString());
 
 		if (ev.getAllDayEvent()) {
-			s(p, "Calendar:AllDayEvent", (ev.getAllDayEvent() ? "1" : "0"));
+			s(p, ASCalendar.ALL_DAY_EVENT.asASValue(), (ev.getAllDayEvent() ? "1" : "0"));
 		} else {
-			s(p, "Calendar:AllDayEvent", "0");
+			s(p, ASCalendar.ALL_DAY_EVENT.asASValue(), "0");
 		}
 
 		if (udr.checkHint("hint.loadAttendees", true)
 				&& ev.getAttendees().size() > 1) {
-			s(p, "Calendar:MeetingStatus", CalendarMeetingStatus.IS_A_MEETING
+			s(p, ASCalendar.MEETING_STATUS.asASValue(), CalendarMeetingStatus.IS_A_MEETING
 					.asIntString());
 		} else {
-			s(p, "Calendar:MeetingStatus",
+			s(p, ASCalendar.MEETING_STATUS.asASValue(),
 					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
@@ -174,7 +174,7 @@ public class CalendarEncoder extends Encoder {
 		}
 
 		if (ev.getReminder() != null) {
-			s(p, "Calendar:ReminderMinsBefore", ev.getReminder().toString());
+			s(p, ASCalendar.REMINDER_MINS_BEFORE.asASValue(), ev.getReminder().toString());
 		}
 
 		// DOMUtils.createElement(p, "Calendar:Compressed_RTF");
@@ -198,42 +198,42 @@ public class CalendarEncoder extends Encoder {
 		
 		// Exceptions.Exception
 		if(excepts.size()>0){
-			Element es = DOMUtils.createElement(p, "Calendar:Exceptions");
+			Element es = DOMUtils.createElement(p, ASCalendar.EXCEPTIONS.asASValue());
 			for (MSEventException ex : excepts) {
-				Element e = DOMUtils.createElement(es, "Calendar:Exception");
+				Element e = DOMUtils.createElement(es, ASCalendar.EXCEPTION.asASValue());
 				if (ex.isDeleted()) {
 				
-					s(e, "Calendar:ExceptionIsDeleted", "1");
-					s(e, "Calendar:MeetingStatus",
+					s(e, ASCalendar.EXCEPTION_IS_DELETED.asASValue(), "1");
+					s(e, ASCalendar.MEETING_STATUS.asASValue(),
 						CalendarMeetingStatus.MEETING_IS_CANCELED.asIntString());
 
 				} else {
 					if (udr.checkHint("hint.loadAttendees", true)
 						&& parent.getAttendees().size() > 1) {
-						s(e, "Calendar:MeetingStatus",
+						s(e, ASCalendar.MEETING_STATUS.asASValue(),
 							CalendarMeetingStatus.IS_A_MEETING.asIntString());
 					} else {
-						s(e, "Calendar:MeetingStatus",
+						s(e, ASCalendar.MEETING_STATUS.asASValue(),
 							CalendarMeetingStatus.IS_NOT_A_MEETING
 							.asIntString());
 					}
 
 					encodeBody(udr, e, ex.getDescription());
 
-					s(e, "Calendar:Location", ex.getLocation());
-					s(e, "Calendar:Sensitivity", ex.getSensitivity().asIntString());
-					s(e, "Calendar:BusyStatus", ex.getBusyStatus().asIntString());
-					s(e, "Calendar:AllDayEvent", (ex.getAllDayEvent() ? "1" : "0"));
-					s(e, "Calendar:ReminderMinsBefore", ex.getReminder());
-					DOMUtils.createElement(e, "Calendar:Categories");
+					s(e, ASCalendar.LOCATION.asASValue(), ex.getLocation());
+					s(e, ASCalendar.SENSITIVITY.asASValue(), ex.getSensitivity().asIntString());
+					s(e, ASCalendar.BUSY_STATUS.asASValue(), ex.getBusyStatus().asIntString());
+					s(e, ASCalendar.ALL_DAY_EVENT.asASValue(), (ex.getAllDayEvent() ? "1" : "0"));
+					s(e, ASCalendar.REMINDER_MINS_BEFORE.asASValue(), ex.getReminder());
+					DOMUtils.createElement(e, ASCalendar.CATEGORIES.asASValue());
 				}
-				s(e, "Calendar:Subject", ex.getSubject());
+				s(e, ASCalendar.SUBJECT.asASValue(), ex.getSubject());
 
-				s(e, "Calendar:ExceptionStartTime", ex.getExceptionStartTime(),sdf);
+				s(e, ASCalendar.EXCEPTION_START_TIME.asASValue(), ex.getExceptionStartTime(),sdf);
 
-				s(e, "Calendar:StartTime", ex.getStartTime(),sdf);
-				s(e, "Calendar:EndTime", ex.getEndTime(),sdf);
-				s(e, "Calendar:DTStamp", ex.getDtStamp(),sdf);
+				s(e, ASCalendar.START_TIME.asASValue(), ex.getStartTime(),sdf);
+				s(e, ASCalendar.END_TIME.asASValue(), ex.getEndTime(),sdf);
+				s(e, ASCalendar.DTSTAMP.asASValue(), ex.getDtStamp(),sdf);
 			}
 		}
 	}
@@ -255,11 +255,11 @@ public class CalendarEncoder extends Encoder {
 			MSEvent ev,
 			SimpleDateFormat sdf) {
 		
-		Element r = DOMUtils.createElement(p, "Calendar:Recurrence");
-		DOMUtils.createElementAndText(r, "Calendar:RecurrenceType", rec(ev)
+		Element r = DOMUtils.createElement(p, ASCalendar.RECURRENCE.asASValue());
+		DOMUtils.createElementAndText(r, ASCalendar.RECURRENCE_TYPE.asASValue(), rec(ev)
 				.getType().asIntString());
-		s(r, "Calendar:RecurrenceInterval", rec(ev).getInterval());
-		s(r, "Calendar:RecurrenceUntil", rec(ev).getUntil(),sdf);
+		s(r, ASCalendar.RECURRENCE_INTERVAL.asASValue(), rec(ev).getInterval());
+		s(r, ASCalendar.RECURRENCE_UNTIL.asASValue(), rec(ev).getUntil(),sdf);
 
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		cal.setTimeInMillis(ev.getStartTime().getTime());
@@ -267,24 +267,24 @@ public class CalendarEncoder extends Encoder {
 		case DAILY:
 			break;
 		case MONTHLY:
-			s(r, "Calendar:RecurrenceDayOfMonth",
+			s(r, ASCalendar.RECURRENCE_DAY_OF_MONTH.asASValue(),
 					"" + cal.get(Calendar.DAY_OF_MONTH));
 			break;
 		case MONTHLY_NDAY:
 			int weekOfMonth = DateUtils.getWeekOfCurrentDayWithoutStartShift(cal);
-			s(r, "Calendar:RecurrenceWeekOfMonth", String.valueOf(weekOfMonth));
-			s(r, "Calendar:RecurrenceDayOfWeek", ""
+			s(r, ASCalendar.RECURRENCE_WEEK_OF_MONTH.asASValue(), String.valueOf(weekOfMonth));
+			s(r, ASCalendar.RECURRENCE_DAY_OF_WEEK.asASValue(), ""
 					+ RecurrenceDayOfWeek.dayOfWeekToInt(cal
 							.get(Calendar.DAY_OF_WEEK)));
 			break;
 		case WEEKLY:
-			s(r, "Calendar:RecurrenceDayOfWeek", ""
+			s(r, ASCalendar.RECURRENCE_DAY_OF_WEEK.asASValue(), ""
 					+ RecurrenceDayOfWeek.asInt(rec(ev).getDayOfWeek()));
 			break;
 		case YEARLY:
-			s(r, "Calendar:RecurrenceDayOfMonth",
+			s(r, ASCalendar.RECURRENCE_DAY_OF_MONTH.asASValue(),
 					"" + cal.get(Calendar.DAY_OF_MONTH));
-			s(r, "Calendar:RecurrenceMonthOfYear",
+			s(r, ASCalendar.RECURRENCE_MONTH_OF_YEAR.asASValue(),
 					"" + (cal.get(Calendar.MONTH) + 1));
 			break;
 		case YEARLY_NDAY:

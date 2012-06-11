@@ -69,13 +69,13 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 		// Main attributes
 		calendar.setOrganizerName(parseDOMString(DOMUtils.getUniqueElement(
-				syncData, "OrganizerName")));
+				syncData, ASCalendar.ORGANIZER_NAME.getName())));
 		calendar.setOrganizerEmail(parseDOMString(DOMUtils.getUniqueElement(
-				syncData, "OrganizerEmail")));
+				syncData, ASCalendar.ORGANIZER_EMAIL.getName())));
 		calendar.setUid(
-				new MSEventUid(parseDOMString(DOMUtils.getUniqueElement(syncData, "UID"))));
+				new MSEventUid(parseDOMString(DOMUtils.getUniqueElement(syncData, ASCalendar.UID.getName()))));
 		
-		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(syncData, "TimeZone")));
+		calendar.setTimeZone(parseDOMTimeZone(DOMUtils.getUniqueElement(syncData, ASCalendar.TIME_ZONE.getName())));
 
 		setEventCalendar(calendar, syncData);
 
@@ -83,7 +83,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 		// Attendees
 
-		containerNode = DOMUtils.getUniqueElement(syncData, "Attendees");
+		containerNode = DOMUtils.getUniqueElement(syncData, ASCalendar.ATTENDEES.getName());
 		if (containerNode != null) {
 			// <Attendee>
 			// <AttendeeName>noIn TheDatabase</AttendeeName>
@@ -96,7 +96,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 			// <AttendeeType>2</AttendeeType>
 			// </Attendee>
 
-			NodeList attendeesNodeList = containerNode.getElementsByTagName("Attendee");
+			NodeList attendeesNodeList = containerNode.getElementsByTagName(ASCalendar.ATTENDEE.getName());
 			if (attendeesNodeList != null) {
 				
 				for (int i = 0, n = attendeesNodeList.getLength(); i < n; i += 1) {
@@ -108,7 +108,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 							attendeeEl, "Email"));
 					if (email == null || "".equals(email)) {
 						email = parseDOMString(DOMUtils.getUniqueElement(attendeeEl,
-								"AttendeeEmail"));
+								ASCalendar.ATTENDEE_EMAIL.getName()));
 					}
 					attendee.setEmail(email);
 
@@ -116,12 +116,12 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 							"Name"));
 					if (name == null || "".equals(name)) {
 						name = parseDOMString(DOMUtils.getUniqueElement(attendeeEl,
-								"AttendeeName"));
+								ASCalendar.ATTENDEE_NAME.getName()));
 					}
 					attendee.setName(name);
 
 					switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(attendeeEl,
-							"AttendeeStatus"))) {
+							ASCalendar.ATTENDEE_STATUS.getName()))) {
 					case 0:
 						attendee.setAttendeeStatus(AttendeeStatus.RESPONSE_UNKNOWN);
 						break;
@@ -145,7 +145,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 					}
 
 					switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(attendeeEl,
-							"AttendeeType"))) {
+							ASCalendar.ATTENDEE_TYPE.getName()))) {
 					case 1:
 						attendee.setAttendeeType(AttendeeType.REQUIRED);
 						break;
@@ -167,10 +167,10 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		}
 			
 		// Exceptions
-		containerNode = DOMUtils.getUniqueElement(syncData, "Exceptions");
+		containerNode = DOMUtils.getUniqueElement(syncData, ASCalendar.EXCEPTIONS.getName());
 		if (containerNode != null) {
 		
-			NodeList exceptionsNodeList = containerNode.getElementsByTagName("Exception");
+			NodeList exceptionsNodeList = containerNode.getElementsByTagName(ASCalendar.EXCEPTION.getName());
 			if (exceptionsNodeList != null) {
 
 				int exceptionsListLength = exceptionsNodeList.getLength();
@@ -186,31 +186,31 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		}
 
 		// Recurrence
-		containerNode = DOMUtils.getUniqueElement(syncData, "Recurrence");
+		containerNode = DOMUtils.getUniqueElement(syncData, ASCalendar.RECURRENCE.getName());
 		if (containerNode != null) {
 			logger.info("decode recurrence");
 			MSRecurrence recurrence = new MSRecurrence();
 
 			recurrence.setUntil(parseDOMDate(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceUntil")));
+					containerNode, ASCalendar.RECURRENCE_UNTIL.getName())));
 			recurrence.setWeekOfMonth(parseDOMInt(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceWeekOfMonth")));
+					containerNode, ASCalendar.RECURRENCE_WEEK_OF_MONTH.getName())));
 			recurrence.setMonthOfYear(parseDOMInt(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceMonthOfYear")));
+					containerNode, ASCalendar.RECURRENCE_MONTH_OF_YEAR.getName())));
 			recurrence.setDayOfMonth(parseDOMInt(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceDayOfMonth")));
+					containerNode, ASCalendar.RECURRENCE_DAY_OF_MONTH.getName())));
 			recurrence.setOccurrences(parseDOMInt(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceOccurrences")));
+					containerNode, ASCalendar.RECURRENCE_OCCURRENCES.getName())));
 			recurrence.setInterval(parseDOMInt(DOMUtils.getUniqueElement(
-					containerNode, "RecurrenceInterval")));
+					containerNode, ASCalendar.RECURRENCE_INTERVAL.getName())));
 			Integer i = parseDOMInt(DOMUtils.getUniqueElement(containerNode,
-					"RecurrenceDayOfWeek"));
+					ASCalendar.RECURRENCE_DAY_OF_WEEK.getName()));
 			if (i != null) {
 				recurrence.setDayOfWeek(RecurrenceDayOfWeek.fromInt(i));
 			}
 
 			switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(containerNode,
-					"RecurrenceType"))) {
+					ASCalendar.RECURRENCE_TYPE.getName()))) {
 			case 0:
 				recurrence.setType(RecurrenceType.DAILY);
 				break;
@@ -244,22 +244,22 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 	private MSEventException buildEventException(Element dom) {
 		MSEventException exception = new MSEventException();
 		fillEventCommon(exception, dom);
-		exception.setDeleted(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, "ExceptionIsDeleted")));
-		exception.setExceptionStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "ExceptionStartTime")));
+		exception.setDeleted(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, ASCalendar.EXCEPTION_IS_DELETED.getName())));
+		exception.setExceptionStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, ASCalendar.EXCEPTION_START_TIME.getName())));
 		return exception;
 	}
 	
 	private void fillEventCommon(MSEventCommon common, Element dom) {
-		common.setLocation(parseDOMString(DOMUtils.getUniqueElement(dom, "Location")));
+		common.setLocation(parseDOMString(DOMUtils.getUniqueElement(dom, ASCalendar.LOCATION.getName())));
 		Element body = DOMUtils.getUniqueElement(dom, "Body");
 		common.setDescription(decodeBody(body));
-		common.setDtStamp(parseDOMDate(DOMUtils.getUniqueElement(dom, "DTStamp")));
-		common.setSubject(parseDOMString(DOMUtils.getUniqueElement(dom, "Subject")));
-		common.setEndTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "EndTime")));
-		common.setStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, "StartTime")));
-		common.setAllDayEvent(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, "AllDayEvent")));
-		common.setReminder(parseDOMInt(DOMUtils.getUniqueElement(dom, "ReminderMinsBefore")));
-		common.setCategories(parseDOMStringCollection(DOMUtils.getUniqueElement(dom, "Categories"), "Category"));
+		common.setDtStamp(parseDOMDate(DOMUtils.getUniqueElement(dom, ASCalendar.DTSTAMP.getName())));
+		common.setSubject(parseDOMString(DOMUtils.getUniqueElement(dom, ASCalendar.SUBJECT.getName())));
+		common.setEndTime(parseDOMDate(DOMUtils.getUniqueElement(dom, ASCalendar.END_TIME.getName())));
+		common.setStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, ASCalendar.START_TIME.getName())));
+		common.setAllDayEvent(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, ASCalendar.ALL_DAY_EVENT.getName())));
+		common.setReminder(parseDOMInt(DOMUtils.getUniqueElement(dom, ASCalendar.REMINDER_MINS_BEFORE.getName())));
+		common.setCategories(parseDOMStringCollection(DOMUtils.getUniqueElement(dom, ASCalendar.CATEGORIES.getName()), ASCalendar.CATEGORIES.getName()));
 		common.setBusyStatus(getCalendarBusyStatus(dom));
 		common.setSensitivity(getCalendarSensitivity(dom));
 		common.setMeetingStatus(getMeetingStatus(dom));
@@ -296,7 +296,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 	private CalendarBusyStatus getCalendarBusyStatus(Element domSource) {
 		switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(domSource,
-				"BusyStatus"))) {
+				ASCalendar.BUSY_STATUS.getName()))) {
 		case 0:
 			return CalendarBusyStatus.FREE;
 		case 1:
@@ -311,7 +311,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 	private CalendarSensitivity getCalendarSensitivity(Element domSource) {
 		switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(domSource,
-				"Sensitivity"))) {
+				ASCalendar.SENSITIVITY.getName()))) {
 		case 0:
 			return CalendarSensitivity.NORMAL;
 		case 1:
@@ -326,7 +326,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 
 	private CalendarMeetingStatus getMeetingStatus(Element domSource) {
 		switch (parseDOMNoNullInt(DOMUtils.getUniqueElement(domSource,
-				"MeetingStatus"))) {
+				ASCalendar.MEETING_STATUS.getName()))) {
 		case 0:
 			return CalendarMeetingStatus.IS_NOT_A_MEETING;
 		case 1:
