@@ -53,9 +53,36 @@ import com.google.common.base.Charsets;
 @RunWith(SlowFilterRunner.class)
 public class MSEmailTest {
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireUid() {
-		new MSEmail.MSEmailBuilder().build();
+		new MSEmail.MSEmailBuilder()
+				.header(new MSEmailHeader.Builder().build())
+				.body(new MSEmailBody(new SerializableInputStream(
+					new ByteArrayInputStream("text".getBytes())), 
+					MSEmailBodyType.PlainText, 
+					null, 
+					Charsets.UTF_8))
+				.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testMSEmailBuilderRequireBody() {
+		new MSEmail.MSEmailBuilder()
+		.uid(1)
+		.header(new MSEmailHeader.Builder().build())
+		.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testMSEmailBuilderRequireHeader() {
+		new MSEmail.MSEmailBuilder()
+				.uid(1)
+				.body(new MSEmailBody(new SerializableInputStream(
+					new ByteArrayInputStream("text".getBytes())), 
+					MSEmailBodyType.PlainText, 
+					null, 
+					Charsets.UTF_8))
+				.build();
 	}
 	
 	@Test

@@ -128,10 +128,10 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmail build() {
-			Preconditions.checkNotNull(uid, "The uid is required");
-			Preconditions.checkNotNull(header, "The header is required");
-			Preconditions.checkNotNull(body, "The body is required");
-			Preconditions.checkNotNull(attachments, "The attachments cannot be null");
+			Preconditions.checkState(uid != null, "The uid is required");
+			Preconditions.checkState(header != null, "The header is required");
+			Preconditions.checkState(body != null, "The body is required");
+			Preconditions.checkState(attachments != null, "The attachments cannot be null");
 			
 			if (messageClass == null) {
 				messageClass = MSMessageClass.NOTE;
