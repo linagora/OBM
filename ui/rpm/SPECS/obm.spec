@@ -586,6 +586,7 @@ fi
 if [ "$1" = "1" ] ; then
   echo -n "[obm-cyrus] activating obm-satellite cyrus module..."
   /usr/sbin/osenmod cyrusPartition
+  /usr/sbin/osenmod backupEntity
   #We need a certificate before starting
   if [ -e /etc/obm/certs/obm_cert.pem ] ; then
     echo -n "[obm-cyrus] starting obm-satellite cyrus module..."
@@ -635,6 +636,7 @@ if [ "$1" = "0" ]; then
   echo -n "[obm-cyrus] removing obm-satellite cyrus module..."
   if [ -e /usr/sbin/osdismod ]; then
     /usr/sbin/osdismod cyrusPartition
+    /usr/sbin/osdismod backupEntity
   fi
 fi
 

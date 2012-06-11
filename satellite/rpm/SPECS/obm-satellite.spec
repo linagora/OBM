@@ -111,7 +111,8 @@ install -p -m 755 mods-available/postfixSmtpInMaps $RPM_BUILD_ROOT%{_sysconfdir}
 install -p -m 755 mods-available/postfixAccess $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
 #Cyrus configuration file
 install -p -m 755 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
-
+#backupEntity configuration file
+install -p -m 755 mods-available/backupEntity $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -144,6 +145,7 @@ perl -MXML::SAX -e "XML::SAX->add_parser(q(XML::SAX::PurePerl))->save_parsers()"
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/postfixSmtpInMaps
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/postfixAccess
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/cyrusPartition
+%config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/backupEntity
 %{_sysconfdir}/obm-satellite/mods-enabled
 %{_sysconfdir}/init.d/obmSatellite
 %config(noreplace) %{_sysconfdir}/logrotate.d/obm-satellite
