@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.base.Objects;
@@ -64,7 +65,7 @@ public class MSMeetingRequest {
 		private MSMeetingRequestSensitivity sensitivity;
 		private MSMeetingRequestIntDBusyStatus intDBusyStatus;
 		private String timeZone;
-		private String globalObjId;
+		private MSEventExtId msEventExtId;
 		private List<MSMeetingRequestCategory> categories;
 		
 		public MsMeetingRequestBuilder allDayEvent(boolean allDayEvent) {
@@ -139,8 +140,8 @@ public class MSMeetingRequest {
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder globalObjId(String globalObjId) {
-			this.globalObjId = globalObjId;
+		public MsMeetingRequestBuilder msEventExtId(MSEventExtId msEventExtId) {
+			this.msEventExtId = msEventExtId;
 			return this;
 		}
 		
@@ -179,11 +180,11 @@ public class MSMeetingRequest {
 				timeZone = DEFAULT_TIME_ZONE;
 			}
 
-			Preconditions.checkNotNull(globalObjId, "The field GlobalObjId is required");
+			Preconditions.checkNotNull(msEventExtId, "The field msEventExtId is required");
 			
 			return new MSMeetingRequest(allDayEvent, startTime, dtStamp, endTime, instanceType, location, 
 					organizer, recurrenceId, reminder, responseRequested, recurrences, sensitivity, 
-					intDBusyStatus, timeZone, globalObjId, categories);
+					intDBusyStatus, timeZone, msEventExtId, categories);
 		}
 	}
 	
@@ -201,13 +202,13 @@ public class MSMeetingRequest {
 	private final MSMeetingRequestSensitivity sensitivity;
 	private final MSMeetingRequestIntDBusyStatus intDBusyStatus;
 	private final String timeZoneInBase64;
-	private final String globalObjId;
+	private final MSEventExtId msEventExtId;
 	private final List<MSMeetingRequestCategory> categories;
 	
 	private MSMeetingRequest(boolean allDayEvent, Date startTime, Date dtStamp, Date endTime, MSMeetingRequestInstanceType instanceType, 
 			String location, String organizer, Date recurrenceId, Long reminder, boolean responseRequested,
 			List<MSMeetingRequestRecurrence> recurrences, MSMeetingRequestSensitivity sensitivity, 
-			MSMeetingRequestIntDBusyStatus intDBusyStatus, String timeZoneInBase64, String globalObjId, 
+			MSMeetingRequestIntDBusyStatus intDBusyStatus, String timeZoneInBase64, MSEventExtId msEventExtId, 
 			List<MSMeetingRequestCategory> categories) {
 		
 		super();
@@ -225,7 +226,7 @@ public class MSMeetingRequest {
 		this.sensitivity = sensitivity;
 		this.intDBusyStatus = intDBusyStatus;
 		this.timeZoneInBase64 = timeZoneInBase64;
-		this.globalObjId = globalObjId;
+		this.msEventExtId = msEventExtId;
 		this.categories = categories;
 	}
 
@@ -285,8 +286,8 @@ public class MSMeetingRequest {
 		return timeZoneInBase64;
 	}
 	
-	public String getGlobalObjId() {
-		return globalObjId;
+	public MSEventExtId getExtId() {
+		return msEventExtId;
 	}
 
 	public List<MSMeetingRequestCategory> getCategories() {
@@ -297,7 +298,7 @@ public class MSMeetingRequest {
 	public final int hashCode(){
 		return Objects.hashCode(allDayEvent, startTime, dtStamp, endTime, 
 				instanceType, location, organizer, recurrenceId, reminder, 
-				responseRequested, recurrences, sensitivity, intDBusyStatus, timeZoneInBase64, globalObjId, categories);
+				responseRequested, recurrences, sensitivity, intDBusyStatus, timeZoneInBase64, msEventExtId, categories);
 	}
 	
 	@Override
@@ -318,7 +319,7 @@ public class MSMeetingRequest {
 				&& Objects.equal(this.sensitivity, that.sensitivity)
 				&& Objects.equal(this.intDBusyStatus, that.intDBusyStatus)
 				&& Objects.equal(this.timeZoneInBase64, that.timeZoneInBase64)
-				&& Objects.equal(this.globalObjId, that.globalObjId)
+				&& Objects.equal(this.msEventExtId, that.msEventExtId)
 				&& Objects.equal(this.categories, that.categories);
 		}
 		return false;

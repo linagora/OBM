@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
@@ -215,19 +216,6 @@ public class MSMeetingRequestSerializingTest {
 		Assertions.assertThat(tag(encodedDocument, ASEMAIL.CATEGORIES)).isNull();
 	}
 
-	@Test
-	public void testMeetingRequestGlobalObjId() {
-		String globalObjIdValue = "a globalObjIdValue";
-		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
-				.globalObjId(globalObjIdValue)
-				.build();
-		
-		Element encodedDocument = encode(meetingRequest);
-		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.GLOBAL_OBJ_ID)).isEqualTo(
-				MSMeetingRequestSerializer.msEventUidToGlobalObjId(globalObjIdValue, new IntEncoder()));
-	}
-	
 	@Test
 	public void testMeetingRequestBusyStatusFree() {
 		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
@@ -473,7 +461,7 @@ public class MSMeetingRequestSerializingTest {
 				.startTime(DateUtils.date("1970-01-01T12:00:00"))
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))
 				.instanceType(MSMeetingRequestInstanceType.SINGLE)
-				.globalObjId("a global object id");
+				.msEventExtId(new MSEventExtId("anyExtId"));
 	}
 
 	private Element encode(MSMeetingRequest meetingRequest) throws FactoryConfigurationError {

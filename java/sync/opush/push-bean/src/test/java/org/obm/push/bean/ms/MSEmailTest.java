@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
@@ -112,7 +113,7 @@ public class MSEmailTest {
 
 	private MSMeetingRequest anyMeetingRequest() {
 		return new MSMeetingRequest.MsMeetingRequestBuilder()
-			.globalObjId("anyGlobalObjId")
+			.msEventExtId(new MSEventExtId("anyExtId"))
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.startTime(new DateTime("2012-07-10T07:00:00").toDate())
 			.dtStamp(new DateTime("2012-04-24T07:57:07").toDate())

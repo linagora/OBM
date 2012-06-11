@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -313,7 +314,7 @@ public class MSMeetingRecurrenceSerializingTest {
 				.startTime(DateUtils.date("1970-01-01T12:00:00"))
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))
 				.instanceType(MSMeetingRequestInstanceType.SINGLE)
-				.globalObjId("a global object id")
+				.msEventExtId(new MSEventExtId("anyExtId"))
 				.recurrenceId(DateUtils.date("1970-01-01T15:00:00"));
 	}
 

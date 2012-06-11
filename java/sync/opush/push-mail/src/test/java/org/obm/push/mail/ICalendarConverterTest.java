@@ -43,6 +43,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.ICalendar;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
@@ -76,7 +77,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
@@ -96,7 +97,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.BUSY)
 					.build());
@@ -116,7 +117,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.OUT_OF_OFFICE)
 					.build());
@@ -136,7 +137,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.TENTATIVE)
 					.build());
@@ -162,7 +163,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reminder(600l)
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
@@ -182,7 +183,7 @@ public class ICalendarConverterTest {
 					.organizer("user@obm.lng.org")
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
-					.globalObjId("3c428e8d-efee-413a-8a5b-d340feb21187")
+					.msEventExtId(new MSEventExtId("3c428e8d-efee-413a-8a5b-d340feb21187"))
 					.reminder(600l)
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.BUSY)
@@ -204,7 +205,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -229,7 +230,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -255,7 +256,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -286,7 +287,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -318,7 +319,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -346,7 +347,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -372,7 +373,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-05-12T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -401,7 +402,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -429,7 +430,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -456,7 +457,7 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
-					.globalObjId("f28d13af-a5b5-44cf-83c9-3e76aa743179")
+					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2013-10-01T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
@@ -496,8 +497,8 @@ public class ICalendarConverterTest {
 					.organizer("xavier.niel@jri.obm.lng.org")
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
-					.globalObjId("4ca827c0eb819956ede718d75cd4c7239f43950a1762a8a2d1378e9061bf2a" +
-							"ba3fabf0ed4247ad4d3068078724708ada16134995df87089a0250bfa0f7ff88cd3da9ee5ebc750260")
+					.msEventExtId(new MSEventExtId("4ca827c0eb819956ede718d75cd4c7239f43950a1762a8a2d1378e9061bf2a" +
+							"ba3fabf0ed4247ad4d3068078724708ada16134995df87089a0250bfa0f7ff88cd3da9ee5ebc750260"))
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());

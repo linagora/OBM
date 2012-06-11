@@ -47,6 +47,7 @@ import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.icalendar.ical4jwrapper.ICalendarRule;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
+import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -57,6 +58,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -136,9 +138,17 @@ public class ICalendarConverter {
 			.reponseRequested(true)
 			.sensitivity(sensitivity(iCalendarEvent))
 			.intDBusyStatus(transparency(iCalendarEvent))
-			.globalObjId(iCalendarEvent.uid());
+			.msEventExtId(extId(iCalendarEvent.uid()));
 	}
 	
+	private MSEventExtId extId(String uid) {
+		if (Strings.isNullOrEmpty(uid)) {
+			return new MSEventExtId(MSEventExtId.generateUid().toString());
+		} else {
+			return new MSEventExtId(uid);
+		}
+	}
+
 	private Date recurrenceId(ICalendarEvent iCalendarEvent) {
 		Date recurrenceId = iCalendarEvent.reccurenceId();
 		if (recurrenceId == null) {

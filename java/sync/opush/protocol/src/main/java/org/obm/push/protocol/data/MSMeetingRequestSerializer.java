@@ -146,7 +146,7 @@ public class MSMeetingRequestSerializer {
 
 	private void serializeGlobalId() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getGlobalObjId(), intEncoder));
+				ASEMAIL.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getExtId().serializeToString(), intEncoder));
 	}
 	
 	private void serializeRecurrenceId() {

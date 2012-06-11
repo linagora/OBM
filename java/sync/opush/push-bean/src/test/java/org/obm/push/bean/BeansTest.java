@@ -102,6 +102,7 @@ public class BeansTest {
 					.add(MSMeetingRequestCategory.class)
 					.add(MSEmailHeader.class)
 					.add(MSRead.class)
+					.add(MSEventExtId.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
