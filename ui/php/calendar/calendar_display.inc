@@ -4053,29 +4053,17 @@ function check_loggued_user_is_the_only_attendee($attendees){
  * @return HTML
  */
 function dis_calendar_quick_form($calendar_entity) {
-  $user_id = $GLOBALS["obm"]["uid"];
-  $user_entities = array();
-  if ( $calendar_entity['user'] && is_array($calendar_entity['user']) ) {
-    foreach ( $calendar_entity['user'] as $key => $val ) {
-      $user_entities[$key] = $val;
-    }
-  }
 
-  // add the current logged user to the list of selectable calendars if he's not already present
-  if ( ! array_key_exists($user_id, $user_entities) ) {
-    $session_user_infos = get_user_info($user_id);
-    $user_entities[$user_id] = array(
-      "name" => $session_user_infos["lastname"]." ".$session_user_infos["firstname"],
-      "class" => "eventOwner",
-      "type" => "user",
-      "id" => $user_id
-    );
-  }
+  $user_id = $GLOBALS[obm][uid];
 
-  if( sizeof($user_entities) > 1 ){
+  if(is_array($calendar_entity['user']) && sizeof($calendar_entity['user']) > 1){
+    $u = get_user_info(); 
     $entity_view.="<select id=\"calendarViewEntity\">";
-    foreach($user_entities as $user){
+    foreach($calendar_entity['user'] as $user){
       if(OBM_Acl::canWrite($user_id, 'calendar',array($user['id']))) {
+        if($user_id == $user["id"]) {
+          $uid = true;
+        }
         $entity_view.="<option id='calendarViewEntity$user[id]' value='$user[id]'>$user[name]</option>";
       }
     }
@@ -4085,9 +4073,15 @@ function dis_calendar_quick_form($calendar_entity) {
       <th>$GLOBALS[l_calendar]:</th>
       <td>$entity_view</td>";
   } else {
-    $user = array_values($user_entities);
-    $calendar_inputs ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0]['id']."' />";
-    $calendar_inputs .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    if (is_array($calendar_entity['user'])) {
+      $user = array_values($calendar_entity['user']);
+      $calendar_inputs ="<input id=\"calendarViewEntity\" type='hidden' value='".$user[0][id]."' />";
+      $calendar_inputs .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    } else {
+      $txt = $GLOBALS['l_create_in_mine'];
+      $calendar_inputs ="<input id=\"calendarViewEntity\" type='hidden' value='".$GLOBALS['obm']['uid']."' />";
+      $calendar_inputs .="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
+    }
   }
 
   // template form
