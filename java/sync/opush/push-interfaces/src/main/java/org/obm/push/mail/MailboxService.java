@@ -56,7 +56,7 @@ public interface MailboxService {
 			Collection<Long> uids) throws MailException;
 
 	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName, 
-			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException;
+			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException;
 	
 	void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 

@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventExtId;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -315,7 +316,8 @@ public class MSMeetingRecurrenceSerializingTest {
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))
 				.instanceType(MSMeetingRequestInstanceType.SINGLE)
 				.msEventExtId(new MSEventExtId("anyExtId"))
-				.recurrenceId(DateUtils.date("1970-01-01T15:00:00"));
+				.recurrenceId(DateUtils.date("1970-01-01T15:00:00"))
+				.msEventUid(new MSEventUid("81412D3C-2A24-4E9D-B20E-11F7BBE92799"));
 	}
 
 	private Element encode(MSMeetingRequestRecurrence meetingRequestRecurrence) throws FactoryConfigurationError {

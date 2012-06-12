@@ -481,7 +481,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_valarm_allDay.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		Assertions.assertThat(
-				msMeetingRequest.getTimeZoneInBase64()).isEqualTo(MSMeetingRequest.MsMeetingRequestBuilder.DEFAULT_TIME_ZONE);
+				msMeetingRequest.getTimeZoneInBase64()).isEqualTo(MSMeetingRequest.DEFAULT_TIME_ZONE);
 	}
 	
 	@Test

@@ -43,13 +43,18 @@ import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
+import org.obm.push.exception.DaoException;
+import org.obm.push.service.EventService;
 import org.obm.push.utils.SerializableInputStream;
+import org.obm.sync.calendar.EventExtId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,14 +72,16 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	private static final Charset DEFAULT_CHARSET = Charsets.ISO_8859_1;
 
 	private final MSEmailHeaderConverter emailHeaderConverter;
+	private final EventService eventService;
 
 	@Inject
-	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter) {
+	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter, EventService eventService) {
 		this.emailHeaderConverter = emailHeaderConverter;
+		this.eventService = eventService;
 	}
 	
 	@Override
-	public MSEmail convert(EmailView emailView) {
+	public MSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException {
 		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
 		msEmailBuilder.uid(emailView.getUid());
 		
@@ -82,10 +89,25 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		msEmailBuilder.header(convertHeader(emailView));
 		msEmailBuilder.body(convertBody(emailView));
 		msEmailBuilder.attachements(convertAttachment(emailView));
-		msEmailBuilder.meetingRequest(convertICalendar(emailView));
+		
+		MSMeetingRequest msMeetingRequest = convertICalendar(emailView);
+		msEmailBuilder.meetingRequest(fillMSEventUid(msMeetingRequest, userDataRequest));
+		
 		msEmailBuilder.messageClass(convertInvitationType(emailView));
 		
 		return msEmailBuilder.build();
+	}
+
+	private MSMeetingRequest fillMSEventUid(MSMeetingRequest msMeetingRequest, UserDataRequest userDataRequest) throws DaoException {
+		if (msMeetingRequest != null) {
+			EventExtId eventExtId = new EventExtId(msMeetingRequest.getMSEventExtId().serializeToString());
+			MSEventUid msEventUid = eventService.getMSEventUidFor(eventExtId, userDataRequest.getDevice());
+			return new MSMeetingRequest.MsMeetingRequestBuilder()
+				.copy(msMeetingRequest)
+				.msEventUid(msEventUid).build();
+		} else {
+			return null;
+		}
 	}
 
 	private void fillFlags(MSEmailBuilder msEmailBuilder, EmailView emailView) {

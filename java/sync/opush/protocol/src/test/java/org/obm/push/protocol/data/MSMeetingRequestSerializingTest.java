@@ -217,6 +217,19 @@ public class MSMeetingRequestSerializingTest {
 	}
 
 	@Test
+	public void testMeetingRequestGlobalObjId() {
+		MSEventUid globalObjIdValue = new MSEventUid("a globalObjIdValue");
+		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
+				.msEventUid(globalObjIdValue)
+				.build();
+		
+		Element encodedDocument = encode(meetingRequest);
+		
+		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.GLOBAL_OBJ_ID)).isEqualTo(
+				MSMeetingRequestSerializer.msEventUidToGlobalObjId(globalObjIdValue, new IntEncoder()));
+	}
+	
+	@Test
 	public void testMeetingRequestBusyStatusFree() {
 		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
 				.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
@@ -435,7 +448,7 @@ public class MSMeetingRequestSerializingTest {
 		Element encodedDocument = encode(meetingRequest);
 		
 		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TIME_ZONE))
-				.isEqualTo(MsMeetingRequestBuilder.DEFAULT_TIME_ZONE);
+				.isEqualTo(MSMeetingRequest.DEFAULT_TIME_ZONE);
 	}
 	
 	@Test
@@ -461,7 +474,8 @@ public class MSMeetingRequestSerializingTest {
 				.startTime(DateUtils.date("1970-01-01T12:00:00"))
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))
 				.instanceType(MSMeetingRequestInstanceType.SINGLE)
-				.msEventExtId(new MSEventExtId("anyExtId"));
+				.msEventExtId(new MSEventExtId("anyExtId"))
+				.msEventUid(new MSEventUid("81412D3C-2A24-4E9D-B20E-11F7BBE92799"));
 	}
 
 	private Element encode(MSMeetingRequest meetingRequest) throws FactoryConfigurationError {

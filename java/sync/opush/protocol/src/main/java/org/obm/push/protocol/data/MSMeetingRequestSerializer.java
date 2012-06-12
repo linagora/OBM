@@ -146,7 +146,7 @@ public class MSMeetingRequestSerializer {
 
 	private void serializeGlobalId() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getExtId().serializeToString(), intEncoder));
+				ASEMAIL.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getMsEventUid(), intEncoder));
 	}
 	
 	private void serializeRecurrenceId() {
@@ -228,11 +228,7 @@ public class MSMeetingRequestSerializer {
 	}
 	
 	public static String msEventUidToGlobalObjId(MSEventUid msEventUid, IntEncoder intEncoder) {
-		return msEventUidToGlobalObjId(msEventUid.serializeToString(), intEncoder);
-	}
-	
-	@VisibleForTesting static String msEventUidToGlobalObjId(String eventUidAsString, IntEncoder intEncoder) {
-		byte[] eventUidAsBytes = eventUidAsString.getBytes(Charsets.US_ASCII);
+		byte[] eventUidAsBytes = msEventUid.serializeToString().getBytes(Charsets.US_ASCII);
 		byte[] preambule = buildByteSequence(
 				0x4, 0x0, 0x0, 0x0, 0x82, 0x0, 0xE0, 0, 0x74, 0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08,
 				0x0, 0x0, 0x0, 0x0,

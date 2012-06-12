@@ -259,6 +259,8 @@ public class MailBackendImpl implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
 		}
 	}
 	

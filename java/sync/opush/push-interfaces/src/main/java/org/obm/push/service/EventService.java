@@ -51,5 +51,6 @@ public interface EventService {
 	MSEvent convertEventToMSEvent(UserDataRequest udr, Event event)  throws DaoException, ConversionException;
 
 	MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException;
-	
+
+	MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException;
 }

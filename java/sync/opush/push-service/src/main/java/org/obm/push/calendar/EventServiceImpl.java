@@ -88,24 +88,26 @@ public class EventServiceImpl implements EventService {
 	@Override
 	@Transactional
 	public MSEvent convertEventToMSEvent(UserDataRequest udr, Event event) throws DaoException, ConversionException {
-		MSEventUid msEventUid = getMSEventUidFor(event, udr.getDevice());
+		MSEventUid msEventUid = getMSEventUidFor(event.getExtId(), udr.getDevice());
 		MSEvent msEvent = eventConverter.convert(event, msEventUid, udr.getCredentials().getUser());
 		return msEvent;
 	}
 	
-	private MSEventUid getMSEventUidFor(Event event, Device device) throws DaoException {
-		Preconditions.checkNotNull(event.getExtId(), "Event must contain an extId");
-		MSEventUid msEventUidFromDatabase = retrieveMSEventUidFromDatabase(event, device);
+	@Override
+	@Transactional
+	public MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException {
+		Preconditions.checkNotNull(eventExtId, "Event must contain an extId");
+		MSEventUid msEventUidFromDatabase = retrieveMSEventUidFromDatabase(eventExtId, device);
 		if (msEventUidFromDatabase != null) {
 			return msEventUidFromDatabase;
 		}
-		return createMSEventUidInDatabase(event, device);
+		return createMSEventUidInDatabase(eventExtId, device);
 	}
 
-	private MSEventUid createMSEventUidInDatabase(Event event, Device device) throws DaoException {
-		MSEventUid convertedFromExtId = createMSEventUidFromEventExtId(event);
-		byte[] hashedExtId = hashExtId(event.getExtId());
-		calendarDao.insertExtIdMSEventUidMapping(event.getExtId(), convertedFromExtId, device, hashedExtId);
+	private MSEventUid createMSEventUidInDatabase(EventExtId eventExtId, Device device) throws DaoException {
+		MSEventUid convertedFromExtId = createMSEventUidFromEventExtId(eventExtId);
+		byte[] hashedExtId = hashExtId(eventExtId);
+		calendarDao.insertExtIdMSEventUidMapping(eventExtId, convertedFromExtId, device, hashedExtId);
 		return convertedFromExtId;
 	}
 
@@ -114,14 +116,14 @@ public class EventServiceImpl implements EventService {
 		return hashCode.asBytes();
 	}
 
-	private MSEventUid retrieveMSEventUidFromDatabase(Event event, Device device)
+	private MSEventUid retrieveMSEventUidFromDatabase(EventExtId eventExtId, Device device)
 			throws DaoException {
-		MSEventUid msEventUidFromDatabase = calendarDao.getMSEventUidFor(event.getExtId(), device);
+		MSEventUid msEventUidFromDatabase = calendarDao.getMSEventUidFor(eventExtId, device);
 		return msEventUidFromDatabase;
 	}
 
-	private MSEventUid createMSEventUidFromEventExtId(Event event) {
-		return new MSEventUid(convertExtIdAsHex(event.getExtId()));
+	private MSEventUid createMSEventUidFromEventExtId(EventExtId eventExtId) {
+		return new MSEventUid(convertExtIdAsHex(eventExtId));
 	}
 	
 	private String convertExtIdAsHex(EventExtId extId) {

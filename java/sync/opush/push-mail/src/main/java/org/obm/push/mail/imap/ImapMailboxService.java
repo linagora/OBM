@@ -172,7 +172,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 
 	@Override
 	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
-			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException {
+			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
 		
 		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
 		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
@@ -181,7 +181,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		for (Long uid: uids) {
 			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
 			if (emailView != null) {
-				msEmails.add(msEmailConverter.convert(emailView));
+				msEmails.add(msEmailConverter.convert(emailView, udr));
 			}
 		}
 		return msEmails;
