@@ -37,6 +37,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Set;
 
 import org.minig.imap.Flag;
+import org.obm.icalendar.ICalendar;
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
@@ -168,19 +170,32 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		return msAttachments;
 	}
 	
-	private MSMeetingRequest convertICalendar(EmailView emailView) {
-		if (emailView.getICalendar() == null) {
-			return null;
+	private boolean isSupportedICalendar(EmailView emailView) {
+		ICalendar iCalendar = emailView.getICalendar();
+		if (iCalendar != null) {
+			ICalendarEvent iCalendarEvent = iCalendar.getICalendarEvent();
+			if (iCalendarEvent != null && iCalendarEvent.isVEvent()) {
+				return iCalendarEvent.reccurenceId() == null;
+			}
 		}
-		return new ICalendarConverter().convertToMSMeetingRequest(emailView.getICalendar());
+		return false;
+	}
+	
+	private MSMeetingRequest convertICalendar(EmailView emailView) {
+		if (isSupportedICalendar(emailView)) {
+			return new ICalendarConverter().convertToMSMeetingRequest(emailView.getICalendar());
+		}
+		return null;
 	}
 
 	private MSMessageClass convertInvitationType(EmailView emailView) {
-		if (emailView.getInvitationType() == EmailViewInvitationType.REQUEST) {
-			return MSMessageClass.SCHEDULE_MEETING_REQUEST;
-		}
-		if (emailView.getInvitationType() == EmailViewInvitationType.CANCELED) {
-			return MSMessageClass.SCHEDULE_MEETING_CANCELED;
+		if (isSupportedICalendar(emailView)) {
+			if (emailView.getInvitationType() == EmailViewInvitationType.REQUEST) {
+				return MSMessageClass.SCHEDULE_MEETING_REQUEST;
+			}
+			if (emailView.getInvitationType() == EmailViewInvitationType.CANCELED) {
+				return MSMessageClass.SCHEDULE_MEETING_CANCELED;
+			}
 		}
 		return null;
 	}

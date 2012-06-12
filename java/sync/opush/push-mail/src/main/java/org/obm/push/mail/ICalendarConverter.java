@@ -95,9 +95,9 @@ public class ICalendarConverter {
 	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar) {
 		Preconditions.checkNotNull(icalendar, "ICalendar is null");
 		
-		MsMeetingRequestBuilder builder = new MSMeetingRequest.MsMeetingRequestBuilder();
 		ICalendarEvent iCalendarEvent = icalendar.getICalendarEvent();
 		if (iCalendarEvent.isVEvent()) {
+			MsMeetingRequestBuilder builder = new MSMeetingRequest.MsMeetingRequestBuilder();
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
 			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);
@@ -107,11 +107,16 @@ public class ICalendarConverter {
 				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
 				fillMsMeetingRequestFromRRule(iCalendarRule, builder);
+			} else if (iCalendarEvent.reccurenceId() != null) {
+				//FIXME OBMFULL-3610: MeetingResponse doesn't support accepting
+				//Event Exception
+				return null;
 			}
 			
 			builder.timeZone(timeZone);
+			return builder.build();
 		}
-		return builder.build();
+		return null;
 	}
 
 	private TimeZone getTimeZone(ICalendarTimeZone iCalendarTimeZone) {

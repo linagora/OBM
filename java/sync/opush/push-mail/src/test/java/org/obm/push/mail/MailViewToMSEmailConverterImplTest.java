@@ -50,6 +50,7 @@ import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
@@ -371,13 +372,36 @@ public class MailViewToMSEmailConverterImplTest {
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getMeetingRequest()).isNull();
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.NOTE);
 	}
 	
 	@Test
 	public void testMeetingRequest() throws IOException, ParserException, DaoException {
+		emailViewFixture.invitationType = EmailViewInvitationType.REQUEST;
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getMeetingRequest()).isNotNull();
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
+	}
+	
+	@Test
+	public void testEventExceptionMeetingRequest() throws IOException, ParserException, DaoException {
+		emailViewFixture.attachmentInputStream = null;
+		
+		ICalendar iCalendar = EasyMock.createMock(ICalendar.class);
+		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
+		EasyMock.expect(iCalendar.getICalendarEvent()).andReturn(iCalendarEvent).anyTimes();
+		EasyMock.expect(iCalendarEvent.isVEvent()).andReturn(true).anyTimes();
+		EasyMock.expect(iCalendarEvent.reccurenceId()).andReturn(new Date()).anyTimes();
+		EasyMock.replay(iCalendar, iCalendarEvent);
+		
+		emailViewFixture.iCalendar = iCalendar;
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+
+		EasyMock.verify(iCalendar, iCalendarEvent);
+		
+		assertThat(convertedMSEmail.getMeetingRequest()).isNull();
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.NOTE);
 	}
 	
 	@Test
@@ -431,7 +455,7 @@ public class MailViewToMSEmailConverterImplTest {
 			.bodyTruncation(emailViewFixture.bodyTruncationSize)
 			.attachments(emailViewFixture.attachments)
 			.iCalendar(emailViewFixture.iCalendar)
-			.invitationType(null)
+			.invitationType(emailViewFixture.invitationType)
 			.mimeType(emailViewFixture.bodyContentType.getFullMimeType())
 			.build();
 	}

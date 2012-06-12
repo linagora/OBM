@@ -503,6 +503,13 @@ public class ICalendarConverterTest {
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
 	}
+
+	@Test
+	public void testICalendarConverterOrphanedEventException() throws IOException, ParserException {
+		ICalendar icalendar = icalendar("orphaned_event_exception.ics");
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		Assertions.assertThat(msMeetingRequest).isNull();
+	}
 	
 	private ICalendar icalendar(String filename) throws IOException, ParserException {
 		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("ics/" + filename);
