@@ -31,11 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+
+import static org.junit.Assert.assertNotNull;
+
 import java.io.InputStream;
 
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+
 @Ignore
 public class TestFolderSync extends AbstractPushTest {
 

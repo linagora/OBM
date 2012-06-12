@@ -31,6 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+import static org.junit.Assert.assertNotNull;
+import static org.obm.push.client.tests.SyncKeyUtils.fillSyncKey;
+import static org.obm.push.client.tests.SyncKeyUtils.processCollection;
+
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,8 +45,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import static org.obm.push.client.tests.SyncKeyUtils.fillSyncKey;
-import static org.obm.push.client.tests.SyncKeyUtils.processCollection;
 @Ignore
 public class TestGetItemEstimate extends AbstractPushTest {
 

@@ -31,6 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.Random;
 import java.util.UUID;

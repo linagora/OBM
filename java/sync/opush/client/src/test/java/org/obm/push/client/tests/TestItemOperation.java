@@ -31,12 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.InputStream;
 
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 @Ignore
 public class TestItemOperation extends AbstractPushTest {
 

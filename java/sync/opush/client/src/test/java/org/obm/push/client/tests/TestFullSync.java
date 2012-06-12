@@ -31,15 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.obm.push.client.tests.SyncKeyUtils.fillSyncKey;
+import static org.obm.push.client.tests.SyncKeyUtils.processCollection;
+
 import java.io.InputStream;
 import java.util.Map;
 
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
-
-import static org.obm.push.client.tests.SyncKeyUtils.fillSyncKey;
-import static org.obm.push.client.tests.SyncKeyUtils.processCollection;
 
 @Ignore("It's necessary to do again all tests")
 public class TestFullSync extends AbstractPushTest {

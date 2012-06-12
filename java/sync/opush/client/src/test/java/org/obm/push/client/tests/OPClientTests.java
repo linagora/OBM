@@ -31,8 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.client.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Folder;
@@ -43,6 +49,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+@Ignore("it needs a server to be usefull")
 public class OPClientTests extends AbstractPushTest {
 
 	public void testOptions() {

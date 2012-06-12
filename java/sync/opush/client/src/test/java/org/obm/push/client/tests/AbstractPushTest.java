@@ -34,8 +34,8 @@ package org.obm.push.client.tests;
 import java.io.InputStream;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.OPClient;
@@ -44,7 +44,7 @@ import org.obm.sync.push.client.WBXMLOPClient;
 import org.w3c.dom.Document;
 
 @Ignore("It's necessary to do again all tests")
-public class AbstractPushTest extends TestCase {
+public class AbstractPushTest {
 
 	protected OPClient opc;
 	protected WBXMLTools wbxmlTools;
@@ -58,9 +58,8 @@ public class AbstractPushTest extends TestCase {
 		return p.getProperty(k);
 	}
 
-	@Override
+	@Before
 	protected void setUp() throws Exception {
-		super.setUp();
 
 		InputStream in = loadDataFile("test.properties.sample");
 		Properties p = new Properties();
@@ -77,9 +76,8 @@ public class AbstractPushTest extends TestCase {
 		opc = new WBXMLOPClient(login, password, devId, devType, userAgent, 9142, wbxmlTools);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	protected void tearDown() {
 		opc.destroy();
 		opc = null;
 	}
