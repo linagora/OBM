@@ -96,7 +96,7 @@ public class MSMeetingRequestSerializingTest {
 	public void testMeetingRequestNull() {
 		Element encodedDocument = encode(null);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.MEETING_REQUEST)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.MEETING_REQUEST)).isNull();
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.START_TIME)).isEqualTo(date(startTime));
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.START_TIME)).isEqualTo(date(startTime));
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.END_TIME)).isEqualTo(date(endTime));
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.END_TIME)).isEqualTo(date(endTime));
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.DTSTAMP)).isEqualTo(date(dtStamp));
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.DTSTAMP)).isEqualTo(date(dtStamp));
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INSTANCE_TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INSTANCE_TYPE))
 				.isEqualTo(MSMeetingRequestInstanceType.SINGLE.specificationValue());
 	}
 
@@ -155,7 +155,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INSTANCE_TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INSTANCE_TYPE))
 				.isEqualTo(MSMeetingRequestInstanceType.SINGLE_INSTANCE_RECURRING.specificationValue());
 	}
 
@@ -167,7 +167,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INSTANCE_TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INSTANCE_TYPE))
 				.isEqualTo(MSMeetingRequestInstanceType.MASTER_RECURRING.specificationValue());
 	}
 
@@ -179,7 +179,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INSTANCE_TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INSTANCE_TYPE))
 				.isEqualTo(MSMeetingRequestInstanceType.EXCEPTION_TO_RECURRING.specificationValue());
 	}
 
@@ -191,7 +191,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.ALL_DAY_EVENT)).isEqualTo("1");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.ALL_DAY_EVENT)).isEqualTo("1");
 	}
 
 	@Test
@@ -202,7 +202,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.ALL_DAY_EVENT)).isEqualTo("0");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.ALL_DAY_EVENT)).isEqualTo("0");
 	}
 
 	@Test
@@ -213,7 +213,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.CATEGORIES)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.CATEGORIES)).isNull();
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.GLOBAL_OBJ_ID)).isEqualTo(
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.GLOBAL_OBJ_ID)).isEqualTo(
 				MSMeetingRequestSerializer.msEventUidToGlobalObjId(globalObjIdValue, new IntEncoder()));
 	}
 	
@@ -237,7 +237,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INT_DB_BUSY_STATUS))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INT_DB_BUSY_STATUS))
 				.isEqualTo(MSMeetingRequestIntDBusyStatus.FREE.specificationValue());
 	}
 	
@@ -249,7 +249,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INT_DB_BUSY_STATUS))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INT_DB_BUSY_STATUS))
 				.isEqualTo(MSMeetingRequestIntDBusyStatus.BUSY.specificationValue());
 	}
 	
@@ -261,7 +261,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INT_DB_BUSY_STATUS))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INT_DB_BUSY_STATUS))
 				.isEqualTo(MSMeetingRequestIntDBusyStatus.OUT_OF_OFFICE.specificationValue());
 	}
 	
@@ -273,7 +273,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INT_DB_BUSY_STATUS))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INT_DB_BUSY_STATUS))
 				.isEqualTo(MSMeetingRequestIntDBusyStatus.TENTATIVE.specificationValue());
 	}
 
@@ -285,7 +285,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.LOCATION)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.LOCATION)).isNull();
 	}
 
 	@Test
@@ -297,7 +297,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.LOCATION)).isEqualTo(location);
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.LOCATION)).isEqualTo(location);
 	}
 
 	@Test
@@ -308,7 +308,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.ORGANIZER)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.ORGANIZER)).isNull();
 	}
 
 	@Test
@@ -320,7 +320,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.ORGANIZER)).isEqualTo(organizer);
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.ORGANIZER)).isEqualTo(organizer);
 	}
 
 	@Test
@@ -331,7 +331,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.RECURRENCE_ID)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.RECURRENCE_ID)).isNull();
 	}
 
 	@Test
@@ -343,7 +343,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.RECURRENCE_ID)).isEqualTo(date(recurrenceId));
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.RECURRENCE_ID)).isEqualTo(date(recurrenceId));
 	}
 
 	@Test
@@ -354,7 +354,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.REMINDER)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.REMINDER)).isNull();
 	}
 
 	@Test
@@ -366,7 +366,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.REMINDER)).isEqualTo(String.valueOf(reminder));
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.REMINDER)).isEqualTo(String.valueOf(reminder));
 	}
 
 	@Test
@@ -377,7 +377,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.RESPONSE_REQUESTED)).isEqualTo("1");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.RESPONSE_REQUESTED)).isEqualTo("1");
 	}
 	
 	@Test
@@ -388,7 +388,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.RESPONSE_REQUESTED)).isEqualTo("0");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.RESPONSE_REQUESTED)).isEqualTo("0");
 	}
 	
 	@Test
@@ -399,7 +399,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.SENSITIVITY))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.SENSITIVITY))
 				.isEqualTo(MSMeetingRequestSensitivity.CONFIDENTIAL.specificationValue());
 	}
 	
@@ -411,7 +411,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.SENSITIVITY))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.SENSITIVITY))
 				.isEqualTo(MSMeetingRequestSensitivity.NORMAL.specificationValue());
 	}
 
@@ -423,7 +423,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.SENSITIVITY))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.SENSITIVITY))
 				.isEqualTo(MSMeetingRequestSensitivity.PERSONAL.specificationValue());
 	}
 	
@@ -435,7 +435,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.SENSITIVITY))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.SENSITIVITY))
 				.isEqualTo(MSMeetingRequestSensitivity.PRIVATE.specificationValue());
 	}
 	
@@ -447,7 +447,7 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TIME_ZONE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TIME_ZONE))
 				.isEqualTo(MSMeetingRequest.DEFAULT_TIME_ZONE);
 	}
 	
@@ -461,7 +461,7 @@ public class MSMeetingRequestSerializingTest {
 		Element encodedDocument = encode(meetingRequest);
 		
 		String expectedTimeZone = Base64.encodeBase64String(timeZone.getID().getBytes());
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TIME_ZONE)).isEqualTo(expectedTimeZone);
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TIME_ZONE)).isEqualTo(expectedTimeZone);
 	}
 
 	private String date(Date date) {
@@ -484,11 +484,11 @@ public class MSMeetingRequestSerializingTest {
 		return parentElement;
 	}
 
-	private Node tag(Element element, ASEMAIL asemail) {
+	private Node tag(Element element, ASEmail asemail) {
 		return serializingTest.tag(element, asemail);
 	}
 
-	private String tagValue(Element element, ASEMAIL asemail) {
+	private String tagValue(Element element, ASEmail asemail) {
 		return serializingTest.tagValue(element, asemail);
 	}
 

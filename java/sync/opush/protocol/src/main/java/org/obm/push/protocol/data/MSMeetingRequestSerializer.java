@@ -64,7 +64,7 @@ public class MSMeetingRequestSerializer {
 
 	public void serializeMSMeetingRequest() {
 		Preconditions.checkNotNull(meetingRequest, "The meeting request is required");
-		meetingRequestElement = DOMUtils.createElement(parentElement, ASEMAIL.MEETING_REQUEST.asASValue());
+		meetingRequestElement = DOMUtils.createElement(parentElement, ASEmail.MEETING_REQUEST.asASValue());
 		
 		serializeAllDayEvent();
 		serializeStartTime();
@@ -86,80 +86,80 @@ public class MSMeetingRequestSerializer {
 
 	private void serializeAllDayEvent() {
 		DOMUtils.createElementAndText(meetingRequestElement, 
-				ASEMAIL.ALL_DAY_EVENT.asASValue(), meetingRequest.isAllDayEvent());
+				ASEmail.ALL_DAY_EVENT.asASValue(), meetingRequest.isAllDayEvent());
 	}
 	
 	private void serializeStartTime() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.START_TIME.asASValue(), formatDate(meetingRequest.getStartTime()));
+				ASEmail.START_TIME.asASValue(), formatDate(meetingRequest.getStartTime()));
 	}
 	
 	private void serializeEndTime() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.END_TIME.asASValue(), formatDate(meetingRequest.getEndTime()));
+				ASEmail.END_TIME.asASValue(), formatDate(meetingRequest.getEndTime()));
 	}
 	
 	private void serializeDTStamp() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.DTSTAMP.asASValue(), formatDate(meetingRequest.getDtStamp()));
+				ASEmail.DTSTAMP.asASValue(), formatDate(meetingRequest.getDtStamp()));
 	}
 	
 	private void serializeInstanceType() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.INSTANCE_TYPE.asASValue(), meetingRequest.getInstanceType().specificationValue());
+				ASEmail.INSTANCE_TYPE.asASValue(), meetingRequest.getInstanceType().specificationValue());
 	}
 	
 	private void serializeLocation() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.LOCATION.asASValue(), meetingRequest.getLocation());
+				ASEmail.LOCATION.asASValue(), meetingRequest.getLocation());
 	}
 	
 	private void serializeOrganizer() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.ORGANIZER.asASValue(), meetingRequest.getOrganizer());
+				ASEmail.ORGANIZER.asASValue(), meetingRequest.getOrganizer());
 	}
 	
 	private void serializeReminder() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.REMINDER.asASValue(), meetingRequest.getReminder());
+				ASEmail.REMINDER.asASValue(), meetingRequest.getReminder());
 	}
 	
 	private void serializeResponseRequested() {
 		DOMUtils.createElementAndText(meetingRequestElement, 
-				ASEMAIL.RESPONSE_REQUESTED.asASValue(), meetingRequest.isResponseRequested());
+				ASEmail.RESPONSE_REQUESTED.asASValue(), meetingRequest.isResponseRequested());
 	}
 	
 	private void serializeSensitivity() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.SENSITIVITY.asASValue(), meetingRequest.getSensitivity().specificationValue());
+				ASEmail.SENSITIVITY.asASValue(), meetingRequest.getSensitivity().specificationValue());
 	}
 	
 	private void serializeBusyStatus() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.INT_DB_BUSY_STATUS.asASValue(), meetingRequest.getIntDBusyStatus().specificationValue());
+				ASEmail.INT_DB_BUSY_STATUS.asASValue(), meetingRequest.getIntDBusyStatus().specificationValue());
 	}
 
 	private void serializeTimeZone() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.TIME_ZONE.asASValue(), meetingRequest.getTimeZoneInBase64());
+				ASEmail.TIME_ZONE.asASValue(), meetingRequest.getTimeZoneInBase64());
 	}
 
 	private void serializeGlobalId() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getMsEventUid(), intEncoder));
+				ASEmail.GLOBAL_OBJ_ID.asASValue(), msEventUidToGlobalObjId(meetingRequest.getMsEventUid(), intEncoder));
 	}
 	
 	private void serializeRecurrenceId() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEMAIL.RECURRENCE_ID.asASValue(), formatDate(meetingRequest.getRecurrenceId()));
+				ASEmail.RECURRENCE_ID.asASValue(), formatDate(meetingRequest.getRecurrenceId()));
 	}
 	
 	private void serializeMSMeetingRequestRecurrence() {
 		List<MSMeetingRequestRecurrence> recurrences = meetingRequest.getRecurrences();
 		if (recurrences != null && !recurrences.isEmpty()) {
-			Element recurrencesElement = DOMUtils.createElement(meetingRequestElement, ASEMAIL.RECURRENCES.asASValue());
+			Element recurrencesElement = DOMUtils.createElement(meetingRequestElement, ASEmail.RECURRENCES.asASValue());
 			for (MSMeetingRequestRecurrence recurrence: recurrences) {
-				Element recurrenceElement = DOMUtils.createElement(recurrencesElement, ASEMAIL.RECURRENCE.asASValue());
+				Element recurrenceElement = DOMUtils.createElement(recurrencesElement, ASEmail.RECURRENCE.asASValue());
 				serializeInterval(recurrence, recurrenceElement);
 				serializeUntil(recurrence, recurrenceElement);
 				serializeOccurrences(recurrence, recurrenceElement);
@@ -179,43 +179,43 @@ public class MSMeetingRequestSerializer {
 			for (MSMeetingRequestRecurrenceDayOfWeek day : dayOfWeek) {
 				computedValue += day.asXmlValue();
 			}
-			DOMUtils.createElementAndText(parentElement, ASEMAIL.DAY_OF_WEEK.asASValue(), computedValue);
+			DOMUtils.createElementAndText(parentElement, ASEmail.DAY_OF_WEEK.asASValue(), computedValue);
 		}
 	}
 
 	private void serializeInterval(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.INTERVAL.asASValue(), recurrence.getInterval());
+				ASEmail.INTERVAL.asASValue(), recurrence.getInterval());
 	}
 	
 	private void serializeUntil(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.UNTIL.asASValue(), formatDate(recurrence.getUntil()));
+				ASEmail.UNTIL.asASValue(), formatDate(recurrence.getUntil()));
 	}
 	
 	private void serializeOccurrences(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.OCCURRENCES.asASValue(), recurrence.getOccurrences());
+				ASEmail.OCCURRENCES.asASValue(), recurrence.getOccurrences());
 	}
 	
 	private void serializeType(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.TYPE.asASValue(), recurrence.getType().specificationValue());
+				ASEmail.TYPE.asASValue(), recurrence.getType().specificationValue());
 	}
 	
 	private void serializeDayOfMonth(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.DAY_OF_MONTH.asASValue(), recurrence.getDayOfMonth());
+				ASEmail.DAY_OF_MONTH.asASValue(), recurrence.getDayOfMonth());
 	}
 
 	private void serializeMonthOfYears(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.MONTH_OF_YEAR.asASValue(), recurrence.getMonthOfYear());
+				ASEmail.MONTH_OF_YEAR.asASValue(), recurrence.getMonthOfYear());
 	}
 
 	private void serializeWeekOfMonth(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEMAIL.WEEK_OF_MONTH.asASValue(), recurrence.getWeekOfMonth());
+				ASEmail.WEEK_OF_MONTH.asASValue(), recurrence.getWeekOfMonth());
 	}
 	
 	private String formatDate(Date date) {

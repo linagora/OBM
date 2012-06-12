@@ -40,8 +40,8 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.protocol.data.ASAIRS;
-import org.obm.push.protocol.data.ASEMAIL;
+import org.obm.push.protocol.data.ASAirs;
+import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.IntEncoder;
 import org.obm.push.protocol.data.MSEmailHeaderSerializer;
 import org.obm.push.protocol.data.MSMeetingRequestSerializer;
@@ -73,25 +73,25 @@ public class MSEmailEncoder {
 		new MSEmailHeaderSerializer(parent, msEmail.getHeader()).serializeMSEmailHeader();
 
 		String messageImportance = msEmail.getImportance().asIntString();
-		DOMUtils.createElementAndText(parent, ASEMAIL.IMPORTANCE.asASValue(), messageImportance);
+		DOMUtils.createElementAndText(parent, ASEmail.IMPORTANCE.asASValue(), messageImportance);
 		
-		DOMUtils.createElementAndText(parent, ASEMAIL.READ.asASValue(), msEmail.isRead());
+		DOMUtils.createElementAndText(parent, ASEmail.READ.asASValue(), msEmail.isRead());
 
 		serializeBody(parent, msEmail.getBody());
 		serializeAttachments(parent, msEmail.getAttachments());
 
 		MSMessageClass messageClass = msEmail.getMessageClass();
-		DOMUtils.createElementAndText(parent, ASEMAIL.MESSAGE_CLASS.asASValue(), messageClass.specificationValue());
+		DOMUtils.createElementAndText(parent, ASEmail.MESSAGE_CLASS.asASValue(), messageClass.specificationValue());
 		
 		if (msEmail.getMeetingRequest() != null) {
 			new MSMeetingRequestSerializer(intEncoder, parent, msEmail.getMeetingRequest()).serializeMSMeetingRequest();
-			DOMUtils.createElementAndText(parent, ASEMAIL.CONTENT_CLASS.asASValue(), CALENDAR_CLASS);
+			DOMUtils.createElementAndText(parent, ASEmail.CONTENT_CLASS.asASValue(), CALENDAR_CLASS);
 		} else {
-			DOMUtils.createElementAndText(parent, ASEMAIL.CONTENT_CLASS.asASValue(), MESSAGE_CLASS);
+			DOMUtils.createElementAndText(parent, ASEmail.CONTENT_CLASS.asASValue(), MESSAGE_CLASS);
 		}
 		
-		DOMUtils.createElementAndText(parent, ASEMAIL.CPID.asASValue(), CPID_DEFAULT);
-		DOMUtils.createElementAndText(parent, ASAIRS.NATIVE_TYPE.asASValue(), msEmail.getBody().getBodyType().asXmlValue());
+		DOMUtils.createElementAndText(parent, ASEmail.CPID.asASValue(), CPID_DEFAULT);
+		DOMUtils.createElementAndText(parent, ASAirs.NATIVE_TYPE.asASValue(), msEmail.getBody().getBodyType().asXmlValue());
 	}
 	
 	private void serializeBody(Element parent, MSEmailBody body) throws IOException {
@@ -99,23 +99,23 @@ public class MSEmailEncoder {
 		SerializableInputStream mimeData = body.getMimeData();
 		Integer truncation = body.getTruncationSize();
 
-		Element bodyElement = DOMUtils.createElement(parent, ASAIRS.BODY.asASValue());
+		Element bodyElement = DOMUtils.createElement(parent, ASAirs.BODY.asASValue());
 		
-		DOMUtils.createElementAndCDataText(bodyElement, ASAIRS.DATA.asASValue(), mimeData, body.getCharset());
-		DOMUtils.createElementAndText(bodyElement, ASAIRS.TYPE.asASValue(), bodyType.asXmlValue());
-		DOMUtils.createElementAndText(bodyElement, ASAIRS.TRUNCATED.asASValue(), body.isTruncated());
-		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation);
+		DOMUtils.createElementAndCDataText(bodyElement, ASAirs.DATA.asASValue(), mimeData, body.getCharset());
+		DOMUtils.createElementAndText(bodyElement, ASAirs.TYPE.asASValue(), bodyType.asXmlValue());
+		DOMUtils.createElementAndText(bodyElement, ASAirs.TRUNCATED.asASValue(), body.isTruncated());
+		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAirs.ESTIMATED_DATA_SIZE.asASValue(), truncation);
 	}
 
 	private void serializeAttachments(Element parent, Set<MSAttachement> attachments) {
 		if (!Iterables.isEmpty(attachments)) {
-			Element atts = DOMUtils.createElement(parent, ASAIRS.ATTACHMENTS.asASValue());
+			Element atts = DOMUtils.createElement(parent, ASAirs.ATTACHMENTS.asASValue());
 			for (MSAttachement msAtt: attachments) {
-				Element att = DOMUtils.createElement(atts, ASAIRS.ATTACHMENT.asASValue());
-				DOMUtils.createElementAndText(att, ASAIRS.DISPLAY_NAME.asASValue(), msAtt.getDisplayName());
-				DOMUtils.createElementAndText(att, ASAIRS.FILE_REFERENCE.asASValue(), msAtt.getFileReference());
-				DOMUtils.createElementAndText(att, ASAIRS.METHOD.asASValue(), msAtt.getMethod().asIntString());
-				DOMUtils.createElementAndText(att, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), 
+				Element att = DOMUtils.createElement(atts, ASAirs.ATTACHMENT.asASValue());
+				DOMUtils.createElementAndText(att, ASAirs.DISPLAY_NAME.asASValue(), msAtt.getDisplayName());
+				DOMUtils.createElementAndText(att, ASAirs.FILE_REFERENCE.asASValue(), msAtt.getFileReference());
+				DOMUtils.createElementAndText(att, ASAirs.METHOD.asASValue(), msAtt.getMethod().asIntString());
+				DOMUtils.createElementAndText(att, ASAirs.ESTIMATED_DATA_SIZE.asASValue(), 
 						msAtt.getEstimatedDataSize().toString());
 			}
 		}

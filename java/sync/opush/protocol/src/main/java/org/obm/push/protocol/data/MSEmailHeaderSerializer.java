@@ -68,38 +68,38 @@ public class MSEmailHeaderSerializer {
 
 	private void serializeTo() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEMAIL.TO.asASValue(), formatMSAddresses(msEmailHeader.getTo()));
+				ASEmail.TO.asASValue(), formatMSAddresses(msEmailHeader.getTo()));
 	}
 	
 	private void serializeCC() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEMAIL.CC.asASValue(), formatMSAddresses(msEmailHeader.getCc()));
+				ASEmail.CC.asASValue(), formatMSAddresses(msEmailHeader.getCc()));
 	}
 	
 	private void serializeFrom() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEMAIL.FROM.asASValue(), formatMSAddresses(msEmailHeader.getFrom()));
+				ASEmail.FROM.asASValue(), formatMSAddresses(msEmailHeader.getFrom()));
 	}
 	
 	private void serializeReplyTo() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEMAIL.REPLY_TO.asASValue(), formatMSAddresses(msEmailHeader.getReplyTo()));
+				ASEmail.REPLY_TO.asASValue(), formatMSAddresses(msEmailHeader.getReplyTo()));
 	}
 	
 	private void serializeSubject() {
 		DOMUtils.createElementAndTextIfNotNull(element,
-				ASEMAIL.SUBJECT.asASValue(), msEmailHeader.getSubject());
+				ASEmail.SUBJECT.asASValue(), msEmailHeader.getSubject());
 	}
 	
 	private void serializeDateReceived() {
 		DOMUtils.createElementAndTextIfNotNull(element,
-				ASEMAIL.DATE_RECEIVED.asASValue(), formatDate(msEmailHeader.getDate()));
+				ASEmail.DATE_RECEIVED.asASValue(), formatDate(msEmailHeader.getDate()));
 	}
 
 	private void serializeDisplayTo() {
 		if (msEmailHeader.getDisplayTo() != null) {
 			DOMUtils.createElementAndText(element, 
-					ASEMAIL.DISPLAY_TO.asASValue(), msEmailHeader.getDisplayTo().toMSProtocol());
+					ASEmail.DISPLAY_TO.asASValue(), msEmailHeader.getDisplayTo().toMSProtocol());
 		}
 	}
 	

@@ -32,23 +32,50 @@
 package org.obm.push.protocol.data;
 
 
-public enum ASAIRS {
+public enum ASEmail {
 
-	BODY("Body"),
-	TYPE("Type"),
-	ESTIMATED_DATA_SIZE("EstimatedDataSize"),
-	TRUNCATED("Truncated"),
-	DATA("Data"),
-	ATTACHMENTS("Attachments"),
-	ATTACHMENT("Attachment"),
-	DISPLAY_NAME("DisplayName"),
-	FILE_REFERENCE("FileReference"),
-	METHOD("Method"), 
-	NATIVE_TYPE("NativeBodyType");
+	TO("To"),
+	REPLY_TO("ReplyTo"),
+	DISPLAY_TO("DisplayTo"),
+	CC("Cc"),
+	FROM("From"),
+	SUBJECT("Subject"),
+	DATE_RECEIVED("DateReceived"),
+	MEETING_REQUEST("MeetingRequest"),
+	ALL_DAY_EVENT("AllDayEvent"),
+	START_TIME("StartTime"),
+	END_TIME("EndTime"),
+	DTSTAMP("DTStamp"),
+	LOCATION("Location"),
+	INSTANCE_TYPE("InstanceType"),
+	ORGANIZER("Organizer"),
+	REMINDER("Reminder"),
+	RECURRENCE_ID("RecurrenceId"),
+	RESPONSE_REQUESTED("ResponseRequested"),
+	SENSITIVITY("Sensitivity"),
+	INT_DB_BUSY_STATUS("IntDBusyStatus"),
+	TIME_ZONE("TimeZone"),
+	GLOBAL_OBJ_ID("GlobalObjId"),
+	CATEGORIES("Categories"),
+	RECURRENCES("Recurrences"),
+	RECURRENCE("Recurrence"),
+	INTERVAL("Recurrence_Interval"),
+	UNTIL("Recurrence_Until"),
+	OCCURRENCES("Recurrence_Occurrences"),
+	TYPE("Recurrence_Type"),
+	DAY_OF_MONTH("Recurrence_DayOfMonth"),
+	WEEK_OF_MONTH("Recurrence_WeekOfMonth"),
+	DAY_OF_WEEK("Recurrence_DayOfWeek"),
+	MONTH_OF_YEAR("Recurrence_MonthOfYear"),
+	READ("Read"),
+	IMPORTANCE("Importance"),
+	MESSAGE_CLASS("MessageClass"),
+	CPID("InternetCPID"),
+	CONTENT_CLASS("ContentClass");
 	
 	private final String name;
 
-	private ASAIRS(String name) {
+	private ASEmail(String name) {
 		this.name = name;
 	}
 	
@@ -57,6 +84,6 @@ public enum ASAIRS {
 	}
 	
 	public String asASValue() {
-		return "AirSyncBase:".concat(getName());
+		return "Email:".concat(getName());
 	}
 }

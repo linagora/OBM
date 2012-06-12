@@ -71,7 +71,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.DAY_OF_MONTH)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.DAY_OF_MONTH)).isNull();
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.DAY_OF_MONTH)).isEqualTo("5");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.DAY_OF_MONTH)).isEqualTo("5");
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.MONTH_OF_YEAR)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.MONTH_OF_YEAR)).isNull();
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.MONTH_OF_YEAR)).isEqualTo("2");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.MONTH_OF_YEAR)).isEqualTo("2");
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.WEEK_OF_MONTH)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.WEEK_OF_MONTH)).isNull();
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.WEEK_OF_MONTH)).isEqualTo("3");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.WEEK_OF_MONTH)).isEqualTo("3");
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.DAY_OF_WEEK)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.DAY_OF_WEEK)).isNull();
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.DAY_OF_WEEK))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.DAY_OF_WEEK))
 				.isEqualTo(MSMeetingRequestRecurrenceDayOfWeek.FRIDAY.specificationValue());
 	}
 
@@ -168,7 +168,7 @@ public class MSMeetingRecurrenceSerializingTest {
 						MSMeetingRequestRecurrenceDayOfWeek.WEDNESDAY.asXmlValue() +
 						MSMeetingRequestRecurrenceDayOfWeek.SUNDAY.asXmlValue();
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.DAY_OF_WEEK))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.DAY_OF_WEEK))
 				.isEqualTo(String.valueOf(expectedComputedValue));
 	}
 
@@ -180,7 +180,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.INTERVAL)).isEqualTo("5");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.INTERVAL)).isEqualTo("5");
 	}
 
 	@Test
@@ -191,7 +191,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.OCCURRENCES)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.OCCURRENCES)).isNull();
 	}
 
 	@Test
@@ -202,7 +202,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.OCCURRENCES)).isEqualTo("100");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.OCCURRENCES)).isEqualTo("100");
 	}
 
 	@Test
@@ -213,7 +213,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.DAILY.specificationValue());
 	}
 
@@ -225,7 +225,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.MONTHLY.specificationValue());
 	}
 
@@ -237,7 +237,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY.specificationValue());
 	}
 
@@ -250,7 +250,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.WEEKLY.specificationValue());
 	}
 
@@ -263,7 +263,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.YEARLY.specificationValue());
 	}
 
@@ -277,7 +277,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.TYPE))
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TYPE))
 				.isEqualTo(MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY.specificationValue());
 	}
 
@@ -289,7 +289,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tag(encodedDocument, ASEMAIL.UNTIL)).isNull();
+		Assertions.assertThat(tag(encodedDocument, ASEmail.UNTIL)).isNull();
 	}
 
 	@Test
@@ -300,7 +300,7 @@ public class MSMeetingRecurrenceSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEMAIL.UNTIL)).isEqualTo("1970-01-01T12:00:00.000Z");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.UNTIL)).isEqualTo("1970-01-01T12:00:00.000Z");
 	}
 
 	private Builder initializedRequiredFieldsRecurrenceBuilder() {
@@ -335,11 +335,11 @@ public class MSMeetingRecurrenceSerializingTest {
 		return meetingRequest;
 	}
 	
-	private Node tag(Element element, ASEMAIL asemail) {
+	private Node tag(Element element, ASEmail asemail) {
 		return serializingTest.tag(element, asemail);
 	}
 
-	private String tagValue(Element element, ASEMAIL asemail) {
+	private String tagValue(Element element, ASEmail asemail) {
 		return serializingTest.tagValue(element, asemail);
 	}
 

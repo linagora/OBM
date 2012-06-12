@@ -73,13 +73,13 @@ public class MSEmailHeaderSerializingTest {
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.FROM)).isEqualTo(" <from@obm.lng.org> ");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.REPLY_TO)).isEqualTo(" <from@mydomain.org> ");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.CC)).isEqualTo(" <cc@obm.lng.org> ");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.TO)).isEqualTo(" <to.1@obm.lng.org> , <to.2@obm.lng.org> ");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.DISPLAY_TO)).isEqualTo(" <to.1@obm.lng.org> ");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.SUBJECT)).isEqualTo("Subject");
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.DATE_RECEIVED)).isEqualTo(sdf.format(date));
+		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo(" <from@obm.lng.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.REPLY_TO)).isEqualTo(" <from@mydomain.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.CC)).isEqualTo(" <cc@obm.lng.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.TO)).isEqualTo(" <to.1@obm.lng.org> , <to.2@obm.lng.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.DISPLAY_TO)).isEqualTo(" <to.1@obm.lng.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo("Subject");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.DATE_RECEIVED)).isEqualTo(sdf.format(date));
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class MSEmailHeaderSerializingTest {
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.FROM)).isEqualTo(" <from@obm.lng.org> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo(" <from@obm.lng.org> ");
 	}
 	
 	@Test
@@ -100,7 +100,7 @@ public class MSEmailHeaderSerializingTest {
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.FROM)).isEqualTo("\"Empty From\" <o-push@linagora.com> ");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo("\"Empty From\" <o-push@linagora.com> ");
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ public class MSEmailHeaderSerializingTest {
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tagValue(parentElement, ASEMAIL.SUBJECT)).isEqualTo("[Empty Subject]");
+		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo("[Empty Subject]");
 	}
 	
 	@Test
@@ -120,17 +120,17 @@ public class MSEmailHeaderSerializingTest {
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tag(parentElement, ASEMAIL.CC)).isNull();
-		Assertions.assertThat(tag(parentElement, ASEMAIL.TO)).isNull();
-		Assertions.assertThat(tag(parentElement, ASEMAIL.DATE_RECEIVED)).isNull();
-		Assertions.assertThat(tag(parentElement, ASEMAIL.DISPLAY_TO)).isNull();
+		Assertions.assertThat(tag(parentElement, ASEmail.CC)).isNull();
+		Assertions.assertThat(tag(parentElement, ASEmail.TO)).isNull();
+		Assertions.assertThat(tag(parentElement, ASEmail.DATE_RECEIVED)).isNull();
+		Assertions.assertThat(tag(parentElement, ASEmail.DISPLAY_TO)).isNull();
 	}
 
-	private Node tag(Element element, ASEMAIL asemail) {
+	private Node tag(Element element, ASEmail asemail) {
 		return serializingTest.tag(element, asemail);
 	}
 
-	private String tagValue(Element element, ASEMAIL asemail) {
+	private String tagValue(Element element, ASEmail asemail) {
 		return serializingTest.tagValue(element, asemail);
 	}
 

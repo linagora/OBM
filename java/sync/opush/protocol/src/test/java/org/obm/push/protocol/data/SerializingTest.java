@@ -40,11 +40,11 @@ import org.w3c.dom.NodeList;
 
 public class SerializingTest {
 
-	public String tagValue(Element element, ASEMAIL asemail) {
+	public String tagValue(Element element, ASEmail asemail) {
 		return tag(element, asemail).getTextContent();
 	}
 
-	public Node tag(Element element, ASEMAIL asemail) {
+	public Node tag(Element element, ASEmail asemail) {
 		NodeList tags = tags(element, asemail);
 		if (tags.getLength() == 0) {
 			return null;
@@ -55,7 +55,7 @@ public class SerializingTest {
 		}
 	}
 
-	private NodeList tags(Element element, ASEMAIL asemail) {
+	private NodeList tags(Element element, ASEmail asemail) {
 		return element.getElementsByTagName(asemail.asASValue());
 	}
 

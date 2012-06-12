@@ -52,7 +52,7 @@ public class DateUtils {
 	}
 	
 	public static Calendar getEpochCalendar(TimeZone timeZone) {
-		if (null == timeZone) {
+		if (timeZone == null) {
 			return getEpochCalendar();
 		}
 		
