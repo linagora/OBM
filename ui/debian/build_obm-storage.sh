@@ -153,5 +153,7 @@ cp ${OBM_UPDATE_SCRIPTS_23}/update-2.3.19-2.3.20.pgsql.sql ${UPGRADE_SQL_DIR_PGS
 cp ${CURDIR}/debian/misc/db/update-2.3-2.4.sh ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.0-1
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha6.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~alpha6
 cp ${CURDIR}/debian/misc/db/pgsql/upgrade2.4.1~alpha9+git.sh ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.1~alpha9+git
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha10+git.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~alpha10+git
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha10+git.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~alpha10+git
 
 exit 0

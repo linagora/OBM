@@ -69,4 +69,7 @@ mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
 
 ./update-2.4.0-2.4.1~alpha9+git.mysql.sh
 
+mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+  < "updates/update-2.4.1~alpha10+git.mysql.sql" >> /tmp/data_insert.log 2>&1
+
 echo "DONE."
