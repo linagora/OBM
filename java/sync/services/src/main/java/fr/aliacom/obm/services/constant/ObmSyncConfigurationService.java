@@ -117,4 +117,8 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE);
 	}
 	
+	@Override
+	public boolean usePersistentCache() {
+		return false;
+	}
 }

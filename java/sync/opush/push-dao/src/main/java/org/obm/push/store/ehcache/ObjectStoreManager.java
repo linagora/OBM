@@ -60,16 +60,17 @@ public class ObjectStoreManager {
 	private final CacheManager singletonManager;
 
 	@Inject ObjectStoreManager(ConfigurationService configurationService) {
-		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds(); 
-		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds));
+		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
+		boolean usePersistentCache = configurationService.usePersistentCache();
+		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache));
 		logger.info("initializing ehcache with transaction timeout = {} seconds", transactionTimeoutInSeconds);
 	}
 	
-	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds) {
+	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache) {
 		Configuration configuration = new Configuration();
-		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE));
-		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE));
-		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE));
+		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE).eternal(usePersistentCache));
+		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
+		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 		return configuration;
 	}
@@ -78,7 +79,6 @@ public class ObjectStoreManager {
 		return new CacheConfiguration()
 			.maxElementsInMemory(1000)
 			.maxElementsOnDisk(100000)
-			.eternal(true)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.XA);

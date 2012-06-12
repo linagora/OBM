@@ -126,4 +126,8 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 		return 60;
 	}
 	
+	@Override
+	public boolean usePersistentCache() {
+		return false;
+	}
 }

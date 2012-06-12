@@ -70,5 +70,6 @@ public interface ConfigurationService {
 	String getDatabasePassword();
 
 	int transactionTimeoutInSeconds();
-	
+
+	boolean usePersistentCache();
 }

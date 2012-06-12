@@ -33,13 +33,13 @@ package org.obm.push.store.ehcache;
 
 import org.easymock.EasyMock;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
 
 public class StoreManagerConfigurationTest {
 
 	protected ConfigurationService initConfigurationServiceMock() {
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationServiceImpl.class);
+		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
 		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(false);
 		EasyMock.replay(configurationService);
 		
 		return configurationService;

@@ -200,5 +200,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	public String getDatabasePassword() {
 	    return removeEnclosingDoubleQuotes(getStringValue(DB_PASSWORD_KEY));
 	}
+
+	@Override
+	public boolean usePersistentCache() {
+		return true;
+	}
 	
 }
