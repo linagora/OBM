@@ -33,10 +33,6 @@ package org.obm.configuration;
 
 import java.io.File;
 
-import org.obm.configuration.TransactionConfiguration;
-
-import com.google.common.io.Files;
-
 public class TestTransactionConfiguration implements TransactionConfiguration {
 
 	@Override
@@ -45,12 +41,17 @@ public class TestTransactionConfiguration implements TransactionConfiguration {
 	}
 
 	@Override
-	public File getJournalPart2Path() {
-		return new File(Files.createTempDir().getAbsoluteFile() + File.pathSeparator + "btm2");
+	public File getJournalPart1Path() {
+		return null;
 	}
 
 	@Override
-	public File getJournalPart1Path() {
-		return new File(Files.createTempDir().getAbsoluteFile() + File.pathSeparator + "btm2");
+	public File getJournalPart2Path() {
+		return null;
+	}
+	
+	@Override
+	public boolean enableJournal() {
+		return false;
 	}
 }

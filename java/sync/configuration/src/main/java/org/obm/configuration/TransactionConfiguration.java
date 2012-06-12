@@ -38,5 +38,6 @@ public interface TransactionConfiguration {
 	int getTimeOutInSecond();
 	File getJournalPart1Path();
 	File getJournalPart2Path();
+	boolean enableJournal();
 	
 }

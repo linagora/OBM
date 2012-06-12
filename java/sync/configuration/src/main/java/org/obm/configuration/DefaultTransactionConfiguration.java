@@ -63,4 +63,9 @@ public class DefaultTransactionConfiguration implements TransactionConfiguration
 	public int getTimeOutInSecond() {
 		return configurationService.transactionTimeoutInSeconds();
 	}
+	
+	@Override
+	public boolean enableJournal() {
+		return true;
+	}
 }

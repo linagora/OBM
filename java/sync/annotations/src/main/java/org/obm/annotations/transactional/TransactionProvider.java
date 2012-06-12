@@ -57,8 +57,12 @@ public class TransactionProvider implements Provider<TransactionManager> {
 
 	private void configureBitronix(TransactionConfiguration configuration) {
 		Configuration btConfiguration = TransactionManagerServices.getConfiguration();
-		btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
-		btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());
+		if (configuration.enableJournal()) {
+			btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
+			btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());	
+		} else {
+			btConfiguration.setJournal("null");
+		}
 		btConfiguration.setDefaultTransactionTimeout(configuration.getTimeOutInSecond());
 	}
 	
