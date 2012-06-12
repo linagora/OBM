@@ -69,8 +69,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException {
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		this.transactionManager.begin();
 		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
@@ -79,7 +79,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		this.transactionManager.rollback();
+		this.objectStoreManager.shutdown();
 		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	

@@ -77,6 +77,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
+		objectStoreManager.shutdown();
 		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	

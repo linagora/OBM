@@ -45,6 +45,7 @@ import org.obm.configuration.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -64,6 +65,10 @@ public class ObjectStoreManager {
 		boolean usePersistentCache = configurationService.usePersistentCache();
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache));
 		logger.info("initializing ehcache with transaction timeout = {} seconds", transactionTimeoutInSeconds);
+	}
+
+	@VisibleForTesting void shutdown() {
+		this.singletonManager.shutdown();
 	}
 	
 	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache) {

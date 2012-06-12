@@ -58,12 +58,12 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	
 	@Before
 	public void init() {
-		// by default, loading one store in objectStoreManager.xml
 		this.opushCacheManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 	}
 
 	@After
 	public void shutdown() {
+		opushCacheManager.shutdown();
 		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 
