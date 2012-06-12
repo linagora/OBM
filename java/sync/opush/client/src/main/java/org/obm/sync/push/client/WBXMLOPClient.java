@@ -31,10 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
@@ -47,10 +43,12 @@ import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.obm.push.utils.DOMUtils;
-import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 
 
 public class WBXMLOPClient extends OPClient {
@@ -113,24 +111,11 @@ public class WBXMLOPClient extends OPClient {
 						+ "\n" + pm.getResponseBodyAsString());
 				throw new HttpRequestException(ret);
 			} else {
-				InputStream is = pm.getResponseBodyAsStream();
-				File localCopy = File.createTempFile("pushresp_", ".bin");
-				FileUtils.transfer(is, new FileOutputStream(localCopy), true);
-				logger.info("binary response stored in "
-						+ localCopy.getAbsolutePath());
-
-				InputStream in = new FileInputStream(localCopy);
-				if (pm.getResponseHeader("Content-Encoding") != null
-						&& pm.getResponseHeader("Content-Encoding").getValue()
-								.contains("gzip")) {
-					in = new GZIPInputStream(in);
-				}
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				FileUtils.transfer(in, out, true);
+				byte[] response = getResponse(pm);
 				if (pm.getResponseHeader("Content-Type") != null
 						&& pm.getResponseHeader("Content-Type").getValue()
 								.contains("application/vnd.ms-sync.multipart")) {
-					byte[] all = out.toByteArray();
+					byte[] all = response;
 					int idx = 0;
 					byte[] buffer = new byte[4];
 					for (int i = 0; i < buffer.length; i++) {
@@ -162,8 +147,8 @@ public class WBXMLOPClient extends OPClient {
 						}
 
 					}
-				} else if (out.toByteArray().length > 0) {
-					xml = wbxmlTools.toXml(out.toByteArray());
+				} else if (response.length > 0) {
+					xml = wbxmlTools.toXml(response);
 					DOMUtils.logDom(xml);
 				}
 			}
@@ -171,6 +156,26 @@ public class WBXMLOPClient extends OPClient {
 			pm.releaseConnection();
 		}
 		return xml;
+	}
+
+	private byte[] getResponse(PostMethod pm) throws IOException {
+		InputStream responseStream = null;
+		try {
+			responseStream = getResponseStream(pm);
+			return ByteStreams.toByteArray(responseStream);
+		} finally {
+			Closeables.closeQuietly(responseStream);
+		}
+	}
+
+	private InputStream getResponseStream(PostMethod pm) throws IOException {
+		InputStream is = pm.getResponseBodyAsStream();
+		if (pm.getResponseHeader("Content-Encoding") != null
+				&& pm.getResponseHeader("Content-Encoding").getValue().contains("gzip")) {
+			return new GZIPInputStream(is);
+		} else {
+			return is;
+		}
 	}
 	
 	private final int byteArrayToInt(byte[] b) {
