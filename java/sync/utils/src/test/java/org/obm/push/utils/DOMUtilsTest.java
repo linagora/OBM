@@ -31,22 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.TransformerException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
+
+import org.junit.internal.matchers.StringContains;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Charsets;
+
+import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class DOMUtilsTest {
@@ -63,23 +62,6 @@ public class DOMUtilsTest {
 		
 		Assert.assertThat(new String(out.toByteArray(), "UTF-8"), 
 				StringContains.containsString(expectedString));
-	}
-	
-	@Test
-	public void testCDataSectionEncoding() throws TransformerException, IOException{
-		Document reply = DOMUtils.createDoc(null, "Root");
-		Element root = reply.getDocumentElement();
-
-		String expectedString = " \" ' éàâ";
-		DOMUtils.createElementAndCDataText(root, 
-				"CDataSection",  new ByteArrayInputStream(expectedString.getBytes()), Charsets.UTF_8);
-		
-
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DOMUtils.serialize(reply, out);
-				
-		Assert.assertThat(new String(out.toByteArray(), "UTF-8"), 
-				StringContains.containsString("<CDataSection><![CDATA["+ expectedString + "]]></CDataSection>"));
 	}
 }
 

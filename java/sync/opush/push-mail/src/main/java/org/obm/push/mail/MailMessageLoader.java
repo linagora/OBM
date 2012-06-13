@@ -157,6 +157,7 @@ public class MailMessageLoader {
 		msEmail.setFrom(convertAdressToMSAddress(mailMessage.getSender()));
 		msEmail.setDate(mailMessage.getDate());
 		msEmail.setHeaders(mailMessage.getHeaders());
+		msEmail.setForwardMessage(convertAllMailMessageToMSEmail(mailMessage.getForwardMessage(), udr, uid, collectionId, messageId));
 		msEmail.setAttachements(convertMailMessageAttachmentToMSAttachment(mailMessage, uid, collectionId, messageId));	
 		msEmail.setUid(mailMessage.getUid());
 		
@@ -237,6 +238,15 @@ public class MailMessageLoader {
 		return false;
 	}
 	
+	private Set<MSEmail> convertAllMailMessageToMSEmail(final Set<MailMessage> set, final UserDataRequest udr, 
+			final long uid, final Integer collectionId, final long messageId) throws ConversionException {
+		final Set<MSEmail> msEmails = new HashSet<MSEmail>();
+		for (final MailMessage mailMessage: set) {
+			msEmails.add(convertMailMessageToMSEmail(mailMessage, udr, uid, collectionId, messageId));
+		}
+		return msEmails;
+	}
+
 	private MSAddress convertAdressToMSAddress(Address adress) {
 		if (adress != null) {
 			return new MSAddress(adress.getDisplayName(), adress.getMail());

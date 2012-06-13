@@ -40,7 +40,9 @@ import java.util.UUID;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
@@ -48,11 +50,9 @@ import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -176,25 +176,26 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState state, 
-			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException, ConversionException {
-		
-		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions);
+		DataDelta dataDelta = getChanged(udr, state, filterType, collectionId);
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws DaoException,
-			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException {
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException {
 		
 		AccessToken token = login(udr);
 		
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		String calendar = parseCalendarName(collectionPath);
 
-		state.updatingLastSync(syncCollectionOptions.getFilterType());
+		state.updatingLastSync(filterType);
 		try {
 			
 			EventChanges changes = null;
@@ -526,8 +527,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds, SyncCollectionOptions collectionOptions)
-			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
+			throws CollectionNotFoundException, DaoException,
+			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(udr);

@@ -37,43 +37,43 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 
 import com.google.common.collect.ImmutableList;
 
 public class TaskBackend implements PIMBackend {
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr,
-			List<String> fetchServerIds,
-			SyncCollectionOptions syncCollectionOptions)
-			throws ProcessingEmailException, CollectionNotFoundException,
-			DaoException, UnexpectedObmSyncServerException {
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
+			throws CollectionNotFoundException, DaoException,
+			ProcessingEmailException, UnexpectedObmSyncServerException {
 		throw new CollectionNotFoundException();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions options) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException {
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException {
 		return new DataDeltaBuilder().withSyncDate(new Date()).build();
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, 
-			SyncState state, SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
-			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnexpectedObmSyncServerException {
 		return 0;
 	}
 	
@@ -113,4 +113,5 @@ public class TaskBackend implements PIMBackend {
 	public List<ItemChange> getHierarchyChanges() {
 		return ImmutableList.<ItemChange>of();
 	}
+	
 }

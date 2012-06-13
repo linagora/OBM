@@ -31,14 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemChange;
@@ -49,7 +49,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.StoreName;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -121,8 +120,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		} catch (UnsupportedStoreException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (ProcessingEmailException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
-		} catch (IOException e) {
 			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}
@@ -219,8 +216,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		return fetchResult;
 	}
 
-	private FetchItemResult fetchItem(String serverId, Integer collectionId, 
-			MSEmailBodyType type, UserDataRequest udr) {
+	private FetchItemResult fetchItem(String serverId, Integer collectionId, MSEmailBodyType type, UserDataRequest udr) {
 		
 		FetchItemResult fetchResult = new FetchItemResult();
 		fetchResult.setServerId(serverId);
@@ -228,19 +224,16 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			
-			BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(type).build();
-
-			List<ItemChange> itemChanges = contentsExporter.fetch(udr, 
-					new SyncCollection(dataType, ImmutableList.of(serverId), ImmutableList.of(bodyPreference)));
-			
+			List<ItemChange> itemChanges = contentsExporter.fetch(udr, ImmutableList.of(serverId), dataType);
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 			} else {
 				fetchResult.setItemChange(itemChanges.get(0));
 				SyncCollection c = new SyncCollection();
 				c.setCollectionId(collectionId);
+				BodyPreference bp = new BodyPreference.Builder().bodyType(type).build();
 				SyncCollectionOptions options = new SyncCollectionOptions();
-				options.setBodyPreferences(ImmutableList.of(bodyPreference));
+				options.addBodyPreference(bp);
 				c.setOptions(options);
 				fetchResult.setSyncCollection(c);
 				fetchResult.setStatus(ItemOperationsStatus.SUCCESS);

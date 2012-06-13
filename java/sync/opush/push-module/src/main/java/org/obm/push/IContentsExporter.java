@@ -29,12 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push;
 
+import java.util.List;
 
-public class EmailViewPartsFetcherException extends Exception {
+import org.obm.push.backend.DataDelta;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncState;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
 
-	public EmailViewPartsFetcherException(Throwable t) {
-		super(t);
-	}
+public interface IContentsExporter {
+
+	DataDelta getChanged(UserDataRequest udr, SyncState state,
+			Integer collectionId, FilterType filterType, PIMDataType dataType)
+			throws DaoException, CollectionNotFoundException,
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
+
+	List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds,
+			PIMDataType dataType) throws CollectionNotFoundException,
+			DaoException, ProcessingEmailException,
+			UnexpectedObmSyncServerException, ConversionException;
+
+	int getItemEstimateSize(UserDataRequest udr, SyncState state,
+			Integer collectionId, FilterType filterType, PIMDataType dataType)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnexpectedObmSyncServerException, ConversionException;
+
 }

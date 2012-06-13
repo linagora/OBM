@@ -33,9 +33,9 @@ package org.obm.push.handler;
 
 import java.util.Set;
 
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;

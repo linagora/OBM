@@ -138,8 +138,8 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	
 	@Override
 	public boolean isAttachment() {
-		return (idx > 1	&& 
-				(!"html".equalsIgnoreCase(getSubtype()) && !"text".equalsIgnoreCase(getPrimaryType())));
+		return (idx > 1 && getPrimaryType() != null && !"html".equalsIgnoreCase(getSubtype()))
+				|| !"text".equalsIgnoreCase(getPrimaryType());
 	}
 
 	@Override
@@ -251,11 +251,6 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 				equalsIgnoreCase(contentType.getFullMimeType());
 	}
 	
-	@Override
-	public boolean isICSAttachment() {
-		return contentType.getFullMimeType().equalsIgnoreCase("application/ics");
-	}
-
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())

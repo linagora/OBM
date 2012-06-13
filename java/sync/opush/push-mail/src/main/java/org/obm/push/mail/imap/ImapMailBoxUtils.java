@@ -49,7 +49,6 @@ import javax.mail.Flags;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Part;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimePartDataSource;
 
@@ -134,12 +133,7 @@ public class ImapMailBoxUtils {
 	}
 	
 	private Address buildAddressFromJavaMailAddress(javax.mail.Address address) {
-		if (address instanceof InternetAddress) {
-			InternetAddress internetAddress = (InternetAddress) address;
-			return new Address(internetAddress.getPersonal(), internetAddress.getAddress());
-		} else {
-			return new Address(address.toString());
-		}
+		return new Address(address.toString());
 	}
 
 	public Collection<FastFetch> buildFastFetchFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) throws MailException {

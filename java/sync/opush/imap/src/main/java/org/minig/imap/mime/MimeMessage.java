@@ -274,9 +274,4 @@ public class MimeMessage implements IMimePart {
 	public boolean hasMimePart(ContentType contentType) {
 		return from.hasMimePart(contentType);
 	}
-
-	@Override
-	public boolean isICSAttachment() {
-		return from.isICSAttachment();
-	}
 }

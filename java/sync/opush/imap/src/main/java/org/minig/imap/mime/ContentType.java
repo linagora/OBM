@@ -76,8 +76,6 @@ public class ContentType {
 		private void setPrimayTypeAndSubType(String contentType) {
 			Iterable<String> itr = Splitter.on("/").split(
 					extractPrimaryTypeAndSubType(contentType) );
-			Preconditions.checkState(Iterables.size(itr) == 2, 
-					"The content type format of [" + contentType + "] is not valid.");
 			this.primaryType = Iterables.get(itr, 0);
 			this.subType = Iterables.get(itr, 1);
 		}

@@ -34,7 +34,6 @@ package org.obm.push.utils;
 import java.util.Iterator;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
@@ -53,10 +52,6 @@ public class UserEmailParserUtils {
 	public String getDomain(String userId) {
 		String[] loginAndDomain = getLoginAndDomain(userId);
 		return loginAndDomain[DOMAIN];
-	}
-	
-	public boolean isAddress(String email) {
-		return !Strings.isNullOrEmpty(getLogin(email));
 	}
 	
 	private String[] getLoginAndDomain(String userId) {

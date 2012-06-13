@@ -41,7 +41,6 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
-import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -62,35 +61,32 @@ import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Email;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
-import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -153,7 +149,7 @@ public class MailBackendHandlerTest {
 			new ItemChangesBuilder()
 				.addItemChange(
 					new ItemChangeBuilder().serverId(serverId + syncEmailId)
-						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+						.withApplicationData(new MSEmail())))
 		.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -161,7 +157,7 @@ public class MailBackendHandlerTest {
 		mockDao(serverId, syncState);
 		
 		bindCollectionIdToPath(serverId);
-		bindChangedToDelta(delta);
+		bindChangedToDelta(delta, serverId, syncState);
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
@@ -187,10 +183,13 @@ public class MailBackendHandlerTest {
 		expectLastCall().anyTimes();
 	}
 
-	private void bindChangedToDelta(DataDelta delta) throws Exception {
+	private void bindChangedToDelta(DataDelta delta, Integer collectionId, SyncState syncState) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
-		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), anyObject(SyncCollection.class)))
+		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), eq(syncState), eq(collectionId), anyObject(FilterType.class), anyObject(PIMDataType.class)))
 			.andReturn(delta).once();
+		
+		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), eq(syncState), eq(collectionId), anyObject(FilterType.class), anyObject(PIMDataType.class)))
+			.andReturn(delta).anyTimes();
 	}
 
 	private void mockDao(int serverId, SyncState syncState) throws Exception {
@@ -266,13 +265,5 @@ public class MailBackendHandlerTest {
 	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {
 		MailFolder inboxFolder = imapHostManager.getFolder(user, mailbox);
 		Assertions.assertThat(inboxFolder.getMessageCount()).isEqualTo(expectedNumberOfEmails);
-	}
-	
-	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
-		return new MSEmail.MSEmailBuilder()
-			.uid(1l)
-			.header(new MSEmailHeader.Builder().build())
-			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8)).build();
 	}
 }

@@ -43,24 +43,26 @@ import org.junit.Test;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
+import org.minig.imap.mime.ContentType;
+import org.minig.imap.mime.IMimePart;
+import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.collect.Lists;
 
 public class EmailViewTest {
 
-	@Test(expected=EmailViewBuildException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testUidDefault() {
 		new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
-			.mimeType("text/plain")
 			.build();
 	}
 
@@ -68,9 +70,9 @@ public class EmailViewTest {
 	public void testUid() {
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getUid()).isEqualTo(155);
@@ -80,29 +82,38 @@ public class EmailViewTest {
 	public void testUidNegativeValue() {
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(-115)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getUid()).isEqualTo(-115);
 	}
 
-	@Test(expected=EmailViewBuildException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testEnvelopeRequired() {
 		new EmailView.Builder().envelope(null)
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 	}
 
-	@Test(expected=EmailViewBuildException.class)
+	@Test(expected=IllegalStateException.class)
+	public void testBodyMimePartRequired() {
+		new EmailView.Builder().bodyMimePart(null)
+			.envelope(anyEnvelope())
+			.bodyMimePartData(anyBodyMimePartData())
+			.uid(155)
+			.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
 	public void testBodyMimePartDataRequired() {
 		new EmailView.Builder().bodyMimePartData(null)
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 	}
 	
@@ -110,10 +121,10 @@ public class EmailViewTest {
 	public void testFlagsAtNull() {
 		new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.flags(null)
-			.mimeType("text/plain");
+			.flags(null);
 	}
 
 	@Test
@@ -122,10 +133,10 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getFlags()).containsOnly(Flag.ANSWERED);
@@ -135,9 +146,9 @@ public class EmailViewTest {
 	public void testFlagsDefault() {
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getFlags()).isEmpty();
@@ -147,9 +158,9 @@ public class EmailViewTest {
 	public void testFlagsDefaultIsImmutable() {
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		emailView.getFlags().add(Flag.ANSWERED);
@@ -161,10 +172,10 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		mutableFlagsList.add(Flag.DELETED);
@@ -178,10 +189,10 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
 			.build();
 		
 		emailView.getFlags().add(Flag.DELETED);
@@ -194,11 +205,11 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
@@ -210,11 +221,11 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
 			.build();
 		
 		emailView.getAttachments().add(anyEmailViewAttachment("id2"));
@@ -227,11 +238,11 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
 			.build();
 		
 		attachments.add(anyEmailViewAttachment("id2"));
@@ -240,16 +251,16 @@ public class EmailViewTest {
 	}
 	
 	@Test
-	public void testICalendar() throws IOException, ParserException, EmailViewBuildException {
+	public void testICalendar() throws IOException, ParserException {
 		ICalendar iCalendar = anyICalendar("attendee.ics");
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.iCalendar(iCalendar)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getICalendar()).equals(iCalendar);
@@ -261,33 +272,24 @@ public class EmailViewTest {
 		
 		EmailView emailView = new EmailView.Builder()
 			.envelope(anyEnvelope())
+			.bodyMimePart(anyBodyMimePart())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.invitationType(invitationType)
-			.mimeType("text/plain")
 			.build();
 		
 		Assertions.assertThat(emailView.getInvitationType()).equals(invitationType);
 	}
 	
-	@Test(expected=EmailViewBuildException.class)
-	public void testMimeTypeRequired() {
-		new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePartData(anyBodyMimePartData())
-			.uid(155)
-			.build();
+	private ContentType buildContentType(String contentType) {
+		return new ContentType.Builder().contentType(contentType).build();
 	}
 	
-	@Test (expected=IllegalStateException.class)
-	public void testMimeTypeIsNotAContentType() {
-		new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePartData(anyBodyMimePartData())
-			.uid(155)
-			.mimeType("text")
-			.build();
+	private IMimePart anyBodyMimePart() {
+		IMimePart mimePart = new MimePart();
+		mimePart.setContentType(buildContentType("text/plain;"));
+		return mimePart;
 	}
 	
 	private InputStream anyBodyMimePartData() {

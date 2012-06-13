@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
@@ -53,30 +52,28 @@ public class CalendarMonitoringThread extends MonitoringThread {
 		private final CollectionDao collectionDao;
 		private final org.obm.push.service.PushPublishAndSubscribe.Factory pubSubFactory;
 		private final CalendarBackend calendarBackend;
-		private final IContentsExporter contentsExporter;
 
 		@Inject
 		private Factory(CollectionDao collectionDao, CalendarBackend calendarBackend,
-				PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+				PushPublishAndSubscribe.Factory pubSubFactory) {
 			this.collectionDao = collectionDao;
 			this.calendarBackend = calendarBackend;
 			this.pubSubFactory = pubSubFactory;
-			this.contentsExporter = contentsExporter;
 		}
 
 		public CalendarMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
 			return new CalendarMonitoringThread(freqMs, ccls,
-					this.collectionDao, this.calendarBackend, pubSubFactory, contentsExporter);
+					this.collectionDao, this.calendarBackend, pubSubFactory);
 		}
 	}
 
 	private CalendarMonitoringThread(long freqMs,
 			Set<ICollectionChangeListener> ccls,
 			CollectionDao collectionDao, CalendarBackend calendarBackend,
-			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
-		super(freqMs, ccls, collectionDao, calendarBackend, pubSubFactory, contentsExporter);
+			PushPublishAndSubscribe.Factory pubSubFactory) {
+		super(freqMs, ccls, collectionDao, calendarBackend, pubSubFactory);
 	}
 
 	@Override

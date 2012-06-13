@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import java.io.IOException;
-
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.push.bean.IApplicationData;
@@ -143,7 +141,7 @@ public class ItemOperationsProtocol {
 				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
 	}
 
-	public Document encodeResponse(ItemOperationsResponse response, UserDataRequest udr) throws IOException {
+	public Document encodeResponse(ItemOperationsResponse response, UserDataRequest udr) {
 		Document document = DOMUtils.createDoc(null, "ItemOperations");
 		Element root = document.getDocumentElement();
 		if (response.getEmptyFolderContentsResult() != null) {
@@ -162,8 +160,8 @@ public class ItemOperationsProtocol {
 		DOMUtils.createElementAndText(empty, "AirSync:CollectionId", String.valueOf(result.getCollectionId()));
 	}
 
-	private void encodeMailboxFetchResult(MailboxFetchResult mailboxFetchResult, Element root, 
-			boolean multipart, UserDataRequest udr) throws IOException {
+	private void encodeMailboxFetchResult(
+			MailboxFetchResult mailboxFetchResult, Element root, boolean multipart, UserDataRequest udr) {
 		
 		if (mailboxFetchResult.getFetchItemResult() != null) {
 			encodeFetchItemResult(udr, root, mailboxFetchResult.getFetchItemResult());
@@ -173,9 +171,7 @@ public class ItemOperationsProtocol {
 	}
 
 	
-	private void encodeFetchItemResult(UserDataRequest udr, Element root, FetchItemResult fetchItemResult) 
-			throws IOException {
-		
+	private void encodeFetchItemResult(UserDataRequest udr, Element root, FetchItemResult fetchItemResult) {
 		DOMUtils.createElementAndText(root, "Status",
 				ItemOperationsStatus.SUCCESS.asXmlValue());
 		Element resp = DOMUtils.createElement(root, "Response");
@@ -187,7 +183,7 @@ public class ItemOperationsProtocol {
 				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
-			encoderFactory.encode(udr, dataElem, data, true);
+			encoderFactory.encode(udr, dataElem, data, fetchItemResult.getSyncCollection(), true);
 		}
 	}
 	

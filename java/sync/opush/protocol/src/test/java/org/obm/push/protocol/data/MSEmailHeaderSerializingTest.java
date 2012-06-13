@@ -42,7 +42,6 @@ import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -54,7 +53,7 @@ public class MSEmailHeaderSerializingTest {
 
 	@Before
 	public void setUp() {
-		sdf = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
+		sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 		serializingTest = new SerializingTest();
 	}
 	

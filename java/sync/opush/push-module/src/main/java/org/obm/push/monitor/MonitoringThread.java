@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;
@@ -63,10 +62,10 @@ public abstract class MonitoringThread implements Runnable {
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
 			CollectionDao collectionDao, PIMBackend backend,
-			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+			PushPublishAndSubscribe.Factory pubSubFactory) {
 		super();
 		
-		this.pushPublishAndSubscribe = pubSubFactory.create(backend, contentsExporter);
+		this.pushPublishAndSubscribe = pubSubFactory.create(backend);
 		this.freqMillisec = freqMillisec;
 		this.stopped = false;
 		this.ccls = ccls;

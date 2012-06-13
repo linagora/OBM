@@ -97,7 +97,7 @@ public class MockBasedImapMailboxServiceTest {
 		EasyMock.replay(smtpSender);
 		
 		ImapMailboxService emailManager = 
-				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null, null);
+				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null);
 
 		emailManager.sendEmail(udr,
 				new Address("test@test.fr"),
@@ -116,7 +116,7 @@ public class MockBasedImapMailboxServiceTest {
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 		
 		ImapMailboxService emailManager = new ImapMailboxService(
-				emailConfiguration, null, null, null, null, collectionPathHelper, null);
+				emailConfiguration, null, null, null, null, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
@@ -129,7 +129,7 @@ public class MockBasedImapMailboxServiceTest {
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 
 		ImapMailboxService emailManager = new ImapMailboxService(
-				emailConfiguration, null, null, null, null, collectionPathHelper, null);
+				emailConfiguration, null, null, null, null, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
@@ -144,7 +144,7 @@ public class MockBasedImapMailboxServiceTest {
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 
 		ImapMailboxService emailManager = new ImapMailboxService(
-				emailConfiguration, null, null, imapClientProvider, null, collectionPathHelper, null);
+				emailConfiguration, null, null, imapClientProvider, null, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(folderEndingByINBOX));
 		Assertions.assertThat(parsedMailbox).isEqualTo(folderEndingByINBOX);

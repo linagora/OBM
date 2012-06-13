@@ -47,6 +47,8 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.mime.ContentType;
+import org.minig.imap.mime.IMimePart;
+import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
@@ -58,7 +60,6 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -173,7 +174,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getFrom()).containsOnly(MSEmailHeader.DEFAULT_FROM_ADDRESS);
+		assertThat(convertedMSEmail.getFrom()).containsOnly(newEmptyMSAddress());
 	}
 	
 	@Test
@@ -211,7 +212,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getTo()).isEmpty();
+		assertThat(convertedMSEmail.getTo()).containsOnly(newEmptyMSAddress());
 	}
 	
 	@Test
@@ -249,7 +250,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getCc()).isEmpty();
+		assertThat(convertedMSEmail.getCc()).containsOnly(newEmptyMSAddress());
 	}
 	
 	@Test
@@ -350,14 +351,14 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getAttachments()).isEmpty();
+		assertThat(convertedMSEmail.getAttachements()).isEmpty();
 	}
 	
 	@Test
 	public void testAttachments() throws IOException, ParserException {
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getAttachments()).hasSize(1);
+		assertThat(convertedMSEmail.getAttachements()).hasSize(1);
 	}
 
 	@Test
@@ -402,8 +403,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException {
-		return new MailViewToMSEmailConverterImpl(
-				new MSEmailHeaderConverter(new UserEmailParserUtils())).convert(newEmailViewFromFixture());
+		return new MailViewToMSEmailConverterImpl().convert(newEmailViewFromFixture());
 	}
 
 	private void buildICalendar() throws IOException, ParserException {
@@ -419,12 +419,12 @@ public class MailViewToMSEmailConverterImplTest {
 			.uid(emailViewFixture.uid)
 			.flags(flagsListFromFixture())
 			.envelope(envelopeFromFixture())
+			.bodyMimePart(bodyMimePartFromFixture())
 			.bodyMimePartData(emailViewFixture.bodyData)
 			.bodyTruncation(emailViewFixture.bodyTruncationSize)
 			.attachments(emailViewFixture.attachments)
 			.iCalendar(emailViewFixture.iCalendar)
 			.invitationType(null)
-			.mimeType(emailViewFixture.bodyContentType.getFullMimeType())
 			.build();
 	}
 
@@ -450,6 +450,12 @@ public class MailViewToMSEmailConverterImplTest {
 			.subject(emailViewFixture.subject)
 			.date(emailViewFixture.date)
 			.build();
+	}
+
+	private IMimePart bodyMimePartFromFixture() {
+		MimePart mimePart = new MimePart();
+		mimePart.setContentType(emailViewFixture.bodyContentType);
+		return mimePart;
 	}
 
 	public Address newEmptyAddress() {

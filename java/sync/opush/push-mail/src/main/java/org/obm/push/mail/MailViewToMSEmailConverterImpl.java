@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Set;
 
 import org.minig.imap.Flag;
@@ -50,28 +47,12 @@ import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.utils.SerializableInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverter {
-	
-	private static final Logger logger = LoggerFactory.getLogger(MailViewToMSEmailConverterImpl.class);
-	private static final Charset DEFAULT_CHARSET = Charsets.ISO_8859_1;
-
-	private final MSEmailHeaderConverter emailHeaderConverter;
-
-	@Inject
-	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter) {
-		this.emailHeaderConverter = emailHeaderConverter;
-	}
 	
 	@Override
 	public MSEmail convert(EmailView emailView) {
@@ -95,40 +76,15 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 	
 	private MSEmailHeader convertHeader(EmailView emailView) {
-		return emailHeaderConverter.convertToMSEmailHeader(emailView.getEnvelope());
+		return new MSEmailHeaderConverter().convertToMSEmailHeader(emailView.getEnvelope());
 	}
 
 	private MSEmailBody convertBody(EmailView emailView) {
 		SerializableInputStream mimeData = new SerializableInputStream(emailView.getBodyMimePartData());
+		MSEmailBodyType bodyType = MSEmailBodyType.fromMimeType(emailView.getBodyContentType().getFullMimeType());
 		Integer bodyTruncation = emailView.getBodyTruncation();
 		
-		return new MSEmailBody(mimeData, convertContentType(emailView), 
-				bodyTruncation, chooseSupportedCharset(emailView.getCharset()));
-	}
-
-	private Charset chooseSupportedCharset(String charset) {
-		if (Strings.isNullOrEmpty(charset)) {
-			return DEFAULT_CHARSET;
-		}
-		
-		try {
-			if (Charset.isSupported(charset)) {
-				return Charset.forName(charset);
-			}
-		} catch (IllegalCharsetNameException e) {
-			logger.warn(e.getMessage());
-		} catch (UnsupportedCharsetException e) {
-			logger.warn(e.getMessage());
-		}
-		return DEFAULT_CHARSET;
-	}
-	
-	private MSEmailBodyType convertContentType(EmailView emailView) {
-		MSEmailBodyType msEmailBodyType = MSEmailBodyType.fromMimeType(emailView.getContentType().getFullMimeType());
-		if (msEmailBodyType == null) {
-			msEmailBodyType = MSEmailBodyType.MIME;
-		}
-		return msEmailBodyType;
+		return new MSEmailBody(mimeData, bodyType, bodyTruncation);
 	}
 
 	private Set<MSAttachement> convertAttachment(EmailView emailView) {

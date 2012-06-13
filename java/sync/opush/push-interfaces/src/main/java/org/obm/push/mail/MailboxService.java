@@ -38,12 +38,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -55,9 +53,6 @@ public interface MailboxService {
 	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws MailException;
 
-	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName, 
-			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException;
-	
 	void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 
 	String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException;

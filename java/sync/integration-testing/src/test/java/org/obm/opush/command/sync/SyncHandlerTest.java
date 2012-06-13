@@ -39,7 +39,6 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMail
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasNoChange;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 
-import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -49,8 +48,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.PortNumber;
 import org.obm.opush.SingleUserFixture;
@@ -60,11 +58,7 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
-import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.utils.SerializableInputStream;
+import org.obm.push.bean.MSEmail;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.Delete;
@@ -74,8 +68,10 @@ import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
 
-import com.google.common.base.Charsets;
 import com.google.inject.Inject;
+
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncHandlerTest {
@@ -129,7 +125,7 @@ public class SyncHandlerTest {
 				new ItemChangesBuilder()
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -155,10 +151,10 @@ public class SyncHandlerTest {
 				new ItemChangesBuilder()
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+							.withApplicationData(new MSEmail()))
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":1")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -185,7 +181,7 @@ public class SyncHandlerTest {
 			.addDeletions(
 				new ItemChangesBuilder().addItemChange(
 					new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
-						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+						.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -209,11 +205,11 @@ public class SyncHandlerTest {
 			.addChanges(
 				new ItemChangesBuilder().addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+							.withApplicationData(new MSEmail())))
 			.addDeletions(
 				new ItemChangesBuilder().addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":122")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
+							.withApplicationData(new MSEmail())))
 			.withSyncDate(new Date()).build();
 		
 		mockHierarchyChanges(classToInstanceMap);
@@ -228,14 +224,6 @@ public class SyncHandlerTest {
 		checkSyncDefaultMailFolderHasItems(inbox, syncEmailResponse, 
 				Arrays.asList(new Add(syncEmailCollectionId + ":123")),
 				Arrays.asList(new Delete(syncEmailCollectionId + ":122")));
-	}
-	
-	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
-		return new MSEmail.MSEmailBuilder()
-			.uid(1l)
-			.header(new MSEmailHeader.Builder().build())
-			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8)).build();
 	}
 
 }

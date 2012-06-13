@@ -1,0 +1,419 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
+package org.obm.push.protocol.data;
+
+import java.math.BigDecimal;
+import java.security.InvalidParameterException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Set;
+import java.util.TimeZone;
+
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSAttachement;
+import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.MSRecurrence;
+import org.obm.push.bean.RecurrenceDayOfWeek;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
+
+public class EmailEncoder {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(EmailEncoder.class);
+	
+	private HTMLBodyFormatter htmlFormatter;
+	private PlainBodyFormatter plainFormatter;
+
+	private final IntEncoder intEncoder;
+
+	@Inject
+	@VisibleForTesting EmailEncoder(IntEncoder intEncoder) {
+		this.intEncoder = intEncoder;
+		htmlFormatter = new HTMLBodyFormatter();
+		plainFormatter = new PlainBodyFormatter();
+	}
+
+	public void encode(UserDataRequest udr, Element parent,
+			IApplicationData data, SyncCollection c) {
+		MSEmail mail = (MSEmail) data;
+
+		DOMUtils.createElementAndTextIfNotNull(parent, "Email:To",
+				MSEmailHeaderSerializer.formatMSAddresses(mail.getTo()));
+		
+		DOMUtils.createElementAndTextIfNotNull(parent, "Email:CC",
+					MSEmailHeaderSerializer.formatMSAddresses(mail.getCc()));
+		
+		if (mail.getFrom() != null) {
+			DOMUtils.createElementAndText(parent, "Email:From", mail.getFrom().toMSProtocol());
+		} else {
+			DOMUtils.createElementAndText(parent, "Email:From", "");
+		}
+		DOMUtils.createElementAndText(parent, "Email:Subject", Objects.firstNonNull(mail.getSubject(), "[Empty Subject]"));
+
+		if (mail.getDate() != null) {
+			DOMUtils.createElementAndText(parent, "Email:DateReceived",
+					MSEmailHeaderSerializer.formatDate(mail.getDate()));
+		} else {
+			logger.warn("date received is null for mail " + mail.getUid()
+					+ " s: " + mail.getSubject());
+		}
+
+		if (mail.getTo().size() > 0 && mail.getTo().get(0) != null
+				&& mail.getTo().get(0).getDisplayName() != null
+				&& !"".equals(mail.getTo().get(0).getDisplayName())) {
+			DOMUtils.createElementAndText(parent, "Email:DisplayTo", mail
+					.getTo().get(0).getDisplayName());
+		}
+		// DOMUtils.createElementAndText(parent, "Email:ThreadTopic", mail
+		// .getSubject());
+		DOMUtils.createElementAndText(parent, "Email:Importance", mail
+				.getImportance().asIntString());
+		DOMUtils.createElementAndText(parent, "Email:Read", mail.isRead() ? "1"
+				: "0");
+
+		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
+			appendBody25(parent, mail, c);
+		} else {
+			appendBody(parent, mail, c);
+		}
+
+		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) == 0) {
+			appendAttachments25(parent, mail.getAttachements());
+		} else {
+			appendAttachments(parent, mail.getAttachements());
+		}
+
+		DOMUtils.createElementAndText(parent, "Email:MessageClass", mail
+				.getMessageClass().specificationValue());
+		if (mail.getInvitation() != null) {
+			appendMeetingRequest(parent, mail);
+		}
+
+		DOMUtils.createElementAndText(parent, "Email:InternetCPID", "65001");
+	}
+
+	private void appendBody25(Element parent, MSEmail mail, SyncCollection c) {
+		if (c.getOptions().getTruncation() != null && c.getOptions().getTruncation().equals(1)) {
+			DOMUtils.createElementAndText(parent, "Email:BodyTruncated", "1");
+		} else {
+			MSEmailBodyType availableFormat = getAvailableFormat(c, mail);
+			String mailBody = getBodyData(mail, availableFormat);
+			if (MSEmailBodyType.MIME.equals(availableFormat)) {
+				DOMUtils.createElementAndText(parent, "Email:MIMETruncated",
+						"0");
+				DOMUtils.createElementAndText(parent, "Email:MIME", mailBody);
+			} else {
+				DOMUtils.createElementAndText(parent, "Email:BodyTruncated",
+						"0");
+				if (mailBody != null && mailBody.length() > 0) {
+					DOMUtils.createElementAndText(parent, "Email:Body",
+							mailBody);
+				}
+			}
+		}
+	}
+
+	protected void appendBody(Element parent, MSEmail mail, SyncCollection c) {
+		Element elemBody = DOMUtils.createElement(parent, "AirSyncBase:Body");
+		MSEmailBodyType availableFormat = getAvailableFormat(c, mail);
+		String data = getBodyData(mail, availableFormat);
+
+		DOMUtils.createElementAndText(elemBody, "AirSyncBase:Type", availableFormat.asXmlValue());
+		if (data != null) {
+			DOMUtils.createElementAndText(elemBody,
+					"AirSyncBase:EstimatedDataSize", ""
+							+ data.getBytes().length);
+
+			if (c.getOptions().getBodyPreference(availableFormat) != null
+					&& c.getOptions().getBodyPreference(availableFormat).getTruncationSize() != null) {
+				if (c.getOptions().getBodyPreference(availableFormat).getTruncationSize() < data
+						.length()) {
+					data = data.substring(0, c.getOptions().getBodyPreference(availableFormat)
+							.getTruncationSize());
+					DOMUtils.createElementAndText(elemBody,
+							"AirSyncBase:Truncated", "1");
+				}
+			}
+
+		}
+
+		if (data != null && data.length() > 0) {
+			DOMUtils.createElementAndText(elemBody, "AirSyncBase:Data", data);
+		}
+
+		if (mail.getInvitation() != null) {
+			DOMUtils.createElementAndText(parent, "Email:ContentClass",
+					"urn:content-classes:calendarmessage");
+		} else {
+			DOMUtils.createElementAndText(parent, "Email:ContentClass",
+					"urn:content-classes:message");
+		}
+
+		DOMUtils.createElementAndText(parent, "AirSyncBase:NativeBodyType",
+				availableFormat.asXmlValue());
+
+	}
+
+	private MSEmailBodyType getAvailableFormat(SyncCollection c, MSEmail mail) {
+		if (c.getOptions().getMimeSupport() != null && c.getOptions().getMimeSupport().equals(2)) {
+			return MSEmailBodyType.MIME;
+		} else if (c.getOptions().getBodyPreferences().size() > 1) {
+			if (c.getOptions().getBodyPreference(MSEmailBodyType.HTML) != null
+					&& mail.getBody().getValue(MSEmailBodyType.HTML) != null) {
+				return MSEmailBodyType.HTML;
+			} else if (c.getOptions().getBodyPreference(MSEmailBodyType.PlainText) != null
+					&& mail.getBody().getValue(MSEmailBodyType.PlainText) != null) {
+				return MSEmailBodyType.PlainText;
+			} else if (c.getOptions().getBodyPreference(MSEmailBodyType.MIME) != null
+					&& mail.getBody().getValue(MSEmailBodyType.MIME) != null) {
+				return MSEmailBodyType.MIME;
+			}
+		} else if (c.getOptions().getBodyPreferences().size() == 1) {
+			BodyPreference pref = c.getOptions().getBodyPreferences().values().iterator()
+					.next();
+			if (pref != null && pref.getType() != null) {
+				return pref.getType();
+			}
+		}
+		return MSEmailBodyType.PlainText;
+	}
+
+	private String getBodyData(MSEmail mail,
+			MSEmailBodyType type) {
+		switch (type) {
+		case PlainText:
+			String body = mail.getBody().getValue(MSEmailBodyType.PlainText);
+			if (body != null && body.length() != 0) {
+				return body.trim();
+			} else {
+				body = mail.getBody().getValue(MSEmailBodyType.HTML);
+				if (body != null && body.length() != 0) {
+					return plainFormatter.convert(body).trim();
+				}
+			}
+			break;
+		case HTML:
+			body = mail.getBody().getValue(MSEmailBodyType.HTML);
+			if (body != null && body.length() != 0) {
+				return body.trim();
+			} else {
+				body = mail.getBody().getValue(MSEmailBodyType.PlainText);
+				if (body != null && body.length() != 0) {
+					return htmlFormatter.convert(body).trim();
+				}
+			}
+			break;
+		case RTF:
+			return mail.getBody().getValue(MSEmailBodyType.RTF);
+		case MIME:
+			try {
+				return FileUtils.streamString(mail.getMimeData(), false);
+			} catch (Exception e) {
+				return "";
+			}
+		}
+		return "";
+	}
+
+	private void appendMeetingRequest(Element parent, MSEmail mail) {
+		if (mail.getInvitation() != null) {
+			Element mr = DOMUtils.createElement(parent, "Email:MeetingRequest");
+
+			MSEvent invi = mail.getInvitation();
+			DOMUtils.createElementAndText(mr, "Email:AllDayEvent",
+					invi.getAllDayEvent() ? "1" : "0");
+			DOMUtils.createElementAndText(mr, "Email:StartTime",
+					formatDate(invi.getStartTime()));
+			DOMUtils.createElementAndText(mr, "Email:DTStamp",
+					formatDate(invi.getDtStamp()));
+			DOMUtils.createElementAndText(mr, "Email:EndTime",
+					formatDate(invi.getEndTime()));
+
+			DOMUtils.createElementAndText(mr, "Email:InstanceType", "0");
+
+			if (invi.getLocation() != null && !"".equals(invi.getLocation())) {
+				DOMUtils.createElementAndText(mr, "Email:Location",
+						invi.getLocation());
+			}
+			if (invi.getOrganizerEmail() != null
+					&& !"".equals(invi.getOrganizerEmail())) {
+				DOMUtils.createElementAndText(mr, "Email:Organizer",
+						invi.getOrganizerEmail());
+			} else if (invi.getOrganizerName() != null
+					&& !"".equals(invi.getOrganizerName())) {
+				DOMUtils.createElementAndText(mr, "Email:Organizer",
+						invi.getOrganizerName());
+			}
+			if (invi.getReminder() != null) {
+				DOMUtils.createElementAndText(mr, "Email:Reminder", invi
+						.getReminder().toString());
+			}
+
+			DOMUtils.createElementAndText(mr, "Email:ResponseRequested", "0");
+
+			if (invi.getSensitivity() != null) {
+				DOMUtils.createElementAndText(mr, "Email:Sensitivity", invi
+						.getSensitivity().asIntString());
+			}
+
+			if (invi.getBusyStatus() != null) {
+				DOMUtils.createElementAndText(mr, "Email:IntDBusyStatus", invi
+						.getBusyStatus().asIntString());
+			}
+
+			Element tz = DOMUtils.createElement(mr, "Email:TimeZone");
+			// taken from exchange 2k7 : eastern greenland, gmt+0, no dst
+			tz.setTextContent("xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==");
+			MSEventUid eventUid = invi.getUid();
+			if (eventUid != null) {
+				DOMUtils.createElementAndText(mr, "Email:GlobalObjId",
+						MSMeetingRequestSerializer.msEventUidToGlobalObjId(eventUid, intEncoder));
+			} else {
+				throw new InvalidParameterException("a MSEvent must have an UID");
+			}
+			appendRecurence(mr, invi);
+		}
+	}
+
+	private void appendRecurence(Element parent, MSEvent invi) {
+		MSRecurrence recur = invi.getRecurrence();
+		if (recur != null) {
+			Element ers = DOMUtils.createElement(parent, "Email:Recurrences");
+			Element r = DOMUtils.createElement(ers, "Email:Recurrence");
+			if (recur.getInterval() != null) {
+				DOMUtils.createElementAndText(r, "Email:Recurrence_Interval",
+						recur.getInterval().toString());
+			}
+			if (recur.getUntil() != null) {
+				DOMUtils.createElementAndText(r, "Email:Recurrence_Until",
+						formatDate(recur.getUntil()));
+			}
+			if (recur.getOccurrences() != null) {
+				DOMUtils.createElementAndText(r,
+						"Email:Recurrence_Occurrences", recur.getOccurrences()
+								.toString());
+			}
+
+			DOMUtils.createElementAndText(r, "Email:Recurrence_Type", recur
+					.getType().asIntString());
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			cal.setTimeInMillis(invi.getStartTime().getTime());
+			switch (recur.getType()) {
+			case DAILY:
+				break;
+			case MONTHLY:
+				DOMUtils.createElementAndText(r, "Email:Recurrence_DayOfMonth",
+						"" + cal.get(Calendar.DAY_OF_MONTH));
+				break;
+			case MONTHLY_NDAY:
+				DOMUtils.createElementAndText(r,
+						"Email:Recurrence_WeekOfMonth",
+						"" + cal.get(Calendar.WEEK_OF_MONTH));
+				DOMUtils.createElementAndText(
+						r,
+						"Email:Recurrence_DayOfWeek",
+						""
+								+ RecurrenceDayOfWeek.dayOfWeekToInt(cal
+										.get(Calendar.DAY_OF_WEEK)));
+				break;
+			case WEEKLY:
+				DOMUtils.createElementAndText(r, "Email:Recurrence_DayOfWeek",
+						"" + RecurrenceDayOfWeek.asInt(recur.getDayOfWeek()));
+				break;
+			case YEARLY:
+				DOMUtils.createElementAndText(r, "Email:Recurrence_DayOfMonth",
+						"" + cal.get(Calendar.DAY_OF_MONTH));
+				DOMUtils.createElementAndText(r,
+						"Email:Recurrence_MonthOfYear",
+						"" + (cal.get(Calendar.MONTH) + 1));
+				break;
+			case YEARLY_NDAY:
+				break;
+
+			}
+		}
+	}
+
+	private void appendAttachments(Element parent, Set<MSAttachement> attachments) {
+		if (attachments.size() > 0) {
+			Element atts = DOMUtils.createElement(parent,
+					"AirSyncBase:Attachments");
+
+			for (MSAttachement msAtt : attachments) {
+				Element att = DOMUtils.createElement(atts, "AirSyncBase:Attachment");
+				DOMUtils.createElementAndText(att, "AirSyncBase:DisplayName", msAtt.getDisplayName());
+				DOMUtils.createElementAndText(att, "AirSyncBase:FileReference", msAtt.getFileReference());
+				DOMUtils.createElementAndText(att, "AirSyncBase:Method", msAtt.getMethod().asIntString());
+				DOMUtils.createElementAndText(att, 
+						"AirSyncBase:EstimatedDataSize", msAtt.getEstimatedDataSize().toString());
+			}
+		}
+	}
+
+	private void appendAttachments25(Element parent, Set<MSAttachement> attachments) {
+		if (attachments.size() > 0) {
+			Element atts = DOMUtils.createElement(parent, "Email:Attachments");
+
+			for (MSAttachement msAtt : attachments) {
+				Element att = DOMUtils.createElement(atts, "Email:Attachment");
+				DOMUtils.createElementAndText(att, "Email:DisplayName", msAtt.getDisplayName());
+				DOMUtils.createElementAndText(att, "Email:AttName", msAtt.getFileReference());
+				DOMUtils.createElementAndText(att, "Email:AttMethod", msAtt.getMethod().asIntString());
+				DOMUtils.createElementAndText(att, "Email:AttSize", msAtt.getEstimatedDataSize().toString());
+			}
+		}
+	}
+	
+	private String formatDate(Date date) {
+		if (date != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'");
+			return dateFormat.format(date);
+		} else {
+			return null;
+		}
+	}
+}

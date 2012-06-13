@@ -55,7 +55,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
@@ -67,12 +66,9 @@ import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -198,25 +194,26 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState state, 
-			SyncCollectionOptions syncCollectionOptions) throws ProcessingEmailException, 
-			CollectionNotFoundException, DaoException {
-		
-		MailChanges mailChanges = getSync(udr, state, collectionId, syncCollectionOptions.getFilterType());
-		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges, syncCollectionOptions.getBodyPreferences());
+	public int getItemEstimateSize(UserDataRequest udr, FilterType filterType,
+			Integer collectionId, SyncState state)
+			throws CollectionNotFoundException, ProcessingEmailException,
+			DaoException, UnexpectedObmSyncServerException {
+		MailChanges mailChanges = getSync(udr, state, collectionId, filterType);
+		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges);
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException {
+	public DataDelta getChanged(UserDataRequest udr, SyncState state,
+			FilterType filterType, Integer collectionId) throws DaoException,
+			CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException {
 		
-		MailChanges mailChanges = getSync(udr, state, collectionId, syncCollectionOptions.getFilterType());
+		MailChanges mailChanges = getSync(udr, state, collectionId, filterType);
 		try {
 			updateData(udr.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
 					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
-			return getDataDelta(udr, collectionId, mailChanges, syncCollectionOptions.getBodyPreferences());
+			return getDataDelta(udr, collectionId, mailChanges);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		}
@@ -234,30 +231,30 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 	
-	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges, 
-			List<BodyPreference> bodyPreferences) throws ProcessingEmailException, 
-			CollectionNotFoundException, DaoException {
+	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges) 
+			throws ProcessingEmailException, CollectionNotFoundException, DaoException {
 		
 		List<ItemChange> itemChanges = fetchMails(udr, collectionId, 
-				mappingService.getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids(), bodyPreferences);
+				mappingService.getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids());
 		List<ItemChange> itemsToDelete = mappingService.buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
 		return new DataDelta(itemChanges, itemsToDelete, mailChanges.getLastSync());
 	}
 	
-	private List<ItemChange> fetchMails(UserDataRequest udr, Integer collectionId, String collection, 
-			Collection<Long> emailsUids, List<BodyPreference> bodyPreferences) throws ProcessingEmailException {
+	private List<ItemChange> fetchMails(
+			UserDataRequest udr, Integer collectionId, String collection, 
+			Collection<Long> emailsUids) throws ProcessingEmailException {
 		
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
-			List<org.obm.push.bean.ms.MSEmail> msMails = 
-					mailboxService.fetch(udr, collectionId, collection, emailsUids, bodyPreferences);
-			for (org.obm.push.bean.ms.MSEmail mail: msMails) {
+			List<MSEmail> msMails = 
+					mailboxService.fetchMails(udr, collectionId, collection, emailsUids);
+			for (MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
 			return itch.build();
-		} catch (LocatorClientException e) {
+		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (EmailViewPartsFetcherException e) {
+		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
@@ -267,6 +264,25 @@ public class MailBackendImpl implements MailBackend {
 		ic.setServerId(mappingService.getServerIdFor(collectionId, "" + uid));
 		ic.setData(data);
 		return ic;
+	}
+	
+	@Override
+	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds)
+			throws CollectionNotFoundException, DaoException,
+			ProcessingEmailException, UnexpectedObmSyncServerException {
+	
+		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
+		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
+		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
+			Integer collectionId = entry.getKey();
+			Collection<Long> uids = entry.getValue();
+			try {
+				ret.addAll(fetchItems(udr, collectionId, uids));
+			} catch (CollectionNotFoundException e) {
+				logger.error("fetchItems : collection {} not found !", collectionId);
+			}
+		}
+		return ret;
 	}
 	
 	private Map<Integer, Collection<Long>> getEmailUidByCollectionId(List<String> fetchIds) {
@@ -283,27 +299,25 @@ public class MailBackendImpl implements MailBackend {
 		return ret;
 	}
 
-	private List<ItemChange> fetchItems(UserDataRequest udr, Integer collectionId, Collection<Long> uids, 
-			List<BodyPreference> bodyPreferences) throws CollectionNotFoundException, ProcessingEmailException {
+	private List<ItemChange> fetchItems(UserDataRequest udr, Integer collectionId, Collection<Long> uids) 
+			throws CollectionNotFoundException, ProcessingEmailException {
 		
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<org.obm.push.bean.ms.MSEmail> emails = mailboxService.
-					fetch(udr, collectionId, collectionPath, uids, bodyPreferences);
-			
-			for (final org.obm.push.bean.ms.MSEmail email: emails) {
+			final List<MSEmail> emails = mailboxService.fetchMails(udr, collectionId, collectionPath, uids);
+			for (final MSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(mappingService.getServerIdFor(collectionId, String.valueOf(email.getUid())));
 				ic.setData(email);
 				ret.add(ic);
 			}
 			return ret.build();	
+		} catch (MailException e) {
+			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
-			throw new ProcessingEmailException(e);
-		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
@@ -355,13 +369,13 @@ public class MailBackendImpl implements MailBackend {
 	public String createOrUpdate(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, ItemNotFoundException {
 		
-		MSRead msRead = (MSRead) data;
+		MSEmail email = (MSEmail) data;
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
 			if (serverId != null) {
 				Long mailUid = getEmailUidFromServerId(serverId);
-				mailboxService.updateReadFlag(udr, collectionPath, mailUid, msRead.isRead());
+				mailboxService.updateReadFlag(udr, collectionPath, mailUid, email.isRead());
 			}
 			return serverId;
 		} catch (MailException e) {
@@ -755,21 +769,4 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds, SyncCollectionOptions collectionOptions) 
-			throws ProcessingEmailException {
-		
-		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
-		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
-		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
-			Integer collectionId = entry.getKey();
-			Collection<Long> uids = entry.getValue();
-			try {
-				ret.addAll(fetchItems(udr, collectionId, uids, collectionOptions.getBodyPreferences()));
-			} catch (CollectionNotFoundException e) {
-				logger.error("fetchItems : collection {} not found !", collectionId);
-			}
-		}
-		return ret;
-	}
 }

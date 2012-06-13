@@ -55,8 +55,6 @@ import com.google.inject.Inject;
 
 public class MSEmailEncoder {
 
-	public final static String UTC_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.000'Z'";
-	
 	private final static String MESSAGE_CLASS = "urn:content-classes:message";
 	private final static String CALENDAR_CLASS = "urn:content-classes:calendarmessage";
 	private final static String CPID_DEFAULT = "65001";
@@ -78,7 +76,7 @@ public class MSEmailEncoder {
 		DOMUtils.createElementAndText(parent, ASEMAIL.READ.asASValue(), msEmail.isRead());
 
 		serializeBody(parent, msEmail.getBody());
-		serializeAttachments(parent, msEmail.getAttachments());
+		serializeAttachments(parent, msEmail.getAttachements());
 
 		MSMessageClass messageClass = msEmail.getMessageClass();
 		DOMUtils.createElementAndText(parent, ASEMAIL.MESSAGE_CLASS.asASValue(), messageClass.specificationValue());
@@ -101,10 +99,10 @@ public class MSEmailEncoder {
 
 		Element bodyElement = DOMUtils.createElement(parent, ASAIRS.BODY.asASValue());
 		
-		DOMUtils.createElementAndCDataText(bodyElement, ASAIRS.DATA.asASValue(), mimeData, body.getCharset());
+		DOMUtils.createElementAndText(bodyElement, ASAIRS.DATA.asASValue(), mimeData);
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TYPE.asASValue(), bodyType.asXmlValue());
 		DOMUtils.createElementAndText(bodyElement, ASAIRS.TRUNCATED.asASValue(), body.isTruncated());
-		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation);
+		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAIRS.ESTIMATED_DATA_SIZE.asASValue(), truncation.intValue());
 	}
 
 	private void serializeAttachments(Element parent, Set<MSAttachement> attachments) {

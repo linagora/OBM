@@ -152,6 +152,7 @@ public class MSMeetingRequest {
 		public MSMeetingRequest build() {
 			Preconditions.checkNotNull(startTime, "The field startTime is required");
 			Preconditions.checkNotNull(dtStamp, "The field dtStamp is required");
+			Preconditions.checkNotNull(endTime, "The field endTime is required");
 			Preconditions.checkNotNull(instanceType, "The field instanceType is required");
 			
 			if (!Strings.isNullOrEmpty(organizer)) {

@@ -33,11 +33,12 @@ package org.obm.push.bean;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 
 
 public class SyncCollection implements Serializable {
@@ -60,20 +61,15 @@ public class SyncCollection implements Serializable {
 	}
 
 	public SyncCollection(int collectionId, String collectionPath) {
-		this(null, Lists.<String>newLinkedList(), Lists.<BodyPreference>newArrayList());
+		super();
 		this.collectionId = collectionId;
 		this.collectionPath = collectionPath;
-	}
-	
-	public SyncCollection(PIMDataType dataType, List<String> fetchIds, List<BodyPreference> bodyPreferences) {
-		super();
-		this.dataType = dataType;
-		this.fetchIds = fetchIds;
-		this.options = new SyncCollectionOptions(bodyPreferences);
-		this.moreAvailable = false;
-		this.windowSize = 100;
-		this.changes = new HashSet<SyncCollectionChange>();
-		this.status = SyncStatus.OK;
+		fetchIds = new LinkedList<String>();
+		moreAvailable = false;
+		windowSize = 100;
+		changes = new HashSet<SyncCollectionChange>();
+		status = SyncStatus.OK;
+		options = new SyncCollectionOptions();
 	}
 	
 	public SyncState getSyncState() {

@@ -45,13 +45,19 @@ import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Objects;
 
-public class MSEmail implements Serializable {
+public class MSEmail implements IApplicationData, Serializable {
+
+	@Override
+	public PIMDataType getType() {
+		return PIMDataType.EMAIL;
+	}
 
 	private String subject;
 	private MSEmailBody body;
 	private MSAddress from;
 	private Date date;
 	private Map<String, String> headers;
+	private Set<MSEmail> forwardMessage;
 	private Set<MSAttachement> attachements;
 	private long uid;
 	private MSEvent invitation;
@@ -85,6 +91,7 @@ public class MSEmail implements Serializable {
 		this.from = from;
 		this.headers = headers;
 		this.attachements = attachements;
+		this.forwardMessage = new HashSet<MSEmail>();
 		if (to != null) {
 			this.to = to;
 		} else {
@@ -167,6 +174,18 @@ public class MSEmail implements Serializable {
 
 	public List<MSAddress> getCc() {
 		return cc;
+	}
+
+	public void setForwardMessage(Set<MSEmail> forwardMessage) {
+		this.forwardMessage = forwardMessage;
+	}
+
+	public Set<MSEmail> getForwardMessage() {
+		return forwardMessage;
+	}
+
+	public void addForwardMessage(MSEmail forwardMessage) {
+		this.forwardMessage.add(forwardMessage);
 	}
 
 	public long getUid() {
@@ -269,7 +288,7 @@ public class MSEmail implements Serializable {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(answered, attachements, bcc, body, cc, date, 
-				from, headers, importance, invitation, messageClass,
+				forwardMessage, from, headers, importance, invitation, messageClass,
 				mimeData, read, smtpId, starred, subject, to, uid);
 	}
 	
@@ -284,6 +303,7 @@ public class MSEmail implements Serializable {
 				.append(body, other.body)
 				.append(cc, other.cc)
 				.append(date, other.date)
+				.append(forwardMessage, other.forwardMessage)
 				.append(from, other.from)
 				.append(headers, other.headers)
 				.append(importance, other.importance)

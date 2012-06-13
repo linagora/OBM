@@ -38,7 +38,6 @@ import java.util.Set;
 
 import org.minig.imap.IMAPException;
 import org.obm.push.backend.ICollectionChangeListener;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.UserDataRequest;
@@ -67,16 +66,14 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	private final MappingService mappingService;
 	private final Factory pubSubFactory;
 	private final MailBackend mailBackend;
-	private final IContentsExporter contentsExporter;
 	
 	
 	@Inject
 	private ImapMonitoringImpl(ImapClientProvider imapClientProvider,
 			MappingService mappingService, MailboxService emailManager,
-			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory) {
 		this.mailBackend = mailBackend;
 		this.pubSubFactory = pubSubFactory;
-		this.contentsExporter = contentsExporter;
 		this.emailPushMonitors = Collections
 				.synchronizedMap(new HashMap<Integer, EmailMonitoringThread>());
 		this.emailManager = emailManager;
@@ -92,7 +89,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 
 		public Manager(Set<ICollectionChangeListener> registeredListeners) {
 			this.registeredListeners = registeredListeners;
-			pushPublishAndSubscribe = pubSubFactory.create(mailBackend, contentsExporter);
+			pushPublishAndSubscribe = pubSubFactory.create(mailBackend);
 		}
 		
 		@Override

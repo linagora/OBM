@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,10 +40,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
+import org.obm.push.IContentsExporter;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IBackend;
-import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
@@ -186,8 +185,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		} catch (UnsupportedBackendFunctionException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
-		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
@@ -236,7 +233,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(udr, c);
+			delta = contentsExporter.getChanged(udr, c.getSyncState(), c.getCollectionId(), 
+					c.getOptions().getFilterType(), c.getDataType());
 			
 			lastSync = delta.getSyncDate();
 		} else {
@@ -366,8 +364,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(responder, SyncStatus.PROTOCOL_ERROR.asXmlValue(), e);			
 		} catch (ConversionException e) {
 			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
-		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asXmlValue(), e);
 		}
 	}
 
@@ -412,8 +408,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
 			} else {
-				syncCollectionResponse.setItemChanges(
-						contentsExporter.fetch(udr, syncCollection));
+				List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection.getFetchIds(), syncCollection.getDataType());
+				syncCollectionResponse.setItemChanges(itemChanges);
 			}
 			identifyNewItems(syncCollectionResponse, st);
 			String newSyncKey = 

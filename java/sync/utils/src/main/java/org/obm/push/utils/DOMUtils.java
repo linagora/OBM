@@ -39,7 +39,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -74,7 +73,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 
 public final class DOMUtils {
@@ -427,19 +425,5 @@ public final class DOMUtils {
 	public static Element createElementAndText(Element parent, String elementName, InputStream inputStream) throws IOException {
 		return createElementAndText(parent, elementName, 
 				CharStreams.toString(new InputStreamReader(inputStream)));
-	}
-	
-	public static Element createElementAndCDataSection(Element parent, String elementName, String text) {
-		Preconditions.checkNotNull(text, "Text is required");
-		Element el = parent.getOwnerDocument().createElement(elementName);
-		parent.appendChild(el);
-		el.appendChild(el.getOwnerDocument().createCDATASection(text));
-		return el;
-	}
-	
-	public static Element createElementAndCDataText(Element parent, String elementName, 
-			InputStream inputStream, Charset charset) throws IOException {
-		return createElementAndCDataSection(parent, elementName, 
-				CharStreams.toString(new InputStreamReader(inputStream, charset)));
 	}
 }

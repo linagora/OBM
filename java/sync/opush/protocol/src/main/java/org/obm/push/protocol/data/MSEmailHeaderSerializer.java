@@ -38,7 +38,6 @@ import java.util.List;
 
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -121,7 +120,7 @@ public class MSEmailHeaderSerializer {
 	
 	public static String formatDate(Date date) {
 		if (date != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 			return dateFormat.format(date);
 		} else {
 			return null;
