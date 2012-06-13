@@ -208,6 +208,7 @@ $l_calendar_select_group = "Sélectionner les groupes.";
 $l_owner_notification = "Notifier par e-mail l'organisateur de la réunion";
 $l_notification = "Notification";
 $l_attach_documents = "Attacher";
+$l_add_documents = "Ajouter des documents";
 
 $l_view = "Vue";
 $l_view_default = "Vue Défaut";

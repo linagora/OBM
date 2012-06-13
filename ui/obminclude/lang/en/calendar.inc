@@ -162,6 +162,7 @@ $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";
 $l_notification =  "Notify";
 $l_attach_documents = "Attach";
+$l_add_documents = "Attach documents";
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 $l_confirm_delete = "This operation will remove the occurrence of this event for all users, are you sure you want to continue?";
 $l_confirm = "Confirm";

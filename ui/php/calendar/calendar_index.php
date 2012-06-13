@@ -837,30 +837,36 @@ if ($action == 'search') {
   
 } elseif ($action == 'attach_documents') {
 ///////////////////////////////////////////////////////////////////////////////
-  try {
-    $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
-    $existent_doc_ids = get_calendar_event_document_ids($params['calendar_id']);
-    $already_attached_doc_ids = array_intersect($doc_ids, $existent_doc_ids);
-    $doc_ids = array_diff($doc_ids, $existent_doc_ids);
-    $other_files = run_query_insert_other_files($params);
-    if (!$other_files) {
-      $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
-    } else {
-      $doc_ids = array_merge($doc_ids, $other_files);
-    }
-    $event_entity_id = of_entity_get('event', $params['calendar_id']);
-    foreach ($doc_ids as $document_id) {
-      run_query_calendar_attach_document($document_id, $event_entity_id);
-    }
-    if (count($already_attached_doc_ids) != 0) {
-      redirect_err($params, $l_warn_already_attached);
-    } else {
-      redirect_ok($params, "$l_document: $l_insert_ok");
-    }
-  } catch (OverQuotaDocumentException $e) {
-    redirect_err($params, $l_over_quota_error);
-  }
-  
+	if (check_upload_errors()) {
+	  try {
+	    $doc_ids = isset($params['sel_document_id']) ? $params['sel_document_id'] : array();
+	    $existent_doc_ids = get_calendar_event_document_ids($params['calendar_id']);
+	    $already_attached_doc_ids = array_intersect($doc_ids, $existent_doc_ids);
+	    $doc_ids = array_diff($doc_ids, $existent_doc_ids);
+	    $other_files = run_query_insert_other_files($params);
+	    if (!$other_files) {
+	      $display['msg'] .= display_warn_msg("$l_event : $l_warn_file_upload");
+	    } else {
+	      $doc_ids = array_merge($doc_ids, $other_files);
+	    }
+	    $event_entity_id = of_entity_get('event', $params['calendar_id']);
+	    foreach ($doc_ids as $document_id) {
+	      run_query_calendar_attach_document($document_id, $event_entity_id);
+	    }
+	    if (count($already_attached_doc_ids) != 0) {
+	      redirect_err($params, $l_warn_already_attached);
+	    } else {
+	      redirect_ok($params, "$l_document: $l_insert_ok");
+	    }
+	  } catch (OverQuotaDocumentException $e) {
+	    redirect_err($params, $l_over_quota_error);
+	  }
+	} else {
+	    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+	    $display['msg'] .= add_upload_error_message_too_big();
+	    $display['msg'] .= add_upload_warn_message_if_attachments();
+	    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+	}
 } elseif ($action == 'download_document') {
 ///////////////////////////////////////////////////////////////////////////////
   require '../document/document_query.inc';

@@ -3014,7 +3014,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_wait, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
-  global $l_documents,$l_attach_documents,$l_title,$l_name;
+  global $l_documents,$l_attach_documents,$l_add_documents,$l_title,$l_name;
   global $l_accepted, $l_needs_action, $l_declined;
   global $ico_add, $ico_delete, $ico_spinner;
   global $l_comments, $l_edit, $l_add, $l_add_alarm;
@@ -3465,7 +3465,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $dis_document_form = "
         <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
         <fieldset class=\"detail\">
-        <legend>Ajouter des documents</legend>
+        <legend>$l_add_documents</legend>
         <table>
           ".html_calendar_documents_form_fieldset()."
         </table>
