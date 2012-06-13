@@ -66,7 +66,6 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
@@ -204,22 +203,29 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			+ "event_description, event_domain_id, event_usercreate, event_origin, event_type, event_timecreate,"
 			+ "event_sequence";
 
-	private static final String ATT_AND_ALERT_FIELDS = "eventlink_event_id, "
+	private static final String ATT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
 			+ "eventlink_comment, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
-			+ "eventalert_duration, userobm_email, userobm_firstname, userobm_lastname, userobm_commonname, userentity_user_id ";
+			+ "userobm_email, "
+			+ "userobm_firstname, "
+			+ "userobm_lastname, "
+			+ "userobm_commonname, "
+			+ "userentity_user_id";
 
-	private static final String CONTACT_AND_ALERT_FIELDS = "eventlink_event_id, "
+	private static final String CONTACT_FIELDS = "eventlink_event_id, "
 			+ "eventlink_state, "
 			+ "eventlink_comment, "
 			+ "eventlink_required, "
 			+ "eventlink_percent, "
 			+ "eventlink_is_organizer, "
-			+ "0 as eventalert_duration, email_address as userobm_email, contact_firstname as userobm_firstname, "
-			+ "contact_lastname as userobm_lastname, contact_commonname as userobm_commonname, contactentity_contact_id as userentity_user_id ";
+			+ "email_address as userobm_email, "
+			+ "contact_firstname as userobm_firstname, "
+			+ "contact_lastname as userobm_lastname, "
+			+ "contact_commonname as userobm_commonname, "
+			+ "contactentity_contact_id as userentity_user_id";
 
 	private static final String ATT_INSERT_FIELDS = "eventlink_event_id, eventlink_entity_id, "
 			+ "eventlink_state, eventlink_required, eventlink_percent, eventlink_usercreate, eventlink_is_organizer";
@@ -595,7 +601,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				eventById.put(event.getObmId(), event);
 			
 				IntegerIndexedSQLCollectionHelper eventIdSQLCollectionHelper = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(event.getObmId()));
-				loadAttendeesAndAlerts(con, token, eventById, eventIdSQLCollectionHelper, domainName);
+				loadAttendees(con, eventById, eventIdSQLCollectionHelper, domainName);
+				loadAlerts(con, token, eventById, eventIdSQLCollectionHelper);
 				loadExceptions(con, cal, eventById, eventIdSQLCollectionHelper);
 				loadEventExceptions(con, token, eventById, eventIdSQLCollectionHelper);
 				
@@ -1096,8 +1103,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			touchDateForFakeExDates = obmHelper.selectNow(conComp);
 			if (!changedEvent.isEmpty()) {
 				IntegerIndexedSQLCollectionHelper changedIds = new IntegerIndexedSQLCollectionHelper(changedEvent);
-				loadAttendeesAndAlerts(conComp, token, eventById, changedIds, calendarUser
-						.getDomain().getName());
+				loadAttendees(conComp, eventById, changedIds, calendarUser.getDomain().getName());
+				loadAlerts(conComp, token, eventById, changedIds);
 				loadExceptions(conComp, cal, eventById, changedIds);
 				loadEventExceptions(conComp, token, eventById, changedIds);
 			}
@@ -1370,28 +1377,26 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return "";
 	}
 	
-	private void loadAttendeesAndAlerts(Connection con, AccessToken token, Map<EventObmId, Event> eventById,
+	private void loadAttendees(Connection con, Map<EventObmId, Event> eventById,
 			AbstractSQLCollectionHelper<?> eventIds, String domainName) throws SQLException {
 		if (eventById.isEmpty()) {
 			return;
 		}
 		String attUserAlerts = "SELECT "
-				+ ATT_AND_ALERT_FIELDS
+				+ ATT_FIELDS
 				+ " FROM EventLink att "
-				+ "LEFT JOIN EventAlert ON eventlink_event_id=eventalert_event_id "
 				+ "INNER JOIN UserEntity ON att.eventlink_entity_id=userentity_entity_id "
 				+ "INNER JOIN UserObm ON userobm_id=userentity_user_id "
 				+ "WHERE eventlink_event_id IN (" + eventIds.asPlaceHolders() + ")";
 
 		String attContactAlerts = "SELECT "
-				+ CONTACT_AND_ALERT_FIELDS
+				+ CONTACT_FIELDS
 				+ " FROM EventLink att "
 				+ "INNER JOIN ContactEntity ON att.eventlink_entity_id=contactentity_entity_id "
 				+ "INNER JOIN Contact ON contact_id=contactentity_contact_id "
 				+ "INNER JOIN Email ON email_entity_id=contactentity_entity_id "
-				+ "WHERE eventlink_event_id IN ("
-				+ eventIds.asPlaceHolders()
-				+ ") AND email_label='INTERNET;X-OBM-Ref1' ";
+				+ "WHERE eventlink_event_id IN (" + eventIds.asPlaceHolders() + ") "
+				+ "AND email_label='INTERNET;X-OBM-Ref1' ";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1399,9 +1404,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(attUserAlerts);
 			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
-			Multimap<EventObmId, AttendeeAlert> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
+			Multimap<EventObmId, Attendee> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
 			appendAttendeeToEvent(eventById, attsUsersByEvent);
-			appendEventToAlert(token, eventById, attsUsersByEvent);
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
 		}
@@ -1410,7 +1414,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(attContactAlerts);
 			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
-			Multimap<EventObmId, AttendeeAlert> attsContactsByEvent = getContactAttendeesByEventIdFromCursor(rs, domainName);
+			Multimap<EventObmId, Attendee> attsContactsByEvent = getContactAttendeesByEventIdFromCursor(rs, domainName);
 			appendAttendeeToEvent(eventById, attsContactsByEvent);
 			
 		} finally {
@@ -1418,43 +1422,52 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		defineEventsInternalStatus(eventById.values());
 	}
-	
+
+	private void loadAlerts(Connection con, AccessToken token, Map<EventObmId, Event> eventById,
+			AbstractSQLCollectionHelper<?> eventIds) throws SQLException {
+
+		String alertsQuery = "SELECT eventalert_event_id, eventalert_duration "
+				+ "FROM EventAlert "
+				+ "WHERE eventalert_event_id IN (" + eventIds.asPlaceHolders() + ") "
+				+ "AND eventalert_user_id = ?";
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = con.prepareStatement(alertsQuery);
+			int nextId = eventIds.insertValues(ps, 1);
+			ps.setInt(nextId, token.getObmId());
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				EventObmId eventId = new EventObmId(rs.getInt("eventalert_event_id"));
+				int alertDuration = rs.getInt("eventalert_duration");
+				Event event = eventById.get(eventId);
+				event.setAlert(alertDuration);
+			}
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+	}
+
 	private void defineEventsInternalStatus(Collection<Event> events) {
 		for (Event evt: events) {
 			evt.setInternalEvent(EventUtils.isInternalEvent(evt));
 		}
 	}
-
 	
-	private void appendEventToAlert(AccessToken token, Map<EventObmId, Event> eventById, Multimap<EventObmId, AttendeeAlert> userAttendeesByEventId){
-		if (token != null) {
-			for(Event event : eventById.values()){
-				int alert = 0;
-				for(AttendeeAlert att : userAttendeesByEventId.get(event.getObmId())){
-					if (token.getObmId() == att.getEntityId()) {
-						if (att.getAlert() >= 0) {
-							alert = att.getAlert();
-						}
-					}
-				}
-				event.setAlert(alert);
-			}
-		}
-	}
-	
-	private Multimap<EventObmId, AttendeeAlert> getUserAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
+	private Multimap<EventObmId, Attendee> getUserAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
 		return getAttendeesByEventIdFromCursor(rs, domainName, true);
 	}
 	
-	private Multimap<EventObmId, AttendeeAlert> getContactAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
+	private Multimap<EventObmId, Attendee> getContactAttendeesByEventIdFromCursor(ResultSet rs, String domainName) throws SQLException{
 		return getAttendeesByEventIdFromCursor(rs, domainName, false);
 	}
 	
-	private Multimap<EventObmId, AttendeeAlert> getAttendeesByEventIdFromCursor(ResultSet rs, String domainName, boolean isObmUser) throws SQLException{
-		Multimap<EventObmId, AttendeeAlert> attsByEvent = ArrayListMultimap.create();
+	private Multimap<EventObmId, Attendee> getAttendeesByEventIdFromCursor(ResultSet rs, String domainName, boolean isObmUser) throws SQLException{
+		Multimap<EventObmId, Attendee> attsByEvent = ArrayListMultimap.create();
 		while (rs.next()) {
 			EventObmId eventId = new EventObmId(rs.getInt(1));
-			AttendeeAlert att = new AttendeeAlert();
+			Attendee att = new Attendee();
 			att.setObmUser(isObmUser);
 			att.setDisplayName(getAttendeeDisplayName(rs));
 			att.setEmail(getUserObmEmail(rs, domainName));
@@ -1462,16 +1475,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			att.setParticipationRole(getAttendeeRequired(rs));
 			att.setPercent(getAttendeePercent(rs));
 			att.setOrganizer(getAttendeeOrganizer(rs));
-			att.setEntityId(rs.getInt("userentity_user_id"));
-			att.setAlert(rs.getInt("eventalert_duration"));
 			attsByEvent.put(eventId, att);
 		}
 		return attsByEvent;
 	}
 
-	private void appendAttendeeToEvent(Map<EventObmId, Event> eventById, Multimap<EventObmId, AttendeeAlert> attendeesByEventId){
+	private void appendAttendeeToEvent(Map<EventObmId, Event> eventById, Multimap<EventObmId, Attendee> attendeesByEventId){
 		for(Event event : eventById.values()){
-			Collection<AttendeeAlert> atts = attendeesByEventId.get(event.getObmId());
+			Collection<Attendee> atts = attendeesByEventId.get(event.getObmId());
 			event.addAttendees(atts);
 		}
 	}
@@ -1521,8 +1532,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 			}
 			IntegerIndexedSQLCollectionHelper changedIds = new IntegerIndexedSQLCollectionHelper(changedEvent);
-			loadAttendeesAndAlerts(con, token, evenExcepttById, changedIds,
-					domainName);
+			loadAttendees(con, evenExcepttById, changedIds, domainName);
+			loadAlerts(con, token, evenExcepttById, changedIds);
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
 		}
@@ -2186,7 +2197,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				String domainName = evrs.getString("domain_name");
 				Map<EventObmId, Event> eventById = ImmutableMap.of(ret.getObmId(), ret);
 				IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(ret));
-				loadAttendeesAndAlerts(con, token, eventById, eventIds, domainName);
+				loadAttendees(con, eventById, eventIds, domainName);
+				loadAlerts(con, token, eventById, eventIds);
 				loadExceptions(con, cal, eventById, eventIds);
 				loadEventExceptions(con, token, eventById, eventIds);
 				return ret;
@@ -2239,7 +2251,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				String domainName = evrs.getString("domain_name");
 				Map<EventObmId, Event> eventById = ImmutableMap.of(ret.getObmId(), ret);
 				IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(ImmutableList.of(ret));
-				loadAttendeesAndAlerts(con, token, eventById, eventIds, domainName);
+				loadAttendees(con, eventById, eventIds, domainName);
+				loadAlerts(con, token, eventById, eventIds);
 				return ret;
 			}
 		} catch (SQLException e) {
@@ -2303,7 +2316,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			
 			IntegerIndexedSQLCollectionHelper changedIds = new IntegerIndexedSQLCollectionHelper(changedEvent);
-			loadAttendeesAndAlerts(con, token, eventById, changedIds, obmUser.getDomain().getName());
+			loadAttendees(con, eventById, changedIds, obmUser.getDomain().getName());
+			loadAlerts(con, token, eventById, changedIds);
 			loadExceptions(con, cal, eventById, changedIds);
 			loadEventExceptions(con, token, eventById, changedIds);
 			
@@ -2357,7 +2371,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			
 			IntegerIndexedSQLCollectionHelper eventIds = new IntegerIndexedSQLCollectionHelper(ret);
-			loadAttendeesAndAlerts(con, token, eventById, eventIds, calendarUser.getDomain().getName());
+			loadAttendees(con, eventById, eventIds, calendarUser.getDomain().getName());
+			loadAlerts(con, token, eventById, eventIds);
 			loadExceptions(con, cal, eventById, eventIds);
 			loadEventExceptions(con, token, eventById, eventIds);
 			
