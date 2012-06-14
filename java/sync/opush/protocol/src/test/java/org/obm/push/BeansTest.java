@@ -35,8 +35,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASSystemTime;
+import org.obm.push.bean.ms.ASTimeZone;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;

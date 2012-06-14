@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
@@ -49,7 +50,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;
@@ -59,6 +60,11 @@ import com.google.inject.Inject;
 
 public class CalendarEncoder extends Encoder {
 
+	private final static String DEFAULT_TIME_ZONE = 
+			"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAA" +
+			"AAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZw" +
+			"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
+	
 	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private final TimeZoneEncoder timeZoneEncoder;
 	private final TimeZoneConverter timeZoneConverter;
@@ -181,8 +187,13 @@ public class CalendarEncoder extends Encoder {
 
 	}
 
-	private String encodedTimeZoneAsString(TimeZone TimeZone, Locale locale) {
-		return new String(encodedTimeZone(TimeZone, locale));
+	private String encodedTimeZoneAsString(TimeZone timeZone, Locale locale) {
+		byte[] encodedTimeZone = encodedTimeZone(timeZone, locale);
+		if (encodedTimeZone != null) {
+			return Base64.encodeBase64String(encodedTimeZone);
+		} else {
+			return DEFAULT_TIME_ZONE;
+		}
 	}
 	
 	private byte[] encodedTimeZone(TimeZone timeZone, Locale locale) {

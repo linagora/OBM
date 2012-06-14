@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.utils.UserEmailParserUtils;
@@ -204,10 +203,6 @@ public class MSMeetingRequest {
 		}
 	}
 	
-	public final static String DEFAULT_TIME_ZONE = 
-			"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAA" +
-			"AAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZw" +
-			"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
 	private final boolean allDayEvent;
 	private final Date startTime;
 	private final Date dtStamp;
@@ -304,14 +299,6 @@ public class MSMeetingRequest {
 		return intDBusyStatus;
 	}
 
-	public String getTimeZoneInBase64() {
-		if (timeZone != null) {
-			return Base64.encodeBase64String(timeZone.getID().getBytes());
-		} else {
-			return DEFAULT_TIME_ZONE;
-		}
-	}
-	
 	public TimeZone getTimeZone() {
 		return timeZone;
 	}
@@ -329,7 +316,7 @@ public class MSMeetingRequest {
 	}
 	
 	@Override
-	public final int hashCode(){
+	public final int hashCode() {
 		return Objects.hashCode(allDayEvent, startTime, dtStamp, endTime, 
 				instanceType, location, organizer, recurrenceId, reminder, 
 				responseRequested, recurrences, sensitivity, intDBusyStatus, 
@@ -337,7 +324,7 @@ public class MSMeetingRequest {
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	public final boolean equals(Object object) {
 		if (object instanceof MSMeetingRequest) {
 			MSMeetingRequest that = (MSMeetingRequest) object;
 			return Objects.equal(this.allDayEvent, that.allDayEvent)

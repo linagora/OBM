@@ -33,7 +33,6 @@ package org.obm.push.protocol.data;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -449,22 +448,9 @@ public class MSMeetingRequestSerializingTest {
 		Element encodedDocument = encode(meetingRequest);
 		
 		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TIME_ZONE))
-				.isEqualTo(MSMeetingRequest.DEFAULT_TIME_ZONE);
+				.isEqualTo(MSEmailEncoder.DEFAULT_TIME_ZONE);
 	}
 	
-	@Test
-	public void testMeetingReponseTimeZone() {
-		TimeZone timeZone = TimeZone.getTimeZone("GMT+1:00");
-		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
-				.timeZone(timeZone)
-				.build();
-		
-		Element encodedDocument = encode(meetingRequest);
-		
-		String expectedTimeZone = Base64.encodeBase64String(timeZone.getID().getBytes());
-		Assertions.assertThat(tagValue(encodedDocument, ASEmail.TIME_ZONE)).isEqualTo(expectedTimeZone);
-	}
-
 	private String date(Date date) {
 		return protocolDateFormat.format(date);
 	}
@@ -480,8 +466,14 @@ public class MSMeetingRequestSerializingTest {
 	}
 
 	private Element encode(MSMeetingRequest meetingRequest) throws FactoryConfigurationError {
+		return encode(meetingRequest, MSEmailEncoder.DEFAULT_TIME_ZONE);
+	}
+	
+	private Element encode(MSMeetingRequest meetingRequest, String timeZone) throws FactoryConfigurationError {
 		Element parentElement = createRootDocument();
-		new MSMeetingRequestSerializer(new IntEncoder(), parentElement, meetingRequest).serializeMSMeetingRequest();
+		MSMeetingRequestSerializer msMeetingRequestSerializer = new MSMeetingRequestSerializer(
+				new IntEncoder(), parentElement, meetingRequest);
+		msMeetingRequestSerializer.serializeMSMeetingRequest(timeZone);
 		return parentElement;
 	}
 

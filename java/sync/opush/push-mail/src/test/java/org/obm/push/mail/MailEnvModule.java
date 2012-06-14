@@ -48,6 +48,8 @@ import org.obm.push.mail.imap.ImapStoreManagerImpl;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.service.EventService;
 import org.obm.sync.client.login.LoginService;
 
@@ -96,6 +98,7 @@ public class MailEnvModule extends AbstractModule {
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(PrivateMailboxService.class).to(ImapMailboxService.class);
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
+		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
 	}
 	
 }

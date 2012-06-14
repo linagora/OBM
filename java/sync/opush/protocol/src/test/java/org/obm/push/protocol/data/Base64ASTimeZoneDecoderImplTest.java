@@ -34,12 +34,13 @@ package org.obm.push.protocol.data;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.codec.binary.Base64;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
 
 @RunWith(SlowFilterRunner.class)
@@ -75,6 +76,6 @@ public class Base64ASTimeZoneDecoderImplTest {
 	private byte[] toBase64(ASTimeZone asTimeZone) {
 		TimeZoneEncoderImpl timeZoneEncoderImpl = 
 				new TimeZoneEncoderImpl(new IntEncoder(), new WCHAREncoder(), new SystemTimeEncoder());
-		return timeZoneEncoderImpl.encode(asTimeZone);
+		return Base64.encodeBase64(timeZoneEncoderImpl.encode(asTimeZone));
 	}
 }

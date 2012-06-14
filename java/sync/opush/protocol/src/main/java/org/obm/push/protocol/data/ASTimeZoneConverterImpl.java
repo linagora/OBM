@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASTimeZone;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;

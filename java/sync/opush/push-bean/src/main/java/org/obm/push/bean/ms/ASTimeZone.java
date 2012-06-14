@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean.ms;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;

@@ -77,7 +77,9 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	private final EventService eventService;
 
 	@Inject
-	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter, EventService eventService) {
+	@VisibleForTesting MailViewToMSEmailConverterImpl(MSEmailHeaderConverter emailHeaderConverter,
+			EventService eventService) {
+		
 		this.emailHeaderConverter = emailHeaderConverter;
 		this.eventService = eventService;
 	}
@@ -94,7 +96,6 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		
 		MSMeetingRequest msMeetingRequest = convertICalendar(emailView);
 		msEmailBuilder.meetingRequest(fillMSEventUid(msMeetingRequest, userDataRequest));
-		
 		msEmailBuilder.messageClass(convertInvitationType(emailView));
 		
 		return msEmailBuilder.build();

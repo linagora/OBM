@@ -32,18 +32,24 @@
 package org.obm.push.protocol.data.ms;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.ms.ASTimeZone;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.protocol.data.ASAirs;
 import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.MSEmailHeaderSerializer;
 import org.obm.push.protocol.data.MSMeetingRequestSerializer;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.SerializableInputStream;
@@ -55,6 +61,11 @@ import com.google.inject.Inject;
 
 public class MSEmailEncoder {
 
+	public final static String DEFAULT_TIME_ZONE = 
+			"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQBlAAAAAAAAAAAAAAAAA" +
+			"AAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZw" +
+			"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
+	
 	public final static String UTC_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.000'Z'";
 	
 	private final static String MESSAGE_CLASS = "urn:content-classes:message";
@@ -62,10 +73,16 @@ public class MSEmailEncoder {
 	private final static String CPID_DEFAULT = "65001";
 	
 	private final IntEncoder intEncoder;
+	private final TimeZoneEncoder timeZoneEncoder;
+	private final TimeZoneConverter timeZoneConverter;
 
 	@Inject
-	@VisibleForTesting MSEmailEncoder(IntEncoder intEncoder) {
+	@VisibleForTesting MSEmailEncoder(IntEncoder intEncoder, TimeZoneEncoder timeZoneEncoder,
+			TimeZoneConverter timeZoneConverter) {
+		
 		this.intEncoder = intEncoder;
+		this.timeZoneEncoder = timeZoneEncoder;
+		this.timeZoneConverter = timeZoneConverter;
 	}
 
 	public void encode(Element parent, IApplicationData data) throws IOException {
@@ -83,8 +100,12 @@ public class MSEmailEncoder {
 		MSMessageClass messageClass = msEmail.getMessageClass();
 		DOMUtils.createElementAndText(parent, ASEmail.MESSAGE_CLASS.asASValue(), messageClass.specificationValue());
 		
-		if (msEmail.getMeetingRequest() != null) {
-			new MSMeetingRequestSerializer(intEncoder, parent, msEmail.getMeetingRequest()).serializeMSMeetingRequest();
+		MSMeetingRequest meetingRequest = msEmail.getMeetingRequest();
+		if (meetingRequest != null) {
+			String timeZone = getTimeZone(meetingRequest);
+			new MSMeetingRequestSerializer(intEncoder, parent, meetingRequest)
+				.serializeMSMeetingRequest(timeZone);
+			
 			DOMUtils.createElementAndText(parent, ASEmail.CONTENT_CLASS.asASValue(), CALENDAR_CLASS);
 		} else {
 			DOMUtils.createElementAndText(parent, ASEmail.CONTENT_CLASS.asASValue(), MESSAGE_CLASS);
@@ -93,7 +114,7 @@ public class MSEmailEncoder {
 		DOMUtils.createElementAndText(parent, ASEmail.CPID.asASValue(), CPID_DEFAULT);
 		DOMUtils.createElementAndText(parent, ASAirs.NATIVE_TYPE.asASValue(), msEmail.getBody().getBodyType().asXmlValue());
 	}
-	
+
 	private void serializeBody(Element parent, MSEmailBody body) throws IOException {
 		MSEmailBodyType bodyType = body.getBodyType();
 		SerializableInputStream mimeData = body.getMimeData();
@@ -119,5 +140,14 @@ public class MSEmailEncoder {
 						msAtt.getEstimatedDataSize().toString());
 			}
 		}
+	}
+
+	private String getTimeZone(MSMeetingRequest meetingRequest) {
+		ASTimeZone asTimeZone = timeZoneConverter.convert(meetingRequest.getTimeZone(), Locale.US);
+		byte[] timeZone = timeZoneEncoder.encode(asTimeZone);
+		if (timeZone != null) {
+			return Base64.encodeBase64String(timeZone);
+		}
+		return MSEmailEncoder.DEFAULT_TIME_ZONE;
 	}
 }

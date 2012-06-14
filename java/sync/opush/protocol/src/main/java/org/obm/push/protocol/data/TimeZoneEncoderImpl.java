@@ -33,9 +33,8 @@ package org.obm.push.protocol.data;
 
 import java.util.Arrays;
 
-import org.apache.commons.codec.binary.Base64;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASSystemTime;
+import org.obm.push.bean.ms.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.IntEncoder.Capacity;
 
@@ -61,8 +60,10 @@ public class TimeZoneEncoderImpl implements TimeZoneEncoder {
 	
 	@Override
 	public byte[] encode(ASTimeZone asTimeZone) {
-		byte[] binaryTimeZone = encodeTimeZoneAsBinary(asTimeZone);
-		return Base64.encodeBase64(binaryTimeZone);
+		if (asTimeZone == null) {
+			return null;
+		}
+		return encodeTimeZoneAsBinary(asTimeZone);
 	}
 	
 	@VisibleForTesting byte[] encodeTimeZoneAsBinary(ASTimeZone asTimeZone) {

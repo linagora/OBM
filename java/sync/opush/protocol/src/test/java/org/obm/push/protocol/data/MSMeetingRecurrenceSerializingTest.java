@@ -51,6 +51,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence.Builder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
+import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.IntEncoder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -331,7 +332,8 @@ public class MSMeetingRecurrenceSerializingTest {
 		MSMeetingRequest meetingRequest = meetingRequestWithRecurrences(meetingRequestRecurrence);
 		
 		Element parentElement = createRootDocument();
-		new MSMeetingRequestSerializer(new IntEncoder(), parentElement, meetingRequest).serializeMSMeetingRequest();
+		new MSMeetingRequestSerializer(
+				new IntEncoder(), parentElement, meetingRequest).serializeMSMeetingRequest(MSEmailEncoder.DEFAULT_TIME_ZONE);
 		return parentElement;
 	}
 

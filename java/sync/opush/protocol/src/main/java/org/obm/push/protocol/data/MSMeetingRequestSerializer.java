@@ -58,13 +58,15 @@ public class MSMeetingRequestSerializer {
 	private Element meetingRequestElement;
 	private final MSMeetingRequest meetingRequest;
 	
-	public MSMeetingRequestSerializer(IntEncoder intEncoder, Element parentElement, MSMeetingRequest meetingRequest) {
+	public MSMeetingRequestSerializer(IntEncoder intEncoder, Element parentElement,
+			MSMeetingRequest meetingRequest) {
+		
 		this.intEncoder = intEncoder;
 		this.parentElement = parentElement;
 		this.meetingRequest = meetingRequest;
 	}
 
-	public void serializeMSMeetingRequest() {
+	public void serializeMSMeetingRequest(String timeZone) {
 		Preconditions.checkNotNull(meetingRequest, "The meeting request is required");
 		meetingRequestElement = DOMUtils.createElement(parentElement, ASEmail.MEETING_REQUEST.asASValue());
 		
@@ -79,7 +81,7 @@ public class MSMeetingRequestSerializer {
 		serializeResponseRequested();
 		serializeSensitivity();
 		serializeBusyStatus();
-		serializeTimeZone();
+		serializeTimeZone(timeZone);
 		serializeGlobalId();
 		serializeRecurrenceId();
 
@@ -141,9 +143,9 @@ public class MSMeetingRequestSerializer {
 				ASEmail.INT_DB_BUSY_STATUS.asASValue(), meetingRequest.getIntDBusyStatus().specificationValue());
 	}
 
-	private void serializeTimeZone() {
-		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEmail.TIME_ZONE.asASValue(), meetingRequest.getTimeZoneInBase64());
+	private void serializeTimeZone(String timeZone) {
+		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement,
+				ASEmail.TIME_ZONE.asASValue(), timeZone);
 	}
 
 	private void serializeGlobalId() {

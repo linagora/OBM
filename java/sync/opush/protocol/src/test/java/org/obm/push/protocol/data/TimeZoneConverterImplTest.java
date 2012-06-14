@@ -36,12 +36,14 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.bean.ms.ASSystemTime;
+import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.utils.type.UnsignedShort;
 
 @RunWith(SlowFilterRunner.class)
@@ -74,9 +76,10 @@ public class TimeZoneConverterImplTest {
 	private static final int HONOLULU_DST_OFFSET = 0;
 
 	
-	@Test(expected=NullPointerException.class)
+	@Test
 	public void testTimezoneIsRequired() {
-		new TimeZoneConverterImpl().convert(null, null);
+		ASTimeZone asTimeZone = new TimeZoneConverterImpl().convert(null, null);
+		Assertions.assertThat(asTimeZone).isNull();
 	}
 	
 	@Test
