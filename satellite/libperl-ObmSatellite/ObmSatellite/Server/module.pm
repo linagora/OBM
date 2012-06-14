@@ -119,7 +119,7 @@ sub processHttpRequest {
     }else {
         my $response = ObmSatellite::Server::response->new();
         $response->setStatus( RC_NOT_FOUND );
-        $response->setStatusMessage( RC_NOT_FOUND.' URL does not exist' );
+        $response->setStatusMessage( 'Error '. RC_NOT_FOUND .': The URL '. $requestUri .' does not exist, maybe you are trying to access a module which is currently disabled ?' );
         $httpClient->send_response( $response->getHttpResponse() );
     }
 
