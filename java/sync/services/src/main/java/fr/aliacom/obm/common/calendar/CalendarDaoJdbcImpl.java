@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
@@ -59,6 +58,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
+import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
@@ -345,21 +345,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			insertEventExceptions(editor, calendar, ev.getRecurrence()
 					.getEventExceptions(), con, id, useObmUser);
 		}
-		Integer a = ev.getAlert();
-		if (a != null) {
-			ps = con.prepareStatement("insert into EventAlert "
-					+ "(eventalert_event_id, eventalert_user_id, eventalert_duration, eventalert_usercreate) "
-					+ "values (?, ?, ?, ?)");
-			ps.setInt(1, id.getObmId());
-			ps.setInt(2, editor.getObmId());
-			ps.setInt(3, a);
-			ps.setInt(4, editor.getObmId());
-			ps.executeUpdate();
+		Integer alert = ev.getAlert();
+		if (alert != null) {
+			insertEventAlert(con, editor, ownerId, ev);
 		}
-		ps.close();
-		
+
 		indexEvent(editor, ev);	
-		
+
 		return ev;
 	}
 
@@ -1424,7 +1416,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private void loadAlerts(Connection con, AccessToken token, Map<EventObmId, Event> eventById,
-			AbstractSQLCollectionHelper<?> eventIds) throws SQLException {
+			IntegerSQLCollectionHelper eventIds) throws SQLException {
 
 		String alertsQuery = "SELECT eventalert_event_id, eventalert_duration "
 				+ "FROM EventAlert "
@@ -1656,7 +1648,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				updateAttendees(editor, con, calendar, ev, useObmUser);
 				markUpdated(con, ev.getObmId());
 			}
-			updateAlerts(editor, con, ev);
+
+			int ownerId = userDao.userIdFromEmail(con, calendar, editor.getDomain().getId());
+			updateAlerts(editor, con, ev, ownerId);
 
 			removeAllException(con, ev);
 
@@ -2088,78 +2082,94 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		
 		logger.info("event modification needs to add " + toInsert.size() + " attendees.");
 		insertAttendees(token, calendar, event, con, toInsert, useObmUser);
-
-		Statement st = null;
-		try {
-			st = con.createStatement();
-			if (event.getAlert() == null) {
-				st.executeUpdate("delete from EventAlert where eventalert_user_id="
-						+ token.getObmId()
-						+ " AND eventalert_event_id="
-						+ event.getObmId().getObmId());
-			} else {
-				int upd = st
-						.executeUpdate("update EventAlert set eventalert_duration="
-								+ event.getAlert()
-								+ ", eventalert_userupdate="
-								+ token.getObmId()
-								+ " where eventalert_user_id="
-								+ token.getObmId()
-								+ " AND eventalert_event_id="
-								+ event.getObmId().getObmId());
-				if (upd <= 0) {
-					st.executeUpdate("insert into EventAlert (eventalert_duration, eventalert_event_id, eventalert_usercreate, eventalert_user_id)"
-							+ " values ("
-							+ event.getAlert()
-							+ ","
-							+ event.getObmId().getObmId()
-							+ ","
-							+ token.getObmId()
-							+ "," + token.getObmId() + " )");
-				}
-			}
-		} finally {
-			obmHelper.cleanup(null, st, null);
-		}
-
 	}
 
-	private void updateAlerts(AccessToken updater, Connection con, Event ev)
+	private void updateAlerts(AccessToken token, Connection con, Event event, int ownerId)
 			throws SQLException {
-
-		Statement st = null;
-		try {
-			st = con.createStatement();
-			if (ev.getAlert() == null) {
-				st.executeUpdate("delete from EventAlert where eventalert_user_id="
-						+ updater.getObmId()
-						+ " AND eventalert_event_id="
-						+ ev.getObmId().getObmId());
-			} else {
-				int upd = st
-						.executeUpdate("update EventAlert set eventalert_duration="
-								+ ev.getAlert()
-								+ ", eventalert_userupdate="
-								+ updater.getObmId()
-								+ " where eventalert_user_id="
-								+ updater.getObmId()
-								+ " AND eventalert_event_id="
-								+ ev.getObmId().getObmId());
-				if (upd <= 0) {
-					st.executeUpdate("insert into EventAlert (eventalert_duration, eventalert_event_id, eventalert_usercreate, eventalert_user_id)"
-							+ " values ("
-							+ ev.getAlert()
-							+ ","
-							+ ev.getObmId().getObmId()
-							+ ","
-							+ updater.getObmId()
-							+ "," + updater.getObmId() + " )");
-				}
+		if (event.getAlert() == null) {
+			deleteEventAlert(con, token, ownerId, event.getObmId());
+		} else {
+			if (!updateEventAlert(con, token, ownerId, event)) {
+				insertEventAlert(con, token, ownerId, event);
 			}
-		} finally {
-			obmHelper.cleanup(null, st, null);
+		}
+	}
+
+	private void insertEventAlert(Connection con, AccessToken token, Integer ownerId, Event event) throws SQLException {
+
+		int tokenId = token.getObmId();
+		Integer alert = event.getAlert();
+		int eventId = event.getObmId().getObmId();
+
+		String insertAlertQuery = "INSERT INTO EventAlert "
+				+ "(eventalert_event_id, eventalert_user_id, eventalert_duration, eventalert_usercreate) "
+				+ "VALUES (?, ?, ?, ?)";
+
+		if (tokenId != ownerId) {
+			insertAlertQuery += ",(?, ?, ?, ?)";
 		}
 
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement(insertAlertQuery);
+			ps.setInt(1, eventId);
+			ps.setInt(2, tokenId);
+			ps.setInt(3, alert);
+			ps.setInt(4, tokenId);
+			if(tokenId != ownerId) {
+				ps.setInt(5, eventId);
+				ps.setInt(6, ownerId);
+				ps.setInt(7, alert);
+				ps.setInt(8, tokenId);
+			}
+			ps.executeUpdate();
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+
+	private boolean updateEventAlert(Connection con, AccessToken token, Integer ownerId, Event event) throws SQLException {
+
+		IntegerSQLCollectionHelper userIds = new IntegerSQLCollectionHelper(Sets.newHashSet(ownerId, token.getObmId()));
+
+		String updateAlertQuery = "UPDATE EventAlert "
+				+ "SET eventalert_duration = ?, eventalert_userupdate = ? "
+				+ "WHERE eventalert_user_id IN ("+ userIds.asPlaceHolders() +") "
+				+ "AND eventalert_event_id = ?";
+
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement(updateAlertQuery);
+			ps.setInt(1, event.getAlert());
+			ps.setInt(2, token.getObmId());
+			int nextId = userIds.insertValues(ps, 3);
+			ps.setInt(nextId, event.getObmId().getObmId());
+
+			return (ps.executeUpdate() > 0);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+
+	private void deleteEventAlert(Connection con, AccessToken token, Integer ownerId, EventObmId eventObmId) throws SQLException {
+		IntegerSQLCollectionHelper userIds = new IntegerSQLCollectionHelper(Sets.newHashSet(ownerId, token.getObmId()));
+		String deleteAlertQuery = "DELETE FROM EventAlert "
+				+ "WHERE eventalert_user_id in ("+ userIds.asPlaceHolders() +") "
+				+ "AND eventalert_event_id = ?";
+
+		PreparedStatement ps = null;
+
+		try {
+
+			ps = con.prepareStatement(deleteAlertQuery);
+			int nextId = userIds.insertValues(ps, 1);
+			ps.setInt(nextId, eventObmId.getObmId());
+			ps.executeUpdate();
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
 	}
 
 	@Override
