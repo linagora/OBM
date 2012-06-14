@@ -3479,6 +3479,7 @@ function dis_user_export_pdf($id) {
   } else {
     $displayed_login = $login;
   }
+  $Y -= $pdf->getLineHeight();
   $pdf->drawSplittedText($pdf->pages[0], $GLOBALS['l_login']." : ".$displayed_login, $user_login_max_length, $X, $Y);
   $pdf->drawSplittedText($pdf->pages[0], $GLOBALS['l_password']." : ".$password, $user_password_max_length, $X, $Y);
   for($i = 0; $i < 5 && $i < count($email); $i++) {
