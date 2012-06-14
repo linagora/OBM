@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
@@ -93,10 +95,11 @@ public class CalendarEncoder extends Encoder {
 			s(p, ASCalendar.TIME_ZONE.asASValue(), encodedTimeZoneAsString(timeZone, Locale.getDefault()));
 		}
 
-		s(p, ASCalendar.DTSTAMP.asASValue(), ev.getDtStamp() != null ? ev.getDtStamp()
-				: new Date(),sdf);
+		s(p, ASCalendar.DTSTAMP.asASValue(), 
+				getDateForTimeZone(ev.getDtStamp() != null ? ev.getDtStamp() : new Date(), timeZone), sdf);
 
-		s(p, ASCalendar.START_TIME.asASValue(), ev.getStartTime(),sdf);
+		s(p, ASCalendar.START_TIME.asASValue(), 
+				getDateForTimeZone(ev.getStartTime(), timeZone), sdf);
 		s(p, ASCalendar.SUBJECT.asASValue(), ev.getSubject());
 
 		MSEventUid eventUid = ev.getUid();
@@ -142,13 +145,14 @@ public class CalendarEncoder extends Encoder {
 		}
 
 		s(p, ASCalendar.LOCATION.asASValue(), ev.getLocation());
-		s(p, ASCalendar.END_TIME.asASValue(), ev.getEndTime(),sdf);
+		s(p, ASCalendar.END_TIME.asASValue(), 
+				getDateForTimeZone(ev.getEndTime(), timeZone), sdf);
 
 		encodeBody(udr, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
-			encodeRecurrence(p, ev, sdf);
-			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf);
+			encodeRecurrence(p, ev, sdf, timeZone);
+			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf, timeZone);
 		}
 
 		s(p, ASCalendar.SENSITIVITY.asASValue(), ev.getSensitivity().asIntString());
@@ -189,12 +193,26 @@ public class CalendarEncoder extends Encoder {
 		ASTimeZone asTimeZone = timeZoneConverter.convert(timeZone, locale);
 		return timeZoneEncoder.encode(asTimeZone);
 	}
+	
+	private Date getDateForTimeZone(Date date, TimeZone timeZone) {
+		if (timeZone == null) {
+			return date;
+		}
+		
+		if (date == null) {
+			return null;
+		}
+		
+		DateTime dateTime = new DateTime(date.getTime(), DateTimeZone.forTimeZone(timeZone));
+		return dateTime.toDate();
+	}
 
 	private void encodeExceptions(UserDataRequest udr,
 			MSEvent parent,
 			Element p,
 			List<MSEventException> excepts,
-			SimpleDateFormat sdf) {
+			SimpleDateFormat sdf,
+			TimeZone timeZone) {
 		
 		// Exceptions.Exception
 		if(excepts.size()>0){
@@ -229,11 +247,15 @@ public class CalendarEncoder extends Encoder {
 				}
 				s(e, ASCalendar.SUBJECT.asASValue(), ex.getSubject());
 
-				s(e, ASCalendar.EXCEPTION_START_TIME.asASValue(), ex.getExceptionStartTime(),sdf);
+				s(e, ASCalendar.EXCEPTION_START_TIME.asASValue(), 
+						getDateForTimeZone(ex.getExceptionStartTime(), timeZone), sdf);
 
-				s(e, ASCalendar.START_TIME.asASValue(), ex.getStartTime(),sdf);
-				s(e, ASCalendar.END_TIME.asASValue(), ex.getEndTime(),sdf);
-				s(e, ASCalendar.DTSTAMP.asASValue(), ex.getDtStamp(),sdf);
+				s(e, ASCalendar.START_TIME.asASValue(), 
+						getDateForTimeZone(ex.getStartTime(), timeZone), sdf);
+				s(e, ASCalendar.END_TIME.asASValue(), 
+						getDateForTimeZone(ex.getEndTime(), timeZone), sdf);
+				s(e, ASCalendar.DTSTAMP.asASValue(), 
+						getDateForTimeZone(ex.getDtStamp(), timeZone), sdf);
 			}
 		}
 	}
@@ -253,15 +275,17 @@ public class CalendarEncoder extends Encoder {
 
 	private void encodeRecurrence(Element p,
 			MSEvent ev,
-			SimpleDateFormat sdf) {
+			SimpleDateFormat sdf,
+			TimeZone timeZone) {
 		
 		Element r = DOMUtils.createElement(p, ASCalendar.RECURRENCE.asASValue());
 		DOMUtils.createElementAndText(r, ASCalendar.RECURRENCE_TYPE.asASValue(), rec(ev)
 				.getType().asIntString());
 		s(r, ASCalendar.RECURRENCE_INTERVAL.asASValue(), rec(ev).getInterval());
-		s(r, ASCalendar.RECURRENCE_UNTIL.asASValue(), rec(ev).getUntil(),sdf);
+		s(r, ASCalendar.RECURRENCE_UNTIL.asASValue(), 
+				getDateForTimeZone(rec(ev).getUntil(), timeZone), sdf);
 
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Calendar cal = Calendar.getInstance(timeZone);
 		cal.setTimeInMillis(ev.getStartTime().getTime());
 		switch (rec(ev).getType()) {
 		case DAILY:
