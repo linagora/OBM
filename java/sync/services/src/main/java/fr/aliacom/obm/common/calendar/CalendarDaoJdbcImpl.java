@@ -1165,7 +1165,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		+ "WHERE (ue.userentity_user_id=? OR ue.userentity_user_id IS NULL) "
 		+ "AND u.userobm_email IN (" + calendarEmailsPlaceHolders + ") "
 		+ "AND u.userobm_archive != 1 "
-		+ "AND u.userobm_domain_id=?";
+		+ "AND u.userobm_domain_id=?"
+		+ "AND (er.entityright_read = 1 OR er.entityright_write = 1)";
 
 		String publicCalsQuery =
 		// public cals
@@ -1176,7 +1177,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		+ "WHERE er.entityright_consumer_id IS NULL "
 		+ "AND u.userobm_domain_id=? "
 		+ "AND u.userobm_email in (" + calendarEmailsPlaceHolders + ") "
-		+ "AND u.userobm_archive != 1";
+		+ "AND u.userobm_archive != 1"
+		+ "AND (er.entityright_read = 1 OR er.entityright_write = 1)";
 
 		String query = directRightsQuery + " UNION " + publicCalsQuery;
 		
