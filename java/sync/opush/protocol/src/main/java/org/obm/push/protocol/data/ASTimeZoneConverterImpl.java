@@ -42,7 +42,10 @@ import org.obm.push.bean.ms.ASTimeZone;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	
 	@VisibleForTesting static final Collection<String> TIME_ZONE_PREFERENCES =
@@ -51,6 +54,7 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	
 	private final TimeZoneConverter timeZoneConverter;
 	
+	@Inject
 	@VisibleForTesting ASTimeZoneConverterImpl(TimeZoneConverter timeZoneConverter) {
 		this.timeZoneConverter = timeZoneConverter;
 	}

@@ -42,6 +42,7 @@ import org.obm.push.utils.IntEncoder.Capacity;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -55,6 +56,7 @@ public class Base64ASTimeZoneDecoderImpl implements Base64ASTimeZoneDecoder {
 	private final IntEncoder intEncoder;
 	private final SystemTimeEncoder systemTimeEncoder;
 	
+	@Inject
 	@VisibleForTesting Base64ASTimeZoneDecoderImpl(
 			WCHAREncoder wcharEncoder, IntEncoder intEncoder, SystemTimeEncoder systemTimeEncoder) {
 		this.wcharEncoder = wcharEncoder;

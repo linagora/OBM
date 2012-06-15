@@ -44,15 +44,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class Decoder {
 	
 	private final Base64ASTimeZoneDecoder base64asTimeZoneDecoder;
 	private final ASTimeZoneConverter asTimeZoneConverter;
 	
 	@Inject
-	public Decoder(Base64ASTimeZoneDecoder base64asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+	@VisibleForTesting Decoder(Base64ASTimeZoneDecoder base64asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
 		this.base64asTimeZoneDecoder = base64asTimeZoneDecoder;
 		this.asTimeZoneConverter = asTimeZoneConverter;
 	}
