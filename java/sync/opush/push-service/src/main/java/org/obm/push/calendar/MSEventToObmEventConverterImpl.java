@@ -525,8 +525,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 
 	private Integer convertRecurrenceInterval(MSRecurrence from) throws ConversionException {
 		Integer interval = from.getInterval();
-		from.getType().validIntervalOrException(interval);
-		return interval;
+		return from.getType().validIntervalOrException(interval);
 	}
 
 	

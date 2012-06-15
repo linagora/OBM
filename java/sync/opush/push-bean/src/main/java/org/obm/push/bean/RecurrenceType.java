@@ -33,6 +33,8 @@ package org.obm.push.bean;
 
 import org.obm.push.exception.ConversionException;
 
+import com.google.common.base.Objects;
+
 
 public enum RecurrenceType {
 	DAILY(999), // 0
@@ -48,15 +50,15 @@ public enum RecurrenceType {
 		this.maxIntervalValue = maxIntervalValue;
 	}
 	
-	public void validIntervalOrException(Integer interval) throws ConversionException {
-		if (interval == null) {
-			throw new ConversionException("Recurrence.Interval is required");
-			
-		} else if (maxIntervalValue < interval) {
+	public int validIntervalOrException(Integer interval) throws ConversionException {
+		int recurrentInterval = Objects.firstNonNull(interval, 1);
+		
+		if (maxIntervalValue < recurrentInterval) {
 			String msg = String.format("Recurrence.Interval is higher than accepted value. " +
-					"Type:%s MaxInterval:%d Interval:%d", name(), maxIntervalValue, interval);
+					"Type:%s MaxInterval:%d Interval:%d", name(), maxIntervalValue, recurrentInterval);
 			throw new ConversionException(msg);
 		}
+		return recurrentInterval;
 	}
 	
 	public String asIntString() {

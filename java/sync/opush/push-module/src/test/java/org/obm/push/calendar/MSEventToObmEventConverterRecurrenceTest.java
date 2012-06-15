@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
@@ -41,8 +43,8 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.DateUtils;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSRecurrence;
@@ -56,8 +58,6 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.Sets;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterRecurrenceTest {
@@ -76,13 +76,13 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyNeedDayOfMonthAndMonthOfYear() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -90,15 +90,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -106,38 +106,38 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyIntervalIllegal() throws ConversionException {
 		Integer yearlyIntervalShouldBeOne = 2;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(yearlyIntervalShouldBeOne);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(yearlyIntervalShouldBeOne);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 
 		convertToOBMEvent(msEventRecurrent);
@@ -145,16 +145,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeYearly() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -163,46 +163,46 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.yearly);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 
 	@Test
 	public void testConvertAttributeTypeYearlyUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertAttributeTypeYearlyUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -214,23 +214,23 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(2);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(2);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer yearsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer yearsNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addYearsToDate(msEventRecurrent.getStartTime(), yearsNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -238,17 +238,17 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -260,18 +260,18 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyUntilAndOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(2);
-		recurrence.setUntil(date("2005-12-12T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(2);
+		msRecurrence.setUntil(date("2005-12-12T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -280,15 +280,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyNDayNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -296,38 +296,38 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyNDayInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyNDayIntervalIllegal() throws ConversionException {
 		Integer yearlyIntervalShouldBeOne = 2;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(yearlyIntervalShouldBeOne);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(yearlyIntervalShouldBeOne);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 
 		convertToOBMEvent(msEventRecurrent);
@@ -335,16 +335,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeYearlyNDay() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -353,46 +353,46 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.yearlybyday);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 
 	@Test
 	public void testConvertAttributeTypeYearlyNDayUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertAttributeTypeYearlyNDayUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -404,23 +404,23 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyNDayOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(2);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(2);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer yearsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer yearsNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addYearsToDate(msEventRecurrent.getStartTime(), yearsNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -428,17 +428,17 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeYearlyNDayOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -450,18 +450,18 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeYearlyNDayUntilAndOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.YEARLY_NDAY);
-		recurrence.setDayOfMonth(1);
-		recurrence.setMonthOfYear(1);
-		recurrence.setInterval(1);
-		recurrence.setOccurrences(2);
-		recurrence.setUntil(date("2005-12-12T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.YEARLY_NDAY);
+		msRecurrence.setDayOfMonth(1);
+		msRecurrence.setMonthOfYear(1);
+		msRecurrence.setInterval(1);
+		msRecurrence.setOccurrences(2);
+		msRecurrence.setUntil(date("2005-12-12T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -470,13 +470,13 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeMonthlyNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -484,34 +484,34 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(10);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(10);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeMonthlyIntervalIllegal() throws ConversionException {
 		Integer monthlyIntervalShouldLessThan = 100;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(monthlyIntervalShouldLessThan);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(monthlyIntervalShouldLessThan);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -520,14 +520,14 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeMonthly() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -536,7 +536,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybydate);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
@@ -561,35 +561,35 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeMonthlyUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertAttributeTypeMonthlyUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -601,22 +601,22 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(5);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(5);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer monthsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer monthsNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addMonthsToDate(msEventRecurrent.getStartTime(), monthsNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -624,16 +624,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -643,51 +643,55 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 	}
 
-	@Test(expected=ConversionException.class)
-	public void testConvertAttributeTypeMonthlyNDayNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
+	@Test
+	public void testConvertAttributeTypeMonthlyDayNeedInterval() throws ConversionException {
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
-		
-		convertToOBMEvent(msEventRecurrent);
-	}
 
+		Event converted = convertToOBMEvent(msEventRecurrent);
+		
+		EventRecurrence eventRecurrence = converted.getRecurrence();
+		assertThat(eventRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
+		assertThat(eventRecurrence.getFrequence()).isEqualTo(1);
+	}
+	
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(15);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(15);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeMonthlyNDayIntervalIllegal() throws ConversionException {
 		Integer monthlyIntervalShouldLessThan = 100;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(monthlyIntervalShouldLessThan);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(monthlyIntervalShouldLessThan);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -696,14 +700,14 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeMonthlyNDay() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -712,23 +716,23 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 	
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeMonthlyNDayUntilAndOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
-		recurrence.setOccurrences(3);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		msRecurrence.setOccurrences(3);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -737,35 +741,35 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -777,22 +781,22 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(3);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(3);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer monthsNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer monthsNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addMonthsToDate(msEventRecurrent.getStartTime(), monthsNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -800,16 +804,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setInterval(1);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -821,18 +825,18 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeMonthlyNDayOnNinthDayEachTwoMonth() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.MONTHLY_NDAY);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(null);
-		recurrence.setInterval(2);
-		recurrence.setDayOfMonth(9);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.MONTHLY_NDAY);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(null);
+		msRecurrence.setInterval(2);
+		msRecurrence.setDayOfMonth(9);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
-				.withRecurrence(recurrence).build();
+				.withRecurrence(msRecurrence).build();
 
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
@@ -840,19 +844,19 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEventRecurrent.getStartTime());
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.monthlybyday);
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getDays()).isEmpty();
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeWeeklyNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -861,16 +865,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeWeeklyInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -883,15 +887,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeWeeklyIntervalIllegal() throws ConversionException {
 		Integer weeklyIntervalShouldLessThan = 100;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(weeklyIntervalShouldLessThan);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(weeklyIntervalShouldLessThan);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		convertToOBMEvent(msEventRecurrent);
@@ -899,15 +903,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeWeeklyNeedDay() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(new HashSet<RecurrenceDayOfWeek>());
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(new HashSet<RecurrenceDayOfWeek>());
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -916,15 +920,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeWeekly() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -933,44 +937,44 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.weekly);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(daySetOf(RecurrenceDay.Friday));
 	}
 
 	@Test
 	public void testConvertAttributeTypeWeeklyUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertAttributeTypeWeeklyUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -982,22 +986,22 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeWeeklyOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setOccurrences(5);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setOccurrences(5);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer weeksNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer weeksNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addWeeksToDate(msEventRecurrent.getStartTime(), weeksNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -1005,16 +1009,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeWeeklyOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1026,17 +1030,17 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeWeeklyUntilAndOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(1);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
-		recurrence.setOccurrences(3);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(1);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY));
+		msRecurrence.setOccurrences(3);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1045,15 +1049,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeWeeklyEachTwoMonday() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(2);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.MONDAY));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(2);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.MONDAY));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1065,38 +1069,38 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeWeeklyEachFourFridayAndSundayUntilOneYear() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.WEEKLY);
-		recurrence.setInterval(4);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY, RecurrenceDayOfWeek.SUNDAY));
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.WEEKLY);
+		msRecurrence.setInterval(4);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.FRIDAY, RecurrenceDayOfWeek.SUNDAY));
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(
 				daySetOf(RecurrenceDay.Friday, RecurrenceDay.Sunday));
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeDailyNeedInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setDayOfWeek(Sets.newHashSet(RecurrenceDayOfWeek.FRIDAY));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setDayOfWeek(Sets.newHashSet(RecurrenceDayOfWeek.FRIDAY));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1105,34 +1109,34 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeDailyInterval() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(6);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(6);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 	}
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeDailyIntervalIllegal() throws ConversionException {
 		Integer dailyIntervalShouldLessThan = 1000;
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(dailyIntervalShouldLessThan);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(dailyIntervalShouldLessThan);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1140,21 +1144,21 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	}
 
 	public void testConvertAttributeTypeDailyDefaultDays() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(6);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(6);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.daily);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(
 				RecurrenceDay.Saturday, RecurrenceDay.Monday, RecurrenceDay.Tuesday, 
@@ -1163,14 +1167,14 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test
 	public void testConvertAttributeTypeDaily() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(5);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(5);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1179,41 +1183,41 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.isRecurrent()).isTrue();
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.daily);
-		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(recurrence.getInterval());
+		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
 	}
 	
 	@Test
 	public void testConvertAttributeTypeDailyUntil() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(5);
-		recurrence.setUntil(date("2005-12-11T11:15:10Z"));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(5);
+		msRecurrence.setUntil(date("2005-12-11T11:15:10Z"));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 		
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(recurrence.getUntil());
+		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
 	}
 	
 	@Test
 	public void testConvertRecurrenceAttributeTypedDailyUntilNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(5);
-		recurrence.setUntil(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(5);
+		msRecurrence.setUntil(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1225,22 +1229,22 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeDailyOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(7);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(4);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(7);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(4);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
-		Integer daysNeededToContainsOccurrence = recurrence.getOccurrences()-1;
+		Integer daysNeededToContainsOccurrence = msRecurrence.getOccurrences()-1;
 		Date untilDateExpected = addDaysToDate(msEventRecurrent.getStartTime(), daysNeededToContainsOccurrence);
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(untilDateExpected);
@@ -1248,16 +1252,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test
 	public void testConvertAttributeTypeDailyOccurenceNull() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(7);
-		recurrence.setUntil(null);
-		recurrence.setOccurrences(null);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(7);
+		msRecurrence.setUntil(null);
+		msRecurrence.setOccurrences(null);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1269,16 +1273,16 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeDailyUntilAndOccurence() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setInterval(7);
-		recurrence.setUntil(date("2004-12-11T11:15:10Z"));
-		recurrence.setOccurrences(3);
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(7);
+		msRecurrence.setUntil(date("2004-12-11T11:15:10Z"));
+		msRecurrence.setOccurrences(3);
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
@@ -1287,15 +1291,15 @@ public class MSEventToObmEventConverterRecurrenceTest {
 
 	@Test(expected=ConversionException.class)
 	public void testConvertAttributeTypeDailyAndRecurrenceDayOfWeek() throws ConversionException {
-		MSRecurrence recurrence = new MSRecurrence();
-		recurrence.setInterval(1);
-		recurrence.setType(RecurrenceType.DAILY);
-		recurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.MONDAY));
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setInterval(1);
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setDayOfWeek(EnumSet.of(RecurrenceDayOfWeek.MONDAY));
 		MSEvent msEventRecurrent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
 				.withSubject("Any Subject")
-				.withRecurrence(recurrence)
+				.withRecurrence(msRecurrence)
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
 		
