@@ -45,7 +45,7 @@ public class MSMeetingRequestRecurrence {
 		private MSMeetingRequestRecurrenceType type;
 		private Integer interval;
 		private Date until;
-		private Integer occurrences = -1;
+		private Integer occurrences;
 		private Integer weekOfMonth;
 		private Integer dayOfMonth;
 		private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek = Lists.newArrayList();

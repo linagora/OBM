@@ -311,6 +311,39 @@ public class MSMeetingRecurrenceSerializingTest {
 		Assertions.assertThat(tagValue(encodedDocument, ASEmail.UNTIL)).isEqualTo(expectedDateFormat.format(untilDate));
 	}
 
+	@Test
+	public void testMeetingRequestOccurrenceAtNull() {
+		MSMeetingRequestRecurrence meetingRequestRecurrence = initializedRequiredFieldsRecurrenceBuilder()
+				.occurrences(null)
+				.build();
+		
+		Element encodedDocument = encode(meetingRequestRecurrence);
+		
+		Assertions.assertThat(tag(encodedDocument, ASEmail.OCCURRENCES)).isNull();
+	}
+
+	@Test
+	public void testMeetingRequestOccurrenceAtZero() {
+		MSMeetingRequestRecurrence meetingRequestRecurrence = initializedRequiredFieldsRecurrenceBuilder()
+				.occurrences(0)
+				.build();
+		
+		Element encodedDocument = encode(meetingRequestRecurrence);
+		
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.OCCURRENCES)).isEqualTo("0");
+	}
+
+	@Test
+	public void testMeetingRequestOccurrence() {
+		MSMeetingRequestRecurrence meetingRequestRecurrence = initializedRequiredFieldsRecurrenceBuilder()
+				.occurrences(1234)
+				.build();
+		
+		Element encodedDocument = encode(meetingRequestRecurrence);
+		
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.OCCURRENCES)).isEqualTo("1234");
+	}
+
 	private Builder initializedRequiredFieldsRecurrenceBuilder() {
 		return new MSMeetingRequestRecurrence.Builder()
 				.type(MSMeetingRequestRecurrenceType.DAILY)

@@ -133,7 +133,7 @@ public class ICalendarRule {
 	public Integer count() {
 		if (rRule != null) {
 			Recur recur = rRule.getRecur();
-			if (recur != null) {
+			if (recur != null && recur.getCount() >= 0) {
 				return recur.getCount();
 			}
 		}
