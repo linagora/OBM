@@ -194,7 +194,7 @@ public class MSMeetingRequestSerializer {
 	
 	private void serializeUntil(MSMeetingRequestRecurrence recurrence, Element parentElement) {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
-				ASEmail.UNTIL.asASValue(), formatDate(recurrence.getUntil()));
+				ASEmail.UNTIL.asASValue(), formatRecurrenceDate(recurrence.getUntil()));
 	}
 	
 	private void serializeOccurrences(MSMeetingRequestRecurrence recurrence, Element parentElement) {
@@ -221,11 +221,18 @@ public class MSMeetingRequestSerializer {
 		DOMUtils.createElementAndTextIfNotNull(parentElement, 
 				ASEmail.WEEK_OF_MONTH.asASValue(), recurrence.getWeekOfMonth());
 	}
+
+	@VisibleForTesting String formatDate(Date date) {
+		return formatDate(date, MSEmailEncoder.UTC_DATE_PATTERN);
+	}
 	
-	private String formatDate(Date date) {
+	@VisibleForTesting String formatRecurrenceDate(Date date) {
+		return formatDate(date, MSEmailEncoder.UTC_DATE_NO_PUNCTUATION_PATTERN);
+	}
+	
+	private String formatDate(Date date, String dateFormat) {
 		if (date != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
-			return dateFormat.format(date);
+			return new SimpleDateFormat(dateFormat).format(date);
 		} else {
 			return null;
 		}

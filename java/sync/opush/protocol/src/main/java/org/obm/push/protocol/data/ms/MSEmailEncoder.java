@@ -67,6 +67,7 @@ public class MSEmailEncoder {
 			"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
 	
 	public final static String UTC_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.000'Z'";
+	public final static String UTC_DATE_NO_PUNCTUATION_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
 	
 	private final static String MESSAGE_CLASS = "urn:content-classes:message";
 	private final static String CALENDAR_CLASS = "urn:content-classes:calendarmessage";

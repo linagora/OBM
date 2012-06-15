@@ -300,7 +300,7 @@ public class MSMeetingRecurrenceSerializingTest {
 	@Test
 	public void testMeetingRequestUntil() {
 		Date untilDate = DateUtils.date("1970-01-01T12:00:00.000Z");
-		SimpleDateFormat expectedDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.000Z'");
+		SimpleDateFormat expectedDateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 		
 		MSMeetingRequestRecurrence meetingRequestRecurrence = initializedRequiredFieldsRecurrenceBuilder()
 				.until(untilDate)
