@@ -37,12 +37,14 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -455,6 +457,44 @@ public class EmailViewPartsFetcherImplTest {
 
 		assertThat(emailView.getBodyMimePartData()).equals(
 				StreamMailTestsUtils.newInputStreamFromString("Encoding bodyData to BASE64 !"));
+	}
+	
+	@Test
+	public void testNoAttachmentFoundWhenLeafIsNestedMultipartMixed() {
+		testNoAttachmentFoundWhenLeafHasContentTypeOf("multipart/mixed");
+	}
+
+	@Test
+	public void testNoAttachmentFoundWhenLeafIsNestedMultipartAlternative() {
+		testNoAttachmentFoundWhenLeafHasContentTypeOf("multipart/alternative");
+	}
+
+	private void testNoAttachmentFoundWhenLeafHasContentTypeOf(String contentType) {
+		EmailView.Builder shouldGetEmptyAttachmentListViewBuilder = createStrictMock(EmailView.Builder.class);
+		expect(shouldGetEmptyAttachmentListViewBuilder.attachments(Collections.<EmailViewAttachment>emptyList()))
+			.andReturn(shouldGetEmptyAttachmentListViewBuilder)
+			.once();
+		
+		IMimePart multipartLeaf = new MimePart();
+		int multipartLeafIndex = 5;
+		multipartLeaf.setContentType(new ContentType.Builder().contentType(contentType).build());
+
+		IMimePart parentMimePart = createMock(IMimePart.class);
+		expect(parentMimePart.findRootMimePartInTree()).andReturn(parentMimePart);
+		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf));
+		multipartLeaf.defineParent(parentMimePart, multipartLeafIndex);
+		
+		FetchInstructions fetchInstructions = new FetchInstructions.Builder()
+			.mimePart(parentMimePart)
+			.build();
+		
+		replay(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
+
+		long messageUid = 1l;
+		EmailViewPartsFetcherImpl partsFetcher = new EmailViewPartsFetcherImpl(null, null, null, null, null);
+		partsFetcher.fetchAttachments(shouldGetEmptyAttachmentListViewBuilder, fetchInstructions, messageUid);
+		
+		verify(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
 	}
 	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {

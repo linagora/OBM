@@ -55,6 +55,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.sun.mail.util.QPDecoderStream;
 
@@ -137,7 +138,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
 	}
 	
-	private void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions, long uid) {
+	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions, long uid) {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
 		IMimePart parentMessage = fetchInstructions.getMimePart().findRootMimePartInTree();
 		int nbAttachments = 0;

@@ -139,7 +139,8 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	@Override
 	public boolean isAttachment() {
 		return (idx > 1	&& 
-				(!"html".equalsIgnoreCase(getSubtype()) && !"text".equalsIgnoreCase(getPrimaryType())));
+				(!"multipart".equalsIgnoreCase(getPrimaryType()))) &&
+				(!"html".equalsIgnoreCase(getSubtype()) && !"text".equalsIgnoreCase(getPrimaryType()));
 	}
 
 	@Override

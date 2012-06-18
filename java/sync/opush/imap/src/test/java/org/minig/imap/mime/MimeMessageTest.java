@@ -209,6 +209,117 @@ public class MimeMessageTest {
 						MimeMessage mimeMessage = new MimeMessage(multiPartMixed);
 						Assertions.assertThat(mimeMessage.findMainMessage(buildContentType("text/html"))).isNull();
 					}
+
+	
+	@Test
+	public void testIsAttachmentIsFalseWhenTextPlain() {
+		IMimePart mimePart = buildMimePart("text/plain");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void testIsAttachmentIsFalseWhenTextHtml() {
+		IMimePart mimePart = buildMimePart("text/html");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void testIsAttachmentIsFalseWhenTextCalendar() {
+		IMimePart mimePart = buildMimePart("text/calendar");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void testIsAttachmentIsFalseWhenMultipartAlternative() {
+		IMimePart mimePart = buildMimePart("multipart/alternative");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void testIsAttachmentIsFalseWhenMultipartMixed() {
+		IMimePart mimePart = buildMimePart("multipart/mixed");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+
+	@Test
+	public void testIsAttachmentIsFalseWhenMultipartReport() {
+		IMimePart mimePart = buildMimePart("multipart/report");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void testIsAttachmentIsTrueWhenMessageRfc822() {
+		IMimePart mimePart = buildMimePart("message/rfc822");
+		
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
+	}
+	
+	@Test
+	public void testIsAttachmentIsTrueWhenMessageDeliveryStatus() {
+		IMimePart mimePart = buildMimePart("message/delivery-status");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
+	}
+	
+	@Test
+	public void testIsAttachmentIsTrueWhenApplicationICS() {
+		IMimePart mimePart = buildMimePart("application/ics");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
+	}
+	
+	@Test
+	public void testIsAttachmentIsTrueWhenApplicationPDF() {
+		IMimePart mimePart = buildMimePart("application/pdf");
+
+		int mimePartIndex = 5;
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		mimePart.defineParent(parentMimePart, mimePartIndex);
+		
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
+	}
 	
 	private IMimePart buildMimePart(String contentType) {
 		IMimePart mimePart = new MimePart();
