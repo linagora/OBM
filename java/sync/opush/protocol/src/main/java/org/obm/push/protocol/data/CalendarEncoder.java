@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
@@ -90,16 +88,14 @@ public class CalendarEncoder extends Encoder {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 		
 		if (null != timeZone) {
-			sdf.setTimeZone(timeZone);
-		
 			s(p, ASCalendar.TIME_ZONE.asASValue(), encodedTimeZoneAsString(timeZone, Locale.getDefault()));
 		}
 
 		s(p, ASCalendar.DTSTAMP.asASValue(), 
-				getDateForTimeZone(ev.getDtStamp() != null ? ev.getDtStamp() : new Date(), timeZone), sdf);
+				ev.getDtStamp() != null ? ev.getDtStamp() : new Date(), sdf);
 
 		s(p, ASCalendar.START_TIME.asASValue(), 
-				getDateForTimeZone(ev.getStartTime(), timeZone), sdf);
+				ev.getStartTime(), sdf);
 		s(p, ASCalendar.SUBJECT.asASValue(), ev.getSubject());
 
 		MSEventUid eventUid = ev.getUid();
@@ -146,13 +142,13 @@ public class CalendarEncoder extends Encoder {
 
 		s(p, ASCalendar.LOCATION.asASValue(), ev.getLocation());
 		s(p, ASCalendar.END_TIME.asASValue(), 
-				getDateForTimeZone(ev.getEndTime(), timeZone), sdf);
+				ev.getEndTime(), sdf);
 
 		encodeBody(udr, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev, sdf, timeZone);
-			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf, timeZone);
+			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf);
 		}
 
 		s(p, ASCalendar.SENSITIVITY.asASValue(), ev.getSensitivity().asIntString());
@@ -194,25 +190,11 @@ public class CalendarEncoder extends Encoder {
 		return timeZoneEncoder.encode(asTimeZone);
 	}
 	
-	private Date getDateForTimeZone(Date date, TimeZone timeZone) {
-		if (timeZone == null) {
-			return date;
-		}
-		
-		if (date == null) {
-			return null;
-		}
-		
-		DateTime dateTime = new DateTime(date.getTime(), DateTimeZone.forTimeZone(timeZone));
-		return dateTime.toDate();
-	}
-
 	private void encodeExceptions(UserDataRequest udr,
 			MSEvent parent,
 			Element p,
 			List<MSEventException> excepts,
-			SimpleDateFormat sdf,
-			TimeZone timeZone) {
+			SimpleDateFormat sdf) {
 		
 		// Exceptions.Exception
 		if(excepts.size()>0){
@@ -248,14 +230,14 @@ public class CalendarEncoder extends Encoder {
 				s(e, ASCalendar.SUBJECT.asASValue(), ex.getSubject());
 
 				s(e, ASCalendar.EXCEPTION_START_TIME.asASValue(), 
-						getDateForTimeZone(ex.getExceptionStartTime(), timeZone), sdf);
+						ex.getExceptionStartTime(), sdf);
 
 				s(e, ASCalendar.START_TIME.asASValue(), 
-						getDateForTimeZone(ex.getStartTime(), timeZone), sdf);
+						ex.getStartTime(), sdf);
 				s(e, ASCalendar.END_TIME.asASValue(), 
-						getDateForTimeZone(ex.getEndTime(), timeZone), sdf);
+						ex.getEndTime(), sdf);
 				s(e, ASCalendar.DTSTAMP.asASValue(), 
-						getDateForTimeZone(ex.getDtStamp(), timeZone), sdf);
+						ex.getDtStamp(), sdf);
 			}
 		}
 	}
@@ -283,7 +265,7 @@ public class CalendarEncoder extends Encoder {
 				.getType().asIntString());
 		s(r, ASCalendar.RECURRENCE_INTERVAL.asASValue(), rec(ev).getInterval());
 		s(r, ASCalendar.RECURRENCE_UNTIL.asASValue(), 
-				getDateForTimeZone(rec(ev).getUntil(), timeZone), sdf);
+				rec(ev).getUntil(), sdf);
 
 		Calendar cal = Calendar.getInstance(timeZone);
 		cal.setTimeInMillis(ev.getStartTime().getTime());
