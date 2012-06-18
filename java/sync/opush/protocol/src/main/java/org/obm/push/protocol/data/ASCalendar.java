@@ -46,7 +46,7 @@ public enum ASCalendar {
 	ATTENDEE_NAME("AttendeeName"),
 	ATTENDEE_STATUS("AttendeeStatus"),
 	ATTENDEE_TYPE("AttendeeType"),
-	LOCATION("LOCATION"),
+	LOCATION("Location"),
 	END_TIME("EndTime"),
 	SENSITIVITY("Sensitivity"),
 	BUSY_STATUS("BusyStatus"),
