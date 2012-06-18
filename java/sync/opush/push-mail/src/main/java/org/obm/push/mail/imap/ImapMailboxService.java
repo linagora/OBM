@@ -816,6 +816,7 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 			
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			imapMessages = store.fetchBodyStructure(mailboxName, uids);
+			return imapMailBoxUtils.buildMimeMessageCollectionFromIMAPMessage(imapMessages);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (NoImapClientAvailableException e) {
@@ -829,7 +830,6 @@ public class ImapMailboxService implements MailboxService, PrivateMailboxService
 		} finally {
 			closeQuietly(store);
 		}
-		return imapMailBoxUtils.buildMimeMessageCollectionFromIMAPMessage(imapMessages);
 	}
 	
 	@Override
