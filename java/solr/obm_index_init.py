@@ -115,7 +115,7 @@ def index_contact(domain, domain_name, solr):
 		if rows[i][12] == None:
 			fname = ""
 		else:
-			fname = rows[i][11]
+			fname = rows[i][12]
 		contact.appendChild(solr_set_field(doc, 'sortable',      lname+" "+fname))
 		contact.appendChild(solr_set_field(doc, 'middlename',    rows[i][13]))
 		contact.appendChild(solr_set_field(doc, 'suffix',        rows[i][14]))
