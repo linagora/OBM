@@ -46,7 +46,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
-import org.obm.icalendar.ical4jwrapper.ICalendarRule;
+import org.obm.icalendar.ical4jwrapper.ICalendarRecur;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
@@ -109,8 +109,8 @@ public class ICalendarConverter {
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
 			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);
 			
-			ICalendarRule iCalendarRule = iCalendarEvent.getICalendarRule();
-			if (iCalendarRule.isRRule()) {
+			if (iCalendarEvent.hasRecur()) {
+				ICalendarRecur iCalendarRule = iCalendarEvent.getICalendarRecur();
 				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
 				fillMsMeetingRequestFromRRule(iCalendarRule, iCalendarEvent, timeZone, builder);
@@ -235,7 +235,7 @@ public class ICalendarConverter {
 		return MSMeetingRequestIntDBusyStatus.BUSY;
 	}
 	
-	private void fillMsMeetingRequestFromRRule(ICalendarRule iCalendarRule, ICalendarEvent iCalendarEvent,
+	private void fillMsMeetingRequestFromRRule(ICalendarRecur iCalendarRule, ICalendarEvent iCalendarEvent,
 			TimeZone iCalendarTimeZone, MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
 		List<MSMeetingRequestRecurrence> meetingRequestRecurrences = Lists.newArrayList();
@@ -259,7 +259,7 @@ public class ICalendarConverter {
 		msMeetingRequestBuilder.recurrences(meetingRequestRecurrences);
 	}
 
-	private Integer monthOfYear(MSMeetingRequestRecurrenceType type, ICalendarRule iCalendarRule,
+	private Integer monthOfYear(MSMeetingRequestRecurrenceType type, ICalendarRecur iCalendarRule,
 			ICalendarEvent iCalendarEvent, TimeZone iCalendarTimeZone) {
 
 		if (type.isYearly()) {
@@ -290,7 +290,7 @@ public class ICalendarConverter {
 		return frequency;
 	}
 
-	private Integer dayOfMonth(ICalendarRule iCalendarRule, MSMeetingRequestRecurrenceType frequency) {
+	private Integer dayOfMonth(ICalendarRecur iCalendarRule, MSMeetingRequestRecurrenceType frequency) {
 		Integer byMonthDay = iCalendarRule.byMonthDay();
 		if (byMonthDay == null && (frequency == MSMeetingRequestRecurrenceType.MONTHLY 
 				|| frequency == MSMeetingRequestRecurrenceType.YEARLY)) {
@@ -303,12 +303,12 @@ public class ICalendarConverter {
 		return byMonthDay;
 	}
 
-	private MSMeetingRequestRecurrenceType frequency(ICalendarRule iCalendarRule) {
+	private MSMeetingRequestRecurrenceType frequency(ICalendarRecur iCalendarRule) {
 		String frequency = iCalendarRule.frequency();
 		return RECUR_FREQUENCY.get(frequency);
 	}
 	
-	private List<MSMeetingRequestRecurrenceDayOfWeek> dayList(ICalendarRule iCalendarRule) {
+	private List<MSMeetingRequestRecurrenceDayOfWeek> dayList(ICalendarRecur iCalendarRule) {
 		List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeeks = Lists.newArrayList();
 		Collection<WeekDay> dayList = iCalendarRule.dayList();
 		if (dayList != null && !dayList.isEmpty()) {

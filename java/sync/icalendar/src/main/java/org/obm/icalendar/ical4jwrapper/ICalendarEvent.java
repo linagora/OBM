@@ -36,6 +36,7 @@ import java.util.Date;
 
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Clazz;
@@ -45,6 +46,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Uid;
@@ -56,12 +58,23 @@ import com.google.common.base.Strings;
 public class ICalendarEvent {
 
 	private final VEvent vEvent;
-	private final ICalendarRule iCalendarRule;
+	private final ICalendarRecur iCalendarRecur;
 	
 	public ICalendarEvent(VEvent vEvent) {
 		Preconditions.checkNotNull(vEvent);
 		this.vEvent = vEvent;
-		this.iCalendarRule = new ICalendarRule(vEvent);
+		this.iCalendarRecur = createRRule();
+	}
+	
+	private ICalendarRecur createRRule() {
+		RRule rRule = (RRule) vEvent.getProperties().getProperty(Property.RRULE);
+		if (rRule != null) {
+			Recur recur = rRule.getRecur();
+			if (recur != null) {
+				return new ICalendarRecur(recur);
+			}
+		}
+		return null;
 	}
 	
 	public Date endDate(Date startDate) {
@@ -164,7 +177,11 @@ public class ICalendarEvent {
 		return vEvent.getClassification();
 	}
 	
-	public ICalendarRule getICalendarRule() {
-		return iCalendarRule;
+	public boolean hasRecur() {
+		return iCalendarRecur != null;
+	}
+	
+	public ICalendarRecur getICalendarRecur() {
+		return iCalendarRecur;
 	}
 }

@@ -34,113 +34,70 @@ package org.obm.icalendar.ical4jwrapper;
 import java.util.Collection;
 import java.util.Date;
 
-import com.google.common.collect.Iterables;
-
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.WeekDayList;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.RRule;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+
+public class ICalendarRecur {
 
 
-public class ICalendarRule {
+	private final Recur recur;
 
-	private final RRule rRule;
-	
-	public ICalendarRule(VEvent vEvent) {
-		this.rRule = (RRule) vEvent.getProperties().getProperty(Property.RRULE);
+	public ICalendarRecur(Recur recur) {
+		Preconditions.checkNotNull(recur);
+		this.recur = recur;
 	}
 	
 	public String frequency() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				return recur.getFrequency();
-			}
-		}
-		return null;
+		return recur.getFrequency();
 	}
 
 	public Integer interval() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				return recur.getInterval();
-			}
-		}
-		return null;
+		return recur.getInterval();
 	}
 
 	public Date until() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null && recur.getUntil() != null) {
-				return recur.getUntil();
-			}
+		if (recur.getUntil() != null) {
+			return recur.getUntil();
 		}
 		return null;
 	}
 	
 	public WeekDayList dayList() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				return recur.getDayList();
-			}
-		}
-		return null;
+		return recur.getDayList();
 	}
 	
 	public Integer byMonthDay() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				Collection<Integer> monthDayList = recur.getMonthDayList();
-				if (monthDayList != null && !monthDayList.isEmpty()) {
-					return Iterables.getOnlyElement(monthDayList);
-				}
-			}
+		Collection<Integer> monthDayList = recur.getMonthDayList();
+		if (monthDayList != null && !monthDayList.isEmpty()) {
+			return Iterables.getOnlyElement(monthDayList);
 		}
 		return null;
 	}
 	
 	public Integer byMonth() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				Collection<Integer> monthList = recur.getMonthList();
-				if (monthList != null && !monthList.isEmpty()) {
-					return Iterables.getOnlyElement(monthList);
-				}
-			}
+		Collection<Integer> monthList = recur.getMonthList();
+		if (monthList != null && !monthList.isEmpty()) {
+			return Iterables.getOnlyElement(monthList);
 		}
 		return null;
 	}
 
 	public Integer bySetPos() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null) {
-				Collection<Integer> setPosList = recur.getSetPosList();
-				if (setPosList != null && !setPosList.isEmpty()) {
-					return Iterables.getOnlyElement(setPosList);
-				}
-			}
+		Collection<Integer> setPosList = recur.getSetPosList();
+		if (setPosList != null && !setPosList.isEmpty()) {
+			return Iterables.getOnlyElement(setPosList);
 		}
 		return null;
 	}
 	
 	public Integer count() {
-		if (rRule != null) {
-			Recur recur = rRule.getRecur();
-			if (recur != null && recur.getCount() >= 0) {
-				return recur.getCount();
-			}
+		if (recur.getCount() >= 0) {
+			return recur.getCount();
 		}
 		return null;
 	}
 	
-	public boolean isRRule() {
-		return rRule != null;
-	}
 }
