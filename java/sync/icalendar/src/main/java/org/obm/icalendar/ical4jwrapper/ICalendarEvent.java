@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar.ical4jwrapper;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 
@@ -43,7 +44,6 @@ import net.fortuna.ical4j.model.property.Clazz;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStamp;
 import net.fortuna.ical4j.model.property.DtStart;
-import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
@@ -77,15 +77,10 @@ public class ICalendarEvent {
 		return null;
 	}
 	
-	public Date endDate(Date startDate) {
+	public Date endDate() {
 		DtEnd dtEnd = vEvent.getEndDate();
-		Duration duration = vEvent.getDuration();
 		if (dtEnd != null) {
 			return dtEnd.getDate();
-		}
-		if (duration != null) {			
-			Dur dur = duration.getDuration();
-			return dur.getTime(startDate);
 		}
 		return null;
 	}
@@ -117,7 +112,10 @@ public class ICalendarEvent {
 	public String organizer() {
 		Organizer organizer = vEvent.getOrganizer();
 		if (organizer != null) {
-			return organizer.getCalAddress().getSchemeSpecificPart();
+			URI calAddress = organizer.getCalAddress();
+			if (calAddress != null) {
+				return calAddress.getSchemeSpecificPart();
+			}
 		}
 		return null;
 	}
@@ -149,7 +147,7 @@ public class ICalendarEvent {
 		return null;
 	}
 
-	public Date reccurenceId() {
+	public Date recurrenceId() {
 		RecurrenceId recurrenceId = vEvent.getRecurrenceId();
 		if (recurrenceId != null) {
 			return recurrenceId.getDate();

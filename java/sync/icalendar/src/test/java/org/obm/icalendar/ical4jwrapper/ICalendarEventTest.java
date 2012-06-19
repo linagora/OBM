@@ -32,19 +32,33 @@
 package org.obm.icalendar.ical4jwrapper;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
+
+import java.net.URISyntaxException;
+import java.util.Date;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Clazz;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStamp;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.Organizer;
+import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.XProperty;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
 public class ICalendarEventTest {
 
 	@Test
@@ -161,4 +175,200 @@ public class ICalendarEventTest {
 		return new VEvent(properties);
 	}
 	
+	private PropertyList properties(Property... properties) {
+		PropertyList propertyList = new PropertyList(properties.length);
+		for (Property property: properties) {
+			propertyList.add(property);
+		}
+		return propertyList;
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void nullEvent() {
+		@SuppressWarnings("unused")
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(null);
+	}
+	
+	@Test
+	public void nullDtStamp() {
+		VEvent vEvent = new VEvent();
+		vEvent.getDateStamp().setDate(null);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.dtStamp()).isNull();
+	}
+	
+	@Test
+	public void dtStamp() {
+		java.util.Date expectedDate = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStamp(new DateTime(expectedDate))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.dtStamp()).isEqualTo(expectedDate);
+	}
+
+	@Test
+	public void unsetProperties() {
+		VEvent vEvent = new VEvent();
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.uid()).isNull();
+		assertThat(iCalendarEvent.classification()).isNull();
+		assertThat(iCalendarEvent.hasRecur()).isFalse();
+		assertThat(iCalendarEvent.recur()).isNull();
+		assertThat(iCalendarEvent.location()).isNull();
+		assertThat(iCalendarEvent.organizer()).isNull();
+		assertThat(iCalendarEvent.recurrenceId()).isNull();
+		assertThat(iCalendarEvent.startDate()).isNull();
+		assertThat(iCalendarEvent.transparency()).isNull();
+		assertThat(iCalendarEvent.endDate()).isNull();
+	}
+	
+	@Test
+	public void nullUidValue() {
+		VEvent vEvent = new VEvent(
+				properties(new Uid(null)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.uid()).isNull();
+	}
+	
+	@Test
+	public void uid() {
+		String uid = "UIDXX111222333FEAFEAZ";
+		VEvent vEvent = new VEvent(
+				properties(new Uid(uid)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.uid()).isEqualTo(uid);
+	}
+	
+	@Test
+	public void confidentialClassification() {
+		VEvent vEvent = new VEvent(
+				properties(Clazz.CONFIDENTIAL));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.classification()).isEqualTo(Clazz.CONFIDENTIAL);
+	}
+
+	@Test
+	public void hasOneRecur() {
+		VEvent vEvent = new VEvent(
+				properties(new RRule(new Recur(Recur.WEEKLY, 3))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.hasRecur()).isTrue();
+	}
+
+	@Test
+	public void nullLocationValue() {
+		VEvent vEvent = new VEvent(
+				properties(new Location(null)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.location()).isNull();
+	}
+	
+	@Test
+	public void location() {
+		String expectedLocation = "at home";
+		VEvent vEvent = new VEvent(
+				properties(new Location(expectedLocation)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.location()).isEqualTo(expectedLocation);
+	}
+	
+
+	@Test
+	public void nullOrganizerValue() {
+		VEvent vEvent = new VEvent(
+				properties(new Organizer()));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.organizer()).isNull();
+	}
+	
+	@Test
+	public void organizer() throws URISyntaxException {
+		String expectedOrganizer = "karl.marx@ussr";
+		VEvent vEvent = new VEvent(
+				properties(new Organizer(expectedOrganizer)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.organizer()).isEqualTo(expectedOrganizer);
+	}
+	
+	@Test
+	public void recurrenceId() {
+		Date expectedRecurrenceId = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(new RecurrenceId(new DateTime(expectedRecurrenceId))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.recurrenceId()).isEqualTo(expectedRecurrenceId);
+	}
+	
+	@Test
+	public void startDate() {
+		Date expectedStartDate = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(new DtStart(new DateTime(expectedStartDate))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.startDate()).isEqualTo(expectedStartDate);
+	}
+	
+	@Test
+	public void transparencyOpaque() {
+		VEvent vEvent = new VEvent(
+				properties(Transp.OPAQUE));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.transparency()).isEqualTo("OPAQUE");
+	}
+	
+	@Test
+	public void endDate() {
+		Date expectedEndDate = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(new DtEnd(new DateTime(expectedEndDate))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
+	}
+	
+	@Test
+	public void endDateWithStartAndDuration() {
+		Date startDate = date("2012-01-01T10:22:33");
+		Date expectedEndDate = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(startDate)),
+						new Duration(new Dur("1H"))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
+	}
+	
+	@Test
+	public void endDatePriority() {
+		Date startDate = date("2012-01-01T10:22:33");
+		Date expectedEndDate = date("2012-01-01T11:22:33");
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(startDate)),
+						new Duration(new Dur("2H")),
+						new DtEnd(new DateTime(expectedEndDate))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
+	}
+	
+
+	@Test
+	public void endDateWithStartButNoDuration() {
+		Date startDate = date("2012-01-01T10:22:33");
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(startDate))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.endDate()).isNull();
+	}
+	
+	@Ignore("ical4j bug")
+	@Test
+	public void endDateWithDurationButNoStart() {
+		VEvent vEvent = new VEvent(
+				properties(
+						new Duration(new Dur("2H"))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.endDate()).isNull();
+	}
 }

@@ -114,7 +114,7 @@ public class ICalendarConverter {
 				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
 				fillMsMeetingRequestFromRRule(iCalendarRule, iCalendarEvent, timeZone, builder);
-			} else if (iCalendarEvent.reccurenceId() != null) {
+			} else if (iCalendarEvent.recurrenceId() != null) {
 				//FIXME OBMFULL-3610: MeetingResponse doesn't support accepting
 				//Event Exception
 				return null;
@@ -137,7 +137,7 @@ public class ICalendarConverter {
 			MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
 		Date startDate = iCalendarEvent.startDate();
-		Date endDate = endTime(iCalendarEvent, startDate);
+		Date endDate = endTime(iCalendarEvent);
 		msMeetingRequestBuilder
 			.startTime(startDate)
 			.endTime(endDate)
@@ -153,12 +153,12 @@ public class ICalendarConverter {
 			.msEventExtId(extId(iCalendarEvent.uid()));
 	}
 	
-	private Date endTime(ICalendarEvent iCalendarEvent, Date startDate) {
-		Date endDate = iCalendarEvent.endDate(startDate);
+	private Date endTime(ICalendarEvent iCalendarEvent) {
+		Date endDate = iCalendarEvent.endDate();
 		if (endDate == null 
 				&& hasXObmAllDayProperty(iCalendarEvent)) {
 			
-			return new DateTime(startDate.getTime()).plusDays(1).toDate();
+			return new DateTime(iCalendarEvent.startDate().getTime()).plusDays(1).toDate();
 		}
 		return endDate;
 	}
@@ -172,7 +172,7 @@ public class ICalendarConverter {
 	}
 
 	private Date recurrenceId(ICalendarEvent iCalendarEvent) {
-		Date recurrenceId = iCalendarEvent.reccurenceId();
+		Date recurrenceId = iCalendarEvent.recurrenceId();
 		if (recurrenceId == null) {
 			return iCalendarEvent.startDate();
 		}

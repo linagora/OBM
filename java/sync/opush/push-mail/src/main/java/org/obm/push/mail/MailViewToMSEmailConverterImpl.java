@@ -175,7 +175,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		ICalendar iCalendar = emailView.getICalendar();
 		if (iCalendar != null && iCalendar.hasEvent()) {
 			ICalendarEvent iCalendarEvent = iCalendar.getICalendarEvent();
-			return iCalendarEvent.reccurenceId() == null;
+			return iCalendarEvent.recurrenceId() == null;
 		}
 		return false;
 	}

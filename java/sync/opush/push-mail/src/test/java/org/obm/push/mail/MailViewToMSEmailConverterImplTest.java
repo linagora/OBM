@@ -392,7 +392,7 @@ public class MailViewToMSEmailConverterImplTest {
 		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
 		EasyMock.expect(iCalendar.hasEvent()).andReturn(true).anyTimes();
 		EasyMock.expect(iCalendar.getICalendarEvent()).andReturn(iCalendarEvent).anyTimes();
-		EasyMock.expect(iCalendarEvent.reccurenceId()).andReturn(new Date()).anyTimes();
+		EasyMock.expect(iCalendarEvent.recurrenceId()).andReturn(new Date()).anyTimes();
 		EasyMock.replay(iCalendar, iCalendarEvent);
 		
 		emailViewFixture.iCalendar = iCalendar;
