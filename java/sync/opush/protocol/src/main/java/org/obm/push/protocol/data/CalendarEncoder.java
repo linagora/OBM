@@ -50,7 +50,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Element;

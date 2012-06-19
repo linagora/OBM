@@ -1,6 +1,6 @@
 package org.obm.push.protocol.data;
 
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASTimeZone;
 
 public interface Base64ASTimeZoneDecoder {
 

@@ -54,8 +54,8 @@ import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.ms.ASSystemTime;
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.type.UnsignedShort;
 import org.w3c.dom.Document;
 

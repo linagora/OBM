@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean.ms;
+package org.obm.push.protocol.bean;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

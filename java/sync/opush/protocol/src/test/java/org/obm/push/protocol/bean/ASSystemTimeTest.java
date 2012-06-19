@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean.ms;
+package org.obm.push.protocol.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.ms.ASSystemTime.FromDateBuilder;
+import org.obm.push.protocol.bean.ASSystemTime.FromDateBuilder;
 import org.obm.push.utils.type.UnsignedShort;
 
 public class ASSystemTimeTest {

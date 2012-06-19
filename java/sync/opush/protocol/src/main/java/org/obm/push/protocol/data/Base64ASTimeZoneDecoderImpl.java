@@ -35,8 +35,8 @@ import java.io.ByteArrayInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.obm.push.bean.ms.ASSystemTime;
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.IntEncoder.Capacity;
 

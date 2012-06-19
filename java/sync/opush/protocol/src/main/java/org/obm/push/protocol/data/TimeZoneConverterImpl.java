@@ -39,9 +39,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.obm.push.bean.ms.ASSystemTime;
-import org.obm.push.bean.ms.ASTimeZone;
-import org.obm.push.bean.ms.ASTimeZone.Builder;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.protocol.bean.ASTimeZone.Builder;
 import org.obm.push.utils.type.UnsignedShort;
 
 public class TimeZoneConverterImpl implements TimeZoneConverter {

@@ -34,7 +34,7 @@ package org.obm.push.protocol.data;
 import java.util.Arrays;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.obm.push.bean.ms.ASSystemTime;
+import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.annotations.VisibleForTesting;

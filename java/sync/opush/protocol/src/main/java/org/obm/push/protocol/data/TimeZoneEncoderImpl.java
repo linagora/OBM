@@ -33,8 +33,8 @@ package org.obm.push.protocol.data;
 
 import java.util.Arrays;
 
-import org.obm.push.bean.ms.ASSystemTime;
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASSystemTime;
+import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.IntEncoder.Capacity;
 

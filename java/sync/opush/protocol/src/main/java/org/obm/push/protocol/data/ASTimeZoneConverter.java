@@ -33,7 +33,7 @@ package org.obm.push.protocol.data;
 
 import java.util.TimeZone;
 
-import org.obm.push.bean.ms.ASTimeZone;
+import org.obm.push.protocol.bean.ASTimeZone;
 
 public interface ASTimeZoneConverter {
 
