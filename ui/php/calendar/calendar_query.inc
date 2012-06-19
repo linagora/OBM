@@ -48,8 +48,16 @@ applicable to the OBM software.
 
 require_once(dirname(__file__)."/../contact/addressbook.php");
 
-function run_query_calendar_detail($calendar_id) {
+function run_query_calendar_detail($calendar_id, $occurrence_date=null) {
   global $cdg_sql;
+
+  if ($occurrence_date !== null) {
+    $exception_q = run_query_find_event_exception($calendar_id, $occurrence_date);
+    if ($exception_q !== null) {
+      return $exception_q;
+    }
+  }
+
   $obm_q = new DB_OBM;
 
   if(preg_match('/^OBM-/', $calendar_id)) {
@@ -126,6 +134,79 @@ function run_query_calendar_detail($calendar_id) {
   $obm_q->next_record();
 
   return $obm_q;
+}
+
+function run_query_find_event_exception($parent_event_id, $date_occurrence) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('event');
+
+  $query = "SELECT
+    event_id,
+    event_ext_id,
+    event_userupdate,
+    event_usercreate,
+    e.evententity_entity_id AS event_entity_id,
+    c.userobm_login AS usercreate,
+    u.userobm_login AS userupdate,
+    $timeupdate,
+    $timecreate,
+    event_owner,
+    o.userobm_lastname AS owner_lastname,
+    o.userobm_firstname AS owner_firstname,
+    d.domain_name AS owner_domain,
+    d.domain_uuid AS owner_domain_uuid,
+    event_opacity,
+    event_title,
+    event_description,
+    event_properties,
+    event_repeatfrequence,
+    event_location,
+    event_category1_id,
+    eventcategory1_label,
+    event_privacy,
+    event_priority,
+    event_repeatkind,
+    event_duration,
+    event_repeatdays,
+    event_allday,
+    event_tag_id,
+    eventtag_color,
+    eventtag_label,
+    event_endrepeat,
+    event_domain_id,
+    event_origin,
+    event_allow_documents,
+    event_date,
+    ee.eventexception_parent_id AS event_eventexception_parent_id,
+    ee.eventexception_date AS event_eventexception_date,
+    event_sequence
+    FROM
+    Event
+    INNER JOIN EventEntity AS e ON event_id = evententity_event_id
+    LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+    INNER JOIN UserObm AS c ON event_usercreate = c.userobm_id
+    LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
+    INNER JOIN UserObm AS o ON event_owner = o.userobm_id
+    INNER JOIN Domain AS d ON d.domain_id = o.userobm_domain_id
+    LEFT JOIN EventTag AS t ON event_tag_id = t.eventtag_id
+    LEFT JOIN EventException AS ee ON event_id = ee.eventexception_child_id
+    WHERE event_type='VEVENT'
+    AND ee.eventexception_parent_id ".sql_parse_id($parent_event_id, true)."
+    AND ee.eventexception_date='".gmdate('Y-m-d H:i:s', $date_occurrence)."'
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_find_event_exception()');
+  $obm_q->query($query);
+  if ($obm_q->next_record()) {
+    return $obm_q;
+  }
+  else {
+    return null;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2443,11 +2524,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
 
   if( $date_occurrence != NULL){
     $id = sql_parse_id($calendar['event_id']);
-    $exception_date = gmdate('Y-m-d H:i:s', $date_occurrence);
-    $check_exception_already_set = 'SELECT eventexception_child_id FROM EventException WHERE eventexception_date = "'.$exception_date.'" AND eventexception_parent_id = '.$id.';';
+    $check_exception_already_set = "SELECT eventexception_child_id FROM EventException WHERE eventexception_date = '".$date_occurrence."' AND eventexception_parent_id = ".$id.";";
     display_debug_msg($check_exception_already_set, $cdg_sql, 'check_exception_already_set');
     $obm_q->query($check_exception_already_set);
-
     if ($obm_q->next_record())
       return array('already_set' => true, 'id' => $obm_q->f('eventexception_child_id'));
 
@@ -2455,12 +2534,14 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $event_duration = $calendar['event_duration'];
     $exception_recurrence_id_date = $exception_date;
   } else {
-    $title = sql_parse_text($calendar['title']);
     $id = sql_parse_id($calendar['calendar_id']);
     $exception_recurrence_id_date = $calendar['old_date_begin'];
     $event_duration = $calendar['duration'];
     $exception_date = $obm_q->escape($calendar['old_date_begin']);
   }
+  $exception_date = $obm_q->escape($calendar['date_begin']) ? $obm_q->escape($calendar['date_begin']) : $date_occurrence;
+  $event_duration = $calendar['event_duration'] > 0 ? $calendar['event_duration'] : $calendar['duration'];
+  $title = $calendar['event_title'] ? sql_parse_text($calendar['event_title']) : sql_parse_text($calendar['title']);
 
   $oldEvent = OBM_EventFactory::getInstance()->getById($id);
 
@@ -2486,8 +2567,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $properties = $event_q->f('event_properties');
     $location = $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
-    if($date_occurrence == null)
-      $exception_date = $calendar['date_begin'];
     $ext_id = $event_q->f('event_ext_id');
     $oldOwner = intval($oldEvent->get("owner")->__toString());
 

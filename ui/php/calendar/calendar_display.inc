@@ -3003,7 +3003,7 @@ function event_details_access_rights() {
 //   - $entities : entities linked to the event ['user'], ['resource']
 //   - $alerts   : alerts array
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts, $date_edit_occurrence) {
+function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts, $date_edit_occurrence=null) {
   global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
   global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
@@ -3021,7 +3021,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   global $l_decision_ACCEPTED, $l_decision_NEEDS_ACTIONS, $l_decision_DECLINED;
 
   $id = $event_q->f('event_id');
-  $is_exception = $event_q->f('event_is_exception');
+  $is_exception = $date_edit_occurrence != null || $event_q->f('event_is_exception');
 
   $organizer_display_name = null;
   foreach($entities as $entityType => $entitiesLists){
@@ -3102,7 +3102,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   $allow_documents = ($event_q->f('event_allow_documents') == 1);
 
   if ($is_exception) {
-    $parent_event_id = $event_q->f('event_eventexception_parent_id');
+    $parent_event_id = $event_q->f('event_eventexception_parent_id') ? $event_q->f('event_eventexception_parent_id') : $id;
     $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
     $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
     $repeat_block = "
@@ -3931,7 +3931,7 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
 //   - $event_q  : DBO : event result
 //   - $entities : entities linked (event) or selected ['user'], ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_event_form($action, $calendar, $event_q, $entities, $current_view, $organizer_id=null) {
+function dis_calendar_event_form($action, $calendar, $event_q, $entities, $current_view, $organizer_id=null, $date_edit_occurrence=null) {
   global $obm;
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
     $users = $entities['user'];
@@ -4015,7 +4015,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
   $possible_owners = $possible_owners["entity"];
   $cats1 = of_category_get_ordered('event', 'category1');
 
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities, $date_edit_occurrence);
 
   if ($action == 'new' || $action == 'new_meeting' || $action == 'save_as_template') {
     $GLOBALS[display][search] = dis_calendar_select_template_form($action, $calendar);
@@ -4467,7 +4467,7 @@ function dis_event_decision_popup() {
 //   - $cats1        : Array : Calendar categories1
 //   - $documents    : Array : Attached documents
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities=null) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents, $current_view, $template_entities=null, $date_edit_occurrence=null) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -4528,7 +4528,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
-    $is_exception = $event_q->f('event_is_exception');
+    $is_exception = $date_edit_occurrence != null || $calendar['is_exception'] || $event_q->f('event_is_exception');
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -4566,7 +4566,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $end = clone $begin;
       $end = $end->addSecond($calendar['duration']);
     } else {
-      $begin = new Of_Date($event_q->f('event_date'), 'GMT');
+      $begin = $date_edit_occurrence == null ? new Of_Date($event_q->f('event_date'), 'GMT') : new Of_Date($date_edit_occurrence);
       if (isset($calendar['template_id'])) {
         $today = new Of_Date(date("Y-m-d"), 'GMT');
         $begin->setDay($today->getDay());
@@ -4582,23 +4582,27 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     $privacy = $event_q->f('event_privacy');
     $allow_documents = $event_q->f('event_allow_documents');
-    $repeat_kind = $event_q->f('event_repeatkind');
-    $repeat_days = $event_q->f('event_repeatdays');
-    $repeatfrequency = $event_q->f('event_repeatfrequence');
-    if ($repeat_kind != 'none') {
-      $event_endrepeat = $event_q->f('event_endrepeat');
-      if (!empty($event_endrepeat))
-        $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
-    }
-    $id = $event_q->f('event_id');
+    if ($date_edit_occurrence == null) {
+	    $repeat_kind = $event_q->f('event_repeatkind');
+	    $repeat_days = $event_q->f('event_repeatdays');
+	    $repeatfrequency = $event_q->f('event_repeatfrequence');
+	    if ($repeat_kind != 'none') {
+	      $event_endrepeat = $event_q->f('event_endrepeat');
+	      if (!empty($event_endrepeat))
+	        $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
+	    }
+	    $id = $event_q->f('event_id');
 
-    if (isset($exception_q)) {
-      $index=0;
-      while($exception_q->next_record()) {
-        $date_exception[$index]['date'] = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
-        $date_exception[$index]['childId'] = $exception_q->f('eventexception_child_id');
-        $index++;
-      }
+	    if (isset($exception_q)) {
+	      $index=0;
+	      while($exception_q->next_record()) {
+	        $date_exception[$index]['date'] = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
+	        $date_exception[$index]['childId'] = $exception_q->f('eventexception_child_id');
+	        $index++;
+	      }
+	    }
+    } else {
+		$repeat_kind = 'none';
     }
     // Alerts
     if (is_array($alerts) && isset($alerts[$organizer_id])) {
@@ -4617,7 +4621,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   if (isset($calendar['new_meeting'])) $event_q = '';
 
-  if ($event_q=='') { $is_exception = $calendar['is_exception']; }
+  if ($event_q=='') { $is_exception = $date_edit_occurrence != null || $calendar['is_exception']; }
   // If parameters have been given, they supercede the default action value
   if (isset($calendar['calendar_id'])) { $id = $calendar['calendar_id']; }
   if (isset($calendar['title'])) { $title = stripslashes(str_replace('"',"'",$calendar['title'])); }
@@ -4659,7 +4663,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
 
   $attendees_notification  = 'checked';
-  if (isset($calendar['date_exception'])) { $date_exception = $calendar['date_exception']; }
+  if (isset($calendar['date_exception'])) { $date_exception = null; }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
   if (isset($calendar['property-name'])) { $t_property_name = $calendar['property-name']; }
@@ -4714,6 +4718,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" id=\"updateBtn\" value=\"$l_update\" />";
+    if ($date_edit_occurrence !== null) {
+      $dis_button .= "<input type=\"hidden\" name=\"date_edit_occurrence\" value=\"".htmlspecialchars($date_edit_occurrence)."\"/>";
+    }
   } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate') || ($action == 'save_as_template')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
@@ -4727,17 +4734,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"submit\" id=\"saveTemplateBtn\" value=\"$l_save_template\" />";
   }
 
-  $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
-  $$repeat_kind .= "selected=\"selected\" ";
-  $dis_sel_kind .= "
-    <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\" id=\"sel_repeat_kind\">
-      <option value=\"none\">$l_none</option>
-      <option value=\"daily\" $daily>$l_daily</option>
-      <option value=\"weekly\" $weekly>$l_weekly</option>
-      <option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option>
-      <option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option>
-      <option value=\"yearly\" $yearly>$l_yearly</option>
-    </select>";
   switch($priority) {
     case 1 : $tag_low = "selected=\"selected\""; break;
     case 2 : $tag_medium = "selected=\"selected\""; break;
@@ -5301,8 +5297,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $display['title'] = "$dis_title";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_calendar_select_group);
-
   // Exception
+  $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
+  $$repeat_kind .= "selected=\"selected\" ";
+  $dis_sel_kind .= "
+      <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\" id=\"sel_repeat_kind\">
+        <option value=\"none\">$l_none</option>
+        <option value=\"daily\" $daily>$l_daily</option>
+        <option value=\"weekly\" $weekly>$l_weekly</option>
+        <option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option>
+        <option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option>
+        <option value=\"yearly\" $yearly>$l_yearly</option>
+      </select>";
   if(is_array($date_exception)) {
     foreach($date_exception as $key => $exception) {
       $block_exception_detail .= "<div id=\"date_exception-$key\">";
@@ -5325,20 +5331,23 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
 
   if ($is_exception) {
+    $parent_event_id = $event_q->f('event_eventexception_parent_id') ? $event_q->f('event_eventexception_parent_id') : $calendar['calendar_id'];
+    $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
+    $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
     $block_repeat = "
-    <fieldset class=\"detail infos\">
-    <legend>$l_repeat</legend>
-    <input type=\"hidden\" name=\"is_exception\" value=\"1\" />
-    <input type=\"hidden\" name=\"repeat_kind\" value=\"none\" />
-    <input type=\"hidden\" name=\"tf_repeatfrequency\" value=\"1\" />
-    <table>
-    <tr>
-      <th>$GLOBALS[l_exception] :</th>
-      <td>$GLOBALS[l_event_is_exception]</td>
-    </tr>
-    </table>
-    </fieldset>";
-
+    <div class=\"detail infos\">
+     <h1>$l_repeat</h1>
+     <table>
+      <tr>
+       <th>$GLOBALS[l_exception] :</th>
+       <td>$GLOBALS[l_event_is_exception]</td>
+      </tr>
+      <tr>
+       <th>$GLOBALS[l_parent_event] :</th>
+       <td>$show_parent_link</td>
+      </tr>
+     </table>
+    </div>";
   } else {
     $block_repeat = "
     <fieldset class=\"detail infos\">

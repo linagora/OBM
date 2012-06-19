@@ -1110,6 +1110,9 @@ Obm.CalendarManager = new Class({
 	        obm.calendarManager.popupManager.addEvent('update_all', function () {
 	            eventData.all = 1;
 	        });
+	        obm.calendarManager.popupManager.addEvent('update_one', function () {
+				window.location=window.location+'?action=detailupdate&date_edit_occurrence='+encodeURIComponent(eventData.eventdate) + "&calendar_id="+ encodeURIComponent(eventData.calendar_id);
+	        });
 	        obm.calendarManager.popupManager.addEvent('complete', function () {
 	            obm.calendarManager.DetailUpdateRequest(eventData);
 	        }.bind(this));	       
@@ -1119,11 +1122,12 @@ Obm.CalendarManager = new Class({
 	  },
 
   DetailUpdateRequest: function(eventData) {
+      var action = 'quick_update';
 	  new Request.JSON({
 	      url: obm.vars.consts.calendarUrl,
 	      secure : false,
 	      onComplete : this.goToDetailUpdateURI.bind(this)
-	  }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
+	  }).post($merge({ajax : 1, action : action}, eventData));
   },
 	  
   goToDetailUpdateURI: function(response) {
@@ -2016,6 +2020,7 @@ Obm.CalendarPopupManager = new Class({
 
     // Repeated event popup
     $('popup_update_one').addEvent('click', function() {
+      this.fireEvent('update_one');
       this.chain.callChain();
     }.bind(this));
 

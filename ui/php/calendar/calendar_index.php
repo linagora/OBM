@@ -397,11 +397,11 @@ if ($action == 'search') {
     $extra_js_include[] = 'freebusy.js';
     $extra_css[] = $css_ext_color_picker ;
     if (check_calendar_access($params['calendar_id'], 'read')) {
-      $eve_q = run_query_calendar_detail($params['calendar_id']);
-      $entities = get_calendar_event_entity($params['calendar_id']);
+      $eve_q = run_query_calendar_detail($params['calendar_id'], $params['date_edit_occurrence']);
+      $entities = get_calendar_event_entity($eve_q->f('event_id'));
       
 	  $display['detailInfo'] = display_record_info($eve_q);
-      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view);
+      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities, $current_view, null, $params['date_edit_occurrence']);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
     }
@@ -439,6 +439,9 @@ if ($action == 'search') {
     $entities['contact'] = array();
   }
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
+  if ($params['date_edit_occurrence'] !== null) {
+    $params['repeat_kind'] = 'none';
+  }
 
   if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && check_calendar_data_form($params) && check_upload_errors()) {
     try {
@@ -474,11 +477,21 @@ if ($action == 'search') {
             $entities['document'] = array_merge($entities['document'], $other_files);
           }
         }
-        run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
+        if ($params['date_edit_occurrence'] !== null) {
+          $params['event_id'] = $params['calendar_id'];
+          $eve_q = run_query_calendar_detail($params['calendar_id']);
+          $date_occurrence = new Of_Date($params['date_edit_occurrence']);
+          $result = run_query_calendar_event_exception_insert($params, $eve_q, true, $date_occurrence);
+          $id = $result['id'];
+        }
+        else {
+          run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
+          $id = $params['calendar_id'];
+        }
 
         if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
         if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
-        $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$params["calendar_id"];
+        $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".htmlspecialchars($id);
         $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
         if($GLOBALS['display']['warm_add_organizer'] == true){
           redirect_warn($params, "$l_event: $l_update_ok - $l_event_add_organizer - $detail"); 
@@ -2402,7 +2415,7 @@ function create_new_exception($params, $user_id) {
   $event_id = $reccurrence_q->Record['event_id'];
   if ( check_calendar_access( $event_id, 'read' ) ){
     $calendar = $reccurrence_q->Record;
-    $date_occurrence = $params['date_edit_occurrence'];
+    $date_occurrence = new Of_Date($params['date_edit_occurrence']);
     $send_mail = false;
     $exception_insert = run_query_calendar_event_exception_insert( $calendar, $reccurrence_q, $send_mail ,$date_occurrence);
   } else {
