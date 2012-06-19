@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar.ical4jwrapper;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -101,7 +103,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Location location = vEvent.getLocation();
 			if (location != null) {
-				return location.getValue();
+				return emptyToNull(location.getValue());
 			}
 		}
 		return null;
@@ -142,7 +144,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Uid uid = vEvent.getUid();
 			if (uid != null) {
-				return uid.getValue();
+				return emptyToNull(uid.getValue());
 			}
 		}
 		return null;
@@ -162,7 +164,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Transp transp = vEvent.getTransparency();
 			if (transp != null) {
-				return transp.getValue();
+				return emptyToNull(transp.getValue());
 			}
 		}
 		return null;
@@ -172,7 +174,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Property property = vEvent.getProperties().getProperty(name);
 			if (property != null) {
-				return property.getValue();
+				return emptyToNull(property.getValue());
 			}
 		}
 		return null;
