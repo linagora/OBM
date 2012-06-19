@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.fest.assertions.api.Assertions;
@@ -294,13 +297,16 @@ public class MSMeetingRecurrenceSerializingTest {
 
 	@Test
 	public void testMeetingRequestUntil() {
+		Date untilDate = DateUtils.date("1970-01-01T12:00:00.000Z");
+		SimpleDateFormat expectedDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.000Z'");
+		
 		MSMeetingRequestRecurrence meetingRequestRecurrence = initializedRequiredFieldsRecurrenceBuilder()
-				.until(DateUtils.date("1970-01-01T12:00:00"))
+				.until(untilDate)
 				.build();
 		
 		Element encodedDocument = encode(meetingRequestRecurrence);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEmail.UNTIL)).isEqualTo("1970-01-01T12:00:00.000Z");
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.UNTIL)).isEqualTo(expectedDateFormat.format(untilDate));
 	}
 
 	private Builder initializedRequiredFieldsRecurrenceBuilder() {
