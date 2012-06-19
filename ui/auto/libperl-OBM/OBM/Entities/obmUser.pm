@@ -811,8 +811,8 @@ sub getSieveNomade {
     my @validNomadeEmails;
     my $nomadeMsg;
     for( my $i=0; $i<=$#nomadeEmails; $i++ ) {
-        if( $nomadeEmails[$i] =~ /$OBM::Parameters::regexp::regexp_email/) {
-            $nomadeMsg .= 'redirect "'.$nomadeEmails[$i].'";'."\n";
+        if( $nomadeEmails[$i] =~ /$OBM::Parameters::regexp::regexp_email/i) {
+            $nomadeMsg .= 'redirect "'.lc($nomadeEmails[$i]).'";'."\n";
         }
     }
     if(!$nomadeMsg) {
