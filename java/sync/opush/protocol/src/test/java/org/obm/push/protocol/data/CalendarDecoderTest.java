@@ -32,6 +32,7 @@
 
 package org.obm.push.protocol.data;
 
+import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -42,7 +43,6 @@ import static org.obm.push.TestUtils.getXml;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.easymock.EasyMock;
 import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.GregorianChronology;
 import org.junit.Before;
@@ -173,7 +173,7 @@ public class CalendarDecoderTest {
 	}
 	
 	private void mockTimeZoneConversion(TimeZone timeZone, String asEncryptedTimeZone, ASTimeZone asTimeZone) {
-		expect(base64AsTimeZoneDecoder.decode(EasyMock.aryEq(asEncryptedTimeZone.getBytes())))
+		expect(base64AsTimeZoneDecoder.decode(aryEq(asEncryptedTimeZone.getBytes())))
 			.andReturn(asTimeZone).anyTimes();
 		
 		expect(asTimeZoneConverter.convert(eq(asTimeZone)))
