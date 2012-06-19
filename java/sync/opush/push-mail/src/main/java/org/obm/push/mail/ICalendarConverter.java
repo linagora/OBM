@@ -102,9 +102,9 @@ public class ICalendarConverter {
 	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar) {
 		Preconditions.checkNotNull(icalendar, "ICalendar is null");
 		
-		ICalendarEvent iCalendarEvent = icalendar.getICalendarEvent();
-		if (iCalendarEvent.isVEvent()) {
-			MsMeetingRequestBuilder builder = new MSMeetingRequest.MsMeetingRequestBuilder();
+		MsMeetingRequestBuilder builder = new MSMeetingRequest.MsMeetingRequestBuilder();
+		if (icalendar.hasEvent()) {
+			ICalendarEvent iCalendarEvent = icalendar.getICalendarEvent();
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
 			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);

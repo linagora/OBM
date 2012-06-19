@@ -32,7 +32,6 @@
 package org.obm.icalendar.ical4jwrapper;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -50,118 +49,116 @@ public class ICalendarEventTest {
 
 	@Test
 	public void testLocationNull() {
-		Calendar calendar = vEventCalendarWithProperty(new Location(null));
+		VEvent vevent = vEventWithProperty(new Location(null));
 		
-		String location = new ICalendarEvent(calendar).location();
+		String location = new ICalendarEvent(vevent).location();
 		
 		assertThat(location).isNull();
 	}
 	
 	@Test
 	public void testLocationEmpty() {
-		Calendar calendar = vEventCalendarWithProperty(new Location(""));
+		VEvent vevent = vEventWithProperty(new Location(""));
 		
-		String location = new ICalendarEvent(calendar).location();
+		String location = new ICalendarEvent(vevent).location();
 		
 		assertThat(location).isNull();
 	}
 	
 	@Test
 	public void testLocationValue() {
-		Calendar calendar = vEventCalendarWithProperty(new Location("aValue"));
+		VEvent vevent = vEventWithProperty(new Location("aValue"));
 		
-		String location = new ICalendarEvent(calendar).location();
+		String location = new ICalendarEvent(vevent).location();
 		
 		assertThat(location).isEqualTo("aValue");
 	}
 	
 	@Test
 	public void testUidNull() {
-		Calendar calendar = vEventCalendarWithProperty(new Uid(null));
+		VEvent vevent = vEventWithProperty(new Uid(null));
 		
-		String uid = new ICalendarEvent(calendar).uid();
+		String uid = new ICalendarEvent(vevent).uid();
 		
 		assertThat(uid).isNull();
 	}
 	
 	@Test
 	public void testUidEmpty() {
-		Calendar calendar = vEventCalendarWithProperty(new Uid(""));
+		VEvent vevent = vEventWithProperty(new Uid(""));
 		
-		String uid = new ICalendarEvent(calendar).uid();
+		String uid = new ICalendarEvent(vevent).uid();
 		
 		assertThat(uid).isNull();
 	}
 	
 	@Test
 	public void testUidValue() {
-		Calendar calendar = vEventCalendarWithProperty(new Uid("aValue"));
+		VEvent vevent = vEventWithProperty(new Uid("aValue"));
 		
-		String uid = new ICalendarEvent(calendar).uid();
+		String uid = new ICalendarEvent(vevent).uid();
 		
 		assertThat(uid).isEqualTo("aValue");
 	}
 
 	@Test
 	public void testTransparencyNull() {
-		Calendar calendar = vEventCalendarWithProperty(new Transp(null));
+		VEvent vevent = vEventWithProperty(new Transp(null));
 		
-		String transparency = new ICalendarEvent(calendar).transparency();
+		String transparency = new ICalendarEvent(vevent).transparency();
 		
 		assertThat(transparency).isNull();
 	}
 	
 	@Test
 	public void testTransparencyEmpty() {
-		Calendar calendar = vEventCalendarWithProperty(new Transp(""));
+		VEvent vevent = vEventWithProperty(new Transp(""));
 		
-		String transparency = new ICalendarEvent(calendar).transparency();
+		String transparency = new ICalendarEvent(vevent).transparency();
 		
 		assertThat(transparency).isNull();
 	}
 	
 	@Test
 	public void testTransparencyValue() {
-		Calendar calendar = vEventCalendarWithProperty(new Transp("aValue"));
+		VEvent vevent = vEventWithProperty(new Transp("aValue"));
 		
-		String transparency = new ICalendarEvent(calendar).transparency();
+		String transparency = new ICalendarEvent(vevent).transparency();
 		
 		assertThat(transparency).isEqualTo("aValue");
 	}
 
 	@Test
 	public void testPropertyNull() {
-		Calendar calendar = vEventCalendarWithProperty(new XProperty("aName", null));
+		VEvent vevent = vEventWithProperty(new XProperty("aName", null));
 		
-		String property = new ICalendarEvent(calendar).property("aName");
+		String property = new ICalendarEvent(vevent).property("aName");
 		
 		assertThat(property).isNull();
 	}
 	
 	@Test
 	public void testPropertyEmpty() {
-		Calendar calendar = vEventCalendarWithProperty(new XProperty("aName", ""));
+		VEvent vevent = vEventWithProperty(new XProperty("aName", ""));
 		
-		String property = new ICalendarEvent(calendar).property("aName");
+		String property = new ICalendarEvent(vevent).property("aName");
 		
 		assertThat(property).isNull();
 	}
 	
 	@Test
 	public void testPropertyValue() {
-		Calendar calendar = vEventCalendarWithProperty(new XProperty("aName", "aValue"));
+		VEvent vevent = vEventWithProperty(new XProperty("aName", "aValue"));
 		
-		String property = new ICalendarEvent(calendar).property("aName");
+		String property = new ICalendarEvent(vevent).property("aName");
 		
 		assertThat(property).isEqualTo("aValue");
 	}
 
-	private Calendar vEventCalendarWithProperty(Property property) {
+	private VEvent vEventWithProperty(Property property) {
 		PropertyList properties = new PropertyList();
 		properties.add(property);
-		Calendar calendar = new Calendar();
-		calendar.getComponents().add(new VEvent(properties));
-		return calendar;
+		return new VEvent(properties);
 	}
 	
 }

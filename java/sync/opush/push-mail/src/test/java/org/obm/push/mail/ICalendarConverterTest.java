@@ -37,8 +37,6 @@ import java.util.TimeZone;
 
 import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -524,21 +522,19 @@ public class ICalendarConverterTest {
 	
 	@Test
 	public void testRetrieveMonthForNullTimeZone() {
-		ComponentList components = new ComponentList();
-		components.add(new VEvent(new Date(DateUtils.date("2013-01-01T01:00:00+00")), "event summary"));
+		VEvent vEvent = new VEvent(new Date(DateUtils.date("2013-01-01T01:00:00+00")), "event summary");
 		TimeZone iCalendarTimeZone = null;
 
-		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(new ICalendarEvent(new Calendar(components)), iCalendarTimeZone);
+		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(new ICalendarEvent(vEvent), iCalendarTimeZone);
 		
 		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(1);
 	}
 	
 	@Test
 	public void testRetrieveMonthForEarlyerTimeZone() {
-		ComponentList components = new ComponentList();
 		net.fortuna.ical4j.model.DateTime vEventStartTime = new net.fortuna.ical4j.model.DateTime(DateUtils.date("2013-01-01T05:00:00+00"));
-		components.add(new VEvent(vEventStartTime, "event summary"));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(new Calendar(components));
+		VEvent vEvent = new VEvent(vEventStartTime, "event summary");
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
 		TimeZone iCalendarTimeZone = TimeZone.getTimeZone("GMT-8:00");
 
 		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);
@@ -548,10 +544,9 @@ public class ICalendarConverterTest {
 	
 	@Test
 	public void testRetrieveMonthForLaterTimeZone() {
-		ComponentList components = new ComponentList();
 		net.fortuna.ical4j.model.DateTime vEventStartTime = new net.fortuna.ical4j.model.DateTime(DateUtils.date("2013-12-31T20:00:00+00"));
-		components.add(new VEvent(vEventStartTime, "event summary"));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(new Calendar(components));
+		VEvent vEvent = new VEvent(vEventStartTime, "event summary");
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
 		TimeZone iCalendarTimeZone = TimeZone.getTimeZone("GMT+8:00");
 
 		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);

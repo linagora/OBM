@@ -34,10 +34,6 @@ package org.obm.icalendar.ical4jwrapper;
 import java.util.Collection;
 import java.util.Date;
 
-import com.google.common.base.Strings;
-
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VAlarm;
@@ -53,79 +49,71 @@ import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Uid;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 
 public class ICalendarEvent {
 
 	private final VEvent vEvent;
 	private final ICalendarRule iCalendarRule;
 	
-	public ICalendarEvent(Calendar calendar) {
-		this.vEvent = (VEvent)calendar.getComponent(Component.VEVENT);
+	public ICalendarEvent(VEvent vEvent) {
+		Preconditions.checkNotNull(vEvent);
+		this.vEvent = vEvent;
 		this.iCalendarRule = new ICalendarRule(vEvent);
 	}
 	
 	public Date endDate(Date startDate) {
-		if (vEvent != null) {
-			DtEnd dtEnd = vEvent.getEndDate();
-			Duration duration = vEvent.getDuration();
-			if (dtEnd != null) {
-				return dtEnd.getDate();
-			}
-			if (duration != null) {			
-				Dur dur = duration.getDuration();
-				return dur.getTime(startDate);
-			}
+		DtEnd dtEnd = vEvent.getEndDate();
+		Duration duration = vEvent.getDuration();
+		if (dtEnd != null) {
+			return dtEnd.getDate();
+		}
+		if (duration != null) {			
+			Dur dur = duration.getDuration();
+			return dur.getTime(startDate);
 		}
 		return null;
 	}
 	
 	public Date startDate() {
-		if (vEvent != null) {
-			DtStart startDate = vEvent.getStartDate();
-			if (startDate != null) {
-				return startDate.getDate();
-			}
+		DtStart startDate = vEvent.getStartDate();
+		if (startDate != null) {
+			return startDate.getDate();
 		}
 		return null;
 	}
 
 	public Date dtStamp() {
-		if (vEvent != null) {
-			DtStamp dateStamp = vEvent.getDateStamp();
-			if (dateStamp != null) {
-				return dateStamp.getDate();
-			}
+		DtStamp dateStamp = vEvent.getDateStamp();
+		if (dateStamp != null) {
+			return dateStamp.getDate();
 		}
 		return null;
 	}
 
 	public String location() {
-		if (vEvent != null) {
-			Location location = vEvent.getLocation();
-			if (location != null) {
-				return Strings.emptyToNull(location.getValue());
-			}
+		Location location = vEvent.getLocation();
+		if (location != null) {
+			return Strings.emptyToNull(location.getValue());
 		}
 		return null;
 	}
 	
 	public String organizer() {
-		if (vEvent != null) {
-			Organizer organizer = vEvent.getOrganizer();
-			if (organizer != null) {
-				return organizer.getCalAddress().getSchemeSpecificPart();
-			}
+		Organizer organizer = vEvent.getOrganizer();
+		if (organizer != null) {
+			return organizer.getCalAddress().getSchemeSpecificPart();
 		}
 		return null;
 	}
 	
 	public Long firstAlarmDateTime(Date startDate) {
-		if (vEvent != null) {
-			VAlarm vAlarm = getFirstVAlarm(vEvent);
-			if (vAlarm != null) {
-				Dur duration = vAlarm.getTrigger().getDuration();
-				return duration.getTime(startDate).getTime();
-			}
+		VAlarm vAlarm = getFirstVAlarm(vEvent);
+		if (vAlarm != null) {
+			Dur duration = vAlarm.getTrigger().getDuration();
+			return duration.getTime(startDate).getTime();
 		}
 		return null;
 	}
@@ -141,54 +129,39 @@ public class ICalendarEvent {
 	}
 	
 	public String uid() {
-		if (vEvent != null) {
-			Uid uid = vEvent.getUid();
-			if (uid != null) {
-				return Strings.emptyToNull(uid.getValue());
-			}
+		Uid uid = vEvent.getUid();
+		if (uid != null) {
+			return Strings.emptyToNull(uid.getValue());
 		}
 		return null;
 	}
 
 	public Date reccurenceId() {
-		if (vEvent != null) {
-			RecurrenceId recurrenceId = vEvent.getRecurrenceId();
-			if (recurrenceId != null) {
-				return recurrenceId.getDate();
-			}
+		RecurrenceId recurrenceId = vEvent.getRecurrenceId();
+		if (recurrenceId != null) {
+			return recurrenceId.getDate();
 		}
 		return null;
 	}
 	
 	public String transparency() {
-		if (vEvent != null) {
-			Transp transp = vEvent.getTransparency();
-			if (transp != null) {
-				return Strings.emptyToNull(transp.getValue());
-			}
+		Transp transp = vEvent.getTransparency();
+		if (transp != null) {
+			return Strings.emptyToNull(transp.getValue());
 		}
 		return null;
 	}
 	
 	public String property(String name) {
-		if (vEvent != null) {
-			Property property = vEvent.getProperties().getProperty(name);
-			if (property != null) {
-				return Strings.emptyToNull(property.getValue());
-			}
+		Property property = vEvent.getProperties().getProperty(name);
+		if (property != null) {
+			return Strings.emptyToNull(property.getValue());
 		}
 		return null;
 	}
 
 	public Clazz getClassification() {
-		if (vEvent != null) {
-			return vEvent.getClassification();
-		}
-		return null;
-	}
-	
-	public boolean isVEvent() {
-		return vEvent != null;
+		return vEvent.getClassification();
 	}
 	
 	public ICalendarRule getICalendarRule() {

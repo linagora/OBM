@@ -39,6 +39,8 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.data.UnfoldingReader;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
@@ -92,16 +94,29 @@ public class ICalendar {
 		this.calendar = new CalendarBuilder()
 			.build(new UnfoldingReader(new StringReader(iCalendar), true));
 		
-		this.iCalendarEvent = new ICalendarEvent(calendar);
+		this.iCalendarEvent = buildCalendarEvent();
 		this.iCalendarTimeZone = new ICalendarTimeZone(calendar);
 
 		this.iCalendar = iCalendar;
+	}
+
+	private ICalendarEvent buildCalendarEvent() {
+		VEvent vEvent = (VEvent)calendar.getComponent(Component.VEVENT);
+		if (vEvent != null) {
+			return new ICalendarEvent(vEvent);
+		} else {
+			return null;
+		}
 	}
 	
 	public String getICalendar() {
 		return iCalendar;
 	}
 
+	public boolean hasEvent() {
+		return iCalendarEvent != null;
+	}
+	
 	public ICalendarEvent getICalendarEvent() {
 		return iCalendarEvent;
 	}

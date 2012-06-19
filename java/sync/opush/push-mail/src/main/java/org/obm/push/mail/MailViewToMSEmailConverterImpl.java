@@ -173,11 +173,9 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	private boolean isSupportedICalendar(EmailView emailView) {
 		ICalendar iCalendar = emailView.getICalendar();
-		if (iCalendar != null) {
+		if (iCalendar != null && iCalendar.hasEvent()) {
 			ICalendarEvent iCalendarEvent = iCalendar.getICalendarEvent();
-			if (iCalendarEvent != null && iCalendarEvent.isVEvent()) {
-				return iCalendarEvent.reccurenceId() == null;
-			}
+			return iCalendarEvent.reccurenceId() == null;
 		}
 		return false;
 	}
