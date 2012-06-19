@@ -486,6 +486,7 @@ public class ICalendarConverterTest {
 					.startTime(new DateTime("2012-06-15T02:00:00").toDate())
 					.dtStamp(new DateTime("2012-06-04T12:59:20Z").toDate())
 					.allDayEvent(true)
+					.endTime(new DateTime("2012-06-16T02:00:00").toDate())
 					.organizer("xavier.niel@jri.obm.lng.org")
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)

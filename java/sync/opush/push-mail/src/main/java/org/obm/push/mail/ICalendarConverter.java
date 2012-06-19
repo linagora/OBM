@@ -67,6 +67,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ICalendarConverter {
 	
+	private static final String X_OBM_ALL_DAY_ENABLED = "1";
 	private static final String X_OBM_ALL_DAY = "X-OBM-ALL-DAY";
 	private static final String X_MICROSOFT_CDO_INTENDEDSTATUS = "X-MICROSOFT-CDO-INTENDEDSTATUS";
 	private static final Map<String, MSMeetingRequestRecurrenceDayOfWeek> RECUR_DAY_LIST = 
@@ -130,7 +131,7 @@ public class ICalendarConverter {
 			MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
 		Date startDate = iCalendarEvent.startDate();
-		Date endDate = iCalendarEvent.endDate(startDate);
+		Date endDate = endTime(iCalendarEvent, startDate);
 		msMeetingRequestBuilder
 			.startTime(startDate)
 			.endTime(endDate)
@@ -146,6 +147,16 @@ public class ICalendarConverter {
 			.msEventExtId(extId(iCalendarEvent.uid()));
 	}
 	
+	private Date endTime(ICalendarEvent iCalendarEvent, Date startDate) {
+		Date endDate = iCalendarEvent.endDate(startDate);
+		if (endDate == null 
+				&& hasXObmAllDayProperty(iCalendarEvent)) {
+			
+			return new DateTime(startDate.getTime()).plusDays(1).toDate();
+		}
+		return endDate;
+	}
+
 	private MSEventExtId extId(String uid) {
 		if (Strings.isNullOrEmpty(uid)) {
 			return new MSEventExtId(MSEventExtId.generateUid().toString());
@@ -167,8 +178,12 @@ public class ICalendarConverter {
 			DateTime plusDays = new DateTime(startDate).plusDays(1);
 			return plusDays.toDate().getTime() == endDate.getTime();
 		} else {
-			return "1".equals(iCalendarEvent.property(X_OBM_ALL_DAY));
+			return hasXObmAllDayProperty(iCalendarEvent);
 		}
+	}
+
+	private boolean hasXObmAllDayProperty(ICalendarEvent iCalendarEvent) {
+		return X_OBM_ALL_DAY_ENABLED.equals(iCalendarEvent.property(X_OBM_ALL_DAY));
 	}
 
 	private Long reminder(ICalendarEvent iCalendarEvent, Date startDate) {
