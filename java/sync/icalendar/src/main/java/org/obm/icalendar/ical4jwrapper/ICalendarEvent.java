@@ -123,7 +123,7 @@ public class ICalendarEvent {
 	}
 	
 	public Long firstAlarmDateTime(Date startDate) {
-		VAlarm vAlarm = getFirstVAlarm(vEvent);
+		VAlarm vAlarm = firstVAlarm(vEvent);
 		if (vAlarm != null) {
 			Dur duration = vAlarm.getTrigger().getDuration();
 			return duration.getTime(startDate).getTime();
@@ -131,7 +131,7 @@ public class ICalendarEvent {
 		return null;
 	}
 	
-	private VAlarm getFirstVAlarm(VEvent vEvent) {
+	private VAlarm firstVAlarm(VEvent vEvent) {
 		Collection<VAlarm> alarms = vEvent.getAlarms();
 		if (alarms != null) {
 			for (VAlarm vAlarm: alarms) {
@@ -173,7 +173,7 @@ public class ICalendarEvent {
 		return null;
 	}
 
-	public Clazz getClassification() {
+	public Clazz classification() {
 		return vEvent.getClassification();
 	}
 	
@@ -181,7 +181,7 @@ public class ICalendarEvent {
 		return iCalendarRecur != null;
 	}
 	
-	public ICalendarRecur getICalendarRecur() {
+	public ICalendarRecur recur() {
 		return iCalendarRecur;
 	}
 }

@@ -110,7 +110,7 @@ public class ICalendarConverter {
 			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);
 			
 			if (iCalendarEvent.hasRecur()) {
-				ICalendarRecur iCalendarRule = iCalendarEvent.getICalendarRecur();
+				ICalendarRecur iCalendarRule = iCalendarEvent.recur();
 				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
 				fillMsMeetingRequestFromRRule(iCalendarRule, iCalendarEvent, timeZone, builder);
@@ -202,7 +202,7 @@ public class ICalendarConverter {
 	}
 	
 	private MSMeetingRequestSensitivity sensitivity(ICalendarEvent iCalendarEvent) {
-		Clazz clazz = iCalendarEvent.getClassification();
+		Clazz clazz = iCalendarEvent.classification();
 		if (clazz != null) {
 			return VEVENT_CLAZZ.get(clazz);		
 		} else {
