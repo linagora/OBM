@@ -1864,6 +1864,13 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
     // If users have been removed, we note it in DeletedEvent
     if (count($removed_users) > 0) {
       foreach($removed_users as $u_id) {
+        // Avoid duplicates
+        $query = "DELETE FROM DeletedEvent ".
+          "WHERE deletedevent_event_ext_id='".$obm_q->escape($oldEvent->uid)."' AND ".
+          "deletedevent_user_id ".sql_parse_id($u_id, true);
+        display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(1)');
+        $obm_q->query($query);
+
         $query = "INSERT INTO DeletedEvent (
           deletedevent_event_id,
           deletedevent_event_ext_id,
@@ -3661,10 +3668,17 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
       $obm_qm = new DB_OBM;
       $users = array();
       while ($obm_q->next_record()) {
+        // Avoid duplicates
+        $query = "DELETE FROM DeletedEvent ".
+          "WHERE deletedevent_event_ext_id='".$obm_q->escape($event->uid)."' AND ".
+          "deletedevent_user_id ".sql_parse_id($obm_q->f('userentity_user_id'), true);
+        display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
+        $obm_qm->query($query);
+
         // We note the event deletion
         $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_event_ext_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
           VALUES ($event_id, '".$event->uid."', ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
-        display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
+        display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(3)');
         $retour = $obm_qm->query($query);
       }
     }
