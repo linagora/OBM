@@ -155,7 +155,7 @@ public class MSMeetingRequestSerializer {
 	
 	private void serializeRecurrenceId() {
 		DOMUtils.createElementAndTextIfNotNull(meetingRequestElement, 
-				ASEmail.RECURRENCE_ID.asASValue(), formatDate(meetingRequest.getRecurrenceId()));
+				ASEmail.RECURRENCE_ID.asASValue(), formatRecurrenceDate(meetingRequest.getRecurrenceId()));
 	}
 	
 	private void serializeMSMeetingRequestRecurrence() {

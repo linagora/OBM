@@ -59,11 +59,13 @@ import org.w3c.dom.Node;
 public class MSMeetingRequestSerializingTest {
 
 	private SimpleDateFormat protocolDateFormat;
+	private SimpleDateFormat protocolCalendarDateFormat;
 	private SerializingTest serializingTest;
 
 	@Before
 	public void setUp() {
 		protocolDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
+		protocolCalendarDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_NO_PUNCTUATION_PATTERN);
 		serializingTest = new SerializingTest();
 	}
 	
@@ -343,7 +345,8 @@ public class MSMeetingRequestSerializingTest {
 		
 		Element encodedDocument = encode(meetingRequest);
 		
-		Assertions.assertThat(tagValue(encodedDocument, ASEmail.RECURRENCE_ID)).isEqualTo(date(recurrenceId));
+		String expectedFormat = protocolCalendarDateFormat.format(recurrenceId);
+		Assertions.assertThat(tagValue(encodedDocument, ASEmail.RECURRENCE_ID)).isEqualTo(expectedFormat);
 	}
 
 	@Test
