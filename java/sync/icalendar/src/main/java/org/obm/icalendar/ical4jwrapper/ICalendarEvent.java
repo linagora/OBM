@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar.ical4jwrapper;
 
-import static com.google.common.base.Strings.emptyToNull;
-
 import java.util.Collection;
 import java.util.Date;
+
+import com.google.common.base.Strings;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -103,7 +103,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Location location = vEvent.getLocation();
 			if (location != null) {
-				return emptyToNull(location.getValue());
+				return Strings.emptyToNull(location.getValue());
 			}
 		}
 		return null;
@@ -144,7 +144,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Uid uid = vEvent.getUid();
 			if (uid != null) {
-				return emptyToNull(uid.getValue());
+				return Strings.emptyToNull(uid.getValue());
 			}
 		}
 		return null;
@@ -164,7 +164,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Transp transp = vEvent.getTransparency();
 			if (transp != null) {
-				return emptyToNull(transp.getValue());
+				return Strings.emptyToNull(transp.getValue());
 			}
 		}
 		return null;
@@ -174,7 +174,7 @@ public class ICalendarEvent {
 		if (vEvent != null) {
 			Property property = vEvent.getProperties().getProperty(name);
 			if (property != null) {
-				return emptyToNull(property.getValue());
+				return Strings.emptyToNull(property.getValue());
 			}
 		}
 		return null;
