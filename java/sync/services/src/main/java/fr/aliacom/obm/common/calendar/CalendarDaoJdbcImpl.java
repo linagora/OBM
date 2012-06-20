@@ -1830,7 +1830,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	// FIXME: event type should come from database
 	@Override
 	public Event removeEventById(Connection con, AccessToken token, EventObmId uid, EventType et, int sequence) 
-			throws EventNotFoundException, ServerFault {
+			throws SQLException, EventNotFoundException, ServerFault {
 		
 		Event ev = findEventById(token, uid);
 		Event deleted = removeEvent(con, token, et, ev);
@@ -1838,43 +1838,86 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return deleted;
 	}
 
-	private Event removeEvent(Connection con, AccessToken token, EventType et, Event ev) {
-		PreparedStatement dev = null;
+	private Collection<Integer> extractAttendeeIds(Connection con, AccessToken token, Event ev)
+			throws SQLException {
+		List<Attendee> attendees = ev.getAttendees();
+		Collection<Integer> attendeeIds = Lists.newArrayList(attendees.size());
+		int domainId = token.getDomain().getId();
+		for (Attendee at : ev.getAttendees()) {
+			Integer userId = userDao.userIdFromEmail(con, at.getEmail(), domainId);
+			if (userId != null) {
+				attendeeIds.add(userId);
+			}
+		}
+		return attendeeIds;
+	}
+
+	private void removeFromDeletedEvent(Connection con, Event ev, Collection<Integer> attendeeIds)
+			throws SQLException {
+		PreparedStatement stat = null;
 		try {
-			dev = con
+			stat = con.prepareStatement("DELETE FROM DeletedEvent "
+					+ "WHERE deletedevent_event_ext_id=? AND deletedevent_user_id=?");
+			String extId = ev.getExtId().getExtId();
+			for (int attendeeId : attendeeIds) {
+				stat.setString(1, extId);
+				stat.setInt(2, attendeeId);
+				stat.addBatch();
+			}
+			stat.executeBatch();
+			stat.close();
+		} finally {
+			obmHelper.cleanup(null, stat, null);
+		}
+	}
+
+	private void insertIntoDeletedEvent(Connection con, AccessToken token, EventType et, Event ev,
+			Collection<Integer> attendeeIds) throws SQLException {
+		PreparedStatement stat = null;
+		try {
+			stat = con
 					.prepareStatement("INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, "
 							+ "deletedevent_origin, deletedevent_type, deletedevent_timestamp, deletedevent_event_ext_id) "
 							+ "VALUES (?, ?, ?, ?, now(), ?)");
 			EventObmId databaseId = ev.getObmId();
-			for (Attendee at : ev.getAttendees()) {
-				Integer userId = userDao.userIdFromEmail(con,
-						at.getEmail(), token.getDomain().getId());
-				if (userId != null) {
-					dev.setInt(1, databaseId.getObmId());
-					dev.setInt(2, userId);
-					dev.setString(3, token.getOrigin());
-					dev.setObject(4, et.getJdbcObject(obmHelper.getType()));
-					dev.setString(5, ev.getExtId().getExtId());
-					dev.addBatch();
-				}
+			for (int attendeeId : attendeeIds) {
+				stat.setInt(1, databaseId.getObmId());
+				stat.setInt(2, attendeeId);
+				stat.setString(3, token.getOrigin());
+				stat.setObject(4, et.getJdbcObject(obmHelper.getType()));
+				stat.setString(5, ev.getExtId().getExtId());
+				stat.addBatch();
 			}
-			dev.executeBatch();
-			dev.close();
-
-			removeEventExceptions(con, databaseId);
-
-			dev = con.prepareStatement("DELETE FROM Event WHERE event_id=?");
-			dev.setInt(1, databaseId.getObmId());
-			dev.executeUpdate();
-
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
+			stat.executeBatch();
+			stat.close();
 		} finally {
-			obmHelper.cleanup(null, dev, null);
+			obmHelper.cleanup(null, stat, null);
 		}
+	}
 
+	private void removeFromEvent(Connection con, Event ev) throws SQLException {
+		PreparedStatement stat = null;
+		try {
+			stat = con.prepareStatement("DELETE FROM Event WHERE event_id=?");
+			stat.setInt(1, ev.getObmId().getObmId());
+			stat.executeUpdate();
+
+		} finally {
+			obmHelper.cleanup(null, stat, null);
+		}
+	}
+
+	private Event removeEvent(Connection con, AccessToken token, EventType et, Event ev)
+			throws SQLException {
+		Collection<Integer> attendeeIds = extractAttendeeIds(con, token, ev);
+
+		// Avoids potential duplicates
+		removeFromDeletedEvent(con, ev, attendeeIds);
+
+		insertIntoDeletedEvent(con, token, et, ev, attendeeIds);
+		removeFromEvent(con, ev);
 		removeEventFromSolr(token, ev);
-		
+
 		return ev;
 	}
 
