@@ -3697,7 +3697,6 @@ function run_query_calendar_delete($calendar,$force_sendmail = true) {
     }
     $deleted_evt_ids = array_merge($deleted_evt_ids, $deleted_events_exceptions);
   }
-  $obm_q->query($query);
   of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   $obm_q->query($query);
