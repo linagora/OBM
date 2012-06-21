@@ -127,9 +127,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			initializeItems(folderSyncResponse);
 			return folderSyncResponse;
 		} else {
-			
 			Date lastSyncDate = getLastSyncDate(folderSyncRequest);
-			return getFolderSyncContactsResponse(udr, lastSyncDate);
+			return getFolderSyncResponse(udr, lastSyncDate);
 		}
 	}
 
@@ -160,13 +159,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		return createFolderSyncResponse(udr, hierarchyItemsChanges);
 	}
 	
-	private FolderSyncResponse getFolderSyncContactsResponse(UserDataRequest udr, Date lastSync) throws DaoException, 
-		UnexpectedObmSyncServerException, InvalidServerId {
-
-		HierarchyItemsChanges hierarchyItemsChanges =  hierarchyExporter.listContactFoldersChanged(udr, lastSync);
-		return createFolderSyncResponse(udr, hierarchyItemsChanges);
-	}
-
 	private FolderSyncResponse createFolderSyncResponse(UserDataRequest udr, HierarchyItemsChanges hierarchyItemsChanges)
 			throws DaoException, InvalidServerId {
 		
