@@ -117,7 +117,10 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			}
 		}
 		
-		return new HierarchyItemsChanges(itemsChanged, itemsDeleted, folderChanges.getLastSync());
+		return new HierarchyItemsChanges.Builder()
+			.changes(itemsChanged)
+			.deletions(itemsDeleted)
+			.lastSync(folderChanges.getLastSync()).build();
 	}
 
 	private Iterator<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
