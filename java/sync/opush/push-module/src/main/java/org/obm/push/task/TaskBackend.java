@@ -118,7 +118,8 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(
 			UserDataRequest userDataRequest, Date lastSync)
-			throws DaoException, UnexpectedObmSyncServerException {
+			throws DaoException {
+		
 		return new HierarchyItemsChanges.Builder().lastSync(lastSync).build();
 	}
 }

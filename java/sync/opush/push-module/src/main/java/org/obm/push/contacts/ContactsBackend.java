@@ -100,7 +100,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException, UnexpectedObmSyncServerException {
+			throws DaoException {
 
 		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
 		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
