@@ -39,11 +39,11 @@ import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.minig.imap.MailboxFolder;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MailboxFolder;
 
 import com.sun.mail.imap.IMAPMessage;
 

@@ -45,7 +45,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.MailboxFolder;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
@@ -57,6 +56,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.mail.MailEnvModule;
+import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 
