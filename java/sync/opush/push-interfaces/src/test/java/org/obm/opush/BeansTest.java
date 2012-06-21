@@ -29,15 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.opush;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.ContentType;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.MailboxFolder;
+import org.obm.push.mail.MailboxFolders;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -56,12 +55,8 @@ public class BeansTest {
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ContentType.class)
-					.add(BodyParam.class)
-					.add(MimeAddress.class)
+					.add(MailboxFolder.class)
+					.add(MailboxFolders.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

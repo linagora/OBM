@@ -37,8 +37,6 @@ import java.util.Collection;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.IMAPHeaders;
-import org.minig.imap.MailboxFolder;
-import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.MimeMessage;

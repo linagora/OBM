@@ -47,8 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.minig.imap.MailboxFolder;
-import org.minig.imap.MailboxFolders;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
@@ -60,6 +58,8 @@ import org.obm.push.bean.User;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailboxFolder;
+import org.obm.push.mail.MailboxFolders;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.Iterables;
