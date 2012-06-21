@@ -42,6 +42,7 @@ import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FolderType;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
@@ -115,14 +116,18 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return PIMDataType.CALENDAR;
 	}
 	
-	public List<ItemChange> getHierarchyChanges(UserDataRequest udr) 
+	@Override
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync)
 			throws DaoException, UnexpectedObmSyncServerException {
 
+		List<ItemChange> itemChanges = null;
 		if (!udr.checkHint("hint.multipleCalendars", false)) {
-			return getDefaultCalendarItemChange(udr);
+			itemChanges = getDefaultCalendarItemChange(udr);
 		} else {
-			return getCalendarList(udr);
+			itemChanges = getCalendarList(udr);
 		}
+		return new HierarchyItemsChanges.Builder()
+			.changes(itemChanges).lastSync(lastSync).build();
 	}
 
 	private List<ItemChange> getCalendarList(UserDataRequest udr) throws DaoException, UnexpectedObmSyncServerException {

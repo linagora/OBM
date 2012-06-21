@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
+import java.util.Date;
 import java.util.List;
 
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
@@ -79,4 +81,7 @@ public interface PIMBackend {
 	int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState syncState, 
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
+
+	HierarchyItemsChanges getHierarchyChanges(UserDataRequest userDataRequest, Date lastSync)
+			throws DaoException, UnexpectedObmSyncServerException;
 }

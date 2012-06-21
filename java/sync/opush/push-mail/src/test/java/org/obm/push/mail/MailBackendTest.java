@@ -44,7 +44,7 @@ import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Date;
 import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
@@ -57,7 +57,7 @@ import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -66,6 +66,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
@@ -132,7 +133,7 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void hierarchyAlwaysContainsBaseFolders() throws DaoException, CollectionNotFoundException {
+	public void hierarchyAlwaysContainsBaseFolders() throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException {
 
 		MappingService mappingService = createStrictMock(MappingService.class);
 		expect(mappingService.getCollectionIdFor(device, "pathForInbox")).andReturn(1);
@@ -153,11 +154,11 @@ public class MailBackendTest {
 		replay(collectionPathHelper, mappingService);
 		
 		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
-		List<ItemChange> hierarchyChanges = mailBackend.getHierarchyChanges(udr);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, new Date());
 		
 		verify(collectionPathHelper, mappingService);
 		
-		Assertions.assertThat(hierarchyChanges).contains(
+		Assertions.assertThat(hierarchyItemsChanges.getChangedItems()).contains(
 				new ItemChangeBuilder().serverId("collection1")
 					.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
 					.displayName("INBOX").build(),
