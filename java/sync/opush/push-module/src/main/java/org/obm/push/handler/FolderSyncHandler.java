@@ -178,8 +178,8 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			throws DaoException, InvalidServerId {
 		
 		return stMachine.allocateNewSyncKey(udr, getOrAddCollectionId(udr), hierarchyItemsChanges.getLastSync(), 
-				hierarchyItemsChanges.getItemsAddedOrUpdated(),
-				hierarchyItemsChanges.getItemsDeleted());
+				hierarchyItemsChanges.getChangedItems(),
+				hierarchyItemsChanges.getDeletedItems());
 	}
 	
 	private int getOrAddCollectionId(UserDataRequest udr) throws DaoException {
