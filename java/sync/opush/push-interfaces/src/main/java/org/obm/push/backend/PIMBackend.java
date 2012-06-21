@@ -83,5 +83,5 @@ public interface PIMBackend {
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
 
 	HierarchyItemsChanges getHierarchyChanges(UserDataRequest userDataRequest, Date lastSync)
-			throws DaoException, UnexpectedObmSyncServerException;
+			throws DaoException;
 }
