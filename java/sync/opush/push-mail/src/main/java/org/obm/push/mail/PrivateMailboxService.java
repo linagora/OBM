@@ -46,6 +46,10 @@ import org.obm.push.mail.imap.OpushImapFolder;
 
 public interface PrivateMailboxService extends MailboxService {
 
+	void subscribe(UserDataRequest udr, String folder) throws MailException;
+	
+	void unsubscribe(UserDataRequest udr, String folder) throws MailException;
+	
 	MailboxFolders listAllFolders(UserDataRequest udr) throws MailException;
 	
 	OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException;
