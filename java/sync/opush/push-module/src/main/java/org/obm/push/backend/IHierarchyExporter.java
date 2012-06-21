@@ -50,7 +50,4 @@ public interface IHierarchyExporter {
 	HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException;
 
 	int getRootFolderId(UserDataRequest udr) throws DaoException, CollectionNotFoundException;
-
-	HierarchyItemsChanges listContactFoldersChanged(UserDataRequest udr, Date lastSync) throws DaoException;
-
 }
