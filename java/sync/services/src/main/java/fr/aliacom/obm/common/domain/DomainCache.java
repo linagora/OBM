@@ -34,15 +34,21 @@ package fr.aliacom.obm.common.domain;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class DomainCache implements DomainService {
 
+	private final static Logger logger = LoggerFactory.getLogger(DomainCache.class);
+	
 	private final Cache<String, ObmDomain> domainCache;
 	
 	@Inject
@@ -67,8 +73,13 @@ public class DomainCache implements DomainService {
 		try {
 			return domainCache.get(domainName);
 		} catch (NullPointerException e) {
+			logger.warn("domainCache access failed for : " + domainName, e);
 			return null;
 		} catch (ExecutionException e) {
+			logger.warn("domainCache access failed for : " + domainName, e);
+			return null;
+		} catch (InvalidCacheLoadException e) {
+			logger.warn("domainCache access failed for : " + domainName, e);
 			return null;
 		}
 	}
