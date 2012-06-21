@@ -38,6 +38,11 @@
             <version>${obm.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.linagora.obm</groupId>
+            <artifactId>configuration</artifactId>
+            <version>${obm.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>

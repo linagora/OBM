@@ -40,6 +40,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.DatabaseConnectionProvider;
 
@@ -47,10 +49,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener{
 	public static final String ATTRIBUTE_NAME = "GuiceInjecter";
+	private static final String APPLICATION_NAME = "obm-autoconf";
+
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	
         final ServletContext servletContext = servletContextEvent.getServletContext();    
@@ -72,6 +77,8 @@ public class GuiceServletContextListener implements ServletContextListener{
             protected void configure() {
                bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
                bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+               bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+               bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
             }
         }, new TransactionalModule());
 
