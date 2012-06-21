@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
@@ -74,7 +75,7 @@ public class TimeOutMapTest {
 	
 	@Test
 	public void returnApplyValue() throws ExecutionException {
-		Cache<String, String> localCache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS)
+		LoadingCache<String, String> localCache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS)
 				.build(new CacheLoader<String, String>() {
 
 					@Override
@@ -87,7 +88,7 @@ public class TimeOutMapTest {
 	
 	@Test @Slow
 	public void returnApplyValueExpireAfterAccess() throws InterruptedException, ExecutionException {
-		Cache<String, String> cache = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.SECONDS)
+		LoadingCache<String, String> cache = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.SECONDS)
 				.build(new CacheLoader<String, String>() {
 
 					@Override

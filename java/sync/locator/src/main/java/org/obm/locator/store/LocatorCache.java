@@ -41,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -55,7 +55,7 @@ public class LocatorCache implements LocatorService {
 	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
 	private static final String DEFAULT_VALUE = new String();
 	
-	private final Cache<Key, String> store;
+	private final LoadingCache<Key, String> store;
 	private final LocatorClientImpl locatorClientImpl;
 
 	@Inject
@@ -65,7 +65,7 @@ public class LocatorCache implements LocatorService {
 							   obmConfigurationService.getLocatorCacheTimeUnit()); 
 	}
 
-	private Cache<Key, String> createStore(int duration, TimeUnit unit) {
+	private LoadingCache<Key, String> createStore(int duration, TimeUnit unit) {
 		return CacheBuilder.newBuilder().expireAfterWrite(duration, unit)
 				.build(new CacheLoader<Key, String>() {
 

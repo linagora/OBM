@@ -37,10 +37,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,14 +49,14 @@ public class DomainCache implements DomainService {
 
 	private final static Logger logger = LoggerFactory.getLogger(DomainCache.class);
 	
-	private final Cache<String, ObmDomain> domainCache;
+	private final LoadingCache<String, ObmDomain> domainCache;
 	
 	@Inject
 	private DomainCache(DomainDao domainDao) {
 		this.domainCache = configureObmDomainCache(domainDao);
 	}
 
-	private Cache<String,ObmDomain> configureObmDomainCache(final DomainDao domainDao) {
+	private LoadingCache<String, ObmDomain> configureObmDomainCache(final DomainDao domainDao) {
 		return CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
 				.concurrencyLevel(1)
 				.build(new CacheLoader<String, ObmDomain>() {
