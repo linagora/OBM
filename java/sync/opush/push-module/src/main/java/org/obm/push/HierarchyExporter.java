@@ -32,19 +32,18 @@
 package org.obm.push;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map.Entry;
 
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.HierarchyItemsChanges.Builder;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -55,55 +54,25 @@ public class HierarchyExporter implements IHierarchyExporter {
 	private final Backends backends;
 
 	@Inject
-	private HierarchyExporter(FolderBackend folderExporter, Backends backends) {
-		
+	@VisibleForTesting HierarchyExporter(FolderBackend folderExporter, Backends backends) {
 		this.folderExporter = folderExporter;
 		this.backends = backends;
 	}
 
-	private List<ItemChange> getCalendarChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
-		
-		return backend(PIMDataType.CALENDAR).getHierarchyChanges(udr, lastSync).getChangedItems();
-	}
-
-	private List<ItemChange> getMailChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
-		
-		return backend(PIMDataType.EMAIL).getHierarchyChanges(udr, lastSync).getChangedItems();
-	}
-	
 	@Override
 	public HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException {
-		LinkedList<ItemChange> allItemsChanged = new LinkedList<ItemChange>();
-		
-		allItemsChanged.addAll(getCalendarChanges(udr, lastSync));
-		allItemsChanged.addAll(getMailChanges(udr, lastSync));
-		
-		HierarchyItemsChanges itemsContactChanged = getContactsChanges(udr, lastSync);
-		allItemsChanged.addAll(itemsContactChanged.getChangedItems());
-		
-		return new HierarchyItemsChanges.Builder()
-			.changes(allItemsChanged)
-			.deletions(itemsContactChanged.getDeletedItems())
-			.lastSync(itemsContactChanged.getLastSync()).build();
+		Builder builder = new HierarchyItemsChanges.Builder();
+		for (Entry<PIMDataType, PIMBackend> entry: backends.getBackends().entrySet()) {
+			HierarchyItemsChanges hierarchyChanges = entry.getValue().getHierarchyChanges(udr, lastSync);
+			// FIXME : The last sync is only used by contact folders sync
+			if (entry.getKey() == PIMDataType.CONTACTS) {
+				builder.lastSync(hierarchyChanges.getLastSync());
+			}
+			builder.mergeItems(hierarchyChanges);
+		}
+		return builder.build();
 	}
 	
-	private HierarchyItemsChanges getContactsChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
-		
-		return backend(PIMDataType.CONTACTS).getHierarchyChanges(udr, lastSync);
-	}
-	
-	private PIMBackend backend(PIMDataType pimDataType) { 
-		return backends.getBackend(pimDataType);
-	}
-	
-	@Override
-	public int getRootFolderId(UserDataRequest udr) throws DaoException, CollectionNotFoundException {
-		return folderExporter.getServerIdFor(udr);
-	}
-
 	@Override
 	public String getRootFolderUrl(UserDataRequest udr) {
 		return folderExporter.getColName(udr);
