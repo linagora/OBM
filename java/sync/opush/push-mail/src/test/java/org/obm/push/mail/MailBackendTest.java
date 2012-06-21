@@ -245,6 +245,77 @@ public class MailBackendTest {
 		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
 	}
 
+	
+	@Test
+	public void deletedImapFolder() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
+
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(PIMDataType.EMAIL).anyTimes();
+		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "deletedFolder")).andReturn("pathForDeletedFolder");
+		
+		MappingService mappingService = createMock(MappingService.class);
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
+		expect(mappingService.getCollectionIdFor(device, "pathForDeletedFolder")).andReturn(5);
+		expect(mappingService.collectionIdToString(5)).andReturn("deletedFolderCollection");
+		
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
+		
+		replay(collectionPathHelper, mappingService, mailboxService);
+		
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
+		verify(collectionPathHelper, mappingService, mailboxService);
+		
+		ItemChange deletedFolderItemChange = new ItemChangeBuilder().serverId("deletedFolderCollection")
+			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+			.displayName("deletedFolder").build();
+		
+		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(deletedFolderItemChange);
+		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
+	}
+	
+	@Test
+	public void deletedAndAddedImapFolders() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
+
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		MappingService mappingService = createMock(MappingService.class);
+
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(PIMDataType.EMAIL).anyTimes();
+		
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash", "OldFolder"));
+		
+		expect(mappingService.getCollectionIdFor(device, "pathForOldFolder")).andReturn(5);
+		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "OldFolder")).andReturn("pathForOldFolder");
+		expect(mappingService.collectionIdToString(5)).andReturn("oldFolderCollection");
+		
+		expect(mappingService.getCollectionIdFor(device, "pathForNewFolder")).andReturn(6);
+		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "NewFolder")).andReturn("pathForNewFolder");
+		expect(mappingService.collectionIdToString(6)).andReturn("newFolderCollection");
+		
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
+		
+		replay(collectionPathHelper, mappingService, mailboxService);
+		
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
+		verify(collectionPathHelper, mappingService, mailboxService);
+		
+		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("newFolderCollection")
+			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+			.displayName("NewFolder").build();
+		
+		ItemChange oldFolderItemChange = new ItemChangeBuilder().serverId("oldFolderCollection")
+			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+			.displayName("OldFolder").build();
+		
+		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
+		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemChange);
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
+	}
+	
 	private MailboxFolders mailboxFolders(String... folders) {
 		return new MailboxFolders(
 				FluentIterable.from(ImmutableList.copyOf(folders))
