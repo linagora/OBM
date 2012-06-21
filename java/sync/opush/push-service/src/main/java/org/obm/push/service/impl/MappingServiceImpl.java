@@ -130,5 +130,8 @@ public class MappingServiceImpl implements MappingService {
 		return collectionId;
 	}
 
-	
+	@Override
+	public List<String> listCollections(Device device) {
+		return null;
+	}
 }
