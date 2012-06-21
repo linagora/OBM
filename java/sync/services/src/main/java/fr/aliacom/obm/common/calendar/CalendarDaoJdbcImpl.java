@@ -96,6 +96,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -1909,6 +1910,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Event removeEvent(Connection con, AccessToken token, EventType et, Event ev)
 			throws SQLException {
+		Preconditions.checkArgument(ev.getRecurrenceId() != null,
+				"Cannot remove an event exception via removeEvent()");
+
 		Collection<Integer> attendeeIds = extractAttendeeIds(con, token, ev);
 
 		// Avoids potential duplicates
