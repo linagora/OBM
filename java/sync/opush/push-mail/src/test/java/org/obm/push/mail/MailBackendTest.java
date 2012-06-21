@@ -34,20 +34,19 @@ package org.obm.push.mail;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +57,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -71,6 +71,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -78,6 +79,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 
@@ -133,47 +135,71 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void hierarchyAlwaysContainsBaseFolders() throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException {
+	public void initialHierarchyContainsBaseFolders() throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException {
 
-		MappingService mappingService = createStrictMock(MappingService.class);
-		expect(mappingService.getCollectionIdFor(device, "pathForInbox")).andReturn(1);
-		expect(mappingService.collectionIdToString(1)).andReturn("collection1");
-		expect(mappingService.getCollectionIdFor(device, "pathForDraft")).andReturn(2);
-		expect(mappingService.collectionIdToString(2)).andReturn("collection2");
-		expect(mappingService.getCollectionIdFor(device, "pathForSent")).andReturn(3);
-		expect(mappingService.collectionIdToString(3)).andReturn("collection3");
-		expect(mappingService.getCollectionIdFor(device, "pathForTrash")).andReturn(4);
-		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
-		
-		CollectionPathHelper collectionPathHelper = createStrictMock(CollectionPathHelper.class);
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "INBOX")).andReturn("pathForInbox");
 		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "Drafts")).andReturn("pathForDraft");
 		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "Sent")).andReturn("pathForSent");
 		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "Trash")).andReturn("pathForTrash");
+
+		MappingService mappingService = createMock(MappingService.class);
+
+		expect(mappingService.getCollectionIdFor(device, "pathForInbox")).andReturn(1);
+		expect(mappingService.getCollectionIdFor(device, "pathForDraft")).andReturn(2);
+		expect(mappingService.getCollectionIdFor(device, "pathForSent")).andReturn(3);
+		expect(mappingService.getCollectionIdFor(device, "pathForTrash")).andReturn(4);
+		
+		expect(mappingService.collectionIdToString(1)).andReturn("collection1");
+		expect(mappingService.collectionIdToString(2)).andReturn("collection2");
+		expect(mappingService.collectionIdToString(3)).andReturn("collection3");
+		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
+
+		
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.<String>of());
 		
 		replay(collectionPathHelper, mappingService);
 		
 		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, new Date());
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, DateUtils.getEpochCalendar().getTime());
 		
 		verify(collectionPathHelper, mappingService);
 		
-		Assertions.assertThat(hierarchyItemsChanges.getChangedItems()).contains(
-				new ItemChangeBuilder().serverId("collection1")
-					.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
-					.displayName("INBOX").build(),
-					
-				new ItemChangeBuilder().serverId("collection2")
-					.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDERS)
-					.displayName("Drafts").build(),
-					
-				new ItemChangeBuilder().serverId("collection3")
-					.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
-					.displayName("Sent").build(),
-					
-				new ItemChangeBuilder().serverId("collection4")
-					.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDERS)
-					.displayName("Trash").build()
-				);
+		ItemChange inboxItemChange = new ItemChangeBuilder().serverId("collection1")
+			.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
+			.displayName("INBOX").build();
+		
+		ItemChange draftsItemChange = new ItemChangeBuilder().serverId("collection2")
+			.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDER)
+			.displayName("Drafts").build();
+		
+		ItemChange sentItemChange = new ItemChangeBuilder().serverId("collection3")
+			.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
+			.displayName("Sent").build();
+		
+		ItemChange trashItemChange = new ItemChangeBuilder().serverId("collection4")
+			.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDER)
+			.displayName("Trash").build();
+		
+		assertThat(hierarchyItemsChanges.getChangedItems()).contains(
+				inboxItemChange, draftsItemChange, sentItemChange, trashItemChange);
 	}
+	
+	@Test
+	public void emptyHierarchyChanges() throws DaoException, UnexpectedObmSyncServerException {
+
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(PIMDataType.EMAIL).anyTimes();
+		
+		MappingService mappingService = createMock(MappingService.class);
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash"));
+		
+		replay(collectionPathHelper, mappingService);
+		
+		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
+		verify(collectionPathHelper, mappingService);
+		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+	}
+
 }
