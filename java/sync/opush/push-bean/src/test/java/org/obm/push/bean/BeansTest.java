@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
@@ -103,6 +104,7 @@ public class BeansTest {
 					.add(MSEmailHeader.class)
 					.add(MSRead.class)
 					.add(MSEventExtId.class)
+					.add(CollectionPath.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
