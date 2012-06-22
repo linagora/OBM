@@ -216,6 +216,32 @@ public class MailBackendTest {
 	}
 
 	@Test
+	public void filterContactsHierarchyChanges() throws DaoException, UnexpectedObmSyncServerException {
+
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType("INBOX")).andReturn(PIMDataType.EMAIL);
+		expect(collectionPathHelper.recognizePIMDataType("Drafts")).andReturn(PIMDataType.EMAIL);
+		expect(collectionPathHelper.recognizePIMDataType("Sent")).andReturn(PIMDataType.EMAIL);
+		expect(collectionPathHelper.recognizePIMDataType("Trash")).andReturn(PIMDataType.EMAIL);
+		expect(collectionPathHelper.recognizePIMDataType("contact")).andReturn(PIMDataType.CONTACTS);
+		
+		MappingService mappingService = createMock(MappingService.class);
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash", "contact"));
+
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("INBOX", "Drafts", "Sent", "Trash"));
+		
+		replay(collectionPathHelper, mappingService, mailboxService);
+		
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
+		verify(collectionPathHelper, mappingService, mailboxService);
+		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
+	}
+	
+	@Test
 	public void newImapFolder() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
 
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
