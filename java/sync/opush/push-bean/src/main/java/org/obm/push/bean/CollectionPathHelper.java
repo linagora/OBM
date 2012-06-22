@@ -95,6 +95,7 @@ public class CollectionPathHelper {
 		Preconditions.checkNotNull(udr);
 		Preconditions.checkNotNull(collectionType);
 		Preconditions.checkArgument(collectionType != PIMDataType.UNKNOWN);
+		Preconditions.checkNotNull(imapFolders);
 		
 		StringBuilder userPath = getUserPathByCollection(udr, collectionType);
 		for (String folder: imapFolders) {
