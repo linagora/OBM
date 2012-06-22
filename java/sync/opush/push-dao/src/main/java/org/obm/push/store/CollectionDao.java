@@ -32,6 +32,7 @@
 package org.obm.push.store;
 
 import java.util.Date;
+import java.util.List;
 
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
@@ -63,5 +64,7 @@ public interface CollectionDao {
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
 
 	SyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
+
+	List<String> getUserCollections(Device device) throws DaoException;
 
 }

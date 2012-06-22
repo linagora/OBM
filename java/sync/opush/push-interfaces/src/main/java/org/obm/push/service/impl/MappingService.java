@@ -34,8 +34,10 @@ package org.obm.push.service.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
@@ -62,5 +64,5 @@ public interface MappingService {
 
 	Integer getCollectionIdFromServerId(String serverId);
 	
-	List<String> listCollections(Device device);
+	List<CollectionPath> listCollections(UserDataRequest udr) throws DaoException;
 }

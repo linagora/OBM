@@ -35,24 +35,33 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
 public class MappingServiceImpl implements MappingService {
 
 	private final CollectionDao collectionDao;
+	private final Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 
 	@Inject
-	private MappingServiceImpl(CollectionDao collectionDao) {
+	@VisibleForTesting MappingServiceImpl(CollectionDao collectionDao,
+			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
 		this.collectionDao = collectionDao;
+		this.collectionPathBuilderProvider = collectionPathBuilderProvider;
 	}
 
 	@Override
@@ -131,7 +140,17 @@ public class MappingServiceImpl implements MappingService {
 	}
 
 	@Override
-	public List<String> listCollections(Device device) {
-		return null;
+	public List<CollectionPath> listCollections(final UserDataRequest udr) throws DaoException {
+		List<String> userCollections = collectionDao.getUserCollections(udr.getDevice());
+		return Lists.transform(userCollections, new Function<String, CollectionPath>(){
+
+			@Override
+			public CollectionPath apply(String fullyQualifiedCollectionPath) {
+				return collectionPathBuilderProvider.get()
+					.userDataRequest(udr)
+					.fullyQualifiedCollectionPath(fullyQualifiedCollectionPath)
+					.build();
+			}
+		});
 	}
 }

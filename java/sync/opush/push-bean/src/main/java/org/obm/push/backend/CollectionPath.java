@@ -36,9 +36,10 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.inject.Inject;
 
 public class CollectionPath {
 
@@ -48,6 +49,7 @@ public class CollectionPath {
 		private UserDataRequest userDataRequest;
 		private PIMDataType pimType;
 		private String displayName;
+		private String fullyQualifiedCollectionPath;
 
 		@Inject
 		@VisibleForTesting Builder(CollectionPathHelper collectionPathHelper) {
@@ -69,12 +71,36 @@ public class CollectionPath {
 			return this;
 		}
 		
+		public Builder fullyQualifiedCollectionPath(String fullyQualifiedCollectionPath) {
+			this.fullyQualifiedCollectionPath = fullyQualifiedCollectionPath;
+			return this;
+		}
+		
 		public CollectionPath build() {
 			Preconditions.checkState(userDataRequest != null);
-			Preconditions.checkState(pimType != null);
-			Preconditions.checkState(displayName != null);
+			
+			if (Strings.isNullOrEmpty(fullyQualifiedCollectionPath)) {
+				Preconditions.checkState(pimType != null);
+				Preconditions.checkState(displayName != null);
+				
+				return buildFromPimType();
+			} else {
+				Preconditions.checkState(pimType == null, "Build either from pimType or fullyQualifiedCollectionPath");
+				Preconditions.checkState(displayName == null, "Build either from displayName or fullyQualifiedCollectionPath");
+
+				return buildFromFullyQualifiedCollectionPath();
+			}
+		}
+
+		private CollectionPath buildFromPimType() {
 			String collectionPath = collectionPathHelper.buildCollectionPath(userDataRequest, pimType, displayName);
 			return new CollectionPath(collectionPath, pimType, displayName);
+		}
+
+		private CollectionPath buildFromFullyQualifiedCollectionPath() {
+			PIMDataType recognizedPimType = collectionPathHelper.recognizePIMDataType(fullyQualifiedCollectionPath);
+			String recognizedDisplayName = collectionPathHelper.extractFolder(userDataRequest, fullyQualifiedCollectionPath, recognizedPimType);
+			return new CollectionPath(fullyQualifiedCollectionPath, recognizedPimType, recognizedDisplayName);
 		}
 	}
 
@@ -82,7 +108,7 @@ public class CollectionPath {
 	private final transient PIMDataType pimType;
 	private final transient String displayName;
 	
-	private CollectionPath(String collectionPath, PIMDataType pimType, String displayName) {
+	protected CollectionPath(String collectionPath, PIMDataType pimType, String displayName) {
 		this.collectionPath = collectionPath;
 		this.pimType = pimType;
 		this.displayName = displayName;

@@ -31,25 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import static org.easymock.EasyMock.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.CollectionPathException;
 
 
 public class CollectionPathTest {
 
 	@Test(expected=IllegalStateException.class)
-	public void nullUserDataRequest() {
+	public void nullUserDataRequest() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		replay(collectionPathHelper);
 		new CollectionPath.Builder(collectionPathHelper).displayName("displayName").pimType(PIMDataType.CALENDAR).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void nullPimType() {
+	public void nullPimType() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		replay(collectionPathHelper, udr);
@@ -57,7 +62,7 @@ public class CollectionPathTest {
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void nullDisplayName() {
+	public void nullDisplayName() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		replay(collectionPathHelper, udr);
@@ -72,14 +77,64 @@ public class CollectionPathTest {
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		expect(collectionPathHelper.buildCollectionPath(udr, collectionType, displayName)).andReturn("collectionPath");
 		replay(collectionPathHelper, udr);
+		
 		CollectionPath collectionPath = new CollectionPath.Builder(collectionPathHelper)
 			.pimType(collectionType)
 			.displayName(displayName)
-			.userDataRequest(udr).build();
+			.userDataRequest(udr)
+			.build();
+		
 		verify(collectionPathHelper, udr);
 		assertThat(collectionPath.collectionPath()).isEqualTo("collectionPath");
 		assertThat(collectionPath.displayName()).isEqualTo(displayName);
 		assertThat(collectionPath.pimType()).isEqualTo(collectionType);
 	}
-	
+
+	@Test(expected=IllegalStateException.class)
+	public void testBuildByQualifiedCollectionPathDenyDisplayName() throws CollectionPathException {
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		UserDataRequest udr = createMock(UserDataRequest.class);
+		replay(collectionPathHelper, udr);
+		
+		new CollectionPath.Builder(collectionPathHelper)
+			.userDataRequest(udr)	
+			.fullyQualifiedCollectionPath("obm:\\\\login@domain\\email\\INBOX")
+			.displayName("displayName")
+			.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testBuildByQualifiedCollectionPathDenyPIMDataType() throws CollectionPathException {
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		UserDataRequest udr = createMock(UserDataRequest.class);
+		replay(collectionPathHelper, udr);
+		
+		new CollectionPath.Builder(collectionPathHelper)
+			.userDataRequest(udr)	
+			.fullyQualifiedCollectionPath("obm:\\\\login@domain\\email\\INBOX")
+			.pimType(PIMDataType.EMAIL)
+			.build();
+	}
+
+	@Test
+	public void testValidBuildByQualifiedCollectionPath() throws CollectionPathException {
+		String qualifiedCollectionPath = "obm:\\\\login@domain\\email\\INBOX";
+
+		UserDataRequest udr = createMock(UserDataRequest.class);
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.EMAIL);
+		expect(collectionPathHelper.extractFolder(udr, qualifiedCollectionPath, PIMDataType.EMAIL)).andReturn("INBOX");
+		replay(collectionPathHelper, udr); 
+		
+		CollectionPath collectionPath = new CollectionPath.Builder(collectionPathHelper)
+			.userDataRequest(udr)	
+			.fullyQualifiedCollectionPath(qualifiedCollectionPath)
+			.build();
+
+		verify(collectionPathHelper, udr);
+		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
+		assertThat(collectionPath.displayName()).isEqualTo("INBOX");
+		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.EMAIL);
+	}
+
 }

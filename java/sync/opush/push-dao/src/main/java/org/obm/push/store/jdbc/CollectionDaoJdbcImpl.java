@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -53,6 +54,7 @@ import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -66,6 +68,29 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	@Inject
 	protected CollectionDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
+	}
+
+	@Override
+	public List<String> getUserCollections(Device device) throws DaoException {
+		Integer id = device.getDatabaseId();
+		List<String> userCollections = Lists.newArrayList();
+		Connection con = null;
+		PreparedStatement ps = null;
+		try{
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping WHERE device_id=?");
+			ps.setInt(1, id);
+			ResultSet resultSet = ps.executeQuery();
+
+			while (resultSet.next()) {
+				userCollections.add(resultSet.getString("collection"));
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, null);
+		}
+		return userCollections;
 	}
 
 	@Override
