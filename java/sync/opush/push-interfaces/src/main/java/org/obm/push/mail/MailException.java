@@ -32,7 +32,7 @@
 package org.obm.push.mail;
 
 
-public class MailException extends Exception {
+public class MailException extends RuntimeException {
 
 	public MailException(Throwable cause) {
 		super(cause);

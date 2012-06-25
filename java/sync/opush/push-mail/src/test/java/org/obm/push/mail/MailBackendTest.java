@@ -79,6 +79,8 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
@@ -155,15 +157,18 @@ public class MailBackendTest {
 		expect(mappingService.collectionIdToString(3)).andReturn("collection3");
 		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
 
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
+
 		
 		expect(mappingService.listCollections(device)).andReturn(ImmutableList.<String>of());
 		
-		replay(collectionPathHelper, mappingService);
+		replay(collectionPathHelper, mappingService, mailboxService);
 		
-		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
 		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, DateUtils.getEpochCalendar().getTime());
 		
-		verify(collectionPathHelper, mappingService);
+		verify(collectionPathHelper, mappingService, mailboxService);
 		
 		ItemChange inboxItemChange = new ItemChangeBuilder().serverId("collection1")
 			.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
@@ -193,13 +198,55 @@ public class MailBackendTest {
 		
 		MappingService mappingService = createMock(MappingService.class);
 		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash"));
+
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		
-		replay(collectionPathHelper, mappingService);
+		replay(collectionPathHelper, mappingService, mailboxService);
 		
-		MailBackend mailBackend = new MailBackendImpl(null, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
 		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
-		verify(collectionPathHelper, mappingService);
+		verify(collectionPathHelper, mappingService, mailboxService);
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 	}
 
+	@Test
+	public void newImapFolder() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
+
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(PIMDataType.EMAIL).anyTimes();
+		expect(collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, "NewFolder")).andReturn("pathForNewFolder");
+		
+		MappingService mappingService = createMock(MappingService.class);
+		expect(mappingService.listCollections(device)).andReturn(ImmutableList.of("INBOX", "Drafts", "Sent", "Trash"));
+		expect(mappingService.getCollectionIdFor(device, "pathForNewFolder")).andReturn(5);
+		expect(mappingService.collectionIdToString(5)).andReturn("newFolderCollection");
+		
+		MailboxService mailboxService = createMock(MailboxService.class);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
+		
+		replay(collectionPathHelper, mappingService, mailboxService);
+		
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
+		verify(collectionPathHelper, mappingService, mailboxService);
+		
+		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("newFolderCollection")
+				.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.displayName("NewFolder").build();
+		
+		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
+	}
+
+	private MailboxFolders mailboxFolders(String... folders) {
+		return new MailboxFolders(
+				FluentIterable.from(ImmutableList.copyOf(folders))
+					.transform(new Function<String, MailboxFolder>() {
+							@Override
+							public MailboxFolder apply(String input) {
+								return new MailboxFolder(input);
+							}
+						})
+					.toImmutableList());
+	}
 }
