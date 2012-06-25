@@ -316,8 +316,8 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   * @param $old other OBM_Event to compare to
   * @return boolean whether or not the changes should bring a sequence bump 
   */
-  public function shouldIncrementSequence($old) {
-	  return $this->location != $old->location
+  public function shouldIncrementSequence($old, $exceptionsMatter = true) {
+	  $isDifferentEnough = $this->location != $old->location
 		|| $this->allday  != $old->allday
 		|| $this->date_begin->compare($old->date_begin) != 0
 		|| $this->duration != $old->duration
@@ -329,9 +329,15 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
 					  || $this->repeat_end && $old->repeat_end && $this->repeat_end->compareDateIso($old->repeat_end) != 0 
 						) 
 	  )
-		|| ($this->repeat_kind != 'none' && $this->repeatfrequency != $old->repeatfrequency)
-		|| (count(array_udiff($this->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
-		|| (count(array_udiff($old->date_exception, $this->date_exception, array('Of_Date', 'cmp'))));
+		|| ($this->repeat_kind != 'none' && $this->repeatfrequency != $old->repeatfrequency);
+
+    if ($exceptionsMatter) {
+  		$isDifferentEnough = $isDifferentEnough
+      || (count(array_udiff($this->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
+  	  || (count(array_udiff($old->date_exception, $this->date_exception, array('Of_Date', 'cmp'))));
+    }
+
+    return $isDifferentEnough;
   }
 
   /**
@@ -1098,8 +1104,8 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @access public 
    * @return void
    */
-  public static function hasEventFullyChanged($old, $new) {
-    return $new->shouldIncrementSequence($old)
+  public static function hasEventFullyChanged($old, $new, $exceptionsMatter = true) {
+    return $new->shouldIncrementSequence($old, $exceptionsMatter)
       || $new->title != $old->title
       || $new->category1 != $old->category1
       || $new->privacy != $old->privacy
