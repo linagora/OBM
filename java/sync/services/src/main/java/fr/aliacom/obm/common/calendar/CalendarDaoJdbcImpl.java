@@ -1839,12 +1839,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return deleted;
 	}
 
-	private Collection<Integer> extractAttendeeIds(Connection con, AccessToken token, Event ev)
+	private Collection<Integer> extractAttendeeIds(Connection con, AccessToken token, Event event)
 			throws SQLException {
-		List<Attendee> attendees = ev.getAttendees();
+		List<Attendee> attendees = event.getAttendees();
 		Collection<Integer> attendeeIds = Lists.newArrayList(attendees.size());
 		int domainId = token.getDomain().getId();
-		for (Attendee at : ev.getAttendees()) {
+		for (Attendee at : event.getAttendees()) {
 			Integer userId = userDao.userIdFromEmail(con, at.getEmail(), domainId);
 			if (userId != null) {
 				attendeeIds.add(userId);
@@ -1855,74 +1855,71 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private void removeFromDeletedEvent(Connection con, Event ev, Collection<Integer> attendeeIds)
 			throws SQLException {
-		PreparedStatement stat = null;
+		PreparedStatement deleteStatement = null;
 		try {
-			stat = con.prepareStatement("DELETE FROM DeletedEvent "
+			deleteStatement = con.prepareStatement("DELETE FROM DeletedEvent "
 					+ "WHERE deletedevent_event_ext_id=? AND deletedevent_user_id=?");
 			String extId = ev.getExtId().getExtId();
 			for (int attendeeId : attendeeIds) {
-				stat.setString(1, extId);
-				stat.setInt(2, attendeeId);
-				stat.addBatch();
+				deleteStatement.setString(1, extId);
+				deleteStatement.setInt(2, attendeeId);
+				deleteStatement.addBatch();
 			}
-			stat.executeBatch();
-			stat.close();
+			deleteStatement.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, stat, null);
+			obmHelper.cleanup(null, deleteStatement, null);
 		}
 	}
 
-	private void insertIntoDeletedEvent(Connection con, AccessToken token, EventType et, Event ev,
+	private void insertIntoDeletedEvent(Connection con, AccessToken token, Event event, EventType eventType,
 			Collection<Integer> attendeeIds) throws SQLException {
-		PreparedStatement stat = null;
+		PreparedStatement insertStatement = null;
 		try {
-			stat = con
+			insertStatement = con
 					.prepareStatement("INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, "
 							+ "deletedevent_origin, deletedevent_type, deletedevent_timestamp, deletedevent_event_ext_id) "
 							+ "VALUES (?, ?, ?, ?, now(), ?)");
-			EventObmId databaseId = ev.getObmId();
+			EventObmId databaseId = event.getObmId();
 			for (int attendeeId : attendeeIds) {
-				stat.setInt(1, databaseId.getObmId());
-				stat.setInt(2, attendeeId);
-				stat.setString(3, token.getOrigin());
-				stat.setObject(4, et.getJdbcObject(obmHelper.getType()));
-				stat.setString(5, ev.getExtId().getExtId());
-				stat.addBatch();
+				insertStatement.setInt(1, databaseId.getObmId());
+				insertStatement.setInt(2, attendeeId);
+				insertStatement.setString(3, token.getOrigin());
+				insertStatement.setObject(4, eventType.getJdbcObject(obmHelper.getType()));
+				insertStatement.setString(5, event.getExtId().getExtId());
+				insertStatement.addBatch();
 			}
-			stat.executeBatch();
-			stat.close();
+			insertStatement.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, stat, null);
+			obmHelper.cleanup(null, insertStatement, null);
 		}
 	}
 
-	private void removeFromEvent(Connection con, Event ev) throws SQLException {
-		PreparedStatement stat = null;
+	private void removeFromEvent(Connection con, Event event) throws SQLException {
+		PreparedStatement deleteStatement = null;
 		try {
-			stat = con.prepareStatement("DELETE FROM Event WHERE event_id=?");
-			stat.setInt(1, ev.getObmId().getObmId());
-			stat.executeUpdate();
-
+			deleteStatement = con.prepareStatement("DELETE FROM Event WHERE event_id=?");
+			deleteStatement.setInt(1, event.getObmId().getObmId());
+			deleteStatement.executeUpdate();
 		} finally {
-			obmHelper.cleanup(null, stat, null);
+			obmHelper.cleanup(null, deleteStatement, null);
 		}
 	}
 
-	private Event removeEvent(Connection con, AccessToken token, EventType et, Event ev)
+	private Event removeEvent(Connection con, AccessToken token, EventType eventType, Event event)
 			throws SQLException {
-		Preconditions.checkArgument(ev.getRecurrenceId() != null,
+		Preconditions.checkArgument(event.getRecurrenceId() != null,
 				"Cannot remove an event exception via removeEvent()");
 
-		Collection<Integer> attendeeIds = extractAttendeeIds(con, token, ev);
+		Collection<Integer> attendeeIds = extractAttendeeIds(con, token, event);
 
 		// Avoids potential duplicates
-		removeFromDeletedEvent(con, ev, attendeeIds);
+		removeFromDeletedEvent(con, event, attendeeIds);
 
-		insertIntoDeletedEvent(con, token, et, ev, attendeeIds);
-		removeFromEvent(con, ev);
-		removeEventFromSolr(token, ev);
+		insertIntoDeletedEvent(con, token, event, eventType, attendeeIds);
+		removeFromEvent(con, event);
+		removeEventFromSolr(token, event);
 
-		return ev;
+		return event;
 	}
 
 	private void removeEventFromSolr(AccessToken token, Event ev) {
