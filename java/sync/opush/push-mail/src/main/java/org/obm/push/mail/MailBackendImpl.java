@@ -174,7 +174,7 @@ public class MailBackendImpl implements MailBackend {
 					.addAll(listSpecialFolders())
 					.addAll(listSubscribedFolders(udr))
 				.build();
-		return computeChanges(udr, currentSubscribedFolders).lastSync(lastSync).build();
+		return computeChanges(udr, currentSubscribedFolders).lastSync(new Date()).build();
 	}
 	
 	private List<String> listSpecialFolders() {

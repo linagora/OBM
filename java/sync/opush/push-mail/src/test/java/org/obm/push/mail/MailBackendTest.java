@@ -188,6 +188,9 @@ public class MailBackendTest {
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).contains(
 				inboxItemChange, draftsItemChange, sentItemChange, trashItemChange);
+
+		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
 	}
 	
 	@Test
@@ -208,6 +211,8 @@ public class MailBackendTest {
 		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
 		verify(collectionPathHelper, mappingService, mailboxService);
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
 	}
 
 	@Test
@@ -228,7 +233,7 @@ public class MailBackendTest {
 		replay(collectionPathHelper, mappingService, mailboxService);
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathHelper);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
 		verify(collectionPathHelper, mappingService, mailboxService);
 		
 		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("newFolderCollection")
@@ -236,6 +241,8 @@ public class MailBackendTest {
 				.displayName("NewFolder").build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
+		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
 	}
 
 	private MailboxFolders mailboxFolders(String... folders) {
