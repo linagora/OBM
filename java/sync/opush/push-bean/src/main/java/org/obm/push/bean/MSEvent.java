@@ -32,6 +32,7 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -116,7 +117,7 @@ public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	}
 
 	public List<MSEventException> getExceptions() {
-		return exceptions;
+		return Objects.firstNonNull(exceptions, Collections.<MSEventException>emptyList());
 	}
 
 	public void setExceptions(List<MSEventException> exceptions) {

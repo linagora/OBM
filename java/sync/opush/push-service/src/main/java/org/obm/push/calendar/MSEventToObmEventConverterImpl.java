@@ -63,7 +63,10 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -73,6 +76,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverter {
 
+	private static final Logger logger = LoggerFactory.getLogger(MSEventToObmEventConverterImpl.class);
+	
 	private static final int EVENT_CATEGORIES_MAX = 300;
 	
 	@Override
@@ -168,31 +173,37 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private void fillEventException(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent, 
 			Event convertedEvent, EventRecurrence eventRecurrence) throws ConversionException {
 		
-		if (msEvent.getExceptions() != null && !msEvent.getExceptions().isEmpty()) {
-		
-			for (MSEventException msEventException : msEvent.getExceptions()) {
-				assertExceptionValidity(eventRecurrence, msEventException);
-				if (msEventException.isDeleted()) {
-					eventRecurrence.addException(msEventException.getExceptionStartTime());
-				} else {
-					Event obmEvent = convertEventException(user, eventFromDB, convertedEvent, 
-							msEventException, isObmInternalEvent);
-
-					assertEventExceptionUnicityAtDate(eventRecurrence, obmEvent);
-					
-					eventRecurrence.addEventException(obmEvent);
-				}
+		for (MSEventException msEventException : msEvent.getExceptions()) {
+			assertExceptionValidity(eventRecurrence, msEventException);
+			if (msEventException.isDeleted()) {
+				addDeletedExceptionToRecurrence(eventRecurrence, msEventException);
+			} else {
+				Event eventException = convertEventException(user, eventFromDB, convertedEvent, msEventException, isObmInternalEvent);
+				addEventExceptionToRecurrence(eventRecurrence, eventException);
 			}
 		}
 	}
 
-	private void assertEventExceptionUnicityAtDate(EventRecurrence eventRecurrence, Event event) throws ConversionException {
-		if (eventRecurrence.hasDifferentEventExceptionAtDate(event)) {
-			throw new ConversionException("Trying to add two different event exceptions at the same date");
+	private void addDeletedExceptionToRecurrence(EventRecurrence eventRecurrence, MSEventException msEventException) {
+		Date exceptionStartTime = msEventException.getExceptionStartTime();
+		if (eventRecurrence.hasDeletedExceptionAtDate(exceptionStartTime)) {
+			logger.warn("The converter discards a duplicate deleted exception");
+		} else {
+			eventRecurrence.addException(exceptionStartTime);
 		}
 	}
 	
-	private Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
+	private void addEventExceptionToRecurrence(EventRecurrence eventRecurrence, Event eventException) throws ConversionException {
+		if (eventRecurrence.hasDifferentEventExceptionAtDate(eventException)) {
+			throw new ConversionException("Trying to add two different event exceptions at the same date");
+		} else if (eventRecurrence.hasEventExceptionAtDate(eventException.getRecurrenceId())) {
+			logger.warn("The converter discards a duplicate exception");
+		} else {
+			eventRecurrence.addEventException(eventException);
+		}
+	}
+
+	@VisibleForTesting Event convertEventException(User user, Event eventFromDB, Event parentEvent, 
 			MSEventException msEventException, boolean isObmInternalEvent) throws ConversionException {
 		
 		Event convertedEvent = new Event();
