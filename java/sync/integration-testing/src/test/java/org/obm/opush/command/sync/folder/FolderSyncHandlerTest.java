@@ -37,11 +37,11 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -51,29 +51,30 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.PortNumber;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.MailBackend;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
+import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.FolderHierarchy;
-import org.obm.sync.push.client.FolderStatus;
 import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 
 import com.google.inject.Inject;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class FolderSyncHandlerTest {
@@ -107,7 +108,6 @@ public class FolderSyncHandlerTest {
 		mockHierarchyChanges(classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 		mockCollectionDao(collectionDao, initialSyncKey, serverId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
@@ -121,7 +121,6 @@ public class FolderSyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		
 		Assertions.assertThat(folderSyncResponse.getStatus()).isEqualTo(1);
-		checkRegularFoldersAreSynchronized(folderSyncResponse, FolderStatus.ADD);
 	}
 	
 	@Test
@@ -130,10 +129,24 @@ public class FolderSyncHandlerTest {
 		int serverId = 4;
 		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		mockHierarchyChanges(classToInstanceMap);
+		
+		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
+		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
+		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
+		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
+		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
 		mockCollectionDao(collectionDao, syncKey, serverId);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
@@ -150,23 +163,9 @@ public class FolderSyncHandlerTest {
 		Assertions.assertThat(folderSyncResponse.getCount()).isEqualTo(0);
 		Assertions.assertThat(folderSyncResponse.getFolders()).isEmpty();
 	}
-	
-	private void checkRegularFoldersAreSynchronized(FolderSyncResponse folderSyncResponse, FolderStatus folderStatus) {
-		FolderHierarchy folderHierarchy = folderSyncResponse.getFolders();
-		Assertions.assertThat(folderHierarchy).isNotNull();
-		Assertions.assertThat(folderHierarchy.keySet())
-			.contains(FolderType.DEFAULT_INBOX_FOLDER,
-					FolderType.DEFAULT_DRAFTS_FOLDERS,
-					FolderType.DEFAULT_SENT_EMAIL_FOLDER,
-					FolderType.DEFAULT_DELETED_ITEMS_FOLDERS);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_INBOX_FOLDER, folderStatus);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_DRAFTS_FOLDERS, folderStatus);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_SENT_EMAIL_FOLDER, folderStatus);
-		checkStatus(folderHierarchy, FolderType.DEFAULT_DELETED_ITEMS_FOLDERS, folderStatus);
-	}
 
-	private void checkStatus(FolderHierarchy folderHierarchy, FolderType folderType, FolderStatus folderStatus) {
-		Assertions.assertThat(folderHierarchy.get(folderType).getStatus()).isEqualTo(folderStatus);
+	private HierarchyItemsChanges buildHierarchyItemsChangeEmpty() {
+		return new HierarchyItemsChanges.Builder().build();
 	}
 	
 	private void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
@@ -185,5 +184,4 @@ public class FolderSyncHandlerTest {
 		SyncState state = new SyncState(syncKey);
 		expect(collectionDao.findStateForKey(syncKey)).andReturn(state).anyTimes();
 	}
-
 }
