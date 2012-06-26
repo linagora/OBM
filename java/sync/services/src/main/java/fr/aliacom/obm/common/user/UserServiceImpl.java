@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private ObmUser findUserFromEmail(String email) {
-		String domainName = findDomainNameFromEmail(email);
+		String domainName = getDomainNameFromEmail(email);
 		if (domainName != null) {
 			ObmDomain obmDomain = domainService.findDomainByName(domainName);
 			if (obmDomain != null) {
@@ -127,7 +127,9 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 	
-	private String findDomainNameFromEmail(String email) {
+
+	@Override
+	public String getDomainNameFromEmail(String email) {
 		String[] parts = email.split("@");
 		String domain = null;
 		if (parts.length > 1) {

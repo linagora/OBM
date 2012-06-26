@@ -40,6 +40,7 @@ import org.obm.sync.calendar.Attendee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -99,11 +100,23 @@ public class HelperServiceImpl implements HelperService {
 	 */
 	@Override
 	public boolean canWriteOnCalendar(AccessToken accessToken, String loginOrEmail) {
-		String login = extractLogin(loginOrEmail);
+		if (isNotSameDomain(accessToken, loginOrEmail)) {
+			return false;
+		} else {
+			return canWriteOnCalendarFromUserLogin(accessToken, extractLogin(loginOrEmail));
+		}
+	}
+
+	private boolean canWriteOnCalendarFromUserLogin(AccessToken accessToken, String login) {
 		if (checkImplicitRights(accessToken, login)) {
 			return true;
 		}
 		return helperDao.canWriteOnCalendar(accessToken, login);
+	}
+
+	@VisibleForTesting boolean isNotSameDomain(AccessToken accessToken, String email) {
+		String emailDomain = userService.getDomainNameFromEmail(email);
+		return !accessToken.getDomain().getName().equalsIgnoreCase(emailDomain);
 	}
 
 	/**
