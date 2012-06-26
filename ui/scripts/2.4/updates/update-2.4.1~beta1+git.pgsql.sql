@@ -58,4 +58,4 @@ ALTER TABLE opush_folder_mapping ALTER folder_sync_state_id SET NOT NULL;
 ALTER TABLE opush_folder_mapping DROP device_id;
 ALTER TABLE opush_folder_sync_state DROP collection_id;
 
-COMMIT;
+ROLLBACK;
