@@ -100,6 +100,6 @@ psql -U ${user} -h ${host} ${db} -f \
   "updates/update-2.4.1~alpha10+git.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 psql -U ${user} -h ${host} ${db} -f \
-  "updates/update-2.4.1~beta1.pgsql.sql" >> /tmp/data_insert.log 2>&1
+  "updates/update-2.4.1~beta1+git.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 echo "DONE."
