@@ -433,10 +433,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event> {
 		if (reference == null) {
 			return true;
 		}
-		if (timeCreate.after(reference)) {
+		if (timeCreate.compareTo(reference) >= 0) {
 			return true;
 		}
-		if (timeUpdate != null && timeUpdate.after(reference)) {
+		if (timeUpdate != null && timeUpdate.compareTo(reference) >= 0) {
 			return true;
 		}
 		return false;

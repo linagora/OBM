@@ -1136,7 +1136,7 @@ public class CalendarBindingImplTest {
 	public void testRecurrenceIdAtTheProperFormatInGetSyncResponse() throws FindException, ServerFault{
 		String calendar = "cal1";
 		String userName = "user";
-		Date lastSync = new Date(1327680144000L);
+		Date lastSync = new Date(1327690144000L);
 		EventChanges daoChanges = getFakeEventChanges(RecurrenceKind.none);
 		
 		EventChanges sortedChanges = mockGetSyncWithSortedChanges(calendar, userName, lastSync, daoChanges);
