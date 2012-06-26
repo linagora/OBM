@@ -38,20 +38,22 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.mail.MailBackend;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class IntegrationPushTestUtils {
 
@@ -59,6 +61,7 @@ public class IntegrationPushTestUtils {
 		mockAddressBook(classToInstanceMap);
 		mockTask(classToInstanceMap);
 		mockCalendar(classToInstanceMap);
+		mockMailBackend(classToInstanceMap);
 	}
 	
 	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
@@ -70,10 +73,10 @@ public class IntegrationPushTestUtils {
 				.andReturn(hierarchyItemsChanges).anyTimes();
 	}
 	
-	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap) {
+	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException {
 		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
-		expect(taskBackend.getHierarchyChanges())
-				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
+		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(new HierarchyItemsChanges.Builder().build()).anyTimes();
 	}
 	
 	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap)
@@ -86,7 +89,22 @@ public class IntegrationPushTestUtils {
 		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
 				.andReturn(hierarchyItemsChanges).anyTimes();	
 	}
+	
+	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException {
+		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
+		
+		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
+			.changes(Lists.newArrayList(buildInboxFolder()))
+			.lastSync(new Date()).build();
+		
+		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(hierarchyItemsChanges).anyTimes();
+	}
 
+	public static ItemChange buildInboxFolder() {
+		return new ItemChange("1", "1", "INBOX", FolderType.DEFAULT_INBOX_FOLDER, true);
+	}
+	
 	public static void mockMonitoredCollectionDao(MonitoredCollectionDao monitoredCollectionDao) {
 		monitoredCollectionDao.put(
 				anyObject(Credentials.class), 

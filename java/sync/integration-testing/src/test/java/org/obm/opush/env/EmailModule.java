@@ -31,6 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import static org.easymock.EasyMock.expect;
+
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.smtp.SmtpSender;
 
@@ -44,6 +48,8 @@ public final class EmailModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		bindWithMock(ImapClientProvider.class);
 		bindWithMock(SmtpSender.class);
+		bindWithMock(MailBackend.class);
+		MailBackend mailBackend = getMock(MailBackend.class);
+		expect(mailBackend.getPIMDataType()).andReturn(PIMDataType.EMAIL);
 	}
-
 }
