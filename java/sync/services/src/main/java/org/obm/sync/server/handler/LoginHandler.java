@@ -34,6 +34,7 @@ package org.obm.sync.server.handler;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBindingImpl;
+import org.obm.sync.login.TrustedLoginBindingImpl;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.server.mailer.ErrorMailer;
@@ -57,6 +58,7 @@ public class LoginHandler implements ISyncHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final LoginBindingImpl binding;
+	private final TrustedLoginBindingImpl trustedBinding;
 	private final ErrorMailer errorMailer;
 	private final VersionValidator versionValidator;
 	private final SettingsService settingsService;
@@ -64,9 +66,11 @@ public class LoginHandler implements ISyncHandler {
 
 	@Inject
 	private LoginHandler(LoginBindingImpl loginBindingImpl,
+			TrustedLoginBindingImpl trustedLoginBindingImpl,
 			ErrorMailer errorMailer, SettingsService settingsService,
 			VersionValidator versionValidator, UserService userService) {
 		this.binding = loginBindingImpl;
+		this.trustedBinding = trustedLoginBindingImpl;
 		this.errorMailer = errorMailer;
 		this.settingsService = settingsService;
 		this.versionValidator = versionValidator;
@@ -98,14 +102,14 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	private void trustedLogin(Request request, XmlResponder responder) {
-		responder.sendToken(doLogin(request, responder));
+		responder.sendToken(doLogin(request, responder, trustedBinding));
 	}
 
 	private void authLogin(Request request, XmlResponder responder) {
-		responder.sendToken(doLogin(request, responder));
+		responder.sendToken(doLogin(request, responder, binding));
 	}
 
-	private AccessToken doLogin(Request request, XmlResponder responder) {
+	private AccessToken doLogin(Request request, XmlResponder responder, LoginBindingImpl loginBinding) {
 		try {
 			request.createSession();
 
@@ -126,7 +130,7 @@ public class LoginHandler implements ISyncHandler {
 				request.dumpHeaders();
 			}
 
-			AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+			AccessToken token = loginBinding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
 				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
 			if(token == null) {
 				responder.sendError("Login failed for user '" + login + "'");

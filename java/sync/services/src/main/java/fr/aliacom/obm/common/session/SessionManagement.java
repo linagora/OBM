@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.Login;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
@@ -154,6 +155,17 @@ public class SessionManagement {
 	}
 
 	/**
+	 * logs user without authenticating (simply accepts as a valid login) this should
+	 * either not be exposed to the outside world or have its result encrypted lest
+	 * one wants everyone to be able to login as anyone
+	 */
+	public AccessToken trustedLogin(String user, String password,
+			String origin, String clientIP, String remoteIP, String lemonLogin,
+			String lemonDomain, boolean isPasswordHashed) {
+		return null;
+	}
+
+	/**
 	 * @return null if the credential are not valid
 	 * @throws ObmSyncVersionNotFoundException
 	 */
@@ -161,56 +173,56 @@ public class SessionManagement {
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
-		String login = chooseLogin(specifiedLogin, lemonLogin, lemonDomain);
+		Login login = new Login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain));
 
 		logLoginTrial(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
-		String[] split = login.split("@", 2);
-		String userLogin = split[0];
-		String domainName = split.length < 2 ? null : split[1];
-
 		IAuthentificationService authService = authentificationServiceFactory.get();
-		if (domainName == null) {
-			domainName = authService.getObmDomain(userLogin);
+		if (!login.hasDomain()) {
+			login = login.withDomain(authService.getObmDomain(login.getLogin()));
 		}
 
-		ObmDomain obmDomain = domainService.findDomainByName(domainName);
+		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
 		if (obmDomain == null) {
-			logger.warn("cannot figure out domain for the domain_name "	+ domainName);
+			logger.warn("cannot figure out domain for the domain_name "	+ login.getDomain());
 			return null;
 		}
 
 		if ((lemonLogin != null && lemonDomain != null
 				&& doAuthLemonLdap(remoteIP))
-			|| doAuthSpecialAccount(userLogin, obmDomain, clientIP)
-			|| authService.doAuth(userLogin, obmDomain, password, isPasswordHashed)) {
+			|| doAuthSpecialAccount(login.getLogin(), obmDomain, clientIP)
+			|| authService.doAuth(login.getLogin(), obmDomain, password, isPasswordHashed)) {
 
-			AccessToken token = buildAccessToken(origin, userLogin, obmDomain);
-			registerTokenInSession(token);
-			logLoginSuccess(login, authService, token);
-			return token;
+			return login(origin, login.getLogin(), obmDomain, authService.getType());
 		}
-		logLoginFailure(userLogin, authService, obmDomain);
+		logLoginFailure(login.getLogin(), authService, obmDomain.getName());
 		return null;
 	}
 
+	private AccessToken login(String origin, String userLogin, ObmDomain obmDomain, String authServiceType) {
+		AccessToken token = buildAccessToken(origin, userLogin, obmDomain);
+		registerTokenInSession(token);
+		logLoginSuccess(userLogin, obmDomain.getName(), authServiceType, token);
+		return token;
+	}
+
 	private void logLoginFailure(String userLogin,
-			IAuthentificationService authService, ObmDomain obmDomain) {
+			IAuthentificationService authService, String obmDomainName) {
 		logger.info("access refused to login: '" + userLogin
-				+ "' domain: '" + obmDomain.getName() + "' auth type: "
+				+ "' domain: '" + obmDomainName + "' auth type: "
 				+ authService.getType());
 	}
 
 	private void logLoginSuccess(String login,
-			IAuthentificationService authService, AccessToken token) {
-		logger.info(LogUtils.prefix(token) + login + " logged in from " + token.getOrigin()
-				+ ". auth type: " + authService.getType() + " (mail: " + token.getUserEmail()
+			String domainName, String authServiceType, AccessToken token) {
+		logger.info(LogUtils.prefix(token) + login + "@" + domainName + " logged in from " + token.getOrigin()
+				+ ". auth type: " + authServiceType + " (mail: " + token.getUserEmail()
 				+ ") on obm-sync " + token.getVersion());
 	}
 
 	private void logLoginTrial(String origin, String clientIP, String remoteIP,
-			String lemonLogin, String lemonDomain, String login) {
-		logger.debug("Login trial for login: " + login
+			String lemonLogin, String lemonDomain, Login login) {
+		logger.debug("Login trial for login: " + login.getFullLogin()
 				+ " from client ip: " + clientIP + ", remoteIP: "
 				+ remoteIP + " origin: " + origin + " lemonLogin: "
 				+ lemonLogin + " lemonDomain: " + lemonDomain);
