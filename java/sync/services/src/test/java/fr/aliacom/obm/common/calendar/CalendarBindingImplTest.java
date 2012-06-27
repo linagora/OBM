@@ -506,9 +506,9 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testToModifyEventWithoutWriteRightOnCalendar() throws FindException, EventNotFoundException, ServerFault {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-		String calendar = "cal1";
+		String calendar = defaultObmUser.getEmail();
 		Event event = new Event();
-		event.setOwner(defaultObmUser.getEmail());
+		event.setOwner("user");
 
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 
@@ -519,7 +519,7 @@ public class CalendarBindingImplTest {
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 
 		HelperService rightsHelper = createMock(HelperService.class);
-		expect(rightsHelper.canWriteOnCalendar(accessToken, defaultObmUser.getEmail()))
+		expect(rightsHelper.canWriteOnCalendar(accessToken, calendar))
 				.andReturn(false).once();
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);

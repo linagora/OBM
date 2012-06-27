@@ -99,11 +99,11 @@ public class HelperServiceImpl implements HelperService {
 	 * calendar
 	 */
 	@Override
-	public boolean canWriteOnCalendar(AccessToken accessToken, String loginOrEmail) {
-		if (isNotSameDomain(accessToken, loginOrEmail)) {
+	public boolean canWriteOnCalendar(AccessToken accessToken, String email) {
+		if (isNotSameDomain(accessToken, email)) {
 			return false;
 		} else {
-			return canWriteOnCalendarFromUserLogin(accessToken, extractLogin(loginOrEmail));
+			return canWriteOnCalendarFromUserLogin(accessToken, extractLogin(email));
 		}
 	}
 
@@ -116,6 +116,9 @@ public class HelperServiceImpl implements HelperService {
 
 	@VisibleForTesting boolean isNotSameDomain(AccessToken accessToken, String email) {
 		String emailDomain = userService.getDomainNameFromEmail(email);
+		if (emailDomain == null) {
+			return false;
+		}
 		return !accessToken.getDomain().getName().equalsIgnoreCase(emailDomain);
 	}
 

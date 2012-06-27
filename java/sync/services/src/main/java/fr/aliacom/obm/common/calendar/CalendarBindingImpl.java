@@ -355,11 +355,11 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 			
-			if (before.getOwner() != null && !helperService.canWriteOnCalendar(token, before.getOwner())) {
+			if (!helperService.canWriteOnCalendar(token, calendar)) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUserLogin() + " cannot modify event["
-						+ before.getTitle() + "] because not owner"
-						+ " or no write right on owner " + before.getOwner()+". ParticipationState will be updated.");
+						+ before.getTitle() + "] because no write right on calendar "
+						+ calendar + ". ParticipationState will be updated.");
 				return before;
 				
 			} else {

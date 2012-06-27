@@ -88,7 +88,7 @@ public class HelperServiceImplTest {
 	}
 
 	@Test
-	public void testIsNotSameDomainWhenNoDomain() {
+	public void testIsSameDomainWhenNoDomain() {
 		accessToken.setDomain(domainWithName("otherdomain.org"));
 
 		String userLogin = "test";
@@ -101,7 +101,7 @@ public class HelperServiceImplTest {
 
 		verify(userService);
 		
-		assertThat(isNotSameDomain).isTrue();
+		assertThat(isNotSameDomain).isFalse();
 	}
 
 	private ObmDomain domainWithName(String domainName) {
