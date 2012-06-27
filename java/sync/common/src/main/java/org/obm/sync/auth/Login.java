@@ -42,4 +42,8 @@ public class Login {
 		return domain != null;
 	}
 
+	public Login withDomain(String alternativeDomain) {
+		return new Login(login, alternativeDomain);
+	}
+
 }
