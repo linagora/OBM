@@ -38,6 +38,7 @@ import java.util.List;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -99,6 +100,11 @@ public class MappingServiceImpl implements MappingService {
 	}
 	
 	@Override
+	public int createCollectionMapping(Device device, String col, SyncState syncState) throws DaoException {
+		return collectionDao.addCollectionMapping(device, col, syncState);
+	}
+	
+	@Override
 	public String getCollectionPathFor(Integer collectionId) throws CollectionNotFoundException, DaoException {
 		return collectionDao.getCollectionPath(collectionId);
 	}
@@ -153,4 +159,5 @@ public class MappingServiceImpl implements MappingService {
 			}
 		});
 	}
+
 }
