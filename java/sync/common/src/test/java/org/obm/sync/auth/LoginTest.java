@@ -5,6 +5,7 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 public class LoginTest {
+	private static final String ALTERNATIVE_DOMAIN = "exemple.net";
 	private static final String DOMAIN = "exemple.com";
 	private static final String LOGIN = "test";
 	private static final String FULL_LOGIN = LOGIN + Login.FULL_LOGIN_SEPARATOR + DOMAIN;
@@ -37,6 +38,13 @@ public class LoginTest {
 		login = new Login(null, DOMAIN);
 	}
 
+	@Test
+	public void alterDomain() {
+		login = new Login(FULL_LOGIN);
+		login = login.withDomain(ALTERNATIVE_DOMAIN);
+		Login alternative = new Login(LOGIN, ALTERNATIVE_DOMAIN);
+		assertLogin(LOGIN, ALTERNATIVE_DOMAIN, alternative.getFullLogin());
+	}
 
 	private void assertLogin(String shortLogin, String domain, String fullLogin) {
 		Assertions.assertThat(login.getLogin()).isEqualTo(shortLogin);
