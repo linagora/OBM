@@ -113,6 +113,25 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		}
 		return ret;
 	}
+
+	@Override
+	public int addCollectionMapping(Device device, String collection, SyncState syncState) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try{
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("INSERT INTO opush_folder_mapping" +
+					" (collection, folder_sync_state_id) VALUES (?, ?)");
+			ps.setString(1, collection);
+			ps.setInt(2, syncState.getId());
+			ps.executeUpdate();
+			return dbcp.lastInsertId(con);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, null);
+		}
+	}
 	
 	@Override
 	public void resetCollection(Device device, Integer collectionId) throws DaoException {
