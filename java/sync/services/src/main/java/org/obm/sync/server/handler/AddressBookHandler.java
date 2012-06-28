@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import java.sql.SQLException;
+import com.google.common.base.Strings;
 import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -110,6 +112,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			searchContact(token, request, responder);
 		} else if ("searchContactInGroup".equals(method)) {
 			searchContactInGroup(token, request, responder);
+		} else if ("countContactsInGroup".equals(method)) {
+			countContactsInGroup(token, request, responder);
 		} else if ("getAddressBookSync".equals(method)) {
 			getAddressBookSync(token, request, responder);
 		} else if ("unsubscribeBook".equals(method)) {
@@ -233,8 +237,9 @@ public class AddressBookHandler extends SecureSyncHandler {
 
 	private void searchContact(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
 		String query = p(request, "query");
-		int limit = Integer.parseInt(p(request, "limit"));
-		List<Contact> ret = binding.searchContact(at, query, limit);
+		int limit = Integer.valueOf(p(request, "limit"));
+		Integer offset = getOffset(request);
+		List<Contact> ret = binding.searchContact(at, query, limit, offset);
 		responder.sendListContact(ret);
 	}
 
@@ -242,9 +247,17 @@ public class AddressBookHandler extends SecureSyncHandler {
 		String query = p(request, "query");
 		int limit = Integer.valueOf(p(request, "limit"));
 		int groupId = Integer.valueOf(p(request, "group"));
+		Integer offset = getOffset(request);
 		AddressBook book = getAddressBookFromUid(at, groupId);
-		List<Contact> ret = binding.searchContactInGroup(at, book, query, limit);
+		List<Contact> ret = binding.searchContactInGroup(at, book, query, limit, offset);
 		responder.sendListContact(ret);
+	}
+
+	private void countContactsInGroup(AccessToken at, Request request, XmlResponder responder) throws SQLException, ServerFault {
+		int groupId = Integer.valueOf(p(request, "group"));
+		AddressBook book = getAddressBookFromUid(at, groupId);
+		int ret = binding.countContactsInGroup(at, book.getUid());
+		responder.sendCountContacts(ret);
 	}
 
 	private AddressBook getAddressBookFromUid(AccessToken at, int uid) throws ServerFault {
@@ -298,9 +311,15 @@ public class AddressBookHandler extends SecureSyncHandler {
 			XmlResponder responder) throws ServerFault {
 		
 		String query = p(request, "query");
-		int limit = Integer.parseInt(p(request, "limit"));
-		List<Contact> ret = binding.searchContactsInSynchronizedAddressBooks(token, query, limit);
+		int limit = Integer.valueOf(p(request, "limit"));
+		Integer offset = getOffset(request);
+		List<Contact> ret = binding.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
 		responder.sendListContact(ret);
 	}
 	
+	private Integer getOffset(Request request) {
+		String offset = p(request, "offset");
+		return Strings.isNullOrEmpty(offset) ? null : Integer.valueOf(offset);
+	}
+
 }

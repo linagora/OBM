@@ -34,6 +34,7 @@ package org.obm.sync.services;
 import java.util.Date;
 import java.util.List;
 
+import java.sql.SQLException;
 import javax.naming.NoPermissionException;
 
 import org.obm.sync.auth.AccessToken;
@@ -102,7 +103,7 @@ public interface IAddressBook {
 	 * Search contacts using a solr query
 	 */
 	List<Contact> searchContact(AccessToken token, String query,
-			int limit) throws ServerFault;
+			int limit, Integer offset) throws ServerFault;
 
 	// Methods for Funambol sync
 
@@ -120,10 +121,12 @@ public interface IAddressBook {
 	 * Search contacts in a group, based on a solr query
 	 */
 	List<Contact> searchContactInGroup(AccessToken token, AddressBook group,
-			String query, int limit) throws ServerFault;
+			String query, int limit, Integer offset) throws ServerFault;
 
 
 	boolean unsubscribeBook(AccessToken token, Integer bookId) throws ServerFault;
+
+	int countContactsInGroup(AccessToken token, int gid) throws ServerFault, SQLException;
 
 	/**
 	 * Get the list of folders that changed or were deleted since given date.
@@ -133,6 +136,6 @@ public interface IAddressBook {
 
 	ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
 
-	List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault;
+	List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault;
 	
 }

@@ -271,4 +271,8 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		return doc;
 	}
 
+	public void appendCountContacts(Element root, int count) {
+		createIfNotNull(root, "count", count);
+	}
+
 }

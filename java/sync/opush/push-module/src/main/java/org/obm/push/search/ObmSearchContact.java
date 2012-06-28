@@ -77,7 +77,8 @@ public class ObmSearchContact implements ISearchSource {
 			AccessToken token = login.login(udr.getUser().getLoginAtDomain(), udr.getPassword());
 			ContactConverter cc = new ContactConverter();
 			try {
-				List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit);
+				Integer offset = null;
+				List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
 				for (Contact contact: contacts) {
 					ret.add(cc.convertToSearchResult(contact));
 				}

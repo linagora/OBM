@@ -1407,7 +1407,7 @@ public class ContactDao {
 		}
 	}
 
-	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit) 
+	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit, Integer offset) 
 			throws MalformedURLException, SQLException, LocatorClientException {
 		
 		List<Contact> ret = new LinkedList<Contact>();
@@ -1441,11 +1441,13 @@ public class ContactDao {
 					sb.append("*) OR email:(");
 					sb.append(query.toLowerCase());
 					sb.append("*))");
+					sb.append(",score asc");
 				}
 				SolrQuery params = new SolrQuery();
 				params.setQuery(sb.toString());
 				params.setIncludeScore(true);
 				params.setRows(limit);
+				params.setStart(offset);
 
 				try {
 					QueryResponse resp = solrServer.query(params);
@@ -1473,7 +1475,7 @@ public class ContactDao {
 				+ CONTACT_SELECT_FIELDS
 				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
 				+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
-				+ eventIds.asPlaceHolders() + ")";
+				+ eventIds.asPlaceHolders() + ") ORDER BY contact_lastname";
 
 			ps = con.prepareStatement(q);
 			eventIds.insertValues(ps, 1);
@@ -1509,13 +1511,13 @@ public class ContactDao {
 		return ret;
 	}
 
-	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit) 
+	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit, Integer offset) 
 			throws MalformedURLException, LocatorClientException, SQLException {
 		
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return searchContact(at, addrBooks, con, query, limit);
+			return searchContact(at, addrBooks, con, query, limit, offset);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1525,11 +1527,11 @@ public class ContactDao {
 	 * Search contacts. Query will match against lastname, firstname & email
 	 * prefixes.
 	 */
-	public List<Contact> searchContact(AccessToken at, AddressBook book, String query, int limit) {
+	public List<Contact> searchContact(AccessToken at, AddressBook book, String query, int limit, Integer offset) {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return searchContact(at, Arrays.asList(book), con, query, limit);
+			return searchContact(at, Arrays.asList(book), con, query, limit, offset);
 		} catch (Throwable e1) {
 			logger.error(e1.getMessage(), e1);
 		} finally {
@@ -1746,4 +1748,26 @@ public class ContactDao {
 		}
 	}
 	
+	public int countContactsInGroup(int gid) throws SQLException {
+		String query = "SELECT COUNT(*) "
+					+  "FROM Contact "
+					+  "WHERE contact_addressbook_id = ?";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setInt(1, gid);
+			rs = ps.executeQuery();
+			return rs.next() ? rs.getInt(1) : 0;
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+	}
+
 }

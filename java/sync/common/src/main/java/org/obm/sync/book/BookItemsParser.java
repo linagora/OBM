@@ -244,6 +244,11 @@ public class BookItemsParser extends AbstractItemsParser {
 		return ret;
 	}
 
+	public int parseCountContactsInGroup(Element element) {
+		return i(element, "count");
+	}
+
+
 	public FolderChanges parseFolderChangesResponse(Document doc) {
 		Element root = doc.getDocumentElement();
 	    return parseFolderChanges(root);

@@ -295,10 +295,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<Contact> searchContact(AccessToken token, String query, int limit) throws ServerFault {
+	public List<Contact> searchContact(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		try {
 			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
-			return contactDao.searchContactsInAddressBooksList(token, addrBooks, query, limit);
+			return contactDao.searchContactsInAddressBooksList(token, addrBooks, query, limit, offset);
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
@@ -313,10 +313,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit) throws ServerFault {
+	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit, Integer offset) throws ServerFault {
 
 		try {
-			return contactDao.searchContact(token, book, query, limit);
+			return contactDao.searchContact(token, book, query, limit, offset);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -395,10 +395,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 		
 	@Override
 	@Transactional(readOnly=true)
-	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault {
+	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		try {
 			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);
-			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit);
+			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit, offset);
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
@@ -428,6 +428,16 @@ public class AddressBookBindingImpl implements IAddressBook {
 			return addressBookId.intValue() == contactConfiguration.getAddressBookUserId();
 		} else {
 			return false;
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public int countContactsInGroup(AccessToken token, int gid) throws ServerFault, SQLException {
+		try {
+			return contactDao.countContactsInGroup(gid);
+		} catch (SQLException ex) {
+			throw new ServerFault(ex);
 		}
 	}
 

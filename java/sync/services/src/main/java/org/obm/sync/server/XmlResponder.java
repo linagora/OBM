@@ -439,4 +439,17 @@ public class XmlResponder {
 		emitResponse(biw.writeListAddressBooksChanged(folderChanges));
 	}
 
+	public String sendCountContacts(int count) {
+		String res = "";
+		try {
+			Document doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/addressbookcount.xsd", "addressbook-count");
+			Element root = doc.getDocumentElement();
+			biw.appendCountContacts(root, count);
+			res = emitResponse(doc);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+		return res;
+	}
+
 }

@@ -57,6 +57,7 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -174,7 +175,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public List<Contact> searchContact(AccessToken token, String query, int limit) throws ServerFault {
+	public List<Contact> searchContact(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
+		Preconditions.checkNotNull(offset);
 		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", "" + limit);
@@ -184,15 +186,26 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public List<Contact> searchContactInGroup(AccessToken token, AddressBook group, String query, int limit) throws ServerFault {
+	public List<Contact> searchContactInGroup(AccessToken token, AddressBook group, String query, int limit, Integer offset) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", String.valueOf(limit));
+		params.put("offset", String.valueOf(offset));
 		params.put("group", String.valueOf(group.getUid()));
 		Document doc = execute(token, "/book/searchContactInGroup", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListContact(doc.getDocumentElement());
 	}
+	
+	@Override
+	public int countContactsInGroup(AccessToken token, int gid) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+	    params.put("group", String.valueOf(gid));
+	    Document doc = execute(token, "/book/countContactsInGroup", params);
+	    exceptionFactory.checkServerFaultException(doc);
+	    return respParser.parseCountContactsInGroup(doc.getDocumentElement());
+	}
+
 	
 	@Override
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date lastSync) throws ServerFault {
@@ -238,10 +251,13 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit) throws ServerFault {
+	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
 		params.put("limit", String.valueOf(limit));
+		if( offset != null ) {
+			params.put("offset", String.valueOf(offset));
+		}
 		Document doc = execute(token, "/book/searchContactsInSynchronizedAddressBooks", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListContact(doc.getDocumentElement());
