@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
@@ -60,11 +59,14 @@ public class StateMachine {
 	
 	private final CollectionDao collectionDao;
 	private final ItemTrackingDao itemTrackingDao;
+	private final SyncKeyFactory syncKeyFactory;
 
 	@Inject
-	private StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao) {
+	private StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
+			SyncKeyFactory syncKeyFactory) {
 		this.collectionDao = collectionDao;
 		this.itemTrackingDao = itemTrackingDao;
+		this.syncKeyFactory = syncKeyFactory;
 	}
 
 	public SyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
@@ -77,8 +79,8 @@ public class StateMachine {
 
 	public String allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
-		
-		String newSk = UUID.randomUUID().toString();
+
+		String newSk = syncKeyFactory.randomSyncKey();
 		SyncState newState = new SyncState(newSk, lastSync);
 		int syncStateId = collectionDao.updateState(udr.getDevice(), collectionId, newState);
 		newState.setId(syncStateId);
