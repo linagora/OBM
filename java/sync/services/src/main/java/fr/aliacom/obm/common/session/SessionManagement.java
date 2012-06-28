@@ -157,12 +157,22 @@ public class SessionManagement {
 	/**
 	 * logs user without authenticating (simply accepts as a valid login) this should
 	 * either not be exposed to the outside world or have its result encrypted lest
-	 * one wants everyone to be able to login as anyone
+	 * one wants everyone to be able to login as anyone!
 	 */
-	public AccessToken trustedLogin(String user, String password,
-			String origin, String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) {
-		return null;
+	public AccessToken trustedLogin(String specifiedLogin, String origin,
+			String clientIP, String remoteIP, String lemonLogin, String lemonDomain) {
+		IAuthentificationService authService = authentificationServiceFactory.get();
+
+		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
+		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
+
+		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
+		if (obmDomain == null) {
+			logNoDomain(login.getDomain());
+			return null;
+		}
+
+		return login(origin, login.getLogin(), obmDomain, authService.getType());
 	}
 
 	/**
@@ -176,7 +186,7 @@ public class SessionManagement {
 		IAuthentificationService authService = authentificationServiceFactory.get();
 
 		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
-		logLoginTrial(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
+		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
 		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
 		if (obmDomain == null) {
@@ -228,7 +238,7 @@ public class SessionManagement {
 				+ ") on obm-sync " + token.getVersion());
 	}
 
-	private void logLoginTrial(String origin, String clientIP, String remoteIP,
+	private void logLoginAttempt(String origin, String clientIP, String remoteIP,
 			String lemonLogin, String lemonDomain, Login login) {
 		logger.debug("Login trial for login: " + login.getFullLogin()
 				+ " from client ip: " + clientIP + ", remoteIP: "
