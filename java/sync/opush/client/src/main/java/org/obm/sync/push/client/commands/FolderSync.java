@@ -70,9 +70,9 @@ public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 		int count = Integer.valueOf(DOMUtils.getElementText(root, "Count"));
 		Map<FolderType, Folder> ret = new HashMap<FolderType, Folder>(count + 1);
 
-		// TODO process deletions
 		getFolders(ret, root, FolderStatus.ADD);
 		getFolders(ret, root, FolderStatus.UPDATE);
+		getFolders(ret, root, FolderStatus.DELETE);
 		
 		return new FolderSyncResponse(key, ret, status, count);
 	}
@@ -85,9 +85,18 @@ public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 			f.setServerId(DOMUtils.getElementText(e, "ServerId"));
 			f.setParentId(DOMUtils.getElementText(e, "ParentId"));
 			f.setName(DOMUtils.getElementText(e, "DisplayName"));
-			f.setType(FolderType.getValue(Integer.parseInt(DOMUtils.getElementText(e, "Type"))));
+			f.setType(recognizeType(e));
 			f.setStatus(statusNodeName);
 			ret.put(f.getType(), f);
+		}
+	}
+
+	private FolderType recognizeType(Element e) {
+		String type = DOMUtils.getElementText(e, "Type");
+		if (type != null) {
+			return FolderType.getValue(Integer.parseInt(type));
+		} else {
+			return null;
 		}
 	}
 

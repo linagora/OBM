@@ -49,13 +49,21 @@ public class FolderSyncHandlerTestModule  extends AbstractOpushEnv {
 		Module overrideModule = super.overrideModule();
 		
 		Module contentsExporterBackend = bindContentsExporterBackendModule();
+		Module syncKeyFactory = bindSyncKeyFactoryModule();
 		
-		return Modules.combine(overrideModule, contentsExporterBackend);
+		return Modules.combine(overrideModule, contentsExporterBackend, syncKeyFactory);
 	}
 
 	private Module bindContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule();
-		getMockMap().addMap(contentsExporterBackend.getMockMap());
-		return contentsExporterBackend;
+		return bindModule(ModuleUtils.buildContentsExporterBackendModule());
+	}
+
+	private Module bindSyncKeyFactoryModule() {
+		return bindModule(ModuleUtils.buildSyncKeyFactoryModule());
+	}
+	
+	private Module bindModule(AbstractOverrideModule module) {
+		getMockMap().addMap(module.getMockMap());
+		return module;
 	}
 }

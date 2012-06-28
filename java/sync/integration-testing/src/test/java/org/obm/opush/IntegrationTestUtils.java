@@ -59,7 +59,7 @@ import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 
 public class IntegrationTestUtils {
 
@@ -112,7 +112,11 @@ public class IntegrationTestUtils {
 	}
 
 	public static void replayMocks(Iterable<Object> toReplay) {
-		EasyMock.replay(Lists.newArrayList(toReplay).toArray());
+		EasyMock.replay(Iterables.toArray(toReplay, Object.class));
+	}
+
+	public static void verifyMocks(Iterable<Object> toVerify) {
+		EasyMock.verify(Iterables.toArray(toVerify, Object.class));
 	}
 	
 	public static OPClient buildOpushClient(OpushUser user, int port) {
