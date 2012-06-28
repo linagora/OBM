@@ -57,48 +57,59 @@ import com.google.common.collect.Lists;
 
 public class IntegrationPushTestUtils {
 
-	public static void mockHierarchyChanges(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException, UnexpectedObmSyncServerException {
-		mockAddressBook(classToInstanceMap);
-		mockTask(classToInstanceMap);
-		mockCalendar(classToInstanceMap);
-		mockMailBackend(classToInstanceMap);
+	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException, UnexpectedObmSyncServerException {
+		mockHierarchyChangesOnlyInbox(classToInstanceMap, new Date());
 	}
 	
-	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
+	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate) throws DaoException, UnexpectedObmSyncServerException {
+		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
+			.changes(Lists.newArrayList(buildInboxFolder()))
+			.lastSync(newSyncDate).build();
+		
+		mockHierarchyChangesForMailboxes(classToInstanceMap, hierarchyItemsChanges);
+	}
+
+	public static void mockHierarchyChangesForMailboxes(ClassToInstanceAgregateView<Object> classToInstanceMap,
+			HierarchyItemsChanges mailboxesChanges) throws DaoException, UnexpectedObmSyncServerException {
+		
+		Date lastSync = mailboxesChanges.getLastSync();
+		mockAddressBook(classToInstanceMap, lastSync);
+		mockTask(classToInstanceMap, lastSync);
+		mockCalendar(classToInstanceMap, lastSync);
+		mockMailBackend(classToInstanceMap, mailboxesChanges);
+	}
+
+	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
 			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder().build();
+		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
 		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
 				.andReturn(hierarchyItemsChanges).anyTimes();
 	}
 	
-	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException {
+	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate) throws DaoException {
 		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
 		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
-				.andReturn(new HierarchyItemsChanges.Builder().build()).anyTimes();
+				.andReturn(new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build()).anyTimes();
 	}
 	
-	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap)
+	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
 			throws DaoException, UnexpectedObmSyncServerException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
 		HierarchyItemsChanges hierarchyItemsChanges =
-				new HierarchyItemsChanges.Builder().lastSync(new Date()).build();
+				new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
 		
 		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
 				.andReturn(hierarchyItemsChanges).anyTimes();	
 	}
 	
-	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException {
+	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap, HierarchyItemsChanges hierarchyMailboxesChanges) throws DaoException {
 		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
-			.changes(Lists.newArrayList(buildInboxFolder()))
-			.lastSync(new Date()).build();
-		
 		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
-				.andReturn(hierarchyItemsChanges).anyTimes();
+				.andReturn(hierarchyMailboxesChanges).anyTimes();
 	}
 
 	public static ItemChange buildInboxFolder() {
