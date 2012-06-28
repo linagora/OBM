@@ -139,7 +139,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	private Date getLastSyncDate(FolderSyncRequest folderSyncRequest) throws DaoException, InvalidSyncKeyException {
 		
 		String syncKey = folderSyncRequest.getSyncKey();
-		SyncState syncState = stMachine.getSyncState(syncKey);
+		SyncState syncState = stMachine.getItemSyncState(syncKey);
 		if (syncState == null) {
 			throw new InvalidSyncKeyException(syncKey);
 		}
