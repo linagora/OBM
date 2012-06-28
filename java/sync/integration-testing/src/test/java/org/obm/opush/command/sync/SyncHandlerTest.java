@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
-import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
+import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasAddItems;
@@ -110,7 +110,7 @@ public class SyncHandlerTest {
 		int syncEmailCollectionId = 4;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
-		mockHierarchyChanges(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -137,7 +137,7 @@ public class SyncHandlerTest {
 			.withSyncDate(new Date()).build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
-		mockHierarchyChanges(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -167,7 +167,7 @@ public class SyncHandlerTest {
 			.withSyncDate(new Date()).build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
-		mockHierarchyChanges(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -195,7 +195,7 @@ public class SyncHandlerTest {
 			.withSyncDate(new Date()).build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
-		mockHierarchyChanges(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
@@ -224,7 +224,7 @@ public class SyncHandlerTest {
 			.withSyncDate(new Date()).build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
-		mockHierarchyChanges(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
