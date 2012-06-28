@@ -46,4 +46,9 @@ public class PingHandlerTestModule extends AbstractOpushEnv {
 		Module overrideModule = super.overrideModule();
 		return overrideModule;
 	}
+	
+	@Override
+	protected void onModuleInstalled() {
+		// Do nothing
+	}
 }
