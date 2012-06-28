@@ -64,8 +64,12 @@ import com.google.inject.Singleton;
 @Singleton
 public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements CollectionDao {
 
+	private static final String SYNC_STATE_ITEM_TABLE = "opush_sync_state";
+	private static final String SYNC_STATE_FOLDER_TABLE = "opush_folder_sync_state";
 	private static final String SYNC_STATE_FIELDS = 
 			Joiner.on(',').join("id", "last_sync", "sync_key");
+	private static final String SYNC_STATE_FOLDER_FIELDS = 
+			Joiner.on(',').join("id", "sync_key");
 	
 	@Inject
 	protected CollectionDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
@@ -237,7 +241,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(
 					"SELECT " + SYNC_STATE_FIELDS 
-					+ " FROM opush_sync_state WHERE sync_key=?");
+					+ " FROM " + SYNC_STATE_ITEM_TABLE + " WHERE sync_key=?");
 			ps.setString(1, syncKey);
 
 			rs = ps.executeQuery();
@@ -252,6 +256,34 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return null;
 	}
 	
+	@Override
+	public FolderSyncState findFolderStateForKey(String syncKey) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement(
+					"SELECT " + SYNC_STATE_FOLDER_FIELDS 
+					+ " FROM " + SYNC_STATE_FOLDER_TABLE + " WHERE sync_key=?");
+			ps.setString(1, syncKey);
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				String rsSyncKey = rs.getString("sync_key");
+				FolderSyncState folderSyncState = new FolderSyncState(rsSyncKey);
+				folderSyncState.setId(rs.getInt("id"));
+				return folderSyncState;
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+		return null;
+	}
+
 	@Override
 	public ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
 		Connection con = null;
