@@ -31,7 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import static org.easymock.EasyMock.expect;
+
+import java.util.Collections;
+import java.util.Date;
+
+import org.obm.DateUtils;
 import org.obm.opush.ActiveSyncServletModule;
+import org.obm.push.bean.ChangedCollections;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.DaoException;
+import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +58,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
 	}
-	
+
 	@Provides
 	public ClassToInstanceAgregateView<Object> makeInstanceMapInjectable() {
 		return mockMap;
@@ -86,5 +96,28 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	
 	public ClassToInstanceAgregateView<Object> getMockMap() {
 		return mockMap;
+	}
+	
+	@Override
+	protected void onModuleInstalled() {
+		expectOpushStartupRequirements();
+	}
+	
+	private void expectOpushStartupRequirements() {
+		expectDaoRequirements();
+	}
+
+	private void expectDaoRequirements() {
+		try {
+			Date initialSyncDate = new Date(0);
+			Date newSyncDate = DateUtils.date("1988-05-27T04:38:01");
+			ChangedCollections noChange = new ChangedCollections(newSyncDate, Collections.<SyncCollection>emptySet());
+
+			CollectionDao collectionDao = mockMap.get(CollectionDao.class);
+			expect(collectionDao.getContactChangedCollections(initialSyncDate)).andReturn(noChange).once();
+			expect(collectionDao.getCalendarChangedCollections(initialSyncDate)).andReturn(noChange).once();
+		} catch (DaoException e) {
+			// Cannot append
+		}
 	}
 }

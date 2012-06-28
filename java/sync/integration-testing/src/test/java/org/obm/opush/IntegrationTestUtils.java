@@ -44,6 +44,7 @@ import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
@@ -103,6 +104,11 @@ public class IntegrationTestUtils {
 			String collectionPath = IntegrationTestUtils.buildCalendarCollectionPath(opushUser);  
 			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPath).anyTimes();
 		}
+	}
+
+	public static void expectAllocateFolderState(CollectionDao collectionDao, FolderSyncState folderSyncState) throws DaoException {
+		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(String.class)))
+			.andReturn(folderSyncState);
 	}
 
 	public static void replayMocks(Iterable<Object> toReplay) {

@@ -44,8 +44,6 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
@@ -65,8 +63,6 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
@@ -119,22 +115,18 @@ public class MailBackendHandlerTest {
 	@Inject ImapClientProvider clientProvider;
 	
 	private String mailbox;
-	private GreenMailUser user;
+	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
-	private Credentials credentials;
-	private Device device;
-	private List<OpushUser> fakeTestUsers;
+	private OpushUser user;
 
 	@Before
 	public void init() throws AuthorizationException, FolderException {
-		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		user = singleUserFixture.jaures;
 		greenMail.start();
 		mailbox = singleUserFixture.jaures.user.getLoginAtDomain();
-		user = greenMail.setUser(mailbox, singleUserFixture.jaures.password);
+		greenMailUser = greenMail.setUser(mailbox, singleUserFixture.jaures.password);
 		imapHostManager = greenMail.getManagers().getImapHostManager();
-		imapHostManager.createMailbox(user, "Trash");
-		credentials = new Credentials(singleUserFixture.jaures.user, singleUserFixture.jaures.password);
-		device = new Device(singleUserFixture.jaures.hashCode(), singleUserFixture.jaures.deviceType, singleUserFixture.jaures.deviceId, new Properties());
+		imapHostManager.createMailbox(greenMailUser, "Trash");
 	}
 
 	@After
@@ -156,7 +148,7 @@ public class MailBackendHandlerTest {
 						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 		.withSyncDate(new Date()).build();
 		
-		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockDao(serverId, syncState);
 		
 		bindCollectionIdToPath(serverId);
@@ -179,10 +171,10 @@ public class MailBackendHandlerTest {
 	private void bindCollectionIdToPath(int syncEmailCollectionId) {
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		SyncCollection syncCollection = new SyncCollection(syncEmailCollectionId, IntegrationTestUtils.buildEmailInboxCollectionPath(singleUserFixture.jaures));
-		expect(syncedCollectionDao.get(credentials, device, syncEmailCollectionId))
+		expect(syncedCollectionDao.get(user.credentials, user.device, syncEmailCollectionId))
 			.andReturn(syncCollection).anyTimes();
 		
-		syncedCollectionDao.put(eq(credentials), eq(device), anyObject(Collection.class));
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Collection.class));
 		expectLastCall().anyTimes();
 	}
 
@@ -194,26 +186,32 @@ public class MailBackendHandlerTest {
 
 	private void mockDao(int serverId, ItemSyncState syncState) throws Exception {
 		mockUnsynchronizedItemDao(serverId);
+		mockSyncedCollectionDaoToReturnSyncCollection(serverId);
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
 		mockEmailDao(serverId);
 	}
 	
+	private void mockSyncedCollectionDaoToReturnSyncCollection(int serverId) {
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		expect(syncedCollectionDao.get(user.credentials, user.device, serverId)).andReturn(new SyncCollection());
+	}
+
 	private void mockUnsynchronizedItemDao(int serverId) {
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(credentials, device, serverId))
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, serverId))
 			.andReturn(ImmutableSet.<ItemChange> of()).anyTimes();
 		
-		unsynchronizedItemDao.clearItemsToAdd(credentials, device, serverId);
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, serverId);
 		expectLastCall().anyTimes();
 		
-		expect(unsynchronizedItemDao.listItemsToRemove(credentials, device, serverId))
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, serverId))
 			.andReturn(ImmutableSet.<ItemChange> of()).anyTimes();
 		
-		unsynchronizedItemDao.clearItemsToRemove(credentials, device, serverId);
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, serverId);
 		expectLastCall().anyTimes();
 		
-		unsynchronizedItemDao.storeItemsToRemove(credentials, device, serverId, Lists.<ItemChange> newArrayList());
+		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, serverId, Lists.<ItemChange> newArrayList());
 		expectLastCall().anyTimes();
 	}
 	
@@ -226,10 +224,10 @@ public class MailBackendHandlerTest {
 			.andReturn(syncState).anyTimes();
 		
 		int lastUpdateState = 1;
-		expect(collectionDao.updateState(eq(device), eq(serverId), anyObject(SyncState.class)))
+		expect(collectionDao.updateState(eq(user.device), eq(serverId), anyObject(SyncState.class)))
 			.andReturn(lastUpdateState).anyTimes();
 		
-		expect(collectionDao.getCollectionMapping(eq(device), anyObject(String.class)))
+		expect(collectionDao.getCollectionMapping(eq(user.device), anyObject(String.class)))
 			.andReturn(serverId).anyTimes();
 		
 		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, Sets.newHashSet(singleUserFixture.jaures));
@@ -263,7 +261,7 @@ public class MailBackendHandlerTest {
 	}
 	
 	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {
-		MailFolder inboxFolder = imapHostManager.getFolder(user, mailbox);
+		MailFolder inboxFolder = imapHostManager.getFolder(greenMailUser, mailbox);
 		Assertions.assertThat(inboxFolder.getMessageCount()).isEqualTo(expectedNumberOfEmails);
 	}
 	
