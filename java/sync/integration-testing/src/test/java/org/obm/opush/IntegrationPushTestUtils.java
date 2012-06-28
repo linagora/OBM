@@ -49,6 +49,7 @@ import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -110,6 +111,10 @@ public class IntegrationPushTestUtils {
 		
 		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
 				.andReturn(hierarchyMailboxesChanges).anyTimes();
+	}
+	
+	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, String newSyncKey) {
+		expect(classToInstanceMap.get(SyncKeyFactory.class).randomSyncKey()).andReturn(newSyncKey).once();
 	}
 
 	public static ItemChange buildInboxFolder() {

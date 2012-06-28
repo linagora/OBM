@@ -60,6 +60,10 @@ public final class FolderSyncResponse implements IEasReponse {
 	public int getStatus() {
 		return status;
 	}
+
+	public String getStatusAsString() {
+		return String.valueOf(status);
+	}
 	
 	public int getCount() {
 		return count;
