@@ -1907,7 +1907,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Event removeEvent(Connection con, AccessToken token, EventType eventType, Event event)
 			throws SQLException {
-		Preconditions.checkArgument(event.getRecurrenceId() != null,
+		Preconditions.checkArgument(event.getRecurrenceId() == null,
 				"Cannot remove an event exception via removeEvent()");
 
 		Collection<Integer> attendeeIds = extractAttendeeIds(con, token, event);
