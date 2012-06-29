@@ -29,53 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.exception;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
-import org.obm.push.backend.CollectionPath;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
+public class HierarchyChangesException extends RuntimeException {
 
-public interface MappingService {
+	public HierarchyChangesException(Throwable e) {
+		super(e);
+	}
 
-	String collectionIdToString(Integer collectionId);
-
-	int createCollectionMapping(Device device, String col)
-			throws DaoException;
-	
-	Date getLastBackendMapping(PIMDataType dataType, FolderSyncState folderSyncState)
-			throws DaoException;
-	
-	void createBackendMapping(PIMDataType pimDataType, FolderSyncState outgoingSyncState)
-			throws DaoException;
-	
-	String getCollectionPathFor(Integer collectionId)
-			throws CollectionNotFoundException, DaoException;
-
-	Integer getCollectionIdFor(Device device, String collection) throws CollectionNotFoundException, DaoException;
-	
-	List<ItemChange> buildItemsToDeleteFromUids(Integer collectionId,
-			Collection<Long> uids);
-
-	ItemChange getItemChange(Integer collectionId, String clientId);
-
-	String getServerIdFor(Integer collectionId, String clientId);
-	
-	Integer getItemIdFromServerId(String serverId);
-
-	Integer getCollectionIdFromServerId(String serverId);
-	
-	List<CollectionPath> listCollections(UserDataRequest udr, FolderSyncState folderSyncState) throws DaoException;
-
-	void snapshotCollections(FolderSyncState outgoingSyncState, Set<Integer> collectionIds)
-			throws DaoException;
 }

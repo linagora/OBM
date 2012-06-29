@@ -85,8 +85,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try{
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping " +
-					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = folder_sync_state_id " +
-					"WHERE opush_folder_sync_state.device_id = ?");
+					"WHERE device_id = ?");
 			ps.setInt(1, id);
 			ResultSet resultSet = ps.executeQuery();
 
@@ -101,8 +100,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return userCollections;
 	}
 
-	@Override
-	public Integer addCollectionMapping(Device device, String collection) throws DaoException {
+ 	@Override
+	public int addCollectionMapping(Device device, String collection) throws DaoException {
 		Integer id = device.getDatabaseId();
 		Integer ret = null;
 		Connection con = null;
@@ -120,25 +119,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			JDBCUtils.cleanup(con, ps, null);
 		}
 		return ret;
-	}
-
-	@Override
-	public int addCollectionMapping(Device device, String collection, FolderSyncState syncState) throws DaoException {
-		Connection con = null;
-		PreparedStatement ps = null;
-		try{
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_folder_mapping " +
-					"(collection, folder_sync_state_id) VALUES (?, ?)");
-			ps.setString(1, collection);
-			ps.setInt(2, syncState.getId());
-			ps.executeUpdate();
-			return dbcp.lastInsertId(con);
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, null);
-		}
 	}
 	
 	@Override
@@ -228,7 +208,24 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 
 	@Override
 	public FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException {
-		return null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("INSERT INTO opush_folder_sync_state" +
+					" (sync_key, device_id) VALUES (?, ?)");
+			ps.setString(1, newSyncKey);
+			ps.setInt(2, device.getDatabaseId());
+			ps.executeUpdate();
+			FolderSyncState folderSyncState = new FolderSyncState(newSyncKey);
+			folderSyncState.setId(dbcp.lastInsertId(con));
+			return folderSyncState;
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, null);
+		}
 	}
 	
 	@Override
@@ -255,7 +252,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		}
 		return null;
 	}
-	
+
 	@Override
 	public FolderSyncState findFolderStateForKey(String syncKey) throws DaoException {
 		Connection con = null;
@@ -327,8 +324,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT opush_folder_mapping.id FROM opush_folder_mapping " +
-					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = folder_sync_state_id " +
-					"WHERE opush_folder_sync_state.device_id = ? " +
+					"WHERE device_id = ? " +
 					"AND collection = ?");
 			ps.setInt(1, devDbId);
 			ps.setString(2, collection);

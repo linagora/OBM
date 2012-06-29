@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import java.util.Date;
-
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the
@@ -46,5 +46,6 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(UserDataRequest udr);
 
-	HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException;
+	HierarchyItemsChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState, FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException;
+
 }

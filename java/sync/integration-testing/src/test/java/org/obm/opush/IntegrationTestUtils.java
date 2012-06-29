@@ -46,11 +46,13 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
+import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
@@ -109,6 +111,11 @@ public class IntegrationTestUtils {
 	public static void expectAllocateFolderState(CollectionDao collectionDao, FolderSyncState folderSyncState) throws DaoException {
 		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(String.class)))
 			.andReturn(folderSyncState);
+	}
+
+	public static void expectCreateFolderMappingState(FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao) throws DaoException {
+		folderSyncStateBackendMappingDao.createMapping(anyObject(PIMDataType.class), anyObject(FolderSyncState.class));
+		expectLastCall().anyTimes();
 	}
 
 	public static void replayMocks(Iterable<Object> toReplay) {

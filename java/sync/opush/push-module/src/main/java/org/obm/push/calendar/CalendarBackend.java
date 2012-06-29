@@ -35,12 +35,14 @@ import java.security.InvalidParameterException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
@@ -54,6 +56,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -80,35 +83,36 @@ import org.obm.sync.services.ICalendar;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
 public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
+
+	private static final String DEFAULT_CALENDAR_PARENT_ID = "0";
+	private static final String DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX = " calendar";
+	
 	private final EventConverter eventConverter;
 	private final EventService eventService;
 	private final ICalendar calendarClient;
-	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	private CalendarBackend(MappingService mappingService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EventConverter eventConverter, 
 			EventService eventService,
-			LoginService login, CollectionPathHelper collectionPathHelper) {
-		super(mappingService, login);
+			LoginService login,
+			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
+		super(mappingService, login, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
-		this.collectionPathHelper = collectionPathHelper;
-	}
-
-	private String getDefaultCalendarName(UserDataRequest udr) {
-		return "obm:\\\\" + udr.getUser().getLoginAtDomain() + "\\calendar\\"
-				+ udr.getUser().getLoginAtDomain();
 	}
 	
 	@Override
@@ -117,67 +121,91 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync)
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
+			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException {
 
-		List<ItemChange> itemChanges = null;
-		if (!udr.checkHint("hint.multipleCalendars", false)) {
-			itemChanges = getDefaultCalendarItemChange(udr);
-		} else {
-			itemChanges = getCalendarList(udr);
+		try {
+			List<CollectionPath> contactsCollections = null;
+			if (!udr.checkHint("hint.multipleCalendars", false)) {
+				contactsCollections = getDefaultCalendarCollectionPaths(udr);
+			} else {
+				contactsCollections = getCalendarCollectionPaths(udr);
+			}
+			snapshotHierarchy(udr, contactsCollections, outgoingSyncState);
+			return computeChanges(udr, lastKnownState, contactsCollections);
+		} catch (CollectionNotFoundException e) {
+			throw new HierarchyChangesException(e);
 		}
-		return new HierarchyItemsChanges.Builder()
-			.changes(itemChanges).lastSync(lastSync).build();
 	}
 
-	private List<ItemChange> getCalendarList(UserDataRequest udr) throws DaoException {
-		List<ItemChange> ret = new LinkedList<ItemChange>();
+	private HierarchyItemsChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
+			Iterable<CollectionPath> contactsCollections) throws DaoException, CollectionNotFoundException {
+
+		ImmutableSet<CollectionPath> actualContactsCollections = ImmutableSet.copyOf(contactsCollections);
+		Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
+		
+		Set<CollectionPath> newContactCollections = Sets.difference(actualContactsCollections, lastKnownCollections);
+		Set<CollectionPath> deletedContactCollections = Sets.difference(lastKnownCollections, actualContactsCollections);
+
+		return buildHierarchyItemsChanges(udr, newContactCollections, deletedContactCollections);
+	}
+
+	private List<CollectionPath> getCalendarCollectionPaths(UserDataRequest udr) {
+		
+		List<CollectionPath> ret = Lists.newLinkedList();
 		AccessToken token = login(udr);
 		try {
 			CalendarInfo[] cals = calendarClient.listCalendars(token);
-			String domain = udr.getUser().getDomain();
 			for (CalendarInfo ci : cals) {
-				ItemChange ic = new ItemChange();
-				String col = collectionPathHelper.buildCollectionPath(
-						udr, PIMDataType.CALENDAR, ci.getUid() + domain);
-				Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), col);
-				ic.setServerId(mappingService.collectionIdToString(collectionId));
-				ic.setParentId("0");
-				ic.setDisplayName(ci.getMail() + " calendar");
-				if (udr.getUser().getLoginAtDomain().equalsIgnoreCase(ci.getMail())) {
-					ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
-				} else {
-					ic.setItemType(FolderType.USER_CREATED_CALENDAR_FOLDER);
-				}
-				ret.add(ic);
+				ret.add(collectionPathOfCalendar(udr, ci.getMail()));
 			}
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
-		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage());
 		} finally {
 			logout(token);
 		}
 		return ret;
 	}
 
-	private List<ItemChange> getDefaultCalendarItemChange(UserDataRequest udr) throws DaoException {
+	private List<CollectionPath> getDefaultCalendarCollectionPaths(UserDataRequest udr) {
+		
+		String displayName = udr.getUser().getLoginAtDomain();
+		return ImmutableList.of(collectionPathOfCalendar(udr, displayName));
+	}
+
+	@Override
+	protected ItemChange createItemChange(UserDataRequest udr, CollectionPath collectionPath)
+			throws CollectionNotFoundException, DaoException {
+		
+		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 		
 		ItemChange ic = new ItemChange();
-		String col = getDefaultCalendarName(udr);
-		String serverId = "";
-		try {
-			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), col);
-			serverId = mappingService.collectionIdToString(collectionId);
-		} catch (CollectionNotFoundException e) {
-			serverId = mappingService.createCollectionMapping(udr.getDevice(), col);
-			ic.setIsNew(true);
+		ic.setServerId(mappingService.collectionIdToString(collectionId));
+		ic.setParentId(DEFAULT_CALENDAR_PARENT_ID);
+		ic.setDisplayName(collectionPath.displayName() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX);
+		if (isDefaultCalendarCollectionPath(udr, collectionPath)) {
+			ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
+		} else {
+			ic.setItemType(FolderType.USER_CREATED_CALENDAR_FOLDER);
 		}
-		ic.setServerId(serverId);
-		ic.setParentId("0");
-		ic.setDisplayName(udr.getUser().getLoginAtDomain() + " calendar");
-		ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
-		return ImmutableList.of(ic);
+		return ic;
+	}
+
+	private boolean isDefaultCalendarCollectionPath(UserDataRequest udr, CollectionPath collectionPath) {
+		return udr.getUser().getLoginAtDomain().equalsIgnoreCase(collectionPath.displayName());
+	}
+
+	private String getDefaultCalendarName(UserDataRequest udr) {
+		return collectionPathOfCalendar(udr, udr.getUser().getLoginAtDomain()).collectionPath();
+	}
+
+	private CollectionPath collectionPathOfCalendar(UserDataRequest udr, String calendar) {
+		return collectionPathBuilderProvider.get()
+			.userDataRequest(udr)
+			.pimType(PIMDataType.CALENDAR)
+			.displayName(calendar)
+			.build();
 	}
 
 	@Override

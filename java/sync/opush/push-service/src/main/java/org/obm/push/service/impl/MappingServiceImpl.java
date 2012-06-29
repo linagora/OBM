@@ -32,17 +32,22 @@
 package org.obm.push.service.impl;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.FolderSnapshotDao;
+import org.obm.push.store.FolderSyncStateBackendMappingDao;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -56,12 +61,18 @@ import com.google.inject.Singleton;
 public class MappingServiceImpl implements MappingService {
 
 	private final CollectionDao collectionDao;
+	private final FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
 	private final Provider<CollectionPath.Builder> collectionPathBuilderProvider;
+	private final FolderSnapshotDao folderSnapshotDao;
 
 	@Inject
 	@VisibleForTesting MappingServiceImpl(CollectionDao collectionDao,
+			FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao,
+			FolderSnapshotDao folderSnapshotDao,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
 		this.collectionDao = collectionDao;
+		this.folderSyncStateBackendMappingDao = folderSyncStateBackendMappingDao;
+		this.folderSnapshotDao = folderSnapshotDao;
 		this.collectionPathBuilderProvider = collectionPathBuilderProvider;
 	}
 
@@ -95,13 +106,18 @@ public class MappingServiceImpl implements MappingService {
 	}
 
 	@Override
-	public String createCollectionMapping(Device device, String col) throws DaoException {
-		return collectionDao.addCollectionMapping(device, col).toString();
+	public int createCollectionMapping(Device device, String col) throws DaoException {
+		return collectionDao.addCollectionMapping(device, col);
 	}
-	
+
 	@Override
-	public int createCollectionMapping(Device device, String col, FolderSyncState folderSyncState) throws DaoException {
-		return collectionDao.addCollectionMapping(device, col, folderSyncState);
+	public void createBackendMapping(PIMDataType pimDataType, FolderSyncState outgoingSyncState) throws DaoException {
+		folderSyncStateBackendMappingDao.createMapping(pimDataType, outgoingSyncState);
+	}
+
+	@Override
+	public Date getLastBackendMapping(PIMDataType dataType, FolderSyncState lastKnownState) throws DaoException {
+		return folderSyncStateBackendMappingDao.getLastSyncDate(dataType, lastKnownState);
 	}
 	
 	@Override
@@ -146,7 +162,9 @@ public class MappingServiceImpl implements MappingService {
 	}
 
 	@Override
-	public List<CollectionPath> listCollections(final UserDataRequest udr) throws DaoException {
+	public List<CollectionPath> listCollections(final UserDataRequest udr, FolderSyncState folderSyncState)
+			throws DaoException {
+		
 		List<String> userCollections = collectionDao.getUserCollections(udr.getDevice());
 		return Lists.transform(userCollections, new Function<String, CollectionPath>(){
 
@@ -158,6 +176,13 @@ public class MappingServiceImpl implements MappingService {
 					.build();
 			}
 		});
+	}
+
+	@Override
+	public void snapshotCollections(FolderSyncState outgoingSyncState, Set<Integer> collectionIds)
+			throws DaoException {
+
+		folderSnapshotDao.createFolderSnapshot(outgoingSyncState.getId(), collectionIds);
 	}
 
 }
