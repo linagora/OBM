@@ -32,17 +32,19 @@
 package org.obm.push.contacts;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.naming.NoPermissionException;
 
 import org.obm.configuration.ContactConfiguration;
+import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
@@ -53,13 +55,16 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ObmSyncBackend;
 import org.obm.push.service.impl.MappingService;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
@@ -72,7 +77,13 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -85,9 +96,9 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	@Inject
 	private ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
-			CollectionPathHelper collectionPathHelper) {
+			CollectionPathHelper collectionPathHelper, Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
 		
-		super(mappingService, login);
+		super(mappingService, login, collectionPathBuilderProvider);
 		this.bookClient = bookClient;
 		this.contactConfiguration = contactConfiguration;
 		this.collectionPathHelper = collectionPathHelper;
@@ -99,70 +110,118 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
+			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
+			throws DaoException, InvalidSyncKeyException {
 
-		List<ItemChange> itemsChanged = new LinkedList<ItemChange>();
-		List<ItemChange> itemsDeleted = new LinkedList<ItemChange>();
+		try {
+			FolderChanges folderChanges = listAddressBooksChanged(udr, lastKnownState);
+			Iterable<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
+			Iterable<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges);
+			Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
+			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
 			
-		FolderChanges folderChanges = listAddressBooksChanged(udr, lastSync);
-		
-		Iterator<Folder> folderChangesSorted = 
-				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
-		while (folderChangesSorted.hasNext()) {
-			itemsChanged.add( createItemChange(udr, folderChangesSorted.next()) );
+			return computeChanges(udr, changedCollections, deletedCollections);
+		} catch (CollectionNotFoundException e) {
+			throw new HierarchyChangesException(e);
 		}
-		
-		for (Folder folder: folderChanges.getRemoved()) {
-			ItemChange item = createItemDelete(udr, folder);
-			if (item != null) {
-				itemsDeleted.add( item );
-			}
+	}
+	
+	private Date backendLastSyncDate(FolderSyncState lastKnownState) throws DaoException, InvalidSyncKeyException {
+
+		if (lastKnownState.isInitialFolderSync()) {
+			return DateUtils.getEpochCalendar().getTime();
+		} else {
+			return getLastSyncDateFromSyncState(lastKnownState);
 		}
-		
-		return new HierarchyItemsChanges.Builder()
-			.changes(itemsChanged)
-			.deletions(itemsDeleted)
-			.lastSync(folderChanges.getLastSync()).build();
 	}
 
-	private Iterator<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
+	private Date getLastSyncDateFromSyncState(FolderSyncState lastKnownState)
+			throws InvalidSyncKeyException, DaoException {
+		
+		Date lastSyncDate = mappingService.getLastBackendMapping(getPIMDataType(), lastKnownState);
+		if (lastSyncDate != null) {
+			return lastSyncDate;
+		}
+		throw new InvalidSyncKeyException(lastKnownState.getKey());
+	}
+
+	private void snapshotHierarchy(UserDataRequest udr, Set<CollectionPath> lastKnownCollections,
+			Iterable<CollectionPath> changedItems, Iterable<CollectionPath> deletedItems,
+			FolderSyncState outgoingSyncState) throws DaoException {
+
+		Set<CollectionPath> remainingKnownCollections = Sets.difference(lastKnownCollections, ImmutableSet.copyOf(deletedItems));
+		Iterable<CollectionPath> currentCollections = Iterables.concat(remainingKnownCollections, changedItems);
+		snapshotHierarchy(udr, currentCollections, outgoingSyncState);
+	}
+
+	private HierarchyItemsChanges computeChanges(UserDataRequest udr,
+			Iterable<CollectionPath> changedCollections, Iterable<CollectionPath> deletedCollections)
+			throws DaoException, CollectionNotFoundException {
+		
+		return buildHierarchyItemsChanges(udr, changedCollections, deletedCollections);
+	}
+
+	@Override
+	protected ItemChange createItemChange(UserDataRequest udr, CollectionPath collectionPath)
+			throws DaoException, CollectionNotFoundException {
+		
+		boolean isNew = false;
+		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
+		String parentId = getParentId(udr, collectionPath);
+		FolderType itemType = getItemType(collectionPath);
+		return new ItemChange(serverId, parentId, collectionPath.displayName(), itemType, isNew);
+	}
+
+	private Iterable<CollectionPath> deletedCollections(final UserDataRequest udr, FolderChanges folderChanges) {
+		return foldersToCollectionPaths(udr, folderChanges.getRemoved());
+	}
+
+	private Iterable<CollectionPath> changedCollections(final UserDataRequest udr, FolderChanges folderChanges) {
+		Iterable<Folder> folderChangesSorted = 
+				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
+		return foldersToCollectionPaths(udr, folderChangesSorted);
+	}
+
+	private Iterable<CollectionPath> foldersToCollectionPaths(final UserDataRequest udr, Iterable<Folder> folders) {
+		return Iterables.transform(folders, new Function<Folder, CollectionPath>() {
+
+			@Override
+			public CollectionPath apply(Folder folder) {
+				return collectionPathForFolder(udr, folder);
+			}});
+	}
+
+	protected CollectionPath collectionPathForFolder(UserDataRequest udr, Folder folder) {
+		return collectionPath(udr, folder.getName());
+	}
+	
+	protected CollectionPath collectionPath(UserDataRequest udr, String displayName) {
+		return collectionPathBuilderProvider.get()
+				.userDataRequest(udr)
+				.pimType(getPIMDataType())
+				.displayName(displayName)
+				.build();
+	}
+
+	private Iterable<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
 		TreeSet<Folder> treeSet = new TreeSet<Folder>( new ComparatorUsingFolderName(defaultAddressBookName) );
 		treeSet.addAll(folderChanges.getUpdated());
-		return treeSet.iterator();
+		return treeSet;
 	}
 
-	private FolderChanges listAddressBooksChanged(UserDataRequest udr, Date lastSync) throws UnexpectedObmSyncServerException {
+	private FolderChanges listAddressBooksChanged(UserDataRequest udr, FolderSyncState lastKnownState)
+			throws UnexpectedObmSyncServerException, DaoException, InvalidSyncKeyException {
+		
 		AccessToken token = login(udr);
+		Date lastSyncDate = backendLastSyncDate(lastKnownState);
 		try {
-			return bookClient.listAddressBooksChanged(token, lastSync);
+			return bookClient.listAddressBooksChanged(token, lastSyncDate);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
 		}
-	}
-
-	private ItemChange createItemChange(UserDataRequest udr, Folder folder) throws DaoException {
-		boolean isNew = false;
-		String collectionPath = getCollectionPath(udr, folder.getName());
-		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
-		if (serverId == null) {
-			serverId = mappingService.createCollectionMapping(udr.getDevice(), collectionPath);
-			isNew = true;
-		}
-		String parentId = getParentId(udr, folder);
-		FolderType itemType = getItemType(folder);
-		return new ItemChange(serverId, parentId, folder.getName(), itemType, isNew);
-	}
-
-	private ItemChange createItemDelete(UserDataRequest udr, Folder folder) throws DaoException {
-		String collectionPath = getCollectionPath(udr, folder.getName());
-		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
-		if (serverId != null) {
-			return new ItemChange(serverId);
-		}
-		return null;
 	}
 	
 	private String getCollectionPath(UserDataRequest udr, String folderName)  {
@@ -175,29 +234,24 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 	
-	private String getServerIdFromCollectionPath(UserDataRequest udr, String collectionPath) throws DaoException {
-		try {
-			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
-			return mappingService.collectionIdToString(collectionId);
-		} catch (CollectionNotFoundException e) {
-			return null;
-		}	
+	private String getServerIdFromCollectionPath(UserDataRequest udr, String collectionPath)
+			throws DaoException, CollectionNotFoundException {
+		
+		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
+		return mappingService.collectionIdToString(collectionId);
 	}
-	
-	private String getParentId(UserDataRequest udr, Folder folder) throws DaoException {
-		String defaultParentId = contactConfiguration.getDefaultParentId();
-		if (!isDefaultFolder(folder.getName())) {
-			String collectionPath = getCollectionPath(udr, contactConfiguration.getDefaultAddressBookName());
-			String parentId = getServerIdFromCollectionPath(udr, collectionPath);
-			if (parentId != null) {
-				return parentId;
-			}
+
+	private String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws CollectionNotFoundException, DaoException {
+		if (!isDefaultFolder(collectionPath.displayName())) {
+			CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
+			String parentId = getServerIdFromCollectionPath(udr, defaultBookCollectionPath.collectionPath());
+			return Objects.firstNonNull(parentId, contactConfiguration.getDefaultParentId());
 		}
-		return defaultParentId;
+		return contactConfiguration.getDefaultParentId();
 	}
 	
-	private FolderType getItemType(Folder folder) {
-		if (isDefaultFolder(folder.getName())) {
+	private FolderType getItemType(CollectionPath collectionPath) {
+		if (isDefaultFolder(collectionPath.displayName())) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {
 			return FolderType.USER_CREATED_CONTACTS_FOLDER;
@@ -412,15 +466,6 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			logout(token);
 		}
 	}
-
-	public void createDefaultContactFolder(UserDataRequest udr) throws DaoException {
-		String collectionPath = getCollectionPath(udr, contactConfiguration.getDefaultAddressBookName());
-		String serverId = getServerIdFromCollectionPath(udr, collectionPath);
-		if (serverId == null) {
-			mappingService.createCollectionMapping(udr.getDevice(), collectionPath);
-		}
-	}
-
 
 	@Override
 	public String move(UserDataRequest udr, String srcFolder, String dstFolder,

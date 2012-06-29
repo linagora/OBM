@@ -50,6 +50,7 @@ import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.HierarchyItemsChanges.Builder;
@@ -62,6 +63,7 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.Lists;
@@ -128,7 +130,10 @@ public class HierarchyExporterTest {
 	}
 	
 	@Test
-	public void testNothingChanges() throws DaoException {
+	public void testNothingChanges() throws Exception {
+		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
+		FolderSyncState outgoingSyncKey = new FolderSyncState("1234567890b");
+		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
 		ContactsBackend contactsBackend = createStrictMock(ContactsBackend.class);
@@ -137,24 +142,28 @@ public class HierarchyExporterTest {
 
 		expectGetPIMDataType(contactsBackend, calendarBackend, mailBackend);
 
-		expect(contactsBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(contactsBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges(now));
 
-		expect(calendarBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(calendarBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges());
 		
-		expect(mailBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(mailBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges());
+
+		MappingService mappingService = createMock(MappingService.class);
+		expectLastSyncDateToEpochForBackends(mappingService, incomingSyncState,
+				PIMDataType.CONTACTS, PIMDataType.CALENDAR, PIMDataType.EMAIL);
 		
-		replay(folderExporter, mailBackend, calendarBackend, contactsBackend);
+		replay(folderExporter, mailBackend, calendarBackend, contactsBackend, mappingService);
 
 		IHierarchyExporter hierarchyExporter = buildHierarchyExporter(
-				folderExporter, contactsBackend, calendarBackend, mailBackend);
-		
+				folderExporter, mappingService, contactsBackend, calendarBackend, mailBackend);
+
 		HierarchyItemsChanges hierarchyItemsChanges =
-				hierarchyExporter.getChanged(userDataRequest, epochCalendar);
+				hierarchyExporter.getChanged(userDataRequest, incomingSyncState, outgoingSyncKey);
 		
-		verify(mailBackend, calendarBackend, contactsBackend);
+		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
 		Assertions.assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 		Assertions.assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
@@ -162,9 +171,11 @@ public class HierarchyExporterTest {
 	}
 
 	@Test
-	public void testFolderChanges() throws DaoException {
+	public void testFolderChanges() throws Exception {
 		String contactCollectionId = "5";
 		String mailCollectionId = "2";
+		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
+		FolderSyncState outgoingSyncKey = new FolderSyncState("1234567890b");
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
@@ -175,26 +186,30 @@ public class HierarchyExporterTest {
 		expectGetPIMDataType(contactsBackend, calendarBackend, mailBackend);
 		
 		HierarchyItemsChanges contactHierarchyItemsChanges = buildHierarchyItemsChanges(now, contactCollectionId);
-		expect(contactsBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(contactsBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(contactHierarchyItemsChanges);
 		
-		expect(calendarBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(calendarBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges());
 		
 		HierarchyItemsChanges mailHierarchyItemsChanges = 
 				buildHierarchyItemsChanges(now, mailCollectionId);
-		expect(mailBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(mailBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(mailHierarchyItemsChanges);
+
+		MappingService mappingService = createMock(MappingService.class);
+		expectLastSyncDateToEpochForBackends(mappingService, incomingSyncState,
+				PIMDataType.CONTACTS, PIMDataType.CALENDAR, PIMDataType.EMAIL);
 		
-		replay(folderExporter, mailBackend, calendarBackend, contactsBackend);
+		replay(folderExporter, mailBackend, calendarBackend, contactsBackend, mappingService);
 		
 		IHierarchyExporter hierarchyExporter = buildHierarchyExporter(
-				folderExporter, contactsBackend, calendarBackend, mailBackend);
+				folderExporter, mappingService, contactsBackend, calendarBackend, mailBackend);
 		
 		HierarchyItemsChanges hierarchyItemsChanges =
-				hierarchyExporter.getChanged(userDataRequest, epochCalendar);
+				hierarchyExporter.getChanged(userDataRequest, incomingSyncState, outgoingSyncKey);
 		
-		verify(mailBackend, calendarBackend, contactsBackend);
+		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
 		Builder builder = new HierarchyItemsChanges.Builder()
 			.lastSync(contactHierarchyItemsChanges.getLastSync()).mergeItems(mailHierarchyItemsChanges);
@@ -202,8 +217,19 @@ public class HierarchyExporterTest {
 		Assertions.assertThat(hierarchyItemsChanges).equals(builder.build());
 	}
 
+	private void expectLastSyncDateToEpochForBackends(MappingService mappingService,
+			FolderSyncState incomingSyncState, PIMDataType...backendsType) throws DaoException {
+		for (PIMDataType backendType : backendsType) {
+			expect(mappingService.getLastBackendMapping(backendType, incomingSyncState))
+				.andReturn(epochCalendar);
+		}
+	}
+
 	@Test
-	public void testLastSync() throws DaoException {
+	public void testLastSync() throws Exception {
+		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
+		FolderSyncState outgoingSyncKey = new FolderSyncState("1234567890b");
+		
 		FolderBackend folderExporter = createMock(FolderBackend.class);
 
 		ContactsBackend contactsBackend = createMock(ContactsBackend.class);
@@ -215,26 +241,30 @@ public class HierarchyExporterTest {
 		DateTime dateTime = new DateTime();
 		
 		Date contactFolderLastSync = dateTime.plusHours(1).toDate();
-		expect(contactsBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(contactsBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges(contactFolderLastSync));
 		
 		Date calendarFolderLastSync = dateTime.plusHours(2).toDate();
-		expect(calendarBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(calendarBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges(calendarFolderLastSync));
 		
 		Date mailFolderLastSync = dateTime.plusHours(3).toDate();
-		expect(mailBackend.getHierarchyChanges(userDataRequest, epochCalendar))
+		expect(mailBackend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncKey))
 			.andReturn(buildEmptyHierarchyItemsChanges(mailFolderLastSync));
+
+		MappingService mappingService = createMock(MappingService.class);
+		expectLastSyncDateToEpochForBackends(mappingService, incomingSyncState,
+				PIMDataType.CONTACTS, PIMDataType.CALENDAR, PIMDataType.EMAIL);
 		
-		replay(folderExporter, mailBackend, calendarBackend, contactsBackend);
+		replay(folderExporter, mailBackend, calendarBackend, contactsBackend, mappingService);
 		
 		IHierarchyExporter hierarchyExporter = buildHierarchyExporter(
-				folderExporter, contactsBackend, calendarBackend, mailBackend);
-		
+				folderExporter, mappingService, contactsBackend, calendarBackend, mailBackend);
+
 		HierarchyItemsChanges hierarchyItemsChanges =
-				hierarchyExporter.getChanged(userDataRequest, epochCalendar);
+				hierarchyExporter.getChanged(userDataRequest, incomingSyncState, outgoingSyncKey);
 		
-		verify(mailBackend, calendarBackend, contactsBackend);
+		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
 		Assertions.assertThat(mailFolderLastSync).isAfter(calendarFolderLastSync);
 		Assertions.assertThat(calendarFolderLastSync).isAfter(contactFolderLastSync);
@@ -246,16 +276,16 @@ public class HierarchyExporterTest {
 	private void expectGetPIMDataType(ContactsBackend contactsBackend,
 			CalendarBackend calendarBackend, MailBackend mailBackend) {
 		
-		expect(contactsBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS);
-		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR);
-		expect(mailBackend.getPIMDataType()).andReturn(PIMDataType.EMAIL);
+		expect(contactsBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS).anyTimes();
+		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
+		expect(mailBackend.getPIMDataType()).andReturn(PIMDataType.EMAIL).anyTimes();
 	}
 	
-	private IHierarchyExporter buildHierarchyExporter(FolderBackend folderExporter, ContactsBackend contactsBackend,
-			CalendarBackend calendarBackend, MailBackend mailBackend) {
+	private IHierarchyExporter buildHierarchyExporter(FolderBackend folderExporter, MappingService mappingService,
+			ContactsBackend contactsBackend, CalendarBackend calendarBackend, MailBackend mailBackend) {
 		
 		Backends backends = buildBackends(contactsBackend, calendarBackend, mailBackend);
-		return new HierarchyExporter(folderExporter, backends);
+		return new HierarchyExporter(folderExporter, backends, mappingService);
 	}
 
 	private Backends buildBackends(ContactsBackend contactsBackend,
@@ -289,4 +319,5 @@ public class HierarchyExporterTest {
 		return Lists.newArrayList(
 				new ItemChange(collectionId, "3", "FOLDER DELETED", FolderType.USER_CREATED_EMAIL_FOLDER, false));
 	}
+	
 }
