@@ -29,36 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.push.store;
 
-import org.obm.push.store.CalendarDao;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.store.DeviceDao;
-import org.obm.push.store.EmailDao;
-import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.store.HearbeatDao;
-import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SyncedCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
+import java.util.Date;
 
-public final class DaoModule extends AbstractOverrideModule {
+import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.exception.DaoException;
 
-	public DaoModule() {
-		super();
-	}
+public interface FolderSyncStateBackendMappingDao {
 
-	@Override
-	protected void configureImpl() {
-		bindWithMock(CollectionDao.class);
-		bindWithMock(DeviceDao.class);
-		bindWithMock(EmailDao.class);
-		bindWithMock(HearbeatDao.class);
-		bindWithMock(MonitoredCollectionDao.class);
-		bindWithMock(SyncedCollectionDao.class);
-		bindWithMock(UnsynchronizedItemDao.class);
-		bindWithMock(CalendarDao.class);
-		bindWithMock(ItemTrackingDao.class);
-		bindWithMock(FolderSyncStateBackendMappingDao.class);
-	}
+	Date getLastSyncDate(PIMDataType dataType, FolderSyncState folderSyncState) throws DaoException;
+
+	void createMapping(PIMDataType dataType, FolderSyncState outgoingState) throws DaoException;
 }
