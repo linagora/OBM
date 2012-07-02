@@ -158,6 +158,18 @@ public class JDBCUtils {
 		}
 	}
 
+	public static Date getDate(ResultSet rs, Integer fieldNumber)
+			throws SQLException {
+		Preconditions.checkNotNull(rs);
+		Preconditions.checkNotNull(fieldNumber);
+		Timestamp timestamp = rs.getTimestamp(fieldNumber);
+		if (timestamp != null) {
+			return new Date(timestamp.getTime());
+		} else {
+			return null;
+		}
+	}
+
 	public static java.sql.Date getDateWithoutTime(Date lastSync) {
 		return new java.sql.Date(lastSync.getTime());
 	}

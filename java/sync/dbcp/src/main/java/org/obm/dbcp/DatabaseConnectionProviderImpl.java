@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -162,4 +163,24 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	    ds.cleanup();
 	}
 
+	@Override
+	public Object getJdbcObject(String type, String value) throws SQLException {
+		if (system == DatabaseSystem.PGSQL) {
+			try {
+				Object o = Class.forName("org.postgresql.util.PGobject")
+						.newInstance();
+				Method setType = o.getClass()
+						.getMethod("setType", String.class);
+				Method setValue = o.getClass().getMethod("setValue",
+						String.class);
+
+				setType.invoke(o, type);
+				setValue.invoke(o, value);
+				return o;
+			} catch (Throwable e) {
+				throw new SQLException(e.getMessage(), e);
+			}
+		}
+		return value;
+	}
 }
