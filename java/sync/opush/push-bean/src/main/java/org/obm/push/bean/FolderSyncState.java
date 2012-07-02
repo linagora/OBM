@@ -29,49 +29,24 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.bean;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncState;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
+public class FolderSyncState extends SyncState implements Serializable {
 
-public interface CollectionDao {
+	public FolderSyncState(String syncKey) {
+		this(syncKey, null);
+	}
 
-	int addCollectionMapping(Device device, String collection, FolderSyncState folderSyncState) throws DaoException;
-	
-	Integer addCollectionMapping(Device device, String collection) throws DaoException;
+	public FolderSyncState(String key, Date lastSync) {
+		super(key, lastSync);
+	}
 
-	Integer getCollectionMapping(Device device, String collectionId) throws DaoException;
-
-	String getCollectionPath(Integer collectionId)
-			throws CollectionNotFoundException, DaoException;
-
-	void resetCollection(Device device, Integer collectionId) throws DaoException;
-	
-	/**
-	 * Create a new SyncState entry in database and returns its unique id
-	 * @return SyncState database unique id
-	 */
-	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
-
-	FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException;
-	
-	ItemSyncState findItemStateForKey(String syncKey) throws DaoException ;
-	
-	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
-
-	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
-
-	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
-
-	List<String> getUserCollections(Device device) throws DaoException;
-
-
+	public FolderSyncState(SyncState syncState) {
+		super(syncState.getKey(), syncState.getLastSync());
+		setId(syncState.getId());
+		setLastSyncFiltred(syncState.isLastSyncFiltred());
+	}
 }

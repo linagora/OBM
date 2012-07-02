@@ -36,9 +36,9 @@ import java.util.List;
 
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
@@ -46,7 +46,7 @@ public interface MappingService {
 
 	String collectionIdToString(Integer collectionId);
 
-	int createCollectionMapping(Device device, String col, SyncState syncState)
+	int createCollectionMapping(Device device, String col, FolderSyncState folderSyncState)
 			throws DaoException;
 	
 	String createCollectionMapping(Device device, String col)

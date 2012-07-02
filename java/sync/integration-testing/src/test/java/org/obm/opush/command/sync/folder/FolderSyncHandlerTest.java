@@ -60,6 +60,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
@@ -181,7 +182,7 @@ public class FolderSyncHandlerTest {
 				.andReturn(serverId).anyTimes();
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
 				.andReturn((int)(Math.random()*10000)).anyTimes();
-		SyncState state = new SyncState(syncKey);
-		expect(collectionDao.findStateForKey(syncKey)).andReturn(state).anyTimes();
+		ItemSyncState state = new ItemSyncState(syncKey);
+		expect(collectionDao.findItemStateForKey(syncKey)).andReturn(state).anyTimes();
 	}
 }

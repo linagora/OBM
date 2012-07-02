@@ -39,11 +39,11 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -165,9 +165,9 @@ public class PingHandler extends WbxmlRequestHandler implements
 			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
 			collection.setCollectionPath(collectionPath);
 			collection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath));
-			SyncState lastKnownState = stMachine.lastKnownState(udr.getDevice(), collection.getCollectionId());
+			ItemSyncState lastKnownState = stMachine.lastKnownState(udr.getDevice(), collection.getCollectionId());
 			if (lastKnownState != null) {
-				collection.setSyncState(lastKnownState);
+				collection.setItemSyncState(lastKnownState);
 			} else {
 				collection.newSyncSate();
 			}

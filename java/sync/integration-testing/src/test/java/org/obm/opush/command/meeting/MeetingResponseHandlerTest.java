@@ -52,19 +52,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.PortNumber;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -89,9 +90,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class MeetingResponseHandlerTest {
@@ -347,7 +345,7 @@ public class MeetingResponseHandlerTest {
 	private void expectCollectionDaoUnchange(CollectionDao collectionDao) throws DaoException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		
-		SyncState syncState = new SyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState("sync state");
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		
 		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<SyncCollection>of());
