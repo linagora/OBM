@@ -31,7 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
@@ -46,6 +49,10 @@ public class SingleUserFixture {
 		public String deviceId;
 		public String userAgent;
 		public AccessToken accessToken;
+		public Credentials credentials;
+		public Device device;
+		public UserDataRequest userDataRequest;
+		public String rootCollectionPath;
 	}
 	
 	public final OpushUser jaures;
@@ -61,6 +68,10 @@ public class SingleUserFixture {
 		jaures.accessToken = new AccessToken(1, "o-push");
 		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());
 		jaures.accessToken.setUserEmail(jaures.user.getEmail());
+		jaures.credentials = new Credentials(jaures.user, jaures.password);
+		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId);
+		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device, null);
+		jaures.rootCollectionPath = "obm:\\\\" + jaures.user.getLoginAtDomain();
 	}
 	
 }
