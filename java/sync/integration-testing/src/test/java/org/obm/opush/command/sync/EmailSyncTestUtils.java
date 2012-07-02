@@ -50,6 +50,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
@@ -185,8 +186,8 @@ public class EmailSyncTestUtils {
 				.andReturn(syncEmailCollectionId).anyTimes();
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
 				.andReturn((int)(Math.random()*10000)).anyTimes();
-		SyncState state = new SyncState(syncEmailSyncKey);
-		expect(collectionDao.findStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
+		ItemSyncState state = new ItemSyncState(syncEmailSyncKey);
+		expect(collectionDao.findItemStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
 	}
 
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 

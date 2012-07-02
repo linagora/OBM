@@ -71,6 +71,7 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ServerId;
@@ -146,7 +147,7 @@ public class MailBackendHandlerTest {
 		String syncEmailSyncKey = "1";
 		int serverId = 1234;
 		String syncEmailId = ":2";
-		SyncState syncState = new SyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState("sync state");
 		DataDelta delta = new DataDeltaBuilder()
 		.addChanges(
 			new ItemChangesBuilder()
@@ -191,7 +192,7 @@ public class MailBackendHandlerTest {
 			.andReturn(delta).once();
 	}
 
-	private void mockDao(int serverId, SyncState syncState) throws Exception {
+	private void mockDao(int serverId, ItemSyncState syncState) throws Exception {
 		mockUnsynchronizedItemDao(serverId);
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
@@ -216,12 +217,12 @@ public class MailBackendHandlerTest {
 		expectLastCall().anyTimes();
 	}
 	
-	private void mockCollectionDao(int serverId, SyncState syncState) throws Exception {
+	private void mockCollectionDao(int serverId, ItemSyncState syncState) throws Exception {
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(serverId))
 			.andReturn(IntegrationTestUtils.buildEmailInboxCollectionPath(singleUserFixture.jaures)).anyTimes();
 		
-		expect(collectionDao.findStateForKey(anyObject(String.class)))
+		expect(collectionDao.findItemStateForKey(anyObject(String.class)))
 			.andReturn(syncState).anyTimes();
 		
 		int lastUpdateState = 1;

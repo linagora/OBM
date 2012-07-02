@@ -50,6 +50,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.Sync;
@@ -267,15 +268,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 
 			// get our sync state for this collection
-			SyncState collectionState = stMachine.getSyncState(collection.getSyncKey());
+			ItemSyncState collectionState = stMachine.getSyncState(collection.getSyncKey());
 
 			if (collectionState != null) {
-				collection.setSyncState(collectionState);
+				collection.setItemSyncState(collectionState);
 				Map<String, String> processedClientIds = processModification(udr, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
-				SyncState syncState = new SyncState(collection.getSyncKey());
-				collection.setSyncState(syncState);
+				ItemSyncState syncState = new ItemSyncState(collection.getSyncKey());
+				collection.setItemSyncState(syncState);
 			}
 		}
 		return modificationStatus;
@@ -402,11 +403,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 		
-		SyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
+		ItemSyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
 		if (st == null) {
 			syncCollectionResponse.setSyncStateValid(false);
 		} else {
-			syncCollection.setSyncState(st);
+			syncCollection.setItemSyncState(st);
 			syncCollectionResponse.setSyncStateValid(true);
 			Date syncDate = null;
 			if (syncCollection.getFetchIds().isEmpty()) {

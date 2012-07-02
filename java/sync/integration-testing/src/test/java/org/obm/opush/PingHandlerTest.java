@@ -70,6 +70,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -280,7 +281,7 @@ public class PingHandlerTest {
 		for (OpushUser user : fakeTestUsers) {
 			String collectionPathWhereChangesAppear = buildCalendarCollectionPath(user);
 			
-			SyncState syncState = new SyncState("sync state");
+			ItemSyncState syncState = new ItemSyncState("sync state");
 			expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).once();
 
 			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPathWhereChangesAppear).anyTimes();
@@ -293,7 +294,7 @@ public class PingHandlerTest {
 	
 	private void expectCollectionDaoUnchangeForXIteration(CollectionDao collectionDao, Date activeSyncSpecFirstSyncDate, 
 			int noChangeIterationCount) throws DaoException {
-		SyncState syncState = new SyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState("sync state");
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).times(noChangeIterationCount);
 		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).anyTimes();

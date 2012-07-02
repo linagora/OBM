@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 
 public class SyncCollection implements Serializable {
 	
-	private SyncState syncState;
+	private ItemSyncState itemSyncState;
 	private List<String> fetchIds;
 	private String dataClass;
 	private Integer collectionId;
@@ -77,11 +77,11 @@ public class SyncCollection implements Serializable {
 	}
 	
 	public SyncState getSyncState() {
-		return syncState;
+		return itemSyncState;
 	}
 
-	public void setSyncState(SyncState syncState) {
-		this.syncState = syncState;
+	public void setItemSyncState(ItemSyncState itemSyncState) {
+		this.itemSyncState = itemSyncState;
 	}
 
 	public String getDataClass() {
@@ -173,16 +173,16 @@ public class SyncCollection implements Serializable {
 	}
 
 	public boolean hasSyncState() {
-		return syncState != null;
+		return itemSyncState != null;
 	}
 	
 	public void newSyncSate() {
-		this.syncState = new SyncState(this.getSyncKey());
+		this.itemSyncState = new ItemSyncState(this.getSyncKey());
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(syncState, fetchIds, dataClass, collectionId, collectionPath, 
+		return Objects.hashCode(itemSyncState, fetchIds, dataClass, collectionId, collectionPath, 
 				syncKey, windowSize, moreAvailable, changes, status, dataType, options);
 	}
 	
@@ -190,7 +190,7 @@ public class SyncCollection implements Serializable {
 	public final boolean equals(Object object){
 		if (object instanceof SyncCollection) {
 			SyncCollection that = (SyncCollection) object;
-			return Objects.equal(this.syncState, that.syncState)
+			return Objects.equal(this.itemSyncState, that.itemSyncState)
 				&& Objects.equal(this.fetchIds, that.fetchIds)
 				&& Objects.equal(this.dataClass, that.dataClass)
 				&& Objects.equal(this.collectionId, that.collectionId)
@@ -209,7 +209,7 @@ public class SyncCollection implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("syncState", syncState)
+			.add("itemSyncState", itemSyncState)
 			.add("fetchIds", fetchIds)
 			.add("dataClass", dataClass)
 			.add("collectionId", collectionId)
