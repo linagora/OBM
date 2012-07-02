@@ -29,37 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.bean;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
-import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
-import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
-import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
-import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
-import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
 
-import com.google.inject.AbstractModule;
-
-public class DaoModule extends AbstractModule{
-
-	@Override
-	protected void configure() {
-
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
-		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
-		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
-		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
-	}
-
+public interface DBEnum {
+	
+	String getDbFieldName();
+	
+	String getDbValue();
+	
 }

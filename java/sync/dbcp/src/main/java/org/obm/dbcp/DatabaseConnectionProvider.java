@@ -35,6 +35,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface DatabaseConnectionProvider {
-	public Connection getConnection() throws SQLException;
-	public int lastInsertId(Connection con) throws SQLException;	
+	
+	Connection getConnection() throws SQLException;
+	
+	int lastInsertId(Connection con) throws SQLException;
+	
+	Object getJdbcObject(String dbFieldName, String dbFieldValue) throws SQLException;
 }

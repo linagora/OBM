@@ -31,13 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-
-public enum PIMDataType {
+public enum PIMDataType implements DBEnum {
 
 	EMAIL("Email", "email"), 
 	CALENDAR("Calendar", "calendar"),
 	CONTACTS("Contacts", "contacts"),
 	TASKS("Tasks", "tasks");
+
+	private static final String DB_FIELD_NAME = "pimdata_type";
 	
 	private final String xmlValue;
 	private final String collectionPathValue;
@@ -53,5 +54,15 @@ public enum PIMDataType {
 	
 	public String asCollectionPathValue() {
 		return collectionPathValue;
+	}
+
+	@Override
+	public String getDbFieldName() {
+		return DB_FIELD_NAME;
+	}
+
+	@Override
+	public String getDbValue() {
+		return asCollectionPathValue().toUpperCase();
 	}
 }
