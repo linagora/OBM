@@ -37,9 +37,17 @@ NameVirtualHost *:443
 
     Alias /stats /var/www/munin
 
+#obm#<Location /obm-sync>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /obm-sync http://_TOMCAT_SERVER_:8080/obm-sync
 #obm#ProxyPassReverse /obm-sync http://_TOMCAT_SERVER_:8080/obm-sync
 
+#obm#<Location /funambol>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /funambol http://_TOMCAT_SERVER_:8080/funambol
 #obm#ProxyPassReverse /funambol http://_TOMCAT_SERVER_:8080/funambol
 
@@ -47,18 +55,41 @@ NameVirtualHost *:443
 #obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
 #obm#</Location>
 
-
+#obm#<Location /Microsoft-Server-ActiveSync>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/opush/ActiveSyncServlet/
 #obm#ProxyPassReverse /Microsoft-Server-ActiveSync http://_OPUSH_SERVER_:8082/opush/ActiveSyncServlet/
 
+#obm#<Location /autodiscover>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /autodiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 #obm#ProxyPassReverse /autodiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
+#obm#<Location /Autodiscover>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /Autodiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 #obm#ProxyPassReverse /Autodiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
+#obm#<Location /AutoDiscover>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /AutoDiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 #obm#ProxyPassReverse /AutoDiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
+#obm#<Location /autoDiscover>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /autoDiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 #obm#ProxyPassReverse /autoDiscover http://_OPUSH_SERVER_:8082/opush/Autodiscover/
+#obm#<Location /AUTODISCOVER>
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Location>
 #obm#ProxyPass /AUTODISCOVER http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 #obm#ProxyPassReverse /AUTODISCOVER http://_OPUSH_SERVER_:8082/opush/Autodiscover/
 
