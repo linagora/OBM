@@ -31,10 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync.folder;
 
-import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
@@ -43,7 +41,6 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -59,22 +56,22 @@ import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.push.client.Folder;
 import org.obm.sync.push.client.FolderSyncResponse;
+import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -88,11 +85,14 @@ public class FolderSyncHandlerTest {
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 
-	private List<OpushUser> fakeTestUsers;
+	private List<OpushUser> userAsList;
+
+	private OpushUser user;
 
 	@Before
 	public void init() {
-		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		user = singleUserFixture.jaures;
+		userAsList = Arrays.asList(user);
 	}
 	
 	@After
@@ -101,18 +101,16 @@ public class FolderSyncHandlerTest {
 	}
 
 	@Test
-	public void testInitialFolderSync() throws Exception {
+	public void testInitialFolderSyncContainsINBOX() throws Exception {
 		String initialSyncKey = "0";
-		int serverId = 4;
+		String nextSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 				
-		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChanges(classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		mockCollectionDao(collectionDao, initialSyncKey, serverId);
-		
-		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
-		mockItemTrackingDao(itemTrackingDao);
+		expectCollectionDaoAllocateNewFolderSyncState(collectionDao, nextSyncKey);
+		expectCollectionDaoHasntMapping(collectionDao);
 		
 		replayMocks(classToInstanceMap);
 		
@@ -122,14 +120,17 @@ public class FolderSyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		
 		Assertions.assertThat(folderSyncResponse.getStatus()).isEqualTo(1);
+		Folder inbox = Iterables.getOnlyElement(folderSyncResponse.getFolders().values());
+		Assertions.assertThat(inbox.getName()).isEqualTo("INBOX");
+		Assertions.assertThat(inbox.getType()).isEqualTo(FolderType.DEFAULT_INBOX_FOLDER);
 	}
-	
+
 	@Test
 	public void testFolderSyncUnchange() throws Exception {
 		String syncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 		int serverId = 4;
 		
-		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockUsersAccess(classToInstanceMap, userAsList);
 		
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
@@ -148,10 +149,45 @@ public class FolderSyncHandlerTest {
 				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		mockCollectionDao(collectionDao, syncKey, serverId);
+		expectCollectionDaoHasMapping(collectionDao, serverId);
 		
-		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
-		mockItemTrackingDao(itemTrackingDao);		
+		replayMocks(classToInstanceMap);
+		
+		opushServer.start();
+		
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(syncKey);
+		
+		Assertions.assertThat(folderSyncResponse.getStatus()).isEqualTo(1);
+		Assertions.assertThat(folderSyncResponse.getCount()).isEqualTo(0);
+		Assertions.assertThat(folderSyncResponse.getFolders()).isEmpty();
+	}
+	
+	@Test
+	public void testFolderSyncHasChange() throws Exception {
+		String syncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		int serverId = 4;
+		
+		mockUsersAccess(classToInstanceMap, userAsList);
+		
+		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
+		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
+		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
+		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
+		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(buildHierarchyItemsChangeEmpty()).anyTimes();
+		
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		expectCollectionDaoHasMapping(collectionDao, serverId);
 		
 		replayMocks(classToInstanceMap);
 		
@@ -169,20 +205,21 @@ public class FolderSyncHandlerTest {
 		return new HierarchyItemsChanges.Builder().build();
 	}
 	
-	private void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
-		itemTrackingDao.markAsSynced(anyObject(SyncState.class), anyObject(Set.class));
-		expectLastCall().anyTimes();
-		itemTrackingDao.markAsDeleted(anyObject(SyncState.class), anyObject(Set.class));
-		expectLastCall().anyTimes();
-		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
+	private void expectCollectionDaoAllocateNewFolderSyncState(CollectionDao collectionDao, String nextSyncKey) throws DaoException {
+		expect(collectionDao.allocateNewFolderSyncState(user.device, nextSyncKey))
+			.andReturn(new FolderSyncState(nextSyncKey));
 	}
-
-	private void mockCollectionDao(CollectionDao collectionDao, String syncKey, int serverId) throws DaoException {
-		expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
-				.andReturn(serverId).anyTimes();
-		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
-				.andReturn((int)(Math.random()*10000)).anyTimes();
-		ItemSyncState state = new ItemSyncState(syncKey);
-		expect(collectionDao.findItemStateForKey(syncKey)).andReturn(state).anyTimes();
+	
+	private void expectCollectionDaoHasMapping(CollectionDao collectionDao, int collectionId) throws DaoException {
+		expect(collectionDao.getCollectionMapping(user.device, user.rootCollectionPath))
+				.andReturn(collectionId).anyTimes();
+	}
+	
+	private void expectCollectionDaoHasntMapping(CollectionDao collectionDao) throws DaoException {
+		int createdRootFolderMappingId = 1;
+		expect(collectionDao.getCollectionMapping(user.device, user.rootCollectionPath))
+				.andReturn(null).once();
+		expect(collectionDao.addCollectionMapping(anyObject(Device.class), anyObject(String.class), anyObject(FolderSyncState.class)))
+			.andReturn(createdRootFolderMappingId).anyTimes();
 	}
 }

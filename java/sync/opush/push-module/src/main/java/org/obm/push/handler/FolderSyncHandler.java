@@ -38,16 +38,16 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidSyncKeyException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
@@ -104,8 +104,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (UnexpectedObmSyncServerException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
-		} catch (InvalidServerId e) {
-			sendError(responder, FolderSyncStatus.INVALID_REQUEST, e);
 		}
 	}
 
@@ -119,7 +117,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 	
 	private FolderSyncResponse doTheJob(UserDataRequest udr, FolderSyncRequest folderSyncRequest) throws InvalidSyncKeyException, 
-		DaoException, UnexpectedObmSyncServerException, InvalidServerId {
+		DaoException, UnexpectedObmSyncServerException {
 		
 		if (isFirstSync(folderSyncRequest)) {
 
@@ -153,36 +151,34 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 	}
 
 	private FolderSyncResponse getFolderSyncResponse(UserDataRequest udr, Date lastSync) throws DaoException, 
-			UnexpectedObmSyncServerException, InvalidServerId {
+			UnexpectedObmSyncServerException {
 		
 		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, lastSync);
 		return createFolderSyncResponse(udr, hierarchyItemsChanges);
 	}
 	
 	private FolderSyncResponse createFolderSyncResponse(UserDataRequest udr, HierarchyItemsChanges hierarchyItemsChanges)
-			throws DaoException, InvalidServerId {
+			throws DaoException {
 		
-		String newSyncKey = allocateNewSyncKey(udr, hierarchyItemsChanges);
+		String newSyncKey = allocateNewSyncKey(udr);
 		return new FolderSyncResponse(hierarchyItemsChanges, newSyncKey);
 	}
 
-	private String allocateNewSyncKey(UserDataRequest udr, HierarchyItemsChanges hierarchyItemsChanges) 
-			throws DaoException, InvalidServerId {
+	private String allocateNewSyncKey(UserDataRequest udr) 
+			throws DaoException {
 		
-		return stMachine.allocateNewSyncKey(udr, getOrAddCollectionId(udr), hierarchyItemsChanges.getLastSync(), 
-				hierarchyItemsChanges.getChangedItems(),
-				hierarchyItemsChanges.getDeletedItems());
+		FolderSyncState newFolderSyncState = stMachine.allocateNewFolderSyncState(udr);
+		assertRootCollectionHasMapping(udr, newFolderSyncState);
+		return newFolderSyncState.getKey();
 	}
 	
-	private int getOrAddCollectionId(UserDataRequest udr) throws DaoException {
+	private void assertRootCollectionHasMapping(UserDataRequest udr, FolderSyncState folderSyncState) throws DaoException {
 		Device device = udr.getDevice();
 		String rootFolderUrl = hierarchyExporter.getRootFolderUrl(udr);
 		
-		Integer collectionId = collectionDao.getCollectionMapping(device, rootFolderUrl);
-		if (collectionId == null) {
-			collectionId = collectionDao.addCollectionMapping(device, rootFolderUrl);
+		if (collectionDao.getCollectionMapping(device, rootFolderUrl) == null) {
+			collectionDao.addCollectionMapping(device, rootFolderUrl, folderSyncState);
 		}
-		return collectionId;
 	}
 
 }
