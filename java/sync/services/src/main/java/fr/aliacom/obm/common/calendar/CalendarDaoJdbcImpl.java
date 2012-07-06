@@ -434,7 +434,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setLocation(evrs.getString("event_location"));
 		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
 		e.setStartDate(cal.getTime());
-		e.setDuration(evrs.getInt("event_duration"));
+		e.setDuration(JDBCUtils.convertNegativeIntegerToZero(evrs, "event_duration"));
 		e.setPriority(evrs.getInt("event_priority"));
 		e.setPrivacy(EventPrivacy.fromSqlIntCode(evrs.getInt("event_privacy")));
 		e.setAllday(evrs.getBoolean("event_allday"));

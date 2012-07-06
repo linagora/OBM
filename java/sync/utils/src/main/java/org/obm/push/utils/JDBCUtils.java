@@ -140,4 +140,10 @@ public class JDBCUtils {
 	public static java.sql.Date getDateWithoutTime(Date lastSync) {
 		return new java.sql.Date(lastSync.getTime());
 	}
+
+	public static int convertNegativeIntegerToZero(ResultSet rs, String fieldName) throws SQLException {
+		Preconditions.checkNotNull(rs);
+		Preconditions.checkNotNull(fieldName);
+		return Math.max(0, rs.getInt(fieldName));
+	}
 }
