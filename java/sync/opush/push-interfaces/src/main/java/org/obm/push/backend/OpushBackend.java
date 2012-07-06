@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -115,7 +114,6 @@ public abstract class OpushBackend {
 		return new HierarchyItemsChanges.Builder()
 			.changes(itemChangesTaggedNew(udr, changedCollections))
 			.deletions(itemChangesTaggedDeleted(udr, deletedCollections))
-			.lastSync(new Date())
 			.build();
 	}
 
