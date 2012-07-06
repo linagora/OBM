@@ -68,8 +68,8 @@ import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.AttendeeAlert;
 import org.obm.sync.calendar.CalendarInfo;
-import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Comment;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -102,6 +102,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -1842,15 +1843,23 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private Collection<Integer> extractAttendeeIds(Connection con, AccessToken token, Event event)
 			throws SQLException {
 		List<Attendee> attendees = event.getAttendees();
-		Collection<Integer> attendeeIds = Lists.newArrayList(attendees.size());
+		Map<String, Integer> attendeesEmailToId = Maps.newHashMapWithExpectedSize(attendees.size());
 		int domainId = token.getDomain().getId();
-		for (Attendee at : event.getAttendees()) {
-			Integer userId = userDao.userIdFromEmail(con, at.getEmail(), domainId);
+		for (Attendee attendee : event.getAttendees()) {
+			addAttendeeIdMapping(con, domainId, attendeesEmailToId, attendee);
+		}
+		return attendeesEmailToId.values();
+	}
+
+	private void addAttendeeIdMapping(Connection con, int domainId,
+			Map<String, Integer> attendeesEmailToId, Attendee attendee) throws SQLException {
+		
+		if (!attendeesEmailToId.containsKey(attendee.getEmail())) {
+			Integer userId = userDao.userIdFromEmail(con, attendee.getEmail(), domainId);
 			if (userId != null) {
-				attendeeIds.add(userId);
+				attendeesEmailToId.put(attendee.getEmail(), userId);
 			}
 		}
-		return attendeeIds;
 	}
 
 	private void removeFromDeletedEvent(Connection con, Event ev, Collection<Integer> attendeeIds)
