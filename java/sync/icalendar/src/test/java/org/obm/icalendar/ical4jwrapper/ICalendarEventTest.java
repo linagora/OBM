@@ -37,12 +37,17 @@ import static org.obm.DateUtils.date;
 import java.net.URISyntaxException;
 import java.util.Date;
 
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Parameter;
+import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Related;
 import net.fortuna.ical4j.model.property.Clazz;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStamp;
@@ -53,6 +58,7 @@ import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Transp;
+import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.XProperty;
 
@@ -182,6 +188,22 @@ public class ICalendarEventTest {
 		}
 		return propertyList;
 	}
+
+	private ParameterList parameters(Parameter... parameters) {
+		ParameterList parameterList = new ParameterList();
+		for (Parameter parameter: parameters) {
+			parameterList.add(parameter);
+		}
+		return parameterList;
+	}
+	
+	private ComponentList alarms(VAlarm... alarms) {
+		ComponentList componentList = new ComponentList(alarms.length);
+		for (VAlarm alarm: alarms) {
+			componentList.add(alarm);
+		}
+		return componentList;
+	}
 	
 	@Test(expected=NullPointerException.class)
 	public void nullEvent() {
@@ -221,6 +243,7 @@ public class ICalendarEventTest {
 		assertThat(iCalendarEvent.startDate()).isNull();
 		assertThat(iCalendarEvent.transparency()).isNull();
 		assertThat(iCalendarEvent.endDate()).isNull();
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isNull();
 	}
 	
 	@Test
@@ -370,5 +393,121 @@ public class ICalendarEventTest {
 						new Duration(new Dur("2H"))));
 		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
 		assertThat(iCalendarEvent.endDate()).isNull();
+	}
+
+	@Test
+	public void firstAlarmInSecondsNoAlarm() {
+		VEvent vEvent = new VEvent(properties());
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isNull();
+	}
+	
+	@Test
+	public void firstAlarmInSecondsDateTimeAtBeginning() {
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(
+						new VAlarm(new DateTime(date("2012-01-01T20:22:33")))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isZero();
+	}
+	
+	@Test
+	public void firstAlarmInSecondsDateTime() {
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(
+						new VAlarm(new DateTime(date("2012-01-01T10:22:33")))));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-36000);
+	}
+
+	@Test
+	public void firstAlarmDefaultRelatedIsStartDate() {
+		int durDays = 0;
+		int durHours = -10;
+		int durMinutes = 0;
+		int durSeconds = 0;
+		VAlarm vAlarm = new VAlarm(new Dur(durDays, durHours, durMinutes, durSeconds));
+		
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(vAlarm));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-36000);
+	}
+
+	@Test
+	public void firstAlarmBeforeRelatedStartTime() {
+		int durDays = -1;
+		int durHours = -2;
+		int durMinutes = -30;
+		int durSeconds = 0;
+		VAlarm vAlarm = new VAlarm(properties(new Trigger(parameters(Related.START), new Dur(durDays, durHours, durMinutes, durSeconds))));
+		
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(vAlarm));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-95400);
+	}
+
+	@Test
+	public void firstAlarmAfterRelatedStartTime() {
+		int durDays = 0;
+		int durHours = 2;
+		int durMinutes = 0;
+		int durSeconds = 0;
+		VAlarm vAlarm = new VAlarm(properties(new Trigger(parameters(Related.START), new Dur(durDays, durHours, durMinutes, durSeconds))));
+		
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(vAlarm));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(7200);
+	}
+
+	@Test
+	public void firstAlarmBeforeRelatedToEndDate() {
+		int durDays = 0;
+		int durHours = -1;
+		int durMinutes = 0;
+		int durSeconds = 0;
+		VAlarm vAlarm = new VAlarm(properties(new Trigger(parameters(Related.END), new Dur(durDays, durHours, durMinutes, durSeconds))));
+		
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33"))),
+						new DtEnd(new DateTime(date("2012-01-01T23:22:33")))),
+				alarms(vAlarm));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(7200);
+	}
+
+	@Test
+	public void firstAlarmAfterRelatedToEndDate() {
+		int durDays = 0;
+		int durHours = 10;
+		int durMinutes = 0;
+		int durSeconds = 0;
+		VAlarm vAlarm = new VAlarm(properties(new Trigger(parameters(Related.END), new Dur(durDays, durHours, durMinutes, durSeconds))));
+		
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33"))),
+						new DtEnd(new DateTime(date("2012-01-01T23:22:33")))),
+				alarms(vAlarm));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(46800);
 	}
 }

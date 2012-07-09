@@ -40,6 +40,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.component.VEvent;
 
+import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -169,7 +170,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reminder(600l)
+					.reminder(10l)
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
@@ -189,11 +190,59 @@ public class ICalendarConverterTest {
 					.location("Lyon")
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.msEventExtId(new MSEventExtId("3c428e8d-efee-413a-8a5b-d340feb21187"))
-					.reminder(600l)
+					.reminder(10l)
 					.reponseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.BUSY)
 					.allDayEvent(true)
 					.build());
+	}
+	
+	@Test
+	public void reminderNull() {
+		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
+		EasyMock.expect(iCalendarEvent.firstAlarmInSeconds()).andReturn(null).once();
+		EasyMock.replay(iCalendarEvent);
+		
+		Long reminder = icalendarConverter.reminder(iCalendarEvent);
+		
+		EasyMock.verify(iCalendarEvent);
+		Assertions.assertThat(reminder).isNull();
+	}
+
+	@Test
+	public void reminderZero() {
+		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
+		EasyMock.expect(iCalendarEvent.firstAlarmInSeconds()).andReturn(0l).once();
+		EasyMock.replay(iCalendarEvent);
+		
+		Long reminder = icalendarConverter.reminder(iCalendarEvent);
+		
+		EasyMock.verify(iCalendarEvent);
+		Assertions.assertThat(reminder).isEqualTo(0);
+	}
+
+	@Test
+	public void reminderBeforeStartDateGetsMinuteValue() {
+		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
+		EasyMock.expect(iCalendarEvent.firstAlarmInSeconds()).andReturn(-600l).once();
+		EasyMock.replay(iCalendarEvent);
+		
+		Long reminder = icalendarConverter.reminder(iCalendarEvent);
+		
+		EasyMock.verify(iCalendarEvent);
+		Assertions.assertThat(reminder).isEqualTo(10);
+	}
+
+	@Test
+	public void reminderAfterStartDateGetsNullValue() {
+		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
+		EasyMock.expect(iCalendarEvent.firstAlarmInSeconds()).andReturn(600l).once();
+		EasyMock.replay(iCalendarEvent);
+		
+		Long reminder = icalendarConverter.reminder(iCalendarEvent);
+		
+		EasyMock.verify(iCalendarEvent);
+		Assertions.assertThat(reminder).isNull();
 	}
 	
 	@Test

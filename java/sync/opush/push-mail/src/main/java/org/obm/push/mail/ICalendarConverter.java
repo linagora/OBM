@@ -146,7 +146,7 @@ public class ICalendarConverter {
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.location(iCalendarEvent.location())
 			.organizer(iCalendarEvent.organizer())
-			.reminder(reminder(iCalendarEvent, startDate))
+			.reminder(reminder(iCalendarEvent))
 			.reponseRequested(true)
 			.sensitivity(sensitivity(iCalendarEvent))
 			.intDBusyStatus(transparency(iCalendarEvent))
@@ -192,11 +192,10 @@ public class ICalendarConverter {
 		return X_OBM_ALL_DAY_ENABLED.equals(iCalendarEvent.property(X_OBM_ALL_DAY));
 	}
 
-	private Long reminder(ICalendarEvent iCalendarEvent, Date startDate) {
-		Long firstAlarmDateTime = iCalendarEvent.firstAlarmDateTime(startDate);
-		if (firstAlarmDateTime != null) {
-			long time = startDate.getTime() - firstAlarmDateTime;
-			return Duration.millis(time).getStandardSeconds();
+	@VisibleForTesting Long reminder(ICalendarEvent iCalendarEvent) {
+		Long firstAlarmInSeconds = iCalendarEvent.firstAlarmInSeconds();
+		if (firstAlarmInSeconds != null && firstAlarmInSeconds <= 0) {
+			return Duration.standardSeconds(Math.abs(firstAlarmInSeconds)).getStandardMinutes();
 		}
 		return null;
 	}

@@ -349,4 +349,27 @@ public class MSMeetingRequest implements Serializable {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("allDayEvent", allDayEvent)
+			.add("startTime", startTime)
+			.add("dtStamp", dtStamp)
+			.add("endTime", endTime)
+			.add("instanceType", instanceType)
+			.add("location", location)
+			.add("organizer", organizer)
+			.add("recurrenceId", recurrenceId)
+			.add("reminder", reminder)
+			.add("responseRequested", responseRequested)
+			.add("recurrences", recurrences)
+			.add("sensitivity", sensitivity)
+			.add("intDBusyStatus", intDBusyStatus)
+			.add("timeZone", timeZone)
+			.add("msEventExtId", msEventExtId)
+			.add("categories", categories)
+			.toString();
+	}
+	
 }

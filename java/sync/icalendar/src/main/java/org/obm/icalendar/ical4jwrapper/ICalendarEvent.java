@@ -35,11 +35,12 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 
-import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Related;
 import net.fortuna.ical4j.model.property.Clazz;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStamp;
@@ -49,10 +50,15 @@ import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Transp;
+import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
+
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 
 
 public class ICalendarEvent {
@@ -120,21 +126,43 @@ public class ICalendarEvent {
 		return null;
 	}
 	
-	public Long firstAlarmDateTime(Date startDate) {
+	public Long firstAlarmInSeconds() {
 		VAlarm vAlarm = firstVAlarm(vEvent);
 		if (vAlarm != null) {
-			Dur duration = vAlarm.getTrigger().getDuration();
-			return duration.getTime(startDate).getTime();
+			Trigger trigger = vAlarm.getTrigger();
+			if (trigger.getDuration() != null) {
+				return alarmFromRelatedDateTime(trigger);
+			} else {
+				return alarmFromSpecificDateTime(trigger);
+			}
 		}
 		return null;
+	}
+
+	private long alarmFromRelatedDateTime(Trigger trigger) {
+		Date relatedDate = isRelatedEndDate(trigger) ? endDate() : startDate();
+		return alarmFromStartDateToDate(trigger.getDuration().getTime(relatedDate));
+	}
+
+	private boolean isRelatedEndDate(Trigger trigger) {
+		return Related.END.equals(trigger.getParameter(Parameter.RELATED));
+	}
+
+	private long alarmFromSpecificDateTime(Trigger trigger) {
+		return alarmFromStartDateToDate(trigger.getDateTime());
+	}
+
+	private long alarmFromStartDateToDate(Date toDate) {
+		return new Duration(
+				new DateTime(startDate()),
+				new DateTime(toDate))
+			.getStandardSeconds();
 	}
 	
 	private VAlarm firstVAlarm(VEvent vEvent) {
 		Collection<VAlarm> alarms = vEvent.getAlarms();
 		if (alarms != null) {
-			for (VAlarm vAlarm: alarms) {
-				return vAlarm;
-			}
+			return Iterables.getFirst(alarms, null);
 		}
 		return null;
 	}
