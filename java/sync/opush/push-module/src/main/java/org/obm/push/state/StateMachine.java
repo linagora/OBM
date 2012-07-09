@@ -45,12 +45,16 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -65,7 +69,7 @@ public class StateMachine {
 	private final SyncKeyFactory syncKeyFactory;
 
 	@Inject
-	private StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
+	@VisibleForTesting StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			SyncKeyFactory syncKeyFactory) {
 		this.collectionDao = collectionDao;
 		this.itemTrackingDao = itemTrackingDao;
@@ -80,8 +84,22 @@ public class StateMachine {
 		return collectionDao.findItemStateForKey(syncKey);
 	}
 	
-	public FolderSyncState getFolderSyncState(String syncKey) throws DaoException {
-		return collectionDao.findFolderStateForKey(syncKey);
+	public FolderSyncState getFolderSyncState(String syncKey) throws DaoException, InvalidSyncKeyException {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey));
+		
+		if (FolderSyncState.isSyncKeyOfInitialFolderSync(syncKey)) {
+			return new FolderSyncState(syncKey);
+		} else {
+			return findFolderSyncState(syncKey);
+		}
+	}
+
+	private FolderSyncState findFolderSyncState(String syncKey) throws DaoException, InvalidSyncKeyException {
+		FolderSyncState folderSyncStateForKey = collectionDao.findFolderStateForKey(syncKey);
+		if (folderSyncStateForKey == null) {
+			throw new InvalidSyncKeyException(syncKey);
+		}
+		return folderSyncStateForKey;
 	}
 	
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {

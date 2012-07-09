@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.exception.activesync;
 
 public class InvalidSyncKeyException extends Exception {
 
