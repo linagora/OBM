@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +57,10 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
+import org.obm.push.utils.DateUtils;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -66,6 +70,8 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class ICalendarConverter {
+
+	private static final int JAVA_TO_MS_API_MONTH_OFFSET = 1;
 	
 	private static final String X_OBM_ALL_DAY_ENABLED = "1";
 	private static final String X_OBM_ALL_DAY = "X-OBM-ALL-DAY";
@@ -107,7 +113,7 @@ public class ICalendarConverter {
 			if (iCalendarRule.isRRule()) {
 				builder.recurrenceId(recurrenceId(iCalendarEvent));
 				builder.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING);
-				fillMsMeetingRequestFromRRule(iCalendarRule, builder);
+				fillMsMeetingRequestFromRRule(iCalendarRule, iCalendarEvent, timeZone, builder);
 			} else if (iCalendarEvent.reccurenceId() != null) {
 				//FIXME OBMFULL-3610: MeetingResponse doesn't support accepting
 				//Event Exception
@@ -229,13 +235,14 @@ public class ICalendarConverter {
 		return MSMeetingRequestIntDBusyStatus.BUSY;
 	}
 	
-	private void fillMsMeetingRequestFromRRule(ICalendarRule iCalendarRule, 
-			MsMeetingRequestBuilder msMeetingRequestBuilder) {
+	private void fillMsMeetingRequestFromRRule(ICalendarRule iCalendarRule, ICalendarEvent iCalendarEvent,
+			TimeZone iCalendarTimeZone, MsMeetingRequestBuilder msMeetingRequestBuilder) {
 		
 		List<MSMeetingRequestRecurrence> meetingRequestRecurrences = Lists.newArrayList();
 		
 		MSMeetingRequestRecurrenceType frequency = frequency(iCalendarRule);
 		List<MSMeetingRequestRecurrenceDayOfWeek> dayList = dayList(iCalendarRule);
+		MSMeetingRequestRecurrenceType type = type(frequency, dayList);
 		Integer dayOfMonth = dayOfMonth(iCalendarRule, frequency);
 		
 		meetingRequestRecurrences.add(
@@ -243,13 +250,31 @@ public class ICalendarConverter {
 				.interval(iCalendarRule.interval())
 				.until(iCalendarRule.until())
 				.dayOfWeek(dayList)
-				.type(type(frequency, dayList))
+				.type(type)
 				.dayOfMonth(dayOfMonth)
-				.monthOfYear(iCalendarRule.byMonth())
+				.monthOfYear(monthOfYear(type, iCalendarRule, iCalendarEvent, iCalendarTimeZone))
 				.weekOfMonth(iCalendarRule.bySetPos())
 				.occurrences(iCalendarRule.count())
 				.build());
 		msMeetingRequestBuilder.recurrences(meetingRequestRecurrences);
+	}
+
+	private Integer monthOfYear(MSMeetingRequestRecurrenceType type, ICalendarRule iCalendarRule,
+			ICalendarEvent iCalendarEvent, TimeZone iCalendarTimeZone) {
+
+		if (type.isYearly()) {
+			return Objects.firstNonNull(
+					iCalendarRule.byMonth(),
+					retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone));
+		} else {
+			return iCalendarRule.byMonth();
+		}
+	}
+
+	@VisibleForTesting int retrieveMonthFromStartTime(ICalendarEvent iCalendarEvent, TimeZone iCalendarTimeZone) {
+		Calendar calendar = Calendar.getInstance(Objects.firstNonNull(iCalendarTimeZone, DateUtils.getGMTTimeZone()));
+		calendar.setTime(iCalendarEvent.startDate());
+		return calendar.get(Calendar.MONTH) + JAVA_TO_MS_API_MONTH_OFFSET;
 	}
 
 	private MSMeetingRequestRecurrenceType type(MSMeetingRequestRecurrenceType frequency,

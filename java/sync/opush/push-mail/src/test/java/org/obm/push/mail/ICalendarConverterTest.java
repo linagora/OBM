@@ -37,12 +37,18 @@ import java.util.TimeZone;
 
 import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -51,6 +57,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 
@@ -502,6 +509,54 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("orphaned_event_exception.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		Assertions.assertThat(msMeetingRequest).isNull();
+	}
+
+	@Test
+	public void testICalendarConverterYearlyWithoutBYMONTHGetTheStartDateOne() throws IOException, ParserException {
+		ICalendar icalendar = icalendar("recur_event_freq-yearly_bymonth_unset.ics");
+
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+
+		int julyMonthIndex = 7;
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(msMeetingRequest.getRecurrences());
+		Assertions.assertThat(recurrence.getMonthOfYear()).isEqualTo(julyMonthIndex);
+	}
+	
+	@Test
+	public void testRetrieveMonthForNullTimeZone() {
+		ComponentList components = new ComponentList();
+		components.add(new VEvent(new Date(DateUtils.date("2013-01-01T01:00:00+00")), "event summary"));
+		TimeZone iCalendarTimeZone = null;
+
+		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(new ICalendarEvent(new Calendar(components)), iCalendarTimeZone);
+		
+		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(1);
+	}
+	
+	@Test
+	public void testRetrieveMonthForEarlyerTimeZone() {
+		ComponentList components = new ComponentList();
+		net.fortuna.ical4j.model.DateTime vEventStartTime = new net.fortuna.ical4j.model.DateTime(DateUtils.date("2013-01-01T05:00:00+00"));
+		components.add(new VEvent(vEventStartTime, "event summary"));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(new Calendar(components));
+		TimeZone iCalendarTimeZone = TimeZone.getTimeZone("GMT-8:00");
+
+		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);
+		
+		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(12);
+	}
+	
+	@Test
+	public void testRetrieveMonthForLaterTimeZone() {
+		ComponentList components = new ComponentList();
+		net.fortuna.ical4j.model.DateTime vEventStartTime = new net.fortuna.ical4j.model.DateTime(DateUtils.date("2013-12-31T20:00:00+00"));
+		components.add(new VEvent(vEventStartTime, "event summary"));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(new Calendar(components));
+		TimeZone iCalendarTimeZone = TimeZone.getTimeZone("GMT+8:00");
+
+		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);
+		
+		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(1);
 	}
 	
 	private ICalendar icalendar(String filename) throws IOException, ParserException {

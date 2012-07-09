@@ -40,11 +40,16 @@ import org.joda.time.Duration;
 import com.google.common.primitives.Ints;
 
 public class DateUtils {
-	
-	public static Calendar getCurrentGMTCalendar() {
-		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+
+	public static TimeZone getGMTTimeZone() {
+		return TimeZone.getTimeZone("GMT");
 	}
 	
+	
+	public static Calendar getCurrentGMTCalendar() {
+		return Calendar.getInstance(getGMTTimeZone());
+	}
+
 	public static Calendar getEpochCalendar() {
 		Calendar calendar = getCurrentGMTCalendar();
 		calendar.setTimeInMillis(0);

@@ -31,51 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
-import java.util.Map;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public enum MSMeetingRequestRecurrenceType {
-	
-	DAILY(0), 
-	WEEKLY(1),
-	MONTHLY(2),
-	MONTHLY_NTH_DAY(3),
-	YEARLY(5),
-	YEARLY_NTH_DAY(6); 
+@RunWith(SlowFilterRunner.class)
+public class MSMeetingRequestRecurrenceTypeTest {
 
-	private final int xmlValue;
-	private static Map<Integer, MSMeetingRequestRecurrenceType> values;
-	static {
-		Builder<Integer, MSMeetingRequestRecurrenceType> builder = ImmutableMap.builder();
-		for (MSMeetingRequestRecurrenceType type: values()) {
-			builder.put(type.asXmlValue(), type);
-		}
-		values = builder.build();
+	@Test
+	public void testIsYearlyOnDaily() {
+		assertThat(MSMeetingRequestRecurrenceType.DAILY.isYearly()).isFalse();
 	}
 	
-	private MSMeetingRequestRecurrenceType(int xmlValue) {
-		this.xmlValue = xmlValue;
+	@Test
+	public void testIsYearlyOnMonthly() {
+		assertThat(MSMeetingRequestRecurrenceType.MONTHLY.isYearly()).isFalse();
 	}
 	
-	public int asXmlValue() {
-		return xmlValue;
+	@Test
+	public void testIsYearlyOnMonthlyNthDay() {
+		assertThat(MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY.isYearly()).isFalse();
 	}
 	
-	public String specificationValue() {
-		return String.valueOf(xmlValue);
-	}
-	
-	public static final MSMeetingRequestRecurrenceType getValueOf(Integer xmlValue) {
-		if (xmlValue == null) {
-			return null;
-		}
-		return values.get(xmlValue);
+	@Test
+	public void testIsYearlyOnWeekly() {
+		assertThat(MSMeetingRequestRecurrenceType.WEEKLY.isYearly()).isFalse();
 	}
 
-	public boolean isYearly() {
-		return this == MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY
-				|| this == MSMeetingRequestRecurrenceType.YEARLY;
+	@Test
+	public void testIsYearlyOnYearly() {
+		assertThat(MSMeetingRequestRecurrenceType.YEARLY.isYearly()).isTrue();
 	}
+
+	@Test
+	public void testIsYearlyOnYearlyNthDay() {
+		assertThat(MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY.isYearly()).isTrue();
+	}
+	
 }
