@@ -36,6 +36,8 @@ import java.util.Date;
 
 public class FolderSyncState extends SyncState implements Serializable {
 
+	public static final String INITIAL_FOLDER_SYNC_KEY = "0"; 
+	
 	public FolderSyncState(String syncKey) {
 		this(syncKey, null);
 	}
@@ -48,5 +50,13 @@ public class FolderSyncState extends SyncState implements Serializable {
 		super(syncState.getKey(), syncState.getLastSync());
 		setId(syncState.getId());
 		setLastSyncFiltred(syncState.isLastSyncFiltred());
+	}
+	
+	public boolean isInitialFolderSync() {
+		return isSyncKeyOfInitialFolderSync(getKey());
+	}
+	
+	public static boolean isSyncKeyOfInitialFolderSync(String syncKey) {
+		return INITIAL_FOLDER_SYNC_KEY.equals(syncKey);
 	}
 }
