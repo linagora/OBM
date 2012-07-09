@@ -2453,11 +2453,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
 
     $title = sql_parse_text($calendar['event_title']);
     $event_duration = $calendar['event_duration'];
-    $olddatebegin = $exception_date;
+    $exception_recurrence_id_date = $exception_date;
   } else {
     $title = sql_parse_text($calendar['title']);
     $id = sql_parse_id($calendar['calendar_id']);
-    $olddatebegin = $calendar['old_date_begin'];
+    $exception_recurrence_id_date = $calendar['old_date_begin'];
     $event_duration = $calendar['duration'];
     $exception_date = $obm_q->escape($calendar['old_date_begin']);
   }
@@ -2607,7 +2607,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $idsToIndex = array($id, $exception_id);
   } else {
     $newEvent = OBM_EventFactory::getInstance()->getById($id);
-    $newEvent->negative_recurrence_id = $olddatebegin;
+    $newEvent->negative_recurrence_id = $exception_recurrence_id_date;
     $idsToIndex = array($id);
   }
   
@@ -2617,7 +2617,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   	// Notify Observers and ensure that email content points to the old event
   	// begin and end date.
     if ($isMovedException) {
-        $oldEvent->set("date_begin",$olddatebegin);
+        $oldEvent->set("date_begin",$exception_recurrence_id_date);
         $oldEvent->date_end = clone $oldEvent->date_begin;
         $oldEvent->date_end->addSecond($oldEvent->duration);
         OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
