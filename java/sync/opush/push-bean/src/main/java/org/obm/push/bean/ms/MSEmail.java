@@ -48,6 +48,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 public class MSEmail implements IApplicationData, Serializable {
@@ -56,6 +57,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 		private Long uid;
 		
+		private String subject;
 		private MSEmailHeader header;
 		private MSEmailBody body;
 		private Set<MSAttachement> attachments;
@@ -78,6 +80,11 @@ public class MSEmail implements IApplicationData, Serializable {
 
 		public MSEmailBuilder header(MSEmailHeader header) {
 			this.header = header;
+			return this;
+		}
+		
+		public MSEmailBuilder subject(String subject) {
+			this.subject = subject;
 			return this;
 		}
 
@@ -139,9 +146,11 @@ public class MSEmail implements IApplicationData, Serializable {
 			if (importance == null) {
 				importance = MSImportance.NORMAL;
 			}
-			return new MSEmail(uid, header, body, attachments, meetingRequest, messageClass,
+			String emailSubject = Strings.emptyToNull(subject);
+			return new MSEmail(uid, emailSubject, header, body, attachments, meetingRequest, messageClass,
 					importance, read, starred, answered);
 		}
+
 	}
 	
 	@Override
@@ -151,6 +160,7 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	private final long uid;
 
+	private final String subject;
 	private final MSEmailHeader header;
 	private final MSEmailBody body;
 	private final Set<MSAttachement> attachments;
@@ -162,10 +172,11 @@ public class MSEmail implements IApplicationData, Serializable {
 	private final boolean starred;
 	private final boolean answered;
 
-	private MSEmail(long uid, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachments,
+	private MSEmail(long uid, String subject, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachments,
 			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
 			boolean read, boolean starred, boolean answered) {
 		this.uid = uid;
+		this.subject = subject;
 		this.header = header;
 		this.body = body;
 		this.attachments = attachments;
@@ -177,6 +188,10 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.answered = answered;
 	}
 
+	public MSAddress getDisplayTo() {
+		return header.getDisplayTo();
+	}
+	
 	public List<MSAddress> getFrom() {
 		return header.getFrom();
 	}
@@ -189,8 +204,12 @@ public class MSEmail implements IApplicationData, Serializable {
 		return header.getCc();
 	}
 
+	public List<MSAddress> getReplyTo() {
+		return header.getReplyTo();
+	}
+	
 	public String getSubject() {
-		return header.getSubject();
+		return subject;
 	}
 
 	public Date getDate() {
@@ -263,5 +282,6 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		return false;
 	}
+
 }
 

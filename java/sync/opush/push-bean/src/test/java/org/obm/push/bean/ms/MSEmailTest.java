@@ -127,6 +127,33 @@ public class MSEmailTest {
 	
 		Assertions.assertThat(msEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
 	}
+	
+	@Test
+	public void testMSEmailSubjectNull() {
+		MSEmail msEmail = requirementsInitializedBuilder()
+				.subject(null)
+				.build();
+	
+		Assertions.assertThat(msEmail.getSubject()).isNull();
+	}
+	
+	@Test
+	public void testMSEmailSubjectEmpty() {
+		MSEmail msEmail = requirementsInitializedBuilder()
+				.subject("")
+				.build();
+	
+		Assertions.assertThat(msEmail.getSubject()).isNull();
+	}
+
+	@Test
+	public void testMSEmailSubjectValue() {
+		MSEmail msEmail = requirementsInitializedBuilder()
+				.subject("a subject")
+				.build();
+	
+		Assertions.assertThat(msEmail.getSubject()).isEqualTo("a subject");
+	}
 
 	private MSEmailBuilder requirementsInitializedBuilder() {
 		String message = "text";

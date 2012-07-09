@@ -32,6 +32,7 @@
 package org.obm.push.mail;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.easymock.EasyMock.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +42,6 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.minig.imap.Address;
@@ -88,9 +88,13 @@ public class MailViewToMSEmailConverterImplTest {
 		Integer bodyTruncationSize = null;
 		ContentType bodyContentType = new ContentType.Builder().contentType("text/plain").build();
 		List<EmailViewAttachment> attachments = ImmutableList.of(new EmailViewAttachment("id", subject, "file", 20));
-		InputStream attachmentInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("ics/attendee.ics");
+		InputStream attachmentInputStream = resourceAsStream("ics/attendee.ics");
 		ICalendar iCalendar = null;
 		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;
+
+		private InputStream resourceAsStream(String file) {
+			return ClassLoader.getSystemClassLoader().getResourceAsStream(file);
+		}
 	}
 
 	private EmailViewFixture emailViewFixture;
@@ -280,7 +284,8 @@ public class MailViewToMSEmailConverterImplTest {
 	@Test
 	public void testHeaderSubjectNull() throws IOException, ParserException, DaoException {
 		emailViewFixture.subject = null;
-
+		emailViewFixture.attachmentInputStream = null;
+		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getSubject()).isNull();
@@ -289,19 +294,51 @@ public class MailViewToMSEmailConverterImplTest {
 	@Test
 	public void testHeaderSubjectEmpty() throws IOException, ParserException, DaoException {
 		emailViewFixture.subject = "";
-
+		emailViewFixture.attachmentInputStream = null;
+		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 
 		assertThat(convertedMSEmail.getSubject()).isNull();
 	}
 	
 	@Test
-	public void testHeaderSubject() throws IOException, ParserException, DaoException {
+	public void testHeaderSubjectIfNoInvitation() throws Exception {
 		emailViewFixture.subject = "a subject";
+		emailViewFixture.attachmentInputStream = null;
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getSubject()).isEqualTo("a subject");
+	}
+	
+	@Test
+	public void testInvitationSubjectIsPriorOnSubject() throws Exception {
+		emailViewFixture.attachmentInputStream = emailViewFixture.resourceAsStream("ics/attendee.ics");
+		emailViewFixture.subject = "a subject";
+		
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+		
+		assertThat(convertedMSEmail.getSubject()).isEqualTo("Nouvel événement");
+	}
+
+	@Test
+	public void testInvitationSubjectNull() throws Exception {
+		emailViewFixture.attachmentInputStream = emailViewFixture.resourceAsStream("ics/no_summary.ics");
+		emailViewFixture.subject = "a subject";
+		
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+		
+		assertThat(convertedMSEmail.getSubject()).isNull();
+	}
+
+	@Test
+	public void testInvitationSubjectEmptyGetsEmailSubject() throws Exception {
+		emailViewFixture.attachmentInputStream = emailViewFixture.resourceAsStream("ics/empty_summary.ics");
+		emailViewFixture.subject = "a subject";
+		
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+
+		assertThat(convertedMSEmail.getSubject()).isNull();
 	}
 	
 	@Test
@@ -388,17 +425,18 @@ public class MailViewToMSEmailConverterImplTest {
 	public void testEventExceptionMeetingRequest() throws IOException, ParserException, DaoException {
 		emailViewFixture.attachmentInputStream = null;
 		
-		ICalendar iCalendar = EasyMock.createMock(ICalendar.class);
-		ICalendarEvent iCalendarEvent = EasyMock.createMock(ICalendarEvent.class);
-		EasyMock.expect(iCalendar.hasEvent()).andReturn(true).anyTimes();
-		EasyMock.expect(iCalendar.getICalendarEvent()).andReturn(iCalendarEvent).anyTimes();
-		EasyMock.expect(iCalendarEvent.recurrenceId()).andReturn(new Date()).anyTimes();
-		EasyMock.replay(iCalendar, iCalendarEvent);
+		ICalendar iCalendar = createMock(ICalendar.class);
+		ICalendarEvent iCalendarEvent = createMock(ICalendarEvent.class);
+		expect(iCalendar.hasEvent()).andReturn(true).anyTimes();
+		expect(iCalendar.getICalendarEvent()).andReturn(iCalendarEvent).anyTimes();
+		expect(iCalendarEvent.recurrenceId()).andReturn(new Date()).anyTimes();
+		expect(iCalendarEvent.summary()).andReturn(null).anyTimes();
+		replay(iCalendar, iCalendarEvent);
 		
 		emailViewFixture.iCalendar = iCalendar;
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 
-		EasyMock.verify(iCalendar, iCalendarEvent);
+		verify(iCalendar, iCalendarEvent);
 		
 		assertThat(convertedMSEmail.getMeetingRequest()).isNull();
 		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.NOTE);
@@ -430,8 +468,8 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException, DaoException {
-		EventService eventService = EasyMock.createMock(EventService.class);
-		UserDataRequest userDataRequest = EasyMock.createMock(UserDataRequest.class);
+		EventService eventService = createMock(EventService.class);
+		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
 		
 		return new MailViewToMSEmailConverterImpl(
 				new MSEmailHeaderConverter(new UserEmailParserUtils()), eventService)

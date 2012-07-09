@@ -97,7 +97,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		MSMeetingRequest msMeetingRequest = convertICalendar(emailView);
 		msEmailBuilder.meetingRequest(fillMSEventUid(msMeetingRequest, userDataRequest));
 		msEmailBuilder.messageClass(convertInvitationType(emailView));
-		
+		msEmailBuilder.subject(convertSubject(emailView));
 		return msEmailBuilder.build();
 	}
 
@@ -111,6 +111,15 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		} else {
 			return null;
 		}
+	}
+
+	private String convertSubject(EmailView emailView) {
+		ICalendar iCalendar = emailView.getICalendar();
+		if (iCalendar != null && iCalendar.hasEvent()) {
+			String iCalendarSummary = iCalendar.getICalendarEvent().summary();
+			return Strings.emptyToNull(iCalendarSummary);
+		}
+		return emailView.getSubject();
 	}
 
 	private void fillFlags(MSEmailBuilder msEmailBuilder, EmailView emailView) {

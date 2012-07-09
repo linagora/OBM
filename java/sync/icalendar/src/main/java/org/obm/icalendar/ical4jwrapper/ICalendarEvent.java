@@ -49,6 +49,7 @@ import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
@@ -187,6 +188,14 @@ public class ICalendarEvent {
 		Transp transp = vEvent.getTransparency();
 		if (transp != null) {
 			return Strings.emptyToNull(transp.getValue());
+		}
+		return null;
+	}
+	
+	public String summary() {
+		Summary summary = vEvent.getSummary();
+		if (summary != null) {
+			return summary.getValue();
 		}
 		return null;
 	}

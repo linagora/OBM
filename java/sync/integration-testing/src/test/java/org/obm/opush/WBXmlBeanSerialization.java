@@ -33,18 +33,25 @@ package org.obm.opush;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
 import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.data.MSEmailHeaderSerializer;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
+
+import com.google.common.base.Charsets;
 
 public class WBXmlBeanSerialization {
 
@@ -62,9 +69,21 @@ public class WBXmlBeanSerialization {
 			.date(date)
 			.subject("Subject").build();
 		
-		new MSEmailHeaderSerializer(doc.getDocumentElement(), msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(doc.getDocumentElement(), msEmailWithHeader(msEmailHeader)).serializeMSEmailHeader();
 		byte[] wbxml = new WBXMLTools().toWbxml("AirSync", doc);
 		assertThat(wbxml).isNotNull().isNotEmpty();
+	}
+
+	private MSEmail msEmailWithHeader(MSEmailHeader msEmailHeader) {
+		return new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(msEmailHeader)
+			.body(new MSEmailBody(new SerializableInputStream(
+				new ByteArrayInputStream("text".getBytes())), 
+				MSEmailBodyType.PlainText, 
+				null, 
+				Charsets.UTF_8))
+			.build();
 	}
 	
 }

@@ -88,7 +88,7 @@ public class MSEmailEncoder {
 
 	public void encode(Element parent, IApplicationData data) throws IOException {
 		MSEmail msEmail = (MSEmail) data;
-		new MSEmailHeaderSerializer(parent, msEmail.getHeader()).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parent, msEmail).serializeMSEmailHeader();
 
 		String messageImportance = msEmail.getImportance().asIntString();
 		DOMUtils.createElementAndText(parent, ASEmail.IMPORTANCE.asASValue(), messageImportance);

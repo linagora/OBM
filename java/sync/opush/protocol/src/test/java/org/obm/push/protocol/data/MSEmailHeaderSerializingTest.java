@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -41,21 +42,33 @@ import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.data.ms.MSEmailEncoder;
+import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.google.common.base.Charsets;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEmailHeaderSerializingTest {
 
 	private SimpleDateFormat sdf;
 	private SerializingTest serializingTest;
+	private MSEmailBody simpleBody;
 
 	@Before
 	public void setUp() {
 		sdf = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
 		serializingTest = new SerializingTest();
+		simpleBody = new MSEmailBody(new SerializableInputStream(
+				new ByteArrayInputStream("text".getBytes())), 
+				MSEmailBodyType.PlainText, 
+				null, 
+				Charsets.UTF_8);
 	}
 	
 	@Test
@@ -63,15 +76,20 @@ public class MSEmailHeaderSerializingTest {
 		Date date = DateUtils.date("2012-02-05T11:46:32");
 		
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
-			.from(new MSAddress("from@obm.lng.org"))
-			.replyTo(new MSAddress("from@mydomain.org"))
-			.cc(new MSAddress("cc@obm.lng.org"))
-			.to(new MSAddress("to.1@obm.lng.org"), new MSAddress("to.2@obm.lng.org"))
-			.date(date)
-			.subject("Subject").build();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+				.uid(1)
+				.body(simpleBody)
+					.header(new MSEmailHeader.Builder()
+					.from(new MSAddress("from@obm.lng.org"))
+					.replyTo(new MSAddress("from@mydomain.org"))
+					.cc(new MSAddress("cc@obm.lng.org"))
+					.to(new MSAddress("to.1@obm.lng.org"), new MSAddress("to.2@obm.lng.org"))
+					.date(date)
+					.build())
+				.subject("Subject")
+				.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo(" <from@obm.lng.org> ");
 		Assertions.assertThat(tagValue(parentElement, ASEmail.REPLY_TO)).isEqualTo(" <from@mydomain.org> ");
@@ -85,10 +103,14 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeFrom() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
-			.from(new MSAddress("from@obm.lng.org")).build();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.body(simpleBody)
+			.header(new MSEmailHeader.Builder()
+				.from(new MSAddress("from@obm.lng.org")).build())
+			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo(" <from@obm.lng.org> ");
 	}
@@ -96,9 +118,13 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeEmptyFrom() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
+			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tagValue(parentElement, ASEmail.FROM)).isEqualTo("\"Empty From\" <o-push@linagora.com> ");
 	}
@@ -106,9 +132,13 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeNullSubject() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
+			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tag(parentElement, ASEmail.SUBJECT)).isNull();
 	}
@@ -116,11 +146,14 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeEmptySubject() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
 			.subject("")
 			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tag(parentElement, ASEmail.SUBJECT)).isNull();
 	}
@@ -128,21 +161,43 @@ public class MSEmailHeaderSerializingTest {
 	@Test
 	public void testSerializeSubject() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
 			.subject("a subject")
 			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo("a subject");
 	}
 	
 	@Test
+	public void testSerializeOnlySpaceSubject() {
+		Element parentElement = createRootDocument();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
+			.subject(" ")
+			.build();
+		
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
+		
+		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo(" ");
+	}
+	
+	@Test
 	public void testSerializeEmptyField() {
 		Element parentElement = createRootDocument();
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
+		MSEmail msEmail = new MSEmail.MSEmailBuilder()
+			.uid(1)
+			.header(new MSEmailHeader.Builder().build())
+			.body(simpleBody)
+			.build();
 		
-		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		new MSEmailHeaderSerializer(parentElement, msEmail).serializeMSEmailHeader();
 		
 		Assertions.assertThat(tag(parentElement, ASEmail.CC)).isNull();
 		Assertions.assertThat(tag(parentElement, ASEmail.TO)).isNull();

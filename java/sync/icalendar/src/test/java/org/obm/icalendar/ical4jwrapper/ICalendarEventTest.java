@@ -510,4 +510,28 @@ public class ICalendarEventTest {
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(46800);
 	}
+	
+	@Test
+	public void summaryNull() {
+		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), null);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.summary()).isNull();
+	}
+	
+	@Test
+	public void summaryEmpty() {
+		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), "");
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.summary()).isEmpty();
+	}
+
+	@Test
+	public void summary() {
+		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), "I'm the summary");
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		
+		assertThat(iCalendarEvent.summary()).isEqualTo("I'm the summary");
+	}
 }

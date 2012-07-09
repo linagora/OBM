@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.obm.push.bean.MSAddress;
-import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
@@ -47,15 +47,15 @@ import com.google.common.base.Preconditions;
 public class MSEmailHeaderSerializer {
 
 	private final Element element;
-	private final MSEmailHeader msEmailHeader;
+	private final MSEmail msEmail;
 
-	public MSEmailHeaderSerializer(Element parentElement, MSEmailHeader msEmailHeader) {
+	public MSEmailHeaderSerializer(Element parentElement, MSEmail msEmail) {
 		this.element = parentElement;
-		this.msEmailHeader = msEmailHeader;
+		this.msEmail = msEmail;
 	}
 
 	public void serializeMSEmailHeader() {
-		Preconditions.checkNotNull(msEmailHeader, "The msEmailHeader is required");
+		Preconditions.checkNotNull(msEmail, "The msEmailHeader is required");
 		
 		serializeTo();
 		serializeCC();
@@ -68,38 +68,38 @@ public class MSEmailHeaderSerializer {
 
 	private void serializeTo() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEmail.TO.asASValue(), formatMSAddresses(msEmailHeader.getTo()));
+				ASEmail.TO.asASValue(), formatMSAddresses(msEmail.getTo()));
 	}
 	
 	private void serializeCC() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEmail.CC.asASValue(), formatMSAddresses(msEmailHeader.getCc()));
+				ASEmail.CC.asASValue(), formatMSAddresses(msEmail.getCc()));
 	}
 	
 	private void serializeFrom() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEmail.FROM.asASValue(), formatMSAddresses(msEmailHeader.getFrom()));
+				ASEmail.FROM.asASValue(), formatMSAddresses(msEmail.getFrom()));
 	}
 	
 	private void serializeReplyTo() {
 		DOMUtils.createElementAndTextIfNotNull(element, 
-				ASEmail.REPLY_TO.asASValue(), formatMSAddresses(msEmailHeader.getReplyTo()));
+				ASEmail.REPLY_TO.asASValue(), formatMSAddresses(msEmail.getReplyTo()));
 	}
 	
 	private void serializeSubject() {
 		DOMUtils.createElementAndTextIfNotNull(element,
-				ASEmail.SUBJECT.asASValue(), msEmailHeader.getSubject());
+				ASEmail.SUBJECT.asASValue(), msEmail.getSubject());
 	}
 	
 	private void serializeDateReceived() {
 		DOMUtils.createElementAndTextIfNotNull(element,
-				ASEmail.DATE_RECEIVED.asASValue(), formatDate(msEmailHeader.getDate()));
+				ASEmail.DATE_RECEIVED.asASValue(), formatDate(msEmail.getDate()));
 	}
 
 	private void serializeDisplayTo() {
-		if (msEmailHeader.getDisplayTo() != null) {
+		if (msEmail.getDisplayTo() != null) {
 			DOMUtils.createElementAndText(element, 
-					ASEmail.DISPLAY_TO.asASValue(), msEmailHeader.getDisplayTo().toMSProtocol());
+					ASEmail.DISPLAY_TO.asASValue(), msEmail.getDisplayTo().toMSProtocol());
 		}
 	}
 	
