@@ -2588,7 +2588,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
         NOW(),
         $sql_id,
         $sql_exception_id,
-        '$exception_date'
+        '$exception_recurrence_id_date'
       )";
   $sql_id = sql_parse_id($id, true);
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
