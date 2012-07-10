@@ -77,16 +77,17 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public List<String> getUserCollections(Device device) throws DaoException {
-		Integer id = device.getDatabaseId();
+	public List<String> getUserCollections(FolderSyncState folderSyncState) throws DaoException {
 		List<String> userCollections = Lists.newArrayList();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try{
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping " +
-					"WHERE device_id = ?");
-			ps.setInt(1, id);
+					"INNER JOIN opush_folder_snapshot ON opush_folder_snapshot.collection_id = opush_folder_mapping.id " +
+					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = opush_folder_snapshot.folder_sync_state_id " +
+					"WHERE opush_folder_sync_state.sync_key = ?");
+			ps.setString(1, folderSyncState.getKey());
 			ResultSet resultSet = ps.executeQuery();
 
 			while (resultSet.next()) {

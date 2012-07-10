@@ -71,8 +71,5 @@ public interface CollectionDao {
 
 	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
 
-	List<String> getUserCollections(Device device) throws DaoException;
-
-
-
+	List<String> getUserCollections(FolderSyncState folderSyncState) throws DaoException;
 }
