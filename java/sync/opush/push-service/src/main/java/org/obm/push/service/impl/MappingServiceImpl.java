@@ -165,7 +165,7 @@ public class MappingServiceImpl implements MappingService {
 	public List<CollectionPath> listCollections(final UserDataRequest udr, FolderSyncState folderSyncState)
 			throws DaoException {
 		
-		List<String> userCollections = collectionDao.getUserCollections(udr.getDevice());
+		List<String> userCollections = collectionDao.getUserCollections(folderSyncState);
 		return Lists.transform(userCollections, new Function<String, CollectionPath>(){
 
 			@Override
