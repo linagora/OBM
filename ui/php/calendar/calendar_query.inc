@@ -1263,6 +1263,8 @@ function run_query_reset_comment_recurrent_event($entity, $entity_id, $ext_id) {
 function run_query_calendar_set_organizer($user_id, $event_id) {
   global $cdg_sql, $obm;
 
+  run_query_calendar_unset_organizer($event_id);
+
   $entity_id = sql_parse_id($entity_id);
   $query = "UPDATE EventLink SET eventlink_is_organizer = true
     WHERE eventlink_event_id = $event_id 
@@ -1274,6 +1276,16 @@ function run_query_calendar_set_organizer($user_id, $event_id) {
   return $obm_q; 
 }
 
+function run_query_calendar_unset_organizer($event_id) {
+  global $cdg_sql;
+  
+  $query = "UPDATE EventLink SET eventlink_is_organizer = false WHERE eventlink_event_id = $event_id";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_unset_organizer()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get document infos from the document ids array given
 // Parameters:
@@ -2100,6 +2112,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   }
   
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
+  run_query_calendar_set_organizer($calendar['organizer'], $event_id);
   
   if ($updatedEvent->shouldIncrementSequence($oldEvent)) {
   	if ($updatedEvent->isDifferent($oldEvent)) {
