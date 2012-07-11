@@ -1,2 +1,3 @@
 debian/solr.xml /usr/share/obm-tomcat/applis
 obm_index_init.py /usr/share/obm-solr
+obm_optimize_index.py /usr/share/obm-solr
