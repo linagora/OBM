@@ -31,12 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
+import static org.obm.DateUtils.date;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -150,14 +150,6 @@ public class EventChangeMailerTest {
 			return attendee;
 		}
 
-		protected Date date(int year, int month, int day, int hour, int minute) {
-			Calendar calendar = GregorianCalendar.getInstance();
-			calendar.setTimeZone(TIMEZONE);
-			calendar.set(year, month, day, hour, minute, 0);
-			Date refDate = calendar.getTime();
-			return refDate;
-		}
-
 		protected List<InternetAddress> createAddressList(String addresses) throws AddressException {
 			return ImmutableList.copyOf(InternetAddress.parse(addresses));
 		}
@@ -192,7 +184,7 @@ public class EventChangeMailerTest {
 			event.setOwnerEmail("rrougeron@linagora.com");
 			event.setCreatorDisplayName("Emmanuel SURLEAU");
 			event.setCreatorEmail("esurleau@linagora.com");
-			event.setStartDate(date(2010, 10, 8, 11, 00));
+			event.setStartDate(date("2010-11-08T11:00:00"));
 			event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 			event.setDuration(2700);
 			event.setUid(new EventObmId(1354));
@@ -212,7 +204,7 @@ public class EventChangeMailerTest {
 			event.setOwner("jack");
 			event.setOwnerDisplayName("Jack de Linagora");
 			event.setOwnerEmail("jdlinagora@obm.linagora.com");
-			event.setStartDate(date(2012, 0, 23, 12, 00));
+			event.setStartDate(date("2012-01-23T12:00:00"));
 			event.setExtId(new EventExtId("1234567890"));
 			event.setDuration(3600);
 			event.setLocation("A random location");
@@ -221,7 +213,7 @@ public class EventChangeMailerTest {
 			recurrence.setKind(RecurrenceKind.lookup("weekly"));
 			recurrence.setFrequence(2);
 			recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Thursday));
-			recurrence.setEnd(date(2012, 10, 23, 12, 00));
+			recurrence.setEnd(date("2012-11-23T12:00:00"));
 			event.setRecurrence(recurrence);
 			return event;
 		}
@@ -722,7 +714,7 @@ public class EventChangeMailerTest {
 			AccessToken token = getStubAccessToken();
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setStartDate(date(2010, 10, 8, 12, 00));
+			after.setStartDate(date("2010-11-08T12:00:00"));
 			after.setDuration(3600);
 			for (Attendee att: before.getAttendees()) {
 				att.setState(ParticipationState.ACCEPTED);
@@ -803,7 +795,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestEvent();
 			Event after = before.clone();
-			after.setStartDate(date(2010, 10, 8, 12, 00));
+			after.setStartDate(date("2010-11-08T12:00:00"));
 			after.setDuration(3600);
 			for (Attendee att : before.getAttendees()) {
 				att.setState(ParticipationState.NEEDSACTION);
@@ -905,7 +897,7 @@ public class EventChangeMailerTest {
 		protected void executeProcess(EventChangeMailer eventChangeMailer, Ical4jHelper ical4jHelper) {
 			Event before = buildTestRecurrentEvent();
 			Event after = before.clone();
-			after.setStartDate(date(2012, 01, 15, 13, 00));
+			after.setStartDate(date("2012-02-15T13:00:00"));
 			after.setDuration(7200);
 			for (Attendee att : before.getAttendees()) {
 				att.setState(ParticipationState.NEEDSACTION);
