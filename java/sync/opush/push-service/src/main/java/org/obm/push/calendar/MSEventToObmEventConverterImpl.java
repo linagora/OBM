@@ -358,21 +358,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private String convertSubjectToTitle(MSEventCommon msEvent) {
-		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
-			return msEvent.getSubject();
-		} else {
-			return EVENT_DEFAULT_SUBJECT;
-		}
+		return Strings.emptyToNull(msEvent.getSubject());
 	}
 	
 	private String convertSubjectToTitle(Event parentEvent, MSEventCommon msEvent) {
 		if (!Strings.isNullOrEmpty(msEvent.getSubject())) {
 			return msEvent.getSubject();
-		} else if (!Strings.isNullOrEmpty(parentEvent.getTitle())) {
-			return parentEvent.getTitle();
-		} else {
-			return EVENT_DEFAULT_SUBJECT;
 		}
+		return Strings.emptyToNull(parentEvent.getTitle());
 	}
 
 	private EventMeetingStatus convertMeetingStatus(MSEventCommon msEvent) throws ConversionException {

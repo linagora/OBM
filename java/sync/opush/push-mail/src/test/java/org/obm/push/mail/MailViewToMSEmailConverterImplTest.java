@@ -283,7 +283,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getSubject()).isEqualTo(MSEmailHeader.DEFAULT_SUBJECT);
+		assertThat(convertedMSEmail.getSubject()).isNull();
 	}
 	
 	@Test
@@ -292,7 +292,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 
-		assertThat(convertedMSEmail.getSubject()).isEqualTo(MSEmailHeader.DEFAULT_SUBJECT);
+		assertThat(convertedMSEmail.getSubject()).isNull();
 	}
 	
 	@Test

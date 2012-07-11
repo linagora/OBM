@@ -43,7 +43,6 @@ import com.google.common.collect.Lists;
 
 public class MSEmailHeader implements Serializable {
 
-	public static final String DEFAULT_SUBJECT = "[Empty Subject]";
 	public static final MSAddress DEFAULT_FROM_ADDRESS = new MSAddress("Empty From", "o-push@linagora.com");
 	
 	public static class Builder {
@@ -111,9 +110,6 @@ public class MSEmailHeader implements Serializable {
 			if (from == null || from.isEmpty()) {
 				from = Lists.newArrayList(DEFAULT_FROM_ADDRESS);
 			}
-			if (Strings.isNullOrEmpty(subject)) {
-				subject = DEFAULT_SUBJECT;
-			}
 			if (to == null) {
 				to = ImmutableList.of();
 			}
@@ -123,7 +119,8 @@ public class MSEmailHeader implements Serializable {
 			if (replyTo == null) {
 				replyTo = ImmutableList.of();
 			}
-			return new MSEmailHeader(from, replyTo, to, cc, subject, date);
+			String headerSubject = Strings.emptyToNull(subject);
+			return new MSEmailHeader(from, replyTo, to, cc, headerSubject, date);
 		}
 	}
 	

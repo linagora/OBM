@@ -104,13 +104,37 @@ public class MSEmailHeaderSerializingTest {
 	}
 	
 	@Test
-	public void testSerializeEmptySubject() {
+	public void testSerializeNullSubject() {
 		Element parentElement = createRootDocument();
 		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder().build();
 		
 		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
 		
-		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo("[Empty Subject]");
+		Assertions.assertThat(tag(parentElement, ASEmail.SUBJECT)).isNull();
+	}
+	
+	@Test
+	public void testSerializeEmptySubject() {
+		Element parentElement = createRootDocument();
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
+			.subject("")
+			.build();
+		
+		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		
+		Assertions.assertThat(tag(parentElement, ASEmail.SUBJECT)).isNull();
+	}
+	
+	@Test
+	public void testSerializeSubject() {
+		Element parentElement = createRootDocument();
+		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
+			.subject("a subject")
+			.build();
+		
+		new MSEmailHeaderSerializer(parentElement, msEmailHeader).serializeMSEmailHeader();
+		
+		Assertions.assertThat(tagValue(parentElement, ASEmail.SUBJECT)).isEqualTo("a subject");
 	}
 	
 	@Test

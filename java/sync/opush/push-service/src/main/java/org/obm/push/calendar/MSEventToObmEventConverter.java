@@ -40,8 +40,6 @@ import org.obm.sync.calendar.ParticipationState;
 
 public interface MSEventToObmEventConverter {
 	
-	String EVENT_DEFAULT_SUBJECT = "Unnamed Event";
-	
 	Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) throws ConversionException;
 
 	boolean isInternalEvent(Event event, boolean defaultValue);

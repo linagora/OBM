@@ -587,7 +587,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(MSEventToObmEventConverter.EVENT_DEFAULT_SUBJECT);
+		Assertions.assertThat(convertedEvent.getTitle()).isNull();
 	}
 
 	@Test
@@ -601,7 +601,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(MSEventToObmEventConverter.EVENT_DEFAULT_SUBJECT);
+		Assertions.assertThat(convertedEvent.getTitle()).isNull();
 	}
 	
 	@Test
