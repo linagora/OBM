@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayOutputStream;
@@ -53,12 +54,9 @@ import javax.mail.util.SharedByteArrayInputStream;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.hamcrest.core.IsInstanceOf;
 import org.jsoup.Jsoup;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -255,41 +253,41 @@ public class EventChangeMailerTest {
 		protected InvitationParts checkInvitationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
 			InvitationParts parts = new InvitationParts();
 			parts.rawMessage = getRawMessage(mimeMessage);
-			Assert.assertTrue(mimeMessage.getContentType().startsWith("multipart/mixed"));
-			Assert.assertThat(mimeMessage.getContent(), IsInstanceOf.instanceOf(Multipart.class));
+			assertThat(mimeMessage.getContentType()).startsWith("multipart/mixed");
+			assertThat(mimeMessage.getContent()).isInstanceOf(Multipart.class);
 			Multipart mixed = (Multipart) mimeMessage.getContent();
-			Assert.assertEquals(2, mixed.getCount());
+			assertThat(mixed.getCount()).isEqualTo(2);
 			BodyPart firstPart = mixed.getBodyPart(0);
-			Assert.assertTrue(firstPart.getContentType().startsWith("multipart/alternative"));
-			Assert.assertThat(firstPart.getContent(), IsInstanceOf.instanceOf(Multipart.class));
+			assertThat(firstPart.getContentType()).startsWith("multipart/alternative");
+			assertThat(firstPart.getContent()).isInstanceOf(Multipart.class);
 			Multipart alternative = (Multipart) firstPart.getContent();
-			Assert.assertEquals(3, alternative.getCount());
+			assertThat(alternative.getCount()).isEqualTo(3);
 			parts.plainText = alternative.getBodyPart(0);
-			Assert.assertTrue(parts.plainText.getContentType().startsWith("text/plain; charset=UTF-8"));
+			assertThat(parts.plainText.getContentType()).startsWith("text/plain; charset=UTF-8");
 			parts.htmlText = alternative.getBodyPart(1);
-			Assert.assertTrue(parts.htmlText.getContentType().startsWith("text/html; charset=UTF-8"));
+			assertThat(parts.htmlText.getContentType()).startsWith("text/html; charset=UTF-8");
 			parts.textCalendar = alternative.getBodyPart(2);
 			parts.applicationIcs = mixed.getBodyPart(1);
-			Assert.assertEquals("application/ics; name=meeting.ics", parts.applicationIcs.getContentType());
+			assertThat(parts.applicationIcs.getContentType()).isEqualTo("application/ics; name=meeting.ics");
 			return parts;
 		}
 		
 		protected InvitationParts checkNotificationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
 			InvitationParts parts = new InvitationParts();
 			parts.rawMessage = getRawMessage(mimeMessage);
-			Assert.assertTrue(mimeMessage.getContentType().startsWith("multipart/alternative"));
-			Assert.assertThat(mimeMessage.getContent(), IsInstanceOf.instanceOf(Multipart.class));
+			assertThat(mimeMessage.getContentType()).startsWith("multipart/alternative");
+			assertThat(mimeMessage.getContent()).isInstanceOf(Multipart.class);
 			Multipart alternative = (Multipart) mimeMessage.getContent();
-			Assert.assertEquals(2, alternative.getCount());
+			assertThat(alternative.getCount()).isEqualTo(2);
 			parts.plainText = alternative.getBodyPart(0);
-			Assert.assertTrue(parts.plainText.getContentType().startsWith("text/plain; charset=UTF-8"));
+			assertThat(parts.plainText.getContentType()).startsWith("text/plain; charset=UTF-8");
 			parts.htmlText = alternative.getBodyPart(1);
-			Assert.assertTrue(parts.htmlText.getContentType().startsWith("text/html; charset=UTF-8"));
+			assertThat(parts.htmlText.getContentType()).startsWith("text/html; charset=UTF-8");
 			return parts;
 		}
 
 		protected void checkIcs(BodyPart textCalendar) throws IOException, MessagingException {
-			Assert.assertThat(textCalendar.getContent(), IsInstanceOf.instanceOf(String.class));
+			assertThat(textCalendar.getContent()).isInstanceOf(String.class);
 			String text = (String) textCalendar.getContent();
 			checkStringContains(text, getExpectedIcsStrings());
 		}
@@ -297,7 +295,7 @@ public class EventChangeMailerTest {
 		protected abstract String[] getExpectedIcsStrings();
 
 		protected void checkApplicationIcs(BodyPart applicationIcs) throws IOException, MessagingException {
-			Assert.assertThat(applicationIcs.getContent(), IsInstanceOf.instanceOf(SharedByteArrayInputStream.class));
+			assertThat(applicationIcs.getContent()).isInstanceOf(SharedByteArrayInputStream.class);
 			SharedByteArrayInputStream stream = (SharedByteArrayInputStream) applicationIcs.getContent();
 			String decodedString = IOUtils.toString(stream, Charsets.US_ASCII.displayName());
 			checkStringContains(decodedString, getExpectedIcsStrings());
@@ -305,12 +303,12 @@ public class EventChangeMailerTest {
 
 		protected void checkStringContains(String text, String... expected) {
 			for (String s: expected) {
-				Assert.assertThat(text, StringContains.containsString(s));
+				assertThat(text).contains(s);
 			}
 		}
 
 		protected void checkHtmlMessage(BodyPart htmlText) throws IOException, MessagingException {
-			Assert.assertThat(htmlText.getContent(), IsInstanceOf.instanceOf(String.class));
+			assertThat(htmlText.getContent()).isInstanceOf(String.class);
 			String text = Jsoup.parse((String)htmlText.getContent()).text();
 			checkStringContains(text, getExpectedHtmlStrings());
 		}
@@ -319,7 +317,7 @@ public class EventChangeMailerTest {
 
 
 		protected void checkPlainMessage(BodyPart plainText) throws IOException, MessagingException {
-			Assert.assertThat(plainText.getContent(), IsInstanceOf.instanceOf(String.class));
+			assertThat(plainText.getContent()).isInstanceOf(String.class);
 			String text = (String) plainText.getContent();
 			checkStringContains(text, getExpectedPlainStrings());
 		}
@@ -365,7 +363,7 @@ public class EventChangeMailerTest {
 					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -461,7 +459,7 @@ public class EventChangeMailerTest {
 					"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora_:_A_random_recurrent_event");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -693,7 +691,7 @@ public class EventChangeMailerTest {
 					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertNull(parts.applicationIcs);
+			assertThat(parts.applicationIcs).isNull();
 		}
 		
 	}
@@ -879,7 +877,7 @@ public class EventChangeMailerTest {
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -980,7 +978,7 @@ public class EventChangeMailerTest {
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=REQUEST;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -1080,7 +1078,7 @@ public class EventChangeMailerTest {
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=CANCEL;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=CANCEL;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -1183,7 +1181,7 @@ public class EventChangeMailerTest {
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=CANCEL;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=CANCEL;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
@@ -1296,7 +1294,7 @@ public class EventChangeMailerTest {
 
 			checkPlainMessage(parts.plainText);
 			checkHtmlMessage(parts.htmlText);
-			Assert.assertEquals("text/calendar; charset=UTF-8; method=REPLY;", parts.textCalendar.getContentType());
+			assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REPLY;");
 			checkIcs(parts.textCalendar);
 			checkApplicationIcs(parts.applicationIcs);
 		}
