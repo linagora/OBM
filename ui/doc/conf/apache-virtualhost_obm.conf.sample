@@ -31,6 +31,8 @@ NameVirtualHost *:443
     php_value magic_quotes_gpc  Off
     php_value memory_limit 128M
     php_value post_max_size 10M
+    php_value log_errors 1
+    php_value error_reporting "E_ALL & ~ ( E_NOTICE )"
     php_value upload_max_filesize 10M
 
     LimitRequestBody 20971520
@@ -105,7 +107,3 @@ NameVirtualHost *:443
 	RewriteRule . https://%{SERVER_NAME}%{REQUEST_URI} [L]
     </IfModule>
 </IfModule>
-
-#Debug options
-php_value log_errors 1
-php_value error_reporting "E_ALL & ~ ( E_NOTICE )"
