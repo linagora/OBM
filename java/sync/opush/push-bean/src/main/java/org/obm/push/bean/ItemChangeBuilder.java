@@ -67,7 +67,7 @@ public class ItemChangeBuilder implements Builder<ItemChange> {
 	}
 	
 	public ItemChangeBuilder withNewFlag(boolean isNew) {
-		Preconditions.checkState(newIsDefined, "new flag already defined");
+		Preconditions.checkState(!newIsDefined, "new flag already defined");
 		itemChange.setNew(isNew);
 		this.newIsDefined = true;
 		return this;
