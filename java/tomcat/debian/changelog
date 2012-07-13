@@ -1,3 +1,9 @@
+obm-tomcat (2.4.1~beta1) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Fri, 13 Jul 2012 17:09:03 +0000
+
 obm-tomcat (2.4.1~alpha11) stable; urgency=low
 
   * New upstream release.
