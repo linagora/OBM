@@ -31,28 +31,24 @@ package fr.aliacom.obm.common.trust;
 
 import static org.fest.assertions.api.Assertions.*;
 
-import org.junit.Before;
+import java.util.Date;
+
 import org.junit.Test;
 
-/**
- * Tests the {@link TrustToken} Class.
- */
 public class TrustTokenTest {
 	private TrustToken testee;
 
-	@Before
-	public void setUp() {
-		testee = new TrustToken();
-	}
-
 	@Test
 	public void testIsExpiredNotExpired() {
+		testee = new TrustToken("");
+		
 		assertThat(testee.isExpired(10)).isFalse();
 	}
 
 	@Test
-	public void testIsExpired() throws Exception {
-		Thread.sleep(2000);
+	public void testIsExpired() {
+		testee = new TrustToken("", new Date(System.currentTimeMillis() - 2000));
+		
 		assertThat(testee.isExpired(1)).isTrue();
 	}
 

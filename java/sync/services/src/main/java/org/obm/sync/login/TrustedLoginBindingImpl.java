@@ -27,35 +27,37 @@ public class TrustedLoginBindingImpl extends LoginBindingImpl {
 	}
 
 	@Override
-	@Transactional
-	public AccessToken logUserIn(String user, String password, String origin, String clientIP, String remoteIP, String lemonLogin, String lemonDomain, boolean isPasswordHashed)
-			throws ObmSyncVersionNotFoundException {
+	@Transactional(readOnly = true)
+	public AccessToken logUserIn(String user, String token, String origin,
+			String clientIP, String remoteIP, String lemonLogin,
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
-		TrustToken trustToken = trustTokenDao.getTrustToken();
-
-		// No trust token in database. This shouldn't happen
+		TrustToken trustToken = null;
+		
+		try {
+			trustToken = trustTokenDao.getTrustToken(user);
+		}
+		catch (Exception e) {
+			logger.error("Failed to locate trust token in database.", e);
+		}
+		
 		if (trustToken == null) {
-			logger.warn("No trust token in database, denying access for user '{}'", user);
-			trustTokenDao.updateTrustToken();
-
 			return null;
 		}
 
-		// In a trusted login, the password contains the trust token to verify
-		if (!trustToken.isTokenValid(password)) {
+		if (!trustToken.isTokenValid(token)) {
 			logger.warn("Invalid trust token, denying access for user '{}'.", user);
 
 			return null;
 		}
 
-		AccessToken accessToken = sessionManagement.trustedLogin(user, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
-
-		// Update trust token in the database if needed
 		if (trustToken.isExpired(configurationService.trustTokenTimeoutInSeconds())) {
-			trustTokenDao.updateTrustToken();
+			logger.warn("Trust token is expired, denying access for user '{}'.", user);
+			
+			return null;
 		}
 
-		return accessToken;
+		return sessionManagement.trustedLogin(user, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
 	}
 
 }
