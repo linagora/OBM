@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.ms;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
@@ -41,10 +44,10 @@ import com.google.common.base.Objects;
 
 public class MSEmailBody implements Serializable {
 
-	private final SerializableInputStream mimeData;
-	private final MSEmailBodyType bodyType;
-	private final Integer truncationSize;
-	private final Charset charset;
+	private SerializableInputStream mimeData;
+	private MSEmailBodyType bodyType;
+	private Integer truncationSize;
+	private Charset charset;
 	
 	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, 
 			Integer truncationSize, Charset charset) {
@@ -77,9 +80,20 @@ public class MSEmailBody implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(mimeData, bodyType, truncationSize, charset);
+		return Objects.hashCode(bodyType, truncationSize, charset);
 	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MSEmailBody) {
+			MSEmailBody that = (MSEmailBody) object;
+			return Objects.equal(this.bodyType, that.bodyType)
+				&& Objects.equal(this.truncationSize, that.truncationSize)
+				&& Objects.equal(this.charset, that.charset);
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
@@ -88,5 +102,19 @@ public class MSEmailBody implements Serializable {
 			.add("truncationSize", truncationSize)
 			.add("charset", charset)
 			.toString();
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeObject(mimeData);
+		out.writeObject(bodyType);
+		out.writeObject(truncationSize);
+		out.writeUTF(charset.name());
+	}
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		mimeData = (SerializableInputStream) in.readObject();
+		bodyType = (MSEmailBodyType) in.readObject();
+		truncationSize = (Integer) in.readObject();
+		charset = Charset.forName(in.readUTF());
 	}
 }

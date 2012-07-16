@@ -111,6 +111,7 @@ public class BeansTest {
 	public void testClassWithCharsetField() {
 		ImmutableList<Class<?>> list = ImmutableList.<Class<?>>builder()
 					.add(org.obm.push.bean.ms.MSEmail.class)
+					.add(org.obm.push.bean.ms.MSEmailBody.class)
 					.build();
 		
 		equalsVerifierUtilsTest.testClassWithCharsetField(list);

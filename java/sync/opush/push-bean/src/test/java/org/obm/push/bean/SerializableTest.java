@@ -60,9 +60,12 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.utils.SerializableInputStream;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.SerializableTester;
 
 import org.obm.filter.SlowFilterRunner;
 
@@ -102,6 +105,17 @@ public class SerializableTest {
 		objectOutputStream.writeObject(msEmail);
 	}
 
+	@Test
+	public void testNewMSEmail() {
+		 org.obm.push.bean.ms.MSEmail msEmail = new org.obm.push.bean.ms.MSEmail.MSEmailBuilder()
+			.uid(1l)
+			.header(new MSEmailHeader.Builder().build())
+			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
+					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, null, Charsets.UTF_8)).build();
+		 SerializableTester.reserializeAndAssert(msEmail);
+	}
+
+	
 	@Test
 	public void testMSEvent() throws IOException {
 		MSEvent msEvent = new MSEvent();
