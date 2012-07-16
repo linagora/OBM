@@ -77,8 +77,10 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -94,7 +96,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	private final CollectionPathHelper collectionPathHelper;
 	
 	@Inject
-	private ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
+	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
 			CollectionPathHelper collectionPathHelper, Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
 		
@@ -184,12 +186,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Iterable<CollectionPath> foldersToCollectionPaths(final UserDataRequest udr, Iterable<Folder> folders) {
-		return Iterables.transform(folders, new Function<Folder, CollectionPath>() {
+		return FluentIterable
+				.from(folders)
+				.transform(new Function<Folder, CollectionPath>() {
 
-			@Override
-			public CollectionPath apply(Folder folder) {
-				return collectionPathForFolder(udr, folder);
-			}});
+					@Override
+					public CollectionPath apply(Folder folder) {
+						return collectionPathForFolder(udr, folder);
+					}})
+				.toImmutableSet();
 	}
 
 	protected CollectionPath collectionPathForFolder(UserDataRequest udr, Folder folder) {
@@ -240,7 +245,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 		return mappingService.collectionIdToString(collectionId);
 	}
-
+	
 	private String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws CollectionNotFoundException, DaoException {
 		if (!isDefaultFolder(collectionPath.displayName())) {
 			CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
@@ -259,10 +264,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private boolean isDefaultFolder(String folderName) {
-		if (folderName.equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName())) {
-			return true;
-		}
-		return false;
+		return folderName.equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName());
 	}
 	
 	@Override
