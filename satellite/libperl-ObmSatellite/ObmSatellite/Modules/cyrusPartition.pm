@@ -260,8 +260,19 @@ sub _updateImapdConf {
 
 sub _restartCyrusService {
     my $self = shift;
+    my $stopCommand = "stop";
+    my $startCommand = "start";
 
-    my $cmd = $self->{'cyrusStartupScript'}.' stop > /dev/null 2>&1';
+    my $checkInitscriptExtentedCmd = $self->{'cyrusStartupScript'}." help | grep -q quickstart >/dev/null 2>&1";
+    $self->_log( 'Checking special commands of Cyrus init service '.$checkInitscriptExtentedCmd, 3 );
+    my $checkInitscriptExtentedRes = 0xffff & system $checkInitscriptExtentedCmd;
+    if ( ! $checkInitscriptExtentedRes ) {
+        $self->_log( 'Using special quickstart/quickstop commands of Cyrus init service '.$checkInitscriptExtentedCmd, 3 );
+        $stopCommand = "quickstop";
+        $startCommand = "quickstart";
+    }
+
+    my $cmd = $self->{'cyrusStartupScript'}.' '.$stopCommand.' > /dev/null 2>&1';
     $self->_log( 'Stop Cyrus service '.$cmd, 3 );
     my $ret = 0xffff & system $cmd;
 
@@ -270,7 +281,7 @@ sub _restartCyrusService {
         return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to stop Cyrus service' ] } );
     }
 
-    $cmd = $self->{'cyrusStartupScript'}.' start > /dev/null 2>&1';
+    $cmd = $self->{'cyrusStartupScript'}.' '.$startCommand.' > /dev/null 2>&1';
     $self->_log( 'Start Cyrus service '.$cmd, 3 );
     $ret = 0xffff & system $cmd;
 
