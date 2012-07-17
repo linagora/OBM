@@ -157,7 +157,7 @@ public class EventChangeMailer extends AbstractMailer {
 				new EventMail(
 						extractSenderAddress(synchronizer),
 						current.getAttendees(), 
-						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale, previous), 
+						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale, current), 
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
 						ics, "REQUEST");
@@ -197,7 +197,7 @@ public class EventChangeMailer extends AbstractMailer {
 		EventMail eventMail = new EventMail(
 				extractSenderAddress(synchronizer),
 				current.getAttendees(), 
-				updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale, previous), 
+				updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale, current), 
 				notifyUpdateUserBodyTxt(previous, current, locale, timezone),
 				notifyUpdateUserBodyHtml(previous, current, locale, timezone));
 		if (ics != null) {
@@ -412,7 +412,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String inviteUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.isRecurrent()) {
+		if (newEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateInvitationPlain.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateInvitationPlain.tpl", oldEvent, newEvent, locale, timezone);
@@ -420,7 +420,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String inviteUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.isRecurrent()) {
+		if (newEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateInvitationHtml.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateInvitationHtml.tpl", oldEvent, newEvent, locale, timezone);
@@ -428,7 +428,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String notifyUpdateUserBodyTxt(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.isRecurrent()) {
+		if (newEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateNoticePlain.tpl", oldEvent, newEvent, locale, timezone);
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateNoticePlain.tpl", oldEvent, newEvent, locale, timezone);
@@ -436,7 +436,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String notifyUpdateUserBodyHtml(Event oldEvent, Event newEvent, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		if (oldEvent.isRecurrent()) {
+		if (newEvent.isRecurrent()) {
 			return applyEventUpdateOnTemplate("RecurrentEventUpdateNoticeHtml.tpl", oldEvent, newEvent, locale, timezone);		
 		} else {
 			return applyEventUpdateOnTemplate("EventUpdateNoticeHtml.tpl", oldEvent, newEvent, locale, timezone);
@@ -493,38 +493,53 @@ public class EventChangeMailer extends AbstractMailer {
 				locale);
 		
 		if (event.isRecurrent()) {
-			EventRecurrence currentEventRecurrence = event.getRecurrence();
-			int frequency = currentEventRecurrence.getFrequence();
-			String recurrenceInfo = "";
-			
-			if (frequency > 1) {
-				recurrenceInfo = buildRecurrenceInfoFromEvent(currentEventRecurrence, locale, frequency);
-			} else {
-				recurrenceInfo = buildRecurrenceInfoFromEventWithInsignificantFrequency(currentEventRecurrence, locale);
-			}
-			
-			String recurrence = recurrenceInfo + " "
-					+ buildRepeatDaysFromEventRecurrence(currentEventRecurrence, locale);
-
-			datamodel.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE))
-					 .put("recurrenceKind", recurrence)
-					 .put("startTime", new SimpleDate(event.getStartDate(), TemplateDateModel.TIME))
-					 .put("endTime", new SimpleDate(event.getEndDate(), TemplateDateModel.TIME));
-
-			Date recurrenceEnd = currentEventRecurrence.getEnd();
-			if (recurrenceEnd != null) {
-				datamodel.put("recurrenceEnd", new SimpleDate(recurrenceEnd, TemplateDateModel.DATE));
-			} else {
-				datamodel.put("recurrenceEnd", getMessages(locale).withoutRecurrenceEndDate());
-			}
+			datamodel
+				.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
+				.put("startTime", new SimpleDate(event.getStartDate(), TemplateDateModel.TIME))
+				.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE))
+				.put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME))
+				.put("endTime", new SimpleDate(event.getEndDate(), TemplateDateModel.TIME))
+				.put("endDate", new SimpleDate(event.getEndDate(), TemplateDateModel.DATE))
+				.put("recurrenceKind", describeRecurrence(locale, event.getRecurrence()))
+				.put("recurrenceEnd", recurrenceEnd(locale, event.getRecurrence()));
 			
 		} else {
-			datamodel.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
-					 .put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME));
+			datamodel
+				.put("start", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
+				.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATE))
+				.put("startTime", new SimpleDate(event.getStartDate(), TemplateDateModel.TIME))
+				.put("end", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME))
+				.put("endDate", new SimpleDate(event.getEndDate(), TemplateDateModel.DATE))
+				.put("endTime", new SimpleDate(event.getEndDate(), TemplateDateModel.TIME))
+				.put("recurrenceKind", getMessages(locale).withoutRecurrence())
+				.put("recurrenceEnd", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME));
 		}
 
 		return datamodel;
 
+	}
+
+	private Object recurrenceEnd(Locale locale, EventRecurrence currentEventRecurrence) {
+		Date recurrenceEnd = currentEventRecurrence.getEnd();
+		if (recurrenceEnd != null) {
+			return new SimpleDate(recurrenceEnd, TemplateDateModel.DATE);
+		} else {
+			return getMessages(locale).withoutRecurrenceEndDate();
+		}
+	}
+
+	private String describeRecurrence(Locale locale, EventRecurrence currentEventRecurrence) {
+		String recurrenceInfo = recurrenceInfo(locale, currentEventRecurrence);
+		return recurrenceInfo + buildRepeatDaysFromEventRecurrence(currentEventRecurrence, locale);
+	}
+
+	private String recurrenceInfo(Locale locale, EventRecurrence currentEventRecurrence) {
+		int frequency = currentEventRecurrence.getFrequence();
+		if (frequency > 1) {
+			return buildRecurrenceInfoFromEvent(currentEventRecurrence, locale, frequency);
+		} else {
+			return buildRecurrenceInfoFromEventWithInsignificantFrequency(currentEventRecurrence, locale);
+		}
 	}
 	
 	private String buildRecurrenceInfoFromEvent(EventRecurrence eventRecurrence, Locale locale, int frequency) {
@@ -546,6 +561,8 @@ public class EventChangeMailer extends AbstractMailer {
 				recurrenceInfo.append(getMessages(locale).annuallyRecurrenceInfoWithFrequency(frequency));	
 				break;
 			case none:
+				recurrenceInfo.append(getMessages(locale).withoutRecurrence());
+				break;
 		}
 
 		return recurrenceInfo.toString();
@@ -570,6 +587,8 @@ public class EventChangeMailer extends AbstractMailer {
 				recurrenceInfo.append(getMessages(locale).annuallyRecurrenceInfoWithoutFrequency());	
 				break;
 			case none:
+				recurrenceInfo.append(getMessages(locale).withoutRecurrence());
+				break;
 		}
 
 		return recurrenceInfo.toString();		
@@ -631,7 +650,7 @@ public class EventChangeMailer extends AbstractMailer {
 		else {
 			repeatDaysString = "";
 		}
-		return repeatDaysString.isEmpty() ? "" : "[" + repeatDaysString + "]";
+		return repeatDaysString.isEmpty() ? "" : " [" + repeatDaysString + "]";
 	}
 	
 	private String buildAttendeesFromEvent(List<Attendee> attendeesList, Locale locale) {

@@ -141,8 +141,8 @@ public class EventChangeMailerTest {
 	
 	private static Event buildTestEvent() {
 		Event event = new Event();
-		event.setTimeCreate(new Date(1244470973000L));
-		event.setTimeUpdate(new Date(1244470995000L));
+		event.setTimeCreate(date("2009-06-08T16:22:53"));
+		event.setTimeUpdate(date("2009-06-08T16:23:15"));
 		event.addAttendee(createAttendee("Ronan LANORE", "rlanore@linagora.com"));
 		event.addAttendee(createAttendee("Guillaume ALAUX", "galaux@linagora.com"));
 		event.addAttendee(createAttendee("Matthieu BAECHLER", "mbaechler@linagora.com"));
@@ -165,8 +165,8 @@ public class EventChangeMailerTest {
 	
 	private static Event buildTestRecurrentEvent() {
 		Event event = new Event();
-		event.setTimeCreate(new Date(1244470973000L));
-		event.setTimeUpdate(new Date(1244470995000L));
+		event.setTimeCreate(date("2009-06-08T16:22:53"));
+		event.setTimeUpdate(date("2009-06-08T16:23:15"));
 		event.addAttendee(createAttendee("Jean Dupont", "jdupont@obm.linagora.com"));
 		event.addAttendee(createAttendee("Pierre Dupond", "pdupond@obm.linagora.com"));
 		event.setTitle("A random recurrent event");
@@ -867,4 +867,221 @@ public class EventChangeMailerTest {
 
 		eventChangeMailer.buildUpdateParticipationStateDatamodel(event, obmUser, status, Locale.FRENCH);
 	}
+	
+	@Test
+	public void testNonRecurrentToRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
+				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Event after = buildTestRecurrentEvent();
+		Event before = after.clone();
+		before.setRecurrence(new EventRecurrence());
+		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
+		eventChangeMailer.notifyAcceptedUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		verify(mailService);
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, "From: Obm User <user@test>",
+				"To: Jean Dupont <jdupont@obm.linagora.com>",
+				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event"
+				);
+		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
+				"du 23 janv. 2012", 
+				"au 23 janv. 2012",
+				"de 12:00:00 à 13:00:00",
+				"au 23 nov. 2012",
+				"type de récurrence : Pas de récurrence",
+				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+				"lieu : A random location"
+				);
+		checkHtmlMessage(parts, 
+				"Invitation à un évènement récurrent : mise à jour",
+				"du 23 janv. 2012", 
+				"au 23 janv. 2012",
+				"Heure 12:00:00 - 13:00:00",
+				"Au 23 nov. 2012",
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora",
+				"type de récurrence : Pas de récurrence",
+				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
+		checkIcs(parts, 
+				"BEGIN:VCALENDAR",
+				"CALSCALE:GREGORIAN",
+				"VERSION:2.0",
+				"METHOD:REQUEST",
+				"BEGIN:VEVENT",
+				"DTSTART:20120123T110000Z",
+				"DURATION:PT1H",
+				"SUMMARY:A random recurrent event",
+				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+				"UID:1234567890",
+				"X-OBM-DOMAIN:test.tlse.lng",
+				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+				"CREATED:20090608T142253Z",
+				"LAST-MODIFIED:20090608T142315Z",
+				"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE",
+				"SEQUENCE:0");
+	}
+	
+	@Test
+	public void testRecurrentToNonRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
+				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Event before = buildTestRecurrentEvent();
+		Event after = before.clone();
+		after.setRecurrence(new EventRecurrence());
+		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
+		eventChangeMailer.notifyAcceptedUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		verify(mailService);
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, "From: Obm User <user@test>",
+				"To: Jean Dupont <jdupont@obm.linagora.com>",
+				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Jack_de_Li?=\r\n =?UTF-8?Q?nagora_sur_OBM_:_A_random_recurrent_event?="
+				);
+		checkPlainMessage(parts, 
+				"RENDEZ-VOUS MODIFIÉ !",
+				"du 23 janv. 2012 12:00",
+				"au 23 janv. 2012 13:00",
+				"Le rendez-vous A random recurrent event", 
+				"lieu : A random location",
+				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications."
+				);
+		checkHtmlMessage(parts, 
+				"Invitation à un évènement : mise à jour",
+				"du 23 janv. 2012 12:00",
+				"au 23 janv. 2012 13:00",
+				"lieu : A random location",
+				"Du 23 janv. 2012 12:00",
+				"Au 23 janv. 2012 13:00",
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora"
+				);
+		checkIcs(parts, 
+				"BEGIN:VCALENDAR",
+				"CALSCALE:GREGORIAN",
+				"VERSION:2.0",
+				"METHOD:REQUEST",
+				"BEGIN:VEVENT",
+				"DTSTART:20120123T110000Z",
+				"DURATION:PT1H",
+				"SUMMARY:A random recurrent event",
+				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+				"UID:1234567890",
+				"X-OBM-DOMAIN:test.tlse.lng",
+				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+				"CREATED:20090608T142253Z",
+				"LAST-MODIFIED:20090608T142315Z",
+				"SEQUENCE:0");
+	}
+	
+
+	@Test
+	public void testNonRecurrentToRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
+				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Event after = buildTestRecurrentEvent();
+		Event before = after.clone();
+		before.setRecurrence(new EventRecurrence());
+		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		verify(mailService);
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, "From: Obm User <user@test>",
+				"To: Jean Dupont <jdupont@obm.linagora.com>",
+				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event"
+				);
+		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
+				"du 23 janv. 2012", 
+				"au 23 janv. 2012",
+				"de 12:00:00 à 13:00:00",
+				"au 23 nov. 2012",
+				"type de récurrence : Pas de récurrence",
+				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
+				"lieu : A random location"
+				);
+		checkHtmlMessage(parts, 
+				"Invitation à un évènement récurrent : mise à jour",
+				"du 23 janv. 2012", 
+				"au 23 janv. 2012",
+				"Heure 12:00:00 - 13:00:00",
+				"Au 23 nov. 2012",
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora",
+				"type de récurrence : Pas de récurrence",
+				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
+		checkIcs(parts, 
+				"BEGIN:VCALENDAR",
+				"CALSCALE:GREGORIAN",
+				"VERSION:2.0",
+				"METHOD:REQUEST",
+				"BEGIN:VEVENT",
+				"DTSTART:20120123T110000Z",
+				"DURATION:PT1H",
+				"SUMMARY:A random recurrent event",
+				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+				"UID:1234567890",
+				"X-OBM-DOMAIN:test.tlse.lng",
+				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+				"CREATED:20090608T142253Z",
+				"LAST-MODIFIED:20090608T142315Z",
+				"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE",
+				"SEQUENCE:0");
+	}
+	
+	@Test
+	public void testRecurrentToNonRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
+				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Event before = buildTestRecurrentEvent();
+		Event after = before.clone();
+		after.setRecurrence(new EventRecurrence());
+		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		verify(mailService);
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, "From: Obm User <user@test>",
+				"To: Jean Dupont <jdupont@obm.linagora.com>",
+				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Jack_de_Li?=\r\n =?UTF-8?Q?nagora_sur_OBM_:_A_random_recurrent_event?="
+				);
+		checkPlainMessage(parts, 
+				"RENDEZ-VOUS MODIFIÉ !",
+				"du 23 janv. 2012 12:00",
+				"au 23 janv. 2012 13:00",
+				"Le rendez-vous A random recurrent event", 
+				"lieu : A random location"
+				);
+		checkHtmlMessage(parts, 
+				"Invitation à un évènement : mise à jour",
+				"du 23 janv. 2012 12:00",
+				"au 23 janv. 2012 13:00",
+				"lieu : A random location",
+				"Du 23 janv. 2012 12:00",
+				"Au 23 janv. 2012 13:00",
+				"Sujet A random recurrent event", 
+				"Lieu A random location", 
+				"Organisateur Jack de Linagora"
+				);
+		checkIcs(parts, 
+				"BEGIN:VCALENDAR",
+				"CALSCALE:GREGORIAN",
+				"VERSION:2.0",
+				"METHOD:REQUEST",
+				"BEGIN:VEVENT",
+				"DTSTART:20120123T110000Z",
+				"DURATION:PT1H",
+				"SUMMARY:A random recurrent event",
+				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
+				"UID:1234567890",
+				"X-OBM-DOMAIN:test.tlse.lng",
+				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+				"CREATED:20090608T142253Z",
+				"LAST-MODIFIED:20090608T142315Z",
+				"SEQUENCE:0");
+	}
+
 }

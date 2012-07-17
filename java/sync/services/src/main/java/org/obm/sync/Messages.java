@@ -102,6 +102,10 @@ public class Messages {
 		return getString("WithoutRecurrenceEndDate");
 	}
 	
+	public String withoutRecurrence() {
+		return getString("WithoutRecurrence");
+	}
+	
 	public String dailyRecurrenceInfoWithFrequency(int frequency) {
 		return getString("DailyRecurrenceInfo", frequency+" ");
 	}
