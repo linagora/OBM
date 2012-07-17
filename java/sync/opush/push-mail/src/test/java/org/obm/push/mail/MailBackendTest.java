@@ -44,6 +44,9 @@ import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.junit.Before;
@@ -52,7 +55,6 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
-import org.obm.push.backend.CollectionPathUtils;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -68,6 +70,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
@@ -81,6 +84,8 @@ import org.obm.sync.services.ICalendar;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Provider;
@@ -88,6 +93,8 @@ import com.google.inject.Provider;
 @RunWith(SlowFilterRunner.class)
 public class MailBackendTest {
 
+	private static final String COLLECTION_MAIL_PREFIX = "obm:\\\\test@test\\email\\";
+	
 	private User user;
 	private Device device;
 	private UserDataRequest udr;
@@ -157,45 +164,32 @@ public class MailBackendTest {
 		verifyCommonMocks();
 	}
 	
-	private void expectTestToBuildSpecialFoldersCollectionPaths() {
-		CollectionPath inboxCollectionPath = CollectionPathUtils.emailCollectionPath("INBOX");
-		expect(collectionPathBuilder.displayName("INBOX")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(inboxCollectionPath).once();
+	private void expectBuildMailboxesCollectionPaths(Map<String, Integer> mailboxesIds) {
 		
-		CollectionPath draftsCollectionPath = CollectionPathUtils.emailCollectionPath("Drafts");
-		expect(collectionPathBuilder.displayName("Drafts")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(draftsCollectionPath).once();
-		
-		CollectionPath sentCollectionPath = CollectionPathUtils.emailCollectionPath("Sent");
-		expect(collectionPathBuilder.displayName("Sent")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(sentCollectionPath).once();
-		
-		CollectionPath trashCollectionPath = CollectionPathUtils.emailCollectionPath("Trash");
-		expect(collectionPathBuilder.displayName("Trash")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(trashCollectionPath).once();
+		for(Entry<String, Integer> mailbox : mailboxesIds.entrySet()) {
+			expect(collectionPathBuilder.displayName(mailbox.getKey())).andReturn(collectionPathBuilder).anyTimes();
+			expect(collectionPathBuilder.build()).andReturn(new MailCollectionPath(mailbox.getKey())).once();
+		}
 	}
 	
 	@Test
 	public void initialHierarchyContainsBaseFolders() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("0");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234");
-		String outgoingSyncStateId = "174";
 
-		expectTestToBuildSpecialFoldersCollectionPaths();
+		Map<String, Integer> mailboxesIds = ImmutableMap.of(
+			"INBOX", 1,
+			"Drafts", 2,
+			"Sent", 3,
+			"Trash", 4);
 		
-		expect(mappingService.getCollectionIdFor(device, "collectionpath/INBOX")).andReturn(1);
-		expect(mappingService.getCollectionIdFor(device, "collectionpath/Drafts")).andReturn(2);
-		expect(mappingService.getCollectionIdFor(device, "collectionpath/Sent")).andReturn(3);
-		expect(mappingService.getCollectionIdFor(device, "collectionpath/Trash")).andReturn(4);
+		expectBuildMailboxesCollectionPaths(mailboxesIds);
 		
-		expect(mappingService.collectionIdToString(1)).andReturn("collection1");
-		expect(mappingService.collectionIdToString(2)).andReturn("collection2");
-		expect(mappingService.collectionIdToString(3)).andReturn("collection3");
-		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
-
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "INBOX", "Drafts", "Sent", "Trash");
+		expectMappingServiceSearchThenCreateCollection(mailboxesIds);
+		expectMappingServiceSnapshot(outgoingSyncState, mailboxesIds.values());
+		expectMappingServiceLookupCollection(mailboxesIds);
+		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of());
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(ImmutableList.<CollectionPath>of());
 		
 		replayCommonMocks();
 		
@@ -204,21 +198,21 @@ public class MailBackendTest {
 		
 		verifyCommonMocks();
 		
-		ItemChange inboxItemChange = new ItemChangeBuilder().serverId("collection1")
+		ItemChange inboxItemChange = new ItemChangeBuilder().serverId("1")
 			.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
-			.displayName("INBOX").build();
+			.displayName("INBOX").withNewFlag(true).build();
 		
-		ItemChange draftsItemChange = new ItemChangeBuilder().serverId("collection2")
+		ItemChange draftsItemChange = new ItemChangeBuilder().serverId("2")
 			.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDER)
-			.displayName("Drafts").build();
+			.displayName("Drafts").withNewFlag(true).build();
 		
-		ItemChange sentItemChange = new ItemChangeBuilder().serverId("collection3")
+		ItemChange sentItemChange = new ItemChangeBuilder().serverId("3")
 			.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
-			.displayName("Sent").build();
+			.displayName("Sent").withNewFlag(true).build();
 		
-		ItemChange trashItemChange = new ItemChangeBuilder().serverId("collection4")
+		ItemChange trashItemChange = new ItemChangeBuilder().serverId("4")
 			.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDER)
-			.displayName("Trash").build();
+			.displayName("Trash").withNewFlag(true).build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).contains(
 				inboxItemChange, draftsItemChange, sentItemChange, trashItemChange);
@@ -230,13 +224,21 @@ public class MailBackendTest {
 	public void emptyHierarchyChanges() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
-		
-		expectTestToBuildSpecialFoldersCollectionPaths();
 
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "INBOX", "Drafts", "Sent", "Trash");
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
+		Map<String, Integer> mailboxesIds = ImmutableMap.of(
+			"INBOX", 1,
+			"Drafts", 2,
+			"Sent", 3,
+			"Trash", 4);
+		
+		expectBuildMailboxesCollectionPaths(mailboxesIds);
+		expectMappingServiceFindCollection(mailboxesIds);
+		expectMappingServiceSnapshot(outgoingSyncState, mailboxesIds.values());
+		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of(
+				new MailCollectionPath("INBOX"), new MailCollectionPath("Drafts"),
+				new MailCollectionPath("Sent"), new MailCollectionPath("Trash")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
+		
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
@@ -247,48 +249,29 @@ public class MailBackendTest {
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
 	}
-
-	@Test
-	public void filterContactsHierarchyChanges() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
-		
-		expectTestToBuildSpecialFoldersCollectionPaths();
-
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "INBOX", "Drafts", "Sent", "Trash");
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(
-				ImmutableList.<CollectionPath>builder()
-					.add(CollectionPathUtils.contactCollectionPath("contact"))
-					.addAll(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"))
-					.build());
-		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
-		replayCommonMocks();
-		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
-		
-		verifyCommonMocks();
-		
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-	}
 	
 	@Test
 	public void newImapFolder() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+
+		Map<String, Integer> mailboxesIds = ImmutableMap.of(
+			"INBOX", 1,
+			"Drafts", 2,
+			"Sent", 3,
+			"Trash", 4);
+
+		Map<String, Integer> changeMailboxes = ImmutableMap.of("NewFolder", 5);
 		
-		expectTestToBuildSpecialFoldersCollectionPaths();
-		
-		CollectionPath newFolderCollectionPath = CollectionPathUtils.emailCollectionPath("NewFolder");
-		expect(collectionPathBuilder.displayName("NewFolder")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(newFolderCollectionPath).once();
-		
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "NewFolder", "INBOX", "Drafts", "Sent", "Trash");
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
-		expect(mappingService.getCollectionIdFor(device, newFolderCollectionPath.collectionPath())).andReturn(5);
-		expect(mappingService.collectionIdToString(5)).andReturn("newFolderCollection");
+		expectBuildMailboxesCollectionPaths(mailboxesIds);
+		expectBuildMailboxesCollectionPaths(changeMailboxes);
+		expectMappingServiceFindCollection(mailboxesIds);
+		expectMappingServiceSearchThenCreateCollection(changeMailboxes);
+		expectMappingServiceSnapshot(outgoingSyncState, Iterables.concat(mailboxesIds.values(), Sets.newHashSet(5)));
+		expectMappingServiceLookupCollection(changeMailboxes);
+		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of(
+				new MailCollectionPath("INBOX"), new MailCollectionPath("Drafts"),
+				new MailCollectionPath("Sent"), new MailCollectionPath("Trash")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
 		
 		replayCommonMocks();
@@ -298,9 +281,9 @@ public class MailBackendTest {
 		
 		verifyCommonMocks();
 
-		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("newFolderCollection")
+		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("5")
 				.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-				.displayName("NewFolder").build();
+				.displayName("NewFolder").withNewFlag(true).build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
@@ -311,16 +294,21 @@ public class MailBackendTest {
 	public void deletedImapFolder() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
-		
-		expectTestToBuildSpecialFoldersCollectionPaths();
-		
-		CollectionPath deletedFolderCollection = CollectionPathUtils.emailCollectionPath("deletedFolder");
 
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "INBOX", "Drafts", "Sent", "Trash");
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
-		expect(mappingService.getCollectionIdFor(device, deletedFolderCollection.collectionPath())).andReturn(5);
-		expect(mappingService.collectionIdToString(5)).andReturn("deletedFolderCollection");
+		Map<String, Integer> mailboxesIds = ImmutableMap.of(
+			"INBOX", 1,
+			"Drafts", 2,
+			"Sent", 3,
+			"Trash", 4);
+		Map<String, Integer> deletedMailboxes = ImmutableMap.of("deletedFolder", 5);
+		
+		expectBuildMailboxesCollectionPaths(mailboxesIds);
+		expectMappingServiceFindCollection(mailboxesIds);
+		expectMappingServiceSnapshot(outgoingSyncState, mailboxesIds.values());
+		expectMappingServiceLookupCollection(deletedMailboxes);
+		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of(
+				new MailCollectionPath("INBOX"), new MailCollectionPath("Drafts"),
+				new MailCollectionPath("Sent"), new MailCollectionPath("Trash"), new MailCollectionPath("deletedFolder")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		
 		replayCommonMocks();
@@ -330,9 +318,9 @@ public class MailBackendTest {
 
 		verifyCommonMocks();
 		
-		ItemChange deletedFolderItemChange = new ItemChangeBuilder().serverId("deletedFolderCollection")
+		ItemChange deletedFolderItemChange = new ItemChangeBuilder().serverId("5")
 			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("deletedFolder").build();
+			.displayName("deletedFolder").withNewFlag(false).build();
 		
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(deletedFolderItemChange);
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
@@ -342,26 +330,26 @@ public class MailBackendTest {
 	public void deletedAndAddedImapFolders() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
-		
-		expectTestToBuildSpecialFoldersCollectionPaths();
-		
-		CollectionPath newFolderCollectionPath = CollectionPathUtils.emailCollectionPath("NewFolder");
-		expect(collectionPathBuilder.displayName("NewFolder")).andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.build()).andReturn(newFolderCollectionPath).once();
-		
-		CollectionPath deletedFolderCollection = CollectionPathUtils.emailCollectionPath("deletedFolder");
-		expect(collectionPathBuilder.displayName("deletedFolder")).andReturn(collectionPathBuilder).anyTimes();
-		
-		expect(mappingService.getCollectionIdFor(device, deletedFolderCollection.collectionPath())).andReturn(5);
-		expect(mappingService.collectionIdToString(5)).andReturn("deletedFolderCollection");
-		expect(mappingService.getCollectionIdFor(device, newFolderCollectionPath.collectionPath())).andReturn(6);
-		expect(mappingService.collectionIdToString(6)).andReturn("newFolderCollection");
 
-		expectCreateCollectionMappings(outgoingSyncState, outgoingSyncStateId, "NewFolder", "INBOX", "Drafts", "Sent", "Trash");
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
-		
-		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
+		Map<String, Integer> mailboxesIds = ImmutableMap.of(
+			"INBOX", 1,
+			"Drafts", 2,
+			"Sent", 3,
+			"Trash", 4);
+		Map<String, Integer> changedMailboxes = ImmutableMap.of("changedFolder", 5);
+		Map<String, Integer> deletedMailboxes = ImmutableMap.of("deletedFolder", 6);
+
+		expectBuildMailboxesCollectionPaths(mailboxesIds);
+		expectBuildMailboxesCollectionPaths(changedMailboxes);
+		expectMappingServiceSearchThenCreateCollection(changedMailboxes);
+		expectMappingServiceFindCollection(mailboxesIds);
+		expectMappingServiceSnapshot(outgoingSyncState, Iterables.concat(mailboxesIds.values(), changedMailboxes.values()));
+		expectMappingServiceLookupCollection(changedMailboxes);
+		expectMappingServiceLookupCollection(deletedMailboxes);
+		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of(
+				new MailCollectionPath("INBOX"), new MailCollectionPath("Drafts"),
+				new MailCollectionPath("Sent"), new MailCollectionPath("Trash"), new MailCollectionPath("deletedFolder")));
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("changedFolder"));
 		
 		replayCommonMocks();
 		
@@ -370,28 +358,31 @@ public class MailBackendTest {
 
 		verifyCommonMocks();
 		
-		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("newFolderCollection")
+		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("5")
 			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("NewFolder").build();
+			.displayName("changedFolder").withNewFlag(true).build();
 		
-		ItemChange oldFolderItemChange = new ItemChangeBuilder().serverId("deletedFolderCollection")
+		ItemChange oldFolderItemChange = new ItemChangeBuilder().serverId("6")
 			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("deletedFolder").build();
+			.displayName("deletedFolder").withNewFlag(false).build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemChange);
 	}
 
-	private void expectCreateCollectionMappings(
-			FolderSyncState outgoingSyncState, String outgoingSyncStateId,
-			String...newFolderCollectionPaths) throws DaoException {
-		for (String newFolderCollectionPath : newFolderCollectionPaths) {
-			CollectionPath collectionPath = CollectionPathUtils.emailCollectionPath(newFolderCollectionPath);
-			expect(mappingService.createCollectionMapping(device, collectionPath.collectionPath(),
-					new FolderSyncState(outgoingSyncState))).andReturn(outgoingSyncStateId);
+	private void expectMappingServiceSearchThenCreateCollection(Map<String, Integer> mailboxesIds)
+			throws DaoException, CollectionNotFoundException {
+		
+		for (Entry<String, Integer> mailbox : mailboxesIds.entrySet()) {
+
+			expect(mappingService.getCollectionIdFor(device, COLLECTION_MAIL_PREFIX + mailbox.getKey()))
+				.andThrow(new CollectionNotFoundException()).once();
+			
+			expect(mappingService.createCollectionMapping(device, COLLECTION_MAIL_PREFIX + mailbox.getKey()))
+				.andReturn(mailbox.getValue()).once();
 		}
 	}
-	
+
 	private MailboxFolders mailboxFolders(String... folders) {
 		return new MailboxFolders(
 				FluentIterable.from(ImmutableList.copyOf(folders))
@@ -402,5 +393,51 @@ public class MailBackendTest {
 							}
 						})
 					.toImmutableList());
+	}
+
+	private void expectMappingServiceSnapshot(FolderSyncState outgoingSyncState, Iterable<Integer> collectionIds)
+			throws DaoException {
+
+		mappingService.snapshotCollections(outgoingSyncState, Sets.newHashSet(collectionIds));
+		expectLastCall();
+	}
+
+	private void expectMappingServiceListLastKnowCollection(FolderSyncState incomingSyncState,
+			List<CollectionPath> collectionPaths) throws DaoException {
+		
+		expect(mappingService.listCollections(udr, incomingSyncState))
+			.andReturn(collectionPaths).once();
+	}
+	
+	private void expectMappingServiceFindCollection(Map<String, Integer> mailboxesIds)
+		throws CollectionNotFoundException, DaoException {
+
+		for (Entry<String, Integer> mailbox : mailboxesIds.entrySet()) {
+			expectMappingServiceFindCollection(mailbox.getKey(), mailbox.getValue());
+		}
+	}
+	
+	private void expectMappingServiceFindCollection(String collectionPath, Integer collectionId)
+		throws CollectionNotFoundException, DaoException {
+		
+		expect(mappingService.getCollectionIdFor(device, COLLECTION_MAIL_PREFIX + collectionPath))
+			.andReturn(collectionId).once();
+	}
+	
+	private void expectMappingServiceLookupCollection(Map<String, Integer> mailboxesIds)
+		throws CollectionNotFoundException, DaoException {
+
+		for (Entry<String, Integer> mailbox : mailboxesIds.entrySet()) {
+			expectMappingServiceFindCollection(mailbox.getKey(), mailbox.getValue());
+			expect(mappingService.collectionIdToString(mailbox.getValue()))
+				.andReturn(String.valueOf(mailbox.getValue())).once();
+		}
+	}
+	
+	private static class MailCollectionPath extends CollectionPath {
+
+		public MailCollectionPath(String displayName) {
+			super(COLLECTION_MAIL_PREFIX + displayName, PIMDataType.EMAIL, displayName);
+		}
 	}
 }
