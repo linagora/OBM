@@ -114,6 +114,13 @@ sub setBackupName {
     $self->{'backupName'} = $backupName;
 }
 
+sub setBackupFileName {
+    my $self = shift;
+    my( $backupFileName ) = @_;
+
+    $self->{'backupFileName'} = $backupFileName;
+}
+
 
 sub getBackupName {
     my $self = shift;
@@ -312,6 +319,10 @@ sub setVcard {
 
 sub getBackupFileName {
     my $self = shift;
+
+	if( defined($self->{'backupFileName'})) {
+        return $self->{'backupFileName'};
+    }
 
     if( !$self->{'backupName'} ) {
         return undef;
