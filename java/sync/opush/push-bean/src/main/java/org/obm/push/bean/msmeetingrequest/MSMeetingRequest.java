@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -44,7 +45,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class MSMeetingRequest {
+public class MSMeetingRequest implements Serializable {
 
 	public static class MsMeetingRequestBuilder {
 		private boolean allDayEvent;

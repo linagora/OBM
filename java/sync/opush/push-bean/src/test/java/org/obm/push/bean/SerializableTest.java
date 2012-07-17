@@ -31,10 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import static org.obm.DateUtils.date;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
@@ -60,6 +63,11 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Charsets;
@@ -111,7 +119,25 @@ public class SerializableTest {
 			.uid(1l)
 			.header(new MSEmailHeader.Builder().build())
 			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, null, Charsets.UTF_8)).build();
+					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, null, Charsets.UTF_8))
+			.meetingRequest(
+					new MSMeetingRequest.MsMeetingRequestBuilder()
+						.startTime(date("2012-02-03T11:22:33"))
+						.endTime(date("2012-02-03T12:22:33"))
+						.dtStamp(date("2012-02-02T11:22:33"))
+						.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
+						.msEventExtId(new MSEventExtId("ext-id-123-536"))
+						.recurrences(Arrays.asList(
+								new MSMeetingRequestRecurrence.Builder()
+								.type(MSMeetingRequestRecurrenceType.DAILY)
+								.interval(1)
+								.build()))
+						.recurrenceId(date("2012-02-02T11:22:33"))
+						.categories(Arrays.asList(
+								new MSMeetingRequestCategory("category")
+								))
+						.build())
+			.build();
 		 SerializableTester.reserializeAndAssert(msEmail);
 	}
 
