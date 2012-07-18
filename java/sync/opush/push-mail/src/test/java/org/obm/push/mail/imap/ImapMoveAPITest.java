@@ -41,26 +41,24 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
-import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapMoveAPITest {
@@ -230,7 +228,7 @@ public class ImapMoveAPITest {
 		Assertions.assertThat(movedEmail.isRead()).isEqualTo(sentEmail.isRead());
 	}
 
-	@Test(expected=MailException.class)
+	@Test(expected=CollectionNotFoundException.class)
 	public void testMoveFromNonExistingMailbox() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
 
@@ -239,7 +237,7 @@ public class ImapMoveAPITest {
 		mailboxService.moveItem(udr, testUtils.mailboxPath(fromNonExistingMailbox), testUtils.mailboxPath(INBOX), sentEmail.getUid());
 	}
 
-	@Test(expected=MailException.class)
+	@Test(expected=CollectionNotFoundException.class)
 	public void testMoveToNonExistingMailbox() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
 

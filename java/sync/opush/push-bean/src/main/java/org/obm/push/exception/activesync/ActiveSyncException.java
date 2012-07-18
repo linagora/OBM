@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception.activesync;
 
-public class ActiveSyncException extends Exception {
+public class ActiveSyncException extends RuntimeException {
 
 	public ActiveSyncException() {
 		super();
