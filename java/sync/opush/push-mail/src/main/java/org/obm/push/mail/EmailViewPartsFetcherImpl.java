@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -57,6 +58,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 import com.sun.mail.util.QPDecoderStream;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
@@ -130,12 +133,29 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchBody(Builder emailViewBuilder, FetchInstructions fetchInstructions, 
 			long uid) throws MailException {
 		
-		InputStream bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
+		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
 		
 		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
 		emailViewBuilder.mimeType(fetchInstructions.getMimePart().getFullMimeType());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
 		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
+	}
+
+	private InputStream fetchBodyData(FetchInstructions fetchInstructions, long uid) throws MailException {
+		InputStream bodyData = null;
+		try {
+			bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
+			if (bodyData != null) {
+				return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
+			} else {
+				return null;
+			}
+		} catch (IOException e) {
+			throw new MailException(e);
+		} finally {
+			Closeables.closeQuietly(bodyData);
+		}
+		
 	}
 	
 	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions, long uid) {
