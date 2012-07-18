@@ -359,6 +359,7 @@ $l_module_host = "Hosts";
 $l_module_monitoring = "Monitoring";
 $l_module_mailshare = "Mailshares";
 $l_module_organizationalchart = "Organizational chart";
+$l_module_userbackup = "Backup/Restore";
 $l_module_admin_lang = "Language";
 $l_module_admin_data = "Data";
 $l_module_admin_pref = "Preferences";

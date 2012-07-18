@@ -394,6 +394,7 @@ $l_module_host = "Hôtes";
 $l_module_monitoring = "Supervision";
 $l_module_mailshare = "Partages Mail";
 $l_module_organizationalchart = "Organigramme";
+$l_module_userbackup = "Sauvegarder/Restaurer";
 
 $l_module_admin_lang = "Langue";
 $l_module_admin_data = "Données";
