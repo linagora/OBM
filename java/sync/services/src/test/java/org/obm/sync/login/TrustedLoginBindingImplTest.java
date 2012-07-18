@@ -27,63 +27,41 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.trust;
+package org.obm.sync.login;
 
-import java.util.Date;
+import org.easymock.EasyMock;
+import org.junit.Rule;
+import org.junit.Test;
+import org.obm.configuration.ConfigurationService;
+import org.obm.dbcp.ConfigurationServiceFixturePostgreSQL;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.opush.env.JUnitGuiceRule;
 
-import com.google.common.base.Objects;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
-/**
- * A representation of a {@code Trust} token.<br />
- * A {@link TrustToken} is used for implicit logins to OBM-Sync from other OBM servers.
- */
-public class TrustToken {
-	private final String token;
-	private final Date creationDate;
+import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.utils.HelperService;
 
-	public TrustToken(String token) {
-		this(token, new Date());
+
+public class TrustedLoginBindingImplTest {
+	@Rule
+	public JUnitGuiceRule rule = new JUnitGuiceRule(Env.class);
+	
+	@Inject
+	private TrustedLoginBindingImpl testee;
+	
+	@Test
+	public void testLogUserIn() {
 	}
-
-	public TrustToken(String token, Date creationDate) {
-		this.token = token;
-		this.creationDate = creationDate;
-	}
-
-	public boolean isExpired(long timeoutInSeconds) {
-		return (System.currentTimeMillis() - creationDate.getTime()) >= (timeoutInSeconds * 1000);
-	}
-
-	public boolean isTokenValid(String token) {
-		return Objects.equal(this.token, token);
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public Date getCreatedDate() {
-		return creationDate;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this).add("token", token).add("creationDate", creationDate).toString();
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hashCode(getToken(), getCreatedDate());
-	}
-
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj != null && obj instanceof TrustToken) {
-			TrustToken other = (TrustToken) obj;
-			
-			return Objects.equal(token, other.token) && Objects.equal(creationDate, other.creationDate);
+	
+	private static class Env extends AbstractModule {
+		@Override
+		protected void configure() {
+			bind(ConfigurationService.class).to(ConfigurationServiceFixturePostgreSQL.class);
+			bind(DatabaseConnectionProvider.class).toInstance(EasyMock.createMock(DatabaseConnectionProvider.class));
+			bind(DomainService.class).toInstance(EasyMock.createMock(DomainService.class));
+			bind(HelperService.class).toInstance(EasyMock.createMock(HelperService.class));
 		}
-		
-		return false;
 	}
 }
