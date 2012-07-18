@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
@@ -79,6 +79,8 @@ import com.google.inject.Provider;
 @RunWith(SlowFilterRunner.class)
 public class ContactsBackendTest {
 
+	private static final String COLLECTION_CONTACT_PREFIX = "obm:\\\\test@test\\contacts\\";
+	
 	private User user;
 	private Device device;
 	private UserDataRequest userDataRequest;
@@ -87,7 +89,6 @@ public class ContactsBackendTest {
 	private BookClient bookClient;
 	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
-	private CollectionPathHelper collectionPathHelper;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	
 	@Before
@@ -100,7 +101,6 @@ public class ContactsBackendTest {
 		this.bookClient = createMock(BookClient.class);
 		this.loginService = createMock(LoginService.class);
 		this.contactConfiguration = createMock(ContactConfiguration.class);
-		this.collectionPathHelper = createMock(CollectionPathHelper.class);
 		this.collectionPathBuilderProvider = createMock(Provider.class);
 	}
 	
@@ -133,7 +133,7 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void testGetPIMDataType() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null);
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
 		assertThat(contactsBackend.getPIMDataType()).isEqualTo(PIMDataType.CONTACTS);
 	}
 
@@ -152,27 +152,24 @@ public class ContactsBackendTest {
 		Contact contact = newContactObject(contactUid);
 		ContactChanges contactChanges = new ContactChanges(ImmutableList.<Contact> of(contact), ImmutableSet.<Integer> of(), currentDate);
 		expect(bookClient.listContactsChanged(token, currentDate, 1))
-			.andReturn(contactChanges).anyTimes();
+			.andReturn(contactChanges).once();
 		
-		CollectionPath collectionPath = expectCollectionPath();
-		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath);
-		expectCollectionPathBuilderProvider(collectionPathBuilder);
+		Builder collectionPathBuilder = expectBuildCollectionPath("folder");
 		
 		expectDefaultAddressAndParentForContactConfiguration();
-		
-		expectBuildCollectionPaths();
-		
 		expectMappingServiceCollectionIdBehavior();
 		
 		expect(mappingService.getServerIdFor(contactUid, "2"))
 			.andReturn("2");
 		
-		replay(loginService, bookClient, collectionPathBuilderProvider, contactConfiguration, collectionPathHelper, mappingService, collectionPath);
+		replay(loginService, bookClient, collectionPathBuilderProvider, contactConfiguration,
+				mappingService, collectionPathBuilder);
 		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathHelper, collectionPathBuilderProvider);
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, contactUid, lastKnownState, null);
-		
-		verify(loginService, bookClient, collectionPathBuilderProvider, contactConfiguration, collectionPathHelper, mappingService, collectionPath);
+
+		verify(loginService, bookClient, collectionPathBuilderProvider, contactConfiguration,
+				mappingService, collectionPathBuilder);
 		
 		assertThat(itemEstimateSize).isEqualTo(1);
 	}
@@ -193,9 +190,7 @@ public class ContactsBackendTest {
 		expect(bookClient.modifyContact(token, 1, contact))
 			.andReturn(contact).once();
 
-		CollectionPath collectionPath = expectCollectionPath();
-		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath);
-		expectCollectionPathBuilderProvider(collectionPathBuilder);
+		Builder collectionPathBuilder = expectBuildCollectionPath("folder");
 		
 		expectGetItemIdFromServerId(contactId, serverId);
 		expectMappingServiceCollectionIdBehavior();
@@ -205,16 +200,14 @@ public class ContactsBackendTest {
 
 		expectDefaultAddressAndParentForContactConfiguration();
 		
-		expectBuildCollectionPaths();
-		
-		replay(mappingService, loginService, bookClient, collectionPathBuilderProvider, collectionPathHelper, contactConfiguration, collectionPath);
+		replay(mappingService, loginService, bookClient, collectionPathBuilderProvider, contactConfiguration, collectionPathBuilder);
 		
 		MSContact msContact = new MSContact();
 		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathHelper, collectionPathBuilderProvider);
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		String newServerId = contactsBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, msContact);
 		
-		verify(mappingService, loginService, bookClient, collectionPathBuilderProvider, collectionPathHelper, contactConfiguration, collectionPath);
+		verify(mappingService, loginService, bookClient, collectionPathBuilderProvider, contactConfiguration, collectionPathBuilder);
 		
 		assertThat(newServerId).isEqualTo(serverId);
 	}
@@ -234,21 +227,17 @@ public class ContactsBackendTest {
 		
 		expectGetItemIdFromServerId(contactId, serverId);
 		expectMappingServiceCollectionIdBehavior();
-	
-		CollectionPath collectionPath = expectCollectionPath();
-		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath);
-		expectCollectionPathBuilderProvider(collectionPathBuilder);
+
+		Builder collectionPathBuilder = expectBuildCollectionPath("folder");
 		
 		expectDefaultAddressAndParentForContactConfiguration();
 		
-		expectBuildCollectionPaths();
+		replay(loginService, bookClient, mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
 		
-		replay(loginService, bookClient, mappingService, contactConfiguration, collectionPathHelper, collectionPathBuilderProvider, collectionPath);
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathHelper, collectionPathBuilderProvider);
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		contactsBackend.delete(userDataRequest, contactId, serverId, true);
 		
-		verify(loginService, bookClient, mappingService, contactConfiguration, collectionPathHelper, collectionPathBuilderProvider, collectionPath);
+		verify(loginService, bookClient, mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
 	}
 
 	@Test
@@ -264,6 +253,7 @@ public class ContactsBackendTest {
 		Contact contact = newContactObject(contactUid);
 		expect(bookClient.getContactFromId(token, contactUid, contactId))
 			.andReturn(contact).once();
+
 		
 		expectGetItemIdFromServerId(contactId, serverId);
 		expectMappingServiceCollectionIdBehavior();
@@ -273,15 +263,15 @@ public class ContactsBackendTest {
 			.andReturn(serverId).once();
 	
 		expectDefaultAddressAndParentForContactConfiguration();
+
+		Builder collectionPathBuilder = expectBuildCollectionPath("folder");
 		
-		expectBuildCollectionPaths();
+		replay(loginService, bookClient, mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
 		
-		replay(loginService, bookClient, mappingService, contactConfiguration, collectionPathHelper);
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathHelper, null);
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, ImmutableList.<String> of(serverId), null);
 		
-		verify(loginService, bookClient, mappingService, contactConfiguration, collectionPathHelper);
+		verify(loginService, bookClient, mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
 		
 		ItemChange itemChange = new ItemChange(serverId, null, null, null, false);
 		itemChange.setData(new ContactConverter().convert(contact));
@@ -298,9 +288,8 @@ public class ContactsBackendTest {
 	private void expectListAllBooks(AccessToken token) throws ServerFault {
 		expect(bookClient.listAllBooks(token))
 			.andReturn(ImmutableList.<AddressBook> of(
-					newAddressBookObject("contacts/folder", 1, false),
-					newAddressBookObject("contacts/folder_1", 2, false),
-					newAddressBookObject("contacts/folder_2", 3, false)))
+					newAddressBookObject("folder", 1, false),
+					newAddressBookObject("folder_1", 2, false)))
 			.once();
 	}
 
@@ -327,76 +316,57 @@ public class ContactsBackendTest {
 			.andReturn("contacts").anyTimes();
 		
 		expect(contactConfiguration.getDefaultParentId())
-			.andReturn("contacts").anyTimes();
-	}
-	
-	private void expectBuildCollectionPaths() {
-		expect(collectionPathHelper.buildCollectionPath(userDataRequest, PIMDataType.CONTACTS, "contacts"))
-			.andReturn("contacts").anyTimes();
-		
-		expect(collectionPathHelper.buildCollectionPath(userDataRequest, PIMDataType.CONTACTS, "contacts", "contacts/folder"))
-			.andReturn("contacts/folder").anyTimes();
-	
-		expect(collectionPathHelper.buildCollectionPath(userDataRequest, PIMDataType.CONTACTS, "contacts", "contacts/folder_1"))
-			.andReturn("contacts/folder_1").anyTimes();
-		
-		expect(collectionPathHelper.buildCollectionPath(userDataRequest, PIMDataType.CONTACTS, "contacts", "contacts/folder_2"))
-			.andReturn("contacts/folder_2").anyTimes();
+			.andReturn("0").anyTimes();
 	}
 
 	private void expectMappingServiceCollectionIdBehavior() 
 			throws CollectionNotFoundException, DaoException {
 		
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), "contacts"))
-			.andReturn(1).anyTimes();
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), "contacts/folder"))
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + "folder"))
 			.andReturn(2).anyTimes();
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), "contacts/folder_1"))
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + "folder_1"))
 			.andReturn(3).anyTimes();
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), "contacts/folder_2"))
-			.andReturn(4).anyTimes();
 		
 		expect(mappingService.collectionIdToString(1))
-			.andReturn("contacts").anyTimes();
+			.andReturn("1").anyTimes();
 		expect(mappingService.collectionIdToString(2))
-			.andReturn("contacts/folder").anyTimes();
-		expect(mappingService.collectionIdToString(3))
-			.andReturn("contacts/folder_1").anyTimes();
-		expect(mappingService.collectionIdToString(4))
-			.andReturn("contacts/folder_2").anyTimes();
+			.andReturn("2").anyTimes();
 	}
 
-	private CollectionPath expectCollectionPath() {
-		CollectionPath collectionPath = createMock(CollectionPath.class);
-		expect(collectionPath.collectionPath())
-			.andReturn("contacts").anyTimes();
-		
-		return collectionPath;
+	private Builder expectBuildCollectionPath(String displayName) {
+		CollectionPath collectionPath = new ContactCollectionPath(displayName);
+		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath, displayName);
+		expectCollectionPathBuilderPovider(collectionPathBuilder);
+		return collectionPathBuilder;
 	}
 
-	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath) {
+	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath, String displayName) {
 		CollectionPath.Builder collectionPathBuilder = createMock(CollectionPath.Builder.class);
 		expect(collectionPathBuilder.userDataRequest(userDataRequest))
-			.andReturn(collectionPathBuilder).anyTimes();
+			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.pimType(PIMDataType.CONTACTS))
-			.andReturn(collectionPathBuilder).anyTimes();
+			.andReturn(collectionPathBuilder).once();
 		
-		expect(collectionPathBuilder.displayName(null))
-			.andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.displayName("contacts/folder_1"))
-			.andReturn(collectionPathBuilder).anyTimes();
-		expect(collectionPathBuilder.displayName("contacts/folder_2"))
-			.andReturn(collectionPathBuilder).anyTimes();
+		expect(collectionPathBuilder.displayName(displayName))
+			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.build())
-			.andReturn(collectionPath).anyTimes();
+			.andReturn(collectionPath).once();
 		
 		return collectionPathBuilder;
 	}
 
-	private void expectCollectionPathBuilderProvider(CollectionPath.Builder collectionPathBuilder) {
-		expect(collectionPathBuilderProvider.get())
-			.andReturn(collectionPathBuilder).anyTimes();
+	private void expectCollectionPathBuilderPovider(CollectionPath.Builder collectionPathBuilder) {
+			expect(collectionPathBuilderProvider.get())
+				.andReturn(collectionPathBuilder).once();
+	}
+	
+	private static class ContactCollectionPath extends CollectionPath {
+
+		public ContactCollectionPath(String displayName) {
+			super(COLLECTION_CONTACT_PREFIX + displayName, PIMDataType.CONTACTS, displayName);
+		}
+		
 	}
 }
