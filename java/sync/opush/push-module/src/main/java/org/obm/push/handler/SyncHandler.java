@@ -162,33 +162,33 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			}
 		} catch (InvalidServerId e) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.PROTOCOL_ERROR, e);
 		} catch (ProtocolException convExpt) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR.asSpecificationValue(), convExpt);
+			sendError(responder, SyncStatus.PROTOCOL_ERROR, convExpt);
 		} catch (PartialException pe) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST.asSpecificationValue(), pe);
+			sendError(responder, SyncStatus.PARTIAL_REQUEST, pe);
 		} catch (CollectionNotFoundException ce) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue(), continuation, ce);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND, continuation, ce);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.PARTIAL_REQUEST, e);
 		} catch (WaitIntervalOutOfRangeException e) {
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (DaoException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionPathException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ConversionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnsupportedBackendFunctionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -356,19 +356,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue(), continuation, e);
+			sendError(responder, SyncStatus.OBJECT_NOT_FOUND, continuation, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (InvalidServerId e) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR.asSpecificationValue(), e);			
+			sendError(responder, SyncStatus.PROTOCOL_ERROR, e);			
 		} catch (ConversionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), e);
+			sendError(responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -446,13 +446,21 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 	
-	private void sendError(Responder responder, String errorStatus, Exception exception) {
+	private void sendError(Responder responder, SyncStatus errorStatus, Exception exception) {
 		sendError(responder, errorStatus, null, exception);
 	}
 	
-	private void sendError(Responder responder, String errorStatus, IContinuation continuation, Exception exception) {
-		logger.error(exception.getMessage(), exception);
-		sendError(responder, errorStatus, continuation);
+	private void sendError(Responder responder, SyncStatus errorStatus, IContinuation continuation, Exception exception) {
+		logError(errorStatus, exception);
+		sendError(responder, errorStatus.asSpecificationValue(), continuation);
+	}
+
+	private void logError(SyncStatus errorStatus, Exception exception) {
+		if (errorStatus == SyncStatus.SERVER_ERROR) {
+			logger.error(exception.getMessage(), exception);
+		} else {
+			logger.warn(exception.getMessage(), exception);
+		}
 	}
 
 	@Override
