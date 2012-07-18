@@ -34,16 +34,15 @@ package org.obm.sync;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -58,7 +57,7 @@ public class BeansTest {
 	@Test
 	public void test() {
 		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class, Event.class,
-				EventRecurrence.class, EventChanges.class);
+				EventRecurrence.class, EventChanges.class, Contact.class);
 	}
 	
 }
