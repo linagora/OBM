@@ -71,7 +71,6 @@ import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.ImapCommandException;
@@ -81,6 +80,7 @@ import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
@@ -481,23 +481,19 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException {
-		try {
-			String boxName = collectionPathHelper.extractFolder(udr, collectionName, PIMDataType.EMAIL);
-			
-			if (isINBOXSpecificCase(boxName)) {
-				return EmailConfiguration.IMAP_INBOX_NAME;
-			}
-			
-			final MailboxFolders lr = listAllFolders(udr);
-			for (final MailboxFolder i: lr) {
-				if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
-					return i.getName();
-				}
-			}
-			throw new MailException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
-		} catch (CollectionPathException e){
-			throw new MailException(e);
+		String boxName = collectionPathHelper.extractFolder(udr, collectionName, PIMDataType.EMAIL);
+		
+		if (isINBOXSpecificCase(boxName)) {
+			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
+		
+		final MailboxFolders lr = listAllFolders(udr);
+		for (final MailboxFolder i: lr) {
+			if (i.getName().toLowerCase().equals(boxName.toLowerCase())) {
+				return i.getName();
+			}
+		}
+		throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
 	}
 
 	private boolean isINBOXSpecificCase(String boxName) {
