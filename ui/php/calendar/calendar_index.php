@@ -536,7 +536,7 @@ if ($action == 'search') {
 	  $id = $params['calendar_id'];
         }
       }
-      run_query_quick_attendee_update($params, $id);
+      
       json_build_html_event($params, $current_view, $id);
       $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$id";
       $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
