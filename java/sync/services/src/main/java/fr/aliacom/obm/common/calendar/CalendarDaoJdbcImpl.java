@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,7 @@ import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
+import org.obm.push.utils.jdbc.WildcardStringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -97,6 +99,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -108,6 +111,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
+import fr.aliacom.obm.common.SQLUtils;
 import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -239,6 +243,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private final Ical4jHelper ical4jHelper;
 
 	private final Factory solrHelperFactory;
+
 
 	@Inject
 	private CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
@@ -1153,9 +1158,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throws FindException {
 		Set<CalendarInfo> rights = new HashSet<CalendarInfo>();
 
-		StringSQLCollectionHelper collectionHelper = new StringSQLCollectionHelper(calendarEmails);
-
-		String calendarEmailsPlaceHolders = collectionHelper.asPlaceHolders();
+		StringSQLCollectionHelper collectionHelper = new WildcardStringSQLCollectionHelper(calendarEmails);
 
 		String directRightsQuery =
 		"SELECT u.userobm_login, u.userobm_firstname, u.userobm_lastname, u.userobm_email, er.entityright_read, er.entityright_write "
@@ -1164,7 +1167,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	    + "LEFT JOIN EntityRight er ON ce.calendarentity_entity_id=er.entityright_entity_id "
 	    + "LEFT JOIN UserEntity ue ON er.entityright_consumer_id=ue.userentity_entity_id " 	    
 		+ "WHERE (ue.userentity_user_id=? OR ue.userentity_user_id IS NULL) "
-		+ "AND u.userobm_email IN (" + calendarEmailsPlaceHolders + ") "
+		+ SQLUtils.selectCalendarsCondition(calendarEmails)
 		+ "AND u.userobm_archive != 1 "
 		+ "AND u.userobm_domain_id=? "
 		+ "AND (er.entityright_read = 1 OR er.entityright_write = 1)";
@@ -1177,7 +1180,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		+ "JOIN EntityRight er ON ce.calendarentity_entity_id=er.entityright_entity_id "
 		+ "WHERE er.entityright_consumer_id IS NULL "
 		+ "AND u.userobm_domain_id=? "
-		+ "AND u.userobm_email in (" + calendarEmailsPlaceHolders + ") "
+		+ SQLUtils.selectCalendarsCondition(calendarEmails)
 		+ "AND u.userobm_archive != 1 "
 		+ "AND (er.entityright_read = 1 OR er.entityright_write = 1)";
 
