@@ -202,7 +202,7 @@ class Backup {
     $user_details = $obm_q->Record;
     $realm_id = $user_details['realm_id'];
     $smtp_query = "SELECT
-        DISTINCT host_name AS smtpServer
+        DISTINCT host_ip AS host
         FROM Host
         INNER JOIN ServiceProperty ON host_id=#CAST(serviceproperty_value,INTEGER)
         INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id
@@ -210,7 +210,7 @@ class Backup {
     $obm_q->query($smtp_query);
     $smtp_servers = array();
     while ($obm_q->next_record()) {
-        array_push($smtp_servers, $obm_q->f('smtpServer'));
+        array_push($smtp_servers, $obm_q->f('host'));
     }
     $user_details['smtpServers'] = $smtp_servers;
     $this->details = $user_details;
