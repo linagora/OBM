@@ -469,7 +469,7 @@ if ($cgp_show['module']['organizationalchart']) {
 if ($cgp_show['module']['userbackup']) {
   $modules['userbackup'] = array('Name'=> $l_module_userbackup,
                                     'Ico' => "$ico_data",
-                                    'Url' => "$path/userbackup/userbackup_index.php?action=backup&user_id=".$obm['uid'],
+                                    'Url' => "$path/userbackup/userbackup_index.php",
                   'Right'=> $cright_read);
 }
 

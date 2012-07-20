@@ -46,6 +46,8 @@ include_once("$obminclude/global.inc");
 ///////////////////////////////////////////////////////////////////////////////
 
 function dis_user_backup_form($backup, $params) {
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
   $user_id = $params['user_id'];
   $obm_q = run_query_user_detail($user_id);
   $url = url_prepare('userbackup_index.php');
@@ -83,14 +85,24 @@ function dis_user_backup_form($backup, $params) {
           <input type=\"submit\" name=\"submit\" value=\"{$GLOBALS['l_restore_'.$method]}\" />
         </form>";
       }
-      $dis_backups .= "<tr><td>$dis_date</td><td>{$record['filename']}</td><td><div class=\"buttons\">$dis_buttons</div></td></tr>";
+      $dis_backups .= "<tr><td>$dis_date</td><td>{$record['filename']}</td>";
+
+      if (Perm::check_right('userbackup', $cright_write)) 
+        $dis_backups .= "<td><div class=\"buttons\">$dis_buttons</div></td>";
+
+      $dis_backups .= "</tr>";
     }
 
     if (!empty($dis_backups)) {
+      $dis_backups_content = $dis_backups;
       $dis_backups = "
         <table class=\"spreadSheet\">
-          <thead><tr><th>{$GLOBALS['l_date']}</th><th>{$GLOBALS['l_file']}</th><th>{$GLOBALS['l_restore']}</th></tr></thead>
-          <tbody>$dis_backups</tbody>
+          <thead><tr><th>{$GLOBALS['l_date']}</th><th>{$GLOBALS['l_file']}</th>";
+          if (Perm::check_right('userbackup', $cright_write)) 
+            $dis_backups .= "<th>{$GLOBALS['l_restore']}</th>";
+
+          $dis_backups .= "</tr></thead>
+          <tbody>$dis_backups_content</tbody>
         </table>";
     }
 
@@ -123,19 +135,21 @@ function dis_user_backup_form($backup, $params) {
       <p>{$GLOBALS['l_no_backup_ftp_specified']}</p>";
   }
 
-  $block = "
-    <div class=\"detail extra\">
-      <h1>{$GLOBALS['l_new_backup']}</h1>
-      $dis_new_backup
-    </div>
-    <div class=\"detail extra\">
+  $block = "";
+
+  if (Perm::check_right('userbackup', $cright_write_admin)) {
+    $block .= "
+      <div class=\"detail extra\">
+        <h1>{$GLOBALS['l_new_backup']}</h1>
+        $dis_new_backup
+      </div>
+      ";
+  }
+
+  $block .= "<div class=\"detail extra\">
       <h1>{$GLOBALS['l_available_backups']}</h1>
       $dis_backups
     </div>
-    <!--<div class=\"detail extra\">
-      <h1>{$GLOBALS['l_service_get_ftp_backups']}</h1>
-      $dis_ftp_backups
-    </div>-->
   ";
 
   return $block;

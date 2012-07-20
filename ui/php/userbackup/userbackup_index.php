@@ -42,7 +42,7 @@ applicable to the OBM software.
 
 $debug = 1;
 $path = '..';
-$module = 'user';
+$module = 'userbackup';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 
@@ -60,6 +60,7 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc"); // needed by call from calendar
 require_once("$obminclude/of/of_contact.php");
 
+if ($action == 'index') $action = 'backup';
 
 get_user_action();
 $perm->check_permissions($module, $action);
@@ -68,11 +69,10 @@ update_last_visit('user', $params['user_id'], $action);
 
 page_close();
 
-// get Profile list (name and id)
-// $params['profiles'] = get_all_profiles(false);
+global $obm, $cright_write_admin;
+$params['user_id'] = $obm['uid'];
 
 if ($action == 'backup') {
-///////////////////////////////////////////////////////////////////////////////
   // lang file include for backup
   $lang = strtolower(get_lang());
   include_once("obminclude/lang/$lang/backup.inc");
@@ -84,7 +84,7 @@ if ($action == 'backup') {
     if (!empty($params['retrieveAll'])) {
       $backup->retrieveBackups($options);
       $display['msg'] .= display_ok_msg($l_retrieve_from_ftp_success);
-    } elseif (!empty($params['execute'])) {
+    } elseif (!empty($params['execute']) && Perm::check_right('userbackup', $cright_write_admin)) {
       $result = $backup->doBackup($options);
       $display['msg'] .= display_ok_msg($l_backup_complete);
       if (!$result['pushFtp']['success']) {
@@ -131,7 +131,6 @@ of_category_user_action_switch($module, $action, $params);
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$extra_js_include[] = 'user.js';
 $display['head'] = display_head($l_user);
 if (! $params['popup']) {
   update_user_action();
@@ -160,56 +159,6 @@ function get_user_params() {
       }
     }
     $params['group_nb'] = $nb_group;
-    
-  }
-  if(isset($params['exp_op']))  $params['exp_op'] = urldecode($params['exp_op']);
-  if(isset($params['quota_op']))  $params['quota_op'] = urldecode($params['quota_op']);
-  if (isset ($_FILES['fi_file'])) {
-    $params['file_tmp'] = $_FILES['fi_file']['tmp_name'];
-    $params['file_name'] = $_FILES['fi_file']['name'];
-    $params['size'] = $_FILES['fi_file']['size'];
-    $params['type'] = $_FILES['fi_file']['type'];
-  }
-
-  if(isset ($params['vacation_datebegin'])) {
-    $params['vacation_datebegin'] = of_isodate_convert($params['vacation_datebegin']);
-    $params['vacation_datebegin'] = new Of_Date($params['vacation_datebegin']);
-    $params['vacation_datebegin']->setHour($params["time_begin"])->setMinute($params["min_begin"])->setSecond(0);
-  }
-
-  if(isset ($params['vacation_dateend'])) {
-    $params['vacation_dateend'] = of_isodate_convert($params['vacation_dateend']);
-    $params['vacation_dateend'] = new Of_Date($params['vacation_dateend']);
-    $params['vacation_dateend']->setHour($params["time_end"])->setMinute($params["min_end"])->setSecond(0);
-  } 
-
-  if (is_array($params['email_nomade'])) {
-    $email_aliases = array();
-    while(!empty($params['email_nomade'])) {
-      $email = trim(array_shift($params['email_nomade']));
-      if(!empty($email)) {
-        $email_aliases[] = $email;
-      }
-    }
-
-    $params['email_nomade'] = implode("\r\n", $email_aliases);
-  }
-
-  if (is_array($params['email'])) {
-    $email_aliases = array();
-    while(!empty($params['email'])) {
-      $email = trim(array_shift($params['email']));
-      $domain = array_shift($params['aliases']);
-      if(!empty($email)) {
-       if(!empty($domain)) {
-          $email_aliases[] = $email.'@'.$domain;
-        } else {
-          $email_aliases[] = $email;
-        }
-      }
-    }
-
-    $params['email'] = implode("\r\n", $email_aliases);
   }
 
   return $params;
@@ -231,20 +180,18 @@ function get_user_action() {
   of_category_user_module_action('userbackup');
 
 // Backup
-  $actions['user']['backup'] = array (
+  $actions['userbackup']['backup'] = array (
     'Name'     => $GLOBALS['l_header_backup_restore'],
-    'Url'      => "$path/userbackup/userbackup_index.php?action=backup&amp;user_id=".$params['user_id'],
-    // 'Right'    => $cright_write_admin,
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update','check_delete', 'backup', 'restore') 
+    'Url'      => "$path/userbackup/userbackup_index.php?action=backup",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
   );
 
 // Restore
-  $actions['user']['restore'] = array (
+  $actions['userbackup']['restore'] = array (
     'Name'     => $GLOBALS['l_header_backup_restore'],
-    'Url'      => "$path/userbackup/userbackup_index.php?action=restore&amp;user_id=".$params['user_id'],
-    // 'Right'    => $cright_write_admin,
-    'Right'    => $cright_write,
+    'Url'      => "$path/userbackup/userbackup_index.php?action=restore",
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
   );
 }
@@ -263,29 +210,25 @@ function update_user_action() {
         && check_user_update_rights($params, $u)) {
 
       // Backup
-      $actions['user']['backup']['Url'] = "$path/userbackup/userbackup_index.php?action=backup&amp;user_id=$id";
-      $actions['user']['backup']['Condition'][] = 'insert';
+      $actions['userbackup']['backup']['Url'] = "$path/userbackup/userbackup_index.php";
+      $actions['userbackup']['backup']['Condition'][] = 'insert';
 
       // Restore
-      $actions['user']['restore']['Url'] = "$path/userbackup/userbackup_index.php?action=restore&amp;user_id=$id";
-      $actions['user']['restore']['Condition'][] = 'insert';
+      $actions['userbackup']['restore']['Url'] = "$path/userbackup/userbackup_index.php?action=restore";
+      $actions['userbackup']['restore']['Condition'][] = 'insert';
     } else {
-      $actions['user']['group_consult']['Condition'] = array('None');
-      $actions['user']['check_delete']['Condition'] = array('None');
-      $actions['user']['detailupdate']['Condition'] = array('None');
-      $actions['user']['detailconsult']['Condition'] = array('None');
-      $actions['user']['backup']['Condition'] = array('None');
-      $actions['user']['restore']['Condition'] = array('None');
+      $actions['userbackup']['backup']['Condition'] = array('None');
+      $actions['userbackup']['restore']['Condition'] = array('None');
     }
   }
 
   // Display admin menu only if no userdata defined
   if (empty($cgp_user['user']['category'])) {
-    $actions['user']['admin']['Condition'] = array('None');
+    $actions['userbackup']['admin']['Condition'] = array('None');
   }
 
   if (!check_user_wait($params)) {
-    $actions['user']['wait']['Condition'] = array('None');
+    $actions['userbackup']['wait']['Condition'] = array('None');
   }
 }
 
