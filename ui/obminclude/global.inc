@@ -330,6 +330,9 @@ $auth_ldap_binddn = $ini_array['auth-ldap-binddn'];
 $auth_ldap_bindpw = $ini_array['auth-ldap-bindpw'];
 $auth_ldap_filter = $ini_array['auth-ldap-filter'];
 
+// satellite ini variables
+$admin_mail_address = $ini_array['admin_mail_address'];
+
 //------------------//
 // Services enabled //
 //------------------//

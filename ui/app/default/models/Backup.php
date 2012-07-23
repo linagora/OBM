@@ -367,6 +367,11 @@ class Backup {
     return $addressbooks;
   }
 
+
+  function getDetails() {
+    return $this->details;
+  } 
+
   /**
    * Perform the import of the contacts
    */

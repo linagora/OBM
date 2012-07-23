@@ -45,6 +45,8 @@ applicable to the OBM software.
 // EntityCategoryN (id, time and user * update and create, code, label)
 // EntityCategoryNLink (category_id, entity_id)
 
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = '/usr/share/obm/www/obminclude';
 require_once("$obminclude/javascript/category_js.inc");
 require_once("$obminclude/of/of_select.inc");
 

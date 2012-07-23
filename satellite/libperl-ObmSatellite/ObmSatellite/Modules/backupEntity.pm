@@ -9,6 +9,7 @@ use 5.006_001;
 use ObmSatellite::Modules::abstract;
 @ISA = qw(ObmSatellite::Modules::abstract);
 use strict;
+use POSIX;
 
 eval {
     require ObmSatellite::Modules::BackupEntity::user;
@@ -41,7 +42,7 @@ use constant BACKUP_FTP_TIMEOUT => 10;
 sub _setUri {
     my $self = shift;
 
-    return [ '/backupentity', '/restoreentity', '/availablebackup', '/retrievebackup' ];
+    return [ '/backupentity', '/restoreentity', '/availablebackup', '/retrievebackup', '/endOfBackups' ];
 }
 
 
@@ -235,11 +236,36 @@ sub _postMethod {
         return $self->_postMethodRetrieveBackup($requestUri, $requestBody);
     }
 
+    if($requestUri =~ /^\/endOfBackups/) {
+        return $self->endOfBackups();
+    }
+
     return $self->_response( RC_BAD_REQUEST, {
         content => [ 'Invalid URI '.$requestUri ]
         } );
 }
 
+sub endOfBackups {
+    my $self = shift;
+    my $directory = $self->{'backupRoot'};
+    if (!(-d "$directory")) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [' The Directory : ' . $self->{'backupRoot'} . ' doesn\'t exist ! ' ]
+            } );
+    }
+    my $successFile = 'successDailyBackup.txt';
+    open( DESCR, "> $directory/$successFile" ) ||
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [' Couldn\'t create file : ' . $successFile ]
+            } );
+    
+    my $response = $self->_response(RC_OK);
+    my $localtime=strftime("dailyBackupDate_%d-%b-%Y", localtime);
+    print DESCR $localtime . "\n";
+    close DESCR;
+
+    return $response;
+}
 
 sub _postMethodRestoreEntity {
     my $self = shift;

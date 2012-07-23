@@ -1,0 +1,4 @@
+50 1 * * 1-5       sh /usr/share/obm/cron/backupAgricol.sh -d > /var/log/obm-cron.log
+*/10 2-6 * * 6     [ -f /var/lib/obm/backup/Daily/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -w > /var/log/obm-cron.log
+*/10 2-6 1 * *     [ -f /var/lib/obm/backup/Daily/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -m > /var/log/obm-cron.log
+
