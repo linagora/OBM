@@ -69,7 +69,6 @@ update_last_visit('user', $params['user_id'], $action);
 
 page_close();
 
-global $obm, $cright_write_admin;
 $params['user_id'] = $obm['uid'];
 
 if ($action == 'backup') {
@@ -169,13 +168,8 @@ function get_user_params() {
 // User Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_action() {
-  global $params, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_consult,$l_header_display,$l_header_admin,$l_header_import;
-  global $l_header_upd_group,$l_header_admin, $l_header_reset, $l_header_batch;
-  global $l_header_wait;
-  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $cright_none;
+  global $actions, $cright_read, $cright_write_admin;
+
   
   of_category_user_module_action('userbackup');
 
