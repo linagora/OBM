@@ -339,6 +339,35 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
 
     return $isDifferentEnough;
   }
+
+  /**
+  * return true if the event is different enough to require notification
+  *
+  * @param $old other OBM_Event to compare to
+  * @return boolean whether or not the changes should bring a notification
+  */
+  public function shouldSendNotification($old) {
+    return $this->location != $old->location
+    || $this->allday  != $old->allday
+    || $this->title  != $old->title
+    || $this->owner  != $old->owner
+    || $this->opacity  != $old->opacity
+    || $this->category1  != $old->category1
+    || $this->privacy  != $old->privacy
+    || $this->repeatfrequency  != $old->repeatfrequency
+    || $this->description  != $old->description
+    || $this->repeat_days  != $old->repeat_days
+    || $this->date_begin->compare($old->date_begin) != 0
+    || $this->date_end->compare($old->date_end) != 0
+    || ($this->repeat_kind != 'none' && ( 
+            ($this->repeat_end && !$old->repeat_end) 
+            || (!$this->repeat_end && $old->repeat_end) 
+            || $this->repeat_end && $old->repeat_end && $this->repeat_end->compareDateIso($old->repeat_end) != 0 
+            ) 
+    )
+    || $this->duration != $old->duration
+    || $this->repeat_kind != $old->repeat_kind;
+  }
 }
 
 /**
