@@ -44,7 +44,9 @@ import javax.transaction.UserTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 
 public class JDBCUtils {
 
@@ -82,39 +84,58 @@ public class JDBCUtils {
 	}
 
 	public static final void cleanup(Connection con, Statement ps, ResultSet rs) {
-		closeResultSet(rs);
-		closeStatement(ps);
-		closeConnection(con);
+		Throwable resultSetFailure = closeResultSetThenGetFailure(rs);
+		Throwable statementFailure = closeStatementThenGetFailure(ps);
+		Throwable connectionFailure = closeConnectionThenGetFailure(con);
+		throwFirstNotNull(resultSetFailure, statementFailure, connectionFailure);
 	}
 
-	public static void closeResultSet(ResultSet rs) {
+	@VisibleForTesting static void throwFirstNotNull(Throwable...failures) {
+		for (Throwable failure : failures) {
+			throwRuntimeIfNotNull(failure);
+		}
+	}
+
+	@VisibleForTesting static void throwRuntimeIfNotNull(Throwable failure) {
+		if (failure != null) {
+			Throwables.propagate(failure);
+		}
+	}
+
+	@VisibleForTesting static Throwable closeResultSetThenGetFailure(ResultSet rs) {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (SQLException se) {
+			} catch (Throwable se) {
 				logger.error(se.getMessage(), se);
+				return se;
 			}
 		}
+		return null;
 	}
 
-	public static void closeStatement(Statement ps) {
+	@VisibleForTesting static Throwable closeStatementThenGetFailure(Statement ps) {
 		if (ps != null) {
 			try {
 				ps.close();
-			} catch (SQLException se) {
+			} catch (Throwable se) {
 				logger.error(se.getMessage(), se);
+				return se;
 			}
 		}
+		return null;
 	}
 
-	public static void closeConnection(Connection con) {
+	@VisibleForTesting static Throwable closeConnectionThenGetFailure(Connection con) {
 		if (con != null) {
 			try {
 				con.close();
-			} catch (SQLException se) {
+			} catch (Throwable se) {
 				logger.error(se.getMessage(), se);
+				return se;
 			}
 		}
+		return null;
 	}
 
 	public static void rollback(UserTransaction ut) {
