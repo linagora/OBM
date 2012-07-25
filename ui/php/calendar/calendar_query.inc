@@ -2056,16 +2056,14 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   // SOLR
   run_query_calendar_solr_store($event_id);
 
-  $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-  if ($newEvent->shouldSendNotification($oldEvent)) {   
-    // Send mail session var
-    $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
-    // Notify Observers
-    OBM_EventFactory::getInstance()->store(
-              $newEvent,
-              $oldEvent
-             );
-  }
+
+// Send mail session var
+  $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
+  // Notify Observers
+  OBM_EventFactory::getInstance()->store(
+            OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
+            $oldEvent
+           );
 
 
 
@@ -2202,7 +2200,7 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
       unset($old_exceptions[$iso_date]);
     } else {
       $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);
-      run_query_calendar_event_exception_insert($calendar, '', true);
+      run_query_calendar_event_exception_insert($calendar);
     }
   }
 
@@ -2688,18 +2686,13 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $idsToIndex = array($id, $exception_id);
   } else {
     $newEvent = OBM_EventFactory::getInstance()->getById($id);
-    $newEvent->negative_recurrence_id = $olddatebegin;
-    $newEvent->date_begin = $olddatebegin;
-    $newEvent->date_end = clone $olddatebegin;
-    $newEvent->date_end->addSecond($newEvent->duration);
-    $newEvent->repeat_kind = "none";
+    $newEvent->negative_recurrence_id = $exception_recurrence_id_date;
     $idsToIndex = array($id);
   }
   
   if($run_observers) {
   	// Send mail session var
-  	$GLOBALS['send_notification_mail'] = isset($calendar['attendees_notification'])
-  		? $calendar['attendees_notification'] : $calendar['send_mail'];
+  	$GLOBALS['send_notification_mail'] = $calendar['send_mail'];
   	// Notify Observers and ensure that email content points to the old event
   	// begin and end date.
     if ($isMovedException) {
