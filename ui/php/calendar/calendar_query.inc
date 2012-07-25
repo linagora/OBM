@@ -2057,7 +2057,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_solr_store($event_id);
 
   $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-  if (OBM_EventMailObserver::hasEventFullyChanged($oldEvent, $newEvent, false)) {   
+  if ($newEvent->shouldSendNotification($oldEvent)) {   
     // Send mail session var
     $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
     // Notify Observers
