@@ -69,6 +69,7 @@ class OBM_IndexingService {
     $solr = OBM_IndexingService::connect($core);
     if ($solr) {
       $solr->commit();
+      // OBMFULL-3960 $solr->optimize();
     }
   }
 
@@ -77,6 +78,7 @@ class OBM_IndexingService {
     if ($solr) {
       $solr->deleteByQuery($query);
       $solr->commit();
+      // OBMFULL-3960 $solr->optimize();
     }
   }
 
@@ -85,6 +87,7 @@ class OBM_IndexingService {
     if ($solr) {
       $solr->deleteById($id);
       $solr->commit();
+      // OBMFULL-3960 $solr->optimize();
     }
   }
 

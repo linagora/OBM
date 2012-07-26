@@ -21,7 +21,6 @@ BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  ant
 Requires(post): obm-tomcat-common-libs
-Requires: python-psycopg2, python-mysqldb
 
 
 %description
