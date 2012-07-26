@@ -99,7 +99,7 @@ public class ResponderImpl implements Responder {
 	@Override
 	public void sendWBXMLResponse(String defaultNamespace, Document doc) {
 		logger.debug("response: send response");
-		domDumper.dumpXml(doc);
+		domDumper.dumpXml(doc, WBXMLTools.XML_SERIALIZING_VERSION);
 		
 		try {
 			byte[] wbxml = wbxmlTools.toWbxml(defaultNamespace, doc);

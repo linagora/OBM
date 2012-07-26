@@ -326,7 +326,29 @@ public final class DOMUtils {
 		return buffer.toString();
 	}
 	
+	public static void serialize(Document doc, OutputStream out)
+			throws TransformerException {
+		serialize(doc, out, false);
+	}
+	
 	public static void serialize(Document doc, OutputStream out, boolean pretty)
+			throws TransformerException {
+		serialize(doc, out, pretty, XMLVersion.XML_10);
+	}
+	
+	public static void serialize(Document doc, OutputStream out, XMLVersion xmlVersion)
+			throws TransformerException {
+		serialize(doc, out, false, xmlVersion);
+	}
+	
+	public static String serialize(Document doc)
+			throws TransformerException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		serialize(doc, byteArrayOutputStream, false);
+		return new String(byteArrayOutputStream.toByteArray());
+	}
+	
+	public static void serialize(Document doc, OutputStream out, boolean pretty, XMLVersion xmlVersion) 
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();
 		if (pretty) {
@@ -334,21 +356,10 @@ public final class DOMUtils {
 		} else {
 			tf.setOutputProperty(OutputKeys.INDENT, "no");
 		}
+		tf.setOutputProperty(OutputKeys.VERSION, xmlVersion.version());
 		Source input = new DOMSource(doc.getDocumentElement());
 		Result output = new StreamResult(out);
 		tf.transform(input, output);
-	}
-
-	public static void serialize(Document doc, OutputStream out)
-			throws TransformerException {
-		serialize(doc, out, false);
-	}
-
-	public static String serialize(Document doc)
-			throws TransformerException {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		serialize(doc, byteArrayOutputStream, false);
-		return new String(byteArrayOutputStream.toByteArray());
 	}
 	
 	public static void logDom(Document doc) throws TransformerException {
@@ -442,4 +453,21 @@ public final class DOMUtils {
 		return createElementAndCDataSection(parent, elementName, 
 				CharStreams.toString(new InputStreamReader(inputStream, charset)));
 	}
+	
+	public enum XMLVersion {
+		XML_10("1.0"),
+		XML_11("1.1");
+		
+		private String version;
+
+		private XMLVersion(String version) {
+			this.version = version;
+		}
+
+		public String version() {
+			return version;
+		}
+
+	}
+
 }

@@ -31,18 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,9 +62,8 @@ public class DOMUtilsTest {
 		
 		root.setTextContent(expectedString);
 		DOMUtils.serialize(reply, out);
-		
-		Assert.assertThat(new String(out.toByteArray(), "UTF-8"), 
-				StringContains.containsString(expectedString));
+
+		assertThat(new String(out.toByteArray(), "UTF-8")).contains(expectedString);
 	}
 	
 	@Test
@@ -78,8 +79,85 @@ public class DOMUtilsTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DOMUtils.serialize(reply, out);
 				
-		Assert.assertThat(new String(out.toByteArray(), "UTF-8"), 
-				StringContains.containsString("<CDataSection><![CDATA["+ expectedString + "]]></CDataSection>"));
+		assertThat(new String(out.toByteArray(), "UTF-8")).contains( 
+				"<CDataSection><![CDATA["+ expectedString + "]]></CDataSection>");
+	}
+
+	@Test
+	public void testSerializeDefaultXmlVersionIsXML10() throws Exception {
+		String output = DOMUtils.serialize(createDoc());
+		assertThat(output).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializeOutputDefaultXmlVersionIsXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializePrettyDefaultXmlVersionIsXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, true);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializeNotPrettyDefaultXmlVersionIsXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, false);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializeXmlVersionXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, XMLVersion.XML_10);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializeXmlVersionXML11() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, XMLVersion.XML_11);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.1\"");
+	}
+
+	@Test
+	public void testSerializePrettyXmlVersionXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, true, XMLVersion.XML_10);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializeNotPrettyXmlVersionXML10() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, false, XMLVersion.XML_10);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.0\"");
+	}
+
+	@Test
+	public void testSerializePrettyXmlVersionXML11() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, true, XMLVersion.XML_11);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.1\"");
+	}
+
+	@Test
+	public void testSerializeNotPrettyXmlVersionXML11() throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DOMUtils.serialize(createDoc(), out, false, XMLVersion.XML_11);
+		assertThat(streamToString(out)).startsWith("<?xml version=\"1.1\"");
+	}
+
+	private Document createDoc() throws FactoryConfigurationError {
+		return DOMUtils.createDoc(null, "root");
+	}
+	
+	private String streamToString(ByteArrayOutputStream out) {
+		return new String(out.toByteArray(), Charsets.UTF_8);
 	}
 }
 

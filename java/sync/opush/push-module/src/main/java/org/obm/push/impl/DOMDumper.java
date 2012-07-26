@@ -37,6 +37,7 @@ import javax.xml.transform.TransformerException;
 
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -70,23 +71,25 @@ public class DOMDumper {
 	 * @param doc
 	 */
 	public void dumpXml(Document doc) {
+		dumpXml(doc, XMLVersion.XML_10);
+	}
+	
+	public void dumpXml(Document doc, XMLVersion xmlVersion) {
 		try {
-			
-			fullRequestLogging(DOMUtils.cloneDOM(doc));
-			trimRequestLogging(DOMUtils.cloneDOM(doc));
-
+			fullRequestLogging(DOMUtils.cloneDOM(doc), xmlVersion);
+			trimRequestLogging(DOMUtils.cloneDOM(doc), xmlVersion);
 		} catch (TransformerException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
-	private void fullRequestLogging(Document doc) throws TransformerException {
+	private void fullRequestLogging(Document doc, XMLVersion xmlVersion) throws TransformerException {
 		if (fullREQLogger.isInfoEnabled()) {
-			log(fullREQLogger, doc);
+			log(fullREQLogger, doc, xmlVersion);
 		}
 	}
 
-	private void trimRequestLogging(Document doc) throws TransformerException {
+	private void trimRequestLogging(Document doc, XMLVersion xmlVersion) throws TransformerException {
 		if (trimREQlogger.isInfoEnabled()) {
 			NodeList nl = doc.getElementsByTagName("ApplicationData");
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -98,13 +101,13 @@ public class DOMDumper {
 				}
 				e.setTextContent("[trimmed_output]");
 			}
-			log(trimREQlogger, doc);
+			log(trimREQlogger, doc, xmlVersion);
 		}
 	}
 	
-	private void log(Logger logger, Document doc) throws TransformerException {
+	private void log(Logger logger, Document doc, XMLVersion xmlVersion) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DOMUtils.serialize(doc, out, true);
+		DOMUtils.serialize(doc, out, true, xmlVersion);
 		logger.info(out.toString());
 	}
 	

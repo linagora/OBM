@@ -33,20 +33,23 @@ package org.obm.push.wbxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.junit.internal.matchers.StringContains;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-
-import org.obm.filter.SlowFilterRunner;
+import com.google.common.base.Charsets;
 
 @RunWith(SlowFilterRunner.class)
 public class WBXMLToolsTest {
@@ -63,7 +66,7 @@ public class WBXMLToolsTest {
 		String expectedString = "éàâè";
 		
 		String xmlActiveSync = 
-				"<?xml version=\"1.0\"?>" +
+				"<?xml version=\"1.1\"?>" +
 				"<Sync>" +
 					"<Collections>" +
 						"<Collection>" +
@@ -90,5 +93,59 @@ public class WBXMLToolsTest {
 		Assert.assertThat(new String(byteDoc), 
 				StringContains.containsString(expectedString));
 		
+	}
+	
+	@Test
+	public void cDataSectionWithIllegalCharUsingXML10DoesNotFail() throws Exception{
+		Charset usedCharset = Charsets.UTF_8;
+		String dataWithInvalidXML10Chars = "text&#12; and <> illegal &#1;chars";
+		String xml =
+			"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+			"<Sync " +
+			"xmlns:Email=\"Email\" " +
+			"xmlns:AirSyncBase=\"AirSyncBase\" " +
+			"attributeFormDefault=\"unqualified\" " +
+			"elementFormDefault=\"qualified\" " +
+			"targetNamespace=\"Email:\" " +
+			">" +
+				"<Collections>" +
+					"<Collection>" +
+						"<SyncKey>5b22b86c-6195-48af-b2a9-1ba9af2b6141</SyncKey>" +
+						"<CollectionId>1528</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Responses>" +
+							"<Fetch>" +
+								"<ServerId>1528:57965</ServerId>" +
+								"<Status>1</Status>" +
+								"<ApplicationData>" +
+									"<Email:To>to@domain.com</Email:To>" +
+									"<Email:From>from@domain.com</Email:From>" +
+									"<Email:Subject>Subject</Email:Subject>" +
+									"<Email:DateReceived>2012-07-24T13:01:48.000Z</Email:DateReceived>" +
+									"<Email:Importance>1</Email:Importance>" +
+									"<Email:Read>1</Email:Read>" +
+									"<AirSyncBase:Body>" +
+//										"<AirSyncBase:Data>replaced below data</AirSyncBase:Data>" +
+										"<AirSyncBase:Type>1</AirSyncBase:Type>" +
+										"<AirSyncBase:Truncated>1</AirSyncBase:Truncated>" +
+										"<AirSyncBase:EstimatedDataSize>32768</AirSyncBase:EstimatedDataSize>" +
+									"</AirSyncBase:Body>" +
+									"<Email:MessageClass>IPM.Note</Email:MessageClass>" +
+									"<Email:ContentClass>urn:content-classes:message</Email:ContentClass>" +
+									"<Email:InternetCPID>65001</Email:InternetCPID>" +
+									"<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>" +
+								"</ApplicationData>" +
+							"</Fetch>" +
+						"</Responses>" +
+					"</Collection>" +
+				"</Collections>" +
+			"</Sync>";
+
+		InputStream dataInputStream = new ByteArrayInputStream(dataWithInvalidXML10Chars.getBytes(usedCharset));
+
+		Document doc = DOMUtils.parse(xml);
+		Element docBody = DOMUtils.getUniqueElement(doc.getDocumentElement(), "AirSyncBase:Body");
+		DOMUtils.createElementAndCDataText(docBody, "AirSyncBase:Data", dataInputStream, usedCharset);
+		wbxmlTools.toWbxml("AirSync", doc);
 	}
 }

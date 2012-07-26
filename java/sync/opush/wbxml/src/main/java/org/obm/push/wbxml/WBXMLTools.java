@@ -41,6 +41,7 @@ import java.io.StringReader;
 import javax.xml.transform.TransformerException;
 
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.obm.push.wbxml.parsers.WbxmlEncoder;
 import org.obm.push.wbxml.parsers.WbxmlParser;
 import org.slf4j.Logger;
@@ -56,6 +57,8 @@ import com.google.inject.Singleton;
 public class WBXMLTools {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	public static final XMLVersion XML_SERIALIZING_VERSION = XMLVersion.XML_11;
 
 	@Inject
 	public WBXMLTools() {
@@ -128,7 +131,7 @@ public class WBXMLTools {
 		WbxmlEncoder encoder = new WbxmlEncoder(defaultNamespace);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			DOMUtils.serialize(doc, out);
+			DOMUtils.serialize(doc, out, XML_SERIALIZING_VERSION);
 			StringReader stringReader = new StringReader(new String(out.toByteArray(), "UTF-8"));
 			InputSource is = new InputSource(stringReader);
 			out = new ByteArrayOutputStream();
