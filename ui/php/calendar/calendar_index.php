@@ -1550,11 +1550,16 @@ function get_calendar_params() {
     }
   }
   // repeat days
-  for ($i=0; $i<7; $i++) {
-    if (isset($params["repeatday_$i"])) {
-      $params['repeat_days'] .= '1';
-    } else {
-      $params['repeat_days'] .= '0';
+  if ( $params["repeat_kind"] ) {
+    $params["repeat_days"] = "";
+    if ( $params["repeat_kind"] == "weekly" ) {
+      for ($i=0; $i<7; $i++) {
+        if (isset($params["repeatday_$i"])) {
+          $params["repeat_days"] .= '1';
+        } else {
+          $params["repeat_days"] .= '0';
+        }
+      }
     }
   }
 
