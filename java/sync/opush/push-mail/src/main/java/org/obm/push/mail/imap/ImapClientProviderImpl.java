@@ -32,6 +32,7 @@
 package org.obm.push.mail.imap;
 
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
@@ -46,21 +47,26 @@ import org.obm.push.exception.NoImapClientAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.sun.mail.imap.IMAPStore;
 
 public class ImapClientProviderImpl implements ImapClientProvider {
 
+	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
+
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
+
 	
 	private final LocatorService locatorService;
 	private final ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory;
 	private final boolean loginWithDomain;
 	private final int imapPort;
-	private final Session defaultSession;
+	@VisibleForTesting final Session defaultSession;
 
 	@Inject
-	private ImapClientProviderImpl(EmailConfiguration emailConfiguration, LocatorService locatorService,
+	@VisibleForTesting ImapClientProviderImpl(EmailConfiguration emailConfiguration, LocatorService locatorService,
 			ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory) {
 		this.locatorService = locatorService;
 		this.managedLifecycleImapStoreFactory = managedLifecycleImapStoreFactory;
@@ -72,17 +78,21 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	}
 
 	private Properties buildProperties(EmailConfiguration emailConfiguration) {
-		Properties properties = new Properties();
-
 		boolean activateTls = emailConfiguration.activateTls();
-		logger.debug("Java Mail settings : STARTTLS=" + activateTls);
-		properties.put("mail.imap.starttls.enable", activateTls);
-		
 		int imapTimeout = emailConfiguration.imapTimeout();
+		int imapFetchBlockSize = emailConfiguration.getImapFetchBlockSize();
+		logger.debug("Java Mail settings : STARTTLS=" + activateTls);
 		logger.debug("Java Mail settings : TIMEOUT=" + imapTimeout);
-		properties.put("mail.imap.timeout", imapTimeout);
-		properties.put("mail.imap.fetchsize", emailConfiguration.getImapFetchBlockSize());
+		logger.debug("Java Mail settings : BLOCKSIZE=" + imapFetchBlockSize);
+
+		Properties properties = new Properties();
 		properties.put("mail.debug", "false");
+		properties.put("mail.imap.starttls.enable", activateTls);
+
+		for (String availableProtocol : AVAILABLE_PROTOCOLS) {
+			properties.put("mail." + availableProtocol +".timeout", imapTimeout);
+			properties.put("mail." + availableProtocol +".fetchsize", imapFetchBlockSize);
+		}
 		
 		return properties;
 	}
