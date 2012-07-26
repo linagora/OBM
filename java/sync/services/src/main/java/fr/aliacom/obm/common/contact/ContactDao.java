@@ -1441,7 +1441,6 @@ public class ContactDao {
 					sb.append("*) OR email:(");
 					sb.append(query.toLowerCase());
 					sb.append("*))");
-					sb.append(",score asc");
 				}
 				SolrQuery params = new SolrQuery();
 				params.setQuery(sb.toString());
@@ -1751,7 +1750,8 @@ public class ContactDao {
 	public int countContactsInGroup(int gid) throws SQLException {
 		String query = "SELECT COUNT(*) "
 					+  "FROM Contact "
-					+  "WHERE contact_addressbook_id = ?";
+					+  "WHERE contact_addressbook_id = ?"
+					+  "AND contact_archive != 1";
 
 		Connection con = null;
 		PreparedStatement ps = null;
