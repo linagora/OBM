@@ -15,8 +15,6 @@ License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: %{name}-%{version}.tar.gz
 Source1: solr.xml
-Source2: obm-solr.cron.d
-
 BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  ant
@@ -59,10 +57,6 @@ cp %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/obm-tomcat/applis
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-solr
 cp obm_index_init.py $RPM_BUILD_ROOT%{_datadir}/obm-solr
-cp obm_optimize_index.py $RPM_BUILD_ROOT%{_datadir}/obm-solr
-
-mkdir $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/obm-solr
 
 %files
 %defattr(-,root,root,-)
@@ -71,7 +65,6 @@ install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/obm-solr
 %{_datadir}/solr
 %{_datadir}/obm-solr
 %{_sysconfdir}/obm-tomcat/applis
-%{_sysconfdir}/cron.d/obm-solr
 
 %post
 rm -rf /var/solr/default/conf
