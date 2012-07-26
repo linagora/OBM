@@ -54,7 +54,6 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -204,29 +203,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
+			throws ServerFault, NoPermissionException {
 		
 		try {
 			if (isUsersOBMAddressBook(addressBookId)) {
 				throw new NoPermissionException("no permission to add a contact to address book users.");
 			} else {
-				if (!contactAlreadyExist(token, contact)) {
-					return contactDao.createContactInAddressBook(token, contact, addressBookId);
-				}
-				throw new ContactAlreadyExistException("Contact already exist", contact);	
+				return contactDao.createContactInAddressBook(token, contact, addressBookId);
 			}
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());
 		}
-	}
-
-	
-	private boolean contactAlreadyExist(AccessToken token, Contact contact) {
-		KeyList duplicates = getContactTwinKeys(token, contact);
-		if (duplicates.getKeys() != null && !duplicates.getKeys().isEmpty()) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override

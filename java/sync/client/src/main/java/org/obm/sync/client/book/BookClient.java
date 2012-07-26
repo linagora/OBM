@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.naming.NoPermissionException;
 
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
@@ -46,7 +47,6 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -82,7 +82,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactAlreadyExistException {
+			throws ServerFault, NoPermissionException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));

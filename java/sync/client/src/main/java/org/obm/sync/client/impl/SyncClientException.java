@@ -31,16 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.impl;
 
-import org.obm.sync.NotAllowedException;
 import javax.naming.NoPermissionException;
 
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
-import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 public class SyncClientException {
@@ -51,9 +50,8 @@ public class SyncClientException {
 		}
 	}
 
-	public void checkCreateContactException(Document doc) throws ContactAlreadyExistException, ServerFault, NoPermissionException {
+	public void checkCreateContactException(Document doc) throws ServerFault, NoPermissionException {
 		if (documentIsError(doc)) {
-			throwContactAlreadyExistException(doc);
 			throwNoPermissionException(doc);
 			checkServerFaultException(doc);
 		}
@@ -147,14 +145,6 @@ public class SyncClientException {
 		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
 		if (NoPermissionException.class.getName().equals(type)) {
 			throw new NoPermissionException(message);
-		}
-	}
-	
-	private void throwContactAlreadyExistException(Document doc) throws ContactAlreadyExistException {
-		String message = getErrorMessage(doc);
-		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
-		if (ContactAlreadyExistException.class.getName().equals(type)) {
-			throw new ContactAlreadyExistException(message);
 		}
 	}
 	

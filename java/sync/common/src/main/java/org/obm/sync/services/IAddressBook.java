@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.services;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import java.sql.SQLException;
 import javax.naming.NoPermissionException;
 
 import org.obm.sync.auth.AccessToken;
@@ -43,7 +43,6 @@ import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -86,7 +85,7 @@ public interface IAddressBook {
 	 * Create the given contact into given book if book is writable
 	 */
 	Contact createContact(AccessToken token, Integer addressBook, Contact contact) 
-			throws ServerFault, ContactAlreadyExistException, NoPermissionException;
+			throws ServerFault, NoPermissionException;
 
 	/**
 	 * modify existing contact with data provided if possible.

@@ -70,7 +70,6 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.client.login.LoginService;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -369,9 +368,6 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (NoPermissionException e) {
 			logger.warn(e.getMessage());
 			return null;
-		} catch (ContactAlreadyExistException e) {
-			logger.warn(e.getMessage());
-			return null;
 		}
 		
 		return mappingService.getServerIdFor(collectionId, String.valueOf(contactId));
@@ -391,7 +387,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private Contact createContact(UserDataRequest udr, Integer addressBookId, Contact contact) 
-			throws UnexpectedObmSyncServerException, NoPermissionException, ContactAlreadyExistException {
+			throws UnexpectedObmSyncServerException, NoPermissionException {
 		
 		AccessToken token = login(udr);
 		try {

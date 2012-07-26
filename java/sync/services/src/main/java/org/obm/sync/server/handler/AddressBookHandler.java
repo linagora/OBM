@@ -32,11 +32,10 @@
 package org.obm.sync.server.handler;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import java.sql.SQLException;
-import com.google.common.base.Strings;
 import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
@@ -48,7 +47,6 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
-import org.obm.sync.exception.ContactAlreadyExistException;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -59,6 +57,7 @@ import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DateHelper;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -179,7 +178,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void createContact(AccessToken at, Request request, XmlResponder responder) 
-			throws ServerFault, ContactAlreadyExistException, NoPermissionException {
+			throws ServerFault, NoPermissionException {
 		
 		try {
 			Integer addressBookId = getBookId(request);	
