@@ -46,7 +46,7 @@ import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.OpushImapFolder;
 
-public interface PrivateMailboxService {
+public interface PrivateMailboxService extends MailboxService {
 
 	MailboxFolders listAllFolders(UserDataRequest udr) throws MailException;
 	

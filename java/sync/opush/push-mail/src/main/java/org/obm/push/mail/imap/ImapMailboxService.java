@@ -92,7 +92,6 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
 import org.obm.push.mail.MailViewToMSEmailConverter;
-import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
@@ -115,7 +114,7 @@ import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
 
 @Singleton
-public class ImapMailboxService implements MailboxService, PrivateMailboxService {
+public class ImapMailboxService implements PrivateMailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
 	

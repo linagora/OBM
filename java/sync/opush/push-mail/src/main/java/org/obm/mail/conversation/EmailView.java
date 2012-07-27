@@ -39,8 +39,8 @@ import java.util.List;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.obm.icalendar.ICalendar;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.base.Objects;
@@ -59,7 +59,7 @@ public class EmailView {
 		private List<EmailViewAttachment> attachments;
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
-		private String mimeType;
+		private MSEmailBodyType bodyType;
 		private String charset;
 		
 		public Builder flags(Collection<Flag> flags) {
@@ -104,8 +104,8 @@ public class EmailView {
 			return this;
 		}
 		
-		public Builder mimeType(String mimeType) {
-			this.mimeType = mimeType;
+		public Builder bodyType(MSEmailBodyType bodyType) {
+			this.bodyType = bodyType;
 			return this;
 		}
 		
@@ -124,17 +124,14 @@ public class EmailView {
 			if (bodyMimePartData == null) {
 				throw new EmailViewBuildException("The bodyMimePartData is required");
 			}
-			ContentType contentType = null;
-			if (mimeType == null) {
-				throw new EmailViewBuildException("The mimeType is required");
-			} else {
-				contentType = new ContentType.Builder().contentType(mimeType).build();
+			if (bodyType == null) {
+				throw new EmailViewBuildException("The bodyType is required");
 			}
 			if (flags == null) {
 				this.flags = ImmutableSet.<Flag>of();
 			}
 			return new EmailView(uid, flags, envelope, bodyMimePartData, 
-					bodyTruncation, attachments, iCalendar, invitationType, contentType, charset);
+					bodyTruncation, attachments, iCalendar, invitationType, bodyType, charset);
 		}
 	}
 	
@@ -143,15 +140,15 @@ public class EmailView {
 	private final Envelope envelope;
 	private final InputStream bodyMimePartData;
 	private final Integer bodyTruncation;
-	private final ContentType contentType;
 	private final List<EmailViewAttachment> attachments;
 	private final ICalendar iCalendar;
 	private final EmailViewInvitationType invitationType;
 	private final String charset;
+	private final MSEmailBodyType bodyType;
 
 	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
 			InputStream bodyMimePartData, Integer bodyTruncation, List<EmailViewAttachment> attachments, 
-			ICalendar iCalendar, EmailViewInvitationType invitationType, ContentType contentType, String charset) {
+			ICalendar iCalendar, EmailViewInvitationType invitationType, MSEmailBodyType bodyType, String charset) {
 		
 		this.uid = uid;
 		this.flags = flags;
@@ -161,7 +158,7 @@ public class EmailView {
 		this.attachments = attachments;
 		this.iCalendar = iCalendar;
 		this.invitationType = invitationType;
-		this.contentType = contentType;
+		this.bodyType = bodyType;
 		this.charset = charset;
 	}
 
@@ -220,19 +217,20 @@ public class EmailView {
 	public EmailViewInvitationType getInvitationType() {
 		return invitationType;
 	}
-
-	public ContentType getContentType() {
-		return contentType;
-	}
 	
 	public String getCharset() {
 		return charset;
 	}
+
+	public MSEmailBodyType getBodyType() {
+		return bodyType;
+	}
+
 	
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, 
-				bodyTruncation, attachments, iCalendar, invitationType, contentType, charset);
+				bodyTruncation, attachments, iCalendar, invitationType, bodyType, charset);
 	}
 	
 	@Override
@@ -247,7 +245,7 @@ public class EmailView {
 				&& Objects.equal(this.attachments, that.attachments)
 				&& Objects.equal(this.iCalendar, that.iCalendar)
 				&& Objects.equal(this.invitationType, that.invitationType)
-				&& Objects.equal(this.contentType, that.contentType)
+				&& Objects.equal(this.bodyType, that.bodyType)
 				&& Objects.equal(this.charset, that.charset);
 		}
 		return false;
@@ -264,8 +262,9 @@ public class EmailView {
 			.add("attachments", attachments)
 			.add("iCalendar", iCalendar)
 			.add("invitationType", invitationType)
-			.add("contentType", contentType)
+			.add("bodyType", bodyType)
 			.add("charset", charset)
 			.toString();
 	}
+
 }

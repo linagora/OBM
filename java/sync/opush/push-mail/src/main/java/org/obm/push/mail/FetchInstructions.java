@@ -32,6 +32,7 @@
 package org.obm.push.mail;
 
 import org.minig.imap.mime.IMimePart;
+import org.obm.push.bean.MSEmailBodyType;
 
 import com.google.common.base.Preconditions;
 
@@ -41,6 +42,7 @@ public class FetchInstructions {
 	public static class Builder {
 		private IMimePart mimePart;
 		private Integer truncation;
+		private MSEmailBodyType bodyType;
 		
 		public Builder() {}
 		
@@ -54,20 +56,27 @@ public class FetchInstructions {
 			return this;
 		}
 
+		public Builder bodyType(MSEmailBodyType bodyType) {
+			this.bodyType = bodyType;
+			return this;
+		}
+		
 		public FetchInstructions build() {
 			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
 			return new FetchInstructions(
-					this.mimePart, this.truncation);
+					this.mimePart, this.truncation, this.bodyType);
 		}
 
 	}
 	
 	private final IMimePart mimePart;
 	private final Integer truncation;
+	private final MSEmailBodyType bodyType;
 	
-	private FetchInstructions(IMimePart mimePart, Integer truncation) {
+	private FetchInstructions(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType) {
 		this.mimePart = mimePart;
 		this.truncation = truncation;
+		this.bodyType = bodyType;
 	}
 	
 	public IMimePart getMimePart() {
@@ -76,5 +85,16 @@ public class FetchInstructions {
 	
 	public Integer getTruncation() {
 		return truncation;
+	}
+	
+	public MSEmailBodyType getBodyType() {
+		return bodyType;
+	}
+	
+	public boolean hasMimePartAddressDefined() {
+		if (mimePart.getAddress() != null) {
+			return true;
+		}
+		return false;
 	}
 }

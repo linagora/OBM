@@ -110,6 +110,7 @@ public class MimePartSelector {
 		return new FetchInstructions.Builder()
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())
+			.bodyType(bodyPreference.getType())
 			.build();
 	}
 

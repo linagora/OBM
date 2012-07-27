@@ -136,7 +136,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
 		
 		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
-		emailViewBuilder.mimeType(fetchInstructions.getMimePart().getFullMimeType());
+		emailViewBuilder.bodyType(fetchInstructions.getBodyType());
 		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
 		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
 	}
@@ -144,11 +144,15 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private InputStream fetchBodyData(FetchInstructions fetchInstructions, long uid) throws MailException {
 		InputStream bodyData = null;
 		try {
-			bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
-			if (bodyData != null) {
-				return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
+			if (fetchInstructions.hasMimePartAddressDefined()) {
+				bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
+				if (bodyData != null) {
+					return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
+				} else {
+					return null;
+				}
 			} else {
-				return null;
+				return privateMailboxService.fetchMailStream(udr, collectionName, uid);
 			}
 		} catch (IOException e) {
 			throw new MailException(e);

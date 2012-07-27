@@ -158,11 +158,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 	
 	private MSEmailBodyType convertContentType(EmailView emailView) {
-		MSEmailBodyType msEmailBodyType = MSEmailBodyType.fromMimeType(emailView.getContentType().getFullMimeType());
-		if (msEmailBodyType == null) {
-			msEmailBodyType = MSEmailBodyType.MIME;
-		}
-		return msEmailBodyType;
+		return emailView.getBodyType();
 	}
 
 	private Set<MSAttachement> convertAttachment(EmailView emailView) {
