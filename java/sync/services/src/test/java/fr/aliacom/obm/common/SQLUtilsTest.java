@@ -1,10 +1,10 @@
 package fr.aliacom.obm.common;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.ArrayList;
-import static org.fest.assertions.api.Assertions.*;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 
 import org.junit.Test;
 

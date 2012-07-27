@@ -31,10 +31,7 @@ package fr.aliacom.obm.common;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-
-import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 
 import com.google.common.base.Joiner;
 
