@@ -84,6 +84,8 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		system = configuration.getDataBaseSystem();
 		maxPoolSize = configuration.getDataBaseMaxConnectionPoolSize();
 		logger.info("Database system is " + system);
+		logger.info("Database used is " + name + " on " + host);
+		logger.info("Database connection pool size : " + maxPoolSize);
 		logger.info("Starting OBM connection pool...");
 		createDataSource();
 	}
