@@ -131,7 +131,7 @@ public class AutoconfService extends HttpServlet {
 			resp.setContentType("application/xml");
 
 			try {
-				DOMUtils.serialise(doc, resp.getOutputStream());
+				DOMUtils.serialize(doc, resp.getOutputStream());
 			} catch (Exception e) {
 				logger.error("error sending xml document", e);
 				resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
