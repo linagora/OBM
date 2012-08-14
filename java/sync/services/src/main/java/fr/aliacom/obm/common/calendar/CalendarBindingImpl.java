@@ -355,7 +355,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 			
-			if (!helperService.canWriteOnCalendar(token, calendar)) {
+			if (!helperService.canWriteOnCalendar(token, event.getOwner())) {
 				logger.info(LogUtils.prefix(token) + "Calendar : "
 						+ token.getUserLogin() + " cannot modify event["
 						+ before.getTitle() + "] because no write right on calendar "
