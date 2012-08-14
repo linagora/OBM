@@ -596,7 +596,7 @@ public class TagsTables {
 			"Method", // 0x12
 			"ContentId", // 0x13
 			"ContentLocation", // 0x14
-			"IsInline", // 0x15
+			"IsInLine", // 0x15
 			"NativeBodyType", // 0x16
 			"ContentType", // 0x17
 	};
