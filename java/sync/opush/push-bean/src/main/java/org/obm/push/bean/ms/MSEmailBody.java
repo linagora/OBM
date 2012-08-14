@@ -46,16 +46,18 @@ public class MSEmailBody implements Serializable {
 
 	private SerializableInputStream mimeData;
 	private MSEmailBodyType bodyType;
-	private Integer truncationSize;
+	private int estimatedDataSize;
 	private Charset charset;
+	private boolean truncated;
 	
 	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, 
-			Integer truncationSize, Charset charset) {
+			int estimatedDataSize, Charset charset, boolean truncated) {
 		
 		this.mimeData = mimeData;
 		this.bodyType = bodyType;
-		this.truncationSize = truncationSize;
+		this.estimatedDataSize = estimatedDataSize;
 		this.charset = charset;
+		this.truncated = truncated;
 	}
 	
 	public SerializableInputStream getMimeData() {
@@ -66,12 +68,12 @@ public class MSEmailBody implements Serializable {
 		return bodyType;
 	}
 
-	public Integer getTruncationSize() {
-		return truncationSize;
+	public int getEstimatedDataSize() {
+		return estimatedDataSize;
 	}
 	
 	public boolean isTruncated() {
-		return getTruncationSize() != null;
+		return truncated;
 	}
 	
 	public Charset getCharset() {
@@ -80,7 +82,7 @@ public class MSEmailBody implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(bodyType, truncationSize, charset);
+		return Objects.hashCode(bodyType, estimatedDataSize, charset, truncated);
 	}
 	
 	@Override
@@ -88,8 +90,9 @@ public class MSEmailBody implements Serializable {
 		if (object instanceof MSEmailBody) {
 			MSEmailBody that = (MSEmailBody) object;
 			return Objects.equal(this.bodyType, that.bodyType)
-				&& Objects.equal(this.truncationSize, that.truncationSize)
-				&& Objects.equal(this.charset, that.charset);
+				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize)
+				&& Objects.equal(this.charset, that.charset)
+				&& Objects.equal(this.truncated, that.truncated);
 		}
 		return false;
 	}
@@ -99,22 +102,25 @@ public class MSEmailBody implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("bodyType", bodyType)
 			.add("mimeData", mimeData)
-			.add("truncationSize", truncationSize)
+			.add("truncationSize", estimatedDataSize)
 			.add("charset", charset)
+			.add("truncated", truncated)
 			.toString();
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeObject(mimeData);
 		out.writeObject(bodyType);
-		out.writeObject(truncationSize);
+		out.writeObject(estimatedDataSize);
 		out.writeUTF(charset.name());
+		out.writeObject(truncated);
 	}
 	
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		mimeData = (SerializableInputStream) in.readObject();
 		bodyType = (MSEmailBodyType) in.readObject();
-		truncationSize = (Integer) in.readObject();
+		estimatedDataSize = (Integer) in.readObject();
 		charset = Charset.forName(in.readUTF());
+		truncated = (Boolean) in.readObject();
 	}
 }

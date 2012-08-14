@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.mail.conversion;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -38,7 +40,6 @@ import java.util.List;
 import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
@@ -49,6 +50,7 @@ import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.collect.Lists;
@@ -60,7 +62,7 @@ public class EmailViewTest {
 		new EmailView.Builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
 			.build();
 	}
 
@@ -70,10 +72,11 @@ public class EmailViewTest {
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getUid()).isEqualTo(155);
+		assertThat(emailView.getUid()).isEqualTo(155);
 	}
 	
 	@Test
@@ -82,10 +85,11 @@ public class EmailViewTest {
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(-115)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getUid()).isEqualTo(-115);
+		assertThat(emailView.getUid()).isEqualTo(-115);
 	}
 
 	@Test(expected=EmailViewBuildException.class)
@@ -93,7 +97,7 @@ public class EmailViewTest {
 		new EmailView.Builder().envelope(null)
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
 			.build();
 	}
 
@@ -102,7 +106,7 @@ public class EmailViewTest {
 		new EmailView.Builder().bodyMimePartData(null)
 			.envelope(anyEnvelope())
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
 			.build();
 	}
 	
@@ -113,7 +117,7 @@ public class EmailViewTest {
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
 			.flags(null)
-			.mimeType("text/plain");
+			.bodyType(MSEmailBodyType.PlainText);
 	}
 
 	@Test
@@ -125,10 +129,11 @@ public class EmailViewTest {
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getFlags()).containsOnly(Flag.ANSWERED);
+		assertThat(emailView.getFlags()).containsOnly(Flag.ANSWERED);
 	}
 
 	@Test
@@ -137,10 +142,11 @@ public class EmailViewTest {
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getFlags()).isEmpty();
+		assertThat(emailView.getFlags()).isEmpty();
 	}
 
 	@Test(expected=UnsupportedOperationException.class)
@@ -149,7 +155,8 @@ public class EmailViewTest {
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
 		emailView.getFlags().add(Flag.ANSWERED);
@@ -164,12 +171,13 @@ public class EmailViewTest {
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
 		mutableFlagsList.add(Flag.DELETED);
 		
-		Assertions.assertThat(emailView.getFlags()).containsOnly(Flag.ANSWERED);
+		assertThat(emailView.getFlags()).containsOnly(Flag.ANSWERED);
 	}
 
 	@Test(expected=UnsupportedOperationException.class)
@@ -181,7 +189,8 @@ public class EmailViewTest {
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
 			.uid(155)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
 		emailView.getFlags().add(Flag.DELETED);
@@ -198,10 +207,11 @@ public class EmailViewTest {
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
+		assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
 	}
 	
 	@Test(expected=UnsupportedOperationException.class)
@@ -214,7 +224,8 @@ public class EmailViewTest {
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
 		emailView.getAttachments().add(anyEmailViewAttachment("id2"));
@@ -231,12 +242,13 @@ public class EmailViewTest {
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.attachments(attachments)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
 		attachments.add(anyEmailViewAttachment("id2"));
 		
-		Assertions.assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
+		assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
 	}
 	
 	@Test
@@ -249,10 +261,11 @@ public class EmailViewTest {
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.iCalendar(iCalendar)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getICalendar()).equals(iCalendar);
+		assertThat(emailView.getICalendar()).equals(iCalendar);
 	}
 	
 	@Test
@@ -265,10 +278,11 @@ public class EmailViewTest {
 			.flags(Lists.newArrayList(Flag.ANSWERED))
 			.uid(155)
 			.invitationType(invitationType)
-			.mimeType("text/plain")
+			.bodyType(MSEmailBodyType.PlainText)
+			.truncated(false)
 			.build();
 		
-		Assertions.assertThat(emailView.getInvitationType()).equals(invitationType);
+		assertThat(emailView.getInvitationType()).equals(invitationType);
 	}
 	
 	@Test(expected=EmailViewBuildException.class)
@@ -280,14 +294,29 @@ public class EmailViewTest {
 			.build();
 	}
 	
-	@Test (expected=IllegalStateException.class)
-	public void testMimeTypeIsNotAContentType() {
+	@Test(expected=EmailViewBuildException.class)
+	public void testTruncatedRequired() {
 		new EmailView.Builder()
-			.envelope(anyEnvelope())
-			.bodyMimePartData(anyBodyMimePartData())
-			.uid(155)
-			.mimeType("text")
-			.build();
+		.envelope(anyEnvelope())
+		.bodyMimePartData(anyBodyMimePartData())
+		.flags(Lists.newArrayList(Flag.ANSWERED))
+		.uid(155)
+		.bodyType(MSEmailBodyType.PlainText)
+		.build();
+	}
+	
+	@Test
+	public void testTruncated() {
+		EmailView emailView = new EmailView.Builder()
+		.envelope(anyEnvelope())
+		.bodyMimePartData(anyBodyMimePartData())
+		.flags(Lists.newArrayList(Flag.ANSWERED))
+		.uid(155)
+		.bodyType(MSEmailBodyType.PlainText)
+		.truncated(true)
+		.build();
+		
+		assertThat(emailView.isTruncated()).isTrue();
 	}
 	
 	private InputStream anyBodyMimePartData() {

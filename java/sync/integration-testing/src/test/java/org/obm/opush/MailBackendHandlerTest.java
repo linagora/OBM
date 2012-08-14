@@ -273,6 +273,6 @@ public class MailBackendHandlerTest {
 			.uid(1l)
 			.header(new MSEmailHeader.Builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8)).build();
+					new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false)).build();
 	}
 }

@@ -60,8 +60,9 @@ public class MSEmailTest {
 				.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("text".getBytes())), 
 					MSEmailBodyType.PlainText, 
-					null, 
-					Charsets.UTF_8))
+					0, 
+					Charsets.UTF_8,
+					false))
 				.build();
 	}
 	
@@ -80,8 +81,9 @@ public class MSEmailTest {
 				.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("text".getBytes())), 
 					MSEmailBodyType.PlainText, 
-					null, 
-					Charsets.UTF_8))
+					0, 
+					Charsets.UTF_8,
+					false))
 				.build();
 	}
 	
@@ -162,7 +164,7 @@ public class MSEmailTest {
 				.uid(1l)
 				.header(new MSEmailHeader.Builder().build())
 					.body(new MSEmailBody(new SerializableInputStream(
-							new ByteArrayInputStream(message.getBytes())), emailBodyType, null, Charsets.UTF_8));
+							new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false));
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {

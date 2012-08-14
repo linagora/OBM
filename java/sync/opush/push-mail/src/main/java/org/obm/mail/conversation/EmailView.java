@@ -55,12 +55,13 @@ public class EmailView {
 		private Collection<Flag> flags;
 		private Envelope envelope;
 		private InputStream bodyMimePartData;
-		private Integer bodyTruncation;
+		private int estimatedDataSize;
 		private List<EmailViewAttachment> attachments;
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
 		private MSEmailBodyType bodyType;
 		private String charset;
+		private Boolean truncated;
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();
@@ -82,8 +83,8 @@ public class EmailView {
 			return this;
 		}
 
-		public Builder bodyTruncation(Integer bodyTruncation) {
-			this.bodyTruncation = bodyTruncation;
+		public Builder estimatedDataSize(int estimatedDataSize) {
+			this.estimatedDataSize = estimatedDataSize;
 			return this;
 		}
 		
@@ -114,6 +115,11 @@ public class EmailView {
 			return this;
 		}
 
+		public Builder truncated(Boolean truncated) {
+			this.truncated = truncated;
+			return this;
+		}
+		
 		public EmailView build() {
 			if (uid == null) {
 				throw new EmailViewBuildException("The uid is required");
@@ -130,8 +136,12 @@ public class EmailView {
 			if (flags == null) {
 				this.flags = ImmutableSet.<Flag>of();
 			}
+			if (truncated == null) {
+				throw new EmailViewBuildException("The truncated field is required");
+			}
 			return new EmailView(uid, flags, envelope, bodyMimePartData, 
-					bodyTruncation, attachments, iCalendar, invitationType, bodyType, charset);
+					estimatedDataSize, attachments, iCalendar, invitationType, bodyType,
+					charset, truncated);
 		}
 	}
 	
@@ -139,27 +149,30 @@ public class EmailView {
 	private final Collection<Flag> flags;
 	private final Envelope envelope;
 	private final InputStream bodyMimePartData;
-	private final Integer bodyTruncation;
+	private final Integer estimatedDataSize;
 	private final List<EmailViewAttachment> attachments;
 	private final ICalendar iCalendar;
 	private final EmailViewInvitationType invitationType;
 	private final String charset;
 	private final MSEmailBodyType bodyType;
+	private final boolean truncated;
 
 	private EmailView(long uid, Collection<Flag> flags, Envelope envelope,
-			InputStream bodyMimePartData, Integer bodyTruncation, List<EmailViewAttachment> attachments, 
-			ICalendar iCalendar, EmailViewInvitationType invitationType, MSEmailBodyType bodyType, String charset) {
+			InputStream bodyMimePartData, int estimatedDataSize, List<EmailViewAttachment> attachments, 
+			ICalendar iCalendar, EmailViewInvitationType invitationType, MSEmailBodyType bodyType,
+			String charset, boolean truncated) {
 		
 		this.uid = uid;
 		this.flags = flags;
 		this.envelope = envelope;
 		this.bodyMimePartData = bodyMimePartData;
-		this.bodyTruncation = bodyTruncation;
+		this.estimatedDataSize = estimatedDataSize;
 		this.attachments = attachments;
 		this.iCalendar = iCalendar;
 		this.invitationType = invitationType;
 		this.bodyType = bodyType;
 		this.charset = charset;
+		this.truncated = truncated;
 	}
 
 	public long getUid() {
@@ -202,8 +215,8 @@ public class EmailView {
 		return bodyMimePartData;
 	}
 
-	public Integer getBodyTruncation() {
-		return bodyTruncation;
+	public int getEstimatedDataSize() {
+		return estimatedDataSize;
 	}
 	
 	public List<EmailViewAttachment> getAttachments() {
@@ -226,11 +239,16 @@ public class EmailView {
 		return bodyType;
 	}
 
+	public boolean isTruncated() {
+		return truncated;
+	}
+
 	
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(uid, flags, envelope, bodyMimePartData, 
-				bodyTruncation, attachments, iCalendar, invitationType, bodyType, charset);
+				estimatedDataSize, attachments, iCalendar, invitationType, bodyType, charset,
+				truncated);
 	}
 	
 	@Override
@@ -241,12 +259,13 @@ public class EmailView {
 				&& Objects.equal(this.flags, that.flags)
 				&& Objects.equal(this.envelope, that.envelope)
 				&& Objects.equal(this.bodyMimePartData, that.bodyMimePartData)
-				&& Objects.equal(this.bodyTruncation, that.bodyTruncation)
+				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize)
 				&& Objects.equal(this.attachments, that.attachments)
 				&& Objects.equal(this.iCalendar, that.iCalendar)
 				&& Objects.equal(this.invitationType, that.invitationType)
 				&& Objects.equal(this.bodyType, that.bodyType)
-				&& Objects.equal(this.charset, that.charset);
+				&& Objects.equal(this.charset, that.charset)
+				&& Objects.equal(this.truncated, that.truncated);
 		}
 		return false;
 	}
@@ -258,12 +277,13 @@ public class EmailView {
 			.add("flags", flags)
 			.add("envelope", envelope)
 			.add("bodyMimePartData", bodyMimePartData)
-			.add("bodyTruncation", bodyTruncation)
+			.add("bodyTruncation", estimatedDataSize)
 			.add("attachments", attachments)
 			.add("iCalendar", iCalendar)
 			.add("invitationType", invitationType)
 			.add("bodyType", bodyType)
 			.add("charset", charset)
+			.add("truncated", truncated)
 			.toString();
 	}
 

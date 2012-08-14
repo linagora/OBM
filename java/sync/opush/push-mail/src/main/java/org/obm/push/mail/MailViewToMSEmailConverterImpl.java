@@ -134,10 +134,11 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 
 	private MSEmailBody convertBody(EmailView emailView) {
 		SerializableInputStream mimeData = new SerializableInputStream(emailView.getBodyMimePartData());
-		Integer bodyTruncation = emailView.getBodyTruncation();
+		int estimatedDataSize = emailView.getEstimatedDataSize();
+		boolean truncated = emailView.isTruncated();
 		
 		return new MSEmailBody(mimeData, convertContentType(emailView), 
-				bodyTruncation, chooseSupportedCharset(emailView.getCharset()));
+				estimatedDataSize, chooseSupportedCharset(emailView.getCharset()), truncated);
 	}
 
 	private Charset chooseSupportedCharset(String charset) {

@@ -134,10 +134,11 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			long uid) throws MailException {
 		
 		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
-		
+		 
 		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
 		emailViewBuilder.bodyType(fetchInstructions.getBodyType());
-		emailViewBuilder.bodyTruncation(fetchInstructions.getTruncation());
+		emailViewBuilder.estimatedDataSize(fetchInstructions.getMimePart().getSize());
+		emailViewBuilder.truncated(fetchInstructions.mustTruncate());
 		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
 	}
 

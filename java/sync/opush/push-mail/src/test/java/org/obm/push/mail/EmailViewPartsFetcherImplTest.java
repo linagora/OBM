@@ -97,7 +97,7 @@ public class EmailViewPartsFetcherImplTest {
 		String subject = "a subject";
 		Date date = DateUtils.date("2004-12-14T22:00:00");
 
-		Integer bodyTruncation = 1000;
+		int estimatedDataSize = 1000;
 		MSEmailBodyType bodyType = MSEmailBodyType.PlainText;
 		String bodyPrimaryType = "text";
 		String bodySubType = "plain";
@@ -110,6 +110,7 @@ public class EmailViewPartsFetcherImplTest {
 		boolean isInvitation = false;
 		boolean isICSAttachment = false;
 		String encoding = null;
+		Boolean truncated = false;
 	}
 	
 	private MessageFixture messageFixture;
@@ -348,20 +349,20 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testBodyTruncationNull() throws Exception {
-		messageFixture.bodyTruncation = null;
+		messageFixture.estimatedDataSize = 0;
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 		
-		assertThat(emailView.getBodyTruncation()).isNull();
+		assertThat(emailView.getEstimatedDataSize()).equals(0);
 	}
 	
 	@Test
 	public void testBodyTruncation() throws Exception {
-		messageFixture.bodyTruncation = 1505;
+		messageFixture.estimatedDataSize = 1505;
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 		
-		assertThat(emailView.getBodyTruncation()).isEqualTo(1505);
+		assertThat(emailView.getEstimatedDataSize()).isEqualTo(1505);
 	}
 	
 	@Test
@@ -419,7 +420,7 @@ public class EmailViewPartsFetcherImplTest {
 		
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
-		assertThat(emailView.getContentType().getFullMimeType()).equals(mimeType);
+		assertThat(emailView.getBodyType()).equals(mimeType);
 	}
 
 	@Test
@@ -562,7 +563,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
 		expect(mimePart.getFullMimeType()).andReturn(messageFixture.fullMimeType).anyTimes();
 		expect(mimePart.getContentTransfertEncoding()).andReturn(messageFixture.encoding).anyTimes();
-		expect(mimePart.getSize()).andReturn(20);
+		expect(mimePart.getSize()).andReturn(messageFixture.estimatedDataSize).anyTimes();
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId);
@@ -590,8 +591,8 @@ public class EmailViewPartsFetcherImplTest {
 	private ArrayList<BodyPreference> bodyPreferences() {
 		BodyPreference.Builder builder = new BodyPreference.Builder()
 			.bodyType(messageFixture.bodyType);
-		if (messageFixture.bodyTruncation != null) {
-			builder.truncationSize(messageFixture.bodyTruncation);
+		if (messageFixture.estimatedDataSize != 0) {
+			builder.truncationSize(messageFixture.estimatedDataSize);
 		}
 		return Lists.newArrayList(builder.build());
 	}

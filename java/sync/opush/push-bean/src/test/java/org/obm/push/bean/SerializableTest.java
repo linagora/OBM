@@ -44,24 +44,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.MSAddress;
-import org.obm.push.bean.MSAttachement;
-import org.obm.push.bean.MSAttendee;
-import org.obm.push.bean.MSContact;
-import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.MSEmailBody;
-import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.MSTask;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.MSRecurrence;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncCollectionChange;
-import org.obm.push.bean.SyncCollectionOptions;
-import org.obm.push.bean.SyncState;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
@@ -74,8 +57,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.SerializableTester;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class SerializableTest {
@@ -119,7 +100,7 @@ public class SerializableTest {
 			.uid(1l)
 			.header(new MSEmailHeader.Builder().build())
 			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, null, Charsets.UTF_8))
+					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, 0, Charsets.UTF_8, false))
 			.meetingRequest(
 					new MSMeetingRequest.MsMeetingRequestBuilder()
 						.startTime(date("2012-02-03T11:22:33"))

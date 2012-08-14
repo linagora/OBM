@@ -31,8 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.easymock.EasyMock.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +50,6 @@ import org.junit.Test;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
@@ -62,6 +64,7 @@ import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.UserEmailParserUtils;
 
@@ -85,8 +88,8 @@ public class MailViewToMSEmailConverterImplTest {
 		Date date = DateUtils.date("2004-12-14T22:00:00");
 
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
-		Integer bodyTruncationSize = null;
-		ContentType bodyContentType = new ContentType.Builder().contentType("text/plain").build();
+		int estimatedDataSize = 0;
+		MSEmailBodyType bodyType = MSEmailBodyType.PlainText;
 		List<EmailViewAttachment> attachments = ImmutableList.of(new EmailViewAttachment("id", subject, "file", 20));
 		InputStream attachmentInputStream = resourceAsStream("ics/attendee.ics");
 		ICalendar iCalendar = null;
@@ -95,6 +98,7 @@ public class MailViewToMSEmailConverterImplTest {
 		private InputStream resourceAsStream(String file) {
 			return ClassLoader.getSystemClassLoader().getResourceAsStream(file);
 		}
+		Boolean truncated = false;
 	}
 
 	private EmailViewFixture emailViewFixture;
@@ -360,30 +364,30 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 	
 	@Test
-	public void testBodyNoTruncation() throws IOException, ParserException, DaoException {
-		emailViewFixture.bodyTruncationSize = null;
+	public void testNullEstimatedDataSize() throws IOException, ParserException, DaoException {
+		emailViewFixture.estimatedDataSize = 0;
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getBody().getTruncationSize()).isNull();
+		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).equals(0);
 	}
 	
 	@Test
-	public void testBodyTruncationValue() throws IOException, ParserException, DaoException {
-		emailViewFixture.bodyTruncationSize = 1512;
+	public void testEstimatedDataSize() throws IOException, ParserException, DaoException {
+		emailViewFixture.estimatedDataSize = 1024;
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getBody().getTruncationSize()).isEqualTo(1512);
+		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).equals(1024);
 	}
 	
 	@Test
 	public void testBodyContentTypePlainText() throws IOException, ParserException, DaoException {
-		emailViewFixture.bodyContentType = new ContentType.Builder().contentType("text/plain").build();
+		emailViewFixture.bodyType = MSEmailBodyType.HTML;
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getBody().getBodyType()).isEqualTo(MSEmailBodyType.PlainText);
+		assertThat(convertedMSEmail.getBody().getBodyType()).isEqualTo(MSEmailBodyType.HTML);
 	}
 
 	@Test
@@ -467,6 +471,31 @@ public class MailViewToMSEmailConverterImplTest {
 		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.SCHEDULE_MEETING_REQUEST);
 	}
 	
+	@Test(expected=EmailViewBuildException.class)
+	public void testExpectEmailViewExceptionTruncated() throws IOException, ParserException, DaoException {
+		emailViewFixture.truncated = null;
+		
+		makeConversionFromEmailViewFixture();
+	}
+	
+	@Test
+	public void testNotTruncated() throws IOException, ParserException, DaoException {
+		emailViewFixture.truncated = false;
+		
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+		
+		assertThat(convertedMSEmail.getBody().isTruncated()).isFalse();
+	}
+	
+	@Test
+	public void testTruncated() throws IOException, ParserException, DaoException {
+		emailViewFixture.truncated = true;
+		
+		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+		
+		assertThat(convertedMSEmail.getBody().isTruncated()).isTrue();
+	}
+	
 	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException, DaoException {
 		EventService eventService = createMock(EventService.class);
 		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
@@ -490,11 +519,12 @@ public class MailViewToMSEmailConverterImplTest {
 			.flags(flagsListFromFixture())
 			.envelope(envelopeFromFixture())
 			.bodyMimePartData(emailViewFixture.bodyData)
-			.bodyTruncation(emailViewFixture.bodyTruncationSize)
+			.estimatedDataSize(emailViewFixture.estimatedDataSize)
 			.attachments(emailViewFixture.attachments)
 			.iCalendar(emailViewFixture.iCalendar)
 			.invitationType(emailViewFixture.invitationType)
-			.mimeType(emailViewFixture.bodyContentType.getFullMimeType())
+			.bodyType(emailViewFixture.bodyType)
+			.truncated(emailViewFixture.truncated)
 			.build();
 	}
 

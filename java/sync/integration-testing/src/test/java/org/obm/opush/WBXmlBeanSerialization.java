@@ -81,8 +81,9 @@ public class WBXmlBeanSerialization {
 			.body(new MSEmailBody(new SerializableInputStream(
 				new ByteArrayInputStream("text".getBytes())), 
 				MSEmailBodyType.PlainText, 
-				null, 
-				Charsets.UTF_8))
+				0, 
+				Charsets.UTF_8,
+				false))
 			.build();
 	}
 	

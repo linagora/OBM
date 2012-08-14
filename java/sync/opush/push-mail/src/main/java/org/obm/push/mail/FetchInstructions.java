@@ -97,4 +97,11 @@ public class FetchInstructions {
 		}
 		return false;
 	}
+	
+	public boolean mustTruncate() {
+		if (truncation != null) {
+			return mimePart.getSize() > truncation;			
+		}
+		return false;
+	}
 }
