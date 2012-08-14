@@ -67,6 +67,11 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+
+	private static final String USEROBM_ALL_JOBS = "userobm_company, userobm_service, userobm_direction, userobm_title, userobm_description";
+	private static final String USEROBM_ALL_PHONES = "userobm_phone, userobm_phone2, userobm_mobile, userobm_fax, userobm_fax2";
+	private static final String USEROBM_ALL_ADDRESSES = "userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, "
+			+ "userobm_town, userobm_expresspostal";
 	
 	private static final Map<ContactLabel, String> contactLabelForUserObmField = 
 			ImmutableMap.<ContactLabel, String>builder()
@@ -96,9 +101,7 @@ public class UserDao {
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
 				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name, "
-				+ "userobm_phone, userobm_phone2, userobm_mobile, userobm_fax, userobm_fax2, "
-				+ "userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, "
-				+ "userobm_town, userobm_expresspostal " 
+				+ Joiner.on(", ").join(USEROBM_ALL_JOBS, USEROBM_ALL_PHONES, USEROBM_ALL_ADDRESSES) + " "
 				+ "from UserObm "
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
@@ -279,8 +282,10 @@ public class UserDao {
 	}
 
 	public Contact findUserObmContact(AccessToken token, Integer userId) throws SQLException, ContactNotFoundException {
+		
 		String sql = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name "
+				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name, "
+				+ Joiner.on(", ").join(USEROBM_ALL_JOBS, USEROBM_ALL_PHONES, USEROBM_ALL_ADDRESSES) + " "
 				+ "from UserObm "
 				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
 				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
