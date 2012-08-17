@@ -2238,7 +2238,6 @@ function run_query_calendar_quick_event_update($calendar) {
   if ($all_day == 'TRUE' && $event_duration == 3600) {
       $event_duration = 86400;
   }
-  $event_id = sql_parse_id($calendar['calendar_id'], true);
   $all = $calendar['all'];
   if ($all != 1) {
     $event_date = "event_date = '$datebegin',";
@@ -2247,7 +2246,7 @@ function run_query_calendar_quick_event_update($calendar) {
   $obm_q = new DB_OBM;
   $escape_title = ($oldEvent->privacy == 1) ? $obm_q->escape($oldEvent->title) : $obm_q->escape($title);
   $query = "UPDATE Event SET
-    event_timeupdate = NOW(),
+      event_timeupdate = NOW(),
       event_userupdate = $obm[uid],
       event_title = '".$escape_title."',
       $event_date
@@ -2255,7 +2254,7 @@ function run_query_calendar_quick_event_update($calendar) {
       event_duration = '$event_duration',
       event_allday = $all_day
       WHERE
-      event_id $event_id $multidomain";
+      event_id ".sql_parse_id($calendar['calendar_id'], true)." $multidomain";
 	display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_event_update()');
 	$obm_q->query($query);
 
@@ -2272,7 +2271,7 @@ function run_query_calendar_quick_event_update($calendar) {
 	// OBMFULL-3499
 	// This is done here so that participation status is up-to-date BEFORE the email is sent
 	// This allows the attached ICS to contain the correct PARTSTAT for the attendees
-	run_query_quick_attendee_update($calendar, $event_id);
+	run_query_quick_attendee_update($calendar, $calendar['calendar_id']);
 	
   // Send mail session var
   $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
@@ -2498,7 +2497,6 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
 
 function run_query_calendar_reset_occurrence_links($users, $contacts, $resources, $id) {
 	global $obm;
-
 	if (is_array($users)) {
 		$users = array_unique($users);
 		foreach ($users as $user_id) {
@@ -2841,7 +2839,6 @@ function run_query_reinitialize_recurrent_event($event_id) {
  */
 function run_query_quick_attendee_update($params, $event_id) {
   global $obm, $cgp_host;
-
   $entities = get_calendar_event_entity($event_id);
   $users = isset($entities['user']) ? $entities['user']['ids'] : array();
   $contacts = isset($entities['contact']) ? $entities['contact']['ids'] : array();
