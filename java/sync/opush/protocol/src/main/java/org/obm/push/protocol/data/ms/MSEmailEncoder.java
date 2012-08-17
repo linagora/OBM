@@ -123,10 +123,10 @@ public class MSEmailEncoder {
 
 		Element bodyElement = DOMUtils.createElement(parent, ASAirs.BODY.asASValue());
 		
-		DOMUtils.createElementAndCDataText(bodyElement, ASAirs.DATA.asASValue(), mimeData, body.getCharset());
 		DOMUtils.createElementAndText(bodyElement, ASAirs.TYPE.asASValue(), bodyType.asXmlValue());
 		DOMUtils.createElementAndText(bodyElement, ASAirs.TRUNCATED.asASValue(), body.isTruncated());
 		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAirs.ESTIMATED_DATA_SIZE.asASValue(), estimatedDataSize);
+		DOMUtils.createElementAndCDataText(bodyElement, ASAirs.DATA.asASValue(), mimeData, body.getCharset());
 	}
 
 	private void serializeAttachments(Element parent, Set<MSAttachement> attachments) {
