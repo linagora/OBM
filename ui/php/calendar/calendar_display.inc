@@ -4455,6 +4455,34 @@ function dis_event_decision_popup() {
 	return $block;
 }
 
+function dis_event_commented_decision_popup() {
+  $block = "
+  <div id=\"commentedDecisionPopup\" class=\"obmPopup\">
+    <h1>
+      <a href='' id='popup_form_close' class='closeSticky' onclick=''obm.commentedDecisionPopup.hide();return false;'>
+      <img src='$GLOBALS[ico_popup_close]' alt='close' />
+      </a>
+      <span>$GLOBALS[l_change_state]</span>
+    </h1>
+    <div class=\"decisionOptions\">
+      <form>
+        <p><img src='$GLOBALS[ico_comment]' alt='comment:' /> $GLOBALS[l_comment_decision]
+        <textarea id=\"comment\" placeholder=\"\" maxlength=\"255\"
+          onKeyPress=\"obm.commentedDecisionPopup.displayCharLimit();\" onKeyUp=\"obm.commentedDecisionPopup.displayCharLimit();\" onKeyDown=\"obm.commentedDecisionPopup.displayCharLimit();\"></textarea>
+        <span style=\"text-align:left;font-size:80%;\"><span id=\"charCountForDecision\" style=\"font-weight:bold;font-size:80%;\">255</span>&nbsp;$GLOBALS[l_remainingChar]</span>
+        </p>
+        <fieldset class=\"buttons\" style=\"margin-right: 30%;\">
+        <input type=\"submit\" href='' onclick=\"obm.commentedDecisionPopup.Accept(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_accept]\"/>
+        <input type=\"submit\" href='' onclick=\"obm.commentedDecisionPopup.Refuse(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_refuse]\"/>
+        </fieldset>
+      </form>
+      <h2><a href='' id='popup_form_close' class='closeSticky' onclick=''obm.commentedDecisionPopup.hide();return false;'>$GLOBALS[l_cancel]</a></h2>
+    </div>
+  </div>
+  <script type=\"text/javascript\"> obm.commentedDecisionPopup = new Obm.CommentedDecisionPopup();</script>
+  ";
+  return $block;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
@@ -5558,7 +5586,7 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_dateend,$l_change_state,$l_validate,$l_user, $l_resource, $l_owner;
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
   global $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
-  global $l_decision_ACCEPTED, $l_decision_NEEDS_ACTIONS, $l_decision_DECLINED;
+  global $l_decision_ACCEPTED, $l_decision_NEEDS_ACTIONS, $l_decision_DECLINED, $l_comment;
   
    
   $owner_notification = "checked";
@@ -5585,7 +5613,7 @@ function html_calendar_waiting_events($obm_wait) {
       }
       $block .= "
       <h1>$type : $current_label</h1>
-      ".dis_event_decision_popup()."
+      ".dis_event_commented_decision_popup()."
       <script type=\"text/javascript\"> 
       obm.vars.consts.calendarUrl = '".$GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME'])."';
       </script>
@@ -5600,6 +5628,7 @@ function html_calendar_waiting_events($obm_wait) {
         <th>$l_owner</th>
         <th>$l_datebegin</th>
         <th>$l_dateend</th>
+        <th>$l_comment</th>
         <th></th>
       </tr>
       </thead>
@@ -5650,10 +5679,23 @@ function html_calendar_waiting_events($obm_wait) {
      <td>".$begin->getOutputDateTime()."</td>
      <td>".$end->getOutputDateTime()."</td>
      <td>
-      <form>
-        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_ACCEPTED', 'waiting_events')\" /> $l_accept</span><br/>
-        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" checked=\"checked\" disabled=\"disabled\"/> $l_wait</span><br/>
-        <span class=\"NW\"><input type=\"radio\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.calendarDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'DECLINED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_DECLINED', 'waiting_events')\" /> $l_refuse</span>
+      <a  class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_ACCEPTED', 'waiting_events')\" />
+     </td>
+     <td>
+      <form method=\"post\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
+        <input type=\"hidden\" name=\"action\" value=\"decision\" />
+        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
+        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
+        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
+        <input type=\"hidden\" name=\"owner_notification\" value=\"true\" />
+        <input type=\"hidden\" name=\"date_begin\" value=\"$date_begin\" />
+        <input type=\"hidden\" name=\"date_end\" value=\"$date_end\" />
+        <input type=\"hidden\" name=\"time_end\" value=\"$time_end\" />
+        <input type=\"hidden\" name=\"min_end\" value=\"$min_end\" />
+        <input type=\"hidden\" name=\"uriAction\" value=\"waiting_events\" />
+        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"ACCEPTED\"  onclick=\"submitWaiting(this.form)\" />$l_accept</span>
+        <br />
+        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"DECLINED\" onclick=\"submitWaiting(this.form)\" />$l_refuse</span>
       </form>
      </td>
     </tr>";

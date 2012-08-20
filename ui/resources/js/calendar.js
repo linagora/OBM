@@ -2229,6 +2229,66 @@ Obm.CalendarDecisionPopup = new Class({
 		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
 	}
 });
+///////////// Waiting event Commented Decision Popup //////////////////////
+Obm.CommentedDecisionPopup = new Class({
+  initialize: function() {
+    this.textarea = $('commentedDecisionPopup').getElements('textarea');
+    this.charCountForDecision = $('commentedDecisionPopup').getElementById('charCountForDecision');
+    this.maxLength = 255;
+  },
+  compute: function(uid, evtid, decision, oldDecision, type, comment, title) {
+    this.uid = uid;
+    this.evtid = evtid;
+    this.decision = decision;
+    this.oldDecision = oldDecision;
+    this.type = type;
+    this.comment = comment;
+    this.textarea.setProperty('placeholder', this.comment);
+    this.show();
+  },
+  show: function() {
+    obm.popup.show('commentedDecisionPopup');
+  },
+  hide: function() {
+    this.decision = this.oldDecision = this.comment = '';
+    obm.popup.hide('commentedDecisionPopup');
+  },
+  Accept: function(){
+    this.comment = this.textarea[0].value;
+    var self = this;
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onSuccess : function(message){
+        if(message.error == 0){
+          showMessage('ok', message.message);
+            window.location='../calendar/calendar_index.php?action=waiting_events';
+        }else{
+            window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
+        }
+      }
+    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'ACCEPTED', entity_kind : this.type});
+  },
+  Refuse: function(){
+    this.comment = this.textarea[0].value;
+    var self = this;
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onSuccess : function(message){
+        if(message.error == 0){
+          showMessage('ok', message.message);
+            window.location='../calendar/calendar_index.php?action=waiting_events';
+        }else{
+            window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
+        }
+      }
+    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'DECLINED', entity_kind : this.type});
+  },
+  displayCharLimit: function(){
+    this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
+  }
+});
 Obm.calendarOccurenceEditPopup = new Class({
   compute: function (evt, location) {
     this.event = evt;
