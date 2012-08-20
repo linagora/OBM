@@ -384,7 +384,7 @@ install -p -m 644 doc/conf/apache-virtualhost_obm.conf.sample $RPM_BUILD_ROOT%{_
 
 # obm-services
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-services/updates
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}-services/updates
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}-services
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 #chmod g+s $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
@@ -396,7 +396,7 @@ cp -apR auto/updateSieve.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/changePasswd.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/ldapContacts.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR scripts/2.3/update-2.2-2.3.ldap.pl $RPM_BUILD_ROOT%{_datadir}/%{name}-services/updates
-install -p -m 640 doc/conf/logrotate.obm-services.sample $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}-services
+install -p -m 640 doc/conf/logrotate.%{name}-services.sample $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}-services
 install -p -m 0644 %{SOURCE14} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name}-services
 
 # obm-ldap
@@ -523,10 +523,10 @@ if [ "$1" = "2" ]; then
 fi
 
 %files		-n %{name}-services
-%config %{_sysconfdir}/cron.d/obm-services
+%config %{_sysconfdir}/cron.d/%{name}-services
 %{_datadir}/%{name}/auto
-%{_datadir}/obm-services/updates
-%config(noreplace) %{_sysconfdir}/logrotate.d/obm-services
+%{_datadir}/%{name}-services/updates
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}-services
 %attr(750, apache, apache) %{_localstatedir}/log/%{name}-services
 
 
