@@ -506,20 +506,20 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testToModifyEventWithoutWriteRightOnCalendar() throws FindException, EventNotFoundException, ServerFault {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-		String calendarOwner = "otheruser@domain.org";
+		String calendar = defaultObmUser.getEmail();
 		Event event = new Event();
-		event.setOwner(calendarOwner);
+		event.setOwner("user");
 
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 
 		final UserService userService = createMock(UserService.class);
-		expect(userService.getUserFromCalendar(defaultObmUser.getEmail(), defaultObmUser.getDomain().getName())).andReturn(defaultObmUser)
+		expect(userService.getUserFromCalendar(calendar, defaultObmUser.getDomain().getName())).andReturn(defaultObmUser)
 						.once();
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 
 		HelperService rightsHelper = createMock(HelperService.class);
-		expect(rightsHelper.canWriteOnCalendar(accessToken, calendarOwner))
+		expect(rightsHelper.canWriteOnCalendar(accessToken, calendar))
 				.andReturn(false).once();
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
@@ -527,7 +527,7 @@ public class CalendarBindingImplTest {
 
 		EasyMock.replay(accessToken, userService, calendarDao, rightsHelper);
 
-		Event modifiedEvent = calendarService.modifyEvent(accessToken, defaultObmUser.getEmail(), event, false, false);
+		Event modifiedEvent = calendarService.modifyEvent(accessToken, calendar, event, false, false);
 		Assertions.assertThat(modifiedEvent).isEqualTo(event);
 	}
 
@@ -558,7 +558,6 @@ public class CalendarBindingImplTest {
 		event.addAttendee(attendee);
 		event.setLocation("aLocation");
 		event.setSequence(1);
-		event.setOwner(calendar);
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = mockRightsHelper(calendar, accessToken);
@@ -612,7 +611,6 @@ public class CalendarBindingImplTest {
 		event.addAttendee(attendee);
 		event.setLocation("aLocation");
 		event.setSequence(1);
-		event.setOwner(calendar);
 
 		AccessToken accessToken = ToolBox.mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = mockRightsHelper(calendar, accessToken);
@@ -685,7 +683,6 @@ public class CalendarBindingImplTest {
 		event.setExtId(extId);
 		event.addAttendee(attendee);
 		event.setSequence(1);
-		event.setOwner(calendar);
 		Event exception = new Event();
 		exception.setType(EventType.VEVENT);
 		exception.setTitle("firstTitle");
@@ -790,7 +787,6 @@ public class CalendarBindingImplTest {
 		event.setExtId(extId);
 		event.addAttendee(attendee);
 		event.setSequence(1);
-		event.setOwner(calendar);
 		Event exception = new Event();
 		exception.setType(EventType.VEVENT);
 		exception.setTitle("firstTitle");
@@ -891,7 +887,6 @@ public class CalendarBindingImplTest {
 		
 		Event event = beforeEvent.clone();
 		event.setSequence(1);
-		event.setOwner(calendar);
 		event.getRecurrence().getEventExceptions().get(0).setLocation("aLocation");
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
@@ -1493,7 +1488,6 @@ public class CalendarBindingImplTest {
 		Date exceptionDate = new DateTime(eventDate).plusMonths(1).toDate();
 		currentEvent.addException(exceptionDate);
 		currentEvent.setInternalEvent(true);
-		currentEvent.setOwner(user.getEmail());
 
 		UserService userService = createMock(UserService.class);
 		EasyMock.expect(userService.getUserFromCalendar(user.getEmail(), "test.tlse.lng"))
