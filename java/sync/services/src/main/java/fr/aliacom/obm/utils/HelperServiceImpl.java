@@ -37,12 +37,15 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -182,6 +185,15 @@ public class HelperServiceImpl implements HelperService {
 				return attendee.getEmail().equalsIgnoreCase(email);
 			}
 		});
+	}
+
+	@Override
+	public boolean eventBelongsToCalendar(Event event, String calendar) {
+		Preconditions.checkNotNull(event);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(event.getOwnerEmail()));
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendar));
+		
+		return calendar.equalsIgnoreCase(event.getOwnerEmail());
 	}
 	
 }

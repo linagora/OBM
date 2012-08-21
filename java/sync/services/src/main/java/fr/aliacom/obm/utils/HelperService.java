@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.Event;
 
 public interface HelperService {
 
@@ -43,5 +44,6 @@ public interface HelperService {
 	String constructEmailFromList(String listofmail, String domain);
 	boolean attendeesContainsUser(List<Attendee> attendees, AccessToken token);
 	String getMD5Diggest(String plaintext);
+	boolean eventBelongsToCalendar(Event event, String calendar);
 
 }

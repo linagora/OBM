@@ -355,20 +355,18 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 			
-			if (!helperService.canWriteOnCalendar(token, calendar)) {
-				logger.info(LogUtils.prefix(token) + "Calendar : "
-						+ token.getUserLogin() + " cannot modify event["
-						+ before.getTitle() + "] because no write right on calendar "
-						+ calendar + ". ParticipationState will be updated.");
-				return before;
-				
-			} else {
-				
+			if (eventCanBeModified(token, calendar, before)) {
 				if (before.isInternalEvent()) {
 					return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 				} else {
 					return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
 				}
+			} else {
+				logger.info(LogUtils.prefix(token) + "Calendar : "
+						+ token.getUserLogin() + " cannot modify event["
+						+ before.getTitle() + "] because no write right on calendar "
+						+ calendar + ". ParticipationState will be updated.");
+				return before;
 			}
 
 		} catch (Throwable e) {
@@ -376,6 +374,11 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e);
 		}
 
+	}
+
+	@VisibleForTesting boolean eventCanBeModified(AccessToken token, String calendar, Event event) {
+		return helperService.canWriteOnCalendar(token, calendar)
+			&& helperService.eventBelongsToCalendar(event, calendar);
 	}
 
 	@VisibleForTesting

@@ -34,11 +34,13 @@ package fr.aliacom.obm.utils;
 import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Event;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserService;
@@ -102,6 +104,57 @@ public class HelperServiceImplTest {
 		verify(userService);
 		
 		assertThat(isNotSameDomain).isFalse();
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testEventBelongsToCalendarWhenNoCalendar() {
+		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(new Event(), null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testEventBelongsToCalendarWhenEmptyCalendar() {
+		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(new Event(), "");
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testEventBelongsToCalendarWhenNoEvent() {
+		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(null, "user@domain.org");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testEventBelongsToCalendarWhenNoOwnerEmail() {
+		Event event = new Event();
+		event.setOwnerEmail(null);
+		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(event, "user@domain.org");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testEventBelongsToCalendarWhenEmptyOwnerEmail() {
+		Event event = new Event();
+		event.setOwnerEmail("");
+		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(event, "user@domain.org");
+	}
+
+	@Test
+	public void testEventBelongsToCalendarWhenOwnerEmailIsDifferentFromCalendar() {
+		Event event = new Event();
+		event.setOwnerEmail("aguy@domain.org");
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null, null);
+		boolean eventBelongsToCalendar = helperServiceImpl.eventBelongsToCalendar(event, "user@domain.org");
+
+		Assertions.assertThat(eventBelongsToCalendar).isFalse();
+	}
+
+	@Test
+	public void testEventBelongsToCalendarWhenOwnerEmailIsEqualsOfCalendar() {
+		Event event = new Event();
+		event.setOwnerEmail("user@domain.org");
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null, null);
+		boolean eventBelongsToCalendar = helperServiceImpl.eventBelongsToCalendar(event, "user@domain.org");
+
+		Assertions.assertThat(eventBelongsToCalendar).isTrue();
 	}
 
 	private ObmDomain domainWithName(String domainName) {
