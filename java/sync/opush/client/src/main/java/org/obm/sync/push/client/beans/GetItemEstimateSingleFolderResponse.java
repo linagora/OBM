@@ -29,7 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
+
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.IEasReponse;
+import org.w3c.dom.Element;
 
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncKey;
@@ -39,6 +43,16 @@ import com.google.common.base.Objects;
 
 public final class GetItemEstimateSingleFolderResponse implements IEasReponse {
 
+	public static class XmlParser {
+		public GetItemEstimateSingleFolderResponse parse(Element root) {
+			Integer colId = DOMUtils.getElementInteger(DOMUtils.getUniqueElement(root, "CollectionId"));
+			Integer estimate = DOMUtils.getElementInteger(DOMUtils.getUniqueElement(root, "Estimate"));
+			Integer statusInteger = DOMUtils.getElementInteger(DOMUtils.getUniqueElement(root, "Status"));
+			GetItemEstimateStatus status = GetItemEstimateStatus.fromSpecificationValue(statusInteger);
+			return new GetItemEstimateSingleFolderResponse(colId, estimate, status);
+		}
+	}
+	
 	private final Integer collectionId;
 	private final Integer estimate;
 	private final GetItemEstimateStatus status;

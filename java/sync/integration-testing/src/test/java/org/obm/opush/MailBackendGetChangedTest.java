@@ -79,12 +79,12 @@ import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.Change;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.beans.Add;
+import org.obm.sync.push.client.beans.Collection;
+import org.obm.sync.push.client.beans.Delete;
+import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -407,7 +407,7 @@ public class MailBackendGetChangedTest {
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.ONE_DAY_BACK, 100);
 		mocksControl.verify();
 		
-		org.obm.sync.push.client.Collection inboxCollectionResponse = syncResponse.getCollection(inboxCollectionIdAsString);
+		Collection inboxCollectionResponse = syncResponse.getCollection(inboxCollectionIdAsString);
 		assertThat(inboxCollectionResponse.getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
 	

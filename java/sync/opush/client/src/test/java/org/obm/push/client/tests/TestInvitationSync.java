@@ -38,10 +38,10 @@ import java.io.InputStream;
 
 import org.junit.Ignore;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.FolderType;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.beans.FolderSyncResponse;
+import org.obm.sync.push.client.beans.FolderType;
+import org.obm.sync.push.client.beans.SyncResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

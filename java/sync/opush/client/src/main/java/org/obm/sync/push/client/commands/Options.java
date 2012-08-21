@@ -35,9 +35,9 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.AccountInfos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

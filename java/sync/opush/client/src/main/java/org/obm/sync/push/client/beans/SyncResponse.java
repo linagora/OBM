@@ -29,17 +29,66 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.Change;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.google.common.base.Objects;
 
 public final class SyncResponse {
 
+	public static class XmlParser {
+		
+		public SyncResponse parse(Element root) {
+			Map<String, Collection> ret = new HashMap<String, Collection>();
+
+			String status = DOMUtils.getElementText(root, "Status");
+			NodeList nl = root.getElementsByTagName("Collection");
+			for (int i = 0; i < nl.getLength(); i++) {
+				Element e = (Element) nl.item(i);
+				Collection col = new Collection();
+				col.setSyncKey(new SyncKey(DOMUtils.getElementText(e, "SyncKey")));
+				col.setCollectionId(DOMUtils.getElementText(e, "CollectionId"));
+				col.setStatus(DOMUtils.getElementText(e, "Status"));
+				NodeList ap = e.getElementsByTagName("Add");
+				for (int j = 0; j < ap.getLength(); j++) {
+					Element appData = (Element) ap.item(j);
+					String serverId = DOMUtils.getElementText(appData, "ServerId");
+					Add add = new Add();
+					add.setServerId(serverId);
+					col.addAdd(add);
+				}
+				NodeList changes = e.getElementsByTagName("Change");
+				for (int j = 0; j < changes.getLength(); j++) {
+					Element appData = (Element) changes.item(j);
+					String serverId = DOMUtils.getElementText(appData, "ServerId");
+					Change change = new Change();
+					change.setServerId(serverId);
+					col.addChange(change);
+				}
+				NodeList deleteNodes = e.getElementsByTagName("Delete");
+				for (int j = 0; j < deleteNodes.getLength(); j++) {
+					Element appData = (Element) deleteNodes.item(j);
+					String serverId = DOMUtils.getElementText(appData, "ServerId");
+					Delete delete = new Delete(serverId);
+					col.addDelete(delete);
+				}
+				ret.put(col.getCollectionId(), col);
+			}
+
+			return new SyncResponse(ret, SyncStatus.fromSpecificationValue(status));
+		}
+		
+	}
+	
 	private Map<String, Collection> cl;
 	private SyncStatus syncStatus;
 

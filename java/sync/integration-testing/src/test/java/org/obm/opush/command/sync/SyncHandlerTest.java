@@ -93,14 +93,14 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.beans.Add;
+import org.obm.sync.push.client.beans.Collection;
+import org.obm.sync.push.client.beans.Delete;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.beans.FolderSyncResponse;
+import org.obm.sync.push.client.beans.FolderType;
+import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -491,7 +491,7 @@ public class SyncHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId, FilterType.THREE_DAYS_BACK, 25);
 
-		org.obm.sync.push.client.Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
+		Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
 		Assertions.assertThat(unexistingCollection.getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
 }

@@ -36,7 +36,7 @@ import java.io.IOException;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
+import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;

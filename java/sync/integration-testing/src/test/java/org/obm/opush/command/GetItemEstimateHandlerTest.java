@@ -61,8 +61,8 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.state.StateMachine;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -122,8 +122,8 @@ public class GetItemEstimateHandlerTest {
 				opClient.getItemEstimateOnMailFolder(syncKey, unexistingCollectionId);
 
 		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
-		Assertions.assertThat(response.getCollectionId()).isEqualTo(0);
-		Assertions.assertThat(response.getEstimate()).isEqualTo(0);
+		Assertions.assertThat(response.getCollectionId()).isNull();
+		Assertions.assertThat(response.getEstimate()).isNull();
 	}
 
 	@Test
@@ -141,7 +141,7 @@ public class GetItemEstimateHandlerTest {
 
 		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
 		Assertions.assertThat(response.getCollectionId()).isEqualTo(collectionId);
-		Assertions.assertThat(response.getEstimate()).isEqualTo(0);
+		Assertions.assertThat(response.getEstimate()).isNull();
 	}
 
 	private void mockAccessAndStateThenStart(Set<Integer> existingCollections, SyncKey syncKey, ItemSyncState syncState)

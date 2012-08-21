@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
 public enum FolderStatus {
 

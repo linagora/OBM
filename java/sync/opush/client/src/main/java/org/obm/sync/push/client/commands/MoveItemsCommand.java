@@ -31,20 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.MoveItemsResponse.MoveResult;
-import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.NS;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-public class MoveItemsCommand extends TemplateBasedCommand<MoveItemsResponse> {
+public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
 
 	public static class Move {
 		
@@ -59,23 +62,20 @@ public class MoveItemsCommand extends TemplateBasedCommand<MoveItemsResponse> {
 		}
 	}
 	
-	private final Move[] moves;
-	
-	public MoveItemsCommand(Move...moves) {
-		super(NS.Move, "MoveItems", "MoveItemsRequest.xml");
-		this.moves = moves;
-	}
-	
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element documentElement = tpl.getDocumentElement();
-		
-		for (Move move : moves) {
-			Element fetchElement = DOMUtils.createElement(documentElement, "Move");
-			DOMUtils.createElementAndText(fetchElement, "SrcMsgId", move.serverId);
-			DOMUtils.createElementAndText(fetchElement, "SrcFldId", String.valueOf(move.sourceCollectionId));
-			DOMUtils.createElementAndText(fetchElement, "DstFldId", String.valueOf(move.destCollectionId));
-		}
+	public MoveItemsCommand(final Move...moves) throws SAXException, IOException {
+		super(NS.Move, "MoveItems", new TemplateDocument("MoveItemsRequest.xml") {
+
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element documentElement = document.getDocumentElement();
+				
+				for (Move move : moves) {
+					Element fetchElement = DOMUtils.createElement(documentElement, "Move");
+					DOMUtils.createElementAndText(fetchElement, "SrcMsgId", move.serverId);
+					DOMUtils.createElementAndText(fetchElement, "SrcFldId", String.valueOf(move.sourceCollectionId));
+					DOMUtils.createElementAndText(fetchElement, "DstFldId", String.valueOf(move.destCollectionId));
+				}
+			}});
 	}
 
 	@Override

@@ -33,7 +33,7 @@ package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
 
-import org.obm.sync.push.client.AccountInfos;
+import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

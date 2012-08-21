@@ -34,6 +34,7 @@ package org.obm.sync.push.client.commands;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
+import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 

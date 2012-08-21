@@ -34,14 +34,12 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
+import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class ProvisionStepTwo extends Provision {
-
-
 
 	public ProvisionStepTwo(final long acknowledgingPolicyKey) throws SAXException, IOException {
 		super(new TemplateDocument("ProvisionRequest2.xml") {

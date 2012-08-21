@@ -32,9 +32,10 @@
 package org.obm.sync.push.client.commands;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

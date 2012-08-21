@@ -36,19 +36,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderHierarchy;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.ItemOperationFetchResponse;
 import org.obm.sync.push.client.ItemOperationResponse;
 import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.ProvisionResponse;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.Add;
+import org.obm.sync.push.client.beans.Collection;
+import org.obm.sync.push.client.beans.Delete;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.beans.FolderHierarchy;
+import org.obm.sync.push.client.beans.FolderSyncResponse;
+import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
+import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 

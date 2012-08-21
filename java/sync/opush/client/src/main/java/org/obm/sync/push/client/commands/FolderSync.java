@@ -32,19 +32,14 @@
 package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderStatus;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.FolderType;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.FolderSyncResponse;
+import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,39 +61,6 @@ public class FolderSync extends AbstractCommand<FolderSyncResponse> {
 
 	@Override
 	protected FolderSyncResponse parseResponse(Element root) {
-		SyncKey key = new SyncKey(DOMUtils.getElementText(root, "SyncKey"));
-		int status = Integer.valueOf(DOMUtils.getElementText(root, "Status"));
-		int count = Integer.valueOf(DOMUtils.getElementText(root, "Count"));
-		Map<FolderType, Folder> ret = new HashMap<FolderType, Folder>(count + 1);
-
-		getFolders(ret, root, FolderStatus.ADD);
-		getFolders(ret, root, FolderStatus.UPDATE);
-		getFolders(ret, root, FolderStatus.DELETE);
-		
-		return new FolderSyncResponse(key, ret, status, count);
+		return new FolderSyncResponse.XmlParser().parse(root);
 	}
-
-	private void getFolders(Map<FolderType, Folder> ret, Element root, FolderStatus statusNodeName) {
-		NodeList nl = root.getElementsByTagName(statusNodeName.getValue());
-		for (int i = 0; i < nl.getLength(); i++) {
-			Element e = (Element) nl.item(i);
-			Folder f = new Folder();
-			f.setServerId(DOMUtils.getElementText(e, "ServerId"));
-			f.setParentId(DOMUtils.getElementText(e, "ParentId"));
-			f.setName(DOMUtils.getElementText(e, "DisplayName"));
-			f.setType(recognizeType(e));
-			f.setStatus(statusNodeName);
-			ret.put(f.getType(), f);
-		}
-	}
-
-	private FolderType recognizeType(Element e) {
-		String type = DOMUtils.getElementText(e, "Type");
-		if (type != null) {
-			return FolderType.getValue(Integer.parseInt(type));
-		} else {
-			return null;
-		}
-	}
-
 }

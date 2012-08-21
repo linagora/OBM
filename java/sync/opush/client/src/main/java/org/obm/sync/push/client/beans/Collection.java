@@ -29,41 +29,95 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
+import org.obm.sync.push.client.Change;
 
 import com.google.common.base.Objects;
 
-public final class Delete {
-	
-	private String serverId;
+/**
+ * <Collection> <SyncKey>f0e0ec53-40a6-432a-bfee-b8c1d391478c</SyncKey>
+ * <CollectionId>179</CollectionId> <Status>1</Status> </Collection>
+ */
+public final class Collection {
 
-	public Delete() {
-	}
+	private SyncKey syncKey;
+	private String collectionId;
+	private SyncStatus status;
+	private List<Add> adds = new LinkedList<Add>();
+	private List<Change> changes = new LinkedList<Change>();
+	private List<Delete> deletes = new LinkedList<Delete>();
 	
-	public Delete(String serverId) {
-		setServerId(serverId);
-	}
-	
-	public String getServerId() {
-		return serverId;
+
+	public SyncKey getSyncKey() {
+		return syncKey;
 	}
 
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
+	public void setSyncKey(SyncKey syncKey) {
+		this.syncKey = syncKey;
 	}
 
+	public String getCollectionId() {
+		return collectionId;
+	}
+
+	public void setCollectionId(String collectionId) {
+		this.collectionId = collectionId;
+	}
+
+	public SyncStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = SyncStatus.fromSpecificationValue(status);
+	}
+
+	public List<Add> getAdds() {
+		return adds;
+	}
+
+	public void addAdd(Add applicationData) {
+		adds.add(applicationData);
+	}
+
+	public List<Delete> getDeletes() {
+		return deletes;
+	}
+	
+	public void addDelete(Delete data) {
+		deletes.add(data);
+	}
+
+	public List<Change> getChanges() {
+		return changes;
+	}
+	
+	public void addChange(Change data) {
+		changes.add(data);
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(serverId);
+		return Objects.hashCode(syncKey, collectionId, status, adds, deletes, changes);
 	}
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof Delete) {
-			Delete that = (Delete) object;
-			return Objects.equal(this.serverId, that.serverId);
+		if (object instanceof Collection) {
+			Collection that = (Collection) object;
+			return Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.collectionId, that.collectionId)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.adds, that.adds)
+				&& Objects.equal(this.changes, that.changes)
+				&& Objects.equal(this.deletes, that.deletes);
 		}
 		return false;
 	}
-	
 }

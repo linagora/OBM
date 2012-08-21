@@ -31,57 +31,59 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.ItemOperationFetchResponse;
 import org.obm.sync.push.client.ItemOperationResponse;
-import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.NS;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-public class ItemOperationFetchCommand extends TemplateBasedCommand<ItemOperationResponse> {
+public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResponse> {
 
-	private final int collectionId;
-	private final String[] serverIds;
-	private final MSEmailBodyType bodyType;
-
-	public ItemOperationFetchCommand(int collectionId, String...serverIds) {
+	public ItemOperationFetchCommand(int collectionId, String...serverIds) throws SAXException, IOException {
 		this(collectionId, null, serverIds);
 	}
-	public ItemOperationFetchCommand(int collectionId, MSEmailBodyType bodyType, String...serverIds) {
-		super(NS.ItemOperations, "ItemOperations", "ItemOperationsFetchRequest.xml");
-		this.collectionId = collectionId;
-		this.bodyType = bodyType;
-		this.serverIds = serverIds;
-	}
 	
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element documentElement = tpl.getDocumentElement();
+	public ItemOperationFetchCommand(final int collectionId, final MSEmailBodyType bodyType, final String...serverIds)
+			throws SAXException, IOException {
 		
-		for (String serverId : serverIds) {
-			Element fetchElement = DOMUtils.createElement(documentElement, "Fetch");
-			DOMUtils.createElementAndText(fetchElement, "Store", "Mailbox");
-			DOMUtils.createElementAndText(fetchElement, "AirSync:CollectionId", String.valueOf(collectionId));
-			DOMUtils.createElementAndText(fetchElement, "AirSync:ServerId", serverId);
-			customizeOptions(fetchElement);
-		}
+		super(NS.ItemOperations, "ItemOperations", new TemplateDocument("ItemOperationsFetchRequest.xml") {
+
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element documentElement = document.getDocumentElement();
+				
+				for (String serverId : serverIds) {
+					Element fetchElement = DOMUtils.createElement(documentElement, "Fetch");
+					DOMUtils.createElementAndText(fetchElement, "Store", "Mailbox");
+					DOMUtils.createElementAndText(fetchElement, "AirSync:CollectionId", String.valueOf(collectionId));
+					DOMUtils.createElementAndText(fetchElement, "AirSync:ServerId", serverId);
+					customizeOptions(fetchElement);
+				}
+			}
+
+			private void customizeOptions(Element fetchElement) {
+				if (bodyType != null) {
+					Element options = DOMUtils.createElement(fetchElement, "Options");
+					Element bodyPreferences = DOMUtils.createElement(options, "AirSyncBase:BodyPreference");
+					DOMUtils.createElementAndText(bodyPreferences, "AirSyncBase:Type", bodyType.asXmlValue());
+					
+				}
+			}
+			
+		});
 	}
 
-	private void customizeOptions(Element fetchElement) {
-		if (bodyType != null) {
-			Element options = DOMUtils.createElement(fetchElement, "Options");
-			Element bodyPreferences = DOMUtils.createElement(options, "AirSyncBase:BodyPreference");
-			DOMUtils.createElementAndText(bodyPreferences, "AirSyncBase:Type", bodyType.asXmlValue());
-			
-		}
-	}
 	@Override
 	protected ItemOperationResponse parseResponse(Element root) {
 		NodeList fetchs = root.getElementsByTagName("Fetch");

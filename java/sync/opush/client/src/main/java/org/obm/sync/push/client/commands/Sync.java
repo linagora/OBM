@@ -32,22 +32,14 @@
 package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncStatus;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Change;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.beans.NS;
+import org.obm.sync.push.client.beans.SyncResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -76,44 +68,7 @@ public class Sync extends AbstractCommand<SyncResponse> {
 
 	@Override
 	protected SyncResponse parseResponse(Element root) {
-		Map<String, Collection> ret = new HashMap<String, Collection>();
-
-		NodeList nl = root.getElementsByTagName("Collection");
-		for (int i = 0; i < nl.getLength(); i++) {
-			Element e = (Element) nl.item(i);
-			Collection col = new Collection();
-			col.setSyncKey(new SyncKey(DOMUtils.getElementText(e, "SyncKey")));
-			col.setCollectionId(DOMUtils.getElementText(e, "CollectionId"));
-			col.setStatus(DOMUtils.getElementText(e, "Status"));
-			NodeList ap = e.getElementsByTagName("Add");
-			for (int j = 0; j < ap.getLength(); j++) {
-				Element appData = (Element) ap.item(j);
-				String serverId = DOMUtils.getElementText(appData, "ServerId");
-				Add add = new Add();
-				add.setServerId(serverId);
-				col.addAdd(add);
-			}
-			NodeList changes = e.getElementsByTagName("Change");
-			for (int j = 0; j < changes.getLength(); j++) {
-				Element appData = (Element) changes.item(j);
-				String serverId = DOMUtils.getElementText(appData, "ServerId");
-				Change change = new Change();
-				change.setServerId(serverId);
-				col.addChange(change);
-			}
-			NodeList deleteNodes = e.getElementsByTagName("Delete");
-			for (int j = 0; j < deleteNodes.getLength(); j++) {
-				Element appData = (Element) deleteNodes.item(j);
-				String serverId = DOMUtils.getElementText(appData, "ServerId");
-				Delete delete = new Delete(serverId);
-				col.addDelete(delete);
-			}
-			ret.put(col.getCollectionId(), col);
-		}
-
-		Element status = DOMUtils.getUniqueElement(root, "Status");
-		SyncStatus syncStatus = SyncStatus.fromSpecificationValue(DOMUtils.getElementText(status));
-		return new SyncResponse(ret, syncStatus);
+		return new SyncResponse.XmlParser().parse(root);
 	}
 
 }

@@ -65,10 +65,10 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.beans.FolderSyncResponse;
+import org.obm.sync.push.client.beans.FolderType;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

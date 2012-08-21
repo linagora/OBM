@@ -29,74 +29,95 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import com.google.common.base.Objects;
 
-public final class Folder {
-	
-	private String serverId;
-	private String parentId;
-	private String name;
-	private FolderType type;
-	private FolderStatus status;
-	
-	public String getServerId() {
-		return serverId;
-	}
-	
-	public void setServerId(String exchangeId) {
-		this.serverId = exchangeId;
-	}
-	
-	public String getParentId() {
-		return parentId;
-	}
-	
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public FolderType getType() {
-		return type;
-	}
-	
-	public void setType(FolderType type) {
-		this.type = type;
+public final class FolderHierarchy implements Map<FolderType, Folder> {
+
+	private Map<FolderType, Folder> folders;
+
+	public FolderHierarchy(Map<FolderType, Folder> folders) {
+		this.folders = new HashMap<FolderType, Folder>(folders.size()+1);
+		this.folders.putAll(folders);
 	}
 
-	public FolderStatus getStatus() {
-		return status;
+	@Override
+	public void clear() {
+		folders.clear();
 	}
-	
-	public void setStatus(FolderStatus status) {
-		this.status = status;
+
+	@Override
+	public boolean containsKey(Object key) {
+		return folders.containsKey(key);
 	}
-	
+
+	@Override
+	public boolean containsValue(Object value) {
+		return folders.containsValue(value);
+	}
+
+	@Override
+	public Set<java.util.Map.Entry<FolderType, Folder>> entrySet() {
+		return folders.entrySet();
+	}
+
+	@Override
+	public Folder get(Object key) {
+		return folders.get(key);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return folders.isEmpty();
+	}
+
+	@Override
+	public Set<FolderType> keySet() {
+		return folders.keySet();
+	}
+
+	@Override
+	public Folder put(FolderType key, Folder value) {
+		return folders.put(key, value);
+	}
+
+	@Override
+	public void putAll(Map<? extends FolderType, ? extends Folder> m) {
+		folders.putAll(m);
+	}
+
+	@Override
+	public Folder remove(Object key) {
+		return folders.remove(key);
+	}
+
+	@Override
+	public int size() {
+		return folders.size();
+	}
+
+	@Override
+	public Collection<Folder> values() {
+		return folders.values();
+	}
+
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(serverId, parentId, name, type, status);
+		return Objects.hashCode(folders);
 	}
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof Folder) {
-			Folder that = (Folder) object;
-			return Objects.equal(this.serverId, that.serverId)
-				&& Objects.equal(this.parentId, that.parentId)
-				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.type, that.type)
-				&& Objects.equal(this.status, that.status);
+		if (object instanceof FolderHierarchy) {
+			FolderHierarchy that = (FolderHierarchy) object;
+			return Objects.equal(this.folders, that.folders);
 		}
 		return false;
 	}
-	
+
 }

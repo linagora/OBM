@@ -29,94 +29,94 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncStatus;
+import org.apache.commons.codec.binary.Base64;
+import org.obm.push.bean.DeviceId;
 
 import com.google.common.base.Objects;
 
-/**
- * <Collection> <SyncKey>f0e0ec53-40a6-432a-bfee-b8c1d391478c</SyncKey>
- * <CollectionId>179</CollectionId> <Status>1</Status> </Collection>
- */
-public final class Collection {
+public final class AccountInfos {
+	private String login;
+	private String password;
+	private String userId;
+	private DeviceId devId;
+	private String devType;
+	private String url;
+	private String userAgent;
 
-	private SyncKey syncKey;
-	private String collectionId;
-	private SyncStatus status;
-	private List<Add> adds = new LinkedList<Add>();
-	private List<Change> changes = new LinkedList<Change>();
-	private List<Delete> deletes = new LinkedList<Delete>();
-	
+	public AccountInfos(String login, String password, DeviceId devId,
+			String devType, String url, String userAgent) {
+		this.login = login;
+		int idx = login.indexOf('@');
+		if (idx > 0) {
+			String d = login.substring(idx + 1);
+			this.userId = d + "\\" + login.substring(0, idx);
+		}
 
-	public SyncKey getSyncKey() {
-		return syncKey;
+		this.password = password;
+		this.devId = devId;
+		this.devType = devType;
+		this.url = url;
+		this.userAgent = userAgent;
 	}
 
-	public void setSyncKey(SyncKey syncKey) {
-		this.syncKey = syncKey;
+	public String getLogin() {
+		return login;
 	}
 
-	public String getCollectionId() {
-		return collectionId;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setCollectionId(String collectionId) {
-		this.collectionId = collectionId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public SyncStatus getStatus() {
-		return status;
+	public DeviceId getDevId() {
+		return devId;
 	}
 
-	public void setStatus(String status) {
-		this.status = SyncStatus.fromSpecificationValue(status);
+	public String getDevType() {
+		return devType;
 	}
 
-	public List<Add> getAdds() {
-		return adds;
+	public String getUrl() {
+		return url;
 	}
 
-	public void addAdd(Add applicationData) {
-		adds.add(applicationData);
-	}
-
-	public List<Delete> getDeletes() {
-		return deletes;
-	}
-	
-	public void addDelete(Delete data) {
-		deletes.add(data);
-	}
-
-	public List<Change> getChanges() {
-		return changes;
+	public String getUserAgent() {
+		return userAgent;
 	}
 	
-	public void addChange(Change data) {
-		changes.add(data);
+	public String authValue() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Basic ");
+		String unCodedString = userId + ":" + password;
+		String encoded = new String(Base64.encodeBase64(unCodedString.getBytes()));
+		sb.append(encoded);
+		String ret = sb.toString();
+		return ret;
 	}
-	
+
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(syncKey, collectionId, status, adds, deletes, changes);
+		return Objects.hashCode(login, password, userId, devId, devType, url, userAgent);
 	}
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof Collection) {
-			Collection that = (Collection) object;
-			return Objects.equal(this.syncKey, that.syncKey)
-				&& Objects.equal(this.collectionId, that.collectionId)
-				&& Objects.equal(this.status, that.status)
-				&& Objects.equal(this.adds, that.adds)
-				&& Objects.equal(this.changes, that.changes)
-				&& Objects.equal(this.deletes, that.deletes);
+		if (object instanceof AccountInfos) {
+			AccountInfos that = (AccountInfos) object;
+			return Objects.equal(this.login, that.login)
+				&& Objects.equal(this.password, that.password)
+				&& Objects.equal(this.userId, that.userId)
+				&& Objects.equal(this.devId, that.devId)
+				&& Objects.equal(this.devType, that.devType)
+				&& Objects.equal(this.url, that.url)
+				&& Objects.equal(this.userAgent, that.userAgent);
 		}
 		return false;
 	}
+
 }

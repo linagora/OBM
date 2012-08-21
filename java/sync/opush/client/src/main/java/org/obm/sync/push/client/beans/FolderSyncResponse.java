@@ -29,16 +29,60 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.IEasReponse;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.google.common.base.Objects;
 
 public final class FolderSyncResponse implements IEasReponse {
 
+	public static class XmlParser {
+
+		public FolderSyncResponse parse(Element root) {
+			String key = DOMUtils.getElementText(root, "SyncKey");
+			int status = Integer.valueOf(DOMUtils.getElementText(root, "Status"));
+			int count = Integer.valueOf(DOMUtils.getElementText(root, "Count"));
+			Map<FolderType, Folder> ret = new HashMap<FolderType, Folder>(count + 1);
+
+			getFolders(ret, root, FolderStatus.ADD);
+			getFolders(ret, root, FolderStatus.UPDATE);
+			getFolders(ret, root, FolderStatus.DELETE);
+			
+			return new FolderSyncResponse(new SyncKey(key), ret, status, count);
+		}
+
+		private void getFolders(Map<FolderType, Folder> ret, Element root, FolderStatus statusNodeName) {
+			NodeList nl = root.getElementsByTagName(statusNodeName.getValue());
+			for (int i = 0; i < nl.getLength(); i++) {
+				Element e = (Element) nl.item(i);
+				Folder f = new Folder();
+				f.setServerId(DOMUtils.getElementText(e, "ServerId"));
+				f.setParentId(DOMUtils.getElementText(e, "ParentId"));
+				f.setName(DOMUtils.getElementText(e, "DisplayName"));
+				f.setType(recognizeType(e));
+				f.setStatus(statusNodeName);
+				ret.put(f.getType(), f);
+			}
+		}
+
+		private FolderType recognizeType(Element e) {
+			String type = DOMUtils.getElementText(e, "Type");
+			if (type != null) {
+				return FolderType.getValue(Integer.parseInt(type));
+			} else {
+				return null;
+			}
+		}
+	}
+	
 	private final FolderHierarchy fl;
 	private final SyncKey key;
 	private final int status;
@@ -65,7 +109,7 @@ public final class FolderSyncResponse implements IEasReponse {
 	}
 
 	public String getStatusAsString() {
-		return String.valueOf(status);
+		return String.valueOf(getStatus());
 	}
 	
 	public int getCount() {

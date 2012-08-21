@@ -74,8 +74,8 @@ import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;

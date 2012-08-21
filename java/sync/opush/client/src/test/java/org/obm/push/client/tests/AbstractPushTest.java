@@ -40,8 +40,8 @@ import org.junit.Ignore;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.ProtocolVersion;
 import org.obm.sync.push.client.WBXMLOPClient;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 
 @Ignore("It's necessary to do again all tests")

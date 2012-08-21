@@ -34,16 +34,14 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.bean.FilterType;
-import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
+import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import com.google.common.base.Strings;
 
 public class GetItemEstimateEmailFolderCommand extends AbstractCommand<GetItemEstimateSingleFolderResponse> {
 
@@ -73,22 +71,6 @@ public class GetItemEstimateEmailFolderCommand extends AbstractCommand<GetItemEs
 
 	@Override
 	protected GetItemEstimateSingleFolderResponse parseResponse(Element root) {
-		int colId = 0;
-		int estimate = 0;
-		String unparsedCollectionId = DOMUtils.getElementText(root, "CollectionId");
-		if (!Strings.isNullOrEmpty(unparsedCollectionId)) {
-			colId = Integer.parseInt(unparsedCollectionId);
-		}
-		String unparsedEstimate = DOMUtils.getElementText(root, "Estimate");
-		if (!Strings.isNullOrEmpty(unparsedEstimate)) {
-			estimate = Integer.parseInt(unparsedEstimate);
-		}
-		GetItemEstimateStatus status = findStatus(root);
-		return new GetItemEstimateSingleFolderResponse(colId, estimate, status);
-	}
-	
-	private GetItemEstimateStatus findStatus(Element root) {
-		int status = Integer.parseInt(DOMUtils.getElementText(root, "Status"));
-		return GetItemEstimateStatus.fromSpecificationValue(status);
+		return new GetItemEstimateSingleFolderResponse.XmlParser().parse(root);
 	}
 }

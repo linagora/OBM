@@ -29,23 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client;
+package org.obm.sync.push.client.beans;
 
-public enum ProtocolVersion {
+import com.google.common.base.Objects;
 
-	V121, V120, V25;
+public final class Delete {
+	
+	private String serverId;
 
-	@Override
-	public String toString() {
-		switch (this) {
-		case V120:
-			return "12.0";
-		case V25:
-			return "2.5";
-		default:
-		case V121:
-			return "12.1";
-		}
+	public Delete() {
+	}
+	
+	public Delete(String serverId) {
+		setServerId(serverId);
+	}
+	
+	public String getServerId() {
+		return serverId;
 	}
 
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(serverId);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Delete) {
+			Delete that = (Delete) object;
+			return Objects.equal(this.serverId, that.serverId);
+		}
+		return false;
+	}
+	
 }

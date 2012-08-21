@@ -29,13 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.sync.push.client.beans;
 
-import org.obm.sync.push.client.beans.AccountInfos;
-import org.w3c.dom.Document;
+public enum NS {
 
-public interface DocumentProvider {
-
-	public Document get(AccountInfos accountInfos);
+	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations, Move;
 	
 }
