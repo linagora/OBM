@@ -363,11 +363,9 @@ public final class DOMUtils {
 	}
 	
 	public static void logDom(Document doc) throws TransformerException {
-		if (logger.isDebugEnabled()) {
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			serialize(doc, out, true);
-			logger.debug(out.toString());
-		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		serialize(doc, out, true);
+		logger.info(out.toString());
 	}
 
 	public static Document parse(String xmlContent) throws SAXException, IOException {
