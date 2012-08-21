@@ -1145,7 +1145,7 @@ sub _createRestoreMailboxFolder {
         }, $entity->getMailboxRestorePath() );
     my $reconstructMailbox = $entity->getMailboxPrefix().$entity->getMailboxRestoreFolder();
     $reconstructMailbox =~ s/^(.+)@/$1\*@/;
-    $cmd = 'su -l -c \'PATH="'.RECONSTRUCT_PATH.'" '.RECONSTRUCT_CMD.' -r -f -x '.$reconstructMailbox.'\' cyrus';
+    $cmd = 'su -l -c \'PATH="'.RECONSTRUCT_PATH.'" '.RECONSTRUCT_CMD.' -r -f -x '.$reconstructMailbox.'\' cyrus -s /bin/sh';
     $self->_log( 'Executing '.$cmd, 4 );
 
     if( my $returnCode = system($cmd) ) {
@@ -1155,7 +1155,7 @@ sub _createRestoreMailboxFolder {
                     } );
     }
 
-    $cmd = 'su -l -c \'PATH="'.QUOTA_PATH.'" '.QUOTA_CMD.' -d '.$entity->getRealm().' '.$entity->getMailboxPrefix().$entity->getLogin().'\' cyrus';
+    $cmd = 'su -l -c \'PATH="'.QUOTA_PATH.'" '.QUOTA_CMD.' -d '.$entity->getRealm().' '.$entity->getMailboxPrefix().$entity->getLogin().'\' cyrus -s /bin/sh';
     $self->_log( 'Executing '.$cmd, 4 );
 
     if( my $returnCode = system($cmd) ) {
