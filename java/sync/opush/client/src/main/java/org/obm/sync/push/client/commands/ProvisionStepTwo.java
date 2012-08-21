@@ -31,24 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
+
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public class ProvisionStepTwo extends Provision {
 
-	private final long acknowledgingPolicyKey;
 
-	public ProvisionStepTwo(long acknowledgingPolicyKey) {
-		super("ProvisionRequest2.xml");
-		this.acknowledgingPolicyKey = acknowledgingPolicyKey;
-	}
 
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element policyKeyElement = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "PolicyKey");
-		policyKeyElement.setTextContent(Long.toString(acknowledgingPolicyKey));
+	public ProvisionStepTwo(final long acknowledgingPolicyKey) throws SAXException, IOException {
+		super(new TemplateDocument("ProvisionRequest2.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element policyKeyElement = DOMUtils.getUniqueElement(document.getDocumentElement(), "PolicyKey");
+				policyKeyElement.setTextContent(Long.toString(acknowledgingPolicyKey));
+			}
+		});
 	}
 
 }

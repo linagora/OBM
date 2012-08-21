@@ -34,17 +34,12 @@ package org.obm.sync.push.client.commands;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public abstract class Provision extends TemplateBasedCommand<ProvisionResponse> {
+public abstract class Provision extends AbstractCommand<ProvisionResponse> {
 
-	public Provision(Document doc) {
-		super(NS.Provision, "Provision", doc);
-	}
-
-	public Provision(String template) {
+	public Provision(TemplateDocument template) {
 		super(NS.Provision, "Provision", template);
 	}
 

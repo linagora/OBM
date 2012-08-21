@@ -31,44 +31,44 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
+
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
 
-public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
+public class GetItemEstimateEmailFolderCommand extends AbstractCommand<GetItemEstimateSingleFolderResponse> {
 
-	private final SyncKey syncKey;
-	private final FilterType filterType;
-	private final int collectionId;
 
-	public GetItemEstimateEmailFolderCommand(SyncKey key, FilterType filterType, int collectionId) {
-		super(NS.GetItemEstimate, "GetItemEstimate", "GetItemEstimateRequestEmail.xml");
-		this.syncKey = key;
-		this.filterType = filterType;
-		this.collectionId = collectionId;
-	}
-
-	public GetItemEstimateEmailFolderCommand(SyncKey key, int collectionId) {
-		this(key, null, collectionId);
+	public GetItemEstimateEmailFolderCommand(SyncKey syncKey, int collectionId)
+			throws SAXException, IOException {
+		this(syncKey, null, collectionId);
 	}
 	
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:SyncKey");
-		sk.setTextContent(syncKey.getSyncKey());
-		if (filterType != null) {
-			Element ft = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:FilterType");
-			ft.setTextContent(filterType.asSpecificationValue());
-		}
-		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
-		collection.setTextContent(String.valueOf(collectionId));
+	public GetItemEstimateEmailFolderCommand(final SyncKey syncKey, final FilterType filterType,
+			final int collectionId) throws SAXException, IOException {
+		
+		super(NS.GetItemEstimate, "GetItemEstimate", new TemplateDocument("GetItemEstimateRequestEmail.xml") {
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "AirSync:SyncKey");
+				sk.setTextContent(syncKey.getSyncKey());
+				if (filterType != null) {
+					Element ft = DOMUtils.getUniqueElement(document.getDocumentElement(), "AirSync:FilterType");
+					ft.setTextContent(filterType.asSpecificationValue());
+				}
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), "CollectionId");
+				collection.setTextContent(String.valueOf(collectionId));				
+			}
+		});
 	}
 
 	@Override

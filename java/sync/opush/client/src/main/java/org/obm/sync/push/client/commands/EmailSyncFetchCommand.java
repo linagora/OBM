@@ -31,32 +31,31 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
+
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public class EmailSyncFetchCommand extends Sync {
 
-	private final SyncKey syncKey;
-	private final String collectionId;
-	private final String serverId;
-
-	public EmailSyncFetchCommand(SyncKey syncKey, String collectionId, String serverId) {
-		super("EmailSyncFetchRequest.xml");
-		this.syncKey = syncKey;
-		this.collectionId = collectionId;
-		this.serverId = serverId;
-	}
-
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "SyncKey");
-		sk.setTextContent(syncKey.getSyncKey());
-		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
-		collection.setTextContent(collectionId);
-		Element server = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "ServerId");
-		server.setTextContent(serverId);
+	public EmailSyncFetchCommand(final SyncKey syncKey, final String collectionId, final String serverId)
+			throws SAXException, IOException {
+		
+		super(new TemplateDocument("EmailSyncFetchRequest.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
+				sk.setTextContent(syncKey.getSyncKey());
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), "CollectionId");
+				collection.setTextContent(collectionId);
+				Element server = DOMUtils.getUniqueElement(document.getDocumentElement(), "ServerId");
+				server.setTextContent(serverId);
+			}
+		});
 	}
 }

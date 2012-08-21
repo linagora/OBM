@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,42 +44,34 @@ import org.obm.sync.push.client.Change;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Performs a Sync AS command for the given folders with 0 as syncKey
  */
-public class Sync extends TemplateBasedCommand<SyncResponse> {
+public class Sync extends AbstractCommand<SyncResponse> {
 
-	private Folder[] folders;
-
-	public Sync(Folder... folders) {
-		this("SyncRequest.xml");
-		this.folders = folders;
+	public Sync(final Folder... folders) throws SAXException, IOException {
+		this(new TemplateDocument("SyncRequest.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element cols = DOMUtils.getUniqueElement(document.getDocumentElement(), "Collections");
+				for (Folder folder : folders) {
+					Element col = DOMUtils.createElement(cols, "Collection");
+					DOMUtils.createElementAndText(col, "SyncKey", "0");
+					DOMUtils.createElementAndText(col, "CollectionId", folder.getServerId());
+				}				
+			}
+		});
 	}
 
-	public Sync(Document doc) {
-		super(NS.AirSync, "Sync", doc);
-	}
-
-	public Sync(String template) {
-		super(NS.AirSync, "Sync", template);
-	}
-
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element cols = DOMUtils.getUniqueElement(tpl.getDocumentElement(),
-				"Collections");
-		for (Folder folder : folders) {
-			Element col = DOMUtils.createElement(cols, "Collection");
-			DOMUtils.createElementAndText(col, "SyncKey", "0");
-			DOMUtils.createElementAndText(col, "CollectionId",
-					folder.getServerId());
-		}
+	public Sync(DocumentProvider documentProvider) {
+		super(NS.AirSync, "Sync", documentProvider);
 	}
 
 	@Override

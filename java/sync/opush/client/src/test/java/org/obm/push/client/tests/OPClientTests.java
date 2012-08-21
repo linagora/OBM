@@ -41,11 +41,13 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Folder;
 import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.commands.DocumentProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -87,8 +89,13 @@ public class OPClientTests extends AbstractPushTest {
 		return null;
 	}
 
-	public SyncResponse testSync(Document doc) throws Exception {
-		SyncResponse resp = opc.sync(doc);
+	public SyncResponse testSync(final Document doc) throws Exception {
+		SyncResponse resp = opc.sync(new DocumentProvider() {
+			@Override
+			public Document get(AccountInfos accountInfos) {
+				return doc;
+			}
+		});
 		assertNotNull(resp);
 		assertNotNull(resp.getCollections());
 		assertTrue(resp.getCollections().size() > 0);
@@ -110,15 +117,14 @@ public class OPClientTests extends AbstractPushTest {
 			if (syncKey == null) {
 				syncKey = DOMUtils.getUniqueElement(e, "AirSync:SyncKey");
 			}
-			try {
+			{
 				FolderType type = FolderType.valueOf(syncKey.getTextContent());
 				if (folder.getType().equals(type)) {
 					syncKey.setTextContent(getSyncKey(folder.getServerId(),
 							syncResp.getCollections()).getSyncKey());
 				}
-			} catch (Throwable t) {
 			}
-			try {
+			{
 				Element collectionId = DOMUtils.getUniqueElement(e,
 						"CollectionId");
 				FolderType type = FolderType.valueOf(collectionId
@@ -126,7 +132,6 @@ public class OPClientTests extends AbstractPushTest {
 				if (folder.getType().equals(type)) {
 					collectionId.setTextContent(folder.getServerId());
 				}
-			} catch (Throwable t) {
 			}
 		}
 	}

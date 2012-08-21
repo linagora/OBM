@@ -46,6 +46,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.commands.DocumentProvider;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.EmailSyncFetchCommand;
@@ -132,8 +133,8 @@ public abstract class OPClient {
 		return run(new EmailSyncCommand(key, String.valueOf(collectionId), filterType, windowSize));
 	}
 	
-	public SyncResponse sync(Document doc) throws Exception {
-		return run(new Sync(doc));
+	public SyncResponse sync(DocumentProvider template) throws Exception {
+		return run(new Sync(template));
 	}
 
 	public SyncResponse deleteEmail(SyncKey key, int collectionId, String uid) throws Exception {

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,27 +42,26 @@ import org.obm.sync.push.client.Folder;
 import org.obm.sync.push.client.FolderStatus;
 import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Performs a FolderSync AS command with the given sync key
  */
-public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
+public class FolderSync extends AbstractCommand<FolderSyncResponse> {
 
-	private SyncKey syncKey;
-
-	public FolderSync(SyncKey syncKey) {
-		super(NS.FolderHierarchy, "FolderSync", "FolderSyncRequest.xml");
-		this.syncKey = syncKey;
-	}
-
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(),
-				"SyncKey");
-		sk.setTextContent(syncKey.getSyncKey());
+	private static final String TEMPLATE_NAME = "FolderSyncRequest.xml";
+	
+	public FolderSync(final SyncKey syncKey) throws SAXException, IOException {
+		super(NS.FolderHierarchy, "FolderSync", new TemplateDocument(TEMPLATE_NAME) {
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
+				sk.setTextContent(syncKey.getSyncKey());
+			}
+		});		
 	}
 
 	@Override

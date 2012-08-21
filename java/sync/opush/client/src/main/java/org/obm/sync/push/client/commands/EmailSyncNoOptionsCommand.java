@@ -31,31 +31,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
+
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public class EmailSyncNoOptionsCommand extends Sync {
 
-	private final SyncKey syncKey;
-	private final String collectionId;
-
-	public EmailSyncNoOptionsCommand(SyncKey syncKey, String collectionId) {
-		super("EmailSyncRequest.xml");
-		this.syncKey = syncKey;
-		this.collectionId = collectionId;
-	}
-
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "SyncKey");
-		sk.setTextContent(syncKey.getSyncKey());
-		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
-		collection.setTextContent(collectionId);
+	public EmailSyncNoOptionsCommand(final SyncKey syncKey, final String collectionId)
+			throws SAXException, IOException {
 		
-		Element collectionElement = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "Collection");
-		collectionElement.removeChild(DOMUtils.getUniqueElement(collectionElement, "Options"));
+		super(new TemplateDocument("EmailSyncRequest.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
+				sk.setTextContent(syncKey.getSyncKey());
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), "CollectionId");
+				collection.setTextContent(collectionId);
+				
+				Element collectionElement = DOMUtils.getUniqueElement(document.getDocumentElement(), "Collection");
+				collectionElement.removeChild(DOMUtils.getUniqueElement(collectionElement, "Options"));
+			}
+		});
 	}
 }

@@ -31,18 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.io.IOException;
+
 import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class ProvisionStepOne extends Provision {
 
-	public ProvisionStepOne() {
-		super("ProvisionRequest1.xml");
-	}
-
-	@Override
-	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
-		// nothing to customize
+	public ProvisionStepOne() throws SAXException, IOException {
+		
+		super(new TemplateDocument("ProvisionRequest1.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				
+			}
+		});
 	}
 
 }

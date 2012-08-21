@@ -31,35 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
-import java.io.IOException;
-
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-public class EmailSyncCommand extends Sync {
+public interface DocumentProvider {
 
-	public EmailSyncCommand(final SyncKey syncKey, final String collectionId,
-			final FilterType filterType, final int windowSize)
-			throws SAXException, IOException {
-
-		super(new TemplateDocument("EmailSyncRequest.xml") {
-			
-			@Override
-			protected void customize(Document document, AccountInfos accountInfos) {
-				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
-				sk.setTextContent(syncKey.getSyncKey());
-				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), "CollectionId");
-				collection.setTextContent(collectionId);
-				Element filterTypeE = DOMUtils.getUniqueElement(document.getDocumentElement(), "FilterType");
-				filterTypeE.setTextContent(filterType.asSpecificationValue());
-				Element windowSizeE = DOMUtils.getUniqueElement(document.getDocumentElement(), "WindowSize");
-				windowSizeE.setTextContent(String.valueOf(windowSize));
-			}
-		});
-	}
+	public Document get(AccountInfos accountInfos);
+	
 }
