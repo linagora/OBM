@@ -1956,14 +1956,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				"?," + // user_create
 				"?" + // is_organizer
 				")";
+		boolean shouldClearOrganizer = false;
 		PreparedStatement ps = null;
+		
 		try {
 			ps = con.prepareStatement(attQ);
 			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomain().getId());
 			
-			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);			
+			final int eventObmId = ev.getObmId().getObmId();
+			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);
+			
 			for (final Attendee at : listAttendee) {
+				Boolean isOrganizer = at.isOrganizer();
 				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
+
+				// There must be only one organizer in a given event
+				if (isOrganizer) {
+					shouldClearOrganizer = true;
+				}
 				
 				if (userEntity == null) {
 					logger.info("Attendee " + at.getEmail()
@@ -1976,18 +1986,37 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					c = contactDao.createContact(editor, con, c);
 					userEntity = c.getEntityId();
 				}
-				ps.setInt(1, ev.getObmId().getObmId());
+				ps.setInt(1, eventObmId);
 				ps.setInt(2, userEntity);
 				ps.setObject(3, getJdbcObjectParticipationState(at));
 				ps.setObject(4, getJdbcObjectParticipationRole(at));
 				ps.setInt(5, at.getPercent());
 				ps.setInt(6, editor.getObmId());
-				ps.setBoolean(7, at.isOrganizer());
+				ps.setBoolean(7, isOrganizer);
 				ps.addBatch();
-				logger.info(LogUtils.prefix(editor) + "Adding " + at.getEmail() + ( at.isOrganizer() ? " as organizer" : " as attendee"));
+				logger.info(LogUtils.prefix(editor) + "Adding " + at.getEmail() + ( isOrganizer ? " as organizer" : " as attendee"));
+			}
+			
+			// Clear the previous organizer if needed
+			if (shouldClearOrganizer) {
+				clearOrganizer(eventObmId, con);
 			}
 			
 			ps.executeBatch();
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+	
+	private void clearOrganizer(int eventId, Connection con) throws SQLException {
+		PreparedStatement ps = null;
+		String query = "UPDATE EventLink SET eventlink_is_organizer = false WHERE eventlink_event_id = ?";
+		
+		try {
+			ps = con.prepareStatement(query);
+			
+			ps.setInt(1, eventId);
+			ps.executeUpdate();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
@@ -2034,7 +2063,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private void updateAttendees(AccessToken token, Connection con, String calendar, Event event, Boolean useObmUser) throws SQLException, ServerFault {
-		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=? "
+		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=?, eventlink_is_organizer=? "
 				+ "where eventlink_event_id=? AND "
 				+ "eventlink_entity_id IN "
 				+ "(select userentity_entity_id from UserEntity where userentity_entity_id=?  "
@@ -2063,6 +2092,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						at.getParticipationRole().getJdbcObject(obmHelper.getType()));
 				ps.setInt(idx++, token.getObmId());
 				ps.setInt(idx++, at.getPercent());
+				ps.setBoolean(idx++, at.isOrganizer());
 				ps.setInt(idx++, event.getObmId().getObmId());
 				ps.setInt(idx++, userEntity);
 				ps.setInt(idx++, userEntity);
@@ -2223,6 +2253,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return null;
 	}
 
+	@Override
 	public Event findEventByExtIdAndRecurrenceId(AccessToken token, ObmUser calendar, EventExtId extId, RecurrenceId recurrenceId) throws ParseException {
 		
 		String ev = "SELECT "
