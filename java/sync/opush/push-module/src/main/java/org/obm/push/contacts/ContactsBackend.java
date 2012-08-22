@@ -43,6 +43,7 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
@@ -92,15 +93,17 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 	private final ContactConfiguration contactConfiguration;
 	private final IAddressBook bookClient;
+	private final CollectionPathHelper collectionPathHelper;
 	
 	@Inject
 	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
-			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
+			CollectionPathHelper collectionPathHelper, Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
 		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.bookClient = bookClient;
 		this.contactConfiguration = contactConfiguration;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -198,7 +201,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return collectionPath(udr, folder.getName());
 	}
 	
-	@VisibleForTesting CollectionPath collectionPath(UserDataRequest udr, String displayName) {
+	protected CollectionPath collectionPath(UserDataRequest udr, String displayName) {
 		return collectionPathBuilderProvider.get()
 				.userDataRequest(udr)
 				.pimType(getPIMDataType())
@@ -223,6 +226,16 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {
 			logout(token);
+		}
+	}
+	
+	private String getCollectionPath(UserDataRequest udr, String folderName)  {
+		
+		if (isDefaultFolder(folderName)) {
+			return collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS, folderName);
+		} else {
+			return collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS, 
+					contactConfiguration.getDefaultAddressBookName(), folderName);
 		}
 	}
 	
@@ -290,7 +303,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		List<AddressBook> addressBooks = listAddressBooks(udr);
 		for (AddressBook addressBook: addressBooks) {
-			String colllectionPath = collectionPath(udr, addressBook.getName()).collectionPath();
+			String colllectionPath = getCollectionPath(udr, addressBook.getName());
 			try {
 				Integer addressBookCollectionId = mappingService.getCollectionIdFor(udr.getDevice(), colllectionPath);
 				if (addressBookCollectionId.intValue() == collectionId.intValue()) {

@@ -178,20 +178,6 @@ public class CollectionPathHelperTest {
 		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
 	}
 
-	@Test
-	public void testBuildContactsNoSubCollectionPath() {
-		String collectionPathExpected = "obm:\\\\user@domain\\contacts";
-		String parsedFolder = collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS);
-		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
-	}
-
-	@Test
-	public void testBuildContactsSubCollectionPath() {
-		String collectionPathExpected = "obm:\\\\user@domain\\contacts\\users";
-		String parsedFolder = collectionPathHelper.buildCollectionPath(udr, PIMDataType.CONTACTS, "users");
-		Assertions.assertThat(parsedFolder).isEqualTo(collectionPathExpected);
-	}
-
 	@Test(expected=NullPointerException.class)
 	public void testBuildDefaultCollectionPathWhenNullSession() {
 		collectionPathHelper.buildDefaultCollectionPath(null, PIMDataType.CONTACTS);

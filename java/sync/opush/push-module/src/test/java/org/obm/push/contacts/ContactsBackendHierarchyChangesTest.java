@@ -49,6 +49,7 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
@@ -89,6 +90,7 @@ public class ContactsBackendHierarchyChangesTest {
 	private BookClient bookClient;
 	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
+	private CollectionPathHelper collectionPathHelper;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	
 	private ContactsBackend contactsBackend;
@@ -104,12 +106,14 @@ public class ContactsBackendHierarchyChangesTest {
 		this.bookClient = createMock(BookClient.class);
 		this.loginService = createMock(LoginService.class);
 		this.contactConfiguration = publicContactConfiguration();
+		this.collectionPathHelper = createMock(CollectionPathHelper.class);
 		this.collectionPathBuilderProvider = createMock(Provider.class);
 		
 		this.contactsBackend = new ContactsBackend(mappingService, 
 				bookClient, 
 				loginService, 
 				contactConfiguration, 
+				collectionPathHelper, 
 				collectionPathBuilderProvider);
 	}
 
