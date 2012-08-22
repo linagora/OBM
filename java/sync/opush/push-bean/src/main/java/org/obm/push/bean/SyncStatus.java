@@ -62,5 +62,4 @@ public enum SyncStatus {
 	public String asSpecificationValue() {
 		return asSpecificationValue;
 	}
-	
 }
