@@ -78,9 +78,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		PreparedStatement ps = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping " +
-					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = folder_sync_state_id " +
-					"WHERE opush_folder_sync_state.device_id = ?");
+			ps = con.prepareStatement("SELECT collection FROM opush_folder_mapping WHERE device_id=?");
 			ps.setInt(1, id);
 			ResultSet resultSet = ps.executeQuery();
 
@@ -95,7 +93,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return userCollections;
 	}
 
-	// TODO: To delete, next method will do the work
 	@Override
 	public Integer addCollectionMapping(Device device, String collection) throws DaoException {
 		Integer id = device.getDatabaseId();
@@ -123,8 +120,8 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		PreparedStatement ps = null;
 		try{
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_folder_mapping " +
-					"(collection, folder_sync_state_id) VALUES (?, ?)");
+			ps = con.prepareStatement("INSERT INTO opush_folder_mapping" +
+					" (collection, folder_sync_state_id) VALUES (?, ?)");
 			ps.setString(1, collection);
 			ps.setInt(2, syncState.getId());
 			ps.executeUpdate();
@@ -288,10 +285,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		ResultSet rs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT opush_folder_mapping.id FROM opush_folder_mapping " +
-					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = folder_sync_state_id " +
-					"WHERE opush_folder_sync_state.device_id = ? " +
-					"AND collection = ?");
+			ps = con.prepareStatement("SELECT id FROM opush_folder_mapping WHERE device_id=? AND collection=?");
 			ps.setInt(1, devDbId);
 			ps.setString(2, collection);
 			rs = ps.executeQuery();
