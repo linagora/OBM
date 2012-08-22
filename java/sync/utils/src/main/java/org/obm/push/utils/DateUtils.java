@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -132,9 +131,5 @@ public class DateUtils {
 
 	public static long yearsToSeconds(long years) {
 		return daysToSeconds(years * 365);
-	}
-	
-	public static Timestamp toTimestamp(Date date) {
-		return new Timestamp(date.getTime()) ;
 	}
 }

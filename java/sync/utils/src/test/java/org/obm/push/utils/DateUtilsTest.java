@@ -33,9 +33,7 @@ package org.obm.push.utils;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -138,14 +136,5 @@ public class DateUtilsTest {
 		assertThat(calendar).isNotNull();
 		assertThat(calendar.getTimeZone()).isEqualTo(timeZone);
 		assertThat(calendar.getTimeInMillis()).isEqualTo(0);
-	}
-	
-	@Test
-	public void testToTimestamp() {
-		long currentTimeMillis = System.currentTimeMillis();
-		Date date = new Date(currentTimeMillis);
-		
-		Timestamp timestamp = DateUtils.toTimestamp(date);
-		assertThat(timestamp.getTime()).isEqualTo(currentTimeMillis);
 	}
 }
