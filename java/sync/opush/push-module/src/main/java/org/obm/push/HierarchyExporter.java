@@ -37,9 +37,9 @@ import java.util.List;
 
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
@@ -92,14 +92,12 @@ public class HierarchyExporter implements IHierarchyExporter {
 		allItemsChanged.addAll(getMailChanges(udr));
 		
 		HierarchyItemsChanges itemsContactChanged = listContactFoldersChanged(udr, lastSync);
-		allItemsChanged.addAll(itemsContactChanged.getChangedItems());
+		allItemsChanged.addAll(itemsContactChanged.getItemsAddedOrUpdated());
 		
 		allItemsChanged.addAll(getTasksChanges());
 
-		return new HierarchyItemsChanges.Builder()
-			.changes(allItemsChanged)
-			.deletions(itemsContactChanged.getDeletedItems())
-			.lastSync(itemsContactChanged.getLastSync()).build();
+		return new HierarchyItemsChanges(
+				allItemsChanged, itemsContactChanged.getItemsDeleted(), itemsContactChanged.getLastSync());
 	}
 	
 	@Override

@@ -78,11 +78,8 @@ public class IntegrationPushTestUtils {
 			throws DaoException, UnexpectedObmSyncServerException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
-		HierarchyItemsChanges hierarchyItemsChanges =
-				new HierarchyItemsChanges.Builder().lastSync(new Date()).build();
-		
 		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
-				.andReturn(hierarchyItemsChanges).anyTimes();	
+				.andReturn(new HierarchyItemsChanges(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), new Date())).anyTimes();	
 	}
 
 	public static void mockMonitoredCollectionDao(MonitoredCollectionDao monitoredCollectionDao) {

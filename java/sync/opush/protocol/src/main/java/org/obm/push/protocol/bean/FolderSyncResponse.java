@@ -58,11 +58,11 @@ public class FolderSyncResponse {
 	}
 
 	public Collection<ItemChange> getItemsAddedAndUpdated() {
-		return hierarchyItemsChanges.getChangedItems();
+		return hierarchyItemsChanges.getItemsAddedOrUpdated();
 	}
 	
 	public Collection<ItemChange> getItemsDeleted() {
-		return hierarchyItemsChanges.getDeletedItems();
+		return hierarchyItemsChanges.getItemsDeleted();
 	}
 	
 	public String getNewSyncKey() {
