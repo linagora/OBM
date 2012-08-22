@@ -33,7 +33,6 @@ package org.obm.opush;
 
 import org.obm.opush.env.AbstractOverrideModule;
 import org.obm.push.backend.IContentsExporter;
-import org.obm.push.state.SyncKeyFactory;
 
 public class ModuleUtils {
 
@@ -46,15 +45,5 @@ public class ModuleUtils {
 			}
 		};
 		return contentsExporterBackend;
-	}
-
-	public static AbstractOverrideModule buildSyncKeyFactoryModule() {
-		return new AbstractOverrideModule() {
-
-			@Override
-			protected void configureImpl() {
-				bindWithMock(SyncKeyFactory.class);
-			}
-		};
 	}
 }
