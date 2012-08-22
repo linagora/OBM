@@ -81,7 +81,7 @@ public class IntegrationUserAccessUtils {
 				user.deviceId, 
 				user.userAgent))
 				.andReturn(
-						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties()))
+						new Device(user.hashCode(), user.deviceType, user.deviceId, new Properties()))
 						.anyTimes();
 	}
 	
