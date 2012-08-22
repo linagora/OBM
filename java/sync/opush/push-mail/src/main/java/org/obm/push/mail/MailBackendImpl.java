@@ -53,10 +53,10 @@ import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
-import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
@@ -113,7 +113,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.sun.mail.util.QPDecoderStream;
@@ -143,16 +142,14 @@ public class MailBackendImpl implements MailBackend {
 	private final MappingService mappingService;
 	private final EmailDao emailDao;
 	private final EmailSync emailSync;
-
-	private final Provider<org.obm.push.backend.CollectionPath.Builder> collectionPathBuilder;
+	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
-			MappingService mappingService,
-			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
+			MappingService mappingService, CollectionPathHelper collectionPathHelper)  {
 
 		this.mailboxService = mailboxService;
 		this.emailDao = emailDao;
@@ -162,7 +159,7 @@ public class MailBackendImpl implements MailBackend {
 		this.calendarClient = calendarClient;
 		this.login = login;
 		this.mappingService = mappingService;
-		this.collectionPathBuilder = collectionPathBuilderProvider;
+		this.collectionPathHelper = collectionPathHelper;
 	}
 
 	@Override
@@ -172,58 +169,44 @@ public class MailBackendImpl implements MailBackend {
 	
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException, MailException {
-		ImmutableSet<CollectionPath> currentSubscribedFolders = 
-				ImmutableSet.<CollectionPath>builder()
-					.addAll(listSpecialFolders(udr))
+		ImmutableSet<String> currentSubscribedFolders = 
+				ImmutableSet.<String>builder()
+					.addAll(listSpecialFolders())
 					.addAll(listSubscribedFolders(udr))
 				.build();
 		return computeChanges(udr, currentSubscribedFolders).lastSync(new Date()).build();
 	}
 	
-	private List<CollectionPath> listSpecialFolders(UserDataRequest udr) {
-		return imapFolderNamesToCollectionPath(udr, SPECIAL_FOLDERS);
+	private List<String> listSpecialFolders() {
+		return SPECIAL_FOLDERS;
 	}
 	
-	private List<CollectionPath> imapFolderNamesToCollectionPath(UserDataRequest udr, Iterable<String> imapFolderNames) {
-		List<CollectionPath> collectionPaths = Lists.newArrayList();
-		for (String imapFolderName: imapFolderNames) {
-			collectionPaths.add(
-					collectionPathBuilder.get()
-						.userDataRequest(udr)
-						.pimType(PIMDataType.EMAIL)
-						.displayName(imapFolderName)
-					.build());
-		}
-		return collectionPaths;
-	}
-	
-	private List<CollectionPath> listSubscribedFolders(UserDataRequest udr) throws MailException {
-		return imapFolderNamesToCollectionPath(udr,
-					FluentIterable
-					.from(
-						mailboxService.listSubscribedFolders(udr))
-					.transform(
-							new Function<MailboxFolder, String>() {
-								@Override
-								public String apply(MailboxFolder input) {
-									return input.getName();
-								}})
-					.toImmutableList());
+	private List<String> listSubscribedFolders(UserDataRequest udr) throws MailException {
+		return FluentIterable
+				.from(
+					mailboxService.listSubscribedFolders(udr))
+				.transform(
+						new Function<MailboxFolder, String>() {
+							@Override
+							public String apply(MailboxFolder input) {
+								return input.getName();
+							}})
+				.toImmutableList();
 	}
 
-	private HierarchyItemsChanges.Builder computeChanges(UserDataRequest udr, ImmutableSet<CollectionPath> currentSubscribedFolders) throws DaoException {
-		ImmutableSet<CollectionPath> previousEmailCollections = listPreviousEmailCollections(udr);
-		SetView<CollectionPath> newFolders = Sets.difference(currentSubscribedFolders, previousEmailCollections);
-		SetView<CollectionPath> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders);
+	private HierarchyItemsChanges.Builder computeChanges(UserDataRequest udr, ImmutableSet<String> currentSubscribedFolders) throws DaoException {
+		ImmutableSet<String> previousEmailCollections = listPreviousEmailCollections(udr);
+		SetView<String> newFolders = Sets.difference(currentSubscribedFolders, previousEmailCollections);
+		SetView<String> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders);
 		return new HierarchyItemsChanges.Builder()
 			.changes(itemChanges(udr, newFolders))
 			.deletions(itemChanges(udr, deletedFolders));
 	}
 
-	private List<ItemChange> itemChanges(UserDataRequest udr, Set<CollectionPath> folders) throws DaoException {
+	private List<ItemChange> itemChanges(UserDataRequest udr, SetView<String> folders) throws DaoException {
 		List<ItemChange> changes = Lists.newArrayList();
-		for (CollectionPath folder: folders) {
-			changes.add(genItemChange(udr, folder));
+		for (String folder: folders) {
+			changes.add(genItemChange(udr, folder, folderType(folder)));
 		}
 		return changes;
 	}
@@ -232,32 +215,31 @@ public class MailBackendImpl implements MailBackend {
 		return Objects.firstNonNull(SPECIAL_FOLDERS_TYPES.get(folder), FolderType.USER_CREATED_EMAIL_FOLDER);
 	}
 
-	private ImmutableSet<CollectionPath> listPreviousEmailCollections(UserDataRequest udr) throws DaoException {
+	private ImmutableSet<String> listPreviousEmailCollections(UserDataRequest udr) {
 		return FluentIterable
-				.from(mappingService.listCollections(udr))
+				.from(mappingService.listCollections(udr.getDevice()))
 				.filter(
-						new Predicate<CollectionPath>() {
+						new Predicate<String>() {
 							@Override
-							public boolean apply(CollectionPath collectionPath) {
-								return collectionPath.pimType() == PIMDataType.EMAIL;
+							public boolean apply(String collectionPath) {
+								return collectionPathHelper.recognizePIMDataType(collectionPath) == PIMDataType.EMAIL;
 							}
 						})
 				.toImmutableSet();
 	}
 	
-	private ItemChange genItemChange(UserDataRequest udr, CollectionPath imapFolder) throws DaoException {
+	private ItemChange genItemChange(UserDataRequest udr, String imapFolder,
+			FolderType type) throws DaoException {
 		
-		ItemChange ic = new ItemChangeBuilder()
-			.parentId("0")
-			.displayName(imapFolder.displayName())
-			.itemType(folderType(imapFolder.displayName())).build();
+		ItemChange ic = new ItemChangeBuilder().parentId("0").displayName(imapFolder).itemType(type).build();
 
+		String imapPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, imapFolder);
 		String serverId;
 		try {
-			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
+			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapPath);
 			serverId = mappingService.collectionIdToString(collectionId);
 		} catch (CollectionNotFoundException e) {
-			serverId = mappingService.createCollectionMapping(udr.getDevice(), imapFolder.collectionPath());
+			serverId = mappingService.createCollectionMapping(udr.getDevice(), imapPath);
 			ic.setIsNew(true);
 		}
 
@@ -265,8 +247,8 @@ public class MailBackendImpl implements MailBackend {
 		return ic;
 	}
 
-	private CollectionPath getWasteBasketPath(UserDataRequest udr) {
-		return collectionPathBuilder.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).displayName(EmailConfiguration.IMAP_TRASH_NAME).build();
+	private String getWasteBasketPath(UserDataRequest udr) {
+		return collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_TRASH_NAME);
 	}
 
 	private MailChanges getSync(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType) 
@@ -415,11 +397,11 @@ public class MailBackendImpl implements MailBackend {
 				final Integer devDbId = udr.getDevice().getDatabaseId();
 
 				if (trash) {
-					CollectionPath wasteBasketPath = getWasteBasketPath(udr);
-					Integer wasteBasketId = mappingService.getCollectionIdFor(udr.getDevice(), wasteBasketPath.collectionPath());
-					long newUID = mailboxService.moveItem(udr, collectionName, wasteBasketPath.collectionPath(), uid);
+					String wasteBasketPath = getWasteBasketPath(udr);
+					Integer wasteBasketId = mappingService.getCollectionIdFor(udr.getDevice(), wasteBasketPath);
+					long newUID = mailboxService.moveItem(udr, collectionName, wasteBasketPath, uid);
 					deleteEmails(devDbId, collectionId, Arrays.asList(newUID));
-					addMessageInCache(udr, devDbId, wasteBasketId, newUID, wasteBasketPath.collectionPath());
+					addMessageInCache(udr, devDbId, wasteBasketId, newUID, wasteBasketPath);
 				} else {
 					mailboxService.delete(udr, collectionName, uid);
 				}
@@ -751,8 +733,8 @@ public class MailBackendImpl implements MailBackend {
 			boolean deleteSubFolder) throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException {
 		
 		try {
-			CollectionPath wasteBasketPath = getWasteBasketPath(udr);
-			if (!wasteBasketPath.collectionPath().equals(collectionPath)) {
+			String wasteBasketPath = getWasteBasketPath(udr);
+			if (!wasteBasketPath.equals(collectionPath)) {
 				throw new NotAllowedException(
 						"Only the Trash folder can be purged.");
 			}
@@ -782,8 +764,8 @@ public class MailBackendImpl implements MailBackend {
 		}
 	}
 
-	private void addMessageInCache(UserDataRequest udr, Integer devId, Integer collectionId, Long mailUids, String collectionPath) throws DaoException, MailException {
-		Collection<Email> emails = mailboxService.fetchEmails(udr, collectionPath, ImmutableList.of(mailUids));
+	private void addMessageInCache(UserDataRequest udr, Integer devId, Integer collectionId, Long mailUids, String collectionName) throws DaoException, MailException {
+		Collection<Email> emails = mailboxService.fetchEmails(udr, collectionName, ImmutableList.of(mailUids));
 		try {
 			markEmailsAsSynced(devId, collectionId, emails);
 		} catch (DaoException e) {

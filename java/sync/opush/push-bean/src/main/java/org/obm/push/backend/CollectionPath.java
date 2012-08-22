@@ -108,7 +108,6 @@ public class CollectionPath {
 	private final transient PIMDataType pimType;
 	private final transient String displayName;
 	
-	@VisibleForTesting 
 	protected CollectionPath(String collectionPath, PIMDataType pimType, String displayName) {
 		this.collectionPath = collectionPath;
 		this.pimType = pimType;
