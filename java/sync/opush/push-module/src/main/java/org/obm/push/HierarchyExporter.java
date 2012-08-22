@@ -31,16 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import java.util.Date;
+import java.util.Map.Entry;
+
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.HierarchyItemsChanges.Builder;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.InvalidSyncKeyException;
-import org.obm.push.service.impl.MappingService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -51,37 +52,27 @@ public class HierarchyExporter implements IHierarchyExporter {
 
 	private final FolderBackend folderExporter;
 	private final Backends backends;
-	private final MappingService mappingService;
 
 	@Inject
-	@VisibleForTesting HierarchyExporter(FolderBackend folderExporter, Backends backends,
-			MappingService mappingService) {
+	@VisibleForTesting HierarchyExporter(FolderBackend folderExporter, Backends backends) {
 		this.folderExporter = folderExporter;
 		this.backends = backends;
-		this.mappingService = mappingService;
 	}
 
 	@Override
-	public HierarchyItemsChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState,
-			FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException {
-		
+	public HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException {
 		Builder builder = new HierarchyItemsChanges.Builder();
-		for (PIMBackend backend: backends) {
-			HierarchyItemsChanges hierarchyChanges = backend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		for (Entry<PIMDataType, PIMBackend> entry: backends.getBackends().entrySet()) {
+			HierarchyItemsChanges hierarchyChanges = entry.getValue().getHierarchyChanges(udr, lastSync);
+			// FIXME : The last sync is only used by contact folders sync
+			if (entry.getKey() == PIMDataType.CONTACTS) {
+				builder.lastSync(hierarchyChanges.getLastSync());
+			}
 			builder.mergeItems(hierarchyChanges);
-			
-			updateBackendSyncState(backend, outgoingSyncState);
-			
 		}
 		return builder.build();
 	}
-
-	private void updateBackendSyncState(PIMBackend backend, FolderSyncState outgoingSyncState)
-			throws DaoException {
-		
-		mappingService.createBackendMapping(backend.getPIMDataType(), outgoingSyncState);
-	}
-
+	
 	@Override
 	public String getRootFolderUrl(UserDataRequest udr) {
 		return folderExporter.getColName(udr);

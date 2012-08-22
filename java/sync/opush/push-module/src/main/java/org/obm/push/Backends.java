@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +44,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class Backends implements Iterable<PIMBackend> {
+public class Backends {
 
 	private final Map<PIMDataType, PIMBackend> backends;
 
@@ -68,8 +67,7 @@ public class Backends implements Iterable<PIMBackend> {
 		return backend;
 	}
 	
-	@Override
-	public Iterator<PIMBackend> iterator() {
-		return backends.values().iterator();
+	public Map<PIMDataType, PIMBackend> getBackends() {
+		return backends;
 	}
 }

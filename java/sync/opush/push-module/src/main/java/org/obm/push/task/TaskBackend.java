@@ -37,7 +37,6 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
@@ -112,9 +111,9 @@ public class TaskBackend implements PIMBackend {
 
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(
-			UserDataRequest userDataRequest, FolderSyncState lastKnownState,
-			FolderSyncState outgoingSyncState) throws DaoException {
-		return new HierarchyItemsChanges.Builder().lastSync(new Date()).build();
+			UserDataRequest userDataRequest, Date lastSync)
+			throws DaoException {
+		
+		return new HierarchyItemsChanges.Builder().lastSync(lastSync).build();
 	}
-	
 }

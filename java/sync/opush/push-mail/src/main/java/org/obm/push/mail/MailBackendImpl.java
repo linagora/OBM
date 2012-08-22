@@ -55,12 +55,10 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.OpushBackend;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
@@ -76,7 +74,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
-import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -105,6 +102,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -121,7 +119,7 @@ import com.google.inject.name.Named;
 import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
-public class MailBackendImpl extends OpushBackend implements MailBackend {
+public class MailBackendImpl implements MailBackend {
 
 	private static final ImmutableList<String> SPECIAL_FOLDERS = 
 			ImmutableList.of(EmailConfiguration.IMAP_INBOX_NAME,
@@ -142,9 +140,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final ConfigurationService configurationService;
 	private final ICalendar calendarClient;
 	private final LoginService login;
+	private final MappingService mappingService;
 	private final EmailDao emailDao;
 	private final EmailSync emailSync;
 
+	private final Provider<org.obm.push.backend.CollectionPath.Builder> collectionPathBuilder;
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
@@ -154,7 +154,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			MappingService mappingService,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
 
-		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
 		this.emailDao = emailDao;
 		this.emailSync = emailSync;
@@ -162,6 +161,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
 		this.login = login;
+		this.mappingService = mappingService;
+		this.collectionPathBuilder = collectionPathBuilderProvider;
 	}
 
 	@Override
@@ -170,21 +171,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
-			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
-			throws DaoException, MailException {
-		
-		try {
-			ImmutableSet<CollectionPath> currentSubscribedFolders = 
-					ImmutableSet.<CollectionPath>builder()
-						.addAll(listSpecialFolders(udr))
-						.addAll(listSubscribedFolders(udr))
-					.build();
-			snapshotHierarchy(udr, currentSubscribedFolders, outgoingSyncState);
-			return computeChanges(udr, lastKnownState, currentSubscribedFolders);
-		} catch (CollectionNotFoundException e) {
-			throw new HierarchyChangesException(e);
-		}
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException, MailException {
+		ImmutableSet<CollectionPath> currentSubscribedFolders = 
+				ImmutableSet.<CollectionPath>builder()
+					.addAll(listSpecialFolders(udr))
+					.addAll(listSubscribedFolders(udr))
+				.build();
+		return computeChanges(udr, currentSubscribedFolders).lastSync(new Date()).build();
 	}
 	
 	private List<CollectionPath> listSpecialFolders(UserDataRequest udr) {
@@ -195,7 +188,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		List<CollectionPath> collectionPaths = Lists.newArrayList();
 		for (String imapFolderName: imapFolderNames) {
 			collectionPaths.add(
-					collectionPathBuilderProvider.get()
+					collectionPathBuilder.get()
 						.userDataRequest(udr)
 						.pimType(PIMDataType.EMAIL)
 						.displayName(imapFolderName)
@@ -218,35 +211,62 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 					.toImmutableList());
 	}
 
-	private HierarchyItemsChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
-			ImmutableSet<CollectionPath> currentSubscribedFolders) throws DaoException, CollectionNotFoundException {
-		
-		ImmutableSet<CollectionPath> previousEmailCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
+	private HierarchyItemsChanges.Builder computeChanges(UserDataRequest udr, ImmutableSet<CollectionPath> currentSubscribedFolders) throws DaoException {
+		ImmutableSet<CollectionPath> previousEmailCollections = listPreviousEmailCollections(udr);
 		SetView<CollectionPath> newFolders = Sets.difference(currentSubscribedFolders, previousEmailCollections);
 		SetView<CollectionPath> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders);
-		
-		return buildHierarchyItemsChanges(udr, newFolders, deletedFolders);
+		return new HierarchyItemsChanges.Builder()
+			.changes(itemChanges(udr, newFolders))
+			.deletions(itemChanges(udr, deletedFolders));
+	}
+
+	private List<ItemChange> itemChanges(UserDataRequest udr, Set<CollectionPath> folders) throws DaoException {
+		List<ItemChange> changes = Lists.newArrayList();
+		for (CollectionPath folder: folders) {
+			changes.add(genItemChange(udr, folder));
+		}
+		return changes;
 	}
 
 	private FolderType folderType(String folder) {
 		return Objects.firstNonNull(SPECIAL_FOLDERS_TYPES.get(folder), FolderType.USER_CREATED_EMAIL_FOLDER);
 	}
+
+	private ImmutableSet<CollectionPath> listPreviousEmailCollections(UserDataRequest udr) throws DaoException {
+		return FluentIterable
+				.from(mappingService.listCollections(udr))
+				.filter(
+						new Predicate<CollectionPath>() {
+							@Override
+							public boolean apply(CollectionPath collectionPath) {
+								return collectionPath.pimType() == PIMDataType.EMAIL;
+							}
+						})
+				.toImmutableSet();
+	}
 	
-	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, CollectionPath imapFolder)
-			throws DaoException, CollectionNotFoundException {
+	private ItemChange genItemChange(UserDataRequest udr, CollectionPath imapFolder) throws DaoException {
 		
-		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
-		return new ItemChangeBuilder()
+		ItemChange ic = new ItemChangeBuilder()
 			.parentId("0")
 			.displayName(imapFolder.displayName())
-			.itemType(folderType(imapFolder.displayName()))
-			.serverId(mappingService.collectionIdToString(collectionId))
-			.build();
+			.itemType(folderType(imapFolder.displayName())).build();
+
+		String serverId;
+		try {
+			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
+			serverId = mappingService.collectionIdToString(collectionId);
+		} catch (CollectionNotFoundException e) {
+			serverId = mappingService.createCollectionMapping(udr.getDevice(), imapFolder.collectionPath());
+			ic.setIsNew(true);
+		}
+
+		ic.setServerId(serverId);
+		return ic;
 	}
 
 	private CollectionPath getWasteBasketPath(UserDataRequest udr) {
-		return collectionPathBuilderProvider.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).displayName(EmailConfiguration.IMAP_TRASH_NAME).build();
+		return collectionPathBuilder.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).displayName(EmailConfiguration.IMAP_TRASH_NAME).build();
 	}
 
 	private MailChanges getSync(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType) 

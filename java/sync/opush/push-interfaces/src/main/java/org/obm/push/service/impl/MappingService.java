@@ -32,15 +32,12 @@
 package org.obm.push.service.impl;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -49,15 +46,12 @@ public interface MappingService {
 
 	String collectionIdToString(Integer collectionId);
 
-	int createCollectionMapping(Device device, String col)
+	int createCollectionMapping(Device device, String col, FolderSyncState folderSyncState)
 			throws DaoException;
 	
-	Date getLastBackendMapping(PIMDataType dataType, FolderSyncState folderSyncState)
+	String createCollectionMapping(Device device, String col)
 			throws DaoException;
-	
-	void createBackendMapping(PIMDataType pimDataType, FolderSyncState outgoingSyncState)
-			throws DaoException;
-	
+
 	String getCollectionPathFor(Integer collectionId)
 			throws CollectionNotFoundException, DaoException;
 
@@ -74,8 +68,5 @@ public interface MappingService {
 
 	Integer getCollectionIdFromServerId(String serverId);
 	
-	List<CollectionPath> listCollections(UserDataRequest udr, FolderSyncState folderSyncState) throws DaoException;
-
-	void snapshotCollections(FolderSyncState outgoingSyncState, Set<Integer> collectionIds)
-			throws DaoException;
+	List<CollectionPath> listCollections(UserDataRequest udr) throws DaoException;
 }

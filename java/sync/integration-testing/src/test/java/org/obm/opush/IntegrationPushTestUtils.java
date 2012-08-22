@@ -40,17 +40,14 @@ import java.util.Set;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -61,15 +58,11 @@ import com.google.common.collect.Lists;
 
 public class IntegrationPushTestUtils {
 
-	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap)
-			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
-		
+	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException, UnexpectedObmSyncServerException {
 		mockHierarchyChangesOnlyInbox(classToInstanceMap, new Date());
 	}
 	
-	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
-			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
-		
+	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate) throws DaoException, UnexpectedObmSyncServerException {
 		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
 			.changes(Lists.newArrayList(buildInboxFolder()))
 			.lastSync(newSyncDate).build();
@@ -78,7 +71,7 @@ public class IntegrationPushTestUtils {
 	}
 
 	public static void mockHierarchyChangesForMailboxes(ClassToInstanceAgregateView<Object> classToInstanceMap,
-			HierarchyItemsChanges mailboxesChanges) throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
+			HierarchyItemsChanges mailboxesChanges) throws DaoException, UnexpectedObmSyncServerException {
 		
 		Date lastSync = mailboxesChanges.getLastSync();
 		mockAddressBook(classToInstanceMap, lastSync);
@@ -90,42 +83,34 @@ public class IntegrationPushTestUtils {
 	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
 			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
-		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
-		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
-				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange(newSyncDate)).anyTimes();
+		
+		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
+		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(hierarchyItemsChanges).anyTimes();
 	}
 	
 	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate) throws DaoException {
 		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
-		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS).anyTimes();
-		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
-				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange(newSyncDate)).anyTimes();
+		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build()).anyTimes();
 	}
 	
 	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
-			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
+			throws DaoException, UnexpectedObmSyncServerException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
-		expect(contactsBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS).anyTimes();
-		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
-				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange(newSyncDate)).anyTimes();
+		HierarchyItemsChanges hierarchyItemsChanges =
+				new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
+		
+		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(hierarchyItemsChanges).anyTimes();	
 	}
 	
-	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap, HierarchyItemsChanges hierarchyMailboxesChanges)
-			throws DaoException, InvalidSyncKeyException {
-		
+	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap, HierarchyItemsChanges hierarchyMailboxesChanges) throws DaoException {
 		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
-		expect(mailBackend.getPIMDataType()).andReturn(PIMDataType.EMAIL).anyTimes();
-		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
-				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(hierarchyMailboxesChanges).anyTimes();
-	}
-
-	private static HierarchyItemsChanges emptyChange(Date newSyncDate) {
-		return new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
+		
+		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
+				.andReturn(hierarchyMailboxesChanges).anyTimes();
 	}
 	
 	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, String newSyncKey) {

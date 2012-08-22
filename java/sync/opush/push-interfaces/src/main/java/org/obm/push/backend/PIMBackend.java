@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
+import java.util.Date;
 import java.util.List;
 
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
@@ -46,7 +46,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -83,6 +82,6 @@ public interface PIMBackend {
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
 
-	HierarchyItemsChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
-			throws DaoException, InvalidSyncKeyException;
+	HierarchyItemsChanges getHierarchyChanges(UserDataRequest userDataRequest, Date lastSync)
+			throws DaoException;
 }

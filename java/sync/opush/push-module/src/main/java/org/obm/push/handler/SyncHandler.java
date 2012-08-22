@@ -442,7 +442,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		for (ItemChange change: syncCollectionResponse.getItemChanges()) {
 			boolean isItemAddition = st.getKey().equals("0") || 
 					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
-			change.setNew(isItemAddition);
+			change.setIsNew(isItemAddition);
 		}
 	}
 	

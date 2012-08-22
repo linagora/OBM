@@ -31,17 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.util.Date;
+
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.HierarchyItemsChanges;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -54,6 +57,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -99,8 +103,6 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		} catch (UnexpectedObmSyncServerException e) {
 			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
-		} catch (HierarchyChangesException e) {
-			sendError(responder, FolderSyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -113,19 +115,69 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}
 	
-	private FolderSyncResponse doTheJob(UserDataRequest udr, FolderSyncRequest folderSyncRequest)
-			throws InvalidSyncKeyException, DaoException, UnexpectedObmSyncServerException {
+	private FolderSyncResponse doTheJob(UserDataRequest udr, FolderSyncRequest folderSyncRequest) throws InvalidSyncKeyException, 
+		DaoException, UnexpectedObmSyncServerException {
 		
-		return getFolderSyncResponse(udr, folderSyncRequest);
+		if (isFirstSync(folderSyncRequest)) {
+
+			FolderSyncResponse folderSyncResponse = getFolderSyncResponse(udr, DateUtils.getEpochCalendar().getTime());
+			initializeItems(folderSyncResponse);
+			return folderSyncResponse;
+		} else {
+			Date lastSyncDate = getLastSyncDate(folderSyncRequest);
+			return getFolderSyncResponse(udr, lastSyncDate);
+		}
 	}
 
-	private FolderSyncResponse getFolderSyncResponse(UserDataRequest udr, FolderSyncRequest folderSyncRequest)
-			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
+	private void initializeItems(FolderSyncResponse folderSyncResponse) {
+		for (ItemChange itemChange: folderSyncResponse.getItemsAddedAndUpdated()) {
+			itemChange.setIsNew(true);
+		}
+	}
+
+	private Date getLastSyncDate(FolderSyncRequest folderSyncRequest) throws DaoException, InvalidSyncKeyException {
 		
-		FolderSyncState incomingSyncState = stMachine.getFolderSyncState(folderSyncRequest.getSyncKey());
-		FolderSyncState outgoingSyncState = stMachine.allocateNewFolderSyncState(udr);
-		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, incomingSyncState, outgoingSyncState);
-		return new FolderSyncResponse(hierarchyItemsChanges, outgoingSyncState.getKey());
+		String syncKey = folderSyncRequest.getSyncKey();
+		FolderSyncState syncState = stMachine.getFolderSyncState(syncKey);
+		if (syncState == null) {
+			throw new InvalidSyncKeyException(syncKey);
+		}
+		return syncState.getLastSync();
+	}
+
+	private boolean isFirstSync(FolderSyncRequest folderSyncRequest) {
+		return folderSyncRequest.getSyncKey().equals("0");
+	}
+
+	private FolderSyncResponse getFolderSyncResponse(UserDataRequest udr, Date lastSync) throws DaoException, 
+			UnexpectedObmSyncServerException {
+		
+		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, lastSync);
+		return createFolderSyncResponse(udr, hierarchyItemsChanges);
+	}
+	
+	private FolderSyncResponse createFolderSyncResponse(UserDataRequest udr, HierarchyItemsChanges hierarchyItemsChanges)
+			throws DaoException {
+		
+		String newSyncKey = allocateNewSyncKey(udr);
+		return new FolderSyncResponse(hierarchyItemsChanges, newSyncKey);
+	}
+
+	private String allocateNewSyncKey(UserDataRequest udr) 
+			throws DaoException {
+		
+		FolderSyncState newFolderSyncState = stMachine.allocateNewFolderSyncState(udr);
+		assertRootCollectionHasMapping(udr, newFolderSyncState);
+		return newFolderSyncState.getKey();
+	}
+	
+	private void assertRootCollectionHasMapping(UserDataRequest udr, FolderSyncState folderSyncState) throws DaoException {
+		Device device = udr.getDevice();
+		String rootFolderUrl = hierarchyExporter.getRootFolderUrl(udr);
+		
+		if (collectionDao.getCollectionMapping(device, rootFolderUrl) == null) {
+			collectionDao.addCollectionMapping(device, rootFolderUrl, folderSyncState);
+		}
 	}
 
 }

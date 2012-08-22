@@ -108,7 +108,7 @@ public class ItemChange implements Serializable {
 		return isNew;
 	}
 
-	public void setNew(boolean isNew) {
+	public void setIsNew(boolean isNew) {
 		this.isNew = isNew;
 	}
 

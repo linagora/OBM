@@ -57,7 +57,6 @@ import org.obm.push.backend.CollectionPathUtils;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
@@ -66,8 +65,11 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
@@ -177,9 +179,7 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void initialHierarchyContainsBaseFolders() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("0");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234");
+	public void initialHierarchyContainsBaseFolders() throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException {
 
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -194,12 +194,12 @@ public class MailBackendTest {
 		expect(mappingService.collectionIdToString(4)).andReturn("collection4");
 		
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(ImmutableList.<CollectionPath>of());
+		expect(mappingService.listCollections(udr)).andReturn(ImmutableList.<CollectionPath>of());
 		
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, DateUtils.getEpochCalendar().getTime());
 		
 		verifyCommonMocks();
 		
@@ -227,18 +227,16 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void emptyHierarchyChanges() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		
+	public void emptyHierarchyChanges() throws DaoException, UnexpectedObmSyncServerException {
+
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
+		expect(mappingService.listCollections(udr)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
 		
 		verifyCommonMocks();
 		
@@ -248,13 +246,11 @@ public class MailBackendTest {
 	}
 
 	@Test
-	public void filterContactsHierarchyChanges() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		
+	public void filterContactsHierarchyChanges() throws DaoException, UnexpectedObmSyncServerException {
+
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(
+		expect(mappingService.listCollections(udr)).andReturn(
 				ImmutableList.<CollectionPath>builder()
 					.add(CollectionPathUtils.contactCollectionPath("contact"))
 					.addAll(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"))
@@ -263,7 +259,7 @@ public class MailBackendTest {
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("20120101"));
 		
 		verifyCommonMocks();
 		
@@ -272,9 +268,7 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void newImapFolder() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
+	public void newImapFolder() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -282,7 +276,7 @@ public class MailBackendTest {
 		expect(collectionPathBuilder.displayName("NewFolder")).andReturn(collectionPathBuilder).anyTimes();
 		expect(collectionPathBuilder.build()).andReturn(newFolderCollectionPath).once();
 		
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
+		expect(mappingService.listCollections(udr)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash"));
 		expect(mappingService.getCollectionIdFor(device, newFolderCollectionPath.collectionPath())).andReturn(5);
 		expect(mappingService.collectionIdToString(5)).andReturn("newFolderCollection");
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
@@ -290,7 +284,7 @@ public class MailBackendTest {
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
 		
 		verifyCommonMocks();
 
@@ -305,15 +299,13 @@ public class MailBackendTest {
 
 	
 	@Test
-	public void deletedImapFolder() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
+	public void deletedImapFolder() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
 		CollectionPath deletedFolderCollection = CollectionPathUtils.emailCollectionPath("deletedFolder");
 		
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
+		expect(mappingService.listCollections(udr)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
 		expect(mappingService.getCollectionIdFor(device, deletedFolderCollection.collectionPath())).andReturn(5);
 		expect(mappingService.collectionIdToString(5)).andReturn("deletedFolderCollection");
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
@@ -321,7 +313,7 @@ public class MailBackendTest {
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
 
 		verifyCommonMocks();
 		
@@ -335,10 +327,8 @@ public class MailBackendTest {
 	}
 	
 	@Test
-	public void deletedAndAddedImapFolders() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		
+	public void deletedAndAddedImapFolders() throws DaoException, UnexpectedObmSyncServerException, CollectionNotFoundException {
+
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
 		CollectionPath newFolderCollectionPath = CollectionPathUtils.emailCollectionPath("NewFolder");
@@ -353,14 +343,14 @@ public class MailBackendTest {
 		expect(mappingService.getCollectionIdFor(device, newFolderCollectionPath.collectionPath())).andReturn(6);
 		expect(mappingService.collectionIdToString(6)).andReturn("newFolderCollection");
 		
-		expect(mappingService.listCollections(udr, incomingSyncState)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
+		expect(mappingService.listCollections(udr)).andReturn(CollectionPathUtils.emailCollectionPaths("INBOX", "Drafts", "Sent", "Trash", "deletedFolder"));
 		
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
 		
 		replayCommonMocks();
 		
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, date("2012-01-01"));
 
 		verifyCommonMocks();
 		
