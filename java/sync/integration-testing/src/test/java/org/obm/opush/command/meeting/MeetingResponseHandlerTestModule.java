@@ -31,11 +31,40 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.meeting;
 
+import org.easymock.EasyMock;
 import org.obm.opush.env.AbstractOpushEnv;
+import org.obm.opush.env.AbstractOverrideModule;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.mail.MailBackend;
+
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
 public class MeetingResponseHandlerTestModule extends AbstractOpushEnv {
 	
 	public MeetingResponseHandlerTestModule() {
 		super();
+	}
+	
+	@Override
+	protected Module overrideModule() throws Exception {
+		Module overrideModule = super.overrideModule();
+
+		Module mailBackend = bindMailBackendModule();
+		
+		return Modules.combine(overrideModule, mailBackend);
+	}
+
+	private Module bindMailBackendModule() {
+		AbstractOverrideModule mailBackend = new AbstractOverrideModule() {
+
+			@Override
+			protected void configureImpl() {
+				bindWithMock(MailBackend.class);
+				EasyMock.expect(getMock(MailBackend.class).getPIMDataType()).andReturn(PIMDataType.EMAIL);
+			}
+		};
+		getMockMap().addMap(mailBackend.getMockMap());
+		return mailBackend;
 	}
 }

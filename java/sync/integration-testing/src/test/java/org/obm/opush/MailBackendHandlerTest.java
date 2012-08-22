@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
@@ -155,6 +156,7 @@ public class MailBackendHandlerTest {
 						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 		.withSyncDate(new Date()).build();
 		
+		mockHierarchyChanges(classToInstanceMap);
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockDao(serverId, syncState);
 		
