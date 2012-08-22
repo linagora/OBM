@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception;
 
-public class CollectionPathException extends RuntimeException {
+public class CollectionPathException extends Exception {
 
 	public CollectionPathException(String message) {
 		super(message);
