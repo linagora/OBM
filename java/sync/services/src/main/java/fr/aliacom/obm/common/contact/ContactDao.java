@@ -1750,8 +1750,8 @@ public class ContactDao {
 	public int countContactsInGroup(int gid) throws SQLException {
 		String query = "SELECT COUNT(*) "
 					+  "FROM Contact "
-					+  "WHERE contact_addressbook_id = ?"
-					+  "AND contact_archive != 1";
+					+  "WHERE contact_addressbook_id = ? "
+					+  "AND contact_archive != 1 ";
 
 		Connection con = null;
 		PreparedStatement ps = null;
