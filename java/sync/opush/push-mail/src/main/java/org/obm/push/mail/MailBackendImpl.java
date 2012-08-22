@@ -168,7 +168,7 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException, MailException {
+	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException {
 		ImmutableSet<String> currentSubscribedFolders = 
 				ImmutableSet.<String>builder()
 					.addAll(listSpecialFolders())
@@ -181,17 +181,8 @@ public class MailBackendImpl implements MailBackend {
 		return SPECIAL_FOLDERS;
 	}
 	
-	private List<String> listSubscribedFolders(UserDataRequest udr) throws MailException {
-		return FluentIterable
-				.from(
-					mailboxService.listSubscribedFolders(udr))
-				.transform(
-						new Function<MailboxFolder, String>() {
-							@Override
-							public String apply(MailboxFolder input) {
-								return input.getName();
-							}})
-				.toImmutableList();
+	private List<String> listSubscribedFolders(@SuppressWarnings("unused") UserDataRequest udr) {
+		return ImmutableList.<String>of();
 	}
 
 	private HierarchyItemsChanges.Builder computeChanges(UserDataRequest udr, ImmutableSet<String> currentSubscribedFolders) throws DaoException {
