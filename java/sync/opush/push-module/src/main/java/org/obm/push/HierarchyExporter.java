@@ -80,7 +80,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 		allItemsChanged.addAll(getCalendarChanges(udr, lastSync));
 		allItemsChanged.addAll(getMailChanges(udr, lastSync));
 		
-		HierarchyItemsChanges itemsContactChanged = getContactsChanges(udr, lastSync);
+		HierarchyItemsChanges itemsContactChanged = listContactFoldersChanged(udr, lastSync);
 		allItemsChanged.addAll(itemsContactChanged.getChangedItems());
 		
 		return new HierarchyItemsChanges.Builder()
@@ -89,9 +89,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 			.lastSync(itemsContactChanged.getLastSync()).build();
 	}
 	
-	private HierarchyItemsChanges getContactsChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
-		
+	public HierarchyItemsChanges listContactFoldersChanged(UserDataRequest udr, Date lastSync) throws DaoException {
 		return backend(PIMDataType.CONTACTS).getHierarchyChanges(udr, lastSync);
 	}
 	
