@@ -43,6 +43,21 @@ INSERT INTO opush_folder_sync_state (collection_id, device_id, sync_key)
 		WHERE opush_folder_sync_state.device_id = opush_sync_state.device_id);
 
 --
+-- Update opush_folder_mapping
+--
+
+ALTER TABLE opush_folder_mapping ADD COLUMN folder_sync_state_id INTEGER 
+	REFERENCES opush_folder_sync_state(id) ON DELETE CASCADE; 
+
+UPDATE opush_folder_mapping SET folder_sync_state_id = opush_folder_sync_state.id FROM opush_folder_sync_state
+	WHERE opush_folder_mapping.device_id = opush_folder_sync_state.device_id
+	AND opush_folder_sync_state.id = (SELECT MAX(id) FROM opush_folder_sync_state
+		WHERE opush_folder_sync_state.device_id = opush_folder_mapping.device_id);
+
+ALTER TABLE opush_folder_mapping ALTER folder_sync_state_id SET NOT NULL;
+ALTER TABLE opush_folder_mapping DROP device_id;
+
+--
 -- Create enum for PIMDataType
 --
 
@@ -60,7 +75,7 @@ CREATE TYPE pimdata_type AS ENUM (
 CREATE TABLE opush_folder_sync_state_backend_mapping (
 	id			SERIAL PRIMARY KEY,
 	data_type		pimdata_type NOT NULL,
-	folder_sync_state_id	INTEGER NOT NULL REFERENCES opush_folder_sync_state(id) ON DELETE CASCADE,
+	folder_sync_state_id	INTEGER REFERENCES opush_folder_sync_state(id),
 	last_sync		TIMESTAMP NOT NULL
 );
 
@@ -68,43 +83,30 @@ INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_stat
 	SELECT 'CALENDAR'::pimdata_type, opush_folder_sync_state.id, last_sync 
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%calendar%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'CONTACTS'::pimdata_type, opush_folder_sync_state.id, last_sync 
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%contacts%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'TASKS'::pimdata_type, opush_folder_sync_state.id, last_sync 
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%tasks%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'EMAIL'::pimdata_type, opush_folder_sync_state.id, last_sync 
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%email%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
---
--- Create opush_folder_snapshot
---
-
-CREATE TABLE opush_folder_snapshot (
-	id			SERIAL PRIMARY KEY,
-	folder_sync_state_id	INTEGER NOT NULL REFERENCES opush_folder_sync_state(id) ON DELETE CASCADE,
-	collection_id		INTEGER NOT NULL REFERENCES opush_folder_mapping(id) ON DELETE CASCADE
-);
-
-INSERT INTO opush_folder_snapshot (folder_sync_state_id, collection_id)
-	SELECT opush_folder_sync_state.id, opush_folder_sync_state.collection_id FROM opush_folder_sync_state;
-	
 -- Finally, drop column used for migration
 
 ALTER TABLE opush_folder_sync_state DROP collection_id;

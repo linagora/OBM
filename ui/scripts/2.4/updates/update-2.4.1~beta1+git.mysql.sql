@@ -45,6 +45,23 @@ INSERT INTO opush_folder_sync_state (collection_id, device_id, sync_key)
 		WHERE opush_folder_sync_state.device_id = opush_sync_state.device_id);
 
 --
+-- Update opush_folder_mapping
+--
+
+ALTER TABLE opush_folder_mapping ADD COLUMN folder_sync_state_id INTEGER;
+
+UPDATE opush_folder_mapping, opush_folder_sync_state SET folder_sync_state_id = opush_folder_sync_state.id
+	WHERE opush_folder_mapping.device_id = opush_folder_sync_state.device_id
+	AND opush_folder_sync_state.id = (SELECT MAX(id) FROM opush_folder_sync_state
+		WHERE opush_folder_sync_state.device_id = opush_folder_mapping.device_id);
+
+ALTER TABLE opush_folder_mapping MODIFY folder_sync_state_id INTEGER NOT NULL;
+ALTER TABLE opush_folder_mapping ADD KEY `opush_folder_mapping_sync_key_opush_folder_sync_state_id_fkey` (`folder_sync_state_id`);
+ALTER TABLE opush_folder_mapping ADD CONSTRAINT `opush_folder_mapping_sync_key_opush_folder_sync_state_id_fkey` FOREIGN KEY (`folder_sync_state_id`) REFERENCES `opush_folder_sync_state` (`id`) ON DELETE CASCADE;
+ALTER TABLE opush_folder_mapping DROP FOREIGN KEY opush_folder_mapping_device_id_opush_device_id_fkey;
+ALTER TABLE opush_folder_mapping DROP device_id;
+
+--
 -- Create opush_backend_folder_sync_mapping
 --
 
@@ -60,53 +77,32 @@ INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_stat
 	SELECT 'CALENDAR', opush_folder_sync_state.id, last_sync
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%calendar%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'CONTACTS', opush_folder_sync_state.id, last_sync
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%contacts%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'TASKS', opush_folder_sync_state.id, last_sync
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%tasks%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 INSERT INTO opush_folder_sync_state_backend_mapping (data_type, folder_sync_state_id, last_sync)
 	SELECT 'EMAIL', opush_folder_sync_state.id, last_sync
 		FROM opush_folder_sync_state, opush_folder_mapping, opush_sync_state
 	WHERE opush_folder_mapping.collection LIKE '%email%'
-	AND opush_folder_mapping.id = opush_folder_sync_state.collection_id
+	AND opush_folder_mapping.folder_sync_state_id = opush_folder_sync_state.id
 	AND opush_sync_state.sync_key = opush_folder_sync_state.sync_key;
 
 ALTER TABLE opush_folder_sync_state_backend_mapping ADD KEY `opush_folder_sync_state_backend_mapping_fkey` (`folder_sync_state_id`);
 ALTER TABLE opush_folder_sync_state_backend_mapping ADD CONSTRAINT `opush_folder_sync_state_backend_mapping_fkey` FOREIGN KEY (`folder_sync_state_id`) REFERENCES `opush_folder_sync_state` (`id`) ON DELETE CASCADE;
-
---
--- Create opush_folder_snapshot
---
-
-CREATE TABLE opush_folder_snapshot (
-        `id`                      INTEGER NOT NULL auto_increment,
-        `folder_sync_state_id`    INTEGER NOT NULL REFERENCES opush_folder_sync_state(id),
-        `collection_id`           INTEGER NOT NULL REFERENCES opush_folder_mapping(id)
-        PRIMARY KEY  (`id`)
-        KEY `ofs_folder_sync_state_id_ofssid_fkey` (`folder_sync_state_id`),
-        CONSTRAINT `ofs_folder_sync_state_id_ofssid_fkey` FOREIGN KEY (`folder_sync_state_id`) REFERENCES `opush_folder_sync_state` (`id`) ON DELETE CASCADE,
-        KEY `ofs_collection_id_ofmid_fkey` (`collection_id`),
-        CONSTRAINT `ofs_collection_id_ofmid_fkey` FOREIGN KEY (`collection_id`) REFERENCES `opush_folder_mapping` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO opush_folder_snapshot (folder_sync_state_id, collection_id)
-        SELECT opush_folder_sync_state.id, opush_folder_sync_state.collection_id FROM opush_folder_sync_state;
-
--- Finally, drop column used for migration
-
 ALTER TABLE opush_folder_sync_state DROP collection_id;
  
 COMMIT;

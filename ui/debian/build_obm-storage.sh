@@ -96,7 +96,6 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha6.mysql.sql ${UPGRADE_SQL_DIR_MYSQ
 cp ${CURDIR}/debian/misc/db/mysql/upgrade2.4.1~alpha9+git.sh ${UPGRADE_SCRIPTS_DIR_MYSQL}/2.4.1~alpha9+git
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha10+git.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~alpha10+git
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~beta1
-cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~beta2
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -159,6 +158,5 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha6.pgsql.sql ${UPGRADE_SQL_DIR_PGSQ
 cp ${CURDIR}/debian/misc/db/pgsql/upgrade2.4.1~alpha9+git.sh ${UPGRADE_SCRIPTS_DIR_PGSQL}/2.4.1~alpha9+git
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~alpha10+git.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~alpha10+git
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~beta1
-cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~beta2
 
 exit 0
