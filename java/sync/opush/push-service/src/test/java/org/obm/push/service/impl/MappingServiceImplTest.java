@@ -108,8 +108,7 @@ public class MappingServiceImplTest {
 
 	private CollectionDao mockCollectionDaoForCollectionPaths(String...paths) throws DaoException {
 		CollectionDao collectionDao = createMock(CollectionDao.class);
-		expect(collectionDao.getUserCollections(anyObject(FolderSyncState.class)))
-			.andReturn(Lists.newArrayList(paths));
+		expect(collectionDao.getUserCollections(anyObject(Device.class))).andReturn(Lists.newArrayList(paths));
 		return collectionDao;
 	}
 	
