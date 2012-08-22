@@ -102,16 +102,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -119,18 +114,6 @@ import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
 public class MailBackendImpl implements MailBackend {
-
-	private static final ImmutableList<String> SPECIAL_FOLDERS = 
-			ImmutableList.of(EmailConfiguration.IMAP_INBOX_NAME,
-							EmailConfiguration.IMAP_DRAFTS_NAME,
-							EmailConfiguration.IMAP_SENT_NAME,
-							EmailConfiguration.IMAP_TRASH_NAME);
-	
-	private static final ImmutableMap<String, FolderType> SPECIAL_FOLDERS_TYPES = 
-			ImmutableMap.of(EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER,
-							EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDER,
-							EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER,
-							EmailConfiguration.IMAP_TRASH_NAME, FolderType.DEFAULT_DELETED_ITEMS_FOLDER);
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -169,56 +152,16 @@ public class MailBackendImpl implements MailBackend {
 	
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException {
-		ImmutableSet<String> currentSubscribedFolders = 
-				ImmutableSet.<String>builder()
-					.addAll(listSpecialFolders())
-					.addAll(listSubscribedFolders(udr))
-				.build();
-		return computeChanges(udr, currentSubscribedFolders).lastSync(lastSync).build();
-	}
-	
-	private List<String> listSpecialFolders() {
-		return SPECIAL_FOLDERS;
-	}
-	
-	private List<String> listSubscribedFolders(@SuppressWarnings("unused") UserDataRequest udr) {
-		return ImmutableList.<String>of();
-	}
-
-	private HierarchyItemsChanges.Builder computeChanges(UserDataRequest udr, ImmutableSet<String> currentSubscribedFolders) throws DaoException {
-		ImmutableSet<String> previousEmailCollections = listPreviousEmailCollections(udr);
-		SetView<String> newFolders = Sets.difference(currentSubscribedFolders, previousEmailCollections);
-		SetView<String> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders);
+		ImmutableList<ItemChange> defaultFolders = ImmutableList.of(
+				genItemChange(udr, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER),
+				genItemChange(udr, EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS),
+				genItemChange(udr, EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER),
+				genItemChange(udr, EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
+		
 		return new HierarchyItemsChanges.Builder()
-			.changes(itemChanges(udr, newFolders))
-			.deletions(itemChanges(udr, deletedFolders));
+			.changes(defaultFolders).lastSync(lastSync).build();
 	}
 
-	private List<ItemChange> itemChanges(UserDataRequest udr, SetView<String> folders) throws DaoException {
-		List<ItemChange> changes = Lists.newArrayList();
-		for (String folder: folders) {
-			changes.add(genItemChange(udr, folder, folderType(folder)));
-		}
-		return changes;
-	}
-
-	private FolderType folderType(String folder) {
-		return Objects.firstNonNull(SPECIAL_FOLDERS_TYPES.get(folder), FolderType.USER_CREATED_EMAIL_FOLDER);
-	}
-
-	private ImmutableSet<String> listPreviousEmailCollections(UserDataRequest udr) {
-		return FluentIterable
-				.from(mappingService.listCollections(udr.getDevice()))
-				.filter(
-						new Predicate<String>() {
-							@Override
-							public boolean apply(String collectionPath) {
-								return collectionPathHelper.recognizePIMDataType(collectionPath) == PIMDataType.EMAIL;
-							}
-						})
-				.toImmutableSet();
-	}
-	
 	private ItemChange genItemChange(UserDataRequest udr, String imapFolder,
 			FolderType type) throws DaoException {
 		
