@@ -268,7 +268,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 
 			// get our sync state for this collection
-			ItemSyncState collectionState = stMachine.getItemSyncState(collection.getSyncKey());
+			ItemSyncState collectionState = stMachine.getSyncState(collection.getSyncKey());
 
 			if (collectionState != null) {
 				collection.setItemSyncState(collectionState);
@@ -403,7 +403,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 		
-		ItemSyncState st = stMachine.getItemSyncState(syncCollection.getSyncKey());
+		ItemSyncState st = stMachine.getSyncState(syncCollection.getSyncKey());
 		if (st == null) {
 			syncCollectionResponse.setSyncStateValid(false);
 		} else {

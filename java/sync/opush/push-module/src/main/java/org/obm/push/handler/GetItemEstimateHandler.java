@@ -142,7 +142,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
 			
 				String syncKey = syncCollection.getSyncKey();
-				SyncState state = stMachine.getItemSyncState(syncKey);
+				SyncState state = stMachine.getSyncState(syncKey);
 				if (state == null) {
 					throw new InvalidSyncKeyException(syncKey);
 				}

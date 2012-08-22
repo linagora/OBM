@@ -76,12 +76,8 @@ public class StateMachine {
 		return collectionDao.lastKnownState(device, collectionId);
 	}
 	
-	public ItemSyncState getItemSyncState(String syncKey) throws DaoException {
+	public ItemSyncState getSyncState(String syncKey) throws DaoException {
 		return collectionDao.findItemStateForKey(syncKey);
-	}
-	
-	public FolderSyncState getFolderSyncState(String syncKey) throws DaoException {
-		return collectionDao.findFolderStateForKey(syncKey);
 	}
 	
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {

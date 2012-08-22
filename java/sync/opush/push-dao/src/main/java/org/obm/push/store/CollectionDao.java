@@ -65,8 +65,6 @@ public interface CollectionDao {
 	
 	ItemSyncState findItemStateForKey(String syncKey) throws DaoException ;
 	
-	FolderSyncState findFolderStateForKey(String syncKey) throws DaoException ;
-
 	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
 
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
@@ -74,7 +72,6 @@ public interface CollectionDao {
 	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
 
 	List<String> getUserCollections(Device device) throws DaoException;
-
 
 
 }
