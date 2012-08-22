@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception;
 
-public class UnexpectedObmSyncServerException extends RuntimeException {
+public class UnexpectedObmSyncServerException extends Exception {
 
 	public UnexpectedObmSyncServerException() {
 		super();

@@ -118,7 +118,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	
 	@Override
 	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync)
-			throws DaoException {
+			throws DaoException, UnexpectedObmSyncServerException {
 
 		List<ItemChange> itemChanges = null;
 		if (!udr.checkHint("hint.multipleCalendars", false)) {
@@ -130,7 +130,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			.changes(itemChanges).lastSync(lastSync).build();
 	}
 
-	private List<ItemChange> getCalendarList(UserDataRequest udr) throws DaoException {
+	private List<ItemChange> getCalendarList(UserDataRequest udr) throws DaoException, UnexpectedObmSyncServerException {
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(udr);
 		try {
