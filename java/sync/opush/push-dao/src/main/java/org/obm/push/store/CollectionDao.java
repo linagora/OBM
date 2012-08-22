@@ -36,15 +36,13 @@ import java.util.List;
 
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 public interface CollectionDao {
 
-	int addCollectionMapping(Device device, String collection, FolderSyncState folderSyncState) throws DaoException;
+	int addCollectionMapping(Device device, String collection, SyncState syncState) throws DaoException;
 	
 	Integer addCollectionMapping(Device device, String collection) throws DaoException;
 
@@ -61,17 +59,14 @@ public interface CollectionDao {
 	 */
 	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
 
-	FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException;
-	
-	ItemSyncState findItemStateForKey(String syncKey) throws DaoException ;
+	SyncState findStateForKey(String syncKey) throws DaoException ;
 	
 	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
 
 	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
 
-	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
+	SyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
 
 	List<String> getUserCollections(Device device) throws DaoException;
-
 
 }

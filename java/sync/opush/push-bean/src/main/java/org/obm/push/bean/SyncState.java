@@ -44,18 +44,18 @@ import com.google.common.base.Objects;
 /**
  * Stores the last sync date for a given sync key & collection
  */
-public abstract class SyncState implements Serializable {
+public class SyncState implements Serializable {
 
 	private Date lastSync;
 	private boolean lastSyncFiltred;
 	private String key;
 	private int id;
 
-	protected SyncState(String syncKey) {
+	public SyncState(String syncKey) {
 		this(syncKey, null);
 	}
 
-	protected SyncState(String key, Date lastSync) {
+	public SyncState(String key, Date lastSync) {
 		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		this.lastSyncFiltred = false;
 		this.key = key;

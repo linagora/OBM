@@ -45,8 +45,6 @@ import java.util.TimeZone;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
@@ -97,6 +95,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return userCollections;
 	}
 
+	// TODO: To delete, next method will do the work
 	@Override
 	public Integer addCollectionMapping(Device device, String collection) throws DaoException {
 		Integer id = device.getDatabaseId();
@@ -119,7 +118,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public int addCollectionMapping(Device device, String collection, FolderSyncState syncState) throws DaoException {
+	public int addCollectionMapping(Device device, String collection, SyncState syncState) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try{
@@ -221,14 +220,9 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			JDBCUtils.cleanup(con, ps, null);
 		}
 	}
-
-	@Override
-	public FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException {
-		return null;
-	}
 	
 	@Override
-	public ItemSyncState findItemStateForKey(String syncKey) throws DaoException {
+	public SyncState findStateForKey(String syncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -242,7 +236,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return buildItemSyncState(rs);
+				return buildSyncState(rs);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -253,7 +247,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
+	public SyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -267,7 +261,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return buildItemSyncState(rs);
+				return buildSyncState(rs);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -277,10 +271,10 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return null;
 	}
 	
-	private ItemSyncState buildItemSyncState(ResultSet rs) throws SQLException {
+	private SyncState buildSyncState(ResultSet rs) throws SQLException {
 		Date lastSync = JDBCUtils.getDate(rs, "last_sync");
 		String syncKey = rs.getString("sync_key");
-		ItemSyncState syncState = new ItemSyncState(syncKey, lastSync);
+		SyncState syncState = new SyncState(syncKey, lastSync);
 		syncState.setId(rs.getInt("id"));
 		return syncState;
 	}

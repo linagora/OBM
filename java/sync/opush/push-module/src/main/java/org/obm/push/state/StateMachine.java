@@ -36,18 +36,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,28 +69,19 @@ public class StateMachine {
 		this.syncKeyFactory = syncKeyFactory;
 	}
 
-	public ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
+	public SyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
 		return collectionDao.lastKnownState(device, collectionId);
 	}
 	
-	public ItemSyncState getSyncState(String syncKey) throws DaoException {
-		return collectionDao.findItemStateForKey(syncKey);
+	public SyncState getSyncState(String syncKey) throws DaoException {
+		return collectionDao.findStateForKey(syncKey);
 	}
-	
-	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {
-		String newSk = syncKeyFactory.randomSyncKey();
-		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk);
-		newFolderState.setLastSync(DateUtils.getCurrentDate());
-		
-		log(udr, newFolderState);
-		return newFolderState;
-	}
-	
+
 	public String allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
 
 		String newSk = syncKeyFactory.randomSyncKey();
-		ItemSyncState newState = new ItemSyncState(newSk, lastSync);
+		SyncState newState = new SyncState(newSk, lastSync);
 		int syncStateId = collectionDao.updateState(udr.getDevice(), collectionId, newState);
 		newState.setId(syncStateId);
 		
