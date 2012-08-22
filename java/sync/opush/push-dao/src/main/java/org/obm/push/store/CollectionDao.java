@@ -42,8 +42,6 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 public interface CollectionDao {
 
-	int addCollectionMapping(Device device, String collection, SyncState syncState) throws DaoException;
-	
 	Integer addCollectionMapping(Device device, String collection) throws DaoException;
 
 	Integer getCollectionMapping(Device device, String collectionId) throws DaoException;
