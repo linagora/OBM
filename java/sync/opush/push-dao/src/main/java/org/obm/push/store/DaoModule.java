@@ -40,7 +40,6 @@ import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
 import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSnapshotDaoJdbcImpl;
 import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
 import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
 
@@ -61,7 +60,6 @@ public class DaoModule extends AbstractModule{
 		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
-		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
 	}
 
 }
