@@ -149,6 +149,7 @@ public class Device implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
+			.add("logger", logger)
 			.add("devType", devType)
 			.add("hints", hints)
 			.add("devId", devId)
