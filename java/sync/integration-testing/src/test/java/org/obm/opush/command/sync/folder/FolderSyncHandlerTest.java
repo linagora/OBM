@@ -43,6 +43,7 @@ import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -50,6 +51,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -104,10 +106,11 @@ public class FolderSyncHandlerTest {
 	public void testInitialFolderSyncContainsINBOX() throws Exception {
 		String initialSyncKey = "0";
 		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		Date newSyncDate = DateUtils.date("2012-12-14T21:39:45");
 		FolderSyncState newMappingSyncState = new FolderSyncState(newGeneratedSyncKey);
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
-		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap, newSyncDate);
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
 		expectCollectionDaoAllocateFolderSyncState(classToInstanceMap.get(CollectionDao.class), newMappingSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -136,10 +139,11 @@ public class FolderSyncHandlerTest {
 
 		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 		int newSyncStateId = 1156;
+		Date newSyncDate = DateUtils.date("2012-12-14T21:39:45");
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
-		mockHierarchyChangesForMailboxes(classToInstanceMap, buildHierarchyItemsChangeEmpty());
+		mockHierarchyChangesForMailboxes(classToInstanceMap, buildHierarchyItemsChangeEmpty(newSyncDate));
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
 		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), currentSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -162,6 +166,7 @@ public class FolderSyncHandlerTest {
 	@Test
 	public void testFolderSyncHasChanges() throws Exception {
 		String currentSyncKey = "12341234-1234-1234-1234-123456123456";
+		Date currentSyncDate = DateUtils.date("2012-12-14T21:39:45");
 
 		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 		int newSyncStateId = 1156;
@@ -172,6 +177,7 @@ public class FolderSyncHandlerTest {
 		
 		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
 		HierarchyItemsChanges mailboxChanges = new HierarchyItemsChanges.Builder()
+			.lastSync(currentSyncDate)
 			.changes(Lists.newArrayList(
 					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
 			.build();
@@ -203,6 +209,7 @@ public class FolderSyncHandlerTest {
 	@Test
 	public void testFolderSyncHasDeletions() throws Exception {
 		String currentSyncKey = "12341234-1234-1234-1234-123456123456";
+		Date currentSyncDate = DateUtils.date("2012-12-14T21:39:45");
 
 		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 		int newSyncStateId = 1156;
@@ -213,6 +220,7 @@ public class FolderSyncHandlerTest {
 		
 		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
 		HierarchyItemsChanges mailboxChanges = new HierarchyItemsChanges.Builder()
+			.lastSync(currentSyncDate)
 			.deletions(Lists.newArrayList(
 					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
 			.build();
@@ -240,8 +248,8 @@ public class FolderSyncHandlerTest {
 		assertThat(inbox.getServerId()).isEqualTo(serverId);
 	}
 
-	private HierarchyItemsChanges buildHierarchyItemsChangeEmpty() {
-		return new HierarchyItemsChanges.Builder().build();
+	private HierarchyItemsChanges buildHierarchyItemsChangeEmpty(Date lastSync) {
+		return new HierarchyItemsChanges.Builder().lastSync(lastSync).build();
 	}
 
 	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, FolderSyncState newSyncState) 

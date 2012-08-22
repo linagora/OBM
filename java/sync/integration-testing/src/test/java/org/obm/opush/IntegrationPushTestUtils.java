@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.obm.push.bean.Credentials;
@@ -63,9 +64,15 @@ public class IntegrationPushTestUtils {
 	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
 		
+		mockHierarchyChangesOnlyInbox(classToInstanceMap, new Date());
+	}
+	
+	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
+			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
+		
 		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
 			.changes(Lists.newArrayList(buildInboxFolder()))
-			.build();
+			.lastSync(newSyncDate).build();
 		
 		mockHierarchyChangesForMailboxes(classToInstanceMap, hierarchyItemsChanges);
 	}
@@ -73,37 +80,38 @@ public class IntegrationPushTestUtils {
 	public static void mockHierarchyChangesForMailboxes(ClassToInstanceAgregateView<Object> classToInstanceMap,
 			HierarchyItemsChanges mailboxesChanges) throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
 		
-		mockAddressBook(classToInstanceMap);
-		mockTask(classToInstanceMap);
-		mockCalendar(classToInstanceMap);
+		Date lastSync = mailboxesChanges.getLastSync();
+		mockAddressBook(classToInstanceMap, lastSync);
+		mockTask(classToInstanceMap, lastSync);
+		mockCalendar(classToInstanceMap, lastSync);
 		mockMailBackend(classToInstanceMap, mailboxesChanges);
 	}
 
-	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
+	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
 			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
 				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange()).anyTimes();
+			.andReturn(emptyChange(newSyncDate)).anyTimes();
 	}
 	
-	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap) throws DaoException {
+	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate) throws DaoException {
 		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
 		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS).anyTimes();
 		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
 				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange()).anyTimes();
+			.andReturn(emptyChange(newSyncDate)).anyTimes();
 	}
 	
-	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap)
+	public static void mockAddressBook(ClassToInstanceAgregateView<Object> classToInstanceMap, Date newSyncDate)
 			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
 		
 		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
 		expect(contactsBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS).anyTimes();
 		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class),
 				anyObject(FolderSyncState.class), anyObject(FolderSyncState.class)))
-			.andReturn(emptyChange()).anyTimes();
+			.andReturn(emptyChange(newSyncDate)).anyTimes();
 	}
 	
 	public static void mockMailBackend(ClassToInstanceAgregateView<Object> classToInstanceMap, HierarchyItemsChanges hierarchyMailboxesChanges)
@@ -116,8 +124,8 @@ public class IntegrationPushTestUtils {
 			.andReturn(hierarchyMailboxesChanges).anyTimes();
 	}
 
-	private static HierarchyItemsChanges emptyChange() {
-		return new HierarchyItemsChanges.Builder().build();
+	private static HierarchyItemsChanges emptyChange(Date newSyncDate) {
+		return new HierarchyItemsChanges.Builder().lastSync(newSyncDate).build();
 	}
 	
 	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, String newSyncKey) {

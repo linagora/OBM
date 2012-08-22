@@ -39,6 +39,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
@@ -71,6 +72,7 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.service.impl.MappingService;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -179,7 +181,7 @@ public class MailBackendTest {
 	public void initialHierarchyContainsBaseFolders() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("0");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -224,13 +226,14 @@ public class MailBackendTest {
 				inboxItemChange, draftsItemChange, sentItemChange, trashItemChange);
 
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
 	}
 	
 	@Test
 	public void emptyHierarchyChanges() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 
@@ -246,13 +249,14 @@ public class MailBackendTest {
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
 	}
 
 	@Test
 	public void filterContactsHierarchyChanges() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 
@@ -271,13 +275,14 @@ public class MailBackendTest {
 		verifyCommonMocks();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(DateUtils.getEpochCalendar().getTime());
 	}
 	
 	@Test
 	public void newImapFolder() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -304,6 +309,7 @@ public class MailBackendTest {
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
 	}
 
 	
@@ -311,7 +317,7 @@ public class MailBackendTest {
 	public void deletedImapFolder() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -336,13 +342,14 @@ public class MailBackendTest {
 		
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(deletedFolderItemChange);
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
 	}
 	
 	@Test
 	public void deletedAndAddedImapFolders() throws Exception {
 		FolderSyncState incomingSyncState = new FolderSyncState("1234a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234b");
-		String outgoingSyncStateId = "174";
+		int outgoingSyncStateId = 174;
 		
 		expectTestToBuildSpecialFoldersCollectionPaths();
 		
@@ -380,10 +387,11 @@ public class MailBackendTest {
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemChange);
+		assertThat(hierarchyItemsChanges.getLastSync()).isAfter(date("2012-01-01"));
 	}
 
 	private void expectCreateCollectionMappings(
-			FolderSyncState outgoingSyncState, String outgoingSyncStateId,
+			FolderSyncState outgoingSyncState, int outgoingSyncStateId,
 			String...newFolderCollectionPaths) throws DaoException {
 		for (String newFolderCollectionPath : newFolderCollectionPaths) {
 			CollectionPath collectionPath = CollectionPathUtils.emailCollectionPath(newFolderCollectionPath);
