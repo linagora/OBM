@@ -81,7 +81,6 @@ import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -104,7 +103,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final ICalendar calendarClient;
 
 	@Inject
-	@VisibleForTesting CalendarBackend(MappingService mappingService, 
+	private CalendarBackend(MappingService mappingService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EventConverter eventConverter, 
 			EventService eventService,
