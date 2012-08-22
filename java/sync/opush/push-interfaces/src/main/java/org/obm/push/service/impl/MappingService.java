@@ -61,6 +61,4 @@ public interface MappingService {
 	Integer getItemIdFromServerId(String serverId);
 
 	Integer getCollectionIdFromServerId(String serverId);
-	
-	List<String> listCollections(Device device);
 }
