@@ -35,7 +35,6 @@ import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.EmailDao;
-import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -61,6 +60,5 @@ public final class DaoModule extends AbstractOverrideModule {
 		bindWithMock(CalendarDao.class);
 		bindWithMock(ItemTrackingDao.class);
 		bindWithMock(FolderSyncStateBackendMappingDao.class);
-		bindWithMock(FolderSnapshotDao.class);
 	}
 }
