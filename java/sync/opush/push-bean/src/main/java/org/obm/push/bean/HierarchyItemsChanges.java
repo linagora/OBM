@@ -34,9 +34,8 @@ package org.obm.push.bean;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 public class HierarchyItemsChanges {
 
@@ -45,20 +44,13 @@ public class HierarchyItemsChanges {
 		private List<ItemChange> deletions;
 		private Date lastSync;
 
-		public Builder() {
-			changes = Lists.newArrayList();
-			deletions = Lists.newArrayList();
-		}
-		
 		public Builder changes(List<ItemChange> changes) {
-			Preconditions.checkNotNull(changes);
-			this.changes.addAll(changes);
+			this.changes = changes;
 			return this;
 		}
 		
 		public Builder deletions(List<ItemChange> deletions) {
-			Preconditions.checkNotNull(deletions);
-			this.deletions.addAll(deletions);
+			this.deletions = deletions;
 			return this;
 		}
 		
@@ -67,13 +59,13 @@ public class HierarchyItemsChanges {
 			return this;
 		}
 		
-		public Builder mergeItems(HierarchyItemsChanges hierarchyItemsChanges) {
-			changes(hierarchyItemsChanges.getChangedItems());
-			deletions(hierarchyItemsChanges.getDeletedItems());
-			return this;
-		}
-		
 		public HierarchyItemsChanges build() {
+			if (changes == null) {
+				changes = ImmutableList.of();
+			}
+			if (deletions == null) {
+				deletions = ImmutableList.of();
+			}
 			return new HierarchyItemsChanges(changes, deletions, lastSync);
 		}
 	}
@@ -99,7 +91,7 @@ public class HierarchyItemsChanges {
 	public Date getLastSync() {
 		return lastSync;
 	}
-	
+
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(changes, deletions, lastSync);
@@ -114,14 +106,5 @@ public class HierarchyItemsChanges {
 				&& Objects.equal(this.lastSync, that.lastSync);
 		}
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("changes", changes)
-			.add("deletions", deletions)
-			.add("lastSync", lastSync)
-			.toString();
 	}
 }

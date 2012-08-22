@@ -37,7 +37,6 @@ import java.util.Set;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.PIMDataType;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -49,7 +48,7 @@ public class Backends {
 	private final Map<PIMDataType, PIMBackend> backends;
 
 	@Inject
-	@VisibleForTesting Backends(Set<PIMBackend> backends) {
+	private Backends(Set<PIMBackend> backends) {
 		this.backends = buildBackendsMap(backends);
 	}
 
@@ -67,7 +66,4 @@ public class Backends {
 		return backend;
 	}
 	
-	public Map<PIMDataType, PIMBackend> getBackends() {
-		return backends;
-	}
 }

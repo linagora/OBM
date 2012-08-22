@@ -36,6 +36,7 @@ import java.util.Date;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 /**
  * The exporter API fetches data from the backend store and returns it to the
@@ -47,4 +48,6 @@ public interface IHierarchyExporter {
 	String getRootFolderUrl(UserDataRequest udr);
 
 	HierarchyItemsChanges getChanged(UserDataRequest udr, Date lastSync) throws DaoException;
+
+	int getRootFolderId(UserDataRequest udr) throws DaoException, CollectionNotFoundException;
 }

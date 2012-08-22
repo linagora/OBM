@@ -142,10 +142,7 @@ public class ItemChange implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("serverId", serverId)
-			.add("parentId", parentId)
-			.add("displayName", displayName)
-			.add("itemType", itemType)
-			.add("isNew", isNew)
 			.toString();
 	}
+
 }
