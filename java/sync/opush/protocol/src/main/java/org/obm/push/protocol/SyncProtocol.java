@@ -90,12 +90,12 @@ public class SyncProtocol {
 			
 			if (!collectionResponse.isSyncStatevalid()) {
 				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asSpecificationValue());
+				DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asXmlValue());
 				DOMUtils.createElementAndText(ce, "SyncKey", "0");
 			} else {
 				Element sk = DOMUtils.createElement(ce, "SyncKey");
 				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asSpecificationValue());
+				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asXmlValue());
 
 				if (!collectionResponse.getSyncCollection().getSyncKey().equals("0")) {
 					if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
@@ -117,7 +117,7 @@ public class SyncProtocol {
 	public Document encodeResponse() {
 		Document reply = DOMUtils.createDoc(null, "Sync");
 		Element root = reply.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", SyncStatus.WAIT_INTERVAL_OUT_OF_RANGE.asSpecificationValue());
+		DOMUtils.createElementAndText(root, "Status", SyncStatus.WAIT_INTERVAL_OUT_OF_RANGE.asXmlValue());
 		DOMUtils.createElementAndText(root, "Limit", "59");
 		return reply;
 	}
@@ -141,7 +141,7 @@ public class SyncProtocol {
 			Element add = DOMUtils.createElement(commands, "Fetch");
 			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 			DOMUtils.createElementAndText(add, "Status",
-					SyncStatus.OK.asSpecificationValue());
+					SyncStatus.OK.asXmlValue());
 			c.getSyncCollection().getOptions().initTruncation();
 			serializeChange(udr, add, ic, encoderFactory);
 		}
@@ -176,12 +176,12 @@ public class SyncProtocol {
 				Element add = DOMUtils.createElement(responses, "Add");
 				DOMUtils.createElementAndText(add, "ClientId", clientId);
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
+				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asXmlValue());
 			
 			} else if (itemChangeIsClientChangeAck(processedClientIds, ic)) {
 				Element add = DOMUtils.createElement(responses, "Change");
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
+				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asXmlValue());
 			} else { // New change done on server
 				String commandName = selectCommandName(ic);
 				Element command = DOMUtils.createElement(commands, commandName);
@@ -212,7 +212,7 @@ public class SyncProtocol {
 					// need send ok since we do not synchronize event with
 					// ParticipationState need-action
 					DOMUtils.createElementAndText(add, "Status",
-							SyncStatus.OK.asSpecificationValue());
+							SyncStatus.OK.asXmlValue());
 					processedClientIds.remove(entry.getKey());
 				}
 			}
