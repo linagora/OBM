@@ -39,7 +39,6 @@ import java.util.Set;
 
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.utils.DisplayNameUtils;
-
 import com.google.common.base.Objects;
 
 public class Contact {
@@ -340,69 +339,4 @@ public class Contact {
 			.toString();
 	}
 	
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(uid, 
-				commonname, 
-				firstname, 
-				lastname, 
-				middlename, 
-				suffix, 
-				title, 
-				service, 
-				aka, 
-				comment, 
-				company, 
-				birthday, 
-				birthdayId, 
-				anniversary, 
-				anniversaryId, 
-				assistant, 
-				manager, 
-				spouse, 
-				entityId, 
-				folderId, 
-				collected, 
-				calUri, 
-				phones, 
-				websites, 
-				emails, 
-				imIdentifiers, 
-				addresses);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof Contact) {
-			Contact that = (Contact) object;
-			return Objects.equal(this.uid, that.uid)
-				&& Objects.equal(this.commonname, that.commonname)
-				&& Objects.equal(this.firstname, that.firstname)
-				&& Objects.equal(this.lastname, that.lastname)
-				&& Objects.equal(this.middlename, that.middlename)
-				&& Objects.equal(this.suffix, that.suffix)
-				&& Objects.equal(this.title, that.title)
-				&& Objects.equal(this.service, that.service)
-				&& Objects.equal(this.aka, that.aka)
-				&& Objects.equal(this.comment, that.comment)
-				&& Objects.equal(this.company, that.company)
-				&& Objects.equal(this.birthday, that.birthday)
-				&& Objects.equal(this.birthdayId, that.birthdayId)
-				&& Objects.equal(this.anniversary, that.anniversary)
-				&& Objects.equal(this.anniversaryId, that.anniversaryId)
-				&& Objects.equal(this.assistant, that.assistant)
-				&& Objects.equal(this.manager, that.manager)
-				&& Objects.equal(this.spouse, that.spouse)
-				&& Objects.equal(this.entityId, that.entityId)
-				&& Objects.equal(this.folderId, that.folderId)
-				&& Objects.equal(this.collected, that.collected)
-				&& Objects.equal(this.calUri, that.calUri)
-				&& Objects.equal(this.phones, that.phones)
-				&& Objects.equal(this.websites, that.websites)
-				&& Objects.equal(this.emails, that.emails)
-				&& Objects.equal(this.imIdentifiers, that.imIdentifiers)
-				&& Objects.equal(this.addresses, that.addresses);
-		}
-		return false;
-	}
 }
