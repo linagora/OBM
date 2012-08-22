@@ -45,16 +45,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.minig.imap.SearchQuery;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
@@ -65,6 +63,9 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
+
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapSearchAPITest {
@@ -104,7 +105,7 @@ public class ImapSearchAPITest {
 		greenMail.stop();
 	}
 	
-	@Test(expected=CollectionNotFoundException.class)
+	@Test(expected=MailException.class)
 	public void testSearchWrongMailbox() throws Exception {
 		try {
 			privateMailboxService.uidSearch(udr, testUtils.mailboxPath("wrong"), SearchQuery.MATCH_ALL);	
