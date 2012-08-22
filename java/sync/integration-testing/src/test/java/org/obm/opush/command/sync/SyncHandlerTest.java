@@ -33,7 +33,6 @@ package org.obm.opush.command.sync;
 
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasAddItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasDeleteItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasItems;
@@ -59,14 +58,12 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
-import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.ItemChangesBuilder;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
@@ -109,7 +106,6 @@ public class SyncHandlerTest {
 		String syncEmailSyncKey = "1";
 		int syncEmailCollectionId = 4;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
-		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -135,8 +131,7 @@ public class SyncHandlerTest {
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 			.withSyncDate(new Date()).build();
-
-		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		
 		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -165,8 +160,7 @@ public class SyncHandlerTest {
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":1")
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 			.withSyncDate(new Date()).build();
-
-		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		
 		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -193,8 +187,7 @@ public class SyncHandlerTest {
 					new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
 						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 			.withSyncDate(new Date()).build();
-
-		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		
 		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -222,8 +215,7 @@ public class SyncHandlerTest {
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":122")
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
 			.withSyncDate(new Date()).build();
-
-		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		
 		mockHierarchyChanges(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -236,10 +228,6 @@ public class SyncHandlerTest {
 		checkSyncDefaultMailFolderHasItems(inbox, syncEmailResponse, 
 				Arrays.asList(new Add(syncEmailCollectionId + ":123")),
 				Arrays.asList(new Delete(syncEmailCollectionId + ":122")));
-	}
-	
-	private FolderSyncState newSyncState(String syncEmailSyncKey) {
-		return new FolderSyncState(syncEmailSyncKey);
 	}
 	
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {

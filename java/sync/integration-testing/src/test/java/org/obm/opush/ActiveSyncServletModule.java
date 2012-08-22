@@ -61,13 +61,11 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	@Inject DOMUtils domUtils;
 	
 	protected abstract Module overrideModule() throws Exception;
-	protected abstract void onModuleInstalled();
 	
 	protected void configure() {
 		OverriddenModuleBuilder override = Modules.override(new OpushModule());
 		try {
 			install(override.with(overrideModule()));
-			onModuleInstalled();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
