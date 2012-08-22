@@ -4,6 +4,8 @@
 %global _binary_payload w9.gzdio
 %global _source_payload w9.gzdio
 
+%global jetty_home /usr/share/jetty6
+
 Name: obm-sync
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
@@ -122,7 +124,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/jta-1.1.jar
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
 
 # install opush
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
+mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/opush
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/opush
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/opush
@@ -132,22 +134,22 @@ cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
 # copie du web-inf
 cd opush
 WEB_INF=`find push/target -name WEB-INF `
-cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/opush
+cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush
 cd -
 
 # install obm-locator
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/obm-locator
+mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-locator
 # copie du web-inf
 WEB_INF=`find obm-locator/target -name WEB-INF `
-cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{_datadir}/jetty/webapps/obm-locator
+cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
 
 # common libs
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/jetty/lib
+mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
 cp -p webapp-common-dependencies/target/jetty/*.jar \
-  $RPM_BUILD_ROOT%{_datadir}/jetty/lib/
+  $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/tomcat/lib
 cp -p webapp-common-dependencies/target/tomcat/*.jar \
@@ -164,7 +166,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 
 %files -n opush
 %defattr(-,root,root,-)
-%{_datadir}/jetty/webapps/opush
+%{jetty_home}/webapps/opush
 %attr(0775,jetty,jetty) %{_localstatedir}/log/opush
 %attr(0775,jetty,jetty) %{_localstatedir}/lib/opush
 %config(noreplace) %{_sysconfdir}/opush/sync_perms.ini
@@ -173,7 +175,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 
 %files -n obm-locator
 %defattr(-,root,root,-)
-%{_datadir}/jetty/webapps/obm-locator
+%{jetty_home}/webapps/obm-locator
 %attr(0775,jetty,jetty) %{_localstatedir}/log/obm-locator
 %attr(0775,jetty,jetty) %{_localstatedir}/lib/obm-locator
 
@@ -183,23 +185,23 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 
 %files -n obm-jetty-common-libs
 %defattr(-,root,root,-)
-%{_datadir}/jetty/lib/*.jar
+%{jetty_home}/lib/ext/*.jar
 
 %post -n opush
 [ ! -f %{_sysconfdir}/opush/logback.xml ] && echo "<included/>" > %{_sysconfdir}/opush/logback.xml
-/sbin/service jetty restart >/dev/null 2>&1 || :
+/sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n opush
 if [ "$1" -ge "1" ] ; then
-    /sbin/service jetty restart >/dev/null 2>&1 || :
+    /sbin/service jetty6 restart >/dev/null 2>&1 || :
 fi
 
 %post -n obm-locator
-/sbin/service jetty restart >/dev/null 2>&1 || :
+/sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n obm-locator
 if [ "$1" -ge "1" ] ; then
-    /sbin/service jetty restart >/dev/null 2>&1 || :
+    /sbin/service jetty6 restart >/dev/null 2>&1 || :
 fi
 
 %post -n obm-sync
