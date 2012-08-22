@@ -119,10 +119,6 @@ public class OpushImapFolder {
 		return folder.list(pattern);
 	}
 
-	public Folder[] listSubscribed(String pattern) throws MessagingException {
-		return folder.listSubscribed(pattern);
-	}
-
 	public void open(int mode) throws MessagingException {
 		folder.open(mode);
 	}
@@ -301,17 +297,5 @@ public class OpushImapFolder {
 		
 		IMAPMessage messageToFetch = getMessageByUID(messageUid);
 		return imapResourceProvider.createMessageInputStream(messageToFetch, mimePartAddress, limit);
-	}
-	
-	public void subscribe() throws MessagingException {
-		folder.setSubscribed(true);
-	}
-
-	public void unsubscribe() throws MessagingException {
-		folder.setSubscribed(false);
-	}
-
-	public boolean isSubscribed() {
-		return folder.isSubscribed();
 	}
 }

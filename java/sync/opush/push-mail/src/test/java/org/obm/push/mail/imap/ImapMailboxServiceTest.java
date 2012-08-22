@@ -79,24 +79,26 @@ public class ImapMailboxServiceTest {
 	@Inject ImapMailboxService mailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
+	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
+	@Inject ImapMailBoxUtils mailboxUtils;
 	private String mailbox;
 	private String password;
+	private UserDataRequest udr;
 	private ImapTestUtils testUtils;
 	private Date beforeTest;
-	private UserDataRequest udr;
 
 	@Before
 	public void setUp() {
 		beforeTest = new Date();
-		greenMail.start();
-		mailbox = "to@localhost.com";
-		password = "password";
-		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
+	    greenMail.start();
+	    mailbox = "to@localhost.com";
+	    password = "password";
+	    greenMail.setUser(mailbox, password);
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new ImapTestUtils(mailboxService, mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -111,6 +113,66 @@ public class ImapMailboxServiceTest {
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailboxPath(IMAP_INBOX_NAME), before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	}
+	
+	@Test
+	public void testDefaultListFolders() throws Exception {
+		MailboxFolders emails = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(emails).isNotNull().containsOnly(inbox());
+	}
+	
+	@Test
+	public void testListTwoFolders() throws Exception {
+		MailboxFolder newFolder = folder("NEW");
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				newFolder);
+	}
+
+	@Test
+	public void testListInboxSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.NEW");
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				newFolder);
+	}
+	
+	@Test
+	public void testListInboxDeepSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4");
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("INBOX.LEVEL1"),
+				folder("INBOX.LEVEL1.LEVEL2"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4"));
+	}
+
+	@Test
+	public void testListToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP");
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("TOP"));
+	}
+	
+	@Test
+	public void testListNestedToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP.LEVEL1");
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).isNotNull().containsOnly(
+				inbox(),
+				folder("TOP"),
+				folder("TOP.LEVEL1"));
 	}
 	
 	@Test(expected=MailException.class)
@@ -279,7 +341,7 @@ public class ImapMailboxServiceTest {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(udr, newFolder);
 
-		InputStream emailData = testUtils.getInputStreamFromFile("plainText.eml");
+		InputStream emailData = getInputStreamFromFile("plainText.eml");
 		boolean isResetable = true;
 		try {
 			emailData.reset();
@@ -318,11 +380,15 @@ public class ImapMailboxServiceTest {
 	}
 
 	private MailboxFolder folder(String name) {
-		return testUtils.folder(name);
+		return new MailboxFolder(name);
 	}
 	
 	private MailboxFolder inbox() {
-		return testUtils.inbox();
+		return folder("INBOX");
+	}
+
+	private InputStream getInputStreamFromFile(String name) {
+		return ClassLoader.getSystemResourceAsStream("eml/" + name);
 	}
 
 }

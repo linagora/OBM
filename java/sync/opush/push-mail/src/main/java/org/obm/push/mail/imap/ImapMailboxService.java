@@ -117,8 +117,6 @@ import com.sun.mail.imap.IMAPMessage;
 public class ImapMailboxService implements PrivateMailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
-
-	private static final String WHOLE_HIERARCHY_PATTERN = "*";
 	
 	private final SmtpSender smtpProvider;
 	private final EventService eventService;
@@ -281,8 +279,14 @@ public class ImapMailboxService implements PrivateMailboxService {
 		try {
 			store = imapClientProvider.getImapClientWithJM(udr);
 			store.login();
-			Folder[] folders = store.getDefaultFolder().list(WHOLE_HIERARCHY_PATTERN);
-			return mailboxFolders(folders);
+			Folder[] folders = store.getDefaultFolder().list("*");
+			
+			List<MailboxFolder> mailboxFolders = Lists.newArrayList();
+			for (Folder folder: folders) {
+				mailboxFolders.add(
+						new MailboxFolder(folder.getFullName(), folder.getSeparator()));
+			}
+			return new MailboxFolders(mailboxFolders);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (LocatorClientException e) {
@@ -298,72 +302,7 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			Folder[] folders = store.getDefaultFolder().listSubscribed(WHOLE_HIERARCHY_PATTERN);
-			return mailboxFolders(folders);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-
-	private MailboxFolders mailboxFolders(Folder[] folders) throws MessagingException {
-		List<MailboxFolder> mailboxFolders = Lists.newArrayList();
-		for (Folder folder: folders) {
-			mailboxFolders.add(
-					new MailboxFolder(folder.getFullName(), folder.getSeparator()));
-		}
-		return new MailboxFolders(mailboxFolders);
-	}
-
-	@Override
-	public void subscribe(UserDataRequest udr, String folderName) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			store.select(folderName).subscribe();
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-
-	@Override
-	public void unsubscribe(UserDataRequest udr, String folderName) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			store.select(folderName).unsubscribe();
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
+		return null;
 	}
 	
 	@Override

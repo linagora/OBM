@@ -124,12 +124,4 @@ public class ImapTestUtils {
 	public MailboxFolder folder(String name) {
 		return new MailboxFolder(name);
 	}
-
-	public MailboxFolder inbox() {
-		return folder(EmailConfiguration.IMAP_INBOX_NAME);
-	}
-
-	public InputStream getInputStreamFromFile(String name) {
-		return ClassLoader.getSystemResourceAsStream("eml/" + name);
-	}
 }
