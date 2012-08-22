@@ -64,10 +64,8 @@ public class IntegrationPushTestUtils {
 	public static void mockCalendar(ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, UnexpectedObmSyncServerException {
 		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
-		
-		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder().build();
-		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), anyObject(Date.class)))
-				.andReturn(hierarchyItemsChanges).anyTimes();
+		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class)))
+				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 	}
 	
 	public static void mockTask(ClassToInstanceAgregateView<Object> classToInstanceMap) {

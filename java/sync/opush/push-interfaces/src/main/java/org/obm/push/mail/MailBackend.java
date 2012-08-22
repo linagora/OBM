@@ -31,16 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.List;
+
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface MailBackend extends PIMBackend {
+
+	List<ItemChange> getHierarchyChanges(UserDataRequest udr) throws DaoException;
 
 	void sendEmail(UserDataRequest udr, byte[] mailContent, boolean saveInSent)
 			throws ProcessingEmailException;
@@ -60,4 +66,5 @@ public interface MailBackend extends PIMBackend {
 			ProcessingEmailException;
 
 	Long getEmailUidFromServerId(String serverId);
+
 }

@@ -37,7 +37,6 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
@@ -113,12 +112,5 @@ public class TaskBackend implements PIMBackend {
 
 	public List<ItemChange> getHierarchyChanges() {
 		return ImmutableList.<ItemChange>of();
-	}
-
-	@Override
-	public HierarchyItemsChanges getHierarchyChanges(
-			UserDataRequest userDataRequest, Date lastSync)
-			throws DaoException, UnexpectedObmSyncServerException {
-		return new HierarchyItemsChanges.Builder().lastSync(lastSync).build();
 	}
 }

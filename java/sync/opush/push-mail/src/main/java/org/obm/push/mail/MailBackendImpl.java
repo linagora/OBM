@@ -60,7 +60,6 @@ import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
@@ -151,15 +150,12 @@ public class MailBackendImpl implements MailBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, Date lastSync) throws DaoException {
-		ImmutableList<ItemChange> defaultFolders = ImmutableList.of(
+	public List<ItemChange> getHierarchyChanges(UserDataRequest udr) throws DaoException {
+		return ImmutableList.of(
 				genItemChange(udr, EmailConfiguration.IMAP_INBOX_NAME, FolderType.DEFAULT_INBOX_FOLDER),
 				genItemChange(udr, EmailConfiguration.IMAP_DRAFTS_NAME, FolderType.DEFAULT_DRAFTS_FOLDERS),
 				genItemChange(udr, EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER),
 				genItemChange(udr, EmailConfiguration.IMAP_TRASH_NAME,FolderType.DEFAULT_DELETED_ITEMS_FOLDERS));
-		
-		return new HierarchyItemsChanges.Builder()
-			.changes(defaultFolders).lastSync(lastSync).build();
 	}
 
 	private ItemChange genItemChange(UserDataRequest udr, String imapFolder,
