@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
@@ -40,7 +40,6 @@ import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
 import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
 import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
 
 import com.google.inject.AbstractModule;
@@ -59,7 +58,6 @@ public class DaoModule extends AbstractModule{
 		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
 		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
 	}
 
 }
