@@ -33,7 +33,7 @@ package org.obm.opush.command.sync.folder;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
+import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChanges;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
@@ -106,7 +106,7 @@ public class FolderSyncHandlerTest {
 		String nextSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 				
 		mockUsersAccess(classToInstanceMap, userAsList);
-		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockHierarchyChanges(classToInstanceMap);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectCollectionDaoAllocateNewFolderSyncState(collectionDao, nextSyncKey);
