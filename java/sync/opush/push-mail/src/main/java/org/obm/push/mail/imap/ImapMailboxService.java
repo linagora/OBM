@@ -56,6 +56,8 @@ import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
 import org.minig.imap.IMAPHeaders;
+import org.minig.imap.MailboxFolder;
+import org.minig.imap.MailboxFolders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.minig.imap.UIDEnvelope;
@@ -90,8 +92,6 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
 import org.obm.push.mail.MailViewToMSEmailConverter;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
@@ -298,11 +298,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 		} finally {
 			closeQuietly(store);
 		}
-	}
-	
-	@Override
-	public MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException {
-		return null;
 	}
 	
 	@Override

@@ -57,6 +57,8 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(Address.class)
+					.add(MailboxFolder.class)
+					.add(MailboxFolders.class)
 					.add(Envelope.class)
 					.add(FastFetch.class)
 					.add(ContentType.class)

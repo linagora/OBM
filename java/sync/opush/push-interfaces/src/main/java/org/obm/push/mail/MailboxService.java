@@ -52,8 +52,6 @@ import org.obm.push.exception.activesync.StoreEmailException;
 
 public interface MailboxService {
 
-	MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException;
-	
 	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionName, 
 			Collection<Long> uids) throws MailException;
 

@@ -30,55 +30,49 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.mail;
+package org.minig.imap;
 
+import java.util.Iterator;
+import java.util.List;
 import com.google.common.base.Objects;
 
-public class MailboxFolder {
+public class MailboxFolders implements Iterable<MailboxFolder> {
 
-	private final static char DEFAULT_HIERARCHY_SEPARATOR = '.';
-	private final String name;
-	private final char imapSeparator;
+	private final List<MailboxFolder> folders;
+	
+	public MailboxFolders(List<MailboxFolder> folders) {
+		super();
+		this.folders = folders;
+	}
 
-	public MailboxFolder(String name) {
-		this(name, DEFAULT_HIERARCHY_SEPARATOR);
+	@Override
+	public Iterator<MailboxFolder> iterator() {
+		return folders.iterator();
 	}
 	
-	public MailboxFolder(String name, Character imapSeparator) {
-		super();
-		this.name = name;
-		this.imapSeparator = imapSeparator;
+	public int size() {
+		return folders.size();
 	}
 
-	public String getName() {
-		return name;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(folders);
 	}
-
-	public char getImapSeparator() {
-		return imapSeparator;
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MailboxFolders) {
+			MailboxFolders that = (MailboxFolders) object;
+			return Objects.equal(this.folders, that.folders);
+		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("name", name)
-			.add("imapSeparator", imapSeparator)
+			.add("folders", folders)
 			.toString();
 	}
-
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(name, imapSeparator);
-	}
 	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof MailboxFolder) {
-			MailboxFolder that = (MailboxFolder) object;
-			return Objects.equal(this.name, that.name)
-				&& Objects.equal(this.imapSeparator, that.imapSeparator);
-		}
-		return false;
-	}
-		
 }

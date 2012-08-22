@@ -37,6 +37,7 @@ import java.util.Set;
 
 import javax.mail.internet.MimeMessage;
 
+import org.minig.imap.MailboxFolder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
@@ -46,7 +47,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 

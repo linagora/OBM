@@ -43,12 +43,12 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.minig.imap.MailboxFolder;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MailboxFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
