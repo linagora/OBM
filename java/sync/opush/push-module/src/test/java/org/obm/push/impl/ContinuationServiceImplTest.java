@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.math.BigDecimal;
 import java.util.Properties;
 
 import net.sf.ehcache.Element;
@@ -59,7 +60,7 @@ public class ContinuationServiceImplTest {
 
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 	}
 	
 	@Test

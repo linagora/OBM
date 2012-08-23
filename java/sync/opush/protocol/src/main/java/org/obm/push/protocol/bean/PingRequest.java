@@ -39,32 +39,59 @@ import com.google.common.base.Objects;
 
 public class PingRequest {
 
+	public static class Builder {
+		private Long heartbeatInterval;
+		private Set<SyncCollection> syncCollections;
+		
+		public Builder() {}
+		
+		public Builder heartbeatInterval(Long heartbeatInterval) {
+			this.heartbeatInterval = heartbeatInterval;
+			return this;
+		}
+		
+		public Builder syncCollections(Set<SyncCollection> syncCollections) {
+			this.syncCollections = syncCollections;
+			return this;
+		}
+		
+		public PingRequest build() {
+			return new PingRequest(
+					this.heartbeatInterval, this.syncCollections);
+		}
+	}
+	
 	private Long heartbeatInterval;
 	private Set<SyncCollection> syncCollections;
 
-	public void setHeartbeatInterval(Long interval) {
-		this.heartbeatInterval = interval;
+	private PingRequest(Long heartbeatInterval, Set<SyncCollection> syncCollections) {
+		this.heartbeatInterval = heartbeatInterval;
+		this.syncCollections = syncCollections;
 	}
 	
 	public Long getHeartbeatInterval() {
 		return heartbeatInterval;
 	}
 
-	public void setSyncCollections(Set<SyncCollection> syncCollections) {
-		this.syncCollections = syncCollections;
+	public void setHeartbeatInterval(Long heartbeatInterval) {
+		this.heartbeatInterval = heartbeatInterval;
 	}
-	
+
 	public Set<SyncCollection> getSyncCollections() {
 		return syncCollections;
 	}
 
+	public void setSyncCollections(Set<SyncCollection> syncCollections) {
+		this.syncCollections = syncCollections;
+	}
+	
 	@Override
-	public final int hashCode() {
+	public final int hashCode(){
 		return Objects.hashCode(heartbeatInterval, syncCollections);
 	}
 	
 	@Override
-	public final boolean equals(Object object) {
+	public final boolean equals(Object object){
 		if (object instanceof PingRequest) {
 			PingRequest that = (PingRequest) object;
 			return Objects.equal(this.heartbeatInterval, that.heartbeatInterval)
@@ -72,12 +99,12 @@ public class PingRequest {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-				.add("heartbeatInterval", heartbeatInterval)
-				.add("syncCollections", syncCollections)
-				.toString();
+			.add("heartbeatInterval", heartbeatInterval)
+			.add("syncCollections", syncCollections)
+			.toString();
 	}
 }

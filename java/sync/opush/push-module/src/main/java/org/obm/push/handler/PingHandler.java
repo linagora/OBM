@@ -133,7 +133,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	private void doTheJob(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) 
 			throws MissingRequestParameterException, DaoException, CollectionNotFoundException, CollectionPathException {
 		
-		continuationService.cancel(udr.getDevice(), PingStatus.NO_CHANGES.asXmlValue());
+		continuationService.cancel(udr.getDevice(), PingStatus.NO_CHANGES.asSpecificationValue());
 		checkHeartbeatInterval(udr, pingRequest);
 		checkSyncCollections(udr, pingRequest);
 		startEmailMonitoringThreadIfNeeded(udr, pingRequest);
@@ -259,7 +259,10 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		if (!enablePush) {
 			// Lie to the phone, try to convince it a new sync is required
 			// Return empty collections since CHANGES_OCCURED is a global scope status, see MS-ASCMD 2.2.2.8
-			return new PingResponse(ImmutableSet.<SyncCollection>of(), PingStatus.CHANGES_OCCURED);
+			return new PingResponse.Builder()
+				.syncCollections(ImmutableSet.<SyncCollection>of())
+				.pingStatus(PingStatus.CHANGES_OCCURED)
+				.build();
 		}
 		
 		if (sendHierarchyChange) {
@@ -268,9 +271,15 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		final Set<SyncCollection> changes = backend.getChangesSyncCollections(continuation.getCollectionChangeListener());
 		if (changes.isEmpty()) {
-			return new PingResponse(changes, PingStatus.NO_CHANGES);
+			return new PingResponse.Builder()
+						.syncCollections(changes)
+						.pingStatus(PingStatus.NO_CHANGES)
+						.build();
 		} else {
-			return new PingResponse(changes, PingStatus.CHANGES_OCCURED);
+			return new PingResponse.Builder()
+			.syncCollections(changes)
+			.pingStatus(PingStatus.CHANGES_OCCURED)
+			.build();
 		}
 	}
 
@@ -281,7 +290,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private void sendError(Device device, Responder responder, PingStatus serverError) {
-		sendError(device, responder, serverError.asXmlValue(), null);
+		sendError(device, responder, serverError.asSpecificationValue(), null);
 	}
 	
 }

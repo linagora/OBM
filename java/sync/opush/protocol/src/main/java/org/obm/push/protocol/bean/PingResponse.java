@@ -36,12 +36,36 @@ import java.util.Set;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 
+import com.google.common.base.Objects;
+
 public class PingResponse {
 
-	private final Set<SyncCollection> syncCollections;
-	private final PingStatus pingStatus;
+	public static class Builder {
+		private PingStatus pingStatus;
+		private Set<SyncCollection> syncCollections;
+		
+		public Builder() {}
+		
+		public Builder pingStatus(PingStatus pingStatus) {
+			this.pingStatus = pingStatus;
+			return this;
+		}
+		
+		public Builder syncCollections(Set<SyncCollection> syncCollections) {
+			this.syncCollections = syncCollections;
+			return this;
+		}
+
+		public PingResponse build() {
+			return new PingResponse(
+					this.pingStatus, this.syncCollections);
+		}
+	}
 	
-	public PingResponse(Set<SyncCollection> syncCollections, PingStatus pingStatus) {
+	private final PingStatus pingStatus;
+	private final Set<SyncCollection> syncCollections;
+	
+	private PingResponse( PingStatus pingStatus, Set<SyncCollection> syncCollections) {
 		this.syncCollections = syncCollections;
 		this.pingStatus = pingStatus;
 	}
@@ -52,5 +76,28 @@ public class PingResponse {
 	
 	public PingStatus getPingStatus() {
 		return pingStatus;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(pingStatus, syncCollections);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof PingResponse) {
+			PingResponse that = (PingResponse) object;
+			return Objects.equal(this.pingStatus, that.pingStatus)
+				&& Objects.equal(this.syncCollections, that.syncCollections);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("pingStatus", pingStatus)
+			.add("syncCollections", syncCollections)
+			.toString();
 	}
 }

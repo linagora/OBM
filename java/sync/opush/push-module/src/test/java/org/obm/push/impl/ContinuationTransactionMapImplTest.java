@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.util.Properties;
 
 import net.sf.ehcache.Cache;
@@ -61,7 +62,7 @@ public class ContinuationTransactionMapImplTest {
 	
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 	}
 	
 	@Test

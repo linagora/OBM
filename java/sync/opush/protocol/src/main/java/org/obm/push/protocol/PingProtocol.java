@@ -31,11 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.utils.DOMUtils;
@@ -49,16 +48,17 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 
 	@Override
 	public PingRequest decodeRequest(Document doc) {
-		PingRequest pingRequest = new PingRequest();
 		if (doc == null) {
-			return pingRequest;
+			return new PingRequest.Builder().build();
 		}
 		Element pr = doc.getDocumentElement();
 		Element hb = DOMUtils.getUniqueElement(pr, "HeartbeatInterval");
+		Long heartbeatInterval = null;
 		if (hb != null) {
-			pingRequest.setHeartbeatInterval(Long.valueOf(hb.getTextContent()));
+			heartbeatInterval = Long.valueOf(hb.getTextContent());
 		}
-		HashSet<SyncCollection> syncCollections = new HashSet<SyncCollection>();
+		
+		LinkedHashSet<SyncCollection> syncCollections = new LinkedHashSet<SyncCollection>();
 		NodeList folders = pr.getElementsByTagName("Folder");
 		for (int i = 0; i < folders.getLength(); i++) {
 			SyncCollection syncCollection = new SyncCollection();
@@ -68,8 +68,36 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 			syncCollection.setCollectionId(id);
 			syncCollections.add(syncCollection);
 		}
-		pingRequest.setSyncCollections(syncCollections);
-		return pingRequest;
+		
+		return new PingRequest.Builder()
+					.heartbeatInterval(heartbeatInterval)
+					.syncCollections(syncCollections)
+					.build();
+	}
+
+	@Override
+	public PingResponse decodeResponse(Document doc) {
+		if (doc == null) {
+			return new PingResponse.Builder().build();
+		}
+		
+		Element pr = doc.getDocumentElement();
+		Element status = DOMUtils.getUniqueElement(pr, "Status");
+		PingStatus pingStatus = PingStatus.fromSpecificationValue(status.getTextContent());
+		
+		LinkedHashSet<SyncCollection> syncCollections = new LinkedHashSet<SyncCollection>();
+		NodeList folders = pr.getElementsByTagName("Folder");
+		for (int i = 0; i < folders.getLength(); i++) {
+			SyncCollection syncCollection = new SyncCollection();
+			Element folder = (Element) folders.item(i);
+			syncCollection.setCollectionId(Integer.valueOf(folder.getTextContent()));
+			syncCollections.add(syncCollection);
+		}
+		
+		return new PingResponse.Builder()
+					.pingStatus(pingStatus)
+					.syncCollections(syncCollections)
+					.build();
 	}
 
 	@Override
@@ -77,7 +105,7 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 		Document document = DOMUtils.createDoc(null, "Ping");
 		Element root = document.getDocumentElement();
 		
-		DOMUtils.createElementAndText(root, "Status", pingResponse.getPingStatus().asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", pingResponse.getPingStatus().asSpecificationValue());
 		if (responseHasFolders(pingResponse)) {
 			encodeFolders(pingResponse, root);
 		}
@@ -95,21 +123,26 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 		}
 	}
 
+	@Override
+	public Document encodeRequest(PingRequest pingRequest) {
+		Document document = DOMUtils.createDoc(null, "Ping");
+		Element root = document.getDocumentElement();
+		
+		DOMUtils.createElementAndText(root, "HeartbeatInterval", String.valueOf(pingRequest.getHeartbeatInterval()));
+		Element folders = DOMUtils.createElement(root, "Folders");
+		for (SyncCollection syncCollection : pingRequest.getSyncCollections()) {
+			Element folder = DOMUtils.createElement(folders, "Folder");
+			DOMUtils.createElementAndText(folder, "Id", String.valueOf(syncCollection.getCollectionId()));
+			DOMUtils.createElementAndText(folder, "Class", syncCollection.getDataClass());
+		}
+		return document;
+	}
+	
 	public Document buildError(String errorStatus) {
 		Document document = DOMUtils.createDoc(null, "Ping");
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", errorStatus);
 		return document;
-	}
-
-	@Override
-	public Document encodeRequest(PingRequest request) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public PingResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
 	}
 	
 }

@@ -38,6 +38,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.bean.PingRequest;
+import org.obm.push.protocol.bean.PingResponse;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -59,6 +60,7 @@ public class BeansTest {
 					.add(ASSystemTime.class)
 					.add(ASTimeZone.class)
 					.add(PingRequest.class)
+					.add(PingResponse.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

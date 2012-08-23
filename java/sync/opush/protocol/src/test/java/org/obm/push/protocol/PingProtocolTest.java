@@ -35,6 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.xml.transform.TransformerException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -49,7 +50,59 @@ import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
 public class PingProtocolTest {
-
+	
+	private PingProtocol pingProtocol;
+	
+	@Before
+	public void init() {
+		pingProtocol = new PingProtocol();
+	}
+	
+	@Test
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Ping>" +
+				"<HeartbeatInterval>470</HeartbeatInterval>" +
+				"<Folders>" +
+				"<Folder>" +
+				"<Id>19</Id>" +
+				"<Class>Contacts</Class>" +
+				"</Folder>" +
+				"<Folder>" +
+				"<Id>22</Id>" +
+				"<Class>Email</Class>" +
+				"</Folder>" +
+				"<Folder>" +
+				"<Id>27</Id>" +
+				"<Class>Calendar</Class>" +
+				"</Folder>" +
+				"</Folders>" +
+				"</Ping>";
+		
+		PingRequest pingRequest = pingProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeRequest = pingProtocol.encodeRequest(pingRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeRequest));
+	}
+	
+	@Test
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Ping>" +
+				"<Status>1</Status>" +
+				"<Folders>" +
+				"<Folder>19</Folder>" +
+				"<Folder>22</Folder>" +
+				"<Folder>27</Folder>" +
+				"</Folders>" +
+				"</Ping>";
+		
+		PingResponse pingResponse = pingProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = pingProtocol.encodeResponse(pingResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
+	
 	@Test
 	public void decodeRequest() throws Exception {
 		Document document = DOMUtils.parse(
@@ -66,8 +119,7 @@ public class PingProtocolTest {
 						"</Folder>" +
 					"</Folders>" +
 				"</Ping>");
-		
-		PingRequest expectedPingRequest = new PingRequest();
+
 		SyncCollection syncCollection1 = new SyncCollection();
 		syncCollection1.setCollectionId(1);
 		syncCollection1.setDataClass("Calendar");
@@ -75,11 +127,10 @@ public class PingProtocolTest {
 		syncCollection2.setCollectionId(4);
 		syncCollection2.setDataClass("Contacts");
 		
-		expectedPingRequest.setSyncCollections(ImmutableSet.of(
-				syncCollection1,
-				syncCollection2));
-		
-		assertThat(new PingProtocol().decodeRequest(document)).isEqualTo(expectedPingRequest);
+		assertThat(new PingProtocol().decodeRequest(document)).isEqualTo(new PingRequest.Builder()
+			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
+			.heartbeatInterval(null)
+			.build());
 	}
 	
 	@Test
@@ -92,11 +143,12 @@ public class PingProtocolTest {
 		syncCollection2.setCollectionId(4);
 		syncCollection2.setDataClass("Contacts");
 
-		PingResponse pingResponse = new PingResponse(
-				ImmutableSet.of(syncCollection1,syncCollection2),
-				PingStatus.NO_CHANGES);
+		PingResponse pingResponse = new PingResponse.Builder()
+			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
+			.pingStatus(PingStatus.NO_CHANGES)
+			.build();
 		
-		assertThat(DOMUtils.serialize(new PingProtocol().encodeResponse(pingResponse))).isEqualTo(
+		assertThat(DOMUtils.serialize(pingProtocol.encodeResponse(pingResponse))).isEqualTo(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Ping>" +
 					"<Status>1</Status>" +
@@ -109,14 +161,16 @@ public class PingProtocolTest {
 	
 	@Test
 	public void encodeChangesWithoutFolder() throws TransformerException {
-		PingResponse pingResponse = new PingResponse(
-				ImmutableSet.<SyncCollection>of(),
-				PingStatus.CHANGES_OCCURED);
+		PingResponse pingResponse = new PingResponse.Builder()
+			.syncCollections(ImmutableSet.<SyncCollection>of())
+			.pingStatus(PingStatus.CHANGES_OCCURED)
+			.build();
 		
-		assertThat(DOMUtils.serialize(new PingProtocol().encodeResponse(pingResponse))).isEqualTo(
+		assertThat(DOMUtils.serialize(pingProtocol.encodeResponse(pingResponse))).isEqualTo(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Ping>" +
 					"<Status>2</Status>" +
 				"</Ping>");
 	}
+
 }
