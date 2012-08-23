@@ -33,8 +33,10 @@ package org.obm.push.protocol;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.provisioning.Policy;
@@ -88,6 +90,16 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", errorStatus.getSpecificationValue());
 		return document;
+	}
+
+	@Override
+	public Document encodeRequest(ProvisionRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public ProvisionResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }

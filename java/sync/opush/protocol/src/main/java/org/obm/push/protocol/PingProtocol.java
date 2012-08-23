@@ -33,7 +33,9 @@ package org.obm.push.protocol;
 
 import java.util.HashSet;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.utils.DOMUtils;
@@ -98,6 +100,16 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", errorStatus);
 		return document;
+	}
+
+	@Override
+	public Document encodeRequest(PingRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public PingResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }

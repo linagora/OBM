@@ -38,6 +38,10 @@ public interface ActiveSyncProtocol<X, Y> {
 
 	X decodeRequest(Document requestDocument) throws ProtocolException;
 	
+	Document encodeRequest(X request) throws ProtocolException;
+	
+	Y decodeResponse(Document responseDocument) throws ProtocolException;
+
 	Document encodeResponse(Y response) throws ProtocolException;
 	
 }

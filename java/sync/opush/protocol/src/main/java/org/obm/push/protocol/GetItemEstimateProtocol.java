@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncCollection;
@@ -42,6 +43,7 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
 import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;
@@ -142,5 +144,13 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		return document;
 	}
 
-	
+	@Override
+	public Document encodeRequest(GetItemEstimateRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public GetItemEstimateResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
+	}
 }

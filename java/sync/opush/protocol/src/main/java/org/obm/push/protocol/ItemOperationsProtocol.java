@@ -33,6 +33,7 @@ package org.obm.push.protocol;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
@@ -227,5 +228,14 @@ public class ItemOperationsProtocol implements ActiveSyncProtocol<ItemOperations
 		DOMUtils.createElementAndText(root, "Status", status.asSpecificationValue());
 		return document;
 	}
-	
+
+	@Override
+	public Document encodeRequest(ItemOperationsRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public ItemOperationsResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
+	}
 }

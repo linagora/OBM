@@ -33,6 +33,7 @@ package org.obm.push.protocol;
 
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
@@ -40,6 +41,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -184,6 +186,16 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 	
 	private void createElementAndText(Element element, String elementName, String value) {
 		DOMUtils.createElementAndText(element, elementName, value);
+	}
+
+	@Override
+	public Document encodeRequest(AutodiscoverRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public AutodiscoverResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 
 }

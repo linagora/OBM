@@ -34,9 +34,11 @@ package org.obm.push.protocol;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
 import org.obm.push.protocol.bean.MoveItemsResponse.MoveItemsItem;
@@ -105,6 +107,16 @@ public class MoveItemsProtocol implements ActiveSyncProtocol<MoveItemsRequest, M
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", moveItemsStatus.asSpecificationValue());
 		return document;
+	}
+
+	@Override
+	public Document encodeRequest(MoveItemsRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public MoveItemsResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }

@@ -31,9 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
@@ -178,6 +180,16 @@ public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchR
 		Element store = DOMUtils.createElement(resp, "Store");
 		DOMUtils.createElementAndText(store, "Status", error.asXmlValue());
 		return document;
+	}
+
+	@Override
+	public Document encodeRequest(SearchRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public SearchResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }

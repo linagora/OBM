@@ -33,11 +33,13 @@ package org.obm.push.protocol;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
@@ -104,5 +106,14 @@ public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest,
 		DOMUtils.createElementAndText(root, "Status", status.asXmlValue());
 		return ret;
 	}
-	
+
+	@Override
+	public Document encodeRequest(FolderSyncRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public FolderSyncResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
+	}
 }

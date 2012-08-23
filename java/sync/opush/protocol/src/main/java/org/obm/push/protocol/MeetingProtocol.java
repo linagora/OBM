@@ -34,11 +34,13 @@ package org.obm.push.protocol;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
@@ -120,6 +122,16 @@ public class MeetingProtocol implements ActiveSyncProtocol<MeetingHandlerRequest
 		} else {
 			return AttendeeStatus.TENTATIVE;
 		}
+	}
+
+	@Override
+	public Document encodeRequest(MeetingHandlerRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public MeetingHandlerResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }
