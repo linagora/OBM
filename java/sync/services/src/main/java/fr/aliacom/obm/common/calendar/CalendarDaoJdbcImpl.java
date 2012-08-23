@@ -1971,7 +1971,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
 
 				// There must be only one organizer in a given event
-				if (isOrganizer) {
+				if (isOrganizer != null && isOrganizer) {
 					shouldClearOrganizer = true;
 				}
 				
