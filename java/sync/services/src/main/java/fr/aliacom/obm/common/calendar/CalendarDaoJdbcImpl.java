@@ -1434,8 +1434,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			while(rs.next()) {
 				EventObmId eventId = new EventObmId(rs.getInt("eventalert_event_id"));
 				int alertDuration = rs.getInt("eventalert_duration");
-				Event event = eventById.get(eventId);
-				event.setAlert(alertDuration);
+				//eventalert_duration is sometimes set to -1 to disable an alert, 
+				//this behaviour does not conform to the rfc but happens in OBM nonetheless
+				if (alertDuration >= 0) {
+					Event event = eventById.get(eventId);
+					event.setAlert(alertDuration);
+				}
 			}
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
