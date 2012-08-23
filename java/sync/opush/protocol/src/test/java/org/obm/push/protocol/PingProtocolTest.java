@@ -79,7 +79,7 @@ public class PingProtocolTest {
 				syncCollection1,
 				syncCollection2));
 		
-		assertThat(new PingProtocol().getRequest(document)).isEqualTo(expectedPingRequest);
+		assertThat(new PingProtocol().decodeRequest(document)).isEqualTo(expectedPingRequest);
 	}
 	
 	@Test

@@ -42,9 +42,10 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ProvisionProtocol {
+public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, ProvisionResponse> {
 
-	public ProvisionRequest getRequest(Document doc) throws InvalidPolicyKeyException {
+	@Override
+	public ProvisionRequest decodeRequest(Document doc) throws InvalidPolicyKeyException {
 		String policyType = DOMUtils.getUniqueElement(doc.getDocumentElement(),	"PolicyType").getTextContent();
 		Element pKeyElem = DOMUtils.getUniqueElement(doc.getDocumentElement(), "PolicyKey");
 		Long policyKey = getPolicyKey(pKeyElem);
@@ -59,6 +60,7 @@ public class ProvisionProtocol {
 		}
 	}
 
+	@Override
 	public Document encodeResponse(ProvisionResponse provisionResponse) throws FactoryConfigurationError {
 		Document ret = DOMUtils.createDoc(null, "Provision");
 		Element root = ret.getDocumentElement();

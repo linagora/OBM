@@ -52,9 +52,10 @@ import org.w3c.dom.NodeList;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class GetItemEstimateProtocol {
+public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstimateRequest, GetItemEstimateResponse> {
 
-	public GetItemEstimateRequest getRequest(Document doc) throws CollectionNotFoundException {
+	@Override
+	public GetItemEstimateRequest decodeRequest(Document doc) throws CollectionNotFoundException {
 		final NodeList collections = doc.getDocumentElement().getElementsByTagName("Collection");
 		int nbElements = collections.getLength();
 		final ArrayList<SyncCollection> syncCollections = new ArrayList<SyncCollection>(nbElements);
@@ -85,6 +86,7 @@ public class GetItemEstimateProtocol {
 		return new GetItemEstimateRequest(syncCollections);
 	}
 
+	@Override
 	public Document encodeResponse(GetItemEstimateResponse response) {
 		final Document document = createDocument();
 		for (Estimate estimate: response.getEstimates()) {

@@ -47,9 +47,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class MeetingProtocol {
+public class MeetingProtocol implements ActiveSyncProtocol<MeetingHandlerRequest, MeetingHandlerResponse> {
 
-	public MeetingHandlerRequest getRequest(Document doc) throws NoDocumentException {
+	@Override
+	public MeetingHandlerRequest decodeRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
 			throw new NoDocumentException("Document of MeetingResponse request is null.");
 		}
@@ -57,8 +58,9 @@ public class MeetingProtocol {
 		List<MeetingResponse> items = parseNodeListAsMeetingResponses(requests);
 		return new MeetingHandlerRequest(items);
 	}
-	
-	public Document encodeResponses(MeetingHandlerResponse meetingResponse) {
+
+	@Override
+	public Document encodeResponse(MeetingHandlerResponse meetingResponse) {
 		Document reply = DOMUtils.createDoc(null, "MeetingResponse");
 		Element root = reply.getDocumentElement();
 		for (ItemChangeMeetingResponse item: meetingResponse.getItemChanges()) {

@@ -43,9 +43,10 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Strings;
 
-public class SearchProtocol {
+public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchResponse> {
 
-	public SearchRequest getRequest(Document document) throws XMLValidationException {
+	@Override
+	public SearchRequest decodeRequest(Document document) throws XMLValidationException {
 		if (document == null) {
 			throw new XMLValidationException("Null Request not supported by Search Command");
 		}
@@ -91,6 +92,7 @@ public class SearchProtocol {
 		return "";
 	}
 
+	@Override
 	public Document encodeResponse(SearchResponse response) {
 		Document search = DOMUtils.createDoc(null, "Search");
 		Element r = search.getDocumentElement();

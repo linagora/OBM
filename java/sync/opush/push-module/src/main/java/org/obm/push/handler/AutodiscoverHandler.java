@@ -71,7 +71,7 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 	protected void process(UserDataRequest udr, Document doc, Responder responder) {
 		AutodiscoverRequest autodiscoverRequest = null;
 		try {
-			autodiscoverRequest = protocol.getRequest(doc);
+			autodiscoverRequest = protocol.decodeRequest(doc);
 			AutodiscoverResponse autodiscoverResponse = doTheJob(udr, autodiscoverRequest);
 			Document ret = protocol.encodeResponse(autodiscoverResponse);
 			sendResponse(responder, ret);

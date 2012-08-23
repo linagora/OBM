@@ -381,7 +381,7 @@ public class MeetingResponseHandlerTest {
 		itemChangeMeetingResponse.setStatus(status);
 		
 		MeetingHandlerResponse response = new MeetingHandlerResponse(Lists.newArrayList(itemChangeMeetingResponse));
-		Document encodeResponses = protocol.encodeResponses(response);
+		Document encodeResponses = protocol.encodeResponse(response);
 		return DOMUtils.serialize(encodeResponses);
 	}
 

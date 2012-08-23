@@ -100,7 +100,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
 		try {
-			GetItemEstimateRequest estimateRequest = protocol.getRequest(doc);
+			GetItemEstimateRequest estimateRequest = protocol.decodeRequest(doc);
 			GetItemEstimateResponse response = doTheJob(udr, estimateRequest);
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document);

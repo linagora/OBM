@@ -114,7 +114,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			PingRequest pingRequest = protocol.getRequest(doc);
+			PingRequest pingRequest = protocol.decodeRequest(doc);
 			doTheJob(continuation, udr, pingRequest);
 
 		} catch (MissingRequestParameterException e) {

@@ -46,9 +46,10 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Strings;
 
-public class AutodiscoverProtocol {
+public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequest, AutodiscoverResponse> {
 
-	public AutodiscoverRequest getRequest(Document document) throws NoDocumentException {
+	@Override
+	public AutodiscoverRequest decodeRequest(Document document) throws NoDocumentException {
 		if (document == null) {
 			throw new NoDocumentException("Document of Autodiscover request is null.");
 		}
@@ -61,7 +62,8 @@ public class AutodiscoverProtocol {
 		return new AutodiscoverRequest( emailAddressElement.getTextContent(),
 										acceptableResponseSchElement.getTextContent());
 	}
-	
+
+	@Override
 	public Document encodeResponse(AutodiscoverResponse autodiscoverResponse) throws AutodiscoverProtocolException {
 		Document autodiscover = DOMUtils.createDoc(null, "Autodiscover");
 		

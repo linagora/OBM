@@ -80,7 +80,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			ProvisionRequest provisionRequest = protocol.getRequest(doc);
+			ProvisionRequest provisionRequest = protocol.decodeRequest(doc);
 			logger.info("required {}", provisionRequest.toString());
 			ProvisionResponse provisionResponse = doTheJob(provisionRequest, udr);
 			Document ret = protocol.encodeResponse(provisionResponse);

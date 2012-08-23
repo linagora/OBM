@@ -43,9 +43,10 @@ import org.w3c.dom.NodeList;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class PingProtocol {
+public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingResponse> {
 
-	public PingRequest getRequest(Document doc) {
+	@Override
+	public PingRequest decodeRequest(Document doc) {
 		PingRequest pingRequest = new PingRequest();
 		if (doc == null) {
 			return pingRequest;
@@ -68,7 +69,8 @@ public class PingProtocol {
 		pingRequest.setSyncCollections(syncCollections);
 		return pingRequest;
 	}
-	
+
+	@Override
 	public Document encodeResponse(PingResponse pingResponse) {
 		Document document = DOMUtils.createDoc(null, "Ping");
 		Element root = document.getDocumentElement();

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,6 +60,7 @@ import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
@@ -118,7 +118,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		boolean acceptGZip = isAcceptGZip(request);
 		ItemOperationsProtocol protocol = protocolFactory.create(udr.getDevice(), acceptMultipart);
 		try {
-			ItemOperationsRequest itemOperationRequest = protocol.getRequest(doc);
+			ItemOperationsRequest itemOperationRequest = protocol.decodeRequest(doc);
 			ItemOperationsResponse response = doTheJob(udr, itemOperationRequest);
 			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document, response, acceptGZip, acceptMultipart);
@@ -128,7 +128,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (ProcessingEmailException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
-		} catch (IOException e) {
+		} catch (ProtocolException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}

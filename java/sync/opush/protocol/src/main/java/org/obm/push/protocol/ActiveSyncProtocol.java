@@ -29,18 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.protocol;
 
 import org.obm.push.exception.activesync.ProtocolException;
+import org.w3c.dom.Document;
 
-public class InvalidPolicyKeyException extends ProtocolException {
+public interface ActiveSyncProtocol<X, Y> {
 
-	public InvalidPolicyKeyException() {
-		super();
-	}
+	X decodeRequest(Document requestDocument) throws ProtocolException;
 	
-	public InvalidPolicyKeyException(NumberFormatException e) {
-		super(e);
-	}
-
+	Document encodeResponse(Y response) throws ProtocolException;
+	
 }

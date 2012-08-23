@@ -112,7 +112,7 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 				+ ")");
 		try {
 		
-			MoveItemsRequest moveItemsRequest = moveItemsProtocol.getRequest(doc);
+			MoveItemsRequest moveItemsRequest = moveItemsProtocol.decodeRequest(doc);
 			MoveItemsResponse moveItemsResponse = doTheJob(moveItemsRequest, udr);
 			Document reply = moveItemsProtocol.encodeResponse(moveItemsResponse);
 			sendResponse(responder, reply);

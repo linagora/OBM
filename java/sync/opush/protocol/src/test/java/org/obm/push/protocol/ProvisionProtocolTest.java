@@ -63,17 +63,17 @@ public class ProvisionProtocolTest {
 	@Test
 	public void parseRequest() throws InvalidPolicyKeyException {
 		Document document = buildRequestDocument(String.valueOf(_3378841480L));
-		ProvisionRequest request = provisionProtocol.getRequest(document);
+		ProvisionRequest request = provisionProtocol.decodeRequest(document);
 		assertThat(request.getPolicyKey()).isEqualTo(_3378841480L);
 	}
 
 	@Test(expected=InvalidPolicyKeyException.class)
 	public void parseRequestWithWrongPolicyKey() throws InvalidPolicyKeyException {
-		provisionProtocol.getRequest( buildRequestDocument("3378841480ZZD") );
+		provisionProtocol.decodeRequest(buildRequestDocument("3378841480ZZD"));
 	}
 
 	public void parseRequestWithoutPolicyKey() throws InvalidPolicyKeyException {
-		ProvisionRequest request = provisionProtocol.getRequest( buildRequestDocumentWithoutPolicyKey() );
+		ProvisionRequest request = provisionProtocol.decodeRequest( buildRequestDocumentWithoutPolicyKey() );
 		assertThat(request.getPolicyType()).isEqualTo(MS_EAS_PROVISIONING_WBXML);
 		assertThat(request.getPolicyKey()).isNull();
 	}

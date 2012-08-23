@@ -85,7 +85,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		
 		try {
-			FolderSyncRequest folderSyncRequest = protocol.getRequest(doc);
+			FolderSyncRequest folderSyncRequest = protocol.decodeRequest(doc);
 			FolderSyncResponse folderSyncResponse = doTheJob(udr, folderSyncRequest);
 			Document ret = protocol.encodeResponse(folderSyncResponse);
 			sendResponse(responder, ret);

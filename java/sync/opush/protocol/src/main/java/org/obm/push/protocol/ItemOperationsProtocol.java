@@ -39,6 +39,8 @@ import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.Fetch;
@@ -56,7 +58,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class ItemOperationsProtocol {
+public class ItemOperationsProtocol implements ActiveSyncProtocol<ItemOperationsRequest, ItemOperationsResponse> {
 
 	@Singleton
 	public static class Factory {
@@ -83,8 +85,9 @@ public class ItemOperationsProtocol {
 		this.device = device;
 		this.isMultipart = isMultipart;
 	}
-	
-	public ItemOperationsRequest getRequest(Document document) {
+
+	@Override
+	public ItemOperationsRequest decodeRequest(Document document) {
 		Element root = document.getDocumentElement();
 		Fetch fetch = buildFetch(root);
 		EmptyFolderContentsRequest emptyFolderContents = buildEmptyFolderContents(root);
@@ -145,15 +148,20 @@ public class ItemOperationsProtocol {
 		return null;
 	}
 
-	public Document encodeResponse(ItemOperationsResponse response) throws IOException {
-		Document document = DOMUtils.createDoc(null, "ItemOperations");
-		Element root = document.getDocumentElement();
-		if (response.getEmptyFolderContentsResult() != null) {
-			encodeEmptyFolderOperation(response.getEmptyFolderContentsResult(), root);
-		} else if (response.getMailboxFetchResult() != null) {
-			encodeMailboxFetchResult(response.getMailboxFetchResult(), root);
+	@Override
+	public Document encodeResponse(ItemOperationsResponse response) throws ProtocolException {
+		try {
+			Document document = DOMUtils.createDoc(null, "ItemOperations");
+			Element root = document.getDocumentElement();
+			if (response.getEmptyFolderContentsResult() != null) {
+				encodeEmptyFolderOperation(response.getEmptyFolderContentsResult(), root);
+			} else if (response.getMailboxFetchResult() != null) {
+				encodeMailboxFetchResult(response.getMailboxFetchResult(), root);
+			}
+			return document;
+		} catch (IOException e) {
+			throw new ServerErrorException(e);
 		}
-		return document;
 	}
 	
 	private void encodeEmptyFolderOperation(EmptyFolderContentsResult result, Element root) {

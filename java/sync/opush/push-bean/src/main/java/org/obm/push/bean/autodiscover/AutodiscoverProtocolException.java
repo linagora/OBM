@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.autodiscover;
 
-public class AutodiscoverProtocolException extends Exception {
+import org.obm.push.exception.activesync.ProtocolException;
+
+public class AutodiscoverProtocolException extends ProtocolException {
 
 	public AutodiscoverProtocolException(String message) {
 		super(message);

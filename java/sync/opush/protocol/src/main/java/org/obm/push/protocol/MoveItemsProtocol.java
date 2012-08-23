@@ -45,12 +45,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class MoveItemsProtocol {
+public class MoveItemsProtocol implements ActiveSyncProtocol<MoveItemsRequest, MoveItemsResponse> {
 
 	public MoveItemsProtocol() {
 	}
 	
-	public MoveItemsRequest getRequest(Document doc) throws NoDocumentException {
+	@Override
+	public MoveItemsRequest decodeRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
 			throw new NoDocumentException("Document of MoveItems request is null.");
 		}
@@ -71,6 +72,7 @@ public class MoveItemsProtocol {
 		return new MoveItemsRequest(moveItems);
 	}
 
+	@Override
 	public Document encodeResponse(MoveItemsResponse moveItemsResponse) {
 		Document reply = DOMUtils.createDoc(null, "MoveItems");
 		Element root = reply.getDocumentElement();

@@ -69,8 +69,8 @@ import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsResponse;
 import org.obm.push.protocol.bean.ItemOperationsResponse.EmptyFolderContentsResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
-import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
+import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.SerializableInputStream;
@@ -112,7 +112,7 @@ public class ItemOperationsProtocolTest {
 				"</Fetch>" +
 				"</ItemOperations>");
 
-		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(document);
+		ItemOperationsRequest decodedRequest = itemOperationsProtocol.decodeRequest(document);
 		
 		assertThat(decodedRequest).isNotNull();
 		assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
@@ -132,7 +132,7 @@ public class ItemOperationsProtocolTest {
 				"</Fetch>" +
 				"</ItemOperations>");
 
-		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(document);
+		ItemOperationsRequest decodedRequest = itemOperationsProtocol.decodeRequest(document);
 
 		assertThat(decodedRequest).isNotNull();
 		assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
@@ -336,8 +336,7 @@ public class ItemOperationsProtocolTest {
 			"</ItemOperations>");
 	}
 
-	private Document testFetchAttachmentEncodingResponseWithMultipart(
-			boolean isMultipart) throws IOException {
+	private Document testFetchAttachmentEncodingResponseWithMultipart(boolean isMultipart) {
 		FetchAttachmentResult fetchAttachmentResult = new FetchAttachmentResult();
 		fetchAttachmentResult.setReference("ref");
 		fetchAttachmentResult.setAttch("data".getBytes());

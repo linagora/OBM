@@ -112,9 +112,9 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		MeetingHandlerRequest meetingRequest;
 		try {
 			
-			meetingRequest = meetingProtocol.getRequest(doc);
+			meetingRequest = meetingProtocol.decodeRequest(doc);
 			MeetingHandlerResponse meetingResponse = doTheJob(meetingRequest, udr);
-			Document document = meetingProtocol.encodeResponses(meetingResponse);
+			Document document = meetingProtocol.encodeResponse(meetingResponse);
 			sendResponse(responder, document);
 			
 		} catch (NoDocumentException e) {

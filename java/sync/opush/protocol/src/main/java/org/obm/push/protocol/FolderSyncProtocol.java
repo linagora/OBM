@@ -46,11 +46,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class FolderSyncProtocol {
+public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest, FolderSyncResponse> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public FolderSyncRequest getRequest(Document doc) throws NoDocumentException {
+	@Override
+	public FolderSyncRequest decodeRequest(Document doc) throws NoDocumentException {
 		if (doc == null) {
 			throw new NoDocumentException("Document of FolderSync request is null.");
 		}
@@ -58,6 +59,7 @@ public class FolderSyncProtocol {
 		return new FolderSyncRequest(syncKey);
 	}
 
+	@Override
 	public Document encodeResponse(FolderSyncResponse folderSyncResponse) throws FactoryConfigurationError {
 		Document ret = DOMUtils.createDoc(null, "FolderSync");
 		Element root = ret.getDocumentElement();

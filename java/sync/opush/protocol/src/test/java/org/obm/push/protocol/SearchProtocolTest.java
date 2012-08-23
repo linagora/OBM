@@ -90,7 +90,7 @@ public class SearchProtocolTest {
 	private SearchRequest getSearchRequest(String filename) throws SAXException, IOException, FactoryConfigurationError, XMLValidationException {
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("file/search/" + filename);
 		Document document = DOMUtils.parse(inputStream);
-		return searchProtocol.getRequest(document);
+		return searchProtocol.decodeRequest(document);
 	}
 	
 }
