@@ -34,7 +34,6 @@ package org.obm.push.protocol;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -48,7 +47,6 @@ import java.util.Properties;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,8 +70,8 @@ import org.obm.push.protocol.bean.ItemOperationsResponse;
 import org.obm.push.protocol.bean.ItemOperationsResponse.EmptyFolderContentsResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
+import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Document;
@@ -94,7 +92,7 @@ public class ItemOperationsProtocolTest {
 		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 		Credentials credentials = new Credentials(user, "test");
 		udr = new UserDataRequest(credentials, "Sync", device);
-		itemOperationsProtocol = new ItemOperationsProtocol.Factory(null).create(device);
+		itemOperationsProtocol = new ItemOperationsProtocol.Factory(null).create(device, true);
 	}
 	
 	@Test
@@ -113,10 +111,9 @@ public class ItemOperationsProtocolTest {
 				"</Options>" +
 				"</Fetch>" +
 				"</ItemOperations>");
-		ActiveSyncRequest request = createDefaultActiveSyncRequestMock();
-		replay(request);
-		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(request, document);
-		verify(request);
+
+		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(document);
+		
 		assertThat(decodedRequest).isNotNull();
 		assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
 		assertThat(decodedRequest.getFetch().getServerId()).isEqualTo("1400:350025");
@@ -134,21 +131,51 @@ public class ItemOperationsProtocolTest {
 				"<ServerId>1400:350025</ServerId>" +
 				"</Fetch>" +
 				"</ItemOperations>");
-		ActiveSyncRequest request = createDefaultActiveSyncRequestMock();
-		replay(request);
-		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(request, document);
-		verify(request);
+
+		ItemOperationsRequest decodedRequest = itemOperationsProtocol.getRequest(document);
+
 		assertThat(decodedRequest).isNotNull();
 		assertThat(decodedRequest.getFetch().getCollectionId()).isEqualTo("1400");
 		assertThat(decodedRequest.getFetch().getServerId()).isEqualTo("1400:350025");
 		assertThat(decodedRequest.getFetch().getType()).isNull();
 	}
 
-	private ActiveSyncRequest createDefaultActiveSyncRequestMock() {
-		ActiveSyncRequest request = createMock(ActiveSyncRequest.class);
-		expect(request.getHeader("MS-ASAcceptMultiPart")).andReturn("T");
-		expect(request.getHeader(HttpHeaders.ACCEPT_ENCODING)).andReturn(null);
-		return request;
+	@Test
+	public void testNoApplicationDataEncodingResponse() throws Exception {
+		String fetchItemResultServerId = "1:2";
+		FetchItemResult fetchItemResult = new FetchItemResult();
+		fetchItemResult.setServerId(fetchItemResultServerId);
+		fetchItemResult.setStatus(ItemOperationsStatus.SUCCESS);
+		fetchItemResult.setSyncCollection(new SyncCollection(1, "obm:\\\\login@domain\\email\\INBOX"));
+		fetchItemResult.setItemChange(null);
+		
+		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
+		mailboxFetchResult.setFetchItemResult(fetchItemResult);
+		
+		boolean isMultipart = true;
+		ItemOperationsResponse response = new ItemOperationsResponse();
+		response.setMailboxFetchResult(mailboxFetchResult);
+
+		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
+		replay(applicationDataEncoder);
+
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder)
+			.create(udr.getDevice(), isMultipart);
+		Document doc = protocol.encodeResponse(response);
+		
+		verify(applicationDataEncoder);
+		
+		assertThat(DOMUtils.serialize(doc)).isEqualTo(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<ItemOperations>" +
+				"<Status>1</Status>" +
+				"<Response>" +
+					"<Fetch>" +
+						"<Status>1</Status>" +
+						"<AirSync:ServerId>1:2</AirSync:ServerId>" +
+					"</Fetch>" +
+				"</Response>" +
+			"</ItemOperations>");
 	}
 
 	@Test
@@ -165,16 +192,16 @@ public class ItemOperationsProtocolTest {
 		
 		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
 		mailboxFetchResult.setFetchItemResult(fetchItemResult);
-		
+
+		boolean isMultipart = true;
 		ItemOperationsResponse response = new ItemOperationsResponse();
-		response.setGzip(false);
-		response.setMultipart(false);
 		response.setMailboxFetchResult(mailboxFetchResult);
 		
 		EncoderFactory applicationDataEncoder = assertApplicationDataEncodeIsCalled();
 		replay(applicationDataEncoder);
-		
-		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder)
+			.create(udr.getDevice(), isMultipart);
 		Document doc = protocol.encodeResponse(response);
 
 		verify(applicationDataEncoder);
@@ -207,14 +234,14 @@ public class ItemOperationsProtocolTest {
 		
 		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
 		mailboxFetchResult.setFetchItemResult(fetchItemResult);
-		
+
+		boolean isMultipart = true;
 		ItemOperationsResponse response = new ItemOperationsResponse();
-		response.setGzip(false);
-		response.setMultipart(false);
 		response.setMailboxFetchResult(mailboxFetchResult);
 
 		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
-		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder)
+			.create(udr.getDevice(), isMultipart);
 		Document doc = protocol.encodeResponse(response);
 
 		assertThat(DOMUtils.serialize(doc)).isEqualTo(
@@ -241,13 +268,13 @@ public class ItemOperationsProtocolTest {
 		emptyFolderContentsResult.setCollectionId(1);
 		emptyFolderContentsResult.setItemOperationsStatus(ItemOperationsStatus.SUCCESS);
 		
+		boolean isMultipart = true;
 		ItemOperationsResponse response = new ItemOperationsResponse();
-		response.setGzip(false);
-		response.setMultipart(false);
 		response.setEmptyFolderContentsResult(emptyFolderContentsResult);
 
 		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
-		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder)
+			.create(udr.getDevice(), isMultipart);
 		Document doc = protocol.encodeResponse(response);
 
 		assertThat(DOMUtils.serialize(doc)).isEqualTo(
@@ -261,6 +288,77 @@ public class ItemOperationsProtocolTest {
 					"</EmptyFolderContents>" +
 				"</Response>" +
 			"</ItemOperations>");
+	}
+	
+	@Test
+	public void testFetchAttachmentEncodingResponseWhenMultipartIsAccepted() throws Exception {
+		boolean multipartIsAccpeted = true;
+		
+		Document doc = testFetchAttachmentEncodingResponseWithMultipart(multipartIsAccpeted);
+		
+		assertThat(DOMUtils.serialize(doc)).isEqualTo(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<ItemOperations>" +
+				"<Status>1</Status>" +
+				"<Response>" +
+					"<Fetch>" +
+						"<Status>1</Status>" +
+						"<AirSyncBase:FileReference>ref</AirSyncBase:FileReference>" +
+						"<Properties>" +
+							"<AirSyncBase:ContentType>text/plain</AirSyncBase:ContentType>" +
+							"<Part>1</Part>" +
+						"</Properties>" +
+					"</Fetch>" +
+				"</Response>" +
+			"</ItemOperations>");
+	}
+	
+	@Test
+	public void testFetchAttachmentEncodingResponseWhenMultipartIsNotAccepted() throws Exception {
+		boolean multipartIsAccpeted = false;
+		
+		Document doc = testFetchAttachmentEncodingResponseWithMultipart(multipartIsAccpeted);
+		
+		assertThat(DOMUtils.serialize(doc)).isEqualTo(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<ItemOperations>" +
+				"<Status>1</Status>" +
+				"<Response>" +
+					"<Fetch>" +
+						"<Status>1</Status>" +
+						"<AirSyncBase:FileReference>ref</AirSyncBase:FileReference>" +
+						"<Properties>" +
+							"<AirSyncBase:ContentType>text/plain</AirSyncBase:ContentType>" +
+							"<Data>data</Data>" +
+						"</Properties>" +
+					"</Fetch>" +
+				"</Response>" +
+			"</ItemOperations>");
+	}
+
+	private Document testFetchAttachmentEncodingResponseWithMultipart(
+			boolean isMultipart) throws IOException {
+		FetchAttachmentResult fetchAttachmentResult = new FetchAttachmentResult();
+		fetchAttachmentResult.setReference("ref");
+		fetchAttachmentResult.setAttch("data".getBytes());
+		fetchAttachmentResult.setContentType("text/plain");
+		fetchAttachmentResult.setStatus(ItemOperationsStatus.SUCCESS);
+		
+		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
+		mailboxFetchResult.setFetchAttachmentResult(fetchAttachmentResult);
+
+		ItemOperationsResponse response = new ItemOperationsResponse();
+		response.setMailboxFetchResult(mailboxFetchResult);
+
+		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
+		replay(applicationDataEncoder);
+
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder)
+			.create(udr.getDevice(), isMultipart);
+		Document doc = protocol.encodeResponse(response);
+
+		verify(applicationDataEncoder);
+		return doc;
 	}
 	
 	private EncoderFactory assertApplicationDataEncodeIsCalled() throws Exception {

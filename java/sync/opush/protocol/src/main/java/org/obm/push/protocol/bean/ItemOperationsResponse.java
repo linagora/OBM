@@ -176,8 +176,6 @@ public class ItemOperationsResponse {
 	
 	private EmptyFolderContentsResult emptyFolderContentsResult;
 	private MailboxFetchResult mailboxFetchResult;
-	private boolean multipart;
-	private boolean gzip;
 	
 	public MailboxFetchResult getMailboxFetchResult() {
 		return mailboxFetchResult;
@@ -195,22 +193,6 @@ public class ItemOperationsResponse {
 		this.emptyFolderContentsResult = emptyFolderContentsResult;
 	}
 
-	public boolean isMultipart() {
-		return multipart;
-	}
-	
-	public void setMultipart(boolean multipart) {
-		this.multipart = multipart;
-	}
-
-	public boolean isGzip() {
-		return gzip;
-	}
-	
-	public void setGzip(boolean gzip) {
-		this.gzip = gzip;
-	}
-	
 	public byte[] getAttachmentData() {
 		if (mailboxFetchResult != null) {
 			return mailboxFetchResult.getAttachmentData();

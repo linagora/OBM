@@ -33,13 +33,12 @@ package org.obm.push.protocol;
 
 import java.io.IOException;
 
-import org.eclipse.jetty.http.HttpHeaderValues;
-import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.Fetch;
@@ -49,7 +48,6 @@ import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchItemResult;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,23 +68,23 @@ public class ItemOperationsProtocol {
 			this.encoderFactory = encoderFactory;
 		}
 		
-		public ItemOperationsProtocol create(Device device) {
-			return new ItemOperationsProtocol(encoderFactory, device);
+		public ItemOperationsProtocol create(Device device, boolean isMultipart) {
+			return new ItemOperationsProtocol(encoderFactory, device, isMultipart);
 		}
 		
 	}
 	
 	private final EncoderFactory encoderFactory;
 	private final Device device;
+	private final boolean isMultipart;
 
-	@VisibleForTesting ItemOperationsProtocol(EncoderFactory encoderFactory, Device device) {
+	@VisibleForTesting ItemOperationsProtocol(EncoderFactory encoderFactory, Device device, boolean isMultipart) {
 		this.encoderFactory = encoderFactory;
 		this.device = device;
+		this.isMultipart = isMultipart;
 	}
 	
-	public ItemOperationsRequest getRequest(ActiveSyncRequest request, Document document) {
-		boolean multipart = isAcceptMultipart(request);
-		boolean gzip = isAcceptGZip(request);
+	public ItemOperationsRequest getRequest(Document document) {
 		Element root = document.getDocumentElement();
 		Fetch fetch = buildFetch(root);
 		EmptyFolderContentsRequest emptyFolderContents = buildEmptyFolderContents(root);
@@ -94,8 +92,6 @@ public class ItemOperationsProtocol {
 		ItemOperationsRequest itemOperationsRequest = new ItemOperationsRequest();
 		itemOperationsRequest.setFetch(fetch);
 		itemOperationsRequest.setEmptyFolderContents(emptyFolderContents);
-		itemOperationsRequest.setMultipart(multipart);
-		itemOperationsRequest.setGzip(gzip);
 		return itemOperationsRequest;
 	}
 
@@ -149,24 +145,13 @@ public class ItemOperationsProtocol {
 		return null;
 	}
 
-	private boolean isAcceptGZip(ActiveSyncRequest request) {
-		String acceptEncoding = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
-		return acceptEncoding != null
-				&& acceptEncoding.contains(HttpHeaderValues.GZIP);
-	}
-
-	private boolean isAcceptMultipart(ActiveSyncRequest request) {
-		return "T".equals(request.getHeader("MS-ASAcceptMultiPart"))
-				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
-	}
-
 	public Document encodeResponse(ItemOperationsResponse response) throws IOException {
 		Document document = DOMUtils.createDoc(null, "ItemOperations");
 		Element root = document.getDocumentElement();
 		if (response.getEmptyFolderContentsResult() != null) {
 			encodeEmptyFolderOperation(response.getEmptyFolderContentsResult(), root);
 		} else if (response.getMailboxFetchResult() != null) {
-			encodeMailboxFetchResult(response.getMailboxFetchResult(), root, response.isMultipart());
+			encodeMailboxFetchResult(response.getMailboxFetchResult(), root);
 		}
 		return document;
 	}
@@ -179,13 +164,11 @@ public class ItemOperationsProtocol {
 		DOMUtils.createElementAndText(empty, "AirSync:CollectionId", String.valueOf(result.getCollectionId()));
 	}
 
-	private void encodeMailboxFetchResult(MailboxFetchResult mailboxFetchResult, Element root, 
-			boolean multipart) throws IOException {
-		
+	private void encodeMailboxFetchResult(MailboxFetchResult mailboxFetchResult, Element root) throws IOException {
 		if (mailboxFetchResult.getFetchItemResult() != null) {
 			encodeFetchItemResult(root, mailboxFetchResult.getFetchItemResult());
 		} else if (mailboxFetchResult.getFileReferenceFetch() != null) {
-			encodeFetchAttachmentResult(root, mailboxFetchResult.getFileReferenceFetch(), multipart);
+			encodeFetchAttachmentResult(root, mailboxFetchResult.getFileReferenceFetch());
 		}
 	}
 
@@ -198,13 +181,19 @@ public class ItemOperationsProtocol {
 
 		if (ItemOperationsStatus.SUCCESS == fetchItemResult.getStatus() &&
 				fetchItemResult.getSyncCollection() != null) {
+			encodeItemChange(fetchResp, fetchItemResult.getItemChange());
+		}
+	}
+
+	private void encodeItemChange(Element fetchResp, ItemChange itemChange) throws IOException {
+		if (itemChange != null && itemChange.getData() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
-			IApplicationData data = fetchItemResult.getItemChange().getData();
+			IApplicationData data = itemChange.getData();
 			encoderFactory.encode(device, dataElem, data, true);
 		}
 	}
 	
-	private void encodeFetchAttachmentResult(Element root, FetchAttachmentResult fetchAttachmentResult, boolean multipart) {
+	private void encodeFetchAttachmentResult(Element root, FetchAttachmentResult fetchAttachmentResult) {
 		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(root, "Response");
 		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
@@ -216,7 +205,7 @@ public class ItemOperationsProtocol {
 		if (fetchAttachmentResult.getContentType() != null) {
 			Element properties = DOMUtils.createElement(fetchResp, "Properties");
 			DOMUtils.createElementAndText(properties, "AirSyncBase:ContentType", fetchAttachmentResult.getContentType());
-			if (!multipart) {
+			if (!isMultipart) {
 				DOMUtils.createElementAndText(properties, "Data", new String(fetchAttachmentResult.getAttch()));
 			} else {
 				DOMUtils.createElementAndText(properties, "Part", "1");

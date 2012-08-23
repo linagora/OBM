@@ -112,18 +112,8 @@ public class ItemOperationsRequest {
 
 	}
 	
-	private boolean multipart;
-	private boolean gzip;
 	private Fetch fetch;
 	private EmptyFolderContentsRequest emptyFolderContents;
-	
-	public boolean isMultipart() {
-		return multipart;
-	}
-
-	public void setMultipart(boolean multipart) {
-		this.multipart = multipart;
-	}
 	
 	public Fetch getFetch() {
 		return fetch;
@@ -131,14 +121,6 @@ public class ItemOperationsRequest {
 
 	public void setFetch(Fetch fetch) {
 		this.fetch = fetch;
-	}
-	
-	public boolean isGzip() {
-		return gzip;
-	}
-	
-	public void setGzip(boolean gzip) {
-		this.gzip = gzip;
 	}
 	
 	public void setEmptyFolderContents(EmptyFolderContentsRequest emptyFolderContents) {

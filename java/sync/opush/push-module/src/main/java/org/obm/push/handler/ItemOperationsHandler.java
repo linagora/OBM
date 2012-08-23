@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jetty.http.HttpHeaderValues;
+import org.eclipse.jetty.http.HttpHeaders;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -112,12 +114,14 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
-		ItemOperationsProtocol protocol = protocolFactory.create(udr.getDevice());
+		boolean acceptMultipart = isAcceptMultipart(request);
+		boolean acceptGZip = isAcceptGZip(request);
+		ItemOperationsProtocol protocol = protocolFactory.create(udr.getDevice(), acceptMultipart);
 		try {
-			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
+			ItemOperationsRequest itemOperationRequest = protocol.getRequest(doc);
 			ItemOperationsResponse response = doTheJob(udr, itemOperationRequest);
 			Document document = protocol.encodeResponse(response);
-			sendResponse(responder, document, response);
+			sendResponse(responder, document, response, acceptGZip, acceptMultipart);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (UnsupportedStoreException e) {
@@ -136,11 +140,12 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
 	}
 	
-	@VisibleForTesting void sendResponse(Responder responder, Document document, ItemOperationsResponse response) {
+	@VisibleForTesting void sendResponse(Responder responder, Document document, ItemOperationsResponse response,
+			boolean isGzip, boolean isMultipart) {
 		
-		if (response.isMultipart() && response.hasFileReference()) {
+		if (isMultipart && response.hasFileReference()) {
 			responder.sendMSSyncMultipartResponse(NAMESPACE, document, 
-					Arrays.asList(response.getAttachmentData()), response.isGzip());
+					Arrays.asList(response.getAttachmentData()), isGzip);
 		} else {
 			responder.sendWBXMLResponse(NAMESPACE, document);
 		}
@@ -158,8 +163,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			EmptyFolderContentsResult result = emptyFolderOperation(udr, emptyFolderContents);
 			response.setEmptyFolderContentsResult(result);
 		}
-		response.setMultipart(itemOperationRequest.isMultipart());
-		response.setGzip(itemOperationRequest.isGzip());
 		return response;
 	}
 
@@ -293,5 +296,15 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		}
 		return emptyFolderContentsResult;
 	}
-	
+
+	@VisibleForTesting static boolean isAcceptGZip(ActiveSyncRequest request) {
+		String acceptEncoding = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
+		return acceptEncoding != null
+				&& acceptEncoding.contains(HttpHeaderValues.GZIP);
+	}
+
+	@VisibleForTesting static boolean isAcceptMultipart(ActiveSyncRequest request) {
+		return "T".equals(request.getHeader("MS-ASAcceptMultiPart"))
+				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
+	}
 }
