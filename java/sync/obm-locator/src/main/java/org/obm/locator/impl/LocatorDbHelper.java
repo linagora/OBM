@@ -51,6 +51,7 @@ public class LocatorDbHelper {
 			.getLogger(LocatorDbHelper.class);
 
 	private final DatabaseConnectionProvider dbcp;
+	private final static int MAX_CHAR_FOR_CAST = 8;
 	
 	@Inject
 	protected LocatorDbHelper(DatabaseConnectionProvider dbcp) {
@@ -74,7 +75,7 @@ public class LocatorDbHelper {
 				+ "FROM Domain "
 				+ "INNER JOIN DomainEntity ON domainentity_domain_id=domain_id "
 				+ " INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id "
-				+ "INNER JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value "
+				+ "INNER JOIN Host ON CAST(host_id as CHAR(" + MAX_CHAR_FOR_CAST + ")) = serviceproperty_value "
 				+ "WHERE domain_name=? "
 				+ "AND serviceproperty_service=? "
 				+ "AND serviceproperty_property=?";
