@@ -4459,7 +4459,7 @@ function dis_event_commented_decision_popup() {
   $block = "
   <div id=\"commentedDecisionPopup\" class=\"obmPopup\">
     <h1>
-      <a href='' id='popup_form_close' class='closeSticky' onclick=''obm.commentedDecisionPopup.hide();return false;'>
+      <a href='' id='popup_form_close' class='closeSticky' onclick='obm.commentedDecisionPopup.hide();return false;'>
       <img src='$GLOBALS[ico_popup_close]' alt='close' />
       </a>
       <span>$GLOBALS[l_change_state]</span>
@@ -4476,7 +4476,7 @@ function dis_event_commented_decision_popup() {
         <input type=\"submit\" href='' onclick=\"obm.commentedDecisionPopup.Refuse(); return false;\" class=\"closeSticky\" value=\"$GLOBALS[l_refuse]\"/>
         </fieldset>
       </form>
-      <h2><a href='' id='popup_form_close' class='closeSticky' onclick=''obm.commentedDecisionPopup.hide();return false;'>$GLOBALS[l_cancel]</a></h2>
+      <h2><a href='' id='popup_form_close' class='closeSticky' onclick='obm.commentedDecisionPopup.hide();return false;'>$GLOBALS[l_cancel]</a></h2>
     </div>
   </div>
   <script type=\"text/javascript\"> obm.commentedDecisionPopup = new Obm.CommentedDecisionPopup();</script>
@@ -5679,7 +5679,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>".$begin->getOutputDateTime()."</td>
      <td>".$end->getOutputDateTime()."</td>
      <td>
-      <a  class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title','$l_decision_ACCEPTED', 'waiting_events')\" />
+      <a  class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($current_entity, ".$obm_wait->f('event_id').", 'ACCEPTED', 'NEEDS-ACTION', '$current_entity_entity', '$current_entity_comment', '$escaped_title', 'waiting_events')\" />
      </td>
      <td>
       <form method=\"post\" action=\"".basename($_SERVER['SCRIPT_NAME'])."\">

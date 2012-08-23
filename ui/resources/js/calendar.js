@@ -2260,10 +2260,20 @@ Obm.CommentedDecisionPopup = new Class({
       secure : false,
       onSuccess : function(message){
         if(message.error == 0){
-          showMessage('ok', message.message);
+          var redirectUrl = message.redirectUrl;
+          if (redirectUrl != null) {
+            window.location=redirectUrl;
+          } else {
+            showMessage('ok', message.message);
             window.location='../calendar/calendar_index.php?action=waiting_events';
+          }
         }else{
+          var redirectUrl = message.redirectUrl;
+          if (redirectUrl != null) {
+            window.location=redirectUrl;
+          } else {
             window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
+          }
         }
       }
     }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'ACCEPTED', entity_kind : this.type});
@@ -2276,10 +2286,20 @@ Obm.CommentedDecisionPopup = new Class({
       secure : false,
       onSuccess : function(message){
         if(message.error == 0){
+          var redirectUrl = message.redirectUrl;
+          if (redirectUrl != null) {
+            window.location=redirectUrl;
+          } else {
           showMessage('ok', message.message);
             window.location='../calendar/calendar_index.php?action=waiting_events';
+          }
         }else{
+          var redirectUrl = message.redirectUrl;
+          if (redirectUrl != null) {
+            window.location=redirectUrl;
+          } else {
             window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
+          }
         }
       }
     }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'DECLINED', entity_kind : this.type});

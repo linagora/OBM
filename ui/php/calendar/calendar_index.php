@@ -749,7 +749,7 @@ if ($action == 'search') {
     $date_end = $end->getURL();
     $time_end = $end->getHour();
     $min_end = $end->getMinute();
-      
+
     $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id'].
       "&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".
       $date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".$params['decision_event']."&uriAction=".$params['uriAction'];
