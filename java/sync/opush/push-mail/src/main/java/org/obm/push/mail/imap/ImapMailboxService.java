@@ -356,10 +356,9 @@ public class ImapMailboxService implements PrivateMailboxService {
 	public long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
+			login(store);
 			
 			assertMoveItemIsSupported(store);
 			
@@ -369,20 +368,24 @@ public class ImapMailboxService implements PrivateMailboxService {
 			String srcMailBox = parseMailBoxName(udr, srcFolder);
 			String dstMailBox = parseMailBoxName(udr, dstFolder);
 
-			return store.moveMessageUID(srcMailBox, dstMailBox, uid);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
+			store.select(srcMailBox);
+			List<Long> uids = ImmutableList.of(uid);
+			Collection<Long> newUid = store.uidCopy(uids, dstMailBox);
+			FlagsList fl = new FlagsList();
+			fl.add(Flag.DELETED);
+			logger.info("delete conv id = ", uid);
+			store.uidStore(uids, fl, true);
+			store.expunge();
+			return Iterables.getOnlyElement(newUid);
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 	
-	private void assertMoveItemIsSupported(ImapStore store) throws UnsupportedBackendFunctionException, MessagingException {
-		if (!store.hasCapability(ImapCapability.UIDPLUS)) {
+	private void assertMoveItemIsSupported(StoreClient store) throws UnsupportedBackendFunctionException {
+		if (!store.capabilities().contains(ImapCapability.UIDPLUS.capability())) {
 			throw new UnsupportedBackendFunctionException("The IMAP server doesn't support UIDPLUS capability");
 		}
 	}
