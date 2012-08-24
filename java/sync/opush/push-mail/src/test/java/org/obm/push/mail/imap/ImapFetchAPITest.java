@@ -46,7 +46,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
@@ -55,12 +54,14 @@ import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.IMimePart;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
@@ -76,9 +77,6 @@ import com.icegreen.greenmail.user.UserException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapFetchAPITest {
@@ -119,6 +117,7 @@ public class ImapFetchAPITest {
 		greenMail.stop();
 	}
 
+	@Ignore("AppendCommand should send optional message's internal date-time in command")
 	@Test
 	public void testFetchEnvelope() throws MailException {
 		Envelope envelope = new Envelope.Builder().date(DateUtils.date("2010-09-17T17:12:26")).

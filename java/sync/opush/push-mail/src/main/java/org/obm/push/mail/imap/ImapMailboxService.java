@@ -41,11 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.mail.Flags;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
+import org.minig.imap.CommandIOException;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
@@ -548,31 +547,27 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	private void storeInFolder(UserDataRequest udr, InputStream mailContent, boolean isRead, String collectionPath) 
 			throws MailException {
-		
-		try {
-			ImapStore store = imapClientProvider.getImapClientWithJM(udr);
-			try {
-				store.login();
-				resetInputStream(mailContent);
-				Message message = store.createMessage(mailContent);
-				message.setFlag(Flags.Flag.SEEN, isRead);
-				String folderName = parseMailBoxName(udr, collectionPath);
-				store.appendMessage(folderName, message);
-			} catch (ImapCommandException e) {
-				throw new MailException(e.getMessage(), e);
-			} catch (LocatorClientException e) {
-				throw new MailException(e.getMessage(), e);
-			} catch (MessagingException e) {
-				throw new MailException(e.getMessage(), e);
-			} catch (IOException e) {
-				throw new MailException(e.getMessage(), e);
-			} finally {
-				closeQuietly(store);
-			}
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e.getMessage(), e);
-		}
 
+		StoreClient store = imapClientProvider.getImapClient(udr);
+		try {
+			login(store);
+			String folderName = parseMailBoxName(udr, collectionPath);
+			FlagsList fl = new FlagsList();
+			if(isRead){
+				fl.add(Flag.SEEN);
+			}
+			resetInputStream(mailContent);
+			store.append(folderName, mailContent, fl);
+			store.expunge();
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		} catch (CommandIOException e) {
+			throw new MailException(e);
+		} catch (IOException e) {
+			throw new MailException(e);
+		} finally {
+			store.logout();
+		}
 	}
 
 	@Override

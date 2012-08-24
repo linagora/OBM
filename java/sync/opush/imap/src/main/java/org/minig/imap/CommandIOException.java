@@ -30,61 +30,21 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.minig.imap.command;
+package org.minig.imap;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+public class CommandIOException extends RuntimeException {
 
-import org.minig.imap.CommandIOException;
-import org.minig.imap.FlagsList;
-import org.minig.imap.impl.IMAPResponse;
-import org.obm.push.utils.FileUtils;
-
-public class AppendCommand extends Command<Boolean> {
-
-	private InputStream in;
-	private String mailbox;
-	private FlagsList flags;
-
-	public AppendCommand(String mailbox, InputStream message, FlagsList flags) {
-		this.mailbox = mailbox;
-		this.in = message;
-		this.flags = flags;
+	public CommandIOException(Throwable e) {
+		super(e);
 	}
-
-	@Override
-	protected CommandArgument buildCommand() {
-		StringBuilder cmd = new StringBuilder(50);
-		cmd.append("APPEND ");
-		cmd.append(toUtf7(mailbox));
-		cmd.append(" ");
-		if (!flags.isEmpty()) {
-			cmd.append(flags.asCommandValue());
-			cmd.append(" ");
-		}
-
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			FileUtils.transfer(in, out, true);
-		} catch (IOException e) {
-			String msg = "Cannot create tmp buffer for append command";
-			logger.error(msg, e);
-			throw new CommandIOException(msg, e);
-		}
-
-		byte[] mailData = out.toByteArray();
-		cmd.append("{");
-		cmd.append(mailData.length);
-		cmd.append("}");
-		return new CommandArgument(cmd.toString(), mailData);
+	
+	public CommandIOException(String s, Throwable e) {
+		super(s, e);
 	}
-
-	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-		IMAPResponse r = rs.get(rs.size() - 1);
-		data = r.isOk();
+	
+	public CommandIOException(String s) {
+		super(s);
 	}
+	
 
 }

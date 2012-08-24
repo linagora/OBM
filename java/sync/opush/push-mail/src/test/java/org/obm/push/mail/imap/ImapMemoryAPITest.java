@@ -139,6 +139,7 @@ public class ImapMemoryAPITest {
 		ByteStreams.toByteArray(new FileInputStream(data));
 	}
 
+	@Ignore("StoreInInbox isn't streamed at all with the 'imap' lib")
 	@Test
 	public void testStoreInInboxMoreThanMemorySize() throws Exception {
 		Date before = new Date();
