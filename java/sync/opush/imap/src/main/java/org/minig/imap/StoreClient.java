@@ -144,6 +144,14 @@ public class StoreClient {
 	public boolean noop() {
 		return cs.noop();
 	}
+	
+	public  ListResult listSubscribed() {
+		return cs.listSubscribed();
+	}
+	
+	public  ListResult listAll() {
+		return cs.listAll();
+	}
 
 	public boolean append(String mailbox, InputStream in, FlagsList fl) {
 		return cs.append(mailbox, in, fl);

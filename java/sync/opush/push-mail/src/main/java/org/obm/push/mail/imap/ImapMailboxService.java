@@ -52,6 +52,8 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
+import org.minig.imap.ListInfo;
+import org.minig.imap.ListResult;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.minig.imap.UIDEnvelope;
@@ -113,8 +115,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
 
-	private static final String WHOLE_HIERARCHY_PATTERN = "*";
-	
 	private final SmtpSender smtpProvider;
 	private final EventService eventService;
 	private final boolean activateTLS;
@@ -202,51 +202,39 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public MailboxFolders listAllFolders(UserDataRequest udr) throws MailException {
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			Folder[] folders = store.getDefaultFolder().list(WHOLE_HIERARCHY_PATTERN);
-			return mailboxFolders(folders);
-		} catch (MessagingException e) {
-			throw new MailException(e);
+			login(store);
+			return mailboxFolders(store.listAll());
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 	
 	@Override
 	public MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException {
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			Folder[] folders = store.getDefaultFolder().listSubscribed(WHOLE_HIERARCHY_PATTERN);
-			return mailboxFolders(folders);
-		} catch (MessagingException e) {
-			throw new MailException(e);
+			login(store);
+			return mailboxFolders(store.listSubscribed());
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 
-	private MailboxFolders mailboxFolders(Folder[] folders) throws MessagingException {
+	private MailboxFolders mailboxFolders(ListResult listResult) {
 		List<MailboxFolder> mailboxFolders = Lists.newArrayList();
-		for (Folder folder: folders) {
+		for (ListInfo folder: listResult) {
 			mailboxFolders.add(
-					new MailboxFolder(folder.getFullName(), folder.getSeparator()));
+					new MailboxFolder(folder.getName(), listResult.getImapSeparator()));
 		}
 		return new MailboxFolders(mailboxFolders);
 	}
