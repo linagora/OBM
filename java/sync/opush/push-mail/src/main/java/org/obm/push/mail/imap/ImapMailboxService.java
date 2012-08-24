@@ -270,30 +270,26 @@ public class ImapMailboxService implements PrivateMailboxService {
 	public void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		updateMailFlag(udr, collectionName, uid, Flags.Flag.SEEN, read);
+		updateMailFlag(udr, collectionName, uid, Flag.SEEN, read);
 	}
 
-	/* package */ void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flags.Flag flag, 
-			boolean status) throws MailException, ImapMessageNotFoundException {
+	/* package */ void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flag flag, 
+			boolean status) throws MailException {
 		
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			IMAPMessage message = getMessage(store, udr, collectionName, uid);
-			message.setFlag(flag, status);
+			login(store);
+			String mailBoxName = parseMailBoxName(udr, collectionName);
+			store.select(mailBoxName);
+			FlagsList fl = new FlagsList();
+			fl.add(flag);
+			store.uidStore(ImmutableList.of(uid), fl, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-					new Object[] { uid, collectionName, imapMailBoxUtils.flagToString(flag), status });
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
+					new Object[] { uid, collectionName, flag.asCommandValue(), status });
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 	
@@ -424,7 +420,7 @@ public class ImapMailboxService implements PrivateMailboxService {
 
 	@Override
 	public void setAnsweredFlag(UserDataRequest udr, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(udr, collectionName, uid, Flags.Flag.ANSWERED, true);
+		updateMailFlag(udr, collectionName, uid, Flag.ANSWERED, true);
 	}
 
 	@Override

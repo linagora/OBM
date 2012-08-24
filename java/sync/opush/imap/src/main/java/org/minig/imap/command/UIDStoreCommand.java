@@ -60,7 +60,7 @@ public class UIDStoreCommand extends Command<Boolean> {
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = "UID STORE " + MessageSet.asString(uids) + " "
-				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.toString();
+				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.asCommandValue();
 		return new CommandArgument(cmd, null);
 	}
 
