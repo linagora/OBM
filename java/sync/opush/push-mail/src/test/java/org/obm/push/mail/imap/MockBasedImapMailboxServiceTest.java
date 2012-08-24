@@ -34,11 +34,7 @@ package org.obm.push.mail.imap;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
-
-import javax.mail.Folder;
-import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.easymock.EasyMock;
@@ -46,14 +42,18 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.minig.imap.ListInfo;
+import org.minig.imap.ListResult;
+import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -61,11 +61,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.smtp.SmtpSender;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MockBasedImapMailboxServiceTest {
@@ -151,42 +147,29 @@ public class MockBasedImapMailboxServiceTest {
 	}
 
 	private ImapClientProvider newImapClientProviderMock(String...allUserFolders) throws Exception {
-		OpushImapFolder imapFolder = newImapFolderMock(allUserFolders);
-		ImapStore imapStore = newImapStoreMock(imapFolder);
-		ImapClientProvider imapClientProvider = EasyMock.createMock(ImapClientProvider.class);
-		EasyMock.expect(imapClientProvider.getImapClientWithJM(udr)).andReturn(imapStore);
+		StoreClient storeClient = newStoreClientMock(allUserFolders);
 		
-		EasyMock.replay(imapFolder, imapStore, imapClientProvider);
+		ImapClientProvider imapClientProvider = EasyMock.createMock(ImapClientProvider.class);
+		EasyMock.expect(imapClientProvider.getImapClient(udr)).andReturn(storeClient);
+		
+		EasyMock.replay(storeClient, imapClientProvider);
 		return imapClientProvider;
 	}
-
-	private ImapStore newImapStoreMock(OpushImapFolder imapFolder) throws Exception {
-		ImapStore imapStore = EasyMock.createMock(ImapStore.class);
-		EasyMock.expect(imapStore.getDefaultFolder()).andReturn(imapFolder);
-		imapStore.login();
+	
+	private StoreClient newStoreClientMock(String[] allUserFolders) throws Exception {
+		StoreClient storeClient = EasyMock.createMock(StoreClient.class);
+		storeClient.login(false);
 		EasyMock.expectLastCall();
-		imapStore.logout();
+		storeClient.logout();
 		EasyMock.expectLastCall();
-		return imapStore;
-	}
-
-	private OpushImapFolder newImapFolderMock(String... allUserFolders) throws MessagingException {
-		List<Folder> expectedFolders = Lists.newArrayList();
+		
+		ListResult listResult = new ListResult(allUserFolders.length);
 		for (String userFolder : allUserFolders) {
-			expectedFolders.add(folder(userFolder));
+			listResult.add(new ListInfo(userFolder, true, false));
 		}
-		OpushImapFolder imapFolder = EasyMock.createMock(OpushImapFolder.class);
-		EasyMock.expect(imapFolder.list("*")).andReturn(expectedFolders.toArray(new Folder[expectedFolders.size()]));
-		return imapFolder;
-	}
-
-	private Folder folder(String userFolder) throws MessagingException {
-		Folder folder = EasyMock.createMock(Folder.class);
-		EasyMock.expect(folder.getName()).andReturn(userFolder);
-		EasyMock.expect(folder.getFullName()).andReturn(userFolder);
-		EasyMock.expect(folder.getSeparator()).andReturn('/');
-		EasyMock.replay(folder);
-		return folder;
+		EasyMock.expect(storeClient.listAll()).andReturn(listResult);
+		
+		return storeClient;
 	}
 	
 	private EmailConfiguration newEmailConfigurationMock() {

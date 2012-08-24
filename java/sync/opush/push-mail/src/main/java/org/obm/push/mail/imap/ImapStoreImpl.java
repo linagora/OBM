@@ -264,7 +264,7 @@ public class ImapStoreImpl implements ImapStore {
 	}
 	
 	private OpushImapFolder newOpushImapFolder(IMAPFolder folder) {
-		return new OpushImapFolder(imapMailBoxUtils, messageInputStreamProvider, folder);
+		return new OpushImapFolderImpl(imapMailBoxUtils, messageInputStreamProvider, folder);
 	}
 
 	protected MessageInputStreamProvider getMessageInputStreamProvider() {

@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.mail.Flags;
-import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -241,19 +240,19 @@ public class ImapMailboxService implements PrivateMailboxService {
 
 	@Override
 	public OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			return store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
+			login(store);
+			if (!store.create(folder.getName())) {
+				throw new MailException("Folder creation failed for : " + folder.getName());
+			}
+			return new MinigOpushImapFolderImpl(false);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 
