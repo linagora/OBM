@@ -50,19 +50,20 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MimeAddress;
@@ -72,11 +73,7 @@ import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
 
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapMemoryAPITest {
@@ -150,25 +147,6 @@ public class ImapMemoryAPITest {
 		mailboxService.storeInInbox(udr, heavyInputStream, true);
 		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Assertions.assertThat(emails).hasSize(1);
-	}
-
-	@Test
-	public void testStoreInInboxMoreThanMemorySizeStream() throws Exception {
-		Date before = new Date();
-		long size = getTwiceThisHeapSize();
-		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
-		mailboxService.storeInInbox(udr, heavyInputStream, Ints.checkedCast(size), true);
-		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
-		Assertions.assertThat(emails).hasSize(1);
-	}
-	
-	@Test
-	public void testFetchMailStream() throws Exception {
-		long size = getTwiceThisHeapSize();
-		final InputStream heavyInputStream = new RandomGeneratedInputStream(size);
-		mailboxService.storeInInbox(udr, heavyInputStream, Ints.checkedCast(size), true);
-		InputStream stream = mailboxService.fetchMailStream(udr, inboxPath, 1L);
-		Assertions.assertThat(stream).hasContentEqualTo(new RandomGeneratedInputStream(size));
 	}
 
 	@Ignore("This test is too long to be executed during the development phase")

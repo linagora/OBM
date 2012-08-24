@@ -86,12 +86,6 @@ public interface MailboxService {
 	 */
 	void storeInInbox(UserDataRequest udr, InputStream mailContent, boolean isRead) throws MailException;
 
-	/**
-	 * Store the mail's inputstream in INBOX.
-	 * The mailContent is guaranteed to be streamed.
-	 */
-	void storeInInbox(UserDataRequest udr, InputStream mailContent, int mailSize, boolean isRead) throws MailException;
-	
 	boolean getLoginWithDomain();
 
 	boolean getActivateTLS();

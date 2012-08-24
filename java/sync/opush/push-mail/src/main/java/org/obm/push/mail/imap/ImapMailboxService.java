@@ -36,16 +36,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
-import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -55,7 +52,6 @@ import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
-import org.minig.imap.IMAPHeaders;
 import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.minig.imap.UIDEnvelope;
@@ -67,7 +63,6 @@ import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Email;
-import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
@@ -107,7 +102,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
@@ -189,70 +183,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 	}
 	
 	@Override
-	public IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, 
-			long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException {
-		
-		Preconditions.checkNotNull(headersToFetch);
-		if (Iterables.isEmpty(headersToFetch)) {
-			return new IMAPHeaders();
-		}
-		
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			OpushImapFolder folder = store.select(parseMailBoxName(udr, collectionName));
-			Message message = folder.fetchHeaders(uid, headersToFetch);
-			return toIMAPHeaders(message);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-
-	private IMAPHeaders toIMAPHeaders(Message message) throws MessagingException {
-		Map<String, String> headersMap = Maps.newHashMap();
-		Enumeration<Header> rawHeaders = message.getAllHeaders();
-		while (rawHeaders.hasMoreElements()) {
-			Header header = rawHeaders.nextElement();
-			headersMap.put(header.getName().toLowerCase(Locale.ENGLISH), header.getValue());
-		}
-		return new IMAPHeaders(headersMap);
-	}
-
-	@Override
-	public Collection<Long> uidSearch(UserDataRequest udr, String collectionName, SearchQuery sq) throws MailException {
-		ImapStore store = null; 
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			OpushImapFolder folder = store.select(parseMailBoxName(udr, collectionName));
-			return folder.uidSearch(sq);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-	
-	@Override
 	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
 		ImapStore store = null;
 		try {
@@ -327,46 +257,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 	}
 
 	@Override
-	public void subscribe(UserDataRequest udr, String folderName) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			store.select(folderName).subscribe();
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-
-	@Override
-	public void unsubscribe(UserDataRequest udr, String folderName) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			store.select(folderName).unsubscribe();
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-	
-	@Override
 	public OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
 		ImapStore store = null;
 		try {
@@ -436,46 +326,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
-		}
-	}
-	
-	/* package */ IMAPMessage getMessage(UserDataRequest udr, String collectionName, long uid) 
-			throws MailException, ImapMessageNotFoundException {
-		
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			return getMessage(store, udr, collectionName, uid);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
-		}
-	}
-	
-	/* package */ void expunge(UserDataRequest udr, String collectionName) throws MailException {
-		ImapStore store = null;
-		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			String mailBoxName = parseMailBoxName(udr, collectionName);
-			OpushImapFolder folder = store.select(mailBoxName);
-			folder.expunge();
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} finally {
-			closeQuietly(store);
 		}
 	}
 	
@@ -705,31 +555,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 			throw new MailException(e);
 		} finally {
 			store.logout();
-		}
-	}
-
-	@Override
-	public void storeInInbox(UserDataRequest udr, InputStream mailContent, int mailSize, boolean isRead) throws MailException {
-		logger.info("Store mail in folder[Inbox]");
-		try {
-			ImapStore store = imapClientProvider.getImapClientWithJM(udr);
-			try {
-				store.login();
-				Flags flags = new Flags();
-				if (isRead) {
-					flags.add(Flags.Flag.SEEN);
-				}
-				StreamedLiteral streamedLiteral = new StreamedLiteral(mailContent, mailSize);
-				store.appendMessageStream(EmailConfiguration.IMAP_INBOX_NAME, streamedLiteral, flags);
-			} catch (ImapCommandException e) {
-				throw new MailException(e.getMessage(), e);
-			} catch (LocatorClientException e) {
-				throw new MailException(e.getMessage(), e);
-			} finally {
-				closeQuietly(store);
-			}
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e.getMessage(), e);
 		}
 	}
 		

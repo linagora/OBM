@@ -143,23 +143,6 @@ public class ImapMailboxServiceTest {
 				inbox(), newFolder);
 	}
 	
-	@Test(expected=ImapMessageNotFoundException.class)
-	public void testExpunge() throws Exception {
-		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
-		String mailBoxPath = mailboxPath(mailBox);
-		Date date = DateUtils.getMidnightCalendar().getTime();
-
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		greenMail.waitForIncomingEmail(1);
-		
-		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
-		long uid = Iterables.getOnlyElement(emails).getUid();
-
-		mailboxService.updateMailFlag(udr, mailBoxPath, uid, Flags.Flag.DELETED, true);
-		mailboxService.expunge(udr,  mailBoxPath);
-		mailboxService.getMessage(udr, mailBoxPath, uid);
-	}
-	
 	@Test
 	public void testUpdateMailFlag() throws Exception {
 		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
@@ -234,17 +217,6 @@ public class ImapMailboxServiceTest {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
 		mailboxService.storeInInbox(udr, tinyInputStream, true);
-
-		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
-	}
-
-	@Test
-	public void testStoreInInboxStream() throws Exception {
-		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
-
-		mailboxService.storeInInbox(udr, tinyInputStream, 4, true);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");

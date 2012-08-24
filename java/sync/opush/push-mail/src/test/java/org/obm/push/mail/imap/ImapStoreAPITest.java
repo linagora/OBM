@@ -45,15 +45,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.RandomGeneratedInputStream;
@@ -62,9 +62,6 @@ import org.obm.push.mail.ThrowingInputStream;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapStoreAPITest {
@@ -110,28 +107,10 @@ public class ImapStoreAPITest {
 	}
 
 	@Test
-	public void testStoreInInboxContentAfterStoringStream() throws Exception {
-		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, 279, true);
-		InputStream fetchedMailStream = mailboxService.fetchMailStream(udr, inboxPath, 1);
-		InputStream expectedEmailData = loadEmail("plainText.eml");
-		Assertions.assertThat(fetchedMailStream).hasContentEqualTo(expectedEmailData);
-	}
-
-	@Test
 	public void testStoreInInboxInvitation() throws Exception {
 		InputStream emailData = loadEmail("androidInvit.eml");
 		mailboxService.storeInInbox(udr, emailData, true);
 
-		InputStream expected = loadEmail("androidInvit.eml");
-		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
-		Assertions.assertThat(fetchedContent).hasContentEqualTo(expected);
-	}
-
-	@Test
-	public void testStoreInInboxInvitationStream() throws Exception {
-		InputStream emailData = loadEmail("androidInvit.eml");
-		mailboxService.storeInInbox(udr, emailData, 3660, true);
 		InputStream expected = loadEmail("androidInvit.eml");
 		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(expected);
@@ -145,15 +124,6 @@ public class ImapStoreAPITest {
 		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(new ByteArrayInputStream(data));
 	}
-
-	@Test
-	public void testStoreInInboxNotAnEmailStream() throws Exception {
-		byte[] data = new byte[]{'t','e','s','t', '\r', '\n', '\r', '\n'};
-		InputStream notAnEmailData = new ByteArrayInputStream(data);
-		mailboxService.storeInInbox(udr, notAnEmailData, data.length, true);
-		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
-		Assertions.assertThat(fetchedContent).hasContentEqualTo(new ByteArrayInputStream(data));
-	}
 	
 	@Test(expected=MailException.class)
 	public void testStoreInInboxThrowExceptionWhenStreamFail() throws Exception {
@@ -162,31 +132,11 @@ public class ImapStoreAPITest {
 	}
 	
 	@Test(expected=MailException.class)
-	public void testStoreInInboxThrowExceptionWhenStreamFailStream() throws Exception {
-		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		mailboxService.storeInInbox(udr, failingEmailStream, 100, true);
-	}
-
-	@Test(expected=MailException.class)
 	public void testStoreInInboxRollbackWhenStreamFail() throws Exception {
 		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
 			mailboxService.storeInInbox(udr, failingEmailStream, true);
-		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
-			Assertions.assertThat(emails).isNotNull().hasSize(0);
-			throw e;
-		}
-	}
-	
-
-	@Test(expected=MailException.class)
-	public void testStoreInInboxRollbackWhenStreamFailStream() throws Exception {
-		Date before = new Date(0);
-		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		try {
-			mailboxService.storeInInbox(udr, failingEmailStream, 100, true);
 		} catch (MailException e) {
 			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
@@ -203,16 +153,6 @@ public class ImapStoreAPITest {
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isTrue();
 	}
-
-	@Test
-	public void testStoreInInboxReadStatusTrueStream() throws Exception {
-		Date before = new Date(0);
-		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, 279, true);
-		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
-		Email element = Iterables.getOnlyElement(emails);
-		Assertions.assertThat(element.isRead()).isTrue();
-	}
 	
 	@Test
 	public void testStoreInInboxReadStatusFalse() throws Exception {
@@ -224,37 +164,5 @@ public class ImapStoreAPITest {
 		Assertions.assertThat(element.isRead()).isFalse();
 	}
 
-	@Test
-	public void testStoreInInboxReadStatusFalseStream() throws Exception {
-		Date before = new Date(0);
-		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, 279, false);
-		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
-		Email element = Iterables.getOnlyElement(emails);
-		Assertions.assertThat(element.isRead()).isFalse();
-	}
-
-	
-	@Test(expected=MailException.class)
-	public void testStoreInInboxThrowExceptionWhenGivenMessageSizeIsShorter() throws Exception {
-		int emailGivenSize = 20;
-		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
-		mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
-	}
-
-	@Test(expected=MailException.class)
-	public void testStoreInInboxRollbackWhenGivenMessageSizeIsShorter() throws Exception {
-		Date before = new Date(0);
-		int emailGivenSize = 20;
-		InputStream emailStream = StreamMailTestsUtils.newInputStreamFromString("This sentence contains 36 characters");
-
-		try {
-			mailboxService.storeInInbox(udr, emailStream, emailGivenSize, true);
-		} catch (MailException e) {
-			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
-			Assertions.assertThat(emails).isNotNull().hasSize(0);
-			throw e;
-		}
-	}
 
 }

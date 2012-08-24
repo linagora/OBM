@@ -36,26 +36,17 @@ import java.util.Collection;
 
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.SearchQuery;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.MimeMessage;
-import org.obm.push.bean.EmailHeaders;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.OpushImapFolder;
 
 public interface PrivateMailboxService extends MailboxService {
 
-	void subscribe(UserDataRequest udr, String folder) throws MailException;
-	
-	void unsubscribe(UserDataRequest udr, String folder) throws MailException;
-	
 	MailboxFolders listAllFolders(UserDataRequest udr) throws MailException;
 	
 	OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException;
 	
-	Collection<Long> uidSearch(UserDataRequest udr, String collectionName, SearchQuery sq) throws MailException;
-
 	Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
 	MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException;
@@ -63,8 +54,6 @@ public interface PrivateMailboxService extends MailboxService {
 	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
 	Collection<Flag> fetchFlags(UserDataRequest udr, String inbox, long uid) throws MailException;
-
-	IMAPHeaders fetchHeaders(UserDataRequest udr, String collectionName, long uid, EmailHeaders headersToFetch) throws MailException, ImapMessageNotFoundException;
 
 	InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, FetchInstructions fetchInstructions) 
 			throws MailException;
