@@ -99,6 +99,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -184,24 +185,18 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			OpushImapFolder imapFolder = store.select( parseMailBoxName(udr, collectionName) );
-			return imapFolder.uidFetchFlags(uid);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
+			login(store);
+			store.select(parseMailBoxName(udr, collectionName));
+			Collection<FlagsList> fetchFlags = store.uidFetchFlags(ImmutableList.of(uid));
+			return Iterables.getOnlyElement(fetchFlags);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 	
