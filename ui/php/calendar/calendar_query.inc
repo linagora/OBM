@@ -2548,8 +2548,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   } else {
     $id = sql_parse_id($calendar['calendar_id']);
     $exception_recurrence_id_date = $calendar['old_date_begin'];
-    $event_duration = $calendar['duration'];
-    $exception_date = $obm_q->escape($calendar['old_date_begin']);
   }
   $exception_date = $obm_q->escape($calendar['date_begin']) ? $obm_q->escape($calendar['date_begin']) : $date_occurrence;
   $event_duration = $calendar['event_duration'] > 0 ? $calendar['event_duration'] : $calendar['duration'];

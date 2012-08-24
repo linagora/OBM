@@ -1122,7 +1122,7 @@ Obm.CalendarManager = new Class({
 	  },
 
   DetailUpdateRequest: function(eventData) {
-      var action = 'quick_update';
+      var action = eventData.specialAction ? eventData.specialAction : 'quick_update';
 	  new Request.JSON({
 	      url: obm.vars.consts.calendarUrl,
 	      secure : false,
@@ -2021,7 +2021,6 @@ Obm.CalendarPopupManager = new Class({
     // Repeated event popup
     $('popup_update_one').addEvent('click', function() {
       this.fireEvent('update_one');
-      this.chain.callChain();
     }.bind(this));
 
     $('popup_update_all').addEvent('click', function() {
