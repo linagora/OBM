@@ -29,44 +29,70 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.protocol;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class FolderSyncProtocolTest {
+	
+	private FolderSyncProtocol folderSyncProtocol;
 	
 	@Before
 	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+		folderSyncProtocol = new FolderSyncProtocol();
+	}
+
+	@Test
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<SyncKey>2f70eaa5-a95a-4f4e-af94-e062955be19b</SyncKey>" +
+				"</FolderSync>";
+		
+		FolderSyncRequest folderSyncRequest = folderSyncProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeRequest = folderSyncProtocol.encodeRequest(folderSyncRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeRequest));
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
-	}
-	
-}
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<Status>1</Status>" +
+				"<SyncKey>2056e98e-be0e-4d1a-8f39-328614a32f3a</SyncKey>" +
+				"<Changes>" +
+				"<Count>3</Count>" +
+				"<Add>" +
+				"<ServerId>11:3</ServerId>" +
+				"<ParentId>11</ParentId>" +
+				"<DisplayName>displayName</DisplayName>" +
+				"<Type>18</Type>" +
+				"</Add>" +
+				"<Update>" +
+				"<ServerId>12:4</ServerId>" +
+				"<ParentId>12</ParentId>" +
+				"<DisplayName>nameDisplayed</DisplayName>" +
+				"<Type>17</Type>" +
+				"</Update>" +
+				"<Delete>" +
+				"<ServerId>13:5</ServerId>" +
+				"</Delete>" +
+				"</Changes>" +
+				"</FolderSync>";
+		
+		FolderSyncResponse folderSyncResponse = folderSyncProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = folderSyncProtocol.encodeResponse(folderSyncResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}}

@@ -38,14 +38,49 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 
+import com.google.common.base.Objects;
+
 public class FolderSyncResponse {
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private HierarchyCollectionChanges hierarchyItemsChanges;
+		private SyncKey newSyncKey;
+
+		private Builder() {}
+		
+		public Builder hierarchyItemsChanges(HierarchyCollectionChanges hierarchyItemsChanges) {
+			this.hierarchyItemsChanges = hierarchyItemsChanges;
+			return this;
+		}
+		
+		public Builder newSyncKey(SyncKey newSyncKey) {
+			this.newSyncKey = newSyncKey;
+			return this;
+		}
+		
+		public FolderSyncResponse build() {
+			return new FolderSyncResponse(this.hierarchyItemsChanges, this.newSyncKey);
+		}
+	}
 	
 	private final HierarchyCollectionChanges hierarchyItemsChanges;
 	private final SyncKey newSyncKey;
 	
-	public FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, SyncKey newSyncKey) {
+	private FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, SyncKey newSyncKey) {
 		this.hierarchyItemsChanges = hierarchyItemsChanges;
 		this.newSyncKey = newSyncKey;
+	}
+
+	public HierarchyCollectionChanges getHierarchyItemsChanges() {
+		return hierarchyItemsChanges;
+	}
+	
+	public SyncKey getNewSyncKey() {
+		return newSyncKey;
 	}
 	
 	public int getCount() {
@@ -67,8 +102,26 @@ public class FolderSyncResponse {
 		return hierarchyItemsChanges.getCollectionDeletions();
 	}
 	
-	public SyncKey getNewSyncKey() {
-		return newSyncKey;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(hierarchyItemsChanges, newSyncKey);
 	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof FolderSyncResponse) {
+			FolderSyncResponse that = (FolderSyncResponse) object;
+			return Objects.equal(this.hierarchyItemsChanges, that.hierarchyItemsChanges)
+				&& Objects.equal(this.newSyncKey, that.newSyncKey);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("hierarchyItemsChanges", hierarchyItemsChanges)
+			.add("newSyncKey", newSyncKey)
+			.toString();
+	}
 }

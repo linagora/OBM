@@ -33,15 +33,57 @@ package org.obm.push.protocol.bean;
 
 import org.obm.push.bean.SyncKey;
 
+import com.google.common.base.Objects;
+
 public class FolderSyncRequest {
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private SyncKey syncKey;
+
+		private Builder() {}
+		
+		public Builder syncKey(SyncKey syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
+		
+		public FolderSyncRequest build() {
+			return new FolderSyncRequest(syncKey);
+		}
+	}
+
 	private final SyncKey syncKey;
 	
-	public FolderSyncRequest(SyncKey syncKey) {
+	private FolderSyncRequest(SyncKey syncKey) {
 		this.syncKey = syncKey;
 	}
 	
 	public SyncKey getSyncKey() {
 		return syncKey;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(syncKey);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof FolderSyncRequest) {
+			FolderSyncRequest that = (FolderSyncRequest) object;
+			return Objects.equal(this.syncKey, that.syncKey);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("syncKey", syncKey)
+			.toString();
 	}
 }

@@ -31,15 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.FolderType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
@@ -47,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest, FolderSyncResponse> {
 
@@ -58,7 +62,77 @@ public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest,
 			throw new NoDocumentException("Document of FolderSync request is null.");
 		}
 		SyncKey syncKey = new SyncKey(DOMUtils.getElementText(doc.getDocumentElement(), "SyncKey"));
-		return new FolderSyncRequest(syncKey);
+		return FolderSyncRequest.builder()
+			.syncKey(syncKey)
+			.build();
+	}
+
+	public Document encodeErrorResponse(FolderSyncStatus status) {
+		Document ret = DOMUtils.createDoc(null, "FolderSync");
+		Element root = ret.getDocumentElement();
+		DOMUtils.createElementAndText(root, "Status", status.asXmlValue());
+		return ret;
+	}
+
+	@Override
+	public FolderSyncResponse decodeResponse(Document doc) throws NoDocumentException {
+		if (doc == null) {
+			throw new NoDocumentException("Document of FolderSync response is null.");
+		}
+		
+		Element fsr = doc.getDocumentElement();
+		
+		Element sk = DOMUtils.getUniqueElement(fsr, "SyncKey");
+		String newSyncKey = sk.getTextContent();
+
+		Element changes = DOMUtils.getUniqueElement(fsr, "Changes");
+
+		List<CollectionChange> collectionChanges = new LinkedList<CollectionChange>();
+		NodeList adds = changes.getElementsByTagName("Add");
+		for (int i = 0; i < adds.getLength(); i++) {
+			Element add = (Element) adds.item(i);
+			collectionChanges.add(createCollectionChange(add, true));
+		}
+		NodeList updates = changes.getElementsByTagName("Update");
+		for (int i = 0; i < updates.getLength(); i++) {
+			Element update = (Element) updates.item(i);
+			collectionChanges.add(createCollectionChange(update, false));
+		}
+
+		List<CollectionDeletion> collectionDeletions = new LinkedList<CollectionDeletion>();
+		NodeList deletes = changes.getElementsByTagName("Delete");
+		for (int i = 0; i < deletes.getLength(); i++) {
+			Element delete = (Element) deletes.item(i);
+			
+			Element se = DOMUtils.getUniqueElement(delete, "ServerId");
+			String serverId = se.getTextContent();
+			collectionDeletions.add(CollectionDeletion.builder().collectionId(serverId).build());
+		}
+		
+		HierarchyCollectionChanges hierarchyItemsChanges = HierarchyCollectionChanges.builder()
+			.changes(collectionChanges)
+			.deletions(collectionDeletions)
+			.build();
+		
+		return FolderSyncResponse.builder()
+			.newSyncKey(new SyncKey(newSyncKey))
+			.hierarchyItemsChanges(hierarchyItemsChanges)
+			.build();
+	}
+
+	private CollectionChange createCollectionChange(Element add, boolean isNew) {
+		Element se = DOMUtils.getUniqueElement(add, "ServerId");
+		Element pe = DOMUtils.getUniqueElement(add, "ParentId");
+		Element dne = DOMUtils.getUniqueElement(add, "DisplayName");
+		Element te = DOMUtils.getUniqueElement(add, "Type");
+		
+		return CollectionChange.builder()
+				.collectionId(se.getTextContent())
+				.parentCollectionId(pe.getTextContent())
+				.displayName(dne.getTextContent())
+				.folderType(FolderType.fromSpecificationValue(te.getTextContent()))
+				.isNew(isNew)
+				.build();
 	}
 
 	@Override
@@ -97,23 +171,17 @@ public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest,
 		DOMUtils.createElementAndText(addedOrUpdated, "ParentId", collectionChange.getParentCollectionId());
 		DOMUtils.createElementAndText(addedOrUpdated, "DisplayName", collectionChange.getDisplayName());
 		DOMUtils.createElementAndText(addedOrUpdated, "Type", collectionChange.getFolderType()
-				.asIntString());
+				.asSpecificationValue());
 	}
 
-	public Document encodeErrorResponse(FolderSyncStatus status) {
+	@Override
+	public Document encodeRequest(FolderSyncRequest folderSyncRequest) {
 		Document ret = DOMUtils.createDoc(null, "FolderSync");
 		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", status.asXmlValue());
+
+		Element sk = DOMUtils.createElement(root, "SyncKey");
+		sk.setTextContent(folderSyncRequest.getSyncKey().getSyncKey());
+		
 		return ret;
-	}
-
-	@Override
-	public Document encodeRequest(FolderSyncRequest request) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public FolderSyncResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
 	}
 }
