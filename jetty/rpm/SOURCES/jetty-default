@@ -1,0 +1,3 @@
+CONFIGS="etc/jetty.xml etc/jetty-logging.xml"
+JAVA_HOME="/usr/java/default/"
+JAVA_OPTIONS="-Djetty.lib=/usr/share/jetty6/lib "
