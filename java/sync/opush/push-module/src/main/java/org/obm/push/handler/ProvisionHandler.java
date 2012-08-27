@@ -45,6 +45,7 @@ import org.obm.push.impl.Responder;
 import org.obm.push.protocol.ProvisionProtocol;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
+import org.obm.push.protocol.bean.ProvisionResponse.Builder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -102,24 +103,26 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 
 	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, UserDataRequest udr) throws DaoException {
-		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
-		provisionResponse.setStatus(ProvisionStatus.SUCCESS);
 		Long policyKey = provisionRequest.getPolicyKey();
+		Builder provisionResponseBuilder = ProvisionResponse.builder()
+				.policyType(provisionRequest.getPolicyType())
+				.status(ProvisionStatus.SUCCESS);
 
 		if (isInitialProvisionRequest(policyKey)) {
-			setUpNewPolicyKey(udr, provisionResponse);
-			provisionResponse.setPolicy(backend.getDevicePolicy(udr));
+			provisionResponseBuilder
+				.policy(backend.getDevicePolicy(udr))
+				.policyKey(allocateNewPolicyKey(udr))
+				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else if (isCurrentPolicyKey(udr, policyKey)) {
-			setUpNewPolicyKey(udr, provisionResponse);
+			provisionResponseBuilder
+				.policyKey(allocateNewPolicyKey(udr))
+				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else {
-			provisionResponse.setPolicyStatus(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
+			provisionResponseBuilder
+				.policyStatus(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
 		}
-		return provisionResponse;
-	}
-
-	private void setUpNewPolicyKey(UserDataRequest udr, ProvisionResponse provisionResponse) throws DaoException {
-		provisionResponse.setPolicyKey(allocateNewPolicyKey(udr));
-		provisionResponse.setPolicyStatus(ProvisionPolicyStatus.SUCCESS);
+		
+		return provisionResponseBuilder.build();
 	}
 
 	private boolean isInitialProvisionRequest(Long policyKey) {

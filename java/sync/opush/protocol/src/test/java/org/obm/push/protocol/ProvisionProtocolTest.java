@@ -42,11 +42,11 @@ import org.junit.runner.RunWith;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.protocol.bean.ProvisionRequest;
+import org.obm.push.protocol.bean.ProvisionResponse;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class ProvisionProtocolTest {
@@ -102,4 +102,87 @@ public class ProvisionProtocolTest {
 		return document;
 	}	
 	
+	@Test
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Provision>" +
+				"<Status>2</Status>" +
+				"<Policies>" +
+				"<Policy>" +
+				"<PolicyType>MS-EAS-Provisioning-WBXML</PolicyType>" +
+				"<Status>2</Status>" +
+				"<PolicyKey>3378841480</PolicyKey>" +
+				"<Data>" +
+				"<EASProvisionDoc>" +
+				"<DevicePasswordEnabled>0</DevicePasswordEnabled>" +
+				"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>" +
+				"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>" +
+				"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>" +
+				"<AttachmentsEnabled>1</AttachmentsEnabled>" +
+				"<MinDevicePasswordLength>4</MinDevicePasswordLength>" +
+				"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>" +
+				"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>" +
+				"<MaxAttachmentSize/>" +
+				"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>" +
+				"<DevicePasswordExpiration/>" +
+				"<DevicePasswordHistory>0</DevicePasswordHistory>" +
+				"<AllowStorageCard>1</AllowStorageCard>" +
+				"<AllowCamera>1</AllowCamera>" +
+				"<RequireDeviceEncryption>0</RequireDeviceEncryption>" +
+				"<AllowUnsignedApplications>1</AllowUnsignedApplications>" +
+				"<AllowUnsignedInstallationPackages>1</AllowUnsignedInstallationPackages>" +
+				"<MinDevicePasswordComplexCharacters>3</MinDevicePasswordComplexCharacters>" +
+				"<AllowWiFi>1</AllowWiFi>" +
+				"<AllowTextMessaging>1</AllowTextMessaging>" +
+				"<AllowPOPIMAPEmail>1</AllowPOPIMAPEmail>" +
+				"<AllowBluetooth>2</AllowBluetooth>" +
+				"<AllowIrDA>1</AllowIrDA>" +
+				"<RequireManualSyncWhenRoaming>0</RequireManualSyncWhenRoaming>" +
+				"<AllowDesktopSync>1</AllowDesktopSync>" +
+				"<MaxCalendarAgeFilter>0</MaxCalendarAgeFilter>" +
+				"<AllowHTMLEmail>1</AllowHTMLEmail>" +
+				"<MaxEmailAgeFilter>0</MaxEmailAgeFilter>" +
+				"<MaxEmailBodyTruncationSize>-1</MaxEmailBodyTruncationSize>" +
+				"<MaxEmailHTMLBodyTruncationSize>-1</MaxEmailHTMLBodyTruncationSize>" +
+				"<RequireSignedSMIMEMessages>0</RequireSignedSMIMEMessages>" +
+				"<RequireEncryptedSMIMEMessages>0</RequireEncryptedSMIMEMessages>" +
+				"<RequireSignedSMIMEAlgorithm>0</RequireSignedSMIMEAlgorithm>" +
+				"<RequireEncryptionSMIMEAlgorithm>0</RequireEncryptionSMIMEAlgorithm>" +
+				"<AllowSMIMEEncryptionAlgorithmNegotiation>2</AllowSMIMEEncryptionAlgorithmNegotiation>" +
+				"<AllowSMIMESoftCerts>1</AllowSMIMESoftCerts>" +
+				"<AllowBrowser>1</AllowBrowser>" +
+				"<AllowConsumerEmail>1</AllowConsumerEmail>" +
+				"<AllowRemoteDesktop>1</AllowRemoteDesktop>" +
+				"<AllowInternetSharing>1</AllowInternetSharing>" +
+				"<UnapprovedInROMApplicationList/>" +
+				"<ApprovedApplicationList/>" +
+				"</EASProvisionDoc>" +
+				"</Data>" +
+				"</Policy>" +
+				"</Policies>" +
+				"</Provision>";
+		
+		ProvisionResponse provisionResponse = provisionProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = provisionProtocol.encodeResponse(provisionResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
+	
+	@Test
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Provision>" +
+				"<Policies>" +
+				"<Policy>" +
+				"<PolicyType>MS-EAS-Provisioning-WBXML</PolicyType>" +
+				"<PolicyKey>3378841480</PolicyKey>" +
+				"</Policy>" +
+				"</Policies>" +
+				"</Provision>";
+		
+		ProvisionRequest provisionRequest = provisionProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeResponse = provisionProtocol.encodeRequest(provisionRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
 }

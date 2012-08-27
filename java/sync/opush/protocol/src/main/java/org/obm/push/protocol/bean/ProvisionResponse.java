@@ -35,17 +35,66 @@ import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.protocol.provisioning.Policy;
 
+import com.google.common.base.Objects;
+
 public class ProvisionResponse {
 
-	private final String policyType;
-	private Long policyKey;
-	private Policy policy;
-	private ProvisionStatus status;
-	private ProvisionPolicyStatus policyStatus;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	public ProvisionResponse(String policyType) {
-		super();
+	public static class Builder {
+		private String policyType;
+		private Long policyKey;
+		private Policy policy;
+		private ProvisionStatus status;
+		private ProvisionPolicyStatus policyStatus;
+
+		private Builder() {}
+		
+		public Builder policyType(String policyType) {
+			this.policyType = policyType;
+			return this;
+		}
+		
+		public Builder policyKey(Long policyKey) {
+			this.policyKey = policyKey;
+			return this;
+		}
+		
+		public Builder policy(Policy policy) {
+			this.policy = policy;
+			return this;
+		}
+		
+		public Builder status(ProvisionStatus status) {
+			this.status = status;
+			return this;
+		}
+		
+		public Builder policyStatus(ProvisionPolicyStatus policyStatus) {
+			this.policyStatus = policyStatus;
+			return this;
+		}
+		
+		public ProvisionResponse build() {
+			return new ProvisionResponse(policyType, policyKey, policy, status, policyStatus);
+		}
+	}
+	
+	private final String policyType;
+	private final Long policyKey;
+	private final Policy policy;
+	private final ProvisionStatus status;
+	private final ProvisionPolicyStatus policyStatus;
+	
+	public ProvisionResponse(String policyType, Long policyKey, Policy policy,
+			ProvisionStatus status, ProvisionPolicyStatus policyStatus) {
 		this.policyType = policyType;
+		this.policyKey = policyKey;
+		this.policy = policy;
+		this.status = status;
+		this.policyStatus = policyStatus;
 	}
 	
 	public String getPolicyType() {
@@ -63,25 +112,37 @@ public class ProvisionResponse {
 	public ProvisionStatus getStatus() {
 		return status;
 	}
-
-	public void setStatus(ProvisionStatus status) {
-		this.status = status;
-	}
-
-	public void setPolicy(Policy policy) {
-		this.policy = policy;
-	}
-
-	public void setPolicyKey(Long policyKey) {
-		this.policyKey = policyKey;
-	}
-
+	
 	public ProvisionPolicyStatus getPolicyStatus() {
 		return policyStatus;
 	}
 
-	public void setPolicyStatus(ProvisionPolicyStatus policyStatus) {
-		this.policyStatus = policyStatus;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(policyType, policyKey, policy, status, policyStatus);
 	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ProvisionResponse) {
+			ProvisionResponse that = (ProvisionResponse) object;
+			return Objects.equal(this.policyType, that.policyType)
+				&& Objects.equal(this.policyKey, that.policyKey)
+				&& Objects.equal(this.policy, that.policy)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.policyStatus, that.policyStatus);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("policyType", policyType)
+			.add("policyKey", policyKey)
+			.add("policy", policy)
+			.add("policyStatus", policyStatus)
+			.add("status", status)
+			.toString();
+	}
 }

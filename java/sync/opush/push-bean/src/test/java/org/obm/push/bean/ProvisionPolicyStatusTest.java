@@ -29,48 +29,31 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.bean;
 
-import org.junit.Before;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.bean.FolderSyncRequest;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.push.protocol.bean.ProvisionRequest;
-import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public class ProvisionPolicyStatusTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	@Test
+	public void testGetValueForPolicySuccess() {
+		ProvisionPolicyStatus expectedProvisionStatus = ProvisionPolicyStatus.SUCCESS;
+		assertThat(ProvisionPolicyStatus.fromSpecificationValue(1)).isEqualTo(expectedProvisionStatus);
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.add(ProvisionRequest.class)
-					.add(ProvisionResponse.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testGetValueForPolicyProtocolError() {
+		ProvisionPolicyStatus expectedProvisionStatus = ProvisionPolicyStatus.POLICY_NOT_DEFINED;
+		assertThat(ProvisionPolicyStatus.fromSpecificationValue(2)).isEqualTo(expectedProvisionStatus);
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetValueForPolicyUnknown() {
+		ProvisionPolicyStatus.fromSpecificationValue(99);
+	}
 }

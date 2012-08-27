@@ -35,10 +35,35 @@ import com.google.common.base.Objects;
 
 public class ProvisionRequest {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String policyType;
+		private Long policyKey;
+		
+		private Builder() {}
+		
+		public Builder policyType(String policyType) {
+			this.policyType = policyType;
+			return this;
+		}
+		
+		public Builder policyKey(Long policyKey) {
+			this.policyKey = policyKey;
+			return this;
+		}
+		
+		public ProvisionRequest build() {
+			return new ProvisionRequest(policyType, policyKey);
+		}
+	}
+	
 	private final String policyType;
 	private final Long policyKey;
 
-	public ProvisionRequest(String policyType, Long policyKey) {
+	private ProvisionRequest(String policyType, Long policyKey) {
 		this.policyType = policyType;
 		this.policyKey = policyKey;
 	}
@@ -52,11 +77,25 @@ public class ProvisionRequest {
 	}
 	
 	@Override
+	public final int hashCode(){
+		return Objects.hashCode(policyType, policyKey);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ProvisionRequest) {
+			ProvisionRequest that = (ProvisionRequest) object;
+			return Objects.equal(this.policyType, that.policyType)
+				&& Objects.equal(this.policyKey, that.policyKey);
+		}
+		return false;
+	}
+
+	@Override
 	public String toString() {
-		return Objects.toStringHelper(getClass())
+		return Objects.toStringHelper(this)
 			.add("policyType", policyType)
 			.add("policyKey", policyKey)
 			.toString();
 	}
-	
 }

@@ -36,6 +36,8 @@ import java.math.BigDecimal;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Policy type for protocol 12.x (windows mobile 6, iPhone, etc)
  */
@@ -52,6 +54,10 @@ public class MSEASProvisioingWBXML extends Policy {
 		DOMUtils.createElementAndText(provDoc, field, value);
 	}
 
+	@VisibleForTesting BigDecimal getProtocolVersion() {
+		return protocolVersion;
+	}
+	
 	@Override
 	public void serialize(Element data) {
 

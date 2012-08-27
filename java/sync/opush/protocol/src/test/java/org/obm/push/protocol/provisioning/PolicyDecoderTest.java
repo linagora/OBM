@@ -29,48 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.protocol.provisioning;
 
-import org.junit.Before;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.bean.FolderSyncRequest;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.push.protocol.bean.ProvisionRequest;
-import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class PolicyDecoderTest {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	@Test
+	public void testDecodeMSWAP() {
+		Document doc = DOMUtils.createDoc(null, "decode");
+		Element root = doc.getDocumentElement();
+		DOMUtils.createElement(root, "wap-provisioningdoc");
+		
+		Policy msWAP = PolicyDecoder.decode(root);
+		assertThat(msWAP).isInstanceOf(MSWAPProvisioningXML.class);
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.add(ProvisionRequest.class)
-					.add(ProvisionResponse.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testDecodeMSEASZeroVersion() {
+		Document doc = DOMUtils.createDoc(null, "decode");
+		Element root = doc.getDocumentElement();
+		
+		MSEASProvisioingWBXML msEAS = (MSEASProvisioingWBXML) PolicyDecoder.decode(root);
+		assertThat(msEAS.getProtocolVersion()).isEqualTo(new BigDecimal(0.0));
 	}
 	
+	@Test
+	public void testDecodeMSEASCurrentVersion() {
+		Document doc = DOMUtils.createDoc(null, "decode");
+		Element root = doc.getDocumentElement();
+		DOMUtils.createElement(root, "AllowStorageCard");
+		
+		MSEASProvisioingWBXML msEAS = (MSEASProvisioingWBXML) PolicyDecoder.decode(root);
+		assertThat(msEAS.getProtocolVersion()).isEqualTo(new BigDecimal(12.1));
+ 	}
 }

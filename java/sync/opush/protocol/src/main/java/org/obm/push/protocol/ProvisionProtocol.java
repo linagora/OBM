@@ -33,13 +33,13 @@ package org.obm.push.protocol;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
-import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.provisioning.Policy;
+import org.obm.push.protocol.provisioning.PolicyDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,7 +51,10 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 		String policyType = DOMUtils.getUniqueElement(doc.getDocumentElement(),	"PolicyType").getTextContent();
 		Element pKeyElem = DOMUtils.getUniqueElement(doc.getDocumentElement(), "PolicyKey");
 		Long policyKey = getPolicyKey(pKeyElem);
-		return new ProvisionRequest(policyType, policyKey);
+		return ProvisionRequest.builder()
+					.policyType(policyType)
+					.policyKey(policyKey)
+					.build();
 	}
 
 	private Long getPolicyKey(Element pKeyElem) throws InvalidPolicyKeyException {
@@ -60,6 +63,42 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 		} catch (NumberFormatException e) {
 			throw new InvalidPolicyKeyException(e);
 		}
+	}
+
+	@Override
+	public ProvisionResponse decodeResponse(Document doc) {
+		Element pe = doc.getDocumentElement();
+		
+		String generalStatus = DOMUtils.getElementText(pe, "Status");
+		ProvisionStatus status = ProvisionStatus.fromSpecificationValue(Integer.valueOf(generalStatus));
+		Element policies = DOMUtils.getUniqueElement(pe, "Policies");
+		Element policyElement = DOMUtils.getUniqueElement(policies, "Policy");
+		
+		Element pte = DOMUtils.getUniqueElement(policyElement, "PolicyType");
+		String policyType = pte.getTextContent();
+		
+		String substatus = DOMUtils.getElementText(policyElement, "Status");
+		ProvisionPolicyStatus policyStatus = ProvisionPolicyStatus.fromSpecificationValue(Integer.valueOf(substatus));
+		
+		Long policyKey = null;
+		Element pke = DOMUtils.getUniqueElement(policyElement, "PolicyKey");
+		if (pke != null) {
+			policyKey = Long.valueOf(pke.getTextContent());
+		}
+		
+		Policy policy = null;
+		Element datae = DOMUtils.getUniqueElement(policyElement, "Data");
+		if (datae != null) {
+			policy = PolicyDecoder.decode(datae);
+		}
+		
+		return ProvisionResponse.builder()
+					.policyType(policyType)
+					.policyKey(policyKey)
+					.policy(policy)
+					.policyStatus(policyStatus)
+					.status(status)
+					.build();
 	}
 
 	@Override
@@ -93,13 +132,16 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 	}
 
 	@Override
-	public Document encodeRequest(ProvisionRequest request) throws ProtocolException {
-		throw new NotImplementedException();
+	public Document encodeRequest(ProvisionRequest provisionRequest) {
+		Document document = DOMUtils.createDoc(null, "Provision");
+		Element root = document.getDocumentElement();
+		
+		Element policies = DOMUtils.createElement(root, "Policies");
+		Element policy = DOMUtils.createElement(policies, "Policy");
+		
+		DOMUtils.createElementAndText(policy, "PolicyType", provisionRequest.getPolicyType());
+		DOMUtils.createElementAndText(policy, "PolicyKey", String.valueOf(provisionRequest.getPolicyKey()));
+		
+		return document;
 	}
-
-	@Override
-	public ProvisionResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-	
 }

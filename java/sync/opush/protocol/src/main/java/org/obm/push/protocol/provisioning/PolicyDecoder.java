@@ -29,48 +29,28 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.protocol.provisioning;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.bean.FolderSyncRequest;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.push.protocol.bean.ProvisionRequest;
-import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import java.math.BigDecimal;
 
-import com.google.common.collect.ImmutableList;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Element;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class PolicyDecoder {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public final static BigDecimal CURRENT_AS_RELEASE = new BigDecimal(12.1);
+	public final static BigDecimal EVERY_PROTOCOL_VERSION_ACCEPTED = new BigDecimal(0.0);
+	
+	public static Policy decode(Element data) {
+		Element wap = DOMUtils.getUniqueElement(data, "wap-provisioningdoc");
+		if (wap != null) {
+			return new MSWAPProvisioningXML();
+		}
+		
+		Element allowStorageCard = DOMUtils.getUniqueElement(data, "AllowStorageCard");
+		if (allowStorageCard != null) {
+			return new MSEASProvisioingWBXML(CURRENT_AS_RELEASE);
+		}
+		return new MSEASProvisioingWBXML(EVERY_PROTOCOL_VERSION_ACCEPTED);
 	}
-	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.add(ProvisionRequest.class)
-					.add(ProvisionResponse.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
-	}
-	
 }
