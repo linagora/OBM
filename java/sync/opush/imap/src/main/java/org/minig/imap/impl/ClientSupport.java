@@ -316,6 +316,10 @@ public class ClientSupport {
 	public InputStream uidFetchPart(long uid, String address) {
 		return run(new UIDFetchPartCommand(uid, address));
 	}
+	
+	public InputStream uidFetchPart(long uid, String address, long truncation) {
+		return run(new UIDFetchPartCommand(uid, address, truncation));
+	}
 
 	public List<MailThread> uidThreads() {
 		// UID THREAD REFERENCES UTF-8 NOT DELETED

@@ -42,17 +42,31 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 
 	private long uid;
 	private String section;
+	private final Long truncation;
 
 	public UIDFetchPartCommand(long uid, String section) {
+		this(uid, section, null);
+	}
+
+	public UIDFetchPartCommand(long uid, String section, Long truncation) {
 		this.uid = uid;
 		this.section = section;
+		this.truncation = truncation;
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + uid + " (UID BODY.PEEK[" + section + "])";
+		String cmd = "UID FETCH " + uid + " (UID BODY.PEEK[" + section + "]" + truncation() + ")";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
+	}
+
+	private String truncation() {
+		if (truncation != null) {
+			return "<0."+truncation+">";
+		} else {
+			return "";
+		}
 	}
 
 	@Override

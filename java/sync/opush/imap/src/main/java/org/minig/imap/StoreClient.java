@@ -205,6 +205,10 @@ public class StoreClient {
 		return cs.uidStore(uids, fl, set);
 	}
 
+	public InputStream uidFetchPart(long uid, String address, long truncation) {
+		return cs.uidFetchPart(uid, address, truncation);
+	}
+	
 	public InputStream uidFetchPart(long uid, String address) {
 		return cs.uidFetchPart(uid, address);
 	}

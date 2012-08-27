@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -72,7 +71,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -121,7 +119,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final ImapClientProvider imapClientProvider;
-	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final CollectionPathHelper collectionPathHelper;
 
 	private final MailViewToMSEmailConverter msEmailConverter;
@@ -129,13 +126,12 @@ public class ImapMailboxService implements PrivateMailboxService {
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
-			ImapMailBoxUtils imapMailBoxUtils, CollectionPathHelper collectionPathHelper, 
+			CollectionPathHelper collectionPathHelper, 
 			MailViewToMSEmailConverter msEmailConverter) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
-		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.collectionPathHelper = collectionPathHelper;
 		this.msEmailConverter = msEmailConverter;
 		this.activateTLS = emailConfiguration.activateTls();
@@ -255,16 +251,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 			throw new MailException(e);
 		} finally {
 			store.logout();
-		}
-	}
-
-	private void closeQuietly(ImapStore store) throws MailException {
-		try {
-			if (store != null) {
-				store.logout();
-			}
-		} catch (ImapLogoutException e) {
-			throw new MailException(e);
 		}
 	}
 
@@ -665,35 +651,25 @@ public class ImapMailboxService implements PrivateMailboxService {
 			FetchInstructions fetchInstructions) throws MailException {
 
 		Preconditions.checkNotNull(fetchInstructions);
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			
-			String mailBoxName = parseMailBoxName(udr, collectionName);
-			OpushImapFolder imapFolder = store.select(mailBoxName);
+			login(store);
+			store.select(parseMailBoxName(udr, collectionName));
 			
 			MimeAddress address = fetchInstructions.getMimePart().getAddress();
+			String addressAsString = Objects.firstNonNull(address.getAddress(), "");
 			Integer truncation = fetchInstructions.getTruncation();
 			if (truncation != null) {
-				return imapFolder.uidFetchPart(uid, address, truncation);
+				return store.uidFetchPart(uid, addressAsString, truncation);
 			} else {
-				return imapFolder.uidFetchPart(uid, address);
+				return store.uidFetchPart(uid, addressAsString);
 			}
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 }
