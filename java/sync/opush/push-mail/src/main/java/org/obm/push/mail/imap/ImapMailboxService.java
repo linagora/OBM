@@ -34,18 +34,19 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.CommandIOException;
-import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -66,6 +67,7 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.ImapCommandException;
@@ -603,28 +605,22 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException {
-		ImapStore store = null;
-		IMAPMessage message = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			
+			login(store);
 			String mailboxName = parseMailBoxName(udr, collectionPath);
-			message = (IMAPMessage) store.fetchEnvelope(mailboxName, uid);
-		} catch (LocatorClientException e) {
+			store.select(mailboxName);
+			Collection<UIDEnvelope> uidFetchEnvelopes = store.uidFetchEnvelope(Arrays.asList(uid));
+			return Iterables.getOnlyElement(uidFetchEnvelopes);
+		} catch (NoSuchElementException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
+		} catch (CollectionPathException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
-		
-		Envelope envelope = imapMailBoxUtils.buildEnvelopeFromMessage(message);
-		return new UIDEnvelope(uid, envelope);
 	}
 	
 	@Override

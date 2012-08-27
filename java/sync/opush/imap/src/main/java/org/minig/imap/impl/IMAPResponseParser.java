@@ -34,12 +34,10 @@ package org.minig.imap.impl;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
 import com.google.common.primitives.Bytes;
 
 public class IMAPResponseParser {

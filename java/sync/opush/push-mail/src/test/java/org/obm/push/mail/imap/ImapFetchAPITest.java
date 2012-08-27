@@ -147,6 +147,7 @@ public class ImapFetchAPITest {
 		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 2l);
 	}
 	
+	@Ignore("Greenmail doesn't respect element orders in its response")
 	@Test
 	public void testFetchEnvelopeMsgnoDifferentThanUID() throws MailException, ImapMessageNotFoundException {
 		testUtils.sendEmailToInbox();
