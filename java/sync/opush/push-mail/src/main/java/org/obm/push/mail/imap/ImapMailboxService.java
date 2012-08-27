@@ -333,23 +333,22 @@ public class ImapMailboxService implements PrivateMailboxService {
 	public void delete(UserDataRequest udr, String collectionPath, long uid) 
 			throws MailException, ImapMessageNotFoundException {
 
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			
-			String mailboxName = parseMailBoxName(udr, collectionPath);
-			store.deleteMessage(mailboxName, uid);
-		} catch (MessagingException e) {
-			throw new MailException(e);
+			login(store);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailBoxName);
+			FlagsList fl = new FlagsList();
+			fl.add(Flag.DELETED);
+			logger.info("delete conv id = ", uid);
+			store.uidStore(ImmutableList.of(uid), fl, true);
+			store.expunge();
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 
