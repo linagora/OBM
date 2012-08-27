@@ -33,10 +33,14 @@
 package org.minig.imap.impl;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterables;
+import com.google.common.primitives.Bytes;
 
 public class IMAPResponseParser {
 
@@ -92,24 +96,11 @@ public class IMAPResponseParser {
 		r.setPayload(response);
 
 		if (msg.hasFragments()) {
-			List<byte[]> all = msg.getFragments();
-			int len = 0;
-			for (byte[] b : all) {
-				len += b.length;
+			byte[] rawData = Bytes.concat(msg.getFragments().toArray(new byte[0][]));
+			if (rawData[rawData.length - 1] == ')') {
+				rawData = Arrays.copyOf(rawData, rawData.length - 1);
 			}
-			byte[] data = new byte[len];
-			int copyIdx = 0;
-			for (int i = 0; i < all.size(); i++) {
-				// remove closing paren on last response...
-				byte[] b = all.get(i);
-				int copySize = b.length;
-				if (b.length > 0 && i == (all.size() - 1) && b[b.length - 1] == ')') {
-					copySize = copySize - 1;
-				}
-				System.arraycopy(b, 0, data, copyIdx, copySize);
-				copyIdx += b.length;
-			}
-			r.setStreamData(new ByteArrayInputStream(data));
+			r.setStreamData(new ByteArrayInputStream(rawData));
 		}
 
 		return r;

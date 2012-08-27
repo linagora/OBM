@@ -97,6 +97,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -486,27 +487,18 @@ public class ImapMailboxService implements PrivateMailboxService {
 	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress)
 			throws MailException {
 		
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
+			login(store);
 			String mailBoxName = parseMailBoxName(udr, collectionName);
-			OpushImapFolder imapFolder = store.select(mailBoxName);
-			return imapFolder.uidFetchPart(mailUid, mimePartAddress);
+			store.select(mailBoxName);
+			return store.uidFetchPart(mailUid, Objects.firstNonNull(mimePartAddress.getAddress(), ""));
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
 	}
 
