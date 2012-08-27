@@ -45,6 +45,9 @@ import org.minig.imap.impl.MessageSet;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.impl.AtomHelper;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 
 	private TreeSet<Long> uids;
@@ -57,7 +60,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + MessageSet.asString(uids) + " (UID BODYSTRUCTURE)";
+		String cmd = "UID FETCH " + MessageSet.asString(uids) + " (UID RFC822.SIZE BODYSTRUCTURE)";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
@@ -77,32 +80,29 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 			int len = rs.size() - 1;
 			for (int i = 0; i < len; i++) {
 				IMAPResponse ir = it.next();
-				String s = ir.getPayload();
-
-				int bsIdx = s.indexOf(" BODYSTRUCTURE ");
-				if (bsIdx == -1) {
+				String s = AtomHelper.getFullResponse(ir.getPayload(), ir.getStreamData());
+				
+				String bs = getBodyStructurePayload(s);
+				if (bs == null) {
 					continue;
 				}
-
-				String bs = s.substring(bsIdx + " BODYSTRUCTURE ".length());
-
+				
 				if (bs.length() < 2) {
 					logger.warn("strange bs response: " + s);
 					continue;
 				}
 
-				int uidIdx = s.indexOf("(UID ");
-				long uid = Long.parseLong(s.substring(
-						uidIdx + "(UID ".length(), bsIdx));
-
-				String bsData = AtomHelper.getFullResponse(bs, ir.getStreamData());
+				long uid = getUid(s);
+				int size = getSize(s);
+				
 				try {
 					//remove closing brace
-					MimeMessage message = bodyStructureParser.parseBodyStructure(bsData.substring(0, bsData.length() - 1));
+					MimeMessage message = bodyStructureParser.parseBodyStructure(bs.substring(0, bs.length() - 1));
 					message.setUid(uid);
+					message.setSize(size);
 					mts.add(message);
 				} catch (RuntimeException re) {
-					logger.error("error parsing:\n" + new String(bsData));
+					logger.error("error parsing:\n" + new String(s));
 					logger.error("payload was:\n" + s);
 					throw re;
 				}
@@ -115,4 +115,55 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 		}
 	}
 
+	private int getSize(String fullPayload) {
+		String intAsString = getNumberForField(fullPayload, "RFC822.SIZE ");
+		return Integer.valueOf(intAsString);
+	}
+
+	private Long getUid(String fullPayload) {
+		String longAsString = getNumberForField(fullPayload, "UID ");
+		return Long.valueOf(longAsString);		
+	}
+
+	private String getNumberForField(String fullPayload, String field) {
+		String uidStartToken = field;
+		int uidIdx = fullPayload.indexOf(uidStartToken);
+		String content = fullPayload.substring(uidIdx + uidStartToken.length());
+		ImmutableList<Character> chars = Lists.charactersOf(content);
+		StringBuilder longAsString = new StringBuilder();
+		for (Character c: chars) {
+			if (Character.isDigit(c)) {
+				longAsString.append(c);
+			} else {
+				break;
+			}
+		}
+		return longAsString.toString();
+	}
+	
+	private String getBodyStructurePayload(String fullPayload) {
+		String bodystructureStartToken = "BODYSTRUCTURE ";
+		int bsIdx = fullPayload.indexOf(bodystructureStartToken);
+		if (bsIdx == -1) {
+			return null;
+		}
+		int contentStart = bsIdx + bodystructureStartToken.length();
+		if (fullPayload.charAt(contentStart) != '(') {
+			return null;
+		}
+		String content = fullPayload.substring(contentStart);
+		ImmutableList<Character> chars = Lists.charactersOf(content);
+		int scope = 1;
+		int position = 0;
+		for (Character c: chars) {
+			position++;
+			if (c == '(') scope++;
+			if (c == ')') scope--;
+			if (scope == 0) {
+				return content.substring(0, position);
+			}
+		}
+		return null;
+	}
+	
 }

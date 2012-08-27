@@ -54,7 +54,7 @@ import org.obm.filter.SlowFilterRunner;
 public class UIDFetchBodyStructureCommandTest {
 
 	private static final String INPUT_LINE1 = 
-		"* 11 FETCH (UID 54 BODYSTRUCTURE ((\"TEXT\" \"PLAIN\" (\"CHARSET\" \"ISO-8859-1\" \"FORMAT\" \"flowed\") NIL NIL \"QUOTED-PRINTABLE\" 620 23 NIL NIL NIL NIL)(\"APPLICATION\" \"X-ZIP-COMPRESSED\" (\"NAME\" \"=?ISO-8859-1?Q?Dpl=F4m=E9s_avant_2001-2002=2Ezip?=\") NIL NIL \"BASE64\" 266416 NIL (\"INLINE\" (\"FILENAME*\" {93}";
+		"* 11 FETCH (UID 54 RFC822.SIZE 123 BODYSTRUCTURE ((\"TEXT\" \"PLAIN\" (\"CHARSET\" \"ISO-8859-1\" \"FORMAT\" \"flowed\") NIL NIL \"QUOTED-PRINTABLE\" 620 23 NIL NIL NIL NIL)(\"APPLICATION\" \"X-ZIP-COMPRESSED\" (\"NAME\" \"=?ISO-8859-1?Q?Dpl=F4m=E9s_avant_2001-2002=2Ezip?=\") NIL NIL \"BASE64\" 266416 NIL (\"INLINE\" (\"FILENAME*\" {93}";
 	private static final String INPUT_BYTESTREAM =
 		"ISO-8859-1''%44%70%6C%F4%6D%E9%73%20%61%76%61%6E%74%20%32%30%30%31%2D%32%30%30%32%2E%7A%69%70)) NIL NIL)(\"APPLICATION\" \"X-ZIP-COMPRESSED\" (\"NAME\" \"=?ISO-8859-1?Q?Dipl=F4m=E9s_depuis_2001-2002=2Ezip?=\") NIL NIL \"BASE64\" 518522 NIL (\"INLINE\" (\"FILENAME*\" {99}" +
 		"ISO-8859-1''%44%69%70%6C%F4%6D%E9%73%20%64%65%70%75%69%73%20%32%30%30%31%2D%32%30%30%32%2E%7A%69%70)) NIL NIL) \"MIXED\" (\"BOUNDARY\" \"------------040903010203040509010609\") NIL NIL NIL))";
@@ -69,7 +69,8 @@ public class UIDFetchBodyStructureCommandTest {
 	public void testResponseReceived() {
 		BodyStructureParser resultCallback = EasyMock.createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
-		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(new MimeMessage(null));
+		MimeMessage mimeMessage = EasyMock.createNiceMock(MimeMessage.class);
+		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(mimeMessage);
 		EasyMock.replay(resultCallback);
 		UIDFetchBodyStructureCommand uidFetchBodyStructureCommand = 
 			new UIDFetchBodyStructureCommand(resultCallback, ImmutableList.of(54l));

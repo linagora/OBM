@@ -270,7 +270,7 @@ public class ImapFetchAPITest {
 		
 		Assertions.assertThat(multiPartMixed.getFullMimeType()).isEqualTo("multipart/mixed");
 		Assertions.assertThat(multiPartMixed.getBodyParam("boundary")).
-			isEqualTo(new BodyParam("boundary", "\"----=_Part_0_1330682067197\""));
+			isEqualTo(new BodyParam("boundary", "----=_Part_0_1330682067197"));
 		
 		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
 		
@@ -309,7 +309,7 @@ public class ImapFetchAPITest {
 		
 		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
 		Assertions.assertThat(multiPartAlternative.getBodyParam("boundary")).
-			isEqualTo(new BodyParam("boundary", "\"----=_Part_2_1320656625672\""));
+			isEqualTo(new BodyParam("boundary", "----=_Part_2_1320656625672"));
 		
 		Assertions.assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
 		Assertions.assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));

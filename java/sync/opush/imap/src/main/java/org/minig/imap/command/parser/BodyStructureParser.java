@@ -173,7 +173,7 @@ public class BodyStructureParser {
 		}
 
 		Rule bodyFldOctets() {
-			return Sequence(number(), drop());
+			return number();
 		}
 
 		boolean addBodyParam() {
@@ -270,6 +270,7 @@ public class BodyStructureParser {
 		}
 
 		boolean createMimePart() {
+			int size = (Integer)pop();
 			String contentTransfertEncoding = (String)pop();
 			String bodyId = (String)pop();
 			Set<BodyParam> bodyParams = (Set<BodyParam>) pop();
@@ -279,6 +280,7 @@ public class BodyStructureParser {
 			mimePart.setBodyParams(bodyParams);
 			mimePart.setContentId(bodyId);
 			mimePart.setContentTransfertEncoding(contentTransfertEncoding);
+			mimePart.setSize(size);
 			push(mimePart);
 			return true;
 		}
