@@ -625,29 +625,18 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
-		ImapStore store = null;
-		Map<Long, IMAPMessage> imapMessages = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			
-			String mailboxName = parseMailBoxName(udr, collectionPath);
-			imapMessages = store.fetchFast(mailboxName, uids);
+			login(store);
+			store.select(parseMailBoxName(udr, collectionPath));
+			return store.uidFetchFast(uids);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
-			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
-			closeQuietly(store);
+			store.logout();
 		}
-		
-		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);
 	}
 	
 	@Override

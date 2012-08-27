@@ -110,6 +110,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 				}
 				builder.internalDate(internalDate);
 				builder.flags(getFlags(payload));
+				builder.size(getSize(payload));
 				buildSet.add(builder.build());
 			}
 		} else {
@@ -120,13 +121,23 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		data = buildSet.build();
 	}
 
+	private int getSize(String payload) {
+		int uidIdx = payload.indexOf("RFC822.SIZE ") + "RFC822.SIZE ".length();
+		int endUid = getIntEnd(payload, uidIdx);
+		return Integer.parseInt(payload.substring(uidIdx, endUid));
+	}
+
 	private long getUid(String payload) {
 		int uidIdx = payload.indexOf("UID ") + "UID ".length();
-		int endUid = uidIdx;
+		int endUid = getIntEnd(payload, uidIdx);
+		return Long.parseLong(payload.substring(uidIdx, endUid));
+	}
+
+	private int getIntEnd(String payload, int endUid) {
 		while (Character.isDigit(payload.charAt(endUid))) {
 			endUid++;
 		}
-		return Long.parseLong(payload.substring(uidIdx, endUid));
+		return endUid;
 	}
 
 	private Date getInternalDate(String payload) {
