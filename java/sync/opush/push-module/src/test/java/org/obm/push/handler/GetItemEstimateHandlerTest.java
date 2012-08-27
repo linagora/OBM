@@ -31,8 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import static org.easymock.EasyMock.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Collections;
 
@@ -52,7 +53,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;
+import org.obm.push.protocol.bean.Estimate;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;

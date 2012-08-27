@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.obm.push.backend.IBackend;
@@ -57,9 +56,9 @@ import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
+import org.obm.push.protocol.bean.Estimate;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
-import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -136,8 +135,8 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		UnexpectedObmSyncServerException, ProcessingEmailException,
 		CollectionNotFoundException, ConversionException {
 		
-		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
-		
+
+		GetItemEstimateResponse.Builder getItemEstimateResponseBuilder = GetItemEstimateResponse.builder();
 		for (SyncCollection syncCollection: request.getSyncCollections()) {
 			
 			Integer collectionId = syncCollection.getCollectionId();
@@ -145,13 +144,13 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			try {
 				syncCollection.setCollectionPath(collectionPath);
 				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
-				estimates.add( computeEstimate(udr, syncCollection) );
+				getItemEstimateResponseBuilder.add(computeEstimate(udr, syncCollection));
 			} catch (CollectionPathException e) {
 				throw new CollectionNotFoundException("Collection path {" + collectionPath + "} not found.");
 			}			
 		}
 		
-		return new GetItemEstimateResponse(estimates);
+		return getItemEstimateResponseBuilder.build();
 	}
 	
 	@VisibleForTesting Estimate computeEstimate(UserDataRequest udr, SyncCollection syncCollection) throws DaoException, InvalidSyncKeyException,
@@ -169,10 +168,15 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			count = contentsExporter.getItemEstimateSize(udr, state, syncCollection);
 		} catch (FilterTypeChangedException e) {
 			syncCollection.setStatus(SyncStatus.INVALID_SYNC_KEY);
-			return new Estimate(syncCollection);
+			return Estimate.builder()
+					.collection(syncCollection)
+					.build();
 		}
 	
-		return new Estimate(syncCollection, count + unSynchronizedItemNb);
+		return Estimate.builder()
+				.collection(syncCollection)
+				.estimate(count + unSynchronizedItemNb)
+				.build();
 	}
 
 	private int listItemToAddSize(UserDataRequest udr, SyncCollection syncCollection) {

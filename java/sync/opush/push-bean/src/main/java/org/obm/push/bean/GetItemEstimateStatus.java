@@ -37,6 +37,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 public enum GetItemEstimateStatus {
+
 	OK(1),
 	INVALID_COLLECTION(2),
 	NEED_SYNC(3),
@@ -67,6 +68,6 @@ public enum GetItemEstimateStatus {
 			return status;
 		}
 		throw new IllegalArgumentException("no status bound for value " + specificationValue);
-	}
 
+	}
 }

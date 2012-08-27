@@ -98,9 +98,9 @@ public enum FilterType {
 		}
 		throw new IllegalStateException("No filtered date available");
 	}
-	
+
 	private static Map<String, FilterType> specValueToEnum;
-		
+	
 	static {
 		Builder<String, FilterType> builder = ImmutableMap.builder();
 		for (FilterType filterType : values()) {

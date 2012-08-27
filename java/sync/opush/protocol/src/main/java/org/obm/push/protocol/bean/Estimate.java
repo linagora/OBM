@@ -31,61 +31,64 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.Collection;
-
 import org.obm.push.bean.SyncCollection;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 
-public class GetItemEstimateRequest {
+public class Estimate {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		private Collection<SyncCollection> syncCollections;
+		private SyncCollection collection;
+		private int estimate;
 		
-		private Builder() {
-			this.syncCollections = Lists.newArrayList();
-		}
+		private Builder() {}
 		
-		public Builder syncCollections(Collection<SyncCollection> syncCollections) {
-			this.syncCollections = syncCollections;
+		public Builder collection(SyncCollection collection) {
+			this.collection = collection;
 			return this;
 		}
 		
-		public Builder add(SyncCollection syncCollection) {
-			this.syncCollections.add(syncCollection);
+		public Builder estimate(int estimate) {
+			this.estimate = estimate;
 			return this;
 		}
 		
-		public GetItemEstimateRequest build() {
-			return new GetItemEstimateRequest(syncCollections);
+		public Estimate build() {
+			return new Estimate(collection, estimate);
 		}
+	}
+
+	private final SyncCollection collection;
+	private final int estimate;
+
+	private Estimate(SyncCollection collection, int estimate) {
+		this.collection = collection;
+		this.estimate = estimate;
 	}
 	
-	private final Collection<SyncCollection> syncCollections;
-
-	private GetItemEstimateRequest(Collection<SyncCollection> syncCollections) {
-		this.syncCollections = syncCollections;
+	public SyncCollection getCollection() {
+		return collection;
 	}
-
-	public Collection<SyncCollection> getSyncCollections() {
-		return syncCollections;
+	
+	public int getEstimate() {
+		return estimate;
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(syncCollections, syncCollections);
+		return Objects.hashCode(collection, estimate);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof GetItemEstimateRequest) {
-			GetItemEstimateRequest that = (GetItemEstimateRequest) object;
-			return Objects.equal(this.syncCollections, that.syncCollections);
+		if (object instanceof Estimate) {
+			Estimate that = (Estimate) object;
+			return Objects.equal(this.collection, that.collection)
+				&& Objects.equal(this.estimate, that.estimate);
 		}
 		return false;
 	}
@@ -93,7 +96,8 @@ public class GetItemEstimateRequest {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("syncCollections", syncCollections)
+			.add("collection", collection)
+			.add("estimate", estimate)
 			.toString();
 	}
 }

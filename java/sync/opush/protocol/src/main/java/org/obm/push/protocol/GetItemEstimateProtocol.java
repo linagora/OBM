@@ -31,11 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import java.util.ArrayList;
-
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncCollection;
@@ -43,10 +40,9 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.protocol.bean.Estimate;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
-import org.obm.push.protocol.bean.GetItemEstimateResponse.Estimate;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -60,7 +56,7 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 	public GetItemEstimateRequest decodeRequest(Document doc) throws CollectionNotFoundException {
 		final NodeList collections = doc.getDocumentElement().getElementsByTagName("Collection");
 		int nbElements = collections.getLength();
-		final ArrayList<SyncCollection> syncCollections = new ArrayList<SyncCollection>(nbElements);
+		GetItemEstimateRequest.Builder getItemEstimateRequestBuilder = GetItemEstimateRequest.builder();
 		for (int i = 0; i < nbElements; i++) {
 	
 			final Element ce = (Element) collections.item(i);
@@ -83,9 +79,35 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 			} catch (NumberFormatException e) {
 				throw new CollectionNotFoundException(e);
 			}
-			syncCollections.add(sc);
+			getItemEstimateRequestBuilder.add(sc);
 		}
-		return new GetItemEstimateRequest(syncCollections);
+		return getItemEstimateRequestBuilder
+			.build();
+	}
+
+	@Override
+	public GetItemEstimateResponse decodeResponse(Document doc) {
+		Element ier = doc.getDocumentElement();
+		
+		GetItemEstimateResponse.Builder getItemEstimateResponseBuilder = GetItemEstimateResponse.builder();
+		NodeList responses = ier.getElementsByTagName("Response");
+		for (int i = 0; i < responses.getLength(); i++) {
+			Element response = (Element) responses.item(i);
+			
+			Element collection = DOMUtils.getUniqueElement(response, "Collection");
+			Integer collectionId = Integer.valueOf(DOMUtils.getElementText(collection, "CollectionId"));
+			SyncCollection syncCollection = new SyncCollection();
+			syncCollection.setCollectionId(collectionId);
+			
+			int estimateSize = Integer.valueOf(DOMUtils.getElementText(collection, "Estimate"));
+			getItemEstimateResponseBuilder.add(Estimate.builder()
+					.collection(syncCollection)
+					.estimate(estimateSize)
+					.build());
+		}
+		
+		return getItemEstimateResponseBuilder
+			.build();
 	}
 
 	@Override
@@ -133,6 +155,27 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		estim.setTextContent(String.valueOf(estimate));
 	}
 
+	@Override
+	public Document encodeRequest(GetItemEstimateRequest request) {
+		Document ret = DOMUtils.createDoc(null, "GetItemEstimate");
+		Element giee = ret.getDocumentElement();
+
+		for (SyncCollection syncCollection : request.getSyncCollections()) {
+			Element collection = DOMUtils.createElement(giee, "Collection");
+			DOMUtils.createElementAndText(collection, "Class", syncCollection.getDataClass());
+			
+			SyncCollectionOptions syncCollectionOptions = syncCollection.getOptions();
+			if (syncCollectionOptions != null && syncCollectionOptions.getFilterType() != null) {
+				DOMUtils.createElementAndText(collection, "FilterType", syncCollectionOptions.getFilterType().asSpecificationValue());
+			}
+			
+			DOMUtils.createElementAndText(collection, "SyncKey", syncCollection.getSyncKey().getSyncKey());
+			DOMUtils.createElementAndText(collection, "CollectionId", syncCollection.getCollectionId());
+		}
+		
+		return ret;
+	}
+	
 	public Document buildError(GetItemEstimateStatus status, Integer collectionId) {
 		Document document = createDocument();
 		Element responseNode = createResponseNode(document);
@@ -144,13 +187,4 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		return document;
 	}
 
-	@Override
-	public Document encodeRequest(GetItemEstimateRequest request) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public GetItemEstimateResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
-	}
 }

@@ -33,40 +33,65 @@ package org.obm.push.protocol.bean;
 
 import java.util.Collection;
 
-import org.obm.push.bean.SyncCollection;
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
 public class GetItemEstimateResponse {
 
-	public static class Estimate {
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private Collection<Estimate> estimates;
 		
-		private final SyncCollection collection;
-		private final int estimate;
+		private Builder() {
+			this.estimates = Lists.newArrayList();
+		}
+		
+		public Builder estimates(Collection<Estimate> estimates) {
+			this.estimates = estimates;
+			return this;
+		}
 
-		public Estimate(SyncCollection collection, int estimate) {
-			this.collection = collection;
-			this.estimate = estimate;
+		public Builder add(Estimate estimate) {
+			this.estimates.add(estimate);
+			return this;
 		}
 		
-		public Estimate(SyncCollection collection) {
-			this(collection, 0);
-		}
-		
-		public SyncCollection getCollection() {
-			return collection;
-		}
-		
-		public int getEstimate() {
-			return estimate;
+		public GetItemEstimateResponse build() {
+			return new GetItemEstimateResponse(estimates);
 		}
 	}
 	
 	private final Collection<Estimate> estimates;
 	
-	public GetItemEstimateResponse(Collection<Estimate> estimates) {
+	private GetItemEstimateResponse(Collection<Estimate> estimates) {
 		this.estimates = estimates;
 	}
 	
 	public Collection<Estimate> getEstimates() {
 		return estimates;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(estimates, estimates);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof GetItemEstimateResponse) {
+			GetItemEstimateResponse that = (GetItemEstimateResponse) object;
+			return Objects.equal(this.estimates, that.estimates);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("estimates", estimates)
+			.toString();
 	}
 }
