@@ -7,13 +7,7 @@
 set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-export JAVA_HOME=/usr/lib/jvm/java-6-sun
-test -d /usr/lib/jvm/java-1.6.0-openjdk && {
-    JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
-}
-test -d /usr/lib/jvm/java-openjdk && {
-    JAVA_HOME=/usr/lib/jvm/java-openjdk
-}
+export JAVA_HOME=/usr/java/default
 
 if [ -r /etc/sysconfig/i18n ]; then
   . /etc/sysconfig/i18n

@@ -8,14 +8,6 @@ else
   MEM=512
 fi
 
-JAVA_HOME="/usr/lib/jvm/java-6-sun"
-test -d /usr/lib/jvm/java-1.6.0-openjdk && {
-    JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
-}
-test -d /usr/lib/jvm/java-openjdk && {
-    JAVA_HOME=/usr/lib/jvm/java-openjdk
-}
-
 CATALINA_PID="/var/run/obm_tomcat.pid"
 CATALINA_HOME="/usr/share/tomcat"
 
