@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.obm.configuration.ConfigurationService;
@@ -39,6 +38,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
+import org.obm.push.bean.autodiscover.AutodiscoverResponse.Builder;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
@@ -49,7 +49,6 @@ import org.obm.push.impl.Responder;
 import org.obm.push.protocol.AutodiscoverProtocol;
 import org.w3c.dom.Document;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -86,9 +85,13 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 		String culture = formatCultureParameter( Locale.getDefault() );
 
 		AutodiscoverResponseUser user = buildUserField(udr, autodiscoverRequest);
-		List<AutodiscoverResponseServer> actionsServer = buildActionsServer(); 
+		Builder autodiscoverResponseBuilder = AutodiscoverResponse.builder();
+		buildActionsServer(autodiscoverResponseBuilder);
 
-		return new AutodiscoverResponse(culture, user, null, actionsServer, null, null);
+		return autodiscoverResponseBuilder
+					.responseCulture(culture)
+					.responseUser(user)
+					.build();
 	}
 
 	/**
@@ -105,14 +108,26 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 	private AutodiscoverResponseUser buildUserField(UserDataRequest udr, AutodiscoverRequest autodiscoverRequest) {
 		String email = autodiscoverRequest.getEmailAddress();
 		String displayName = udr.getUser().getDisplayName();
-		return new AutodiscoverResponseUser(email, displayName);
+		return AutodiscoverResponseUser.builder()
+				.emailAddress(email)
+				.displayName(displayName)
+				.build();
 	}
 	
-	private List<AutodiscoverResponseServer> buildActionsServer() {
+	private void buildActionsServer(AutodiscoverResponse.Builder autodiscoverResponseBuilder) {
 		String url = configurationService.getActiveSyncServletUrl();
-		return Lists.newArrayList( 
-				new AutodiscoverResponseServer("MobileSync", url, url, null), 
-				new AutodiscoverResponseServer("CertEnroll", url, null, "CertEnrollTemplate")
+		autodiscoverResponseBuilder.add(AutodiscoverResponseServer.builder()
+					.type("MobileSync")
+					.url(url)
+					.name(url)
+					.serverData(null)
+					.build());
+		autodiscoverResponseBuilder.add(AutodiscoverResponseServer.builder()
+					.type("CertEnroll")
+					.url(url)
+					.name(null)
+					.serverData("CertEnrollTemplate")
+					.build()
 				);
 	}
 	
@@ -125,8 +140,12 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 		
 		logger.error(e.getMessage(), e);
 		
-		AutodiscoverResponseError autodiscoverError = new AutodiscoverResponseError(
-				errorStatus, e.getMessage(), e.getMessage(), null);
+		AutodiscoverResponseError autodiscoverError = AutodiscoverResponseError.builder()
+			.status(errorStatus)
+			.message(e.getMessage())
+			.debugData(e.getMessage())
+			.errorCode(null)
+			.build();
 		
 		if (autodiscoverRequest != null) {
 			Document document = protocol.encodeErrorResponse(

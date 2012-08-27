@@ -35,10 +35,35 @@ import com.google.common.base.Objects;
 
 public class AutodiscoverResponseUser {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String emailAddress;
+		private String displayName;
+		
+		private Builder() {}
+		
+		public Builder emailAddress(String emailAddress) {
+			this.emailAddress = emailAddress;
+			return this;
+		}
+		
+		public Builder displayName(String displayName) {
+			this.displayName = displayName;
+			return this;
+		}
+		
+		public AutodiscoverResponseUser build() {
+			return new AutodiscoverResponseUser(emailAddress, displayName);
+		}
+	}
+	
 	private final String emailAddress;
 	private final String displayName;
 	
-	public AutodiscoverResponseUser(String emailAddress, String displayName) {
+	private AutodiscoverResponseUser(String emailAddress, String displayName) {
 		this.emailAddress = emailAddress;
 		this.displayName = displayName;
 	}

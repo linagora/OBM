@@ -31,20 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.autodiscover.AutodiscoverStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.google.common.base.Strings;
 
@@ -61,8 +62,126 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 		Element emailAddressElement = DOMUtils.getUniqueElement(root, "EMailAddress");
 		Element acceptableResponseSchElement = DOMUtils.getUniqueElement(root, "AcceptableResponseSchema");
 		
-		return new AutodiscoverRequest( emailAddressElement.getTextContent(),
-										acceptableResponseSchElement.getTextContent());
+		return AutodiscoverRequest.builder()
+					.emailAddress(emailAddressElement.getTextContent())
+					.acceptableResponseSchema(acceptableResponseSchElement.getTextContent())
+					.build();
+	}
+
+	@Override
+	public AutodiscoverResponse decodeResponse(Document document) throws NoDocumentException {
+		if (document == null) {
+			throw new NoDocumentException("Document of Autodiscover response is null.");
+		}
+		
+		Element root = document.getDocumentElement();
+		Element response = DOMUtils.getUniqueElement(root, "Response");
+		
+		String responseCulture = null;
+		Element responseCultureElement = DOMUtils.getUniqueElement(response, "Culture");
+		if (responseCultureElement != null) {
+			responseCulture = responseCultureElement.getTextContent();
+		}
+		
+		AutodiscoverResponseUser responseUser = getAutodiscoverResponseUser(response);
+		
+		String actionRedirect = null;
+		List<AutodiscoverResponseServer> listActionServer = null;
+		AutodiscoverResponseError actionError = null;
+		Element actionElement = DOMUtils.getUniqueElement(response, "Action");
+		if (actionElement != null) {
+			Element redirectElement = DOMUtils.getUniqueElement(actionElement, "Redirect");
+			if (redirectElement != null) {
+				actionRedirect = redirectElement.getTextContent();
+			}
+			
+			listActionServer = getListActionServer(response);
+			
+			actionError = getChildError(actionElement);
+		}
+		
+		AutodiscoverResponseError responseError = getChildError(response);
+		
+		return AutodiscoverResponse.builder()
+			.responseCulture(responseCulture)
+			.responseUser(responseUser)
+			.actionRedirect(actionRedirect)
+			.listActionServer(listActionServer)
+			.actionError(actionError)
+			.responseError(responseError)
+			.build();
+	}
+
+	private AutodiscoverResponseUser getAutodiscoverResponseUser(Element response) {
+		Element user = DOMUtils.getUniqueElement(response, "User");
+		
+		String displayName = DOMUtils.getElementText(user, "DisplayName");
+		String eMailAddress = DOMUtils.getElementText(user, "EMailAddress");
+		
+		if (displayName != null && !Strings.isNullOrEmpty(eMailAddress)) {
+			return AutodiscoverResponseUser.builder()
+					.displayName(displayName)
+					.emailAddress(eMailAddress)
+					.build();
+		}
+		return null;
+	}
+	
+
+	private List<AutodiscoverResponseServer> getListActionServer(Element response) {
+		Element settingsElement = DOMUtils.getUniqueElement(response, "Settings");
+			
+		List<AutodiscoverResponseServer> listActionServer = new ArrayList<AutodiscoverResponseServer>();
+		NodeList servers = settingsElement.getElementsByTagName("Server");
+		for (int i = 0; i < servers.getLength(); i++) {
+			Element server = (Element) servers.item(i);
+			
+			String type = DOMUtils.getElementText(server, "Type");
+			String url = DOMUtils.getElementText(server, "Url");
+			String name = DOMUtils.getElementText(server, "Name");
+			String serverData = DOMUtils.getElementText(server, "ServerData");
+		
+			listActionServer.add(AutodiscoverResponseServer.builder()
+					.type(type)
+					.url(url)
+					.name(name)
+					.serverData(serverData)
+					.build());
+		}
+		return listActionServer;
+	}
+
+	private AutodiscoverResponseError getChildError(Element actionElement) {
+		
+		Element errorElement = DOMUtils.getUniqueElementInChildren(actionElement, "Error");
+		if (errorElement != null) {
+			return getAutodiscoverResponseError(errorElement);
+		}
+		return null;
+	}
+
+	private AutodiscoverResponseError getAutodiscoverResponseError(Element errorElement) {
+		AutodiscoverStatus autodiscoverStatus = null;
+		Element statusElement = DOMUtils.getUniqueElement(errorElement, "Status");
+		if (statusElement != null) {
+			autodiscoverStatus = AutodiscoverStatus.fromSpecificationValue(statusElement.getTextContent());
+		}
+
+		String message = DOMUtils.getElementText(errorElement, "Message");
+		String debugData = DOMUtils.getElementText(errorElement, "DebugData");
+		
+		Integer errorCode = null;
+		Element errorCodeElement = DOMUtils.getUniqueElement(errorElement, "ErrorCode");
+		if (errorCodeElement != null) {
+			errorCode = Integer.valueOf(errorCodeElement.getTextContent());
+		}
+		
+		return AutodiscoverResponseError.builder()
+				.status(autodiscoverStatus)
+				.message(message)
+				.debugData(debugData)
+				.errorCode(errorCode)
+				.build();
 	}
 
 	@Override
@@ -161,7 +280,7 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 	private void createAutodiscoverResponseErrorActionElement(Element actionElement, AutodiscoverResponseError actionError) {
 		if (actionError != null) {
 			Element errorElement = DOMUtils.createElement(actionElement, "Error");
-			DOMUtils.createElementAndText(errorElement, "Status", actionError.getStatus().asXmlValue());
+			DOMUtils.createElementAndText(errorElement, "Status", actionError.getStatus().asSpecificationValue());
 			DOMUtils.createElementAndText(errorElement, "Message", actionError.getMessage());
 			DOMUtils.createElementAndText(errorElement, "DebugData", actionError.getDebugData());
 		}
@@ -189,13 +308,13 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 	}
 
 	@Override
-	public Document encodeRequest(AutodiscoverRequest request) throws ProtocolException {
-		throw new NotImplementedException();
+	public Document encodeRequest(AutodiscoverRequest autodiscoverRequest) {
+		Document root = DOMUtils.createDoc(null, "Autodiscover");
+		Element autodiscover = root.getDocumentElement();
+		
+		DOMUtils.createElementAndText(autodiscover, "EMailAddress", autodiscoverRequest.getEmailAddress());
+		DOMUtils.createElementAndText(autodiscover, "AcceptableResponseSchema", autodiscoverRequest.getAcceptableResponseSchema());
+		
+		return root;
 	}
-
-	@Override
-	public AutodiscoverResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
 }

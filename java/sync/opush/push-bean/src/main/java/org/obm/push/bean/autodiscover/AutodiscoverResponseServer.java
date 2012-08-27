@@ -35,55 +35,67 @@ import com.google.common.base.Objects;
 
 public class AutodiscoverResponseServer {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String type;
+		private String url;
+		private String name;
+		private String serverData;
+		
+		private Builder() {}
+		
+		public Builder type(String type) {
+			this.type = type;
+			return this;
+		}
+		
+		public Builder url(String url) {
+			this.url = url;
+			return this;
+		}
+		
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder serverData(String serverData) {
+			this.serverData = serverData;
+			return this;
+		}
+		
+		public AutodiscoverResponseServer build() {
+			return new AutodiscoverResponseServer(type, url, name, serverData);
+		}
+	}
+	
 	private final String type;
 	private final String url;
 	private final String name;
 	private final String serverData;
 	
-	public AutodiscoverResponseServer(String type, String url, String name,
-			String serverData) {
-		
+	private AutodiscoverResponseServer(String type, String url, String name, String serverData) {
 		this.type = type;
 		this.url = url;
 		this.name = name;
 		this.serverData = serverData;
 	}
 
-	/**
-	 *  Indicates that the URL that is returned by the URL element
-	 *  
-	 * @return MobileSync or CertEnroll
-	 */
 	public String getType() {
 		return type;
 	}
 	
-	/**
-	 * Specifies a URL string that conveys the protocol, port, resource location, and other
-	 * information.
-	 *
-	 * @return url
-	 */
 	public String getUrl() {
 		return url;
 	}
 	
-	/**
-	 * If the Type element value is "MobileSync", then the Name element specifies the URL that conveys
-	 * the protocol. If the Type element value is "CertEnroll", then the Name element value is NULL.
-	 * 
-	 * @return name
-	 */
 	public String getName() {
 		return name;
 	}
 	
-	/**
-	 * The ServerData element is a string value that is present only when the Type element (section
-	 * 2.2.3.159.1) value is set to "CertEnroll".
-	 *
-	 * @return
-	 */
 	public String getServerData() {
 		return serverData;
 	}

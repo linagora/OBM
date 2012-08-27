@@ -35,12 +35,49 @@ import com.google.common.base.Objects;
 
 public class AutodiscoverResponseError {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private AutodiscoverStatus status;
+		private String message;
+		private String debugData;
+		private Integer errorCode;
+		
+		private Builder() {}
+		
+		public Builder status(AutodiscoverStatus status) {
+			this.status = status;
+			return this;
+		}
+		
+		public Builder message(String message) {
+			this.message = message;
+			return this;
+		}
+		
+		public Builder debugData(String debugData) {
+			this.debugData = debugData;
+			return this;
+		}
+		
+		public Builder errorCode(Integer errorCode) {
+			this.errorCode = errorCode;
+			return this;
+		}
+		
+		public AutodiscoverResponseError build() {
+			return new AutodiscoverResponseError(status, message, debugData, errorCode);
+		}
+	}
+	
 	private final AutodiscoverStatus status;
 	private final String message;
 	private final String debugData;
 	private final Integer errorCode;
 	
-	public AutodiscoverResponseError(AutodiscoverStatus status, String message,
+	private AutodiscoverResponseError(AutodiscoverStatus status, String message,
 			String debugData, Integer errorCode) {
 		this.status = status;
 		this.message = message;

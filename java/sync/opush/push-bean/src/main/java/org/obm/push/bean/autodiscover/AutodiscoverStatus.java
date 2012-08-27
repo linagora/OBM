@@ -31,15 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.autodiscover;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
+
 public enum AutodiscoverStatus {
 
 	SUCCESS("1"),
 	PROTOCOL_ERROR("2");
 	
-	private final String id;
+	private final String specificationValue;
 	
-	private AutodiscoverStatus(String id) {
-		this.id = id;
+	private AutodiscoverStatus(String specificationValue) {
+		this.specificationValue = specificationValue;
 	}
 
 	/**
@@ -49,8 +55,25 @@ public enum AutodiscoverStatus {
 	 *
 	 * @return status code that corresponds to the error
 	 */
-	public String asXmlValue() {
-		return id;
+	public String asSpecificationValue() {
+		return specificationValue;
 	}
 	
+
+	public static AutodiscoverStatus fromSpecificationValue(String specificationValue){
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
+		}
+		return null;
+	}
+	
+	private static Map<String, AutodiscoverStatus> specValueToEnum;
+	
+	static {
+		Builder<String, AutodiscoverStatus> builder = ImmutableMap.builder();
+		for (AutodiscoverStatus autodiscoverStatus : values()) {
+			builder.put(autodiscoverStatus.specificationValue, autodiscoverStatus);
+		}
+		specValueToEnum = builder.build();
+	}
 }

@@ -34,9 +34,66 @@ package org.obm.push.bean.autodiscover;
 import java.util.List;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
 public class AutodiscoverResponse {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String responseCulture;
+		private AutodiscoverResponseUser responseUser;
+		private String actionRedirect;
+		private List<AutodiscoverResponseServer> listActionServer;
+		private AutodiscoverResponseError actionError;
+		private AutodiscoverResponseError responseError;
+		
+		private Builder() {
+			this.listActionServer = Lists.newArrayList();
+		}
+		
+		public Builder responseCulture(String responseCulture) {
+			this.responseCulture = responseCulture;
+			return this;
+		}
+		
+		public Builder responseUser(AutodiscoverResponseUser responseUser) {
+			this.responseUser = responseUser;
+			return this;
+		}
+		
+		public Builder actionRedirect(String actionRedirect) {
+			this.actionRedirect = actionRedirect;
+			return this;
+		}
+		
+		public Builder listActionServer(List<AutodiscoverResponseServer> listActionServer) {
+			this.listActionServer = listActionServer;
+			return this;
+		}
+		
+		public Builder add(AutodiscoverResponseServer autodiscoverResponseServer) {
+			this.listActionServer.add(autodiscoverResponseServer);
+			return this;
+		}
+		
+		public Builder actionError(AutodiscoverResponseError actionError) {
+			this.actionError = actionError;
+			return this;
+		}
+		
+		public Builder responseError(AutodiscoverResponseError responseError) {
+			this.responseError = responseError;
+			return this;
+		}
+		
+		public AutodiscoverResponse build() {
+			return new AutodiscoverResponse(responseCulture, responseUser, actionRedirect, listActionServer, actionError, responseError);
+		}
+	}
+	
 	private final String responseCulture;
 	private final AutodiscoverResponseUser responseUser;
 	private final String actionRedirect;
@@ -44,7 +101,7 @@ public class AutodiscoverResponse {
 	private final AutodiscoverResponseError actionError;
 	private final AutodiscoverResponseError responseError;
 	
-	public AutodiscoverResponse(String responseCulture, AutodiscoverResponseUser responseUser, String actionRedirect,
+	private AutodiscoverResponse(String responseCulture, AutodiscoverResponseUser responseUser, String actionRedirect,
 			List<AutodiscoverResponseServer> listActionServer, AutodiscoverResponseError actionError, 
 			AutodiscoverResponseError responseError) {
 		
