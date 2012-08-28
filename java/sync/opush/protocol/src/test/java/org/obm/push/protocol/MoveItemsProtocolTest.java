@@ -29,66 +29,69 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.protocol;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.bean.Estimate;
-import org.obm.push.protocol.bean.FolderSyncRequest;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.GetItemEstimateRequest;
-import org.obm.push.protocol.bean.GetItemEstimateResponse;
-import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
-import org.obm.push.protocol.bean.MeetingHandlerRequest;
-import org.obm.push.protocol.bean.MeetingHandlerResponse;
-import org.obm.push.protocol.bean.MoveItemsItem;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.push.protocol.bean.ProvisionRequest;
-import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class MoveItemsProtocolTest {
+	
+	private MoveItemsProtocol moveItemsProtocol;
 	
 	@Before
 	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+		moveItemsProtocol = new MoveItemsProtocol();
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.add(ProvisionRequest.class)
-					.add(ProvisionResponse.class)
-					.add(Estimate.class)
-					.add(GetItemEstimateRequest.class)
-					.add(GetItemEstimateResponse.class)
-					.add(MeetingHandlerRequest.class)
-					.add(MeetingHandlerResponse.class)
-					.add(ItemChangeMeetingResponse.class)
-					.add(MoveItemsRequest.class)
-					.add(MoveItemsResponse.class)
-					.add(MoveItemsItem.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MoveItems>" +
+				"<Move>" +
+				"<SrcMsgId>messageId</SrcMsgId>" +
+				"<SrcFldId>folderId</SrcFldId>" +
+				"<DstFldId>destinationId</DstFldId>" +
+				"</Move>" +
+				"<Move>" +
+				"<SrcMsgId>messageId2</SrcMsgId>" +
+				"<SrcFldId>folderId2</SrcFldId>" +
+				"<DstFldId>destinationId2</DstFldId>" +
+				"</Move>" +
+				"</MoveItems>";
+		
+		MoveItemsRequest moveItemsRequest = moveItemsProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeRequest = moveItemsProtocol.encodeRequest(moveItemsRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeRequest));
 	}
 	
+	@Test
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MoveItems>" +
+				"<Response>" +
+				"<Status>3</Status>" +
+				"<SrcMsgId>src</SrcMsgId>" +
+				"<DstMsgId>dst</DstMsgId>" +
+				"</Response>" +
+				"<Response>" +
+				"<SrcMsgId>src2</SrcMsgId>" +
+				"<Status>5</Status>" +
+				"</Response>" +
+				"</MoveItems>";
+		
+		MoveItemsResponse moveItemsResponse = moveItemsProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = moveItemsProtocol.encodeResponse(moveItemsResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
 }

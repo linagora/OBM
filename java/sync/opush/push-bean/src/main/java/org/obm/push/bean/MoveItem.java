@@ -35,14 +35,45 @@ import com.google.common.base.Objects;
 
 public class MoveItem {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String sourceMessageId;
+		private String sourceFolderId;
+		private String destinationFolderId;
+
+		private Builder() {}
+		
+		public Builder sourceMessageId(String sourceMessageId) {
+			this.sourceMessageId = sourceMessageId;
+			return this;
+		}
+		
+		public Builder sourceFolderId(String sourceFolderId) {
+			this.sourceFolderId = sourceFolderId;
+			return this;
+		}
+		
+		public Builder destinationFolderId(String destinationFolderId) {
+			this.destinationFolderId = destinationFolderId;
+			return this;
+		}
+		
+		public MoveItem build() {
+			return new MoveItem(sourceMessageId, sourceFolderId, destinationFolderId);
+		}
+	}
+	
 	private final String sourceMessageId;
 	private final String sourceFolderId;
 	private final String destinationFolderId;
 
-	public MoveItem(String srcMsgId, String srcFldId, String dstFldId) {
-		this.sourceMessageId = srcMsgId;
-		this.sourceFolderId = srcFldId;
-		this.destinationFolderId = dstFldId;
+	private MoveItem(String sourceMessageId, String sourceFolderId, String destinationFolderId) {
+		this.sourceMessageId = sourceMessageId;
+		this.sourceFolderId = sourceFolderId;
+		this.destinationFolderId = destinationFolderId;
 	}
 	
 	public String getSourceMessageId() {
@@ -81,5 +112,4 @@ public class MoveItem {
 			.add("destinationFolderId", destinationFolderId)
 			.toString();
 	}
-	
 }

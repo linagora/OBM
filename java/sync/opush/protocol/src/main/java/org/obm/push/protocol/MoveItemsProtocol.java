@@ -31,17 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.exception.activesync.NoDocumentException;
-import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.protocol.bean.MoveItemsItem;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
-import org.obm.push.protocol.bean.MoveItemsResponse.MoveItemsItem;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +54,7 @@ public class MoveItemsProtocol implements ActiveSyncProtocol<MoveItemsRequest, M
 		}
 		
 		NodeList moves = doc.getDocumentElement().getElementsByTagName("Move");
-		List<MoveItem> moveItems = new LinkedList<MoveItem>();
+		MoveItemsRequest.Builder moveItemsRequestBuilder = MoveItemsRequest.builder();
 		for (int i = 0; i < moves.getLength(); i++) {
 			Element mv = (Element) moves.item(i);
 
@@ -67,19 +62,53 @@ public class MoveItemsProtocol implements ActiveSyncProtocol<MoveItemsRequest, M
 			String srcFldId = DOMUtils.getElementText(mv, "SrcFldId");
 			String dstFldId = DOMUtils.getElementText(mv, "DstFldId");
 
-			MoveItem mi = new MoveItem(srcMsgId, srcFldId, dstFldId);
-			moveItems.add(mi);
+			moveItemsRequestBuilder.add(MoveItem.builder()
+					.sourceMessageId(srcMsgId)
+					.sourceFolderId(srcFldId)
+					.destinationFolderId(dstFldId)
+					.build());
 		}
 		
-		return new MoveItemsRequest(moveItems);
+		return moveItemsRequestBuilder
+			.build();
 	}
 
 	@Override
+	public MoveItemsResponse decodeResponse(Document doc) throws NoDocumentException {
+		if (doc == null) {
+			throw new NoDocumentException("Document of MoveItems request is null.");
+		}
+		
+		NodeList responses = doc.getDocumentElement().getElementsByTagName("Response");
+		MoveItemsResponse.Builder moveItemsResponseBuilder = MoveItemsResponse.builder();
+		for (int i = 0; i < responses.getLength(); i++) {
+			Element response = (Element) responses.item(i);
+			
+			MoveItemsStatus itemStatus = MoveItemsStatus.fromSpecificationValue(DOMUtils.getElementText(response, "Status"));
+			String sourceMessageId = DOMUtils.getElementText(response, "SrcMsgId");
+			
+			String newDstId = null; 
+			if (MoveItemsStatus.SUCCESS.equals(itemStatus)) {
+				newDstId = DOMUtils.getElementText(response, "DstMsgId");
+			}
+			
+			moveItemsResponseBuilder.add(MoveItemsItem.builder()
+					.itemStatus(itemStatus)
+					.sourceMessageId(sourceMessageId)
+					.newDstId(newDstId)
+					.build());
+		}
+		
+		return moveItemsResponseBuilder
+			.build();
+	}
+
+	@Override	
 	public Document encodeResponse(MoveItemsResponse moveItemsResponse) {
 		Document reply = DOMUtils.createDoc(null, "MoveItems");
 		Element root = reply.getDocumentElement();
 		
-		for (MoveItemsItem moveItemsItem: moveItemsResponse.getMoveItemsItem()) {
+		for (MoveItemsItem moveItemsItem: moveItemsResponse.getMoveItemsItems()) {
 		
 			Element response = DOMUtils.createElement(root, "Response");
 			
@@ -101,22 +130,27 @@ public class MoveItemsProtocol implements ActiveSyncProtocol<MoveItemsRequest, M
 		}
 		return reply;
 	}
+
+	@Override
+	public Document encodeRequest(MoveItemsRequest moveItemsRequest) {
+		Document reply = DOMUtils.createDoc(null, "MoveItems");
+		Element root = reply.getDocumentElement();
+
+		for (MoveItem moveItem : moveItemsRequest.getMoveItems()) {
+			Element move = DOMUtils.createElement(root, "Move");
+			
+			DOMUtils.createElementAndText(move, "SrcMsgId", moveItem.getSourceMessageId());
+			DOMUtils.createElementAndText(move, "SrcFldId",	moveItem.getSourceFolderId());
+			DOMUtils.createElementAndText(move, "DstFldId",	moveItem.getDestinationFolderId());
+		}
+		return reply;
+	}
 	
 	public Document encodeErrorResponse(MoveItemsStatus moveItemsStatus) {
 		Document document = DOMUtils.createDoc(null, "Move");
 		Element root = document.getDocumentElement();
 		DOMUtils.createElementAndText(root, "Status", moveItemsStatus.asSpecificationValue());
 		return document;
-	}
-
-	@Override
-	public Document encodeRequest(MoveItemsRequest request) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public MoveItemsResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
 	}
 	
 }

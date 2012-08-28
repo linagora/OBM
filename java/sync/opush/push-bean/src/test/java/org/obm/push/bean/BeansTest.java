@@ -111,6 +111,7 @@ public class BeansTest {
 					.add(SyncKey.class)
 					.add(SyncKeysKey.class)
 					.add(FolderSyncState.class)
+					.add(MoveItem.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

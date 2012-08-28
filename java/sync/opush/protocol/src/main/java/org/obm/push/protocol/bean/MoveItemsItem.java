@@ -31,61 +31,77 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.List;
-
-import org.obm.push.bean.MoveItem;
+import org.obm.push.bean.MoveItemsStatus;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 
-public class MoveItemsRequest {
-
+public class MoveItemsItem {
+	
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		private List<MoveItem> moveItems;
+		private MoveItemsStatus itemStatus;
+		private String sourceMessageId;
+		private String newDstId;
 		
-		private Builder() {
-			this.moveItems = Lists.newLinkedList();
-		}
+		private Builder() {}
 		
-		public Builder moveItems(List<MoveItem> moveItems) {
-			this.moveItems = moveItems;
+		public Builder itemStatus(MoveItemsStatus itemStatus) {
+			this.itemStatus = itemStatus;
 			return this;
 		}
 		
-		public Builder add(MoveItem moveItem) {
-			this.moveItems.add(moveItem);
+		public Builder sourceMessageId(String sourceMessageId) {
+			this.sourceMessageId = sourceMessageId;
 			return this;
 		}
 		
-		public MoveItemsRequest build() {
-			return new MoveItemsRequest(moveItems);
+		public Builder newDstId(String newDstId) {
+			this.newDstId = newDstId;
+			return this;
+		}
+		
+		public MoveItemsItem build() {
+			return new MoveItemsItem(itemStatus, sourceMessageId, newDstId);
 		}
 	}
 	
-	private final List<MoveItem> moveItems;
+	private final MoveItemsStatus itemStatus;
+	private final String sourceMessageId;
+	private final String newDstId;
 
-	private MoveItemsRequest(List<MoveItem> moveItems) {
-		this.moveItems = moveItems;
+	private MoveItemsItem(MoveItemsStatus itemStatus, String sourceMessageId, String newDstId) {
+		this.itemStatus = itemStatus;
+		this.sourceMessageId = sourceMessageId;
+		this.newDstId = newDstId; 
 	}
 	
-	public List<MoveItem> getMoveItems() {
-		return moveItems;
+	public MoveItemsStatus getItemStatus() {
+		return itemStatus;
+	}
+	
+	public String getSourceMessageId() {
+		return sourceMessageId;
+	}
+	
+	public String getNewDstId() {
+		return newDstId;
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(moveItems);
+		return Objects.hashCode(itemStatus, sourceMessageId, newDstId);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof MoveItemsRequest) {
-			MoveItemsRequest that = (MoveItemsRequest) object;
-			return Objects.equal(this.moveItems, that.moveItems);
+		if (object instanceof MoveItemsItem) {
+			MoveItemsItem that = (MoveItemsItem) object;
+			return Objects.equal(this.itemStatus, that.itemStatus)
+				&& Objects.equal(this.sourceMessageId, that.sourceMessageId)
+				&& Objects.equal(this.newDstId, that.newDstId);
 		}
 		return false;
 	}
@@ -93,7 +109,9 @@ public class MoveItemsRequest {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("moveItems", moveItems)
+			.add("itemStatus", itemStatus)
+			.add("sourceMessageId", sourceMessageId)
+			.add("newDstId", newDstId)
 			.toString();
 	}
 }

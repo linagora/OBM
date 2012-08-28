@@ -33,44 +33,65 @@ package org.obm.push.protocol.bean;
 
 import java.util.List;
 
-import org.obm.push.bean.MoveItemsStatus;
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
 public class MoveItemsResponse {
 
-	public static class MoveItemsItem {
-		private MoveItemsStatus itemStatus;
-		private final String sourceMessageId;
-		private String newDstId;
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private List<MoveItemsItem> moveItemsItems;
 
-		public MoveItemsItem(MoveItemsStatus status, String sourceMessageId) {
-			this.itemStatus = status;
-			this.sourceMessageId = sourceMessageId;
+		private Builder() {
+			this.moveItemsItems = Lists.newLinkedList();
 		}
-		public void setStatusForItem(MoveItemsStatus status) {
-			this.itemStatus = status;
+		
+		public Builder moveItemsItem(List<MoveItemsItem> moveItemsItem) {
+			this.moveItemsItems = moveItemsItem;
+			return this;
 		}
-		public MoveItemsStatus getItemStatus() {
-			return itemStatus;
+		
+		public Builder add(MoveItemsItem moveItemsItem) {
+			this.moveItemsItems.add(moveItemsItem);
+			return this;
 		}
-		public String getSourceMessageId() {
-			return sourceMessageId;
+		
+		public MoveItemsResponse build() {
+			return new MoveItemsResponse(moveItemsItems);
 		}
-		public void setDstMesgId(String newDstId) {
-			this.newDstId = newDstId;
+	}
+	
+	private final List<MoveItemsItem> moveItemsItems;
+	
+	private MoveItemsResponse(List<MoveItemsItem> moveItemsItem) {
+		this.moveItemsItems = moveItemsItem;
+	}
+	
+	public List<MoveItemsItem> getMoveItemsItems() {
+		return moveItemsItems;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(moveItemsItems);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MoveItemsResponse) {
+			MoveItemsResponse that = (MoveItemsResponse) object;
+			return Objects.equal(this.moveItemsItems, that.moveItemsItems);
 		}
-		public String getNewDstId() {
-			return newDstId;
-		}
+		return false;
 	}
 
-	private final List<MoveItemsItem> moveItemsItem;
-	
-	public MoveItemsResponse(List<MoveItemsItem> moveItemsItem) {
-		this.moveItemsItem = moveItemsItem;
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("moveItemsItem", moveItemsItems)
+			.toString();
 	}
-	
-	public List<MoveItemsItem> getMoveItemsItem() {
-		return moveItemsItem;
-	}
-	
 }

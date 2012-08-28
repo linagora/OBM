@@ -31,18 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -53,9 +50,9 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.protocol.MoveItemsProtocol;
+import org.obm.push.protocol.bean.MoveItemsItem;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
-import org.obm.push.protocol.bean.MoveItemsResponse.MoveItemsItem;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -129,41 +126,48 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 	}
 
 	private MoveItemsResponse doTheJob(MoveItemsRequest moveItemsRequest, UserDataRequest udr) {
-		final List<MoveItemsItem> moveItemsItems = new ArrayList<MoveItemsResponse.MoveItemsItem>();
+		MoveItemsResponse.Builder moveItemsResponseBuilder = MoveItemsResponse.builder();
 		for (MoveItem item: moveItemsRequest.getMoveItems()) {
 			
 			StatusForItem statusForItem = getStatusForItem(item);
-			MoveItemsItem moveItemsItem = new MoveItemsItem(statusForItem.status, item.getSourceMessageId());
+			MoveItemsStatus status = statusForItem.status;
+			String newDstId = null;
 			if (statusForItem.status == null) {
 				try {
 					PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(statusForItem.srcCollection);
-					String newDstId = contentsImporter.importMoveItem(udr, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
+					newDstId = contentsImporter.importMoveItem(udr, dataClass, statusForItem.srcCollection, statusForItem.dstCollection, item.getSourceMessageId());
 					
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SUCCESS);
-					moveItemsItem.setDstMesgId(newDstId);
+					status = MoveItemsStatus.SUCCESS;
 				} catch (CollectionNotFoundException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					status = MoveItemsStatus.SERVER_ERROR;
 					logger.error(e.getMessage(), e);
 				} catch (DaoException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					status = MoveItemsStatus.SERVER_ERROR;
 					logger.error(e.getMessage(), e);
 				} catch (ProcessingEmailException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					status = MoveItemsStatus.SERVER_ERROR;
 					logger.error(e.getMessage(), e);
 				} catch (CollectionPathException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					status = MoveItemsStatus.SERVER_ERROR;
 					logger.error(e.getMessage(), e);
 				} catch (UnsupportedBackendFunctionException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
+					status = MoveItemsStatus.SERVER_ERROR;
 					logger.error(e.getMessage(), e);
 				} catch (ItemNotFoundException e) {
-					moveItemsItem.setStatusForItem(MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID);
+					status = MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID;
 					logger.warn(e.getMessage(), e);
 				}
 			}
-			moveItemsItems.add(moveItemsItem);
+			
+			moveItemsResponseBuilder.add(MoveItemsItem.builder()
+					.itemStatus(status)
+					.sourceMessageId(item.getSourceMessageId())
+					.newDstId(newDstId)
+					.build());
 		}
-		return new MoveItemsResponse(moveItemsItems);
+		
+		return moveItemsResponseBuilder
+			.build();
 	}
 
 	private static class StatusForItem {
