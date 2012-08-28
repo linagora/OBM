@@ -31,17 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
@@ -96,6 +93,9 @@ public class SearchHandler extends WbxmlRequestHandler {
 		} catch (XMLValidationException e) {
 			logger.error("Protocol violation", e);
 			sendError(responder, SearchStatus.PROTOCOL_VIOLATION);
+		} catch (NoDocumentException e) {
+			logger.error("Protocol violation", e);
+			sendError(responder, SearchStatus.PROTOCOL_VIOLATION);
 		}
 	}
 
@@ -109,11 +109,14 @@ public class SearchHandler extends WbxmlRequestHandler {
 	}
 
 	private SearchResponse search(UserDataRequest udr, SearchRequest searchRequest) {
-		final List<SearchResult> results = new LinkedList<SearchResult>();
+		SearchResponse.Builder searchResponseBuilder = SearchResponse.builder();
 		for (final ISearchSource source: sources.get(searchRequest.getStoreName())) {
-			results.addAll(source.search(udr, searchRequest.getQuery(), 1000));
+			searchResponseBuilder.addAll(source.search(udr, searchRequest.getQuery(), 1000));
 		}
-		return new SearchResponse(results, searchRequest.getRangeLower(), searchRequest.getRangeUpper());
+		return searchResponseBuilder
+				.rangeLower(searchRequest.getRangeLower())
+				.rangeUpper(searchRequest.getRangeUpper())
+				.build();
 	}
 
 }

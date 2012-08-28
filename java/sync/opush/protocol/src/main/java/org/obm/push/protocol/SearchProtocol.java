@@ -31,35 +31,36 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.SearchStatus;
 import org.obm.push.bean.StoreName;
-import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.google.common.base.Strings;
 
 public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchResponse> {
 
-	@Override
 	public SearchRequest decodeRequest(Document document) throws XMLValidationException {
 		if (document == null) {
-			throw new XMLValidationException("Null Request not supported by Search Command");
+			throw new NoDocumentException("Document of Search request is null.");
 		}
+		
+		SearchRequest.Builder searchRequestBuilder = SearchRequest.builder();
 		Element documentElement = document.getDocumentElement();
-		SearchRequest ret = new SearchRequest();
-		StoreName st = StoreName.getValue(DOMUtils.getElementText(documentElement, "Name"));
+		StoreName st = StoreName.fromSpecificationValue(DOMUtils.getElementText(documentElement, "Name"));
 		if (st == null) {
 			throw new XMLValidationException();
 		}
-		ret.setStoreName(st);
-		ret.setQuery( getQuery(documentElement) );
+		searchRequestBuilder.storeName(st);
+		searchRequestBuilder.query(getQuery(documentElement));
+		
 		String range = DOMUtils.getElementText(documentElement, "Range");
 		if (!Strings.isNullOrEmpty(range)) {
 			int index = range.indexOf("-");
@@ -67,17 +68,17 @@ public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchR
 				throw new XMLValidationException();
 			}
 			try {
-				Integer rangeLower = Integer.valueOf(range.substring(0, index));
-				Integer rangeUpper = Integer.valueOf(range.substring(index + 1, range.length()));
-				ret.setRangeLower(rangeLower);
-				ret.setRangeUpper(rangeUpper);
+				searchRequestBuilder.rangeLower(Integer.valueOf(range.substring(0, index)));
+				searchRequestBuilder.rangeUpper(Integer.valueOf(range.substring(index + 1, range.length())));
 			} catch (NumberFormatException e) {
 				throw new XMLValidationException(e);
 			} catch (IndexOutOfBoundsException e) {
 				throw new XMLValidationException(e);
 			}
 		}
-		return ret;
+		
+		return searchRequestBuilder
+			.build();
 	}
 
 	private String getQuery(Element documentElement) {
@@ -95,15 +96,63 @@ public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchR
 	}
 
 	@Override
+	public SearchResponse decodeResponse(Document doc) throws NoDocumentException {
+		if (doc == null) {
+			throw new NoDocumentException("Document of Search response is null.");
+		}
+
+		Element root= doc.getDocumentElement();
+
+		Element response = DOMUtils.getUniqueElement(root, "Response");
+		Element store = DOMUtils.getUniqueElement(response, "Store");
+
+		SearchResponse.Builder searchResponseBuilder = SearchResponse.builder();
+		NodeList results = store.getElementsByTagName("Result");
+		for (int i = 0; i < results.getLength(); i++) {
+			Element result = (Element) results.item(i);
+			
+			Element properties = DOMUtils.getUniqueElement(result, "Properties");
+			
+			searchResponseBuilder.add(serializeSearchResult(properties));
+		}
+		
+		String range = DOMUtils.getElementText(store, "Range");
+		int separatorIndex = range.indexOf('-');
+		searchResponseBuilder.rangeLower(Integer.valueOf(range.substring(0, separatorIndex)));
+		searchResponseBuilder.rangeUpper(Integer.valueOf(range.substring(separatorIndex + 1)));
+		
+		return searchResponseBuilder
+			.build();
+	}
+	
+	private SearchResult serializeSearchResult(Element properties) {
+		return SearchResult.builder()
+				.displayName(DOMUtils.getElementText(properties, "GAL:DisplayName"))
+				.alias(DOMUtils.getElementText(properties, "GAL:Alias"))
+				.firstName(DOMUtils.getElementText(properties, "GAL:FirstName"))
+				.lastName(DOMUtils.getElementText(properties, "GAL:LastName"))
+				.emailAddress(DOMUtils.getElementText(properties, "GAL:EmailAddress"))
+				.company(DOMUtils.getElementText(properties, "GAL:Company"))
+				.homePhone(DOMUtils.getElementText(properties, "GAL:HomePhone"))
+				.mobilePhone(DOMUtils.getElementText(properties, "GAL:MobilePhone"))
+				.office(DOMUtils.getElementText(properties, "GAL:Office"))
+				.phone(DOMUtils.getElementText(properties, "GAL:Phone"))
+				.title(DOMUtils.getElementText(properties, "GAL:Title"))
+				.build();
+	}
+
+	@Override
 	public Document encodeResponse(SearchResponse response) {
 		Document search = DOMUtils.createDoc(null, "Search");
 		Element r = search.getDocumentElement();
+		r.setAttribute("xmlns:GAL", "GAL");
+		
 		DOMUtils.createElementAndText(r, "Status",
-				SearchStatus.SUCCESS.asXmlValue());
+				SearchStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(r, "Response");
 		Element store = DOMUtils.createElement(resp, "Store");
 		DOMUtils.createElementAndText(store, "Status",
-				SearchStatus.SUCCESS.asXmlValue());
+				SearchStatus.SUCCESS.asSpecificationValue());
 		if (response.getResults().isEmpty()) {
 			DOMUtils.createElement(store, "Result");
 		} else {
@@ -171,25 +220,34 @@ public class SearchProtocol implements ActiveSyncProtocol<SearchRequest, SearchR
 					result.getTitle());
 		}
 	}
+
+	@Override
+	public Document encodeRequest(SearchRequest searchRequest) {
+		Document reply = DOMUtils.createDoc(null, "Search");
+		Element root = reply.getDocumentElement();
+		root.setAttribute("xmlns:GAL", "GAL");
+		
+		DOMUtils.createElementAndText(root, "Name", searchRequest.getStoreName().asSpecificationValue());
+		
+		String query = searchRequest.getQuery();
+		if (!Strings.isNullOrEmpty(query)){
+			Element querye = DOMUtils.createElement(root, "Query");
+			DOMUtils.createElementAndText(querye, "FreeText", query);
+		}
+		
+		String range = searchRequest.getRangeLower() + "-" + searchRequest.getRangeUpper();
+		DOMUtils.createElementAndText(root, "Range", range);
+		
+		return reply;
+	}
 	
 	public Document buildError(SearchStatus error) {
 		Document document = DOMUtils.createDoc(null, "Search");
 		Element r = document.getDocumentElement();
-		DOMUtils.createElementAndText(r, "Status", SearchStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(r, "Status", SearchStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(r, "Response");
 		Element store = DOMUtils.createElement(resp, "Store");
-		DOMUtils.createElementAndText(store, "Status", error.asXmlValue());
+		DOMUtils.createElementAndText(store, "Status", error.asSpecificationValue());
 		return document;
 	}
-
-	@Override
-	public Document encodeRequest(SearchRequest request) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public SearchResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
-	}
-	
 }

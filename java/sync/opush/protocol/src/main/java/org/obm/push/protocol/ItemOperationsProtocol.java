@@ -102,7 +102,7 @@ public class ItemOperationsProtocol implements ActiveSyncProtocol<ItemOperations
 	/* package */ Fetch buildFetch(Element root) {
 		Element fetchNode = DOMUtils.getUniqueElement(root, "Fetch");
 		if (fetchNode != null) {
-			StoreName storeName = StoreName.getValue(DOMUtils.getElementText(fetchNode,	"Store"));
+			StoreName storeName = StoreName.fromSpecificationValue(DOMUtils.getElementText(fetchNode,	"Store"));
 			String reference = DOMUtils.getElementText(fetchNode, "FileReference");
 			String collectionId = DOMUtils.getElementText(fetchNode, "CollectionId");
 			String serverId = DOMUtils.getElementText(fetchNode, "ServerId");

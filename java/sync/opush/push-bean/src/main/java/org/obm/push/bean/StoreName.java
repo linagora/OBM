@@ -31,18 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 
 public enum StoreName {
-	Mailbox,DocumentLibrary,GAL;
+	Mailbox("Mailbox"),
+	DocumentLibrary("Document Library"),
+	GAL("GAL");
 	
-	public static StoreName getValue(String value) {
-		if("Mailbox".equals(value)){
-			return Mailbox;
-		} else if("Document Library".equals(value)){
-			return DocumentLibrary;
-		} else if("GAL".equals(value)){
-			return GAL;
-		} 
+	private final String specificationValue;
+	
+	private StoreName(String specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+	
+	public String asSpecificationValue() {
+		return specificationValue;
+	}
+	
+	public static StoreName fromSpecificationValue(String specificationValue) {
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
+		}
 		return null;
+	}
+	
+	private static Map<String, StoreName> specValueToEnum;
+	
+	static {
+		Builder<String, StoreName> builder = ImmutableMap.builder();
+		for (StoreName storeName : values()) {
+			builder.put(storeName.specificationValue, storeName);
+		}
+		specValueToEnum = builder.build();
 	}
 }

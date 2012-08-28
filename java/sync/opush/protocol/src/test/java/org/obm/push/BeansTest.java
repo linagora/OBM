@@ -52,6 +52,8 @@ import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
+import org.obm.push.protocol.bean.SearchRequest;
+import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -87,6 +89,8 @@ public class BeansTest {
 					.add(MoveItemsRequest.class)
 					.add(MoveItemsResponse.class)
 					.add(MoveItemsItem.class)
+					.add(SearchRequest.class)
+					.add(SearchResponse.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

@@ -35,110 +35,160 @@ import com.google.common.base.Objects;
 
 public class SearchResult {
 
-	private String displayName;
-	private String alias;
-	private String emailAddress;
-	private String firstName;
-	private String lastName;
-	private String Phone;
-	private String Office;
-	private String Title;
-	private String Company;
-	private String HomePhone;
-	private String MobilePhone;
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private String displayName;
+		private String alias;
+		private String emailAddress;
+		private String firstName;
+		private String lastName;
+		private String phone;
+		private String office;
+		private String title;
+		private String company;
+		private String homePhone;
+		private String mobilePhone;
+	
+		private Builder() {}
+		
+		public Builder displayName(String displayName) {
+			this.displayName = displayName;
+			return this;
+		}
+		
+		public Builder alias(String alias) {
+			this.alias = alias;
+			return this;
+		}
+		
+		public Builder emailAddress(String emailAddress) {
+			this.emailAddress = emailAddress;
+			return this;
+		}
+		
+		public Builder firstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+		
+		public Builder lastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+		
+		public Builder phone(String phone) {
+			this.phone = phone;
+			return this;
+		}
+		
+		public Builder office(String office) {
+			this.office = office;
+			return this;
+		}
+		
+		public Builder title(String title) {
+			this.title = title;
+			return this;
+		}
+		
+		public Builder company(String company) {
+			this.company = company;
+			return this;
+		}
+		
+		public Builder homePhone(String homePhone) {
+			this.homePhone = homePhone;
+			return this;
+		}
+		
+		public Builder mobilePhone(String mobilePhone) {
+			this.mobilePhone = mobilePhone;
+			return this;
+		}
+		
+		public SearchResult build() {
+			return new SearchResult(displayName, alias, emailAddress, firstName, lastName, phone, office, title, company, homePhone, mobilePhone);
+		}
+	}
+	
+	private final String displayName;
+	private final String alias;
+	private final String emailAddress;
+	private final String firstName;
+	private final String lastName;
+	private final String phone;
+	private final String office;
+	private final String title;
+	private final String company;
+	private final String homePhone;
+	private final String mobilePhone;
 
+	private SearchResult(String displayName, String alias, String emailAddress, String firstName, String lastName, 
+		String phone, String office, String title, String company, String homePhone, String mobilePhone) {
+		this.displayName = displayName;
+		this.alias = alias;
+		this.emailAddress = emailAddress;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phone = phone;
+		this.office = office;
+		this.title = title;
+		this.company = company;
+		this.homePhone = homePhone;
+		this.mobilePhone = mobilePhone;
+	}
+	
 	public String getDisplayName() {
 		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
 	}
 
 	public String getAlias() {
 		return alias;
 	}
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
-
 	public String getEmailAddress() {
 		return emailAddress;
-	}
-
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
 	}
 
 	public String getFirstName() {
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
 	public String getLastName() {
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
 	public String getPhone() {
-		return Phone;
-	}
-
-	public void setPhone(String phone) {
-		Phone = phone;
+		return phone;
 	}
 
 	public String getOffice() {
-		return Office;
-	}
-
-	public void setOffice(String office) {
-		Office = office;
+		return office;
 	}
 
 	public String getTitle() {
-		return Title;
-	}
-
-	public void setTitle(String title) {
-		Title = title;
+		return title;
 	}
 
 	public String getCompany() {
-		return Company;
-	}
-
-	public void setCompany(String company) {
-		Company = company;
+		return company;
 	}
 
 	public String getHomePhone() {
-		return HomePhone;
-	}
-
-	public void setHomePhone(String homePhone) {
-		HomePhone = homePhone;
+		return homePhone;
 	}
 
 	public String getMobilePhone() {
-		return MobilePhone;
-	}
-
-	public void setMobilePhone(String mobilePhone) {
-		MobilePhone = mobilePhone;
+		return mobilePhone;
 	}
 
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(displayName, alias, emailAddress, firstName, lastName, 
-				Phone, Office, Title, Company, HomePhone, MobilePhone);
+				phone, office, title, company, homePhone, mobilePhone);
 	}
 	
 	@Override
@@ -150,12 +200,12 @@ public class SearchResult {
 				&& Objects.equal(this.emailAddress, that.emailAddress)
 				&& Objects.equal(this.firstName, that.firstName)
 				&& Objects.equal(this.lastName, that.lastName)
-				&& Objects.equal(this.Phone, that.Phone)
-				&& Objects.equal(this.Office, that.Office)
-				&& Objects.equal(this.Title, that.Title)
-				&& Objects.equal(this.Company, that.Company)
-				&& Objects.equal(this.HomePhone, that.HomePhone)
-				&& Objects.equal(this.MobilePhone, that.MobilePhone);
+				&& Objects.equal(this.phone, that.phone)
+				&& Objects.equal(this.office, that.office)
+				&& Objects.equal(this.title, that.title)
+				&& Objects.equal(this.company, that.company)
+				&& Objects.equal(this.homePhone, that.homePhone)
+				&& Objects.equal(this.mobilePhone, that.mobilePhone);
 		}
 		return false;
 	}
@@ -168,13 +218,12 @@ public class SearchResult {
 			.add("emailAddress", emailAddress)
 			.add("firstName", firstName)
 			.add("lastName", lastName)
-			.add("Phone", Phone)
-			.add("Office", Office)
-			.add("Title", Title)
-			.add("Company", Company)
-			.add("HomePhone", HomePhone)
-			.add("MobilePhone", MobilePhone)
+			.add("Phone", phone)
+			.add("Office", office)
+			.add("Title", title)
+			.add("Company", company)
+			.add("HomePhone", homePhone)
+			.add("MobilePhone", mobilePhone)
 			.toString();
 	}
-	
 }

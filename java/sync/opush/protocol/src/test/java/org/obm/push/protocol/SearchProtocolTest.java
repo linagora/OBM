@@ -32,6 +32,7 @@
 package org.obm.push.protocol;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -41,15 +42,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.StoreName;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.XMLValidationException;
 import org.obm.push.protocol.bean.SearchRequest;
+import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class SearchProtocolTest {
@@ -62,19 +63,19 @@ public class SearchProtocolTest {
 	}
 	
 	@Test
-	public void parseSearchRequestTest() throws SAXException, IOException, FactoryConfigurationError, XMLValidationException {
+	public void parseSearchRequestTest() throws Exception {
 		SearchRequest searchRequest = getSearchRequest("search.xml");
 		verifyObject(searchRequest, "Bill", StoreName.Mailbox, 0, 99);
 	}
 	
 	@Test
-	public void parseSearchRequestWithEmptyQueryElementTest() throws SAXException, IOException, FactoryConfigurationError, XMLValidationException {
+	public void parseSearchRequestWithEmptyQueryElementTest() throws Exception {
 		SearchRequest searchRequest = getSearchRequest("search-with-empty-query-element.xml");
 		verifyObject(searchRequest, "", StoreName.Mailbox, 0, 99);
 	}
 	
 	@Test
-	public void parseSearchRequestStoreGAL() throws SAXException, IOException, FactoryConfigurationError, XMLValidationException {
+	public void parseSearchRequestStoreGAL() throws Exception {
 		SearchRequest searchRequest = getSearchRequest("search-store-GAL.xml");
 		verifyObject(searchRequest, "Jobs", StoreName.GAL, 0, 50);
 	}
@@ -87,10 +88,78 @@ public class SearchProtocolTest {
 		assertThat(searchRequest.getRangeUpper()).as("Range upper").isEqualTo(rangeUpper);
 	}
 	
-	private SearchRequest getSearchRequest(String filename) throws SAXException, IOException, FactoryConfigurationError, XMLValidationException {
+	private SearchRequest getSearchRequest(String filename) 
+			throws SAXException, IOException, FactoryConfigurationError, XMLValidationException, NoDocumentException {
+		
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("file/search/" + filename);
 		Document document = DOMUtils.parse(inputStream);
 		return searchProtocol.decodeRequest(document);
 	}
 	
+	@Test
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Search xmlns:GAL=\"GAL\">" +
+				"<Name>Document Library</Name>" +
+				"<Query>" +
+				"<FreeText>query</FreeText>" +
+				"</Query>" +
+				"<Range>10-100</Range>" +
+				"</Search>";
+		
+		SearchRequest searchRequest = searchProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeRequest = searchProtocol.encodeRequest(searchRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeRequest));
+	}
+	
+	@Test
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<Search xmlns:GAL=\"GAL\">" +
+				"<Status>1</Status>" +
+				"<Response>" +
+				"<Store>" +
+				"<Status>1</Status>" +
+				"<Result>" +
+				"<Properties>" +
+				"<GAL:DisplayName>name</GAL:DisplayName>" +
+				"<GAL:Alias>alias</GAL:Alias>" +
+				"<GAL:FirstName>first</GAL:FirstName>" +
+				"<GAL:LastName>last</GAL:LastName>" +
+				"<GAL:EmailAddress>email</GAL:EmailAddress>" +
+				"<GAL:Company>company</GAL:Company>" +
+				"<GAL:HomePhone>home</GAL:HomePhone>" +
+				"<GAL:MobilePhone>mobile</GAL:MobilePhone>" +
+				"<GAL:Office>office</GAL:Office>" +
+				"<GAL:Phone>phone</GAL:Phone>" +
+				"<GAL:Title>title</GAL:Title>" +
+				"</Properties>" +
+				"</Result>" +
+				"<Result>" +
+				"<Properties>" +
+				"<GAL:DisplayName>name2</GAL:DisplayName>" +
+				"<GAL:Alias>alias2</GAL:Alias>" +
+				"<GAL:FirstName>first2</GAL:FirstName>" +
+				"<GAL:LastName>last2</GAL:LastName>" +
+				"<GAL:EmailAddress>email2</GAL:EmailAddress>" +
+				"<GAL:Company>company2</GAL:Company>" +
+				"<GAL:HomePhone>home2</GAL:HomePhone>" +
+				"<GAL:MobilePhone>mobile2</GAL:MobilePhone>" +
+				"<GAL:Office>office2</GAL:Office>" +
+				"<GAL:Phone>phone2</GAL:Phone>" +
+				"<GAL:Title>title2</GAL:Title>" +
+				"</Properties>" +
+				"</Result>" +
+				"<Range>10-1</Range>" +
+				"<Total>2</Total>" +
+				"</Store>" +
+				"</Response>" +
+				"</Search>";
+		
+		SearchResponse searchResponse = searchProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = searchProtocol.encodeResponse(searchResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
 }

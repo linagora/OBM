@@ -38,9 +38,9 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.search.ISearchSource;
 import org.obm.push.utils.LdapUtils;
 import org.slf4j.Logger;
@@ -100,27 +100,35 @@ public class BookSource implements ISearchSource {
 						sn = cn;
 						givenName = "";
 					}
-					SearchResult sr = new SearchResult();
+					
+					SearchResult.Builder searchResultBuilder = SearchResult.builder();
 					if (display != null && display.length() > 0) {
-						sr.setDisplayName(display);
+						searchResultBuilder.displayName(display);
 					} else {
-						sr.setDisplayName(givenName + " " + sn);
+						searchResultBuilder.displayName(givenName + " " + sn);
 					}
-					sr.setLastName(sn);
-					sr.setFirstName(givenName);
+					
 					if (phones != null) {
 						if (phones.size() > 0) {
-							sr.setPhone(phones.get(0));
+							searchResultBuilder.phone(phones.get(0));
 						}
 						if (phones.size() > 1) {
-							sr.setHomePhone(phones.get(1));
+							searchResultBuilder.homePhone(phones.get(1));
 						}
 					}
-					sr.setMobilePhone(uniqueAttribute("mobile", m));
+					
+					searchResultBuilder.mobilePhone(uniqueAttribute("mobile", m));
+					
 					List<String> mails = m.get("mail");
 					if (mails != null && mails.iterator().hasNext()) {
-						sr.setEmailAddress(mails.iterator().next());
+						searchResultBuilder.emailAddress(mails.iterator().next());
 					}
+					
+					SearchResult sr = searchResultBuilder
+							.firstName(givenName)
+							.lastName(sn)
+							.build();
+					
 					ret.add(sr);
 				}
 			} catch (NamingException e) {

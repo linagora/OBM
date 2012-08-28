@@ -300,22 +300,23 @@ public class ContactConverter {
 	}
 	
 	public SearchResult convertToSearchResult(Contact c) {
-		SearchResult sr = new SearchResult();
-		sr.setAlias(c.getAka());
-		sr.setCompany(c.getCompany());
-		sr.setDisplayName(c.getFirstname()+" "+c.getLastname());
+		SearchResult.Builder searchResultBuilder = SearchResult.builder();
+		searchResultBuilder.displayName(c.getFirstname()+" "+c.getLastname());
 		if(c.getEmails().values().iterator().hasNext()){
-			sr.setEmailAddress(c.getEmails().values().iterator().next().getEmail());
+			searchResultBuilder.emailAddress(c.getEmails().values().iterator().next().getEmail());
 		}
-		sr.setFirstName(c.getFirstname());
-		sr.setLastName(c.getLastname());
-		sr.setHomePhone(obmPhone(c, "HOME;VOICE;X-OBM-Ref1"));
-		sr.setMobilePhone(obmPhone(c, "CELL;VOICE;X-OBM-Ref1"));
-		sr.setOffice(c.getService());
-		sr.setPhone(obmPhone(c, "WORK;VOICE;X-OBM-Ref1"));
-		sr.setTitle(c.getTitle());
+		searchResultBuilder.homePhone(obmPhone(c, "HOME;VOICE;X-OBM-Ref1"));
+		searchResultBuilder.mobilePhone(obmPhone(c, "CELL;VOICE;X-OBM-Ref1"));
+		searchResultBuilder.phone(obmPhone(c, "WORK;VOICE;X-OBM-Ref1"));
 		
-		return sr;
+		return searchResultBuilder
+			.alias(c.getAka())
+			.firstName(c.getFirstname())
+			.lastName(c.getLastname())
+			.office(c.getService())
+			.title(c.getTitle())
+			.company(c.getCompany())
+			.build();
 	}
 
 }

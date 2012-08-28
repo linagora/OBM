@@ -35,13 +35,59 @@ import java.util.List;
 
 import org.obm.push.bean.SearchResult;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+
 public class SearchResponse {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private List<SearchResult> results;
+		private int rangeLower;
+		private int rangeUpper;
+		
+		private Builder() {
+			this.results = Lists.newArrayList();
+		}
+		
+		public Builder results(List<SearchResult> results) {
+			this.results = results;
+			return this;
+		}
+		
+		public Builder add(SearchResult searchResult) {
+			this.results.add(searchResult);
+			return this;
+		}
+		
+		public Builder addAll(List<SearchResult> results) {
+			this.results.addAll(results);
+			return this;
+		}
+		
+		public Builder rangeLower(int rangeLower) {
+			this.rangeLower = rangeLower;
+			return this;
+		}
+		
+		public Builder rangeUpper(int rangeUpper) {
+			this.rangeUpper = rangeUpper;
+			return this;
+		}
+		
+		public SearchResponse build() {
+			return new SearchResponse(results, rangeLower, rangeUpper);
+		}
+	}
+	
 	private final List<SearchResult> results;
 	private final int rangeLower;
 	private final int rangeUpper;
 	
-	public SearchResponse(List<SearchResult> results, int rangeLower, int rangeUpper) {
+	private SearchResponse(List<SearchResult> results, int rangeLower, int rangeUpper) {
 		this.results = results;
 		this.rangeLower = rangeLower;
 		this.rangeUpper = rangeUpper;
@@ -57,5 +103,30 @@ public class SearchResponse {
 	
 	public int getRangeUpper() {
 		return rangeUpper;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(results, rangeLower, rangeUpper);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SearchResponse) {
+			SearchResponse that = (SearchResponse) object;
+			return Objects.equal(this.results, that.results)
+				&& Objects.equal(this.rangeLower, that.rangeLower)
+				&& Objects.equal(this.rangeUpper, that.rangeUpper);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("results", results)
+			.add("rangeLower", rangeLower)
+			.add("rangeUpper", rangeUpper)
+			.toString();
 	}
 }

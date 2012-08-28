@@ -33,43 +33,99 @@ package org.obm.push.protocol.bean;
 
 import org.obm.push.bean.StoreName;
 
+import com.google.common.base.Objects;
+
 public class SearchRequest {
+
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	private StoreName storeName;
-	private String query;
-	private Integer rangeLower;
-	private Integer rangeUpper;
+	public static class Builder {
+		private StoreName storeName;
+		private String query;
+		private Integer rangeLower;
+		private Integer rangeUpper;
+
+		private Builder() {}
+		
+		public Builder storeName(StoreName storeName) {
+			this.storeName = storeName;
+			return this;
+		}
+		
+		public Builder query(String query) {
+			this.query = query;
+			return this;
+		}
+		
+		public Builder rangeLower(Integer rangeLower) {
+			this.rangeLower = rangeLower;
+			return this;
+		}
+		
+		public Builder rangeUpper(Integer rangeUpper) {
+			this.rangeUpper = rangeUpper;
+			return this;
+		}
+		
+		public SearchRequest build() {
+			return new SearchRequest(storeName, query, rangeLower, rangeUpper);
+		}
+	}
+	
+	private final StoreName storeName;
+	private final String query;
+	private final Integer rangeLower;
+	private final Integer rangeUpper;
+	
+	private SearchRequest(StoreName storeName, String query, Integer rangeLower, Integer rangeUpper) {
+		this.storeName = storeName;
+		this.query = query;
+		this.rangeLower = rangeLower;
+		this.rangeUpper = rangeUpper;
+	}
 	
 	public StoreName getStoreName() {
 		return storeName;
-	}
-
-	public void setStoreName(StoreName storeName) {
-		this.storeName = storeName;
 	}
 
 	public String getQuery() {
 		return query;
 	}
 
-	public void setQuery(String query) {
-		this.query = query;
-	}
-
 	public Integer getRangeLower() {
 		return rangeLower;
-	}
-
-	public void setRangeLower(Integer rangeLower) {
-		this.rangeLower = rangeLower;
 	}
 
 	public Integer getRangeUpper() {
 		return rangeUpper;
 	}
 
-	public void setRangeUpper(Integer rangeUpper) {
-		this.rangeUpper = rangeUpper;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(storeName, query, rangeLower, rangeUpper);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SearchRequest) {
+			SearchRequest that = (SearchRequest) object;
+			return Objects.equal(this.storeName, that.storeName)
+				&& Objects.equal(this.query, that.query)
+				&& Objects.equal(this.rangeLower, that.rangeLower)
+				&& Objects.equal(this.rangeUpper, that.rangeUpper);
+		}
+		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("storeName", storeName)
+			.add("query", query)
+			.add("rangeLower", rangeLower)
+			.add("rangeUpper", rangeUpper)
+			.toString();
+	}
 }
