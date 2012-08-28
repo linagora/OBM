@@ -35,16 +35,65 @@ import java.util.List;
 
 import org.obm.push.bean.MeetingResponse;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+
 public class MeetingHandlerRequest {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private List<MeetingResponse> meetingResponses;
+		
+		private Builder() {
+			this.meetingResponses = Lists.newArrayList();
+		}
+		
+		public Builder meetingResponses(List<MeetingResponse> meetingResponses) {
+			this.meetingResponses = meetingResponses;
+			return this;
+		}
+
+		public Builder add(MeetingResponse meetingResponse) {
+			this.meetingResponses.add(meetingResponse);
+			return this;
+		}
+		
+		public MeetingHandlerRequest build() {
+			return new MeetingHandlerRequest(meetingResponses);
+		}
+	}
+	
 	private final List<MeetingResponse> meetingResponses;
 
-	public MeetingHandlerRequest(List<MeetingResponse> meetingResponses) {
+	private MeetingHandlerRequest(List<MeetingResponse> meetingResponses) {
 		this.meetingResponses = meetingResponses;
 	}
 	
 	public List<MeetingResponse> getMeetingResponses() {
 		return meetingResponses;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(meetingResponses);
+	}
 	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MeetingHandlerRequest) {
+			MeetingHandlerRequest that = (MeetingHandlerRequest) object;
+			return Objects.equal(this.meetingResponses, that.meetingResponses);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("meetingResponses", meetingResponses)
+			.toString();
+	}
 }

@@ -31,28 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 public enum AttendeeStatus {
-	RESPONSE_UNKNOWN, // 0
-	TENTATIVE, // 2
-	ACCEPT, // 3
-	DECLINE, // 4
-	NOT_RESPONDED; // 5
+	RESPONSE_UNKNOWN("0"),
+	TENTATIVE("2"),
+	ACCEPT("3"),
+	DECLINE("4"),
+	NOT_RESPONDED("5");
 
-	public String asIntString() {
-		switch (this) {
-		case ACCEPT:
-			return "3";
-		case DECLINE:
-			return "4";
-		case NOT_RESPONDED:
-			return "5";
-		case TENTATIVE:
-			return "2";
-		default:
-		case RESPONSE_UNKNOWN:
-			return "0";
-
+	private final String specificationValue;
+	
+	private AttendeeStatus(String specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+	
+	public String asSpecificationValue() {
+		return specificationValue;
+	}
+	
+	public static AttendeeStatus fromSpecificationValue(String specificationValue){
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
 		}
-
+		return null;
+	}
+	
+	private static Map<String, AttendeeStatus> specValueToEnum;
+	
+	static {
+		Builder<String, AttendeeStatus> builder = ImmutableMap.builder();
+		for (AttendeeStatus attendeeStatus : values()) {
+			builder.put(attendeeStatus.specificationValue, attendeeStatus);
+		}
+		specValueToEnum = builder.build();
 	}
 }

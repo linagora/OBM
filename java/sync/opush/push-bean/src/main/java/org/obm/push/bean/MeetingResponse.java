@@ -36,44 +36,69 @@ import com.google.common.base.Objects;
 
 public class MeetingResponse {
 	
-	private AttendeeStatus userResponse;
-	private Integer collectionId;
-	private String reqId;
-	private String longId;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	public MeetingResponse() {
+	public static class Builder {
+		private AttendeeStatus userResponse;
+		private Integer collectionId;
+		private String reqId;
+		private String longId;
+
+		private Builder() {}
+		
+		public Builder userResponse(AttendeeStatus userResponse) {
+			this.userResponse = userResponse;
+			return this;
+		}
+		
+		public Builder collectionId(Integer collectionId) {
+			this.collectionId = collectionId;
+			return this;
+		}
+		
+		public Builder reqId(String reqId) {
+			this.reqId = reqId;
+			return this;
+		}
+		
+		public Builder longId(String longId) {
+			this.longId = longId;
+			return this;
+		}
+		
+		public MeetingResponse build() {
+			return new MeetingResponse(userResponse, collectionId, reqId, longId);
+		}
+	}
+	
+	private final AttendeeStatus userResponse;
+	private final Integer collectionId;
+	private final String reqId;
+	private final String longId;
+	
+	private MeetingResponse(AttendeeStatus userResponse, Integer collectionId, String reqId, String longId) {
+		this.userResponse = userResponse;
+		this.collectionId = collectionId;
+		this.reqId = reqId;
+		this.longId = longId;
 	}
 
 	public AttendeeStatus getUserResponse() {
 		return userResponse;
 	}
 
-	public void setUserResponse(AttendeeStatus userResponse) {
-		this.userResponse = userResponse;
-	}
-
 	public Integer getCollectionId() {
 		return collectionId;
-	}
-
-	public void setCollectionId(Integer collectionId) {
-		this.collectionId = collectionId;
 	}
 
 	public String getReqId() {
 		return reqId;
 	}
 
-	public void setReqId(String reqId) {
-		this.reqId = reqId;
-	}
-
 	public String getLongId() {
 		return longId;
-	}
-
-	public void setLongId(String longId) {
-		this.longId = longId;
 	}
 
 	@Override
@@ -102,5 +127,4 @@ public class MeetingResponse {
 			.add("longId", longId)
 			.toString();
 	}
-	
 }

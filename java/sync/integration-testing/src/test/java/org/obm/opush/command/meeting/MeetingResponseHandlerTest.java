@@ -76,8 +76,8 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
+import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
-import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
@@ -375,12 +375,16 @@ public class MeetingResponseHandlerTest {
 	}
 		
 	private String buildResponse(MeetingResponseStatus status, String calId) throws TransformerException {
-		ItemChangeMeetingResponse itemChangeMeetingResponse = new ItemChangeMeetingResponse();
-		itemChangeMeetingResponse.setReqId(serverId(invitationCollectionId, invitationItemId));
-		itemChangeMeetingResponse.setCalId(calId);
-		itemChangeMeetingResponse.setStatus(status);
+		ItemChangeMeetingResponse itemChangeMeetingResponse = ItemChangeMeetingResponse.builder()
+			.reqId(serverId(invitationCollectionId, invitationItemId))
+			.calId(calId)
+			.status(status)
+			.build();
 		
-		MeetingHandlerResponse response = new MeetingHandlerResponse(Lists.newArrayList(itemChangeMeetingResponse));
+		MeetingHandlerResponse response = MeetingHandlerResponse.builder()
+			.itemChanges(Lists.newArrayList(itemChangeMeetingResponse))
+			.build();
+		
 		Document encodeResponses = protocol.encodeResponse(response);
 		return DOMUtils.serialize(encodeResponses);
 	}

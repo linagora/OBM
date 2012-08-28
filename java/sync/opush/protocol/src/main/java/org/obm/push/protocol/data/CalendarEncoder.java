@@ -138,7 +138,7 @@ public class CalendarEncoder extends Encoder {
 
 					if (device.getProtocolVersion().compareTo(TWELVE) >= 0) {
 						s(ae, ASCalendar.ATTENDEE_STATUS.asASValue(), ma.getAttendeeStatus()
-							.asIntString());
+							.asSpecificationValue());
 						s(ae, ASCalendar.ATTENDEE_TYPE.asASValue(), ma.getAttendeeType()
 							.getId());
 					}

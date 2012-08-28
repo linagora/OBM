@@ -31,25 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 public enum MeetingResponseStatus {
 
-	SUCCESS, // 1
-	INVALID_MEETING_RREQUEST, // 2
-	SERVER_MAILBOX_ERROR, // 3
-	SERVER_ERROR; // 4
+	SUCCESS("1"),
+	INVALID_MEETING_RREQUEST("2"),
+	SERVER_MAILBOX_ERROR("3"),
+	SERVER_ERROR("4");
 
-	public String asXmlValue() {
-		switch (this) {
-		case INVALID_MEETING_RREQUEST:
-			return "2";
-		case SERVER_MAILBOX_ERROR:
-			return "3";
-		case SERVER_ERROR:
-			return "4";
-		case SUCCESS:
-		default:
-			return "1";
-		}
+	private final String specificationValue;
+	
+	private MeetingResponseStatus(String specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+	
+	public String asSpecificationValue() {
+		return specificationValue;
 	}
 
+	public static MeetingResponseStatus fromSpecificationValue(String specificationValue){
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
+		}
+		return null;
+	}
+	
+	private static Map<String, MeetingResponseStatus> specValueToEnum;
+	
+	static {
+		Builder<String, MeetingResponseStatus> builder = ImmutableMap.builder();
+		for (MeetingResponseStatus meetingResponseStatus : values()) {
+			builder.put(meetingResponseStatus.specificationValue, meetingResponseStatus);
+		}
+		specValueToEnum = builder.build();
+	}
 }

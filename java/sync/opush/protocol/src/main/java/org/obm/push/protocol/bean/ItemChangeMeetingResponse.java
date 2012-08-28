@@ -31,59 +31,77 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.List;
+import org.obm.push.bean.MeetingResponseStatus;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 
-public class MeetingHandlerResponse {
-
+public class ItemChangeMeetingResponse {
+	
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		private List<ItemChangeMeetingResponse> itemChanges;
+		private String calId;
+		private String reqId;
+		private MeetingResponseStatus status;
 		
-		private Builder() {
-			this.itemChanges = Lists.newArrayList();
-		}
+		private Builder() {}
 		
-		public Builder itemChanges(List<ItemChangeMeetingResponse> itemChanges) {
-			this.itemChanges = itemChanges;
+		public Builder calId(String calId) {
+			this.calId = calId;
 			return this;
 		}
 		
-		public Builder add(ItemChangeMeetingResponse itemChangeMeetingResponse) {
-			this.itemChanges.add(itemChangeMeetingResponse);
+		public Builder reqId(String reqId) {
+			this.reqId = reqId;
 			return this;
 		}
 		
-		public MeetingHandlerResponse build() {
-			return new MeetingHandlerResponse(itemChanges);
+		public Builder status(MeetingResponseStatus status) {
+			this.status = status;
+			return this;
+		}
+		
+		public ItemChangeMeetingResponse build() {
+			return new ItemChangeMeetingResponse(calId, reqId, status);
 		}
 	}
 	
-	private final List<ItemChangeMeetingResponse> itemChanges;
+	private final String calId;
+	private final String reqId;
+	private final MeetingResponseStatus status;
 	
-	private MeetingHandlerResponse(List<ItemChangeMeetingResponse> itemChanges) {
-		this.itemChanges = itemChanges;
+	private ItemChangeMeetingResponse(String calId, String reqId, MeetingResponseStatus status) {
+		this.calId = calId;
+		this.reqId = reqId;
+		this.status = status;
+	}
+	
+	public String getCalId() {
+		return calId;
+	}
+	
+	public String getReqId() {
+		return reqId;
 	}
 
-	public List<ItemChangeMeetingResponse> getItemChanges() {
-		return itemChanges;
+	public MeetingResponseStatus getStatus() {
+		return status;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(itemChanges);
+		return Objects.hashCode(calId, reqId, status);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof MeetingHandlerResponse) {
-			MeetingHandlerResponse that = (MeetingHandlerResponse) object;
-			return Objects.equal(this.itemChanges, that.itemChanges);
+		if (object instanceof ItemChangeMeetingResponse) {
+			ItemChangeMeetingResponse that = (ItemChangeMeetingResponse) object;
+			return Objects.equal(this.calId, that.calId)
+					&& Objects.equal(this.reqId, that.reqId)
+					&& Objects.equal(this.status, that.status);
 		}
 		return false;
 	}
@@ -91,7 +109,9 @@ public class MeetingHandlerResponse {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("itemChanges", itemChanges)
+			.add("calId", calId)
+			.add("reqId", reqId)
+			.add("status", status)
 			.toString();
 	}
 }

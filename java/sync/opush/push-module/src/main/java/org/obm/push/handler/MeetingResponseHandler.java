@@ -31,19 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -57,9 +54,9 @@ import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
+import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
-import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -140,13 +137,14 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	private MeetingHandlerResponse doTheJob(MeetingHandlerRequest meetingRequest, UserDataRequest udr) 
 			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
-		
-		List<ItemChangeMeetingResponse> meetingResponses =  new ArrayList<ItemChangeMeetingResponse>();
+
+		MeetingHandlerResponse.Builder meetingHandlerResponseBuilder = MeetingHandlerResponse.builder();
 		for (MeetingResponse item : meetingRequest.getMeetingResponses()) {
 			ItemChangeMeetingResponse meetingResponse = handleSingleResponse(udr, item);
-			meetingResponses.add(meetingResponse);
+			meetingHandlerResponseBuilder.add(meetingResponse);
 		}
-		return new MeetingHandlerResponse(meetingResponses);
+		return meetingHandlerResponseBuilder
+			.build();
 	}
 
 	private ItemChangeMeetingResponse handleSingleResponse(UserDataRequest udr, MeetingResponse item) 
@@ -154,41 +152,47 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		
 		MSEmail email = retrieveMailWithMeetingRequest(udr, item);
 	
-		ItemChangeMeetingResponse meetingResponse = new ItemChangeMeetingResponse();
-		
+		MeetingResponseStatus status = null;
+		String calId = null;
 		if (email != null) {
-			handle(meetingResponse, udr, email, item.getUserResponse());
-			deleteInvitationEmail(udr, item);
+			try {
+				String serverId = handle(udr, email, item.getUserResponse());
+				status = MeetingResponseStatus.SUCCESS;
+				
+				if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
+					calId = serverId;
+				}
+				
+				deleteInvitationEmail(udr, item);
+				
+			} catch (ItemNotFoundException e) {
+				logger.error(e.getMessage(), e);
+				status = MeetingResponseStatus.SERVER_ERROR;
+			} catch (UnexpectedObmSyncServerException e) {
+				logger.error(e.getMessage(), e);
+				status = MeetingResponseStatus.SERVER_ERROR;
+			} catch (DaoException e) {
+				logger.error(e.getMessage(), e);
+				status = MeetingResponseStatus.SERVER_ERROR;
+			} catch (CollectionNotFoundException e) {
+				logger.error(e.getMessage(), e);
+				status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
+			}		
 		} else {
-			meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
+			status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
 		}
 		
-		meetingResponse.setReqId(item.getReqId());
-		return meetingResponse;
+		return ItemChangeMeetingResponse.builder()
+				.calId(calId)
+				.status(status)
+				.reqId(item.getReqId())
+				.build();
 	}
 
-	private void handle(ItemChangeMeetingResponse meetingResponse, UserDataRequest udr, MSEmail email,
-			AttendeeStatus userResponse) throws ConversionException {
+	private String handle(UserDataRequest udr, MSEmail email, AttendeeStatus userResponse) 
+			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException {
 		
-		meetingResponse.setStatus(MeetingResponseStatus.SUCCESS);
-		try {
-			String calId = calendarBackend.handleMeetingResponse(udr, email,	userResponse);
-			if (!AttendeeStatus.DECLINE.equals(userResponse)) {
-				meetingResponse.setCalId(calId);
-			}
-		} catch (ItemNotFoundException e) {
-			logger.error(e.getMessage(), e);
-			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-		} catch (UnexpectedObmSyncServerException e) {
-			logger.error(e.getMessage(), e);
-			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
-			meetingResponse.setStatus(MeetingResponseStatus.SERVER_ERROR);
-		} catch (CollectionNotFoundException e) {
-			logger.error(e.getMessage(), e);
-			meetingResponse.setStatus(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
-		}		
+		return calendarBackend.handleMeetingResponse(udr, email, userResponse);
 	}
 
 	private void deleteInvitationEmail(UserDataRequest udr, MeetingResponse item) {

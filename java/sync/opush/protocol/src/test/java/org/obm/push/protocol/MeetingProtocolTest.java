@@ -29,60 +29,70 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.protocol;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.protocol.bean.ASSystemTime;
-import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.bean.Estimate;
-import org.obm.push.protocol.bean.FolderSyncRequest;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.protocol.bean.GetItemEstimateRequest;
-import org.obm.push.protocol.bean.GetItemEstimateResponse;
-import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
-import org.obm.push.protocol.bean.PingRequest;
-import org.obm.push.protocol.bean.PingResponse;
-import org.obm.push.protocol.bean.ProvisionRequest;
-import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.sync.bean.EqualsVerifierUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class MeetingProtocolTest {
+	
+	private MeetingProtocol meetingProtocol;
 	
 	@Before
 	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+		meetingProtocol = new MeetingProtocol();
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(ASSystemTime.class)
-					.add(ASTimeZone.class)
-					.add(PingRequest.class)
-					.add(PingResponse.class)
-					.add(FolderSyncRequest.class)
-					.add(FolderSyncResponse.class)
-					.add(ProvisionRequest.class)
-					.add(ProvisionResponse.class)
-					.add(Estimate.class)
-					.add(GetItemEstimateRequest.class)
-					.add(GetItemEstimateResponse.class)
-					.add(MeetingHandlerRequest.class)
-					.add(MeetingHandlerResponse.class)
-					.add(ItemChangeMeetingResponse.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testLoopWithinRequestProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Request>" +
+				"<UserResponse>1</UserResponse>" +
+				"<CollectionId>11</CollectionId>" +
+				"<ReqId>reqId</ReqId>" +
+				"<LongId>londId</LongId>" +
+				"</Request>" +
+				"<Request>" +
+				"<UserResponse>3</UserResponse>" +
+				"<ReqId>reqId2</ReqId>" +
+				"<LongId>londId2</LongId>" +
+				"</Request>" +
+				"</MeetingResponse>";
+		
+		MeetingHandlerRequest meetingRequest = meetingProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+		Document encodeRequest = meetingProtocol.encodeRequest(meetingRequest);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeRequest));
 	}
 	
+	@Test
+	public void testLoopWithinResponseProtocolMethods() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Result>" +
+				"<Status>1</Status>" +
+				"<CalId>11:2</CalId>" +
+				"<ReqId>reqId</ReqId>" +
+				"</Result>" +
+				"<Result>" +
+				"<Status>2</Status>" +
+				"<ReqId>reqId2</ReqId>" +
+				"</Result>" +
+				"</MeetingResponse>";
+		
+		MeetingHandlerResponse meetingResponse = meetingProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+		Document encodeResponse = meetingProtocol.encodeResponse(meetingResponse);
+		
+		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
 }
