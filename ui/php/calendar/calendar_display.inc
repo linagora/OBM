@@ -5586,7 +5586,7 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_dateend,$l_change_state,$l_validate,$l_user, $l_resource, $l_owner;
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
   global $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
-  global $l_decision_ACCEPTED, $l_decision_NEEDS_ACTIONS, $l_decision_DECLINED, $l_comment;
+  global $l_decision_ACCEPTED, $l_decision_NEEDS_ACTIONS, $l_decision_DECLINED, $l_comment, $l_state;
   
    
   $owner_notification = "checked";
@@ -5629,7 +5629,7 @@ function html_calendar_waiting_events($obm_wait) {
         <th>$l_datebegin</th>
         <th>$l_dateend</th>
         <th>$l_comment</th>
-        <th></th>
+        <th>$l_state</th>
       </tr>
       </thead>
       <tbody>";
