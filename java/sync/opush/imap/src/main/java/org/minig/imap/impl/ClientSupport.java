@@ -193,9 +193,6 @@ public class ClientSupport {
 		lock(); // this one should wait until this.setResponses is called
 		try {
 			cmd.responseReceived(lastResponses);
-		} catch (Throwable t) {
-			logger.error("receiving/parsing imap response to cmd "
-					+ cmd.getClass().getSimpleName(), t);
 		} finally {
 			lock.release();
 		}

@@ -36,41 +36,34 @@ import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import java.io.InputStream;
 import java.util.Date;
 
-import javax.mail.MessagingException;
-
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.minig.imap.IMAPException;
+import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
-import org.obm.push.exception.ImapCommandException;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapTestUtils;
-import org.obm.push.mail.imap.OpushImapFolder;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchMessageTest {
@@ -167,24 +160,23 @@ public class UIDFetchMessageTest {
 		testUtils.createFolders(mailbox);
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("plainText.eml"));
 
-		ImapStore client = loggedClient();
-		OpushImapFolder folder = client.select(mailbox);
-		folder.uidFetchMessage(sentEmail.getUid());
+		StoreClient client = loggedClient();
+		client.select(mailbox);
+		client.uidFetchMessage(sentEmail.getUid());
 	}
 
-	private InputStream uidFetchMessage(long uid) throws ImapMessageNotFoundException, LocatorClientException,
-			NoImapClientAvailableException, ImapCommandException, MessagingException {
+	private InputStream uidFetchMessage(long uid) throws LocatorClientException, IMAPException {
 		
-		ImapStore client = loggedClient();
-		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		return folder.uidFetchMessage(uid);
+		StoreClient client = loggedClient();
+		client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return client.uidFetchMessage(uid);
 	}
 	
-	private ImapStore loggedClient()
-			throws LocatorClientException, NoImapClientAvailableException, ImapLoginException  {
+	private StoreClient loggedClient()
+			throws LocatorClientException, IMAPException  {
 		
-		ImapStore client = clientProvider.getImapClientWithJM(udr);
-		client.login();
-		return client;
+		StoreClient store = clientProvider.getImapClient(udr);
+		store.login(false);
+		return store;
 	}
 }

@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.utils.FileUtils;
 
 import com.google.common.collect.Iterables;
@@ -86,6 +87,7 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 				logger.error("UIDFetchMessage failed for uid " + uid + ": "
 						+ Iterables.getLast(rs).getPayload());
 			}
+			throw new ImapMessageNotFoundException("UIDFetchMessage failed for uid " + uid);
 		}
 	}
 

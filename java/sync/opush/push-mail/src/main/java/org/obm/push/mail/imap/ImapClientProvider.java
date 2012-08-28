@@ -41,7 +41,7 @@ public interface ImapClientProvider {
 
 	String locateImap(UserDataRequest udr) throws LocatorClientException;
 	StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException;
-	ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException;
+	@Deprecated ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException;
 	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
 	
 }

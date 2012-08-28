@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-
 import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.CommandIOException;
 import org.minig.imap.FastFetch;
@@ -69,9 +67,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
-import org.obm.push.exception.ImapCommandException;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -106,8 +101,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.sun.mail.imap.IMAPInputStream;
-import com.sun.mail.imap.IMAPMessage;
 
 @Singleton
 public class ImapMailboxService implements PrivateMailboxService {
@@ -281,20 +274,6 @@ public class ImapMailboxService implements PrivateMailboxService {
 		}
 	}
 	
-	private IMAPMessage getMessage(ImapStore store, UserDataRequest udr, String collectionName, long uid) 
-			throws MailException, ImapMessageNotFoundException {
-		
-		String mailBoxName = parseMailBoxName(udr, collectionName);
-		try {
-			OpushImapFolder folder = store.select(mailBoxName);
-			return folder.getMessageByUID(uid);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapCommandException e) {
-			throw new MailException(e);
-		}
-	}
-	
 	@Override
 	public String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException {
 		String boxName = collectionPathHelper.extractFolder(udr, collectionName, PIMDataType.EMAIL);
@@ -385,23 +364,19 @@ public class ImapMailboxService implements PrivateMailboxService {
 
 	private InputStream getMessageInputStream(UserDataRequest udr, String collectionName, long messageUID) 
 			throws MailException {
-		
-		ImapStore store = null;
+		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
-			store = imapClientProvider.getImapClientWithJM(udr);
-			store.login();
-			IMAPMessage imapMessage = getMessage(store, udr, collectionName, messageUID);
-			IMAPInputStream imapInputStream = new IMAPInputStream(imapMessage, null, -1, true);
-			return imapInputStream;
-		} catch (ImapMessageNotFoundException e) {
-			throw new MailException(e);
+			login(store);
+			String mailBoxName = parseMailBoxName(udr, collectionName);
+			store.select(mailBoxName);
+			return store.uidFetchMessage(messageUID);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
-		} catch (NoImapClientAvailableException e) {
+		} catch (IMAPException e) {
 			throw new MailException(e);
-		} catch (ImapLoginException e) {
-			throw new MailException(e);
-		} 
+		} finally {
+			store.logout();
+		}
 	}
 
 	private void login(StoreClient store) throws IMAPException {

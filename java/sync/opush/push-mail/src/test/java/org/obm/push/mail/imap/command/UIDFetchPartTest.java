@@ -46,12 +46,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.minig.imap.StoreClient;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -59,6 +59,7 @@ import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.FetchInstructions;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
@@ -67,9 +68,7 @@ import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapTestUtils;
-import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.collect.Iterables;
@@ -352,14 +351,14 @@ public class UIDFetchPartTest {
 	}
 	
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
-		ImapStore client = loggedClient();
-		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		return folder.uidFetchPart(uid, new MimeAddress(partToFetch));
+		StoreClient client = loggedClient();
+		client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return client.uidFetchPart(uid, partToFetch);
 	}
 	
-	private ImapStore loggedClient() throws Exception {
-		ImapStore client = clientProvider.getImapClientWithJM(udr);
-		client.login();
-		return client;
+	private StoreClient loggedClient() throws Exception {
+		StoreClient imapClient = clientProvider.getImapClient(udr);
+		imapClient.login(false);
+		return imapClient;
 	}
 }

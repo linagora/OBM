@@ -52,6 +52,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -66,7 +67,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailTestsUtils;
-import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -163,14 +163,14 @@ public class ImapMemoryAPITest {
 	}
 
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
-		ImapStore client = loggedClient();
-		OpushImapFolder folder = client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		return folder.uidFetchPart(uid, new MimeAddress(partToFetch));
+		StoreClient client = loggedClient();
+		client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return client.uidFetchPart(uid, partToFetch);
 	}
 	
-	private ImapStore loggedClient() throws Exception {
-		ImapStore client = clientProvider.getImapClientWithJM(udr);
-		client.login();
-		return client;
+	private StoreClient loggedClient() throws Exception {
+		StoreClient store = clientProvider.getImapClient(udr);
+		store.login(false);
+		return store;
 	}
 }
