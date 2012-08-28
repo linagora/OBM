@@ -52,6 +52,7 @@ public class MimeMessageTestUtils {
 		Assert.assertEquals(prefixMessage(expected), expected.getContentTransfertEncoding(), actual.getContentTransfertEncoding());
 		Assert.assertEquals(prefixMessage(expected), expected.getContentId(), actual.getContentId());
 		Assert.assertArrayEquals(prefixMessage(expected), expected.getBodyParams().toArray(), actual.getBodyParams().toArray());
+		Assert.assertEquals(prefixMessage(expected), expected.getSize(), actual.getSize());
 		Iterator<IMimePart> expectedParts = expected.getChildren().iterator();
 		Iterator<IMimePart> actualParts = actual.getChildren().iterator();
 		while (actualParts.hasNext()) {

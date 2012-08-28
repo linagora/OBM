@@ -33,6 +33,7 @@ package org.minig.imap.command.parser;
 
 import static org.minig.imap.MimeMessageFactory.createSimpleMimePart;
 import static org.minig.imap.MimeMessageFactory.createSimpleMimeTree;
+import static org.minig.imap.MimeMessageFactory.createSimpleMimeMessage;
 import static org.minig.imap.MimeMessageTestUtils.checkMimeTree;
 
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public class BodyStructureParserTest {
 	public void testRFC3501Ex1() {
 		String bs = "(\"TEXT\" \"PLAIN\" (\"CHARSET\" \"US-ASCII\") NIL NIL \"7BIT\" 2279 48)";
 		IMimePart result = parseStringAsBodyStructure(bs);
-		checkMimeTree(createSimpleMimeTree("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
+		checkMimeTree(createSimpleMimeMessage("TEXT", "PLAIN", null, "7BIT", 2279, ImmutableMap.of("CHARSET", "US-ASCII")),
 				result);
 	}
 
@@ -72,8 +73,8 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, new HashMap<String, String>(), 
-						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-						createSimpleMimePart("TEXT", "PLAIN", "<960723163407.20117h@cac.washington.edu>", "BASE64", ImmutableMap.of("CHARSET", "US-ASCII", "NAME", "cc.diff"))),
+						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 1152, ImmutableMap.of("CHARSET", "US-ASCII")),
+						createSimpleMimePart("TEXT", "PLAIN", "<960723163407.20117h@cac.washington.edu>", "BASE64", 4554, ImmutableMap.of("CHARSET", "US-ASCII", "NAME", "cc.diff"))),
 				result);
 	}
 	
@@ -81,7 +82,7 @@ public class BodyStructureParserTest {
 	public void testBugzilla1502SimpleImagePart() {
 		String bs = "(\"IMAGE\" \"PJPEG\" NIL NIL NIL \"BASE64\" 97418)";
 		IMimePart result = parseStringAsBodyStructure(bs);
-		checkMimeTree(createSimpleMimeTree("IMAGE", "PJPEG", null, "BASE64", new HashMap<String, String>()),
+		checkMimeTree(createSimpleMimeMessage("IMAGE", "PJPEG", null, "BASE64", 97418, new HashMap<String, String>()),
 				result);
 	}
 	
@@ -90,7 +91,7 @@ public class BodyStructureParserTest {
 		String bs = "(\"IMAGE\" \"PJPEG\" NIL NIL NIL \"BASE64\" 97418 NIL " +
 			"(\"ATTACHMENT\" (\"FILENAME\" \"=?UTF-8?Q?Coucher=20de=20soleil.jpg?=\")) NIL NIL)";
 		IMimePart result = parseStringAsBodyStructure(bs);
-		checkMimeTree(createSimpleMimeTree("IMAGE", "PJPEG", null, "BASE64", ImmutableMap.of("FILENAME", "Coucher de soleil.jpg")),
+		checkMimeTree(createSimpleMimeMessage("IMAGE", "PJPEG", null, "BASE64", 97418, ImmutableMap.of("FILENAME", "Coucher de soleil.jpg")),
 				result);
 	}
 	
@@ -104,8 +105,8 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "-=Part.2.4e8359a545e8f099.12be7d033d7.ddfb59d71741cd3a=-"), 
-						createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "UTF-8")),
-						createSimpleMimePart("IMAGE", "PJPEG", null, "BASE64", ImmutableMap.of("FILENAME", "Coucher de soleil.jpg"))),
+						createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 6, ImmutableMap.of("CHARSET", "UTF-8")),
+						createSimpleMimePart("IMAGE", "PJPEG", null, "BASE64", 97418, ImmutableMap.of("FILENAME", "Coucher de soleil.jpg"))),
 				result);
 	}
 	
@@ -127,10 +128,10 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "-=Part.821.826e37e719e7f9f6.12c2f8e482d.f6034b7c2622b555=-"), 
-						createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "UTF-8")),
-						createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("FILENAME", "forwarded_message_0.eml", "BOUNDARY", "mimepart_4cd7f7e7d342a_65d43fe5dce001bc430"),
-								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "UTF-8")),
-								createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "UTF-8")))),
+						createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 489, ImmutableMap.of("CHARSET", "UTF-8")),
+						createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 4224, ImmutableMap.of("FILENAME", "forwarded_message_0.eml", "BOUNDARY", "mimepart_4cd7f7e7d342a_65d43fe5dce001bc430"),
+								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 769, ImmutableMap.of("CHARSET", "UTF-8")),
+								createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 919, ImmutableMap.of("CHARSET", "UTF-8")))),
 				result);
 	}
 	
@@ -156,12 +157,12 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------090508070608040004010708"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT",
+					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 235,
 						ImmutableMap.of("CHARSET", "ISO-8859-1", "FORMAT", "flowed")),
-					createSimpleMimePart("MESSAGE", "RFC822",  null, "8BIT",
+					createSimpleMimePart("MESSAGE", "RFC822",  null, "8BIT", 2329,
 						ImmutableMap.of("NAME", "Re: Suggestion de renommage de 'OBM sur mesure\".eml",
 										"FILENAME", "Re: Suggestion de renommage de 'OBM sur mesure\".eml"),
-						createSimpleMimePart("TEXT", "PLAIN",  null, "BASE64",
+						createSimpleMimePart("TEXT", "PLAIN",  null, "BASE64", 1498,
 								ImmutableMap.of("CHARSET", "ISO-8859-1", "FORMAT", "flowed")))),
 				result);
 	}
@@ -188,14 +189,14 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------090506050700020806090002"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE",
+					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 1071,
 						ImmutableMap.of("CHARSET", "iso-8859-1", "FORMAT", "flowed")),
-					createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT", 
+					createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT", 2806,
 						ImmutableMap.of("NAME", "ALERT PROXY2/proxy: Le serveur Proxy2 est tombé - Bascule vers Proxy1 (Sat Dec 8 12:16:11).eml",
 										"FILENAME", "ALERT PROXY2/proxy: Le serveur Proxy2 est tombé - Bascule vers Proxy1 (Sat Dec 8 12:16:11).eml",
 										"BOUNDARY", "2JFYz.4GCHzc7Eh.t1JsN.8ipKmXd"),
-								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "us-ascii")),
-								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "utf-8"))
+								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 310, ImmutableMap.of("CHARSET", "us-ascii")),
+								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 804, ImmutableMap.of("CHARSET", "utf-8"))
 								)),
 				result);
 	}
@@ -209,9 +210,9 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "=====================_4229656==.ALT"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 
+					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 4295,
 						ImmutableMap.of("CHARSET", "iso-8859-1", "FORMAT", "flowed")),
-					createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE",
+					createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 5429,
 						ImmutableMap.of("CHARSET", "iso-8859-1"))),
 				result);
 	}
@@ -225,9 +226,9 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "618027128011279051"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "8BIT",
+					createSimpleMimePart("TEXT", "PLAIN", null, "8BIT", 1202,
 						ImmutableMap.of("CHARSET", "iso-8859-15")),
-					createSimpleMimePart("TEXT", "HTML", null, "8BIT",
+					createSimpleMimePart("TEXT", "HTML", null, "8BIT", 8761,
 						ImmutableMap.of("CHARSET", "iso-8859-15"))),
 				result);
 	}
@@ -249,12 +250,12 @@ public class BodyStructureParserTest {
 						ImmutableMap.of("BOUNDARY", "hHWLQfXTYDoKhP50",
 										"MICALG", "pgp-sha1",
 										"PROTOCOL", "application/pgp-signature"),
-					createSimpleMimePart("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "MGYHOYXEY6WxJCY8"), 
-							createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE",
+					createSimpleMimePart("multipart", "MIXED", null, null, null, ImmutableMap.of("BOUNDARY", "MGYHOYXEY6WxJCY8"), 
+							createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 197,
 								ImmutableMap.of("CHARSET", "iso-8859-1")),
-							createSimpleMimePart("TEXT", "PLAIN",  null, "QUOTED-PRINTABLE",
+							createSimpleMimePart("TEXT", "PLAIN",  null, "QUOTED-PRINTABLE", 165923,
 								ImmutableMap.of("CHARSET", "utf-8", "FILENAME", "term.log"))),
-					createSimpleMimePart("APPLICATION", "PGP-SIGNATURE",  null, "7BIT",
+					createSimpleMimePart("APPLICATION", "PGP-SIGNATURE",  null, "7BIT", 203,
 						new HashMap<String, String>())),
 				result);
 	}
@@ -296,23 +297,23 @@ public class BodyStructureParserTest {
 		checkMimeTree(
 			createSimpleMimeTree("multipart", "MIXED", null, null,
 					ImmutableMap.of("BOUNDARY", "-=Part.1bc.1c1bae7fc5abaefb.12b1f2d8ba0.24d31e725226dabf=-"),
-			 createSimpleMimePart("TEXT", "HTML", null, "7BIT", ImmutableMap.of("CHARSET", "UTF-8")),
-			 createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT",
+			 createSimpleMimePart("TEXT", "HTML", null, "7BIT", 148, ImmutableMap.of("CHARSET", "UTF-8")),
+			 createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 2536015,
 					 ImmutableMap.of("FILENAME", "forwarded_message_0.eml",
 							 		 "BOUNDARY", "-=Part.e5.7a00b7a55124f47f.12b1ed45c88.99ded3b40b1821b4=-"),
-			    createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "UTF-8")),
-			    createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT",
+			    createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 424, ImmutableMap.of("CHARSET", "UTF-8")),
+			    createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 2534456,
 			    		ImmutableMap.of("FILENAME", "forwarded_message_0.eml", "BOUNDARY", "Boundary_(ID_qsulokVQKbYW8nQHLPYp7Q)"),
-			      createSimpleMimePart("multipart", "ALTERNATIVE", null, null,
+			      createSimpleMimePart("multipart", "ALTERNATIVE", null, null, null,
 			    		 ImmutableMap.of("BOUNDARY", "Boundary_(ID_FPVkfB47oL+ZOyQ0T97MeA)"),
-			       createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE",
+			       createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 1333,
 			    		  ImmutableMap.of("FORMAT", "flowed", "CHARSET", "utf-8")),
-			       createSimpleMimePart("multipart", "RELATED", null, null,
+			       createSimpleMimePart("multipart", "RELATED", null, null, null,
 						    		 ImmutableMap.of("BOUNDARY", "Boundary_(ID_j1VqHCLvxMbObr0Y49iZgQ)"),
-			        createSimpleMimePart("TEXT", "HTML", null, "7BIT", ImmutableMap.of("CHARSET", "utf-8")),
-			        createSimpleMimePart("IMAGE", "JPEG", "<part1.05060905.06000802@cpam-auch.cnamts.fr>", "BASE64", new HashMap<String, String>()),
-			        createSimpleMimePart("IMAGE", "JPEG", "<part2.06080502.08080709@cpam-auch.cnamts.fr>", "BASE64", new HashMap<String, String>()))),
-			      createSimpleMimePart("DOCUMENT", "PDF", null, "BASE64",
+			        createSimpleMimePart("TEXT", "HTML", null, "7BIT", 1840, ImmutableMap.of("CHARSET", "utf-8")),
+			        createSimpleMimePart("IMAGE", "JPEG", "<part1.05060905.06000802@cpam-auch.cnamts.fr>", "BASE64", 3544, new HashMap<String, String>()),
+			        createSimpleMimePart("IMAGE", "JPEG", "<part2.06080502.08080709@cpam-auch.cnamts.fr>", "BASE64", 9638, new HashMap<String, String>()))),
+			      createSimpleMimePart("DOCUMENT", "PDF", null, "BASE64", 2513828,
 			    		  ImmutableMap.of("NAME", "Infos erronées du 010910_1.pdf",
 			    				  "FILENAME", "Infos erronées du 010910_1.pdf"))  
 			        ))), result);
@@ -342,14 +343,14 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------060906090906080602020903"), 
-						createSimpleMimePart("TEXT", "PLAIN", null, "8BIT",
+						createSimpleMimePart("TEXT", "PLAIN", null, "8BIT", 446,
 							ImmutableMap.of("CHARSET", "windows-1252", "FORMAT", "flowed")),
-						createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT",
+						createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 14002,
 								ImmutableMap.of("NAME", "Your travel information.eml", "FILENAME", "Your travel information.eml",
 												"BOUNDARY", "AGENTID00688986-=_HrKq2VwID3ocQY0E4wYbwX4wB"),
-										createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE",
+										createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 5099,
 												ImmutableMap.of("CHARSET", "US-ASCII")),
-										createSimpleMimePart("TEXT", "HTML", null, "BASE64",
+										createSimpleMimePart("TEXT", "HTML", null, "BASE64", 4720,
 												ImmutableMap.of("CHARSET", "iso-8859-1")))),
 				result);
 				
@@ -377,15 +378,16 @@ public class BodyStructureParserTest {
 					"\"REPORT\" (\"REPORT-TYPE\" \"delivery-status\" \"BOUNDARY\" \"5A7C5697BD.1286371801/debian-lenny-amd64.matthieu.lng\") NIL NIL NIL)";
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
-				createSimpleMimeTree("multipart", "REPORT", null, null, ImmutableMap.of("REPORT-TYPE", "delivery-status", "BOUNDARY", "5A7C5697BD.1286371801/debian-lenny-amd64.matthieu.lng"), 
-						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT",	ImmutableMap.of("CHARSET", "us-ascii")),
-						createSimpleMimePart("MESSAGE", "DELIVERY-STATUS", null, "7BIT", new HashMap<String, String>()),
-						createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT", ImmutableMap.of("BOUNDARY", "7d1ea5ebf3d19eeb5e039c3b99dbda5c"), 
-								createSimpleMimePart("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "7e51bdf35d0f4b4605c44068c47f8c7e"),
-									createSimpleMimePart("TEXT", "PLAIN", null, "8BIT",	ImmutableMap.of("CHARSET", "UTF-8")),
-									createSimpleMimePart("TEXT", "HTML", null, "8BIT",	ImmutableMap.of("CHARSET", "UTF-8")),
-									createSimpleMimePart("TEXT", "CALENDAR", null, "8BIT",	ImmutableMap.of("CHARSET", "UTF-8", "METHOD", "REQUEST"))),
-								createSimpleMimePart("APPLICATION", "ICS", null, "BASE64", ImmutableMap.of("FILENAME", "meeting.ics", "NAME", "meeting.ics")))),
+				createSimpleMimeTree("multipart", "REPORT", null, null,
+						ImmutableMap.of("REPORT-TYPE", "delivery-status", "BOUNDARY", "5A7C5697BD.1286371801/debian-lenny-amd64.matthieu.lng"), 
+						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT",	 503, ImmutableMap.of("CHARSET", "us-ascii")),
+						createSimpleMimePart("MESSAGE", "DELIVERY-STATUS", null, "7BIT", 418, new HashMap<String, String>()),
+						createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT", 6378, ImmutableMap.of("BOUNDARY", "7d1ea5ebf3d19eeb5e039c3b99dbda5c"), 
+								createSimpleMimePart("multipart", "ALTERNATIVE", null, null, null, ImmutableMap.of("BOUNDARY", "7e51bdf35d0f4b4605c44068c47f8c7e"),
+									createSimpleMimePart("TEXT", "PLAIN", null, "8BIT", 790, ImmutableMap.of("CHARSET", "UTF-8")),
+									createSimpleMimePart("TEXT", "HTML", null, "8BIT", 1638, ImmutableMap.of("CHARSET", "UTF-8")),
+									createSimpleMimePart("TEXT", "CALENDAR", null, "8BIT", 859, ImmutableMap.of("CHARSET", "UTF-8", "METHOD", "REQUEST"))),
+								createSimpleMimePart("APPLICATION", "ICS", null, "BASE64", 1178, ImmutableMap.of("FILENAME", "meeting.ics", "NAME", "meeting.ics")))),
 				result);
 	}
 
@@ -415,16 +417,16 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "----=_20081016144512_83167"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 
+					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 1090,
 						ImmutableMap.of("CHARSET", "iso-8859-1")),
-					createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT",
+					createSimpleMimePart("MESSAGE", "RFC822", null, "8BIT", 50589,
 						ImmutableMap.of("NAME", "[Préfecture de Police] - Assistance mét	hodologique po ur les développements PHP / Zend Framew	ork.msg",
 										"FILENAME", "[Préfecture de Police] - Assistance mét	hodologique po ur les développements PHP / Zend Framew	ork.msg",
 										"BOUNDARY", "----_=_NextPart_000_01C92EC3.599812EE"),
-							createSimpleMimePart("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "----_=_NextPart_001_01C92EC3.599812EE"), 
-								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "iso-8859-1")),
-								createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", ImmutableMap.of("CHARSET", "iso-8859-1"))),
-						createSimpleMimePart("APPLICATION", "OCTET-STREAM", null, "BASE64", 
+							createSimpleMimePart("multipart", "ALTERNATIVE", null, null, null, ImmutableMap.of("BOUNDARY", "----_=_NextPart_001_01C92EC3.599812EE"), 
+								createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 2351, ImmutableMap.of("CHARSET", "iso-8859-1")),
+								createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 4441, ImmutableMap.of("CHARSET", "iso-8859-1"))),
+						createSimpleMimePart("APPLICATION", "OCTET-STREAM", null, "BASE64", 40064,
 								ImmutableMap.of("NAME", "CCT_2009_AssistancePHP_CdCFPrestation_VersionValidee.pdf",
 										"FILENAME", "CCT_2009_AssistancePHP_CdCFPrestation_VersionValidee.pdf")))),
 				result);
@@ -443,9 +445,9 @@ public class BodyStructureParserTest {
 		IMimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "JQXYJlTd9koAxLsisBpF/IX+AhDOQibtZgGtSogfOJM="), 
-						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT",
+						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 36,
 							ImmutableMap.of("CHARSET", "UTF-8")),
-						createSimpleMimePart("IMAGE", "PNG", null, "BASE64",
+						createSimpleMimePart("IMAGE", "PNG", null, "BASE64", 322754,
 								ImmutableMap.of("NAME", "Screenshot-SFR - Parametrage : parametrez votre  mobile ! - Chromium.png", 
 										"FILENAME", "Screenshot-SFR - Parametrage : parametrez  votre mobile ! - Chromium.png")
 								)),
@@ -521,50 +523,50 @@ public class BodyStructureParserTest {
 					"\"MIXED\" (\"BOUNDARY\" \"owatagusiam\") NIL NIL NIL)";
 		MimeMessage message = 
 		createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "owatagusiam"),
-			createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", new HashMap<String, String>()),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "Interpart_Boundary_AdJn:mu0M2YtJKaFh9AdJn:mu0M2YtJKaFk="),
-				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-				createSimpleMimePart("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "Alternative_Boundary_8dJn:mu0M2Yt5KaFZ8AdJn:mu0M2Yt1KaFdA"),
-					createSimpleMimePart("TEXT", "RICHTEXT", null, "7BIT", new HashMap<String, String>())),
-				createSimpleMimePart("APPLICATION", "ANDREW-INSET", null, "7BIT", new HashMap<String, String>())),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", new HashMap<String, String>(),
-				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", new HashMap<String, String>())),
-			createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", new HashMap<String, String>()),
-			createSimpleMimePart("IMAGE", "PBM", null, "BASE64", new HashMap<String, String>()),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "Outermost_Trek"),
-				createSimpleMimePart("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "Where_No_One_Has_Gone_Before"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-					createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", new HashMap<String, String>())),
-				createSimpleMimePart("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "Where_No_Man_Has_Gone_Before"),
-					createSimpleMimePart("IMAGE", "GIF", null, "BASE64", new HashMap<String, String>()),
-					createSimpleMimePart("IMAGE", "GIF", null, "BASE64", new HashMap<String, String>()),
-					createSimpleMimePart("APPLICATION", "X-BE2", null, "7BIT", ImmutableMap.of("VERSION", "12")),
-					createSimpleMimePart("APPLICATION", "ATOMICMAIL", null, "7BIT", ImmutableMap.of("VERSION", "1.12"))),
-				createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", new HashMap<String, String>())),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "mail.sleepy.sau.144.8891"),
-				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-				createSimpleMimePart("IMAGE", "PGM", null, "BASE64", new HashMap<String, String>()),
-				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII"))),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "mail.sleepy.sau.158.532"),
-				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-				createSimpleMimePart("IMAGE", "PBM", null, "BASE64", new HashMap<String, String>())),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", new HashMap<String, String>(),
-				createSimpleMimePart("APPLICATION", "POSTSCRIPT", null, "7BIT", new HashMap<String, String>())),
-			createSimpleMimePart("IMAGE", "GIF", null, "BASE64", new HashMap<String, String>()),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "hal_9000"),
-				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", new HashMap<String, String>()),
-				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", new HashMap<String, String>())),
-			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "16819560-2078917053-688350843:#11603"),
-				createSimpleMimePart("APPLICATION", "POSTSCRIPT", null, "7BIT", new HashMap<String, String>()),
-				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-				createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", ImmutableMap.of("BOUNDARY", "foobarbazola"),
-					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", ImmutableMap.of("CHARSET", "US-ASCII")),
-					createSimpleMimePart("multipart", "PARALLEL", null, null, ImmutableMap.of("BOUNDARY", "seconddivider"),
-						createSimpleMimePart("IMAGE", "GIF", null, "BASE64", new HashMap<String, String>()),
-						createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", new HashMap<String, String>())),
-					createSimpleMimePart("APPLICATION", "ATOMICMAIL", null, "7BIT", new HashMap<String, String>()),
-					createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", new HashMap<String, String>(),
-						createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", new HashMap<String, String>())))));
+			createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 190, new HashMap<String, String>()),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 4940, ImmutableMap.of("BOUNDARY", "Interpart_Boundary_AdJn:mu0M2YtJKaFh9AdJn:mu0M2YtJKaFk="),
+				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 767, ImmutableMap.of("CHARSET", "US-ASCII")),
+				createSimpleMimePart("multipart", "MIXED", null, null, null, ImmutableMap.of("BOUNDARY", "Alternative_Boundary_8dJn:mu0M2Yt5KaFZ8AdJn:mu0M2Yt1KaFdA"),
+					createSimpleMimePart("TEXT", "RICHTEXT", null, "7BIT", 887, new HashMap<String, String>())),
+				createSimpleMimePart("APPLICATION", "ANDREW-INSET", null, "7BIT", 917, new HashMap<String, String>())),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 562276, new HashMap<String, String>(),
+				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", 561308, new HashMap<String, String>())),
+			createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", 36234, new HashMap<String, String>()),
+			createSimpleMimePart("IMAGE", "PBM", null, "BASE64", 1814, new HashMap<String, String>()),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 182936, ImmutableMap.of("BOUNDARY", "Outermost_Trek"),
+				createSimpleMimePart("multipart", "MIXED", null, null, null, ImmutableMap.of("BOUNDARY", "Where_No_One_Has_Gone_Before"),
+					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 731, ImmutableMap.of("CHARSET", "US-ASCII")),
+					createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", 31472, new HashMap<String, String>())),
+				createSimpleMimePart("multipart", "MIXED", null, null, null, ImmutableMap.of("BOUNDARY", "Where_No_Man_Has_Gone_Before"),
+					createSimpleMimePart("IMAGE", "GIF", null, "BASE64", 26000, new HashMap<String, String>()),
+					createSimpleMimePart("IMAGE", "GIF", null, "BASE64", 18666, new HashMap<String, String>()),
+					createSimpleMimePart("APPLICATION", "X-BE2", null, "7BIT", 46125, ImmutableMap.of("VERSION", "12")),
+					createSimpleMimePart("APPLICATION", "ATOMICMAIL", null, "7BIT", 9203, ImmutableMap.of("VERSION", "1.12"))),
+				createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", 47822, new HashMap<String, String>())),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 86163, ImmutableMap.of("BOUNDARY", "mail.sleepy.sau.144.8891"),
+				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 21, ImmutableMap.of("CHARSET", "US-ASCII")),
+				createSimpleMimePart("IMAGE", "PGM", null, "BASE64", 84174, new HashMap<String, String>()),
+				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 267, ImmutableMap.of("CHARSET", "US-ASCII"))),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 74487, ImmutableMap.of("BOUNDARY", "mail.sleepy.sau.158.532"),
+				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 1246, ImmutableMap.of("CHARSET", "US-ASCII")),
+				createSimpleMimePart("IMAGE", "PBM", null, "BASE64", 71686, new HashMap<String, String>())),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 398041, new HashMap<String, String>(),
+				createSimpleMimePart("APPLICATION", "POSTSCRIPT", null, "7BIT", 397154, new HashMap<String, String>())),
+			createSimpleMimePart("IMAGE", "GIF", null, "BASE64", 45596, new HashMap<String, String>()),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 82165, ImmutableMap.of("BOUNDARY", "hal_9000"),
+				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", 40580, new HashMap<String, String>()),
+				createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", 40634, new HashMap<String, String>())),
+			createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 297367, ImmutableMap.of("BOUNDARY", "16819560-2078917053-688350843:#11603"),
+				createSimpleMimePart("APPLICATION", "POSTSCRIPT", null, "7BIT", 40531, new HashMap<String, String>()),
+				createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 13685, ImmutableMap.of("CHARSET", "US-ASCII")),
+				createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 242126, ImmutableMap.of("BOUNDARY", "foobarbazola"),
+					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 319, ImmutableMap.of("CHARSET", "US-ASCII")),
+					createSimpleMimePart("multipart", "PARALLEL", null, null, null, ImmutableMap.of("BOUNDARY", "seconddivider"),
+						createSimpleMimePart("IMAGE", "GIF", null, "BASE64", 3276, new HashMap<String, String>()),
+						createSimpleMimePart("AUDIO", "BASIC", null, "BASE64", 156706, new HashMap<String, String>())),
+					createSimpleMimePart("APPLICATION", "ATOMICMAIL", null, "7BIT", 4924, new HashMap<String, String>()),
+					createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 75980, new HashMap<String, String>(),
+						createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", 75682, new HashMap<String, String>())))));
 		IMimePart result = parseStringAsBodyStructure(bs);
 		result.toString();
 		checkMimeTree(message, result);
