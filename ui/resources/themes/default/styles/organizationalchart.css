@@ -125,20 +125,24 @@
 .node {
   width: 140px;
   margin: auto;
-  border: 1px solid #646567;
+  border-radius: 5px;
+  border: 1px solid #999;
   background-color: #FFF;
 }
 
 .node h1 {
+  color: #FFF;
   text-align: center;
-  font-size: 100%;
-  border-top: 1px solid #FFF;
-  border-left: 1px solid #FFF;
-  border-bottom: 1px solid #929292; 
-  background-color: #B3B2B2;
-  background-image: url('../images/background_tableHead.gif');
-  background-repeat: repeat-x;
-  background-position: top;
+  font-size: 12px;
+  text-shadow: 0 1px 0 #777;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;  background-color: #368397;
+background-color: #3F99AF;
+  background: linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
 }
 
 .node ul {

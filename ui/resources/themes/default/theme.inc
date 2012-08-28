@@ -181,9 +181,9 @@ $img_home           = "$theme_path/home_obm.png";
 
 // Agenda Icons
 $ico_resize                 = "$theme_path/ico_resize.gif";
-$ico_previous               = "$theme_path/ico_previous.gif";
+$ico_previous               = "$theme_path/ico_previous.png";
 $ico_far_previous           = "$theme_path/ico_far_previous.gif";
-$ico_next                   = "$theme_path/ico_next.gif";
+$ico_next                   = "$theme_path/ico_next.png";
 $ico_far_next               = "$theme_path/ico_far_next.gif";
 $ico_private                = "$theme_path/ico_private.gif";
 $ico_private_alt            = "$theme_path/ico_private_alt.gif";
@@ -197,7 +197,7 @@ $ico_extension_left         = "$theme_path/ico_calendar_extension_left.gif";
 $ico_extension_right        = "$theme_path/ico_calendar_extension_right.gif";
 // $ico_popup_close            = "$theme_path/ico_popup_close.gif";
 $ico_comment                  = "$theme_path/ico_small_comment.png";
-$ico_popup_close            = "$theme_path/ico_close.gif";
+$ico_popup_close            = "$theme_path/ico_close.png";
 $popup_queue                = "$theme_path/popup_queue.gif";
 $ico_day_view               = "$theme_path/ico_calendar_day_view.gif";
 $ico_week_view              = "$theme_path/ico_calendar_week_view.gif";
@@ -250,5 +250,5 @@ $icons['edit']     = "$theme_path/edit.png";
 $icons['delete']   = "$theme_path/delete.png";
 $icons['others']   = "$theme_path/othersDropDown.png";
 $icons['add']      = "$theme_path/addDropDown.png";
-$icons['close']    = "$theme_path/close.png";
+$icons['close']    = "$theme_path/ico_close.png";
 $icons['dropdown'] = "$theme_path/dropDown.png";

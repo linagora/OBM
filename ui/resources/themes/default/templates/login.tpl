@@ -9,6 +9,7 @@
       body {
         text-align: center;
         margin-top: 1em;
+        background:url(../images/structure/pattern.png) top left repeat #FFF;
       }
       form {
         margin: auto;
@@ -17,7 +18,7 @@
       select {
         width: 50%;
       }
-      #aliasource {
+      #linagora {
         margin-top:0;
         margin-bottom:0;
         width: 100%;
@@ -37,7 +38,7 @@
     </style>
   </head>
   <body>
-    <p id="aliasource">
+    <p id="linagora">
     <a href="http://www.obm.org">OBM.org</a>
     </p>
     <h1>$l_obm_title $obm_version</h1>

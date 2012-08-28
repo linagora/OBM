@@ -7,8 +7,9 @@
 /*Tables styling*/
 
 #contactPanel {
+  font-family: sans-serif;
   width: 100%;
-  border: 2px solid #d2d6da;
+  border: 1px solid #ccc;
   border-spacing: 0;
 }
 
@@ -19,43 +20,55 @@
 }
 
 #contactPanel td {
-  vertical-align: top;
+  vertical-align: middle;
 }
 
-.contactPanelHeader thead td, .contactPanelHeader thead th {
+.contactPanelHeader thead td, .contactPanelHeader thead tr {
   line-height: 25px;
   height: 25px;
   overflow: hidden;
-  background-color: #b3b2b2;
   font-weight: bold;
   text-align: center;
-  background-image: url('../images/background_tableHead.gif');
-  background-repeat: repeat-x;
-  background-position: top;
-  border-right: 1px solid #aeaeae;
-  border-top: 1px solid #fff;
-  border-bottom: 1px solid #a0a0a0; 
+  background-color: #FAFAFA;
+  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   vertical-align: middle;
-  color: #000;
-  white-space: nowrap;
+  color: #111;
+  font-size: 12px;
+  line-height: 12px;
 }
+.contactPanelHeader thead tr+tr, .contactPanelHeader thead tr+tr td{
+  background-color: #FFF;
+}
+}
+.contactPanelHeader input{
+  border-radius: 8px;
+}
+
 
 .contactPanelHeader thead td.toolbar, .contactPanelHeader thead th.toolbar {
   text-align: left;
-  background: #c5d2d8;
+  background-color: #FAFAFA;
+  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   height: 25px;
-  padding-left: 10px;
   overflow: visible;
 }
 
 #addressBookContainer tbody td a {
-  color: black;
+  color: #555;
 }
 
 #addressBookContainer tbody td a:hover, #dataGrid tbody tr.even:hover,  #dataGrid tbody tr.odd:hover {
-  background-color: #99a8b7;
+  background-color: #E2F0FF;
   cursor: pointer;
-  color: black;
+  color: #333;
 }
 
 #addressBookContainer tbody td .dropDownMenu ul a:hover {
@@ -64,7 +77,8 @@
 }
 
 #addressBookContainer td.current, #dataGrid tr.current {
-  background-color: #99a8b7;
+  background-color: #E2F0FF;
+  color: #000 !important;
 }
 
 
@@ -80,7 +94,7 @@
 #addressBookGrid {
   border-right: 2px solid #d2d6da;
   width: 15em;
-  background-color: #dee1e3;
+  background-color: #F4F4F4; 
 }
 
 #addressBookGrid input.consult {
@@ -133,7 +147,7 @@
   background-image: url('../images/addAddressbook.png');
   background-repeat: no-repeat;
   background-position: center;    
-  border: 1px solid black;  
+  border: 1px solid #CCC;  
 }
 
 
@@ -142,10 +156,12 @@
   width:45px;
   background-image: url('../images/addContact.png');
   background-repeat: no-repeat;
-  background-position: center;    
-  border: 1px solid black;
+  background-position: center; 
 }
 
+#addContact input:hover {
+  border:3px solid #CCC:
+}
 
 .error input , input.error {
   background-color: #ff9f9f;
@@ -155,7 +171,7 @@
 /* Data rows styling */
 
 #dataGrid {
-  border-right: 2px solid #d2d6da;
+  border-right: 1px solid #CCC;
 }
 
 #dataGrid.shrinked {
@@ -171,35 +187,44 @@
 }
 
 #dataGrid th {
-  width: 20em;
+  width: 200px;
 }
 
 #dataGrid .contactPanelHeader{
   table-layout: fixed;
 }
 
+.contactPanelHeader thead tr th a img{
+  height: 22px;
+}
+
 #dataContainer tr.odd {
-  line-height: 2em;
-  height: 2em;
+  line-height: 2.5em;
+  height: 2.5em;
   background-color: #fafafa;
 }
 
 #dataContainer tr.even {
-  line-height: 2em;
-  height: 2em;
+  line-height: 2.5em;
+  background-color: #F4F4F4;
+  height: 2.5em;
 }
 
 #dataGrid tr.current {
-  background-color: #99a8b7;
+  background-color: #E2F0FF;
+  color: #333 !important;
 }
 
 #dataContainer td, #dataContainer th{
-  border-left: 1px solid #e0e2e4;
+  border-right: 1px solid #CCC;
+  text-align: left;
+  padding-left: 5px;
 }
 
 /* Contact card styling */
 
 #informationContainer {
+  padding-top: 15px;
   position: relative;
 }
 
@@ -209,13 +234,13 @@
   border-radius: 5px;  
   margin: 0 10px 2px 20px ;
   float: left;
-  border: 3px solid #ddd;
+  border: 3px solid #CCC;
   height: 96px;
   width: 96px;
 }
 
 #informationGrid .details {
-  border: 2px solid #ddd;
+  border: 2px solid #CCC;
   min-width : 325px;
   width:90%;
   margin: 12px 0 0 20px;
@@ -278,7 +303,8 @@
 /* Form */
 
 #contactToolbar {
-  width: 400px;
+  width: 390px;
+  padding-left: 10px;
 }
 
 .coordinate th{
@@ -306,7 +332,7 @@
 
 
 #informationGrid fieldset.head {
-  border: 2px solid #ddd;
+  border: 2px solid #ccc;
   background-color: #fafafa;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -342,7 +368,7 @@
 }
 
 input, textarea {
-  border: 1px solid #ddd;
+  border: 1px solid #CCC;
   background-color: #fafafa;
 }
 
@@ -408,7 +434,7 @@ select {
 /*Overflow in grid*/
 
 .contactPanelContainer {
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
@@ -417,7 +443,7 @@ select {
 }
 
 #dataContainer {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 table.contactPanelHeader th, .contactPanelContainer table td {
@@ -446,6 +472,11 @@ table.contactPanelHeader th, .contactPanelContainer table td {
   overflow:hidden;
 }
 
+#informationGrid{
+  background-color: #FAFAFA;
+
+}
+
 #informationGrid select.addressbookSelector {
   margin-left: 2px;
   margin-bottom: 1px;
@@ -455,4 +486,88 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 
 #informationGrid .phones th select{
   width: 15em;
+}
+
+
+input.dropDownButton {
+  color:#FFF;
+  text-shadow: 0 -1px 0px #777;
+  margin-right: 2px;
+  padding-right: 16px;
+  background-image: url('../images/arrow_single_down.gif');
+  background-repeat: no-repeat;
+  background-position: right 65%;
+  border-width: 1px;
+  border-color: #47ADC6 #368397 #296472;
+  border-style: solid;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+}
+
+input.deleteButton {
+  color:#FFF;
+  text-shadow: 0 -1px 0px #777;
+  margin-right: 2px;
+  padding-right: 5px;
+  border: 1px solid #CCC;
+  border-width: 1px;
+  border-color: #47ADC6 #368397 #296472;
+  border-style: solid;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+}
+
+input.updateButton {
+  color:#FFF;
+  text-shadow: 0 -1px 0px #777;
+  margin-right: 2px;
+  padding-right: 5px;
+  border: 1px solid #CCC;
+  border-width: 1px;
+  border-color: #47ADC6 #368397 #296472;
+  border-style: solid;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+}
+
+input.dropDownButton:hover {
+  background-color: #3F99AF;
+  background: linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -moz-linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -webkit-linear-gradient(top, #368397 0%,#3F99AF 100%);
+  background: -o-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  background: -ms-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  cursor: pointer;
+}
+
+input.deleteButton:hover {
+  background-color: #3F99AF;
+  background: linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -moz-linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -webkit-linear-gradient(top, #368397 0%,#3F99AF 100%);
+  background: -o-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  background: -ms-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  cursor: pointer;
+}
+
+input.updateButton:hover {
+  background-color: #3F99AF;
+  background: linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -moz-linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+  background: -webkit-linear-gradient(top, #368397 0%,#3F99AF 100%);
+  background: -o-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  background: -ms-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+  cursor: pointer;
 }

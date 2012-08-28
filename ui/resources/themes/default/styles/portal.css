@@ -7,28 +7,41 @@
 /////////////////////////////////////////////////////////////////////////////*/
 
 .summaryBox {
+  font-family: sans-serif, verdana, tahoma;
   margin: 2px;
-  background-color: #eeeff1;
-  border: 1px solid #b3b3b3;
+  margin-right:20px;
+  margin-top: 10px;
+  background-color: #FFF;
   height: 20em;
   width: 22em;
   float : left;
+  border-radius: 10px;
+  box-shadow: 2px 2px 4px #CCC; 
+  border: 1px solid #eee;
 }
 
 .summaryBox h1 {
-  margin: 0 0 5px 0;
+  margin: 0 0 3px 0;
   font-size: 140%;
   height: 1.6em;
-  line-height: 1.6em;
-  background-image: url('../images/tab_current_border.png');
-  background-repeat: repeat-x;
-  background-position: 0 0.8em;
-  background-color: #eff0f2;
+  font-weight: normal;
+  line-height: 2em;
+  background-color: #FFF;
+  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  color:#777;
   border-bottom: 1px solid #b3b3b3;  
+  border-radius: 8px 8px 0 0;
 }
 
 .summaryBox h1 img{
   float: left;
+  margin-left:5px;
+  margin-top: 5px;
+  width:16px;
 }
 
 .summaryBox h2 {
@@ -44,6 +57,7 @@
   text-align: center;
   text-decoration: none;
   font-weight: bold;
+  margin-top: 3px;
 }
 
 .summaryBox dl {
@@ -52,6 +66,7 @@
 
 .summaryBox table {
   margin: 0 0 5px;
+  height:65%;
 }
 
 .summaryBox dt {
