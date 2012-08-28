@@ -2577,7 +2577,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     if (is_null($event_tag_id)) $event_tag_id = 'NULL' ;
     $description = $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
-    $location = $event_q->f('event_location');
+    $location = $calendar['location'] ? $calendar['location'] : $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $ext_id = $event_q->f('event_ext_id');
     $oldOwner = intval($oldEvent->get("owner")->__toString());
@@ -2709,7 +2709,11 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   // OBMFULL-3499
   // This is done here so that participation status is up-to-date BEFORE the email is sent
   // This allows the attached ICS to contain the correct PARTSTAT for the attendees
-  run_query_quick_attendee_update($calendar, $exception_id);
+  $shouldUpdateAttendees = ($obm['uid'] == $oldOwner || OBM_Acl::canWrite($obm['uid'], 'calendar', $oldOwner))
+	&& ($exception_date != $exception_recurrence_id_date || $location != $oldEvent->location);
+  if ($shouldUpdateAttendees) {
+	  run_query_quick_attendee_update($calendar, $exception_id);
+  }
   
   if($run_observers) {
   	// Send mail session var
