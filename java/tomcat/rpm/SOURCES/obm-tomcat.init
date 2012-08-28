@@ -7,7 +7,7 @@
 set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-export JAVA_HOME=/usr/java/default
+export JAVA_HOME=/usr/lib/jvm/java
 
 if [ -r /etc/sysconfig/i18n ]; then
   . /etc/sysconfig/i18n
