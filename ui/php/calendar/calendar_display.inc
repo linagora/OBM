@@ -5365,6 +5365,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $block_repeat = "
     <div class=\"detail infos\">
      <h1>$l_repeat</h1>
+     <input type=\"hidden\" name=\"tf_repeatfrequency\" value=\"1\" />
      <table>
       <tr>
        <th>$GLOBALS[l_exception] :</th>
