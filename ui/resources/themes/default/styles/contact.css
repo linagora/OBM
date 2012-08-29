@@ -20,7 +20,7 @@
 }
 
 #contactPanel td {
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 .contactPanelHeader thead td, .contactPanelHeader thead tr {
