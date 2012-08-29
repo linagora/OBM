@@ -6586,7 +6586,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
       <div class='buttons'>
         <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/".basename($_SERVER['SCRIPT_NAME'])."'>
           <input class='close readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
-          <input class='close closeSticky' id='formClose' type='button' value='$GLOBALS[l_cancel]' style='margin-left:-2em;'/>
+          <input class='close closeSticky' id='formClose' type='button' value='$GLOBALS[l_cancel]' />
           <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
           <input type='hidden' name='duration' id='duration' value='' />
           <input type='hidden' name='time_begin' id='time_begin' value='' />
