@@ -29,60 +29,86 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.minig.imap.command;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.minig.imap.ListInfo;
 import org.minig.imap.ListResult;
 import org.minig.imap.impl.IMAPResponse;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 
-public class AbstractListCommand extends SimpleCommand<ListResult> {
 
-	private static final int CHAR_SEPARATOR_BLOCK_SIZE = ") \".\" ".length();
-	protected boolean subscribedOnly;
+public class ListCommandTest {
 
-	protected AbstractListCommand(boolean subscribedOnly) {
-		super((subscribedOnly ? "LSUB " : "LIST ") + "\"\" \"*\"");
-		this.subscribedOnly = subscribedOnly;
+	private ListCommand listCommand;
+
+	@Before
+	public void setup() {
+		listCommand = new ListCommand();
+	}
+	
+	@Test
+	public void folderNameList() {
+		listCommand.responseReceived(responses(
+				"* LIST (\\Noinferiors) \"/\" INBOX",
+				"* LIST (\\HasNoChildren) \"/\" Drafts",
+				"* LIST (\\HasNoChildren) \"/\" SPAM",
+				"* LIST (\\HasNoChildren) \"/\" Sent",
+				"* LIST (\\HasNoChildren) \"/\" Templates",
+				"* LIST (\\HasNoChildren) \"/\" Trash",
+				"A OK Completed (0.000 secs 7 calls)"));
+		ListResult result = listCommand.data;
+		assertThat(result).containsOnly(
+				inbox(),
+				folder("Drafts"),
+				folder("SPAM"),
+				folder("Sent"),
+				folder("Templates"),
+				folder("Trash"));
+	}
+	
+	@Test
+	public void folderNameTrimQuotes() {
+		listCommand.responseReceived(responses(
+				"* LIST (\\Noinferiors) \"/\" \"INBOX\"",
+				"* LIST (\\HasNoChildren) \"/\" \"Drafts\"",
+				"* LIST (\\HasNoChildren) \"/\" \"SPAM\"",
+				"* LIST (\\HasNoChildren) \"/\" \"Sent\"",
+				"* LIST (\\HasNoChildren) \"/\" \"Templates\"",
+				"* LIST (\\HasNoChildren) \"/\" \"Trash\"",
+				"A OK Completed (0.000 secs 7 calls)"));
+		ListResult result = listCommand.data;
+		assertThat(result).containsOnly(
+				inbox(),
+				folder("Drafts"),
+				folder("SPAM"),
+				folder("Sent"),
+				folder("Templates"),
+				folder("Trash"));
 	}
 
-	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-		ListResult lr = new ListResult(rs.size() - 1);
-		for (int i = 0; i < rs.size() - 1; i++) {
-			String p = rs.get(i).getPayload();
-			if (!p.contains( subscribedOnly? "LSUB " : " LIST ")) {
-				continue;
-			}
-			int oParen = p.indexOf('(', 5);
-			int cPren = p.indexOf(')', oParen);
-			String flags = p.substring(oParen + 1, cPren);
-			if (i == 0) {
-				char imapSep = p.charAt(cPren + 3);
-				lr.setImapSeparator(imapSep);
-			}
-			String mbox = parseMailboxName(p, cPren);
-			lr.add(new ListInfo(mbox, !flags.contains("\\Noselect"), !flags.contains("\\Noinferiors")));
+	private List<IMAPResponse> responses(String... lines) {
+		List<IMAPResponse> responses = Lists.newArrayList();
+		for (String line: lines) {
+			responses.add(new IMAPResponse("OK", line));
 		}
-		data = lr;
+		return responses;
 	}
+	
 
-	@VisibleForTesting String parseMailboxName(String responseLine, int flagsEndingIndex) {
-		String mailboxName = fromUtf7(responseLine.trim().substring(flagsEndingIndex + CHAR_SEPARATOR_BLOCK_SIZE));
-		return unquote(mailboxName);
+	
+	private ListInfo folder(String name) {
+		return new ListInfo(name, true, true);
 	}
-
-	private String unquote(String mailboxName) {
-		if (mailboxName.charAt(0) == '\"' && 
-				mailboxName.charAt(mailboxName.length() - 1) == '\"') {
-			return mailboxName.substring(1, mailboxName.length() - 1);
-		} else {
-			return mailboxName;
-		}
+	
+	private ListInfo inbox() {
+		return new ListInfo("INBOX", true, false);
 	}
-
+	
 }

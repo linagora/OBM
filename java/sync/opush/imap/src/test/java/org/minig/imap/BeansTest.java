@@ -62,6 +62,7 @@ public class BeansTest {
 					.add(ContentType.class)
 					.add(BodyParam.class)
 					.add(MimeAddress.class)
+					.add(ListInfo.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

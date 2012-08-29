@@ -34,7 +34,7 @@ package org.minig.imap;
 
 import com.google.common.base.Objects;
 
-public class ListInfo {
+public final class ListInfo {
 
 	private String name;
 
@@ -73,6 +73,22 @@ public class ListInfo {
 		return Objects.toStringHelper(getClass())
 				.add("name", name)
 				.toString();
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(name, selectable, createSubfolder);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof ListInfo) {
+			ListInfo that = (ListInfo) object;
+			return Objects.equal(this.name, that.name)
+				&& Objects.equal(this.selectable, that.selectable)
+				&& Objects.equal(this.createSubfolder, that.createSubfolder);
+		}
+		return false;
 	}
 	
 }
