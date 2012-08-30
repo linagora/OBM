@@ -1852,6 +1852,9 @@ form.button-to input {
     height:70px;
     resize:none;
 }
+.obmPopup fieldset{
+  margin:0 auto;
+}
 
 /* Alert Icon and Popup */
 .bellalert{
