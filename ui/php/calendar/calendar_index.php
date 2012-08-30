@@ -1735,6 +1735,10 @@ function get_calendar_action() {
 
   $id = $params['calendar_id'];
   $date = $params['date'];
+  if (isset($params['date_edit_occurrence'])){
+    $exception_update="&amp;date_edit_occurrence=".$params['date_edit_occurrence'];
+  }
+
   // Index
   $actions['calendar']['index'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=index",
@@ -1818,7 +1822,7 @@ function get_calendar_action() {
   // Detail Update
   $actions['calendar']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id",
+    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id$exception_update",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','update_alert','update_decision', 'update_ext_decision') 
   );
