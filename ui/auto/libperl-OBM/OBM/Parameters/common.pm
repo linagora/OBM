@@ -42,7 +42,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $ldapConnectionPooling);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -171,6 +171,19 @@ $ldapRoot = $cfgFile->val( 'automate', 'ldapRoot' );
 if( !defined($ldapRoot) ) {
     $ldapRoot = "local";
 }
+
+# Permet de desactiver le pooling de connexion LDAP => 
+# l'automate va ouvrir une nouvelle connexion à chaque requete si
+# ldapConnectionPooling = 0
+$ldapConnectionPooling = $cfgFile->val( 'automate', 'ldapConnectionPooling' );
+if( !defined($ldapConnectionPooling) || ($ldapConnectionPooling !~ /^[0-9]+$/) ) {
+    $ldapConnectionPooling = 1;
+}elsif( $ldapConnectionPooling > 1 ) {
+    $logLevel = 1;
+}elsif( $ldapConnectionPooling < 0 ) {
+    $logLevel = 1;
+}
+
 
 # Le mapping des UID<->SID
 $sambaOldSidMapping = $cfgFile->val( 'automate', 'oldSidMapping' );

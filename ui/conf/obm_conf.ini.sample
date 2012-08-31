@@ -117,6 +117,13 @@ ldapTls = may
 ; LDAP Root
 ; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
 ldapRoot = local
+;
+; LDAP Connection Pooling
+; value: 0 or 1
+; default value: 1
+; if set to 0, the automaton will open a new LDAP connection to the server on each new request
+ldapConnectionPooling=1
+
 
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain

@@ -94,6 +94,7 @@ sub _getServerDesc {
     require OBM::Parameters::common;
     $self->{'ldapUri'} = $OBM::Parameters::common::ldapServer;
     $self->{'ldapTls'} = $OBM::Parameters::common::ldapTls;
+    $self->{'ldapConnectionPooling'} = $OBM::Parameters::common::ldapConnectionPooling;
 
     $self->{'ldap_admin_login'} = $OBM::Parameters::common::ldapAdminLogin;
     if( !($self->{'ldap_admin_dn'} = $self->_getAdminDn()) ) {
@@ -218,7 +219,7 @@ sub _connect {
         return 1;
     }
 
-    if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
+    if( $self->{'ldapConnectionPooling'} == 1 && ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
         $self->_log( 'connexion déjà établie à '.$self->getDescription(), 4 );
         return 0;
     }
