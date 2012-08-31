@@ -2098,7 +2098,7 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
   $event_id = sql_parse_id( $calendar['calendar_id'], true); 
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
-  $repeat_kind = $calendar['repeat_kind'];
+  $repeat_kind = $calendar['repeat_kind'] ? $calendar['repeat_kind'] : "none";
   $repeat_days = $calendar['repeat_days'];
   if (isset($calendar['repeat_end'])) {
     $repeat_end = "'$calendar[repeat_end]'";
