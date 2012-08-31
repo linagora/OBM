@@ -71,7 +71,7 @@ import com.google.inject.Singleton;
 public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MailViewToMSEmailConverterImpl.class);
-	private static final Charset DEFAULT_CHARSET = Charsets.ISO_8859_1;
+	private static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
 
 	private final MSEmailHeaderConverter emailHeaderConverter;
 	private final EventService eventService;
