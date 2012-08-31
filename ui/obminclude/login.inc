@@ -61,6 +61,11 @@ include_once($lang_file);
 $captcha_file = "lib/captcha/recaptchalib.php";
 require_once($captcha_file);
 
+$conf_login_page_incl = "$path/../conf/themes/login.inc";
+if (file_exists($conf_login_page_incl)) {
+  include "$conf_login_page_incl";
+}
+
 $conf_login_page = "$path/../conf/themes/login.html";
 if (file_exists($conf_login_page)) {
   $lp = $conf_login_page;
