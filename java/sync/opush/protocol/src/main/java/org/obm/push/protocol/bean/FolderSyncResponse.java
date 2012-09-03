@@ -33,6 +33,7 @@ package org.obm.push.protocol.bean;
 
 import java.util.List;
 
+import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
@@ -47,6 +48,8 @@ public class FolderSyncResponse {
 	}
 	
 	public static class Builder {
+		
+		private FolderSyncStatus status;
 		private HierarchyCollectionChanges hierarchyItemsChanges;
 		private SyncKey newSyncKey;
 
@@ -62,15 +65,23 @@ public class FolderSyncResponse {
 			return this;
 		}
 		
+		public Builder status(FolderSyncStatus status) {
+			this.status = status;
+			return this;
+		}
+		
 		public FolderSyncResponse build() {
-			return new FolderSyncResponse(this.hierarchyItemsChanges, this.newSyncKey);
+			return new FolderSyncResponse(status, hierarchyItemsChanges, newSyncKey);
 		}
 	}
 	
+	private final FolderSyncStatus status;
 	private final HierarchyCollectionChanges hierarchyItemsChanges;
 	private final SyncKey newSyncKey;
 	
-	private FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, SyncKey newSyncKey) {
+	private FolderSyncResponse(FolderSyncStatus status,
+			HierarchyCollectionChanges hierarchyItemsChanges, SyncKey newSyncKey) {
+		this.status = status;
 		this.hierarchyItemsChanges = hierarchyItemsChanges;
 		this.newSyncKey = newSyncKey;
 	}
@@ -102,16 +113,21 @@ public class FolderSyncResponse {
 		return hierarchyItemsChanges.getCollectionDeletions();
 	}
 	
+	public FolderSyncStatus getStatus() {
+		return status;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(hierarchyItemsChanges, newSyncKey);
+		return Objects.hashCode(status, hierarchyItemsChanges, newSyncKey);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof FolderSyncResponse) {
 			FolderSyncResponse that = (FolderSyncResponse) object;
-			return Objects.equal(this.hierarchyItemsChanges, that.hierarchyItemsChanges)
+			return Objects.equal(this.status, that.status)
+				&& Objects.equal(this.hierarchyItemsChanges, that.hierarchyItemsChanges)
 				&& Objects.equal(this.newSyncKey, that.newSyncKey);
 		}
 		return false;
@@ -120,6 +136,7 @@ public class FolderSyncResponse {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
+			.add("status", status)
 			.add("hierarchyItemsChanges", hierarchyItemsChanges)
 			.add("newSyncKey", newSyncKey)
 			.toString();

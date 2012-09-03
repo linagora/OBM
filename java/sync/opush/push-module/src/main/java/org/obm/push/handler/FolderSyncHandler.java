@@ -126,6 +126,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		FolderSyncState outgoingSyncState = stMachine.allocateNewFolderSyncState(udr);
 		HierarchyCollectionChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, incomingSyncState, outgoingSyncState);
 		return FolderSyncResponse.builder()
+			.status(FolderSyncStatus.OK)
 			.hierarchyItemsChanges(hierarchyItemsChanges)
 			.newSyncKey(outgoingSyncState.getSyncKey())
 			.build();

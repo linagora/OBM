@@ -37,6 +37,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
@@ -95,4 +98,75 @@ public class FolderSyncProtocolTest {
 		Document encodeResponse = folderSyncProtocol.encodeResponse(folderSyncResponse);
 		
 		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
-	}}
+	}
+	
+	@Test
+	public void testDecodeStatusOK() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<Status>1</Status>" +
+				"<SyncKey>2056e98e-be0e-4d1a-8f39-328614a32f3a</SyncKey>" +
+				"<Changes>" +
+				"<Count>0</Count>" +
+				"</Changes>" +
+				"</FolderSync>";
+		
+		FolderSyncResponse folderSyncResponse = folderSyncProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.OK);
+	}
+	
+	@Test
+	public void testDecodeStatusInvalidSyncKey() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<Status>9</Status>" +
+				"<SyncKey>2056e98e-be0e-4d1a-8f39-328614a32f3a</SyncKey>" +
+				"<Changes>" +
+				"<Count>0</Count>" +
+				"</Changes>" +
+				"</FolderSync>";
+		
+		FolderSyncResponse folderSyncResponse = folderSyncProtocol.decodeResponse(DOMUtils.parse(initialDocument));
+
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.INVALID_SYNC_KEY);
+	}
+	
+	@Test
+	public void testEncodeStatusOK() throws Exception {
+		Document encodedDocument = folderSyncProtocol.encodeResponse(FolderSyncResponse.builder()
+				.newSyncKey(new SyncKey("1234"))
+				.status(FolderSyncStatus.OK)
+				.hierarchyItemsChanges(HierarchyCollectionChanges.builder().build())
+				.build());
+
+		assertThat(DOMUtils.serialize(encodedDocument)).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<Status>1</Status>" +
+				"<SyncKey>1234</SyncKey>" +
+				"<Changes>" +
+				"<Count>0</Count>" +
+				"</Changes>" +
+				"</FolderSync>");
+	}
+	
+	@Test
+	public void testEncodeStatusInvalidSyncKey() throws Exception {
+		Document encodedDocument = folderSyncProtocol.encodeResponse(FolderSyncResponse.builder()
+				.newSyncKey(new SyncKey("1234"))
+				.status(FolderSyncStatus.INVALID_SYNC_KEY)
+				.hierarchyItemsChanges(HierarchyCollectionChanges.builder().build())
+				.build());
+
+		assertThat(DOMUtils.serialize(encodedDocument)).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FolderSync>" +
+				"<Status>9</Status>" +
+				"<SyncKey>1234</SyncKey>" +
+				"<Changes>" +
+				"<Count>0</Count>" +
+				"</Changes>" +
+				"</FolderSync>");
+	}
+}
