@@ -5438,6 +5438,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   $sel_alert .= '</select>';
   
+  // rewrite date_edit_occurrence parameter if set (eg in case we're here bc of a conflict)
+  $date_edit_occurrence = "";
+  if ( $calendar["date_edit_occurrence"] ) {
+    $date_edit_occurrence = '<input type="hidden" name="date_edit_occurrence" value="'.str_replace('"','&quot;',$calendar["date_edit_occurrence"]).'">';
+  }
+
   // Template name popup
   $template_popup = html_calendar_template_name_popup();
 
@@ -5448,6 +5454,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $block = "
   <form method='post' enctype='multipart/form-data' id='new_event_form' name='f_entity'
    onsubmit='return check_calendar_calendar(this);' action=\"".basename($_SERVER['SCRIPT_NAME'])."\">
+$date_edit_occurrence
   <fieldset class='detail infos'>  
   <legend>$l_module_calendar</legend>
   <table>
