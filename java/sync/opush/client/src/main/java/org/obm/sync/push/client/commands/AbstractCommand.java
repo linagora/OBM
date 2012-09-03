@@ -37,7 +37,6 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public abstract class AbstractCommand<T> implements IEasCommand<T> {
 
@@ -56,11 +55,11 @@ public abstract class AbstractCommand<T> implements IEasCommand<T> {
 		Document response = opc.postXml(namespace, documentProvider.get(ai), cmd, null, false);
 		T ret = null;
 		if (response != null) {
-			ret = parseResponse(response.getDocumentElement());
+			ret = parseResponse(response);
 		}
 		return ret;
 	}
 
-	protected abstract T parseResponse(Element responseRootElem) throws Exception;
+	protected abstract T parseResponse(Document responseDocument) throws Exception;
 
 }

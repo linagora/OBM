@@ -34,9 +34,10 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.protocol.FolderSyncProtocol;
+import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
-import org.obm.sync.push.client.beans.FolderSyncResponse;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -60,7 +61,7 @@ public class FolderSync extends AbstractCommand<FolderSyncResponse> {
 	}
 
 	@Override
-	protected FolderSyncResponse parseResponse(Element root) {
-		return new FolderSyncResponse.XmlParser().parse(root);
+	protected FolderSyncResponse parseResponse(Document responseDocument) {
+		return new FolderSyncProtocol().decodeResponse(responseDocument);
 	}
 }

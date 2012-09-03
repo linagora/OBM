@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
@@ -68,12 +69,50 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.push.client.beans.Add;
+import org.obm.sync.push.client.beans.Delete;
+import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public class EmailSyncTestUtils {
 	
+	public static void checkMailFolderHasNoChange(SyncResponse response, String serverId) {
+		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
+		Assertions.assertThat(inboxCollection.getAdds()).isEmpty();
+		Assertions.assertThat(inboxCollection.getDeletes()).isEmpty();
+	}
+
+	public static void checkMailFolderHasAddItems(SyncResponse response, String serverId, Add... changes) {
+		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
+		Assertions.assertThat(inboxCollection.getAdds()).containsOnly(changes);
+		Assertions.assertThat(inboxCollection.getDeletes()).isEmpty();
+	}
+
+	public static void checkMailFolderHasDeleteItems(SyncResponse response, String serverId, Delete... deletes) {
+		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
+		Assertions.assertThat(inboxCollection.getAdds()).isEmpty();
+		Assertions.assertThat(inboxCollection.getDeletes()).containsOnly(deletes);
+	}
+	
+	public static void checkMailFolderHasItems(
+			SyncResponse response, String serverId, Iterable<Add> adds, Iterable<Delete> deletes) {
+		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(
+				response, serverId);
+		Assertions.assertThat(inboxCollection.getAdds()).containsOnly(Iterables.toArray(adds, Add.class));
+		Assertions.assertThat(inboxCollection.getDeletes()).containsOnly(Iterables.toArray(deletes, Delete.class));
+	}
+
+	private static org.obm.sync.push.client.beans.Collection checkCollectionIsInResponse(
+			SyncResponse response, String serverId) {
+		Assertions.assertThat(response).isNotNull();
+		org.obm.sync.push.client.beans.Collection inboxCollection = response.getCollection(serverId);
+		Assertions.assertThat(inboxCollection).isNotNull();
+		return inboxCollection;
+	}
+
 	public static void mockEmailSyncClasses(
 			SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)

@@ -40,12 +40,12 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.FolderType;
+import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Collection;
 import org.obm.sync.push.client.beans.Folder;
-import org.obm.sync.push.client.beans.FolderSyncResponse;
-import org.obm.sync.push.client.beans.FolderType;
 import org.obm.sync.push.client.beans.SyncResponse;
 import org.obm.sync.push.client.commands.DocumentProvider;
 import org.w3c.dom.Document;
@@ -67,8 +67,8 @@ public class OPClientTests extends AbstractPushTest {
 		try {
 			FolderSyncResponse resp = opc.folderSync(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 			assertNotNull(resp);
-			assertNotNull(resp.getFolders());
-			assertTrue(resp.getFolders().size() > 0);
+			assertNotNull(resp.getHierarchyItemsChanges());
+			assertTrue(resp.getCollectionsAddedAndUpdated().size() > 0);
 			return resp;
 		} catch (Exception e) {
 			fail(e.getMessage());

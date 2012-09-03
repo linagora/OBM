@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.beans;
 
+import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.FolderType;
+
 import com.google.common.base.Objects;
 
 public final class Folder {
@@ -39,7 +42,7 @@ public final class Folder {
 	private String parentId;
 	private String name;
 	private FolderType type;
-	private FolderStatus status;
+	private FolderSyncStatus status;
 	
 	public String getServerId() {
 		return serverId;
@@ -73,11 +76,11 @@ public final class Folder {
 		this.type = type;
 	}
 
-	public FolderStatus getStatus() {
+	public FolderSyncStatus getStatus() {
 		return status;
 	}
 	
-	public void setStatus(FolderStatus status) {
+	public void setStatus(FolderSyncStatus status) {
 		this.status = status;
 	}
 	

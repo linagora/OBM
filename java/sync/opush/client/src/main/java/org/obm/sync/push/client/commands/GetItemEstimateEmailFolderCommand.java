@@ -70,7 +70,7 @@ public class GetItemEstimateEmailFolderCommand extends AbstractCommand<GetItemEs
 	}
 
 	@Override
-	protected GetItemEstimateSingleFolderResponse parseResponse(Element root) {
-		return new GetItemEstimateSingleFolderResponse.XmlParser().parse(root);
+	protected GetItemEstimateSingleFolderResponse parseResponse(Document responseDocument) {
+		return new GetItemEstimateSingleFolderResponse.XmlParser().parse(responseDocument.getDocumentElement());
 	}
 }

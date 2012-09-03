@@ -57,18 +57,17 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.FolderType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
+import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.beans.Folder;
-import org.obm.sync.push.client.beans.FolderSyncResponse;
-import org.obm.sync.push.client.beans.FolderType;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -124,13 +123,13 @@ public class FolderSyncHandlerTest {
 		
 		mocksControl.verify();
 		
-		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
-		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
+		assertThat(folderSyncResponse.getNewSyncKey()).isEqualTo(newGeneratedSyncKey);
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.OK);
 		assertThat(folderSyncResponse.getCount()).isEqualTo(1);
-		assertThat(folderSyncResponse.getFolders()).hasSize(1);
-		Folder inbox = Iterables.getOnlyElement(folderSyncResponse.getFolders().values());
-		assertThat(inbox.getName()).isEqualTo("INBOX");
-		assertThat(inbox.getType()).isEqualTo(FolderType.DEFAULT_INBOX_FOLDER);
+		assertThat(folderSyncResponse.getCollectionsAddedAndUpdated()).hasSize(1);
+		CollectionChange inbox = Iterables.getOnlyElement(folderSyncResponse.getCollectionsAddedAndUpdated());
+		assertThat(inbox.getDisplayName()).isEqualTo("INBOX");
+		assertThat(inbox.getFolderType()).isEqualTo(FolderType.DEFAULT_INBOX_FOLDER);
 	}
 
 	@Test
@@ -156,10 +155,10 @@ public class FolderSyncHandlerTest {
 
 		mocksControl.verify();
 
-		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
-		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
+		assertThat(folderSyncResponse.getNewSyncKey()).isEqualTo(newGeneratedSyncKey);
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.OK);
 		assertThat(folderSyncResponse.getCount()).isEqualTo(0);
-		assertThat(folderSyncResponse.getFolders()).isEmpty();
+		assertThat(folderSyncResponse.getCollectionsAddedAndUpdated()).isEmpty();
 	}
 	
 	@Test
@@ -203,13 +202,13 @@ public class FolderSyncHandlerTest {
 
 		mocksControl.verify();
 
-		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
-		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
+		assertThat(folderSyncResponse.getNewSyncKey()).isEqualTo(newGeneratedSyncKey);
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.OK);
 		assertThat(folderSyncResponse.getCount()).isEqualTo(1);
-		assertThat(folderSyncResponse.getFolders()).hasSize(1);
-		Folder inbox = Iterables.getOnlyElement(folderSyncResponse.getFolders().values());
-		assertThat(inbox.getName()).isEqualTo("aNewImapFolder");
-		assertThat(inbox.getType()).isEqualTo(FolderType.USER_CREATED_EMAIL_FOLDER);
+		assertThat(folderSyncResponse.getCollectionsAddedAndUpdated()).hasSize(1);
+		CollectionChange inbox = Iterables.getOnlyElement(folderSyncResponse.getCollectionsAddedAndUpdated());
+		assertThat(inbox.getDisplayName()).isEqualTo("aNewImapFolder");
+		assertThat(inbox.getFolderType()).isEqualTo(FolderType.USER_CREATED_EMAIL_FOLDER);
 	}
 
 	@Test
@@ -241,12 +240,12 @@ public class FolderSyncHandlerTest {
 
 		mocksControl.verify();
 
-		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
-		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
+		assertThat(folderSyncResponse.getNewSyncKey()).isEqualTo(newGeneratedSyncKey);
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.OK);
 		assertThat(folderSyncResponse.getCount()).isEqualTo(1);
-		assertThat(folderSyncResponse.getFolders()).hasSize(1);
-		Folder inbox = Iterables.getOnlyElement(folderSyncResponse.getFolders().values());
-		assertThat(inbox.getServerId()).isEqualTo(collectionId);
+		assertThat(folderSyncResponse.getCollectionsDeleted()).hasSize(1);
+		CollectionDeletion inbox = Iterables.getOnlyElement(folderSyncResponse.getCollectionsDeleted());
+		assertThat(inbox.getCollectionId()).isEqualTo(collectionId);
 	}
 
 	private HierarchyCollectionChanges buildHierarchyItemsChangeEmpty() {

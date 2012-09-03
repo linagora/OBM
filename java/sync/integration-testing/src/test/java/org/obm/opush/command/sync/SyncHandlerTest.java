@@ -42,7 +42,12 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasAddItems;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasDeleteItems;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasItems;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasNoChange;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
+import static org.obm.push.bean.FilterType.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -52,6 +57,7 @@ import java.util.List;
 
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,7 +74,6 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
@@ -79,6 +84,7 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
@@ -86,6 +92,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -97,14 +104,14 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.Add;
 import org.obm.sync.push.client.beans.Collection;
 import org.obm.sync.push.client.beans.Delete;
-import org.obm.sync.push.client.beans.Folder;
-import org.obm.sync.push.client.beans.FolderSyncResponse;
-import org.obm.sync.push.client.beans.FolderType;
 import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -145,14 +152,11 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK, 100);
 
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).isEmpty();
-		assertThat(inboxCollection.getDeletes()).isEmpty();
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
+
+		checkMailFolderHasNoChange(syncEmailResponse, inbox.getCollectionId());
 	}
 	
 	@Test
@@ -179,14 +183,12 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK, 100);
 		
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).containsOnly(new Add(syncEmailCollectionId + ":" + 0));
-		assertThat(inboxCollection.getDeletes()).isEmpty();
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
+
+		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
+				new Add(syncEmailCollectionId + ":" + 0));
 	}
 
 	@Test
@@ -216,16 +218,13 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK, 100);
+		
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
 
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).containsOnly(
+		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
 				new Add(syncEmailCollectionId + ":" + 0),
 				new Add(syncEmailCollectionId + ":" + 1));
-		assertThat(inboxCollection.getDeletes()).isEmpty();
 	}
 
 	@Test
@@ -249,14 +248,12 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK, 100);
 		
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).isEmpty();
-		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":" + 0));
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
+
+		checkMailFolderHasDeleteItems(syncEmailResponse, inbox.getCollectionId(),
+				new Delete(syncEmailCollectionId + ":" + 0));
 	}
 
 	@Test
@@ -284,14 +281,13 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK, 100);
 
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).containsOnly(new Add(syncEmailCollectionId + ":123"));
-		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":122"));
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
+
+		checkMailFolderHasItems(syncEmailResponse, inbox.getCollectionId(), 
+				ImmutableSet.of(new Add(syncEmailCollectionId + ":123")),
+				ImmutableSet.of(new Delete(syncEmailCollectionId + ":122")));
 	}
 
 	@Test
@@ -326,14 +322,11 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
-		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getServerId(), serverId);
+		
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getCollectionId(), serverId);
 
-		assertThat(syncEmailResponse).isNotNull();
-		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getAdds()).isEmpty();
-		assertThat(inboxCollection.getDeletes()).isEmpty();
+		checkMailFolderHasNoChange(syncEmailResponse, inbox.getCollectionId());
 	}
 	
 	@Test
@@ -365,8 +358,8 @@ public class SyncHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		opClient.syncEmail(initialSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
-		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(initialSyncKey, collectionIdAsString, THREE_DAYS_BACK, 100);
+		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, THREE_DAYS_BACK, 100);
 		mocksControl.verify();
 		
 		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
@@ -381,7 +374,7 @@ public class SyncHandlerTest {
 		SyncKey secondSyncKey = new SyncKey("13424");
 
 		SyncCollectionOptions toStoreOptions = new SyncCollectionOptions();
-		toStoreOptions.setFilterType(FilterType.THREE_DAYS_BACK);
+		toStoreOptions.setFilterType(THREE_DAYS_BACK);
 		toStoreOptions.setConflict(1);
 		SyncCollection firstToStoreCollection = new SyncCollection();
 		firstToStoreCollection.setCollectionId(collectionId);
@@ -436,18 +429,13 @@ public class SyncHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
 		
-		opClient.syncEmail(initialSyncKey, inbox.getServerId(), toStoreOptions.getFilterType(), 25);
-		SyncResponse syncWithoutOptions = opClient.syncWithoutOptions(secondSyncKey, inbox.getServerId());
+		opClient.syncEmail(initialSyncKey, inbox.getCollectionId(), toStoreOptions.getFilterType(), 25);
+		SyncResponse syncWithoutOptions = opClient.syncWithoutOptions(secondSyncKey, inbox.getCollectionId());
 		mocksControl.verify();
-		
-		assertThat(syncWithoutOptions).isNotNull();
-		Collection inboxCollection = syncWithoutOptions.getCollection(inbox.getServerId());
-		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getStatus()).isEqualTo(SyncStatus.OK);
-		assertThat(inboxCollection.getAdds()).isEmpty();
-		assertThat(inboxCollection.getDeletes()).isEmpty();
+
+		checkMailFolderHasNoChange(syncWithoutOptions, inbox.getCollectionId());
 	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize(
@@ -489,9 +477,21 @@ public class SyncHandlerTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId, FilterType.THREE_DAYS_BACK, 25);
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId, THREE_DAYS_BACK, 25);
 
 		Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
 		Assertions.assertThat(unexistingCollection.getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
+	}
+
+	private CollectionChange lookupInbox(Iterable<CollectionChange> items) {
+		return FluentIterable
+				.from(items)
+				.firstMatch(new Predicate<CollectionChange>() {
+		
+					@Override
+					public boolean apply(CollectionChange input) {
+						return input.getFolderType() == org.obm.push.bean.FolderType.DEFAULT_INBOX_FOLDER;
+					}
+				}).get();
 	}
 }

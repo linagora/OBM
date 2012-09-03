@@ -67,8 +67,8 @@ public class Sync extends AbstractCommand<SyncResponse> {
 	}
 
 	@Override
-	protected SyncResponse parseResponse(Element root) {
-		return new SyncResponse.XmlParser().parse(root);
+	protected SyncResponse parseResponse(Document responseDocument) {
+		return new SyncResponse.XmlParser().parse(responseDocument.getDocumentElement());
 	}
 
 }

@@ -35,7 +35,7 @@ import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
 import org.obm.sync.push.client.beans.NS;
-import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 public abstract class Provision extends AbstractCommand<ProvisionResponse> {
@@ -45,8 +45,8 @@ public abstract class Provision extends AbstractCommand<ProvisionResponse> {
 	}
 
 	@Override
-	protected ProvisionResponse parseResponse(Element root) {
-		Node statusNode = root.getFirstChild();
+	protected ProvisionResponse parseResponse(Document root) {
+		Node statusNode = root.getDocumentElement().getFirstChild();
 		
 		Node policiesNode = statusNode.getNextSibling();
 		Node policyNode = policiesNode.getFirstChild();

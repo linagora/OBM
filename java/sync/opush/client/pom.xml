@@ -38,6 +38,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>protocol</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
 			<exclusions>

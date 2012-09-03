@@ -45,8 +45,6 @@ import org.obm.sync.push.client.beans.Add;
 import org.obm.sync.push.client.beans.Collection;
 import org.obm.sync.push.client.beans.Delete;
 import org.obm.sync.push.client.beans.Folder;
-import org.obm.sync.push.client.beans.FolderHierarchy;
-import org.obm.sync.push.client.beans.FolderSyncResponse;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.beans.SyncResponse;
 
@@ -70,8 +68,6 @@ public class BeansTest {
 				.add(Add.class)
 				.add(Collection.class)
 				.add(Folder.class)
-				.add(FolderHierarchy.class)
-				.add(FolderSyncResponse.class)
 				.add(GetItemEstimateSingleFolderResponse.class)
 				.add(SyncResponse.class)
 				.add(Delete.class)
