@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 import static fr.aliacom.obm.ToolBox.mockAccessToken;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static org.easymock.EasyMock.createMock;
@@ -39,6 +38,7 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -90,8 +90,6 @@ import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class CalendarBindingImplTest {
@@ -1678,7 +1676,7 @@ public class CalendarBindingImplTest {
 		HelperService helperService = createMock(HelperService.class);
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
 		expect(helperService.eventBelongsToCalendar(eventToModify, calendar)).andReturn(false);
-		EasyMock.replay(helperService);
+		EasyMock.replay(helperService, token);
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
@@ -1699,6 +1697,28 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
 		expect(helperService.eventBelongsToCalendar(eventToModify, calendar)).andReturn(true);
 		EasyMock.replay(helperService);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
+		
+		boolean eventCanBeModified = calendarService.eventCanBeModified(token, calendar, eventToModify);
+		
+		assertThat(eventCanBeModified).isTrue();
+	}
+	
+	@Test
+	public void testEventCanBeModifiedWhenEventBelongsToEditorInAnotherCalendar() {
+		AccessToken token = ToolBox.mockAccessToken();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+		Event eventToModify = new Event();
+		
+		HelperService helperService = createMock(HelperService.class);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(helperService.eventBelongsToCalendar(eventToModify, calendar)).andReturn(false);
+		EasyMock.replay(helperService, token);
+		
+		eventToModify.setOwnerEmail(token.getUserEmail());
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);

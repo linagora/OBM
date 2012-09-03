@@ -59,6 +59,7 @@ public class ToolBox {
 		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
 		EasyMock.expect(accessToken.getDomain()).andReturn(domain).atLeastOnce();
 		EasyMock.expect(accessToken.getUserLogin()).andReturn(login).anyTimes();
+		EasyMock.expect(accessToken.getUserEmail()).andReturn(login + '@' + domain.getName()).anyTimes();
 		EasyMock.expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
 		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
 		return accessToken;

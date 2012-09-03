@@ -378,7 +378,11 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@VisibleForTesting boolean eventCanBeModified(AccessToken token, String calendar, Event event) {
 		return helperService.canWriteOnCalendar(token, calendar)
-			&& helperService.eventBelongsToCalendar(event, calendar);
+			&& (helperService.eventBelongsToCalendar(event, calendar) || eventBelongsToUser(event, token));
+	}
+	
+	private boolean eventBelongsToUser(Event event, AccessToken token) {
+		return token.getUserEmail().equalsIgnoreCase(event.getOwnerEmail());
 	}
 
 	@VisibleForTesting
