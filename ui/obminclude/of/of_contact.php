@@ -339,6 +339,111 @@ class OBM_Contact implements OBM_ISearchable {
     return $contacts;
   }
   
+  public static function insert($contact, $uid, $addressbook, $domain_id) {
+  	global $cgp_show, $cdg_sql;
+
+  	$comp_id = sql_parse_id($contact->company_id);
+  	$dsrc    = sql_parse_id($contact->datasource_id);
+  	$kind    = sql_parse_id($contact->kind);
+  	$market_id  = sql_parse_id($contact->market_id);
+  	$func    = sql_parse_id($contact->function);
+
+  	$date = ($contact->date ? "'{$contact->date}'" : 'null');
+
+  	$query = "INSERT INTO Contact (contact_timeupdate,
+  	      contact_timecreate,
+  	      contact_userupdate,
+  	      contact_usercreate,
+  	      contact_domain_id,
+  	      contact_datasource_id,
+  	      contact_company_id,
+  	      contact_company,
+  	      contact_kind_id,
+  	      contact_marketingmanager_id,
+  	      contact_lastname,
+  	      contact_firstname,
+  	      contact_commonname,
+  	      contact_middlename,
+  	      contact_suffix,
+  	      contact_aka,
+  	      contact_sound,
+  	      contact_manager,
+  	      contact_assistant,
+  	      contact_spouse,
+  	      contact_category,
+  	      contact_service,
+  	      contact_function_id,
+  	      contact_title,
+  	      contact_mailing_ok,
+  	      contact_newsletter,
+  	      contact_archive,
+  	      contact_date,
+  	      contact_comment,
+  	      contact_comment2,
+  	      contact_comment3,
+  	      contact_origin,
+  	      contact_addressbook_id
+  	    ) VALUES (
+  	      NOW(),
+  	      NOW(),
+  	$uid,
+  	$uid,
+  	$domain_id,
+  	$dsrc,
+  	$comp_id,
+  	      '{$contact->company}',
+  	$kind,
+  	$market_id,
+  	      '{$contact->lastname}',
+  	      '{$contact->firstname}',
+  	      '{$contact->commonname}',
+  	      '{$contact->mname}',
+  	      '{$contact->suffix}',
+  	      '{$contact->aka}',
+  	      '{$contact->sound}',
+  	      '{$contact->manager}',
+  	      '{$contact->assistant}',
+  	      '{$contact->spouse}',
+  	      '{$contact->category}',
+  	      '{$contact->service}',
+  	$func,
+  	      '{$contact->title}',
+  	{$contact->mailok},
+  	{$contact->newsletter},
+  	{$contact->archive},
+  	$date,
+  	      '{$contact->comment}',
+  	      '{$contact->comment2}',
+  	      '{$contact->comment3}',
+  	      '{$GLOBALS['c_origin_web']}',
+  	      '{$addressbook->id}'
+  	    )";
+
+  	display_debug_msg($query, $cdg_sql, 'OBM_Contact:create(1)');
+  	$obm_q = new DB_OBM;
+  	$insertedContact = $obm_q->query($query);
+
+  	$contact->id = $obm_q->lastid();
+  	if ($contact->id > 0) {
+  		if (($cgp_show['module']['company']) && ($insertedContact)) {
+  			run_query_global_company_contact_number_update($comp_id);
+  		}
+  		$contact->entity_id = of_entity_insert('contact',$contact->id);
+
+  		// Birthday & Anniversary support
+  		//FIXME: do it better
+  		if (!is_null($contact->birthday)) {
+  			self::storeAnniversary('birthday', $contact->id, $uid, null, $contact->display_name(), null, $contact->birthday);
+  		}
+  		if (!is_null($contact->anniversary)) {
+  			self::storeAnniversary('anniversary', $contact->id, $uid, null, $contact->display_name(), null, $contact->anniversary);
+  		}
+
+  		//FIXME: do it better
+  		self::storeCoords($contact);
+  	}
+  }
+  
   //FIXME Redo this, it's totally buggy and crappy
   public static function create($data, $addressbook) {
     global $cgp_show, $cdg_sql, $obm;
@@ -394,106 +499,13 @@ class OBM_Contact implements OBM_ISearchable {
     $contact->address = is_array($data['addresses'])? $data['addresses'] : array();
     $contact->im      = is_array($data['ims'])      ? $data['ims']       : array();
     $contact->website = is_array($data['websites']) ? $data['websites']  : array();
-    $comp_id = sql_parse_id($contact->company_id);
-    $dsrc    = sql_parse_id($contact->datasource_id);
-    $kind    = sql_parse_id($contact->kind);
-    $market_id  = sql_parse_id($contact->market_id);
-    $func    = sql_parse_id($contact->function);
     $contact->addressbook_id = $addressbook->id;
 
     $date = ($contact->date ? "'{$contact->date}'" : 'null');
 
-    $query = "INSERT INTO Contact (contact_timeupdate,
-      contact_timecreate,
-      contact_userupdate,
-      contact_usercreate,
-      contact_domain_id,
-      contact_datasource_id,
-      contact_company_id,
-      contact_company,
-      contact_kind_id,
-      contact_marketingmanager_id,
-      contact_lastname,
-      contact_firstname,
-      contact_commonname,
-      contact_middlename,
-      contact_suffix,
-      contact_aka,
-      contact_sound,
-      contact_manager,
-      contact_assistant,
-      contact_spouse,
-      contact_category,
-      contact_service,
-      contact_function_id,
-      contact_title,
-      contact_mailing_ok,
-      contact_newsletter,
-      contact_archive,
-      contact_date,
-      contact_comment,
-      contact_comment2,
-      contact_comment3,
-      contact_origin,
-      contact_addressbook_id
-    ) VALUES (
-      NOW(),
-      NOW(),
-      $uid,
-      $uid,
-      $domain_id,
-      $dsrc,
-      $comp_id,
-      '{$contact->company}',
-      $kind,
-      $market_id,
-      '{$contact->lastname}',
-      '{$contact->firstname}',
-      '{$contact->commonname}',
-      '{$contact->mname}',
-      '{$contact->suffix}',
-      '{$contact->aka}',
-      '{$contact->sound}',
-      '{$contact->manager}',
-      '{$contact->assistant}',
-      '{$contact->spouse}',
-      '{$contact->category}',
-      '{$contact->service}',
-      $func,
-      '{$contact->title}',
-      {$contact->mailok},
-      {$contact->newsletter},
-      {$contact->archive},
-      $date,
-      '{$contact->comment}',
-      '{$contact->comment2}',
-      '{$contact->comment3}',
-      '{$GLOBALS['c_origin_web']}',
-      '{$addressbook->id}'
-    )";
+    self::insert($contact, $uid, $addressbook, $domain_id);
 
-    display_debug_msg($query, $cdg_sql, 'OBM_Contact:create(1)');
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-
-    $contact->id = $obm_q->lastid();
     if ($contact->id > 0) {
-      if (($cgp_show['module']['company']) && ($retour)) {
-        run_query_global_company_contact_number_update($comp_id);
-      }
-      $contact->entity_id = of_entity_insert('contact',$contact->id);
-
-      // Birthday & Anniversary support
-      //FIXME: do it better
-      if (!is_null($contact->birthday)) {
-        self::storeAnniversary('birthday', $contact->id, $uid, null, $contact->display_name(), null, $contact->birthday);
-      }
-      if (!is_null($contact->anniversary)) {
-        self::storeAnniversary('anniversary', $contact->id, $uid, null, $contact->display_name(), null, $contact->anniversary);
-      }
-
-      //FIXME: do it better
-      self::storeCoords($contact);
       of_userdata_query_update('contact', $contact->id, $data);
     }
 
@@ -712,31 +724,24 @@ class OBM_Contact implements OBM_ISearchable {
   }
 
   public function move($contact, $addressbook) {
+    global $obm;
+
     if (!$contact->id) return false;
 
-    $now = date('Y-m-d H:i:s');
-    $uid = $GLOBALS['obm']['uid'];
-    $sql_id = sql_parse_id($contact->id, true);
-    $multidomain = sql_multidomain('contact');
-    $archive = 0;
+    OBM_Contact::delete($contact);
+    $uid = sql_parse_id($obm['uid']);
+    $domain_id = sql_parse_id($obm['domain_id']);
 
-    $query = "UPDATE Contact SET
-      contact_timeupdate='{$now}',
-      contact_userupdate='{$uid}',
-      contact_addressbook_id='{$addressbook->id}',
-      contact_archive=$archive
-    WHERE contact_id $sql_id $multidomain";
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    $contact = OBM_Contact::get($contact->id);
+    self::insert($contact, $uid, $addressbook, $domain_id);
+    OBM_AddressBook::timestamp($addressbook->id);
 
-    OBM_AddressBook::timestamp($contact->addressbook_id);
+    $ret = OBM_Contact::get($contact->id);
 
     // Indexing Contact
-    self::solrStore($contact);
+    self::solrStore($ret);
     OBM_IndexingService::commit('contact');
-    
-    return $contact;
+
+    return $ret;
   }
 
   public static function removeFromArchive($contact) {
