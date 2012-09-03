@@ -1727,4 +1727,149 @@ public class CalendarBindingImplTest {
 		
 		assertThat(eventCanBeModified).isTrue();
 	}
+	
+	@Test
+	public void testInheritsParticipationStateForSpecificAttendee() {
+		Attendee expectedAttendee = new Attendee.Builder()
+			.email("attendee@test.lng")
+			.participationState(ParticipationState.NEEDSACTION)
+			.build();
+		Event event = createEvent(Arrays.asList(expectedAttendee));
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+		Attendee attendee = new Attendee.Builder()
+			.email("attendee@test.lng")
+			.participationState(ParticipationState.ACCEPTED)
+			.build();
+		calendarService.inheritsParticipationStateForSpecificAttendee(event, attendee);
+		assertThat(attendee).isEqualTo(expectedAttendee);
+	}
+	
+	@Test
+	public void testInheritsParticipationStateFromExistingEventEmptyAttendees() {
+		Event before = new Event();
+		Event after = new Event();
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(after.getAttendees()).isEmpty();
+	}
+
+	@Test
+	public void testInheritsParticipationStateFromExistingEventOneHandEmptyAttendees() {
+		Event before = new Event();
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		Event after = createEvent(expectedAttendees);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
+	}
+
+	@Test
+	public void testInheritsParticipationStateFromExistingEventThOtherHandEmptyAttendees() {
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		Event before = createEvent(expectedAttendees);
+		
+		Event after = new Event();
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(after.getAttendees()).isEmpty();
+	}
+
+	@Test
+	public void testInheritsParticipationStateFromExistingEvent() {
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
+	}
+
+	@Test
+	public void testInheritsParticipationStateOnEmptyExceptions() {
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateOnExceptions(before, after);
+		assertThat(after.getEventsExceptions()).isEmpty();
+	}
+
+	@Test
+	public void testInheritsParticipationStateOnExceptions() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+		Event beforeException = createEvent(expectedAttendeesException);
+		
+		Event before = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		before.addEventException(beforeException);
+		
+		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		after.addEventException(afterException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateOnExceptions(before, after);
+		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+	}
+
+	@Test
+	public void testRecursiveInheritsParticipationStateFromExistingEvent() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+		Event beforeException = createEvent(expectedAttendeesException);
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		before.addEventException(beforeException);
+		
+		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		after.addEventException(afterException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+	}
+
+	private Event createEvent(List<Attendee> expectedAttendees) {
+		Event event = new Event();
+		event.addAttendees(expectedAttendees);
+		
+		return event;
+	}
+
+	private List<Attendee> createOrganiserAndContactAttendees(ParticipationState contactState) {
+		return Arrays.asList(
+				new Attendee.Builder()
+				.asOrganizer()
+				.participationState(ParticipationState.ACCEPTED)
+				.email("organiser@test.lng").build(),
+				new Attendee.Builder()
+				.asContact()
+				.participationState(contactState)
+				.email("attendee@test.lng").build());
+	}
 }

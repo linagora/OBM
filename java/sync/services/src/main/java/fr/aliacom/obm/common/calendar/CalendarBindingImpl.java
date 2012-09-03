@@ -403,6 +403,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			assignDelegationRightsOnAttendees(token, event);
+			inheritsParticipationStateFromExistingEvent(before, event);
 			applyParticipationStateModifications(before, event);
 			
 			Event after = calendarDao.modifyEventForcingSequence(
@@ -416,6 +417,38 @@ public class CalendarBindingImpl implements ICalendar {
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	@VisibleForTesting void inheritsParticipationStateFromExistingEvent(Event before, Event event) {
+		if (before.getAttendees() != null && event.getAttendees() != null) {
+			for (Attendee beforeAttendee : before.getAttendees()) {
+				inheritsParticipationStateForSpecificAttendee(event, beforeAttendee);
+			}
+		}
+		
+		inheritsParticipationStateOnExceptions(before, event);
+	}
+
+	@VisibleForTesting void inheritsParticipationStateForSpecificAttendee(Event event, Attendee beforeAttendee) {
+		int indexOf = event.getAttendees().indexOf(beforeAttendee);
+		if (indexOf != -1) {
+			Attendee attendee = event.getAttendees().get(indexOf);
+			attendee.setState(beforeAttendee.getState());
+		}
+	}
+
+	@VisibleForTesting void inheritsParticipationStateOnExceptions(Event before, Event event) {
+		List<Event> beforeExceptions = before.getEventsExceptions();
+		List<Event> eventExceptions = event.getEventsExceptions();
+		
+		if (beforeExceptions != null && eventExceptions != null) {
+			for (Event eventException : beforeExceptions) {
+				int eventIndexOf = eventExceptions.indexOf(eventException);
+				if (eventIndexOf != -1) {
+					inheritsParticipationStateFromExistingEvent(eventException, eventExceptions.get(eventIndexOf));
+				}
+			}
 		}
 	}
 
