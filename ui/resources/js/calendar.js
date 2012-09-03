@@ -1177,6 +1177,9 @@ Obm.CalendarManager = new Class({
         obm.calendarManager.popupManager.addEvent('update_all', function () {
           eventData.all = 1;
         });
+        obm.calendarManager.popupManager.addEvent('update_one', function () {
+          this.chain.callChain();
+        });
         obm.calendarManager.popupManager.addEvent('mail', function () {
           eventData.send_mail = true;
         });        
