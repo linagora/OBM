@@ -71,6 +71,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncDecoder {
 
+	private static final int DEFAULT_WINDOWSIZE = 100;
+
 	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 	
 	private final CollectionDao collectionDao;
@@ -100,6 +102,8 @@ public class SyncDecoder {
 
 		Sync.Builder builder = Sync.builder()
 				.waitInMinutes(getWait(root));
+		
+		int requestDefaultWindowSize = getRequestDefaultWindowSize(root);
 
 		Boolean isPartial = getPartial(root);
 		if (isPartial) {
@@ -108,11 +112,20 @@ public class SyncDecoder {
 		NodeList nl = root.getElementsByTagName("Collection");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
-			SyncCollection collec = getCollection(userDataRequest, col, isPartial);
+			SyncCollection collec = getCollection(userDataRequest, col, requestDefaultWindowSize, isPartial);
 			builder.addCollection(collec);
 		}
 		Sync sync = builder.build();
 		return sync;
+	}
+
+	private int getRequestDefaultWindowSize(Element root) {
+		int requestDefaultWindowSize = DEFAULT_WINDOWSIZE;
+		Element windowSizeElement = DOMUtils.getUniqueElement(root, "WindowSize");
+		if (windowSizeElement != null) {
+			requestDefaultWindowSize = Integer.parseInt(windowSizeElement.getTextContent());
+		}
+		return requestDefaultWindowSize;
 	}
 
 	private boolean getPartial(Element root) {
@@ -124,7 +137,8 @@ public class SyncDecoder {
 		return DOMUtils.getElementInteger(node);
 	}
 
-	private SyncCollection getCollection(UserDataRequest udr, Element col, boolean isPartial)
+	private SyncCollection getCollection(UserDataRequest udr, Element col,
+			int requestDefaultWindowSize, boolean isPartial)
 			throws PartialException, ProtocolException, DaoException, CollectionPathException{
 		
 		SyncCollection collection = new SyncCollection();
@@ -140,6 +154,8 @@ public class SyncDecoder {
 		Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
 		if (windowSizeElement != null) {
 			collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
+		} else {
+			collection.setWindowSize(requestDefaultWindowSize);
 		}
 		
 		SyncCollection lastSyncCollection = findLastSyncedCollectionOptions(udr, isPartial, collectionId);

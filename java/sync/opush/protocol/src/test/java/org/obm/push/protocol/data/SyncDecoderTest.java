@@ -57,15 +57,18 @@ import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
@@ -532,6 +535,122 @@ public class SyncDecoderTest {
 		
 		assertThat(sync.getWaitInSecond()).isEqualTo(60000);
 	}
+	
+	@Test(expected=PartialException.class)
+	public void testPartialRequest() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial/>" +
+					"<Wait>1</Wait>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		
+		mocks.replay();
+		newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+	}
+
+	@Test
+	public void testSyncCollectionDefaultValues() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollection collection = Iterables.getOnlyElement(sync.getCollections());
+		assertThat(collection.getCollectionId()).isEqualTo(syncingCollectionId);
+		assertThat(collection.getCollectionPath()).isEqualTo(collectionPath(syncingCollectionId));
+		assertThat(collection.getDataClass()).isNull();
+		assertThat(collection.getDataType()).isEqualTo(PIMDataType.EMAIL);
+		assertThat(collection.getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(collection.getItemSyncState()).isNull();
+		assertThat(collection.getFetchIds()).isEmpty();
+		assertThat(collection.isMoreAvailable()).isFalse();
+		assertThat(collection.getSyncKey()).isEqualTo(new SyncKey(syncingCollectionSyncKey));
+		assertThat(collection.getWindowSize()).isEqualTo(100);
+		assertThat(collection.getOptions()).isEqualTo(new SyncCollectionOptions());
+	}
+
+	@Test
+	public void testWindowSizeIsTookInParentSync() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<WindowSize>150</WindowSize>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, 150);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getWindowSize()).isEqualTo(150);
+	}
+
+	@Test
+	public void testWindowSizeDifferentInSyncAndCollection() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<WindowSize>150</WindowSize>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<WindowSize>75</WindowSize>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, 75);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getWindowSize()).isEqualTo(75);
+	}
 
 	private SyncDecoder newSyncDecoder(SyncedCollectionDao syncedCollectionDao, CollectionDao collectionDao,
 			CollectionPathHelper collectionPathHelper) {
@@ -546,11 +665,18 @@ public class SyncDecoderTest {
 	}
 
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey) {
+		int defaultWindowSize = 100;
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, defaultWindowSize);
+	}
+
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(
+			int collectionId, String syncKey, Integer windowSize) {
 		SyncedCollectionDao syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
 		expect(syncedCollectionDao.get(credentials, device, collectionId)).andReturn(null);
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
 		syncCollection.setDataType(PIMDataType.EMAIL);
 		syncCollection.setSyncKey(new SyncKey(syncKey));
+		syncCollection.setWindowSize(windowSize);
 		syncedCollectionDao.put(credentials, device, syncCollection);
 		expectLastCall();
 		return syncedCollectionDao;
