@@ -31,35 +31,61 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.joda.time.Minutes;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class Sync {
+
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+
+		private final Map<Integer, SyncCollection> collections;
+		private Integer waitInMinutes;
+		
+		public Builder() {
+			collections = Maps.newHashMap();
+		}
+		
+		public Builder addCollection(SyncCollection collection) {
+			collections.put(collection.getCollectionId(), collection);
+			return this;
+		}
+
+		public Builder waitInMinutes(Integer waitInMinutes) {
+			this.waitInMinutes = waitInMinutes;
+			return this;
+		}
+		
+		public Sync build() {
+			if (waitInMinutes == null) {
+				waitInMinutes = 0;
+			}
+			int waitInSeconds = Minutes.minutes(waitInMinutes).toStandardSeconds().getSeconds();
+			return new Sync(collections, waitInSeconds);
+		}
+	}
 	
 	private final Map<Integer, SyncCollection> collections;
-	private Integer wait;
+	private final int waitInSecond;
 	
-	public Sync() {
-		super();
-		this.collections = new HashMap<Integer, SyncCollection>();
+	private Sync(Map<Integer, SyncCollection> collections, int waitInSecond) {
+		this.collections = collections;
+		this.waitInSecond = waitInSecond;
 	}
 	
-	public Integer getWaitInSecond() {
-		Integer ret = 0;
-		if(wait != null){
-			ret = wait * 60;
-		}
-		return ret;
-	}
-	
-	public void setWait(Integer wait) {
-		this.wait = wait;
+	public int getWaitInSecond() {
+		return waitInSecond;
 	}
 	
 	public Set<SyncCollection> getCollections() {
@@ -80,13 +106,9 @@ public class Sync {
 		return collections.get(collectionId);
 	}
 	
-	public void addCollection(SyncCollection collec) {
-		collections.put(collec.getCollectionId(), collec);
-	}
-
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(collections, wait);
+		return Objects.hashCode(collections, waitInSecond);
 	}
 	
 	@Override
@@ -94,7 +116,7 @@ public class Sync {
 		if (object instanceof Sync) {
 			Sync that = (Sync) object;
 			return Objects.equal(this.collections, that.collections)
-				&& Objects.equal(this.wait, that.wait);
+				&& Objects.equal(this.waitInSecond, that.waitInSecond);
 		}
 		return false;
 	}
@@ -103,7 +125,7 @@ public class Sync {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("collections", collections)
-			.add("wait", wait)
+			.add("waitInSecond", waitInSecond)
 			.toString();
 	}
 	

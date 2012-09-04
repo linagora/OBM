@@ -42,7 +42,7 @@ public class SyncTest {
 
 	@Test
 	public void testValidCollectionsWhenEmpty() {
-		Sync sync = new Sync();
+		Sync sync = Sync.builder().build();
 		
 		assertThat(sync.getCollections()).isEmpty();
 		assertThat(sync.getCollectionsValidToProcess()).isEmpty();
@@ -59,16 +59,34 @@ public class SyncTest {
 		SyncCollection invalidCollection2 = new SyncCollection(25, "path 4");
 		invalidCollection2.setStatus(SyncStatus.OBJECT_NOT_FOUND);
 
-		Sync sync = new Sync();
-		sync.addCollection(validCollection);
-		sync.addCollection(validCollection2);
-		sync.addCollection(invalidCollection);
-		sync.addCollection(invalidCollection2);
+		Sync sync = Sync.builder()
+				.addCollection(validCollection)
+				.addCollection(validCollection2)
+				.addCollection(invalidCollection)
+				.addCollection(invalidCollection2)
+				.build();
 		
 		assertThat(sync.getCollections()).containsOnly(
 				validCollection, validCollection2, invalidCollection, invalidCollection2);
 		assertThat(sync.getCollectionsValidToProcess()).containsOnly(
 				validCollection, validCollection2);
+	}
+	
+	public void testWaitNullIsZero() {
+		Sync sync = Sync.builder().waitInMinutes(null).build();
+		assertThat(sync.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testWaitZeroIsZero() {
+		Sync sync = Sync.builder().waitInMinutes(0).build();
+		assertThat(sync.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testWaitMinutesToSeconds() {
+		Sync sync = Sync.builder().waitInMinutes(1).build();
+		assertThat(sync.getWaitInSecond()).isEqualTo(60);
 	}
 	
 }

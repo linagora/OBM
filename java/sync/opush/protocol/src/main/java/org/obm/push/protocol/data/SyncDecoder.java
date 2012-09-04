@@ -96,9 +96,10 @@ public class SyncDecoder {
 
 	public Sync decodeSync(Document doc, UserDataRequest userDataRequest) 
 			throws PartialException, ProtocolException, DaoException, CollectionPathException {
-		Sync ret = new Sync();
 		Element root = doc.getDocumentElement();
-		ret.setWait(getWait(root));
+
+		Sync.Builder builder = Sync.builder()
+				.waitInMinutes(getWait(root));
 
 		Boolean isPartial = getPartial(root);
 		if (isPartial) {
@@ -108,9 +109,10 @@ public class SyncDecoder {
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element col = (Element) nl.item(i);
 			SyncCollection collec = getCollection(userDataRequest, col, isPartial);
-			ret.addCollection(collec);
+			builder.addCollection(collec);
 		}
-		return ret;
+		Sync sync = builder.build();
+		return sync;
 	}
 
 	private boolean getPartial(Element root) {

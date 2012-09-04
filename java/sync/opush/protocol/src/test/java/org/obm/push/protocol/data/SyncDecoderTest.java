@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -61,6 +62,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -70,6 +72,8 @@ public class SyncDecoderTest {
 	
 	private Device device;
 	private UserDataRequest udr;
+	private User user;
+	private Credentials credentials;
 	private String collectionPath;
 	private int collectionId;
 	
@@ -81,8 +85,9 @@ public class SyncDecoderTest {
 	@Before
 	public void setUp() throws Exception {
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
-		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		udr = new UserDataRequest(new Credentials(user, "test"), "Sync", device);
+		user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
+		credentials = new Credentials(user, "test");
+		udr = new UserDataRequest(credentials, "Sync", device);
 		collectionPath = "INBOX";
 		collectionId = 5;
 
@@ -372,4 +377,194 @@ public class SyncDecoderTest {
 				"</Collections>" +
 			"</Sync>");
 	}
+
+	@Test(expected=NumberFormatException.class)
+	public void testGetWaitWhenNotANumber() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait>a10</Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+	}
+
+	@Test
+	public void testGetWaitWhenJustTagReturn0() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait/>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		assertThat(sync.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test(expected=NumberFormatException.class)
+	public void testGetWaitWhenEmpty() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait> </Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+	}
+	
+	@Test
+	public void testGetWaitWhenNotReturn0() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		assertThat(sync.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetWaitWhen0() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait>0</Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		assertThat(sync.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetWaitWhen1000() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait>1000</Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		assertThat(sync.getWaitInSecond()).isEqualTo(60000);
+	}
+
+	private SyncDecoder newSyncDecoder(SyncedCollectionDao syncedCollectionDao, CollectionDao collectionDao,
+			CollectionPathHelper collectionPathHelper) {
+		return new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+	}
+
+	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {
+		String foundPath = collectionPath(syncingCollectionId);
+		CollectionDao collectionDao = mocks.createMock(CollectionDao.class);
+		expect(collectionDao.getCollectionPath(syncingCollectionId)).andReturn(foundPath);
+		return collectionDao;
+	}
+
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey) {
+		SyncedCollectionDao syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
+		expect(syncedCollectionDao.get(credentials, device, collectionId)).andReturn(null);
+		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setSyncKey(new SyncKey(syncKey));
+		syncedCollectionDao.put(credentials, device, syncCollection);
+		expectLastCall();
+		return syncedCollectionDao;
+	}
+
+	private CollectionPathHelper mockCollectionPathHelperRecognizeDataType() {
+		CollectionPathHelper collectionPathHelper = mocks.createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class)))
+			.andReturn(PIMDataType.EMAIL);
+		return collectionPathHelper;
+	}
+
+	private String collectionPath(int collectionId) {
+		return "obm:\\\\" + user.getLoginAtDomain() + "\\" + PIMDataType.EMAIL + "\\" + collectionId;
+	}
+	
 }

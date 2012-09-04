@@ -31,12 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.Collections;
 
 import javax.xml.transform.TransformerException;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,8 +57,10 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
@@ -90,7 +97,7 @@ public class SyncProtocolTest {
 		
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
-		Assertions.assertThat(endcodedResponse).isEqualTo(newCollectionNoChangeResponse(collectionId));
+		assertThat(endcodedResponse).isEqualTo(newCollectionNoChangeResponse(collectionId));
 	}
 	
 	@Test
@@ -102,7 +109,7 @@ public class SyncProtocolTest {
 
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
-		Assertions.assertThat(endcodedResponse).isEqualTo(newCollectionNotFoundResponse(collectionId));
+		assertThat(endcodedResponse).isEqualTo(newCollectionNotFoundResponse(collectionId));
 	}
 	
 	@Test
@@ -115,7 +122,7 @@ public class SyncProtocolTest {
 		
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
-		Assertions.assertThat(endcodedResponse).isEqualTo(newSyncKeyErrorResponse(collectionId));
+		assertThat(endcodedResponse).isEqualTo(newSyncKeyErrorResponse(collectionId));
 	}
 	private String newCollectionNoChangeResponse(int collectionId) {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -173,4 +180,60 @@ public class SyncProtocolTest {
 		collectionResponse.setItemChangesDeletion(Collections.<ItemDeletion>emptyList());
 		return collectionResponse;
 	}
+	
+	@Test(expected=NoDocumentException.class)
+	public void testDecodeRequestWithNullDocument() throws Exception {
+		Document request = null;
+		
+		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
+		
+		new SyncProtocol(syncDecoder).getRequest(request, udr);
+	}
+
+	@Test
+	public void testDecodeRequestWithNullUserDataRequest() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait>10</Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>1234-5678</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
+		expect(syncDecoder.decodeSync(request, null)).andReturn(null);
+		replay(syncDecoder);
+		
+		new SyncProtocol(syncDecoder).getRequest(request, null);
+
+		verify(syncDecoder);
+	}
+	
+	@Test
+	public void testDecodeRequestCallsSyncDecoderWithExpectedArguments() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Wait>10</Wait>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>1234-5678</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
+		expect(syncDecoder.decodeSync(request, udr)).andReturn(null);
+		replay(syncDecoder);
+		
+		new SyncProtocol(syncDecoder).getRequest(request, udr);
+
+		verify(syncDecoder);
+	}
+	
 }
