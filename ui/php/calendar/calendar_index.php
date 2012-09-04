@@ -733,6 +733,7 @@ if ($action == 'search') {
         $params['calendar_id'] = $exception_array['id'];
       }
     }
+    $GLOBALS["send_notification_mail"] = true;
     $comment_and_decision_updated = update_decision_and_comment($params, $obm['uid']);
     if ($comment_and_decision_updated) {
       json_ok_msg("$l_event : $l_update_ok");
@@ -753,15 +754,21 @@ if ($action == 'search') {
     $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=decision&calendar_id=".$params['calendar_id'].
       "&entity_kind=user&entity_id=".$params['entity_id']."&owner_notification=true&date_begin=".
       $date_begin."&date_end=".$date_end."&time_end=".$time_end."&min_end=".$min_end."&rd_decision_event=".$params['decision_event']."&uriAction=".$params['uriAction'];
-    echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
+    echo "({".$display['json'].", \"redirectUrl\" : \"$redirectUrl\"})";
     exit();
   }
   catch (Exception $ex) {
     json_error_msg("$l_event : $err[msg]");
   }
-  if( $params['date_edit_occurrence'] ){
+  if( $params['date_edit_occurrence']){
     $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=detailconsult&calendar_id=".$params['calendar_id'];
-    echo "({".$display['json'].", 'redirectUrl' : \"$redirectUrl\"})";
+    echo "({".$display['json'].", \"redirectUrl\" : \"$redirectUrl\"})";
+    exit();
+  }
+  if($params['uriAction'] == 'detailconsult'){
+    if (empty($display['json'])){ $display['json'] = "error:0,message:'Evénement : Mise à jour réussie'";}
+    $redirectUrl=$_SERVER['SCRIPT_NAME']."?action=detailconsult&calendar_id=".$params['calendar_id'];
+    echo "({".$display['json'].", \"redirectUrl\" : \"$redirectUrl\"})";
     exit();
   }
   echo "({".$display['json']."})";

@@ -2092,51 +2092,7 @@ Obm.CalendarPopupManager = new Class({
 
 });
 
-// Popup Comment Alarm And Decision
-Obm.CalendarCommentPopup = new Class({
-	initialize: function() {
-		this.textarea = $('calendarCommentPopup').getElements('textarea');
-		this.charCount = $('calendarCommentPopup').getElementById('charCount');
-		this.maxLength = 255;
-	},
-	compute: function(uid,evtid,comment,type,usePlaceholder) {
-		this.uid = uid;
-		this.evtid = evtid;
-		this.comment = comment;
-		this.type = type;
-		if(usePlaceholder) {
-			this.textarea.setProperty('placeholder', this.comment);
-		} else {
-			this.textarea.setProperty('value', this.comment);
-		}
-		this.show();
-	},
-	show: function() {
-		obm.popup.show('calendarCommentPopup');
-	},
-	hide: function() {
-		obm.popup.hide('calendarCommentPopup');
-	},
-	updateComment: function(){
-		this.comment = this.textarea[0].value == '' ? null : this.textarea[0].value ;
-		var self = this;
-		new Request.JSON({      
-			url: obm.vars.consts.calendarUrl,
-			secure : false,
-			onSuccess : function(message){
-				if(message.error == 0){
-					showMessage('ok', message.message);
-                    window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
-				}else{
-					window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
-				}
-			}
-		}).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
-	},
-	displayCharLimit: function(){
-		this.charCount.innerHTML = this.maxLength - this.textarea[0].value.length;
-	}
-});
+
 Obm.CalendarAlarmPopup = new Class({
 	initialize: function() {
 		this.radios = $('calendarAlarmPopup').getElements('input[type=radio]');
@@ -2175,84 +2131,22 @@ Obm.CalendarAlarmPopup = new Class({
 		}).post({ajax : 1, action : 'update_alert', calendar_id : this.evtid, user_id : this.uid, sel_alert : checked[0].value});
 	}
 });
-Obm.CalendarDecisionPopup = new Class({
-	initialize: function() {
-		this.textarea = $('calendarDecisionPopup').getElements('textarea');
-		this.charCountForDecision = $('calendarDecisionPopup').getElementById('charCountForDecision');
-		this.maxLength = 255;
-		this.yourDecision = $('calendarDecisionPopup').getElementById('yourDecision');
-		this.eventTitlePlace = $('calendarDecisionPopup').getElementById('eventTitlePlace');
-		this.check_force = $('calendarDecisionPopup').getElementById('forceinsertion');
-	},
-	compute: function(uid, evtid, decision, oldDecision, type, comment, title, choiceByLang, uriAction,  dateEditOccurrence) {
-		this.uid = uid;
-		this.evtid = evtid;
-		this.decision = decision;
-		this.oldDecision = oldDecision;
-		this.choiceByLang = choiceByLang;
-		this.type = type;
-		this.comment = comment;
-		this.eventTitle = title;
-		this.textarea.setProperty('placeholder', this.comment);
-		this.yourDecision.set('text', this.choiceByLang);
-		this.eventTitlePlace.set('text', this.eventTitle);
-		this.uriAction = uriAction;
-    this.dateEditOccurrence = dateEditOccurrence;
-		this.show();
-	},
-	show: function() {
-		obm.popup.show('calendarDecisionPopup');
-	},
-	hide: function() {
-		this.decision = this.oldDecision = this.comment = '';
-		obm.popup.hide('calendarDecisionPopup');
-	},
-	updateDecision: function(){
-		this.comment = this.textarea[0].value;
-		var self = this;
-		new Request.JSON({
-			url: obm.vars.consts.calendarUrl,
-			secure : false,
-			onSuccess : function(message){
-				if(message.error == 0){
-					showMessage('ok', message.message);
-          var redirectUrl = message.redirectUrl;
-          if (redirectUrl != null) {
-            window.location=redirectUrl;
-          } else {
-            window.location='../calendar/calendar_index.php?action='+encodeURIComponent(self.uriAction)+'&calendar_id='+self.evtid;
-          }
-				}else{
-					var redirectUrl = message.redirectUrl;
-					if (redirectUrl != null) {
-						window.location=redirectUrl;
-					}
-					else {
-						window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
-					}
-				}
-			}
-		}).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : this.decision, entity_kind : this.type, uriAction: this.uriAction, date_edit_occurrence : this.dateEditOccurrence});
-	},
-	displayCharLimit: function(){
-		this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
-	}
-});
-///////////// Waiting event Commented Decision Popup //////////////////////
+
 Obm.CommentedDecisionPopup = new Class({
   initialize: function() {
     this.textarea = $('commentedDecisionPopup').getElements('textarea');
     this.charCountForDecision = $('commentedDecisionPopup').getElementById('charCountForDecision');
     this.maxLength = 255;
   },
-  compute: function(uid, evtid, decision, oldDecision, type, comment, title) {
+  compute: function(uid, evtid, decision, oldDecision, type, comment, title , uriAction, propertyComment) {
     this.uid = uid;
     this.evtid = evtid;
     this.decision = decision;
     this.oldDecision = oldDecision;
     this.type = type;
+    this.uriAction = uriAction;
     this.comment = comment;
-    this.textarea.setProperty('placeholder', this.comment);
+    this.textarea.setProperty(propertyComment, this.comment);
     this.show();
   },
   show: function() {
@@ -2263,29 +2157,42 @@ Obm.CommentedDecisionPopup = new Class({
     obm.popup.hide('commentedDecisionPopup');
   },
   Accept: function(){
+    this.updateOnlyComment('ACCEPTED');
     this.comment = this.textarea[0].value;
     var self = this;
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
       onSuccess : obm.commentedDecisionPopup.redirectionSteps
-    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'ACCEPTED', entity_kind : this.type});
+    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'ACCEPTED', entity_kind : this.type, uriAction: this.uriAction});
+  },
+  Wait: function(){
+    this.updateOnlyComment('NEEDS-ACTION');
+    this.comment = this.textarea[0].value;
+    var self = this;
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onSuccess : obm.commentedDecisionPopup.redirectionSteps
+    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'NEEDS-ACTION', entity_kind : this.type, uriAction: this.uriAction});
   },
   Refuse: function(){
+    this.updateOnlyComment('DECLINED');
     this.comment = this.textarea[0].value;
     var self = this;
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
       onSuccess : obm.commentedDecisionPopup.redirectionSteps
-    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'DECLINED', entity_kind : this.type});
+    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'DECLINED', entity_kind : this.type, uriAction: this.uriAction});
   },
 
   redirectionSteps: function(message){
     if(message.error == 0){
       var redirectUrl = message.redirectUrl;
       if (redirectUrl != null) {
-          window.location=redirectUrl;
+        showMessage('ok', message.message);
+        window.location=redirectUrl;
       } else {
         showMessage('ok', message.message);
         window.location='../calendar/calendar_index.php?action=waiting_events';
@@ -2293,6 +2200,7 @@ Obm.CommentedDecisionPopup = new Class({
     }else{
       var redirectUrl = message.redirectUrl;
       if (redirectUrl != null) {
+        showMessage('error', message.message);
         window.location=redirectUrl;
       } else {
         window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
@@ -2300,10 +2208,30 @@ Obm.CommentedDecisionPopup = new Class({
     }
   },
 
+  updateOnlyComment: function(choice){
+    if( choice == this.oldDecision ){
+      this.comment = this.textarea[0].value == '' ? null : this.textarea[0].value ;
+      var self = this;
+      new Request.JSON({      
+        url: obm.vars.consts.calendarUrl,
+        secure : false,
+        onSuccess : function(message){
+          if(message.error == 0){
+            showMessage('ok', message.message);
+            window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid;
+          }else{
+            window.location='../calendar/calendar_index.php?action=detailconsult&calendar_id='+self.evtid+'&errormessage='+encodeURIComponent(message.message);
+          }
+        }
+      }).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
+    }
+  },
+  
   displayCharLimit: function(){
     this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
   }
 });
+
 Obm.calendarOccurenceEditPopup = new Class({
   compute: function (evt, location) {
     this.event = evt;
