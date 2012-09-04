@@ -29,59 +29,20 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.protocol.bean;
 
-import java.util.Map;
+import org.obm.push.bean.Sync;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+public class PartialSyncRequest {
 
-/**
- * Possible values for the status element in Sync reponses
- */
-public enum SyncStatus {
-
-	OK("1"),
-	PROTOCOL_VERSION_MISMATCH("2"),
-	INVALID_SYNC_KEY("3"),
-	PROTOCOL_ERROR("4"),
-	SERVER_ERROR("5"),
-	CONVERSATION_ERROR_OR_INVALID_ITEM("6"),
-	CONFLICT("7"),
-	OBJECT_NOT_FOUND("8"),
-	OUT_OF_DISK_SPACE("9"),
-	NOTIFICATION_GUID_ERROR("10"),
-	NOT_YET_PROVISIONNED("11"),
-	HIERARCHY_CHANGED("12"),
-	PARTIAL_REQUEST("13"),
-	WAIT_INTERVAL_OUT_OF_RANGE("14"),
-	TO_MUCH_FOLDER_TO_MONITOR("15"),
-	NEED_RETRY("16");
-
-	private final String specificationValue;
-
-	private SyncStatus(String asSpecificationValue) {
-		this.specificationValue = asSpecificationValue;
+	private final Sync sync;
+	
+	public PartialSyncRequest(Sync sync) {
+		this.sync = sync;
 	}
 	
-	public String asSpecificationValue() {
-		return specificationValue;
+	public Sync getSync() {
+		return sync;
 	}
 	
-	public static SyncStatus fromSpecificationValue(String specificationValue) {
-		if (specValueToEnum.containsKey(specificationValue)) {
-			return specValueToEnum.get(specificationValue);
-		}
-		throw new IllegalArgumentException("No SyncStatus for '" + specificationValue + "'");
-	}
-
-	private static Map<String, SyncStatus> specValueToEnum;
-	
-	static {
-		Builder<String, SyncStatus> builder = ImmutableMap.builder();
-		for (SyncStatus syncStatus : values()) {
-			builder.put(syncStatus.specificationValue, syncStatus);
-		}
-		specValueToEnum = builder.build();
-	}
 }

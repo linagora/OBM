@@ -50,7 +50,7 @@ public final class SyncResponse {
 		public SyncResponse parse(Element root) {
 			Map<String, Collection> ret = new HashMap<String, Collection>();
 
-			String status = DOMUtils.getElementText(root, "Status");
+			String status = DOMUtils.getUniqueElement(root, "Status").getTextContent();
 			NodeList nl = root.getElementsByTagName("Collection");
 			for (int i = 0; i < nl.getLength(); i++) {
 				Element e = (Element) nl.item(i);
@@ -84,17 +84,21 @@ public final class SyncResponse {
 				ret.put(col.getCollectionId(), col);
 			}
 
-			return new SyncResponse(ret, SyncStatus.fromSpecificationValue(status));
+			return new SyncResponse(SyncStatus.fromSpecificationValue(status), ret);
 		}
 		
 	}
-	
-	private Map<String, Collection> cl;
-	private SyncStatus syncStatus;
 
-	public SyncResponse(Map<String, Collection> cl, SyncStatus syncStatus) {
+	private SyncStatus status;
+	private Map<String, Collection> cl;
+
+	public SyncResponse(SyncStatus status, Map<String, Collection> cl) {
+		this.status = status;
 		this.cl = new HashMap<String, Collection>(cl);
-		this.syncStatus = syncStatus;
+	}
+	
+	public SyncStatus getStatus() {
+		return status;
 	}
 
 	public Map<String, Collection> getCollections() {
@@ -110,20 +114,20 @@ public final class SyncResponse {
 	}
 
 	public SyncStatus getSyncStatus() {
-		return syncStatus;
+		return status;
 	}
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(cl, syncStatus);
+		return Objects.hashCode(status, cl);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof SyncResponse) {
 			SyncResponse that = (SyncResponse) object;
-			return Objects.equal(this.cl, that.cl) && 
-				Objects.equal(this.syncStatus, that.syncStatus);
+			return Objects.equal(this.cl, that.cl)
+				&& Objects.equal(this.status, that.status);
 		}
 		return false;
 	}

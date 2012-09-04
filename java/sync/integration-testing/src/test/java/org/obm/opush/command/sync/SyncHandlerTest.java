@@ -47,7 +47,7 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasDe
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasNoChange;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
-import static org.obm.push.bean.FilterType.*;
+import static org.obm.push.bean.FilterType.THREE_DAYS_BACK;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -57,9 +57,9 @@ import java.util.List;
 
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
-
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,11 +107,11 @@ import org.obm.sync.push.client.beans.Delete;
 import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -455,6 +455,48 @@ public class SyncHandlerTest {
 		return FolderSyncState.builder()
 				.syncKey(syncEmailSyncKey)
 				.build();
+	}
+	
+	public void testPartialSyncWhenNoPreviousSendError13() throws Exception {
+		SyncKey initialFolderSyncKey = new SyncKey("0");
+		SyncKey nextFolderSyncKey = new SyncKey("1234");
+		
+		IntegrationUserAccessUtils.mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(nextFolderSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		opClient.folderSync(initialFolderSyncKey);
+		SyncResponse partialSyncResponse = opClient.partialSync();
+		
+		assertThat(partialSyncResponse.getStatus()).isEqualTo(SyncStatus.PARTIAL_REQUEST);
+	}
+	
+	@Ignore("We don't support partial request yet")
+	@Test
+	public void testPartialSyncWhenValidPreviousSync() throws Exception {
+		SyncKey initialFolderSyncKey = new SyncKey("0");
+		SyncKey nextFolderSyncKey = new SyncKey("56789");
+
+		SyncKey initialSyncKey = new SyncKey("1234");
+		int syncEmailCollectionId = 12;
+		DataDelta emptyDelta = DataDelta.builder().syncDate(new Date()).build();
+		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(nextFolderSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(initialSyncKey, ImmutableSet.of(syncEmailCollectionId), emptyDelta, fakeTestUsers, classToInstanceMap);
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		opClient.folderSync(initialFolderSyncKey);
+		opClient.syncEmail(initialSyncKey, syncEmailCollectionId, THREE_DAYS_BACK, 150);
+		SyncResponse partialSyncResponse = opClient.partialSync();
+		
+		assertThat(partialSyncResponse.getStatus()).isEqualTo(SyncStatus.OK);
 	}
 	
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {

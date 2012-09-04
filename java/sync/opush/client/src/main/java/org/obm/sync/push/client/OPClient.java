@@ -63,6 +63,7 @@ import org.obm.sync.push.client.commands.ItemOperationFetchCommand;
 import org.obm.sync.push.client.commands.MoveItemsCommand;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 import org.obm.sync.push.client.commands.Options;
+import org.obm.sync.push.client.commands.PartialSyncCommand;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.Sync;
@@ -121,6 +122,10 @@ public abstract class OPClient {
 
 	public SyncResponse initialSync(Folder... folders) throws Exception {
 		return run(new Sync(folders));
+	}
+	
+	public SyncResponse partialSync() throws Exception {
+		return run(new PartialSyncCommand());
 	}
 
 	public SyncResponse syncEmail(SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
