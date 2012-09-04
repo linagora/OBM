@@ -74,6 +74,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -275,8 +276,7 @@ public class SyncProtocolTest {
 		assertThat(analyzedRequest.getSync().getWaitInSecond()).isEqualTo(0);
 	}
 
-	@Ignore("Sync decoding is in progress")
-	@Test
+	@Test(expected=ASRequestIntegerFieldException.class)
 	public void testGetWaitWhen1000() throws Exception {
 		int syncingCollectionId = 3;
 		String syncingCollectionSyncKey = "1234-5678";
@@ -298,12 +298,7 @@ public class SyncProtocolTest {
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
-		SyncRequest syncRequest = syncProtocol.decodeRequest(request);
-		AnalysedSyncRequest analyzedRequest = syncProtocol.analyzeRequest(udr, syncRequest);
-
-		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
-		
-		assertThat(analyzedRequest.getSync().getWaitInSecond()).isEqualTo(60000);
+		syncProtocol.decodeRequest(request);
 	}
 
 	@Ignore("Sync decoding is in progress")

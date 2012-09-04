@@ -31,51 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import org.obm.push.exception.CollectionPathException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.PartialException;
-import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
-import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequest.Builder;
-import org.obm.push.utils.DOMUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+public enum SyncRequestFields {
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+	WAIT("Wait");
+	
+	private final String name;
 
-@Singleton
-public class SyncDecoder {
-
-	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
-
-	@Inject
-	protected SyncDecoder() {}
-
-	public SyncRequest decodeSync(Document doc) 
-			throws PartialException, ProtocolException, DaoException, CollectionPathException {
-		Builder requestBuilder = new SyncRequest.Builder();
-		Element root = doc.getDocumentElement();
-		
-		requestBuilder.waitInMinute(getWait(root));
-		return requestBuilder.build();
+	private SyncRequestFields(String name) {
+		this.name = name;
 	}
 
-	@VisibleForTesting Integer getWait(Element root) {
-		String wait = DOMUtils.getElementText(root, SyncRequestFields.WAIT.getName());
-		logger.debug("Wait value : " + wait);
-		
-		if (wait != null) {
-			try {
-				return Integer.parseInt(wait);
-			} catch (NumberFormatException e) {
-				throw new ASRequestIntegerFieldException("Failed to parse field : " + SyncRequestFields.WAIT.getName(), e);
-			}
-		}
-		return null;
+	public String getName() {
+		return name;
 	}
+	
 }

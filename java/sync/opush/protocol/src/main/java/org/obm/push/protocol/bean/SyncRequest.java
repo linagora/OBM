@@ -34,20 +34,42 @@ package org.obm.push.protocol.bean;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+
+import com.google.common.base.Objects;
 
 public class SyncRequest {
 
 	public static class Builder {
+		
+		private Integer waitInMinute;
+
+		public Builder waitInMinute(Integer waitInMinute) {
+			this.waitInMinute = waitInMinute;
+			return this;
+		}
 
 		public SyncRequest build() {
-			return new SyncRequest();
+			assertWait();
+			
+			return new SyncRequest(waitInMinute);
+		}
+
+		private void assertWait() {
+			if (waitInMinute != null && (waitInMinute < 0 || waitInMinute > 59)) {
+				throw new ASRequestIntegerFieldException("Wait should be between 0 and 59 : " + waitInMinute);
+			}
 		}
 	}
 	
-	protected SyncRequest() {}
+	private final Integer waitInMinute;
+	
+	protected SyncRequest(Integer waitInMinute) {
+		this.waitInMinute = waitInMinute;
+	}
 	
 	public Integer getWaitInMinute() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return waitInMinute;
 	}
 	
 	public Boolean isPartial() {
@@ -62,4 +84,24 @@ public class SyncRequest {
 		throw new NotImplementedException("Will be implemented in next commits");
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(waitInMinute);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncRequest) {
+			SyncRequest that = (SyncRequest) object;
+			return Objects.equal(this.waitInMinute, that.waitInMinute);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("waitInMinute", waitInMinute)
+			.toString();
+	}
 }

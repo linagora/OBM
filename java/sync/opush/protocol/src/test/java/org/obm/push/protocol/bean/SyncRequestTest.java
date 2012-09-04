@@ -29,53 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.protocol.bean;
 
-import org.obm.push.exception.CollectionPathException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.PartialException;
-import org.obm.push.exception.activesync.ProtocolException;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
-import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequest.Builder;
-import org.obm.push.utils.DOMUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+@RunWith(SlowFilterRunner.class)
+public class SyncRequestTest {
 
-@Singleton
-public class SyncDecoder {
-
-	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
-
-	@Inject
-	protected SyncDecoder() {}
-
-	public SyncRequest decodeSync(Document doc) 
-			throws PartialException, ProtocolException, DaoException, CollectionPathException {
-		Builder requestBuilder = new SyncRequest.Builder();
-		Element root = doc.getDocumentElement();
+	@Test
+	public void testBuilderWaitIsNotRequired() {
+		SyncRequest syncRequest = new SyncRequest.Builder().build();
 		
-		requestBuilder.waitInMinute(getWait(root));
-		return requestBuilder.build();
+		assertThat(syncRequest.getWaitInMinute()).isNull();
 	}
 
-	@VisibleForTesting Integer getWait(Element root) {
-		String wait = DOMUtils.getElementText(root, SyncRequestFields.WAIT.getName());
-		logger.debug("Wait value : " + wait);
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testBuilderWaitNegative() {
+		new SyncRequest.Builder().waitInMinute(-1).build();
+	}
+
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testBuilderWaitMoreThanValid() {
+		new SyncRequest.Builder().waitInMinute(60).build();
+	}
+
+	@Test
+	public void testBuilderWaitValid() {
+		SyncRequest syncRequest = new SyncRequest.Builder().waitInMinute(58).build();
 		
-		if (wait != null) {
-			try {
-				return Integer.parseInt(wait);
-			} catch (NumberFormatException e) {
-				throw new ASRequestIntegerFieldException("Failed to parse field : " + SyncRequestFields.WAIT.getName(), e);
-			}
-		}
-		return null;
+		assertThat(syncRequest.getWaitInMinute()).isEqualTo(58);
 	}
 }

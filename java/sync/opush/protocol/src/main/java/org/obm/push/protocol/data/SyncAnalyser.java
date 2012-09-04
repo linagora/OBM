@@ -64,6 +64,8 @@ import com.google.inject.Singleton;
 public class SyncAnalyser {
 
 	private static final Logger logger = LoggerFactory.getLogger(SyncAnalyser.class);
+
+	private static final int DEFAULT_WAIT = 0;
 	
 	private final CollectionDao collectionDao;
 	private final SyncedCollectionDao syncedCollectionStoreService;
@@ -91,7 +93,7 @@ public class SyncAnalyser {
 		assertNotPartialRequest(syncRequest);
 
 		Sync.Builder builder = Sync.builder()
-				.waitInMinutes(syncRequest.getWaitInMinute());
+				.waitInMinutes(getWait(syncRequest));
 
 		for (SyncRequestCollection syncRequestCollection : syncRequest.getCollections()) {
 			builder.addCollection(getCollection(userDataRequest, syncRequestCollection,
@@ -106,6 +108,13 @@ public class SyncAnalyser {
 		if (syncRequest.isPartial() != null && syncRequest.isPartial()) {
 			throw new PartialException();
 		}
+	}
+	
+	private int getWait(SyncRequest syncRequest) {
+		if (syncRequest.getWaitInMinute() != null) {
+			return syncRequest.getWaitInMinute();
+		}
+		return DEFAULT_WAIT;
 	}
 
 	private SyncCollection getCollection(UserDataRequest udr, SyncRequestCollection requestCollection,
