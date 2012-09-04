@@ -63,6 +63,8 @@ def get_version_release(args, config, date, sha1):
         raise ValueError("The obm version should be specified on the "
                 "command line or in the configuration file")
     version = obm_version
+    if args.package_type == 'rpm' and not obm_release:
+        obm_release = 1
     short_sha1 = sha1[:7]
     if args.on_commit: 
         formatter = string.Formatter()
