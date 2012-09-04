@@ -570,6 +570,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.isICSAttachment()).andReturn(messageFixture.isICSAttachment);
 
 		MimeMessage mimeMessage = createMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(anyObject(ContentType.class))).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findRootMimePartInTree()).andReturn(mimeMessage);
 		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));

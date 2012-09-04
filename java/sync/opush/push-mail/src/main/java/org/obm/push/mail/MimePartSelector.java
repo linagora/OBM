@@ -38,10 +38,14 @@ import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class MimePartSelector {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MimePartSelector.class);
 	
 	private static final int DEFAULT_TRUNCATION_SIZE = 32*1024;
 	private static final ImmutableList<BodyPreference> DEFAULT_BODY_PREFERENCES = 
@@ -52,6 +56,8 @@ public class MimePartSelector {
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build()).build(); 
 	
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
+		
 		if (bodyPreferences == null || bodyPreferences.isEmpty()) {
 			return fetchIntructions(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		} else {
@@ -82,7 +88,7 @@ public class MimePartSelector {
 					return buildFetchInstructions(mimePart, bodyPreference);
 				}
 			} else {
-				return buildFetchInstructions(mimeMessage.getMimePart(), bodyPreference);
+				return buildFetchInstructions(mimeMessage, bodyPreference);
 			}
 		}
 		return null;
