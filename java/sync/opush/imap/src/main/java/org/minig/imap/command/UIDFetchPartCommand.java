@@ -33,10 +33,14 @@
 package org.minig.imap.command;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.minig.imap.impl.IMAPResponse;
+
+import com.google.common.io.ByteStreams;
 
 public class UIDFetchPartCommand extends Command<InputStream> {
 
@@ -80,7 +84,17 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 		
 		IMAPResponse stream = rs.get(0);
 		if (isOK && stream.getStreamData() != null) {
-			data = stream.getStreamData();
+			try {
+				byte[] rawData = ByteStreams.toByteArray(stream.getStreamData());
+				if (rawData[rawData.length - 1] == ')') {
+					rawData = Arrays.copyOf(rawData, rawData.length - 1);
+				}
+				
+				data = new ByteArrayInputStream(rawData);
+			}
+			catch (IOException e) {
+				logger.error("Error reading response stream", e);
+			}
 		} else {
 			if (isOK) {
 				data = new ByteArrayInputStream("[empty]".getBytes());

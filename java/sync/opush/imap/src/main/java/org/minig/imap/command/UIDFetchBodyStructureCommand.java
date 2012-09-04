@@ -41,6 +41,7 @@ import java.util.TreeSet;
 
 import org.minig.imap.command.parser.BodyStructureParser;
 import org.minig.imap.impl.IMAPResponse;
+import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.MessageSet;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.impl.AtomHelper;
@@ -124,22 +125,14 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 		String longAsString = getNumberForField(fullPayload, "UID ");
 		return Long.valueOf(longAsString);		
 	}
-
+	
 	private String getNumberForField(String fullPayload, String field) {
 		String uidStartToken = field;
 		int uidIdx = fullPayload.indexOf(uidStartToken);
 		String content = fullPayload.substring(uidIdx + uidStartToken.length());
-		ImmutableList<Character> chars = Lists.charactersOf(content);
-		StringBuilder longAsString = new StringBuilder();
-		for (Character c: chars) {
-			if (Character.isDigit(c)) {
-				longAsString.append(c);
-			} else {
-				break;
-			}
-		}
-		return longAsString.toString();
+		return IMAPParsingTools.getNextNumber(content);
 	}
+	
 	
 	private String getBodyStructurePayload(String fullPayload) {
 		String bodystructureStartToken = "BODYSTRUCTURE ";
