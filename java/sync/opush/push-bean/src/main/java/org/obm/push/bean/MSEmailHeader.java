@@ -45,6 +45,10 @@ public class MSEmailHeader implements Serializable {
 
 	public static final MSAddress DEFAULT_FROM_ADDRESS = new MSAddress("Empty From", "o-push@linagora.com");
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		
 		private List<MSAddress> from;
@@ -54,7 +58,7 @@ public class MSEmailHeader implements Serializable {
 		private String subject;
 		private Date date;
 		
-		public Builder() {}
+		private Builder() {}
 		
 		public Builder from(List<MSAddress> from) {
 			this.from = from;

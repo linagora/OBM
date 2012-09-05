@@ -120,7 +120,7 @@ public class ImapFetchAPITest {
 	@Ignore("AppendCommand should send optional message's internal date-time in command")
 	@Test
 	public void testFetchEnvelope() throws MailException {
-		Envelope envelope = new Envelope.Builder().date(DateUtils.date("2010-09-17T17:12:26")).
+		Envelope envelope = Envelope.builder().date(DateUtils.date("2010-09-17T17:12:26")).
 		messageNumber(1).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
@@ -185,7 +185,7 @@ public class ImapFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
+		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
 	
@@ -198,7 +198,7 @@ public class ImapFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L, 1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).
+		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
 	
@@ -212,7 +212,7 @@ public class ImapFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setAnsweredFlag(udr, inbox, 1);
 		Collection<FastFetch> result = privateMailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(new FastFetch.Builder().internalDate(truncatedInternalDate).uid(1).answered().
+		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());
 	}
 	

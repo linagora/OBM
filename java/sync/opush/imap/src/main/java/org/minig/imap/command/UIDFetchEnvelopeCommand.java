@@ -211,7 +211,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		parser.consumeToken(pos, env); // Message-ID
 		String mid = new String(parser.getLastReadToken());
 		
-		return new Envelope.Builder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
+		return Envelope.builder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
 				messageID(mid).build();
 	}
 

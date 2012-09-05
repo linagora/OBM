@@ -50,9 +50,9 @@ public class MimePartSelector {
 	private static final int DEFAULT_TRUNCATION_SIZE = 32*1024;
 	private static final ImmutableList<BodyPreference> DEFAULT_BODY_PREFERENCES = 
 			ImmutableList.<BodyPreference> builder()
-					.add(new BodyPreference.Builder().bodyType(MSEmailBodyType.PlainText)
+					.add(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText)
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
-					.add(new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML)
+					.add(BodyPreference.builder().bodyType(MSEmailBodyType.HTML)
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build()).build(); 
 	
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
@@ -95,7 +95,7 @@ public class MimePartSelector {
 	}
 
 	private FetchInstructions defaultFetchInstructions(MimeMessage mimeMessage) {
-		return new FetchInstructions.Builder()
+		return FetchInstructions.builder()
 			.mimePart(mimeMessage.getMimePart())
 			.truncation(DEFAULT_TRUNCATION_SIZE).build();
 	}
@@ -113,7 +113,7 @@ public class MimePartSelector {
 	}
 	
 	private FetchInstructions buildFetchInstructions(IMimePart mimePart, BodyPreference bodyPreference) {
-		return new FetchInstructions.Builder()
+		return FetchInstructions.builder()
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())
 			.bodyType(bodyPreference.getType())
@@ -131,7 +131,7 @@ public class MimePartSelector {
 	
 	private ContentType toContentType(MSEmailBodyType bodyType) {
 		String contentType = toMimeType(bodyType);
-		return new ContentType.Builder().contentType(contentType).build();
+		return ContentType.builder().contentType(contentType).build();
 	}
 	
 	private String toMimeType(MSEmailBodyType bodyType) {

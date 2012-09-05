@@ -61,7 +61,7 @@ public class MSEmailHeaderConverter {
 	
 	public MSEmailHeader convertToMSEmailHeader(Envelope envelope) {
 		Preconditions.checkNotNull(envelope);
-		return new MSEmailHeader.Builder()
+		return MSEmailHeader.builder()
 		.from(toMSAddresses(envelope.getFrom()))
 		.replyTo(toMSAddresses(envelope.getReplyTo()))
 		.to(toMSAddresses(envelope.getTo()))

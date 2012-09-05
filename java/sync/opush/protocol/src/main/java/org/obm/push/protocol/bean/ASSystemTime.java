@@ -56,6 +56,10 @@ public class ASSystemTime {
 	private final UnsignedShort second;
 	private final UnsignedShort milliseconds;
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 
 		private UnsignedShort year;
@@ -67,6 +71,9 @@ public class ASSystemTime {
 		private UnsignedShort second;
 		private UnsignedShort milliseconds;
 
+		private Builder() {
+		}
+		
 		public Builder year(UnsignedShort year) {
 			this.year = year;
 			return this;

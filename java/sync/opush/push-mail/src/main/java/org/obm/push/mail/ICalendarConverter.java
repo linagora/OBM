@@ -245,7 +245,7 @@ public class ICalendarConverter {
 		Integer dayOfMonth = dayOfMonth(iCalendarRule, frequency);
 		
 		meetingRequestRecurrences.add(
-				new MSMeetingRequestRecurrence.Builder()
+				MSMeetingRequestRecurrence.builder()
 				.interval(iCalendarRule.interval())
 				.until(iCalendarRule.until())
 				.dayOfWeek(dayList)

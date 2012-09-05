@@ -37,11 +37,15 @@ import com.google.common.base.Objects;
 
 public class MSAttendee implements Serializable {
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		
 		private final MSAttendee attendee;
 		
-		public Builder() {
+		private Builder() {
 			super();
 			attendee = new MSAttendee();
 		}

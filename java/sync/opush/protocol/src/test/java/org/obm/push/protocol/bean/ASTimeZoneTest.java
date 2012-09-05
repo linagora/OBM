@@ -57,7 +57,7 @@ public class ASTimeZoneTest {
 	}
 
 	private ASSystemTime anySystemTime() {
-		return new ASSystemTime.Builder()
+		return ASSystemTime.builder()
 			.year(UnsignedShort.checkedCast(0))
 			.month(UnsignedShort.checkedCast(0))
 			.dayOfWeek(UnsignedShort.checkedCast(0))
@@ -71,7 +71,7 @@ public class ASTimeZoneTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsBias() {
-		new ASTimeZone.Builder()
+		ASTimeZone.builder()
 			.standardBias(defaultStandardBiasInMinutes)
 			.standardDate(defaultStandardDate)
 			.dayLightBias(defaultDayLightBiasInMinutes)
@@ -81,7 +81,7 @@ public class ASTimeZoneTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsStandardBias() {
-		new ASTimeZone.Builder()
+		ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardDate(defaultStandardDate)
 			.dayLightBias(defaultDayLightBiasInMinutes)
@@ -91,7 +91,7 @@ public class ASTimeZoneTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsStandardDate() {
-		new ASTimeZone.Builder()
+		ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardBias(defaultStandardBiasInMinutes)
 			.dayLightBias(defaultDayLightBiasInMinutes)
@@ -101,7 +101,7 @@ public class ASTimeZoneTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsDayLightBias() {
-		new ASTimeZone.Builder()
+		ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardBias(defaultStandardBiasInMinutes)
 			.standardDate(defaultStandardDate)
@@ -111,7 +111,7 @@ public class ASTimeZoneTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuilderNeedsDayLightDate() {
-		new ASTimeZone.Builder()
+		ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardBias(defaultStandardBiasInMinutes)
 			.standardDate(defaultStandardDate)
@@ -138,7 +138,7 @@ public class ASTimeZoneTest {
 	}
 	
 	public ASTimeZone.Builder requirementsInitializedBuilder() {
-		return new ASTimeZone.Builder()
+		return ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardBias(defaultStandardBiasInMinutes)
 			.standardDate(defaultStandardDate)

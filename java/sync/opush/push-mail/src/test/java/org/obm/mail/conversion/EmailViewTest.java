@@ -59,7 +59,7 @@ public class EmailViewTest {
 
 	@Test(expected=EmailViewBuildException.class)
 	public void testUidDefault() {
-		new EmailView.Builder()
+		EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.bodyType(MSEmailBodyType.PlainText)
@@ -68,7 +68,7 @@ public class EmailViewTest {
 
 	@Test
 	public void testUid() {
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
@@ -81,7 +81,7 @@ public class EmailViewTest {
 	
 	@Test
 	public void testUidNegativeValue() {
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(-115)
@@ -94,7 +94,7 @@ public class EmailViewTest {
 
 	@Test(expected=EmailViewBuildException.class)
 	public void testEnvelopeRequired() {
-		new EmailView.Builder().envelope(null)
+		EmailView.builder().envelope(null)
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
 			.bodyType(MSEmailBodyType.PlainText)
@@ -103,7 +103,7 @@ public class EmailViewTest {
 
 	@Test(expected=EmailViewBuildException.class)
 	public void testBodyMimePartDataRequired() {
-		new EmailView.Builder().bodyMimePartData(null)
+		EmailView.builder().bodyMimePartData(null)
 			.envelope(anyEnvelope())
 			.uid(155)
 			.bodyType(MSEmailBodyType.PlainText)
@@ -112,7 +112,7 @@ public class EmailViewTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void testFlagsAtNull() {
-		new EmailView.Builder()
+		EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
@@ -124,7 +124,7 @@ public class EmailViewTest {
 	public void testFlags() {
 		List<Flag> mutableFlagsList = Lists.newArrayList(Flag.ANSWERED);
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
@@ -138,7 +138,7 @@ public class EmailViewTest {
 
 	@Test
 	public void testFlagsDefault() {
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
@@ -151,7 +151,7 @@ public class EmailViewTest {
 
 	@Test(expected=UnsupportedOperationException.class)
 	public void testFlagsDefaultIsImmutable() {
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
@@ -166,7 +166,7 @@ public class EmailViewTest {
 	public void testFlagsIsNotLinkedToCollectionArg() {
 		List<Flag> mutableFlagsList = Lists.newArrayList(Flag.ANSWERED);
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
@@ -184,7 +184,7 @@ public class EmailViewTest {
 	public void testFlagsIsImmutable() {
 		List<Flag> mutableFlagsList = Lists.newArrayList(Flag.ANSWERED);
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(mutableFlagsList)
@@ -201,7 +201,7 @@ public class EmailViewTest {
 		EmailViewAttachment emailViewAttachment = anyEmailViewAttachment("id");
 		List<EmailViewAttachment> attachments = Lists.newArrayList(emailViewAttachment);
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -218,7 +218,7 @@ public class EmailViewTest {
 	public void testAttachmentsIsImmutable() {
 		List<EmailViewAttachment> attachments = Lists.newArrayList(anyEmailViewAttachment("id"));
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -236,7 +236,7 @@ public class EmailViewTest {
 		EmailViewAttachment emailViewAttachment = anyEmailViewAttachment("id");
 		List<EmailViewAttachment> attachments = Lists.newArrayList(emailViewAttachment);
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -255,7 +255,7 @@ public class EmailViewTest {
 	public void testICalendar() throws IOException, ParserException, EmailViewBuildException {
 		ICalendar iCalendar = anyICalendar("attendee.ics");
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -272,7 +272,7 @@ public class EmailViewTest {
 	public void testInvitationType() {
 		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;
 		
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -287,7 +287,7 @@ public class EmailViewTest {
 	
 	@Test(expected=EmailViewBuildException.class)
 	public void testMimeTypeRequired() {
-		new EmailView.Builder()
+		EmailView.builder()
 			.envelope(anyEnvelope())
 			.bodyMimePartData(anyBodyMimePartData())
 			.uid(155)
@@ -296,7 +296,7 @@ public class EmailViewTest {
 	
 	@Test(expected=EmailViewBuildException.class)
 	public void testTruncatedRequired() {
-		new EmailView.Builder()
+		EmailView.builder()
 		.envelope(anyEnvelope())
 		.bodyMimePartData(anyBodyMimePartData())
 		.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -307,7 +307,7 @@ public class EmailViewTest {
 	
 	@Test
 	public void testTruncated() {
-		EmailView emailView = new EmailView.Builder()
+		EmailView emailView = EmailView.builder()
 		.envelope(anyEnvelope())
 		.bodyMimePartData(anyBodyMimePartData())
 		.flags(Lists.newArrayList(Flag.ANSWERED))
@@ -324,7 +324,7 @@ public class EmailViewTest {
 	}
 
 	private Envelope anyEnvelope() {
-		Envelope envelope = new Envelope.Builder()
+		Envelope envelope = Envelope.builder()
 			.from(Lists.newArrayList(new Address("from@domain.org")))
 			.to(Lists.newArrayList(new Address("to@domain.org")))
 			.subject("subject")
@@ -342,6 +342,6 @@ public class EmailViewTest {
 		if (in == null) {
 			Assert.fail("Cannot load " + filename);
 		}
-		return new ICalendar.Builder().inputStream(in).build();	
+		return ICalendar.builder().inputStream(in).build();	
 	}
 }

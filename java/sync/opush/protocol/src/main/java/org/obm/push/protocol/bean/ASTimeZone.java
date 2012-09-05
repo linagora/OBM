@@ -44,6 +44,10 @@ public class ASTimeZone {
 	private final ASSystemTime dayLightDate;
 	private final int dayLightBias;
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 
 		private Integer bias;
@@ -54,6 +58,9 @@ public class ASTimeZone {
 		private ASSystemTime dayLightDate;
 		private Integer dayLightBias;
 
+		private Builder() {
+		}
+		
 		public Builder bias(int bias) {
 			this.bias = bias;
 			return this;

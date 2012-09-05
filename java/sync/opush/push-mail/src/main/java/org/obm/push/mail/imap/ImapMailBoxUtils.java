@@ -115,7 +115,7 @@ public class ImapMailBoxUtils {
 			List<Address> from = buildAddressListFromJavaMailAddress(message.getFrom());
 			List<Address> replyTo = buildAddressListFromJavaMailAddress(message.getReplyTo());
 			
-			return new Envelope.Builder().messageNumber(msgno).
+			return Envelope.builder().messageNumber(msgno).
 					date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
 					messageID(messageID).replyTo(replyTo).build();
 		} catch (MessagingException e) {
@@ -157,7 +157,7 @@ public class ImapMailBoxUtils {
 			Date receivedDate = imapMessage.getReceivedDate();
 			int size = imapMessage.getSize();
 			
-			FastFetch.Builder builder = new FastFetch.Builder();
+			FastFetch.Builder builder = FastFetch.builder();
 			builder.uid(uid).internalDate(receivedDate).flags(buildFlagToIMAPMessageFlags).size(size);
 			return builder.build();
 		} catch (MessagingException ex) {
@@ -246,7 +246,7 @@ public class ImapMailBoxUtils {
 	}
 	
 	private ContentType buildContentType(String contentType) {
-		ContentType.Builder builder = new ContentType.Builder();
+		ContentType.Builder builder = ContentType.builder();
 		builder.contentType(contentType);
 		return builder.build();
 	}

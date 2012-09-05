@@ -345,7 +345,7 @@ public class MSMeetingRecurrenceSerializingTest {
 	}
 
 	private Builder initializedRequiredFieldsRecurrenceBuilder() {
-		return new MSMeetingRequestRecurrence.Builder()
+		return MSMeetingRequestRecurrence.builder()
 				.type(MSMeetingRequestRecurrenceType.DAILY)
 				.interval(1);
 	}

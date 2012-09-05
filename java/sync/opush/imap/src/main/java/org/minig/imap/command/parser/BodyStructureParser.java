@@ -183,7 +183,7 @@ public class BodyStructureParser {
 
 			return FirstOf(
 					Sequence(
-							push(new BodyParams.Builder()),
+							push(BodyParams.builder()),
 							'(', 
 							string(),
 							whitespaces(),
@@ -193,7 +193,7 @@ public class BodyStructureParser {
 									whitespaces(), string(), whitespaces(), string(), 
 									addBodyParam()), 
 					')'),
-					Sequence(nil(), drop() && push(new BodyParams.Builder())));
+					Sequence(nil(), drop() && push(BodyParams.builder())));
 		}
 
 		Rule bodyType1part() {
@@ -210,7 +210,7 @@ public class BodyStructureParser {
 			IMimePart mt = (IMimePart) peek();
 
 			if (extBodyParams != null) {
-				BodyParams.Builder newParams = new BodyParams.Builder();
+				BodyParams.Builder newParams = BodyParams.builder();
 				BodyParams bodyParams = mt.getBodyParams();
 				if (bodyParams != null) {
 					newParams.addAll(bodyParams);
@@ -250,7 +250,7 @@ public class BodyStructureParser {
 			MimePart message = (MimePart) peek();
 			IMimePart child = message.getChildren().get(0);
 			if (child.isMultipart()) {
-				BodyParams params = new BodyParams.Builder()
+				BodyParams params = BodyParams.builder()
 					.addAll(message.getBodyParams())
 					.addAll(child.getBodyParams())
 					.build();
@@ -352,12 +352,12 @@ public class BodyStructureParser {
 		boolean createMimeType() {
 			swap();
 			push(
-					new ContentType.Builder().primaryType((String) pop()).subType((String) pop()).build());
+					ContentType.builder().primaryType((String) pop()).subType((String) pop()).build());
 			return true;
 		}
 		
 		Rule mediaMessage() {
-			ContentType.Builder builder = new ContentType.Builder().primaryType("MESSAGE").subType("RFC822");
+			ContentType.Builder builder = ContentType.builder().primaryType("MESSAGE").subType("RFC822");
 			return Sequence("\"MESSAGE\"", whitespaces(), "\"RFC822\"", push(builder.build()));
 		}
 
@@ -367,7 +367,7 @@ public class BodyStructureParser {
 
 		Rule mediaText() {
 			return Sequence("\"TEXT\"", whitespaces(), mediaSubType(), 
-					push(new ContentType.Builder().primaryType("TEXT").subType((String) pop()).build()));
+					push(ContentType.builder().primaryType("TEXT").subType((String) pop()).build()));
 		}
 
 		public Rule rule() {

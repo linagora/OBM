@@ -80,7 +80,7 @@ public class MSEmailHeaderSerializingTest {
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 				.uid(1)
 				.body(simpleBody)
-					.header(new MSEmailHeader.Builder()
+					.header(MSEmailHeader.builder()
 					.from(new MSAddress("from@obm.lng.org"))
 					.replyTo(new MSAddress("from@mydomain.org"))
 					.cc(new MSAddress("cc@obm.lng.org"))
@@ -107,7 +107,7 @@ public class MSEmailHeaderSerializingTest {
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
 			.body(simpleBody)
-			.header(new MSEmailHeader.Builder()
+			.header(MSEmailHeader.builder()
 				.from(new MSAddress("from@obm.lng.org")).build())
 			.build();
 		
@@ -121,7 +121,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();
 		
@@ -135,7 +135,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();
 		
@@ -149,7 +149,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject("")
 			.build();
@@ -164,7 +164,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject("a subject")
 			.build();
@@ -179,7 +179,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject(" ")
 			.build();
@@ -194,7 +194,7 @@ public class MSEmailHeaderSerializingTest {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = new MSEmail.MSEmailBuilder()
 			.uid(1)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();
 		

@@ -51,9 +51,16 @@ import com.google.common.base.Preconditions;
 
 public class ICalendar {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private InputStream inputStream;
 		private String iCalendar;
+
+		private Builder() {
+		}
 		
 		public Builder inputStream(InputStream inputStream) {
 			this.inputStream = inputStream;

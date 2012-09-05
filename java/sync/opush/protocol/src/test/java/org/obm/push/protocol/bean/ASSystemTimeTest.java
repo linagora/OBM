@@ -51,7 +51,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsYear() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
 				.weekOfMonth(unsignedShort(0))
@@ -63,7 +63,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsMonth() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
 				.weekOfMonth(unsignedShort(0))
@@ -75,7 +75,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsDayOfWeek() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.weekOfMonth(unsignedShort(0))
@@ -87,7 +87,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsDay() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -99,7 +99,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsHour() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -111,7 +111,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsMinute() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -123,7 +123,7 @@ public class ASSystemTimeTest {
 		}
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsSecond() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -136,7 +136,7 @@ public class ASSystemTimeTest {
 	
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerNeedsMillis() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -149,7 +149,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerMonthRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(40))
 				.dayOfWeek(unsignedShort(0))
@@ -163,7 +163,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerDayOfWeekRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(8))
@@ -177,7 +177,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerWeekOfMonthRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -191,7 +191,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerHourRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -205,7 +205,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerMinuteRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -219,7 +219,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerSecondRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))
@@ -233,7 +233,7 @@ public class ASSystemTimeTest {
 		
 		@Test(expected=IllegalStateException.class)
 		public void testThatBuilerMillisecondsRange() {
-			new ASSystemTime.Builder()
+			ASSystemTime.builder()
 				.year(unsignedShort(0))
 				.month(unsignedShort(0))
 				.dayOfWeek(unsignedShort(0))

@@ -125,7 +125,7 @@ public class MimePartSelectorTest {
 	public void testSelectDefaultBodyPreferences() {
 		MimePart mimePart = new MimePart();
 		mimePart.setContentType(
-				new ContentType.Builder().primaryType("text").subType("plain").build());
+				ContentType.builder().primaryType("text").subType("plain").build());
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
@@ -181,7 +181,7 @@ public class MimePartSelectorTest {
 	public void testSelectLargerThanQueryPreferencesWithAllOrNone() {
 		MimePart mimePart = new MimePart();
 		mimePart.setContentType(
-				new ContentType.Builder().primaryType("text").subType("html").build());
+				ContentType.builder().primaryType("text").subType("html").build());
 	
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		expect(expectedMimePart.getSize()).andReturn(50);
@@ -193,7 +193,7 @@ public class MimePartSelectorTest {
 	
 		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(mimePart);
 	
-		BodyPreference bodyPreference = new BodyPreference.Builder().
+		BodyPreference bodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
@@ -212,7 +212,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
-		BodyPreference bodyPreference = new BodyPreference.Builder().
+		BodyPreference bodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(50).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
@@ -231,7 +231,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
-		BodyPreference bodyPreference = new BodyPreference.Builder().
+		BodyPreference bodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
@@ -250,7 +250,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
-		BodyPreference bodyPreference = new BodyPreference.Builder().
+		BodyPreference bodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).allOrNone(false).build();
 	
 		replay(mimeMessage, expectedMimePart);
@@ -269,7 +269,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
-		BodyPreference bodyPreference = new BodyPreference.Builder().
+		BodyPreference bodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(false).build();
 	
 		replay(mimeMessage, expectedMimePart);
@@ -294,11 +294,11 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(plainTextMimePart);
 		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(expectedMimePart);
 	
-		BodyPreference rtfBodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.RTF).build();
-		BodyPreference plainTextBodyPreference = new BodyPreference.Builder().
+		BodyPreference rtfBodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.RTF).build();
+		BodyPreference plainTextBodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(true).build();
 	
-		BodyPreference htmlBodyPreference = new BodyPreference.Builder().
+		BodyPreference htmlBodyPreference = BodyPreference.builder().
 				bodyType(MSEmailBodyType.HTML).truncationSize(50).allOrNone(true).build();
 	
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(
@@ -314,10 +314,10 @@ public class MimePartSelectorTest {
 	}
 
 	private ContentType contentType(String mimeType) {
-		return new ContentType.Builder().contentType(mimeType).build();
+		return ContentType.builder().contentType(mimeType).build();
 	}
 
 	private BodyPreference bodyPreference(MSEmailBodyType emailBodyType) {
-		 return new BodyPreference.Builder().bodyType(emailBodyType).build();
+		 return BodyPreference.builder().bodyType(emailBodyType).build();
 	}
 }

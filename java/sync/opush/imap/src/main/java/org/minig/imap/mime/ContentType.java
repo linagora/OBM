@@ -40,13 +40,17 @@ import com.google.common.collect.Iterables;
 
 public class ContentType {
 
-	public static class Builder {
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder implements org.obm.push.bean.Builder<ContentType> {
 		private String primaryType = null;
 		private String subType = null;
 		private BodyParams.Builder bodyParamsBuilder;
 		
-		public Builder() {
-			bodyParamsBuilder = new BodyParams.Builder();
+		private Builder() {
+			bodyParamsBuilder = BodyParams.builder();
 		}
 		
 		public Builder primaryType(String primaryType) {

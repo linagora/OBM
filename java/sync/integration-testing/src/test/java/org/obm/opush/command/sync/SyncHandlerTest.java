@@ -252,7 +252,7 @@ public class SyncHandlerTest {
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
 		return new MSEmail.MSEmailBuilder()
 			.uid(1l)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false)).build();
 	}

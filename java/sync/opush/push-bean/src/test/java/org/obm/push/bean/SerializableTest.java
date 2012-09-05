@@ -72,7 +72,7 @@ public class SerializableTest {
 	@Test
 	public void testSyncCollectionOptions() throws IOException {
 		SyncCollectionOptions obj = new SyncCollectionOptions();
-		obj.setBodyPreferences(ImmutableList.of(new BodyPreference.Builder().build()));
+		obj.setBodyPreferences(ImmutableList.of(BodyPreference.builder().build()));
 		objectOutputStream.writeObject(obj);
 	}
 	
@@ -98,7 +98,7 @@ public class SerializableTest {
 	public void testNewMSEmail() {
 		 org.obm.push.bean.ms.MSEmail msEmail = new org.obm.push.bean.ms.MSEmail.MSEmailBuilder()
 			.uid(1l)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, 0, Charsets.UTF_8, false))
 			.meetingRequest(
@@ -109,7 +109,7 @@ public class SerializableTest {
 						.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 						.msEventExtId(new MSEventExtId("ext-id-123-536"))
 						.recurrences(Arrays.asList(
-								new MSMeetingRequestRecurrence.Builder()
+								MSMeetingRequestRecurrence.builder()
 								.type(MSMeetingRequestRecurrenceType.DAILY)
 								.interval(1)
 								.build()))

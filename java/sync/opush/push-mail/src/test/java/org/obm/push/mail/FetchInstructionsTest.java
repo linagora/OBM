@@ -110,7 +110,7 @@ public class FetchInstructionsTest {
 	}
 
 	private FetchInstructions createFetchInstructions(Integer truncation, IMimePart mimePart) {
-		return new FetchInstructions.Builder()
+		return FetchInstructions.builder()
 			.truncation(truncation)
 			.mimePart(mimePart)
 			.build();

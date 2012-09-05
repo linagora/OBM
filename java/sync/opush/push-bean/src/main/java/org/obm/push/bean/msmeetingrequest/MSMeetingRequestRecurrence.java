@@ -42,6 +42,10 @@ import com.google.common.collect.Lists;
 
 public class MSMeetingRequestRecurrence implements Serializable {
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private MSMeetingRequestRecurrenceType type;
 		private Integer interval;
@@ -51,6 +55,9 @@ public class MSMeetingRequestRecurrence implements Serializable {
 		private Integer dayOfMonth;
 		private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek = Lists.newArrayList();
 		private Integer monthOfYear;
+	
+		private Builder() {
+		}
 		
 		public Builder type(MSMeetingRequestRecurrenceType type) {
 			this.type = type;

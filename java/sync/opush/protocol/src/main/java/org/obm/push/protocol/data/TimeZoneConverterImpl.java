@@ -55,7 +55,7 @@ public class TimeZoneConverterImpl implements TimeZoneConverter {
 			return null;
 		}
 		
-		Builder asTimeZoneBuilder = new ASTimeZone.Builder();
+		Builder asTimeZoneBuilder = ASTimeZone.builder();
 		
 		asTimeZoneBuilder
 			.bias(biasInMinutes(timeZone))

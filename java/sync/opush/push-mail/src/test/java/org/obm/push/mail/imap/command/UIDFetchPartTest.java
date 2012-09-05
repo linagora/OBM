@@ -294,7 +294,7 @@ public class UIDFetchPartTest {
 		Collection<MimeMessage> mimeMessages = 
 				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
-		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML).build();
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
@@ -317,7 +317,7 @@ public class UIDFetchPartTest {
 		Collection<MimeMessage> mimeMessages = 
 				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
-		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
@@ -338,7 +338,7 @@ public class UIDFetchPartTest {
 		Collection<MimeMessage> mimeMessages = 
 				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
-		BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(MSEmailBodyType.RTF).build();
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.RTF).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();

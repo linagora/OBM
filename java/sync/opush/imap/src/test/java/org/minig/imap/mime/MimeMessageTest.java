@@ -342,13 +342,13 @@ public class MimeMessageTest {
 	}
 	
 	private ContentType buildContentType(String contentType) {
-		return new ContentType.Builder().contentType(contentType).build();
+		return ContentType.builder().contentType(contentType).build();
 	}
 	
 	private IMimePart buildInvitationContentType(String method) {
 		IMimePart mimePart = new MimePart();
 		mimePart.setContentType(
-				new ContentType.Builder().contentType("text/calendar; charset=utf-8; method=" + method).build());
+				ContentType.builder().contentType("text/calendar; charset=utf-8; method=" + method).build());
 		return mimePart;
 	}
 }

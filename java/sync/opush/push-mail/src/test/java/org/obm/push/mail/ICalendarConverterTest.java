@@ -263,7 +263,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(2)
 							.type(MSMeetingRequestRecurrenceType.DAILY)
 							.build()))
@@ -288,7 +288,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.until(new DateTime("2012-04-24T23:59:59").toDate())
 							.type(MSMeetingRequestRecurrenceType.DAILY)
@@ -314,7 +314,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.DAILY)
 							.dayOfWeek(Lists.newArrayList(
@@ -345,7 +345,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.occurrences(15)
 							.type(MSMeetingRequestRecurrenceType.DAILY)
@@ -377,7 +377,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.WEEKLY)
 							.dayOfWeek(Lists.newArrayList(
@@ -405,7 +405,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.MONTHLY)
 							.dayOfMonth(24)
@@ -431,7 +431,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-05-12T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY)
 							.weekOfMonth(2)
@@ -460,7 +460,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.MONTHLY_NTH_DAY)
 							.dayOfMonth(2)
@@ -488,7 +488,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.YEARLY)
 							.dayOfMonth(10)
@@ -515,7 +515,7 @@ public class ICalendarConverterTest {
 					.reponseRequested(true)
 					.recurrenceId(new DateTime("2013-10-01T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
-							new MSMeetingRequestRecurrence.Builder()
+							MSMeetingRequestRecurrence.builder()
 							.interval(1)
 							.type(MSMeetingRequestRecurrenceType.YEARLY_NTH_DAY)
 							.monthOfYear(10)
@@ -608,6 +608,6 @@ public class ICalendarConverterTest {
 		if (in == null) {
 			Assert.fail("Cannot load " + filename);
 		}
-		return new ICalendar.Builder().inputStream(in).build();	
+		return ICalendar.builder().inputStream(in).build();	
 	}
 }

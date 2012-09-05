@@ -35,11 +35,15 @@ import com.google.common.base.Objects;
 
 public class Attendee {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		
 		private final Attendee attendee;
 		
-		public Builder() {
+		private Builder() {
 			super();
 			attendee = new Attendee();
 		}

@@ -124,7 +124,7 @@ public class SyncCollectionOptions implements Serializable {
 		Iterable<BodyPreference> bp = Iterables.transform(this.bodyPreferences, new Function<BodyPreference, BodyPreference>() {
 			@Override
 			public BodyPreference apply(BodyPreference input) {
-				return new BodyPreference.Builder()
+				return BodyPreference.builder()
 					.allOrNone(input.isAllOrNone())
 					.bodyType(input.getType()).build();
 			}

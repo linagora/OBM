@@ -553,7 +553,7 @@ public class ImapMailboxService implements PrivateMailboxService {
 		try {
 			login(store);
 			store.select( parseMailBoxName(udr, collectionName) );
-			SearchQuery query = new SearchQuery.Builder().after(windows).build();
+			SearchQuery query = SearchQuery.builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
 			Collection<FastFetch> mails = fetchFast(udr, collectionName, uids);
 			return EmailFactory.listEmailFromFastFetch(mails);

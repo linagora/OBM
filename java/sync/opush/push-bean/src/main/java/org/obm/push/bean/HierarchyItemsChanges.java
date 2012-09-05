@@ -39,11 +39,15 @@ import com.google.common.collect.Lists;
 
 public class HierarchyItemsChanges {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private List<ItemChange> changes;
 		private List<ItemChange> deletions;
 
-		public Builder() {
+		private Builder() {
 			changes = Lists.newArrayList();
 			deletions = Lists.newArrayList();
 		}

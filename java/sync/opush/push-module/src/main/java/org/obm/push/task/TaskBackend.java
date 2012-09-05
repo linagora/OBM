@@ -114,7 +114,7 @@ public class TaskBackend implements PIMBackend {
 	public HierarchyItemsChanges getHierarchyChanges(
 			UserDataRequest userDataRequest, FolderSyncState lastKnownState,
 			FolderSyncState outgoingSyncState) throws DaoException {
-		return new HierarchyItemsChanges.Builder().build();
+		return HierarchyItemsChanges.builder().build();
 	}
 	
 }

@@ -95,7 +95,7 @@ public class OpushImapFolderImplTest {
 	public void afterToSearchTerm() {
 		OpushImapFolderImpl folder = new OpushImapFolderImpl(null, null, null);
 		Date date = new Date();
-		SearchQuery query = new SearchQuery.Builder().after(date).build();
+		SearchQuery query = SearchQuery.builder().after(date).build();
 		
 		SearchTerm searchTerm = folder.toSearchTerm(query);
 		
@@ -108,7 +108,7 @@ public class OpushImapFolderImplTest {
 	public void beforeToSearchTerm() {
 		OpushImapFolderImpl folder = new OpushImapFolderImpl(null, null, null);
 		Date date = new Date();
-		SearchQuery query = new SearchQuery.Builder().before(date).build();
+		SearchQuery query = SearchQuery.builder().before(date).build();
 		
 		SearchTerm searchTerm = folder.toSearchTerm(query);
 		SearchTerm[] andTerms = assertAndTerm(searchTerm);
@@ -124,7 +124,7 @@ public class OpushImapFolderImplTest {
 		Date now = DateUtils.getCurrentDate();
 		Date tommorow = DateUtils.getOneDayLater(now);
 		
-		SearchQuery query = new SearchQuery.Builder().after(now).before(tommorow).build();
+		SearchQuery query = SearchQuery.builder().after(now).before(tommorow).build();
 		
 		SearchTerm searchTerm = folder.toSearchTerm(query);
 		

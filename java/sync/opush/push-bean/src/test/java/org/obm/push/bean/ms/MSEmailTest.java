@@ -56,7 +56,7 @@ public class MSEmailTest {
 	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireUid() {
 		new MSEmail.MSEmailBuilder()
-				.header(new MSEmailHeader.Builder().build())
+				.header(MSEmailHeader.builder().build())
 				.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("text".getBytes())), 
 					MSEmailBodyType.PlainText, 
@@ -70,7 +70,7 @@ public class MSEmailTest {
 	public void testMSEmailBuilderRequireBody() {
 		new MSEmail.MSEmailBuilder()
 		.uid(1)
-		.header(new MSEmailHeader.Builder().build())
+		.header(MSEmailHeader.builder().build())
 		.build();
 	}
 
@@ -162,7 +162,7 @@ public class MSEmailTest {
 		MSEmailBodyType emailBodyType = MSEmailBodyType.PlainText;
 		return new MSEmail.MSEmailBuilder()
 				.uid(1l)
-				.header(new MSEmailHeader.Builder().build())
+				.header(MSEmailHeader.builder().build())
 					.body(new MSEmailBody(new SerializableInputStream(
 							new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false));
 	}

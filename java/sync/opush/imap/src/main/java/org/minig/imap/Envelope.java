@@ -39,6 +39,10 @@ import com.google.common.collect.ImmutableList;
 
 public class Envelope {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private int msgno;
 		private Date date;
@@ -50,7 +54,7 @@ public class Envelope {
 		private String messageId;
 		private List<Address> replyTo;
 		
-		public Builder() {
+		private Builder() {
 			this.msgno = -1;
 		}
 		

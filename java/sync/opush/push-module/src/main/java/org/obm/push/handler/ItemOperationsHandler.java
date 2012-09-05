@@ -228,7 +228,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			
-			BodyPreference bodyPreference = new BodyPreference.Builder().bodyType(type).build();
+			BodyPreference bodyPreference = BodyPreference.builder().bodyType(type).build();
 
 			List<ItemChange> itemChanges = contentsExporter.fetch(udr, 
 					new SyncCollection(dataType, ImmutableList.of(serverId), ImmutableList.of(bodyPreference)));

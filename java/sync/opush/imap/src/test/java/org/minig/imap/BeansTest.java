@@ -69,8 +69,8 @@ public class BeansTest {
 		
 		equalsVerifierUtilsTest.createEqualsVerifier(ContentType.class)
 			.withPrefabValues(BodyParams.class, 
-					new BodyParams.Builder().add(new BodyParam("white", "wine")).build(),
-					new BodyParams.Builder().add(new BodyParam("blond", "beer")).build())
+					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
+					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
 			.verify();
 		
 		equalsVerifierUtilsTest.createEqualsVerifier(BodyParams.class)

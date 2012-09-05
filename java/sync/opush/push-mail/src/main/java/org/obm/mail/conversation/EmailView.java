@@ -49,6 +49,10 @@ import com.google.common.collect.ImmutableSet;
 
 public class EmailView {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 
 		private Long uid;
@@ -62,6 +66,9 @@ public class EmailView {
 		private MSEmailBodyType bodyType;
 		private String charset;
 		private Boolean truncated;
+		
+		private Builder() {
+		}
 		
 		public Builder flags(Collection<Flag> flags) {
 			this.flags = ImmutableSet.<Flag>builder().addAll(flags).build();

@@ -478,14 +478,14 @@ public class EmailViewPartsFetcherImplTest {
 		
 		IMimePart multipartLeaf = new MimePart();
 		int multipartLeafIndex = 5;
-		multipartLeaf.setContentType(new ContentType.Builder().contentType(contentType).build());
+		multipartLeaf.setContentType(ContentType.builder().contentType(contentType).build());
 
 		IMimePart parentMimePart = createMock(IMimePart.class);
 		expect(parentMimePart.findRootMimePartInTree()).andReturn(parentMimePart);
 		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf));
 		multipartLeaf.defineParent(parentMimePart, multipartLeafIndex);
 		
-		FetchInstructions fetchInstructions = new FetchInstructions.Builder()
+		FetchInstructions fetchInstructions = FetchInstructions.builder()
 			.mimePart(parentMimePart)
 			.build();
 		
@@ -523,7 +523,7 @@ public class EmailViewPartsFetcherImplTest {
 	}
 
 	private void mockMailboxServiceEnvelope(ImapMailboxService mailboxService) throws MailException {
-		Envelope envelope = new Envelope.Builder()
+		Envelope envelope = Envelope.builder()
 			.from(messageFixture.from)
 			.to(messageFixture.to)
 			.cc(messageFixture.cc)
@@ -590,7 +590,7 @@ public class EmailViewPartsFetcherImplTest {
 	}
 
 	private ArrayList<BodyPreference> bodyPreferences() {
-		BodyPreference.Builder builder = new BodyPreference.Builder()
+		BodyPreference.Builder builder = BodyPreference.builder()
 			.bodyType(messageFixture.bodyType);
 		if (messageFixture.estimatedDataSize != 0) {
 			builder.truncationSize(messageFixture.estimatedDataSize);

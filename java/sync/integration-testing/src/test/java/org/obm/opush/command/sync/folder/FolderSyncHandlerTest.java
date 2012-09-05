@@ -171,7 +171,7 @@ public class FolderSyncHandlerTest {
 		String parentId = "23";
 		
 		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
-		HierarchyItemsChanges mailboxChanges = new HierarchyItemsChanges.Builder()
+		HierarchyItemsChanges mailboxChanges = HierarchyItemsChanges.builder()
 			.changes(Lists.newArrayList(
 					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
 			.build();
@@ -212,7 +212,7 @@ public class FolderSyncHandlerTest {
 		String parentId = "23";
 		
 		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
-		HierarchyItemsChanges mailboxChanges = new HierarchyItemsChanges.Builder()
+		HierarchyItemsChanges mailboxChanges = HierarchyItemsChanges.builder()
 			.deletions(Lists.newArrayList(
 					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
 			.build();
@@ -241,7 +241,7 @@ public class FolderSyncHandlerTest {
 	}
 
 	private HierarchyItemsChanges buildHierarchyItemsChangeEmpty() {
-		return new HierarchyItemsChanges.Builder().build();
+		return HierarchyItemsChanges.builder().build();
 	}
 
 	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, FolderSyncState newSyncState) 

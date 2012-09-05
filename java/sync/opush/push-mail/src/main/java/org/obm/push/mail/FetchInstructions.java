@@ -38,13 +38,17 @@ import com.google.common.base.Preconditions;
 
 
 public class FetchInstructions {
-
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private IMimePart mimePart;
 		private Integer truncation;
 		private MSEmailBodyType bodyType;
 		
-		public Builder() {}
+		private Builder() {}
 		
 		public Builder mimePart(IMimePart mimePart) {
 			this.mimePart = mimePart;

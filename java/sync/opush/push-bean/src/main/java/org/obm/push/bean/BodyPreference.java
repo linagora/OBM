@@ -37,12 +37,16 @@ import com.google.common.base.Objects;
 
 public final class BodyPreference implements Serializable {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private Integer truncationSize;
 		private MSEmailBodyType type;
 		private boolean allOrNone;
 		
-		public Builder() {
+		private Builder() {
 			allOrNone = false;
 		}
 		

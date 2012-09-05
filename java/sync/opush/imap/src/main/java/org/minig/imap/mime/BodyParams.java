@@ -43,12 +43,15 @@ import com.google.common.collect.Maps;
 
 public class BodyParams implements Iterable<BodyParam> {
 
+	public static Builder builder() {
+		return new Builder();
+	}
 	
 	public static class Builder {
 	
 		private Map<String, BodyParam> params;
 		
-		public Builder() {
+		private Builder() {
 			params = Maps.newHashMap();
 		}
 

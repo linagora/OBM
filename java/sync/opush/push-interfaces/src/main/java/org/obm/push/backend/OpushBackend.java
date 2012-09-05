@@ -111,7 +111,7 @@ public abstract class OpushBackend {
 			Iterable<CollectionPath> changedCollections, Iterable<CollectionPath> deletedCollections)
 					throws DaoException, CollectionNotFoundException {
 		
-		return new HierarchyItemsChanges.Builder()
+		return HierarchyItemsChanges.builder()
 			.changes(itemChangesTaggedNew(udr, changedCollections))
 			.deletions(itemChangesTaggedDeleted(udr, deletedCollections))
 			.build();

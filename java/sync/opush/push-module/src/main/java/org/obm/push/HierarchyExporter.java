@@ -65,7 +65,7 @@ public class HierarchyExporter implements IHierarchyExporter {
 	public HierarchyItemsChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState,
 			FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException {
 		
-		Builder builder = new HierarchyItemsChanges.Builder();
+		Builder builder = HierarchyItemsChanges.builder();
 		for (PIMBackend backend: backends) {
 			HierarchyItemsChanges hierarchyChanges = backend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 			builder.mergeItems(hierarchyChanges);

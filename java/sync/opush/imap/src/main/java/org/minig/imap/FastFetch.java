@@ -39,13 +39,17 @@ import com.google.common.base.Objects;
 
 public class FastFetch {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private long uid;
 		private Date internalDate;
 		private Set<Flag> flags;
 		private Integer size;
 		
-		public Builder() {
+		private Builder() {
 			flags = EnumSet.noneOf(Flag.class);
 		}
 		

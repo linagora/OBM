@@ -61,7 +61,7 @@ public class WBXmlBeanSerialization {
 		Date date = DateUtils.date("2012-02-05T11:46:32");
 		
 		Document doc = DOMUtils.createDoc("AirSync", "ApplicationData");
-		MSEmailHeader msEmailHeader = new MSEmailHeader.Builder()
+		MSEmailHeader msEmailHeader = MSEmailHeader.builder()
 			.from(new MSAddress("from@obm.lng.org"))
 			.replyTo(new MSAddress("from@mydomain.org"))
 			.cc(new MSAddress("cc@obm.lng.org"))

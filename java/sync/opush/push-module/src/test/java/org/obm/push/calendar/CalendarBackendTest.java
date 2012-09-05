@@ -420,7 +420,7 @@ public class CalendarBackendTest {
 		
 		replay(loginService, mappingService, calendarClient, eventService);
 		
-		BodyPreference.Builder bodyPreferenceBuilder = new BodyPreference.Builder();
+		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
@@ -460,7 +460,7 @@ public class CalendarBackendTest {
 		
 		replay(loginService, mappingService, calendarClient, eventService);
 		
-		BodyPreference.Builder bodyPreferenceBuilder = new BodyPreference.Builder();
+		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);

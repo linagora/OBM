@@ -66,7 +66,7 @@ public class SystemTimeEncoder {
 	
 	public ASSystemTime toASSystemTime(byte[] toEncode) {
 		MutableInt index = new MutableInt(0);
-		return new ASSystemTime.Builder()
+		return ASSystemTime.builder()
 				.year(readBytes(index, toEncode))
 				.month(readBytes(index, toEncode))
 				.dayOfWeek(readBytes(index, toEncode))

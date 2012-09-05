@@ -62,7 +62,7 @@ public class MSEmailHeaderConverterTest {
 	
 	@Test
 	public void testMSEmailHeaderConverter() {
-		Envelope envelope = new Envelope.Builder()
+		Envelope envelope = Envelope.builder()
 			.from(Lists.newArrayList(new Address(FROM)))
 			.replyTo(Lists.newArrayList(new Address(REPLY_TO)))
 			.to(Lists.newArrayList(new Address(TO)))
@@ -83,7 +83,7 @@ public class MSEmailHeaderConverterTest {
 	
 	@Test
 	public void testMSEmailHeaderConverterWithoutFrom() {
-		Envelope envelope = new Envelope.Builder()
+		Envelope envelope = Envelope.builder()
 		.to(Lists.newArrayList(new Address(TO)))
 		.cc(Lists.newArrayList(new Address(CC)))
 		.subject(SUBJECT)
@@ -101,7 +101,7 @@ public class MSEmailHeaderConverterTest {
 	
 	@Test
 	public void testMSEmailHeaderConverterWithoutTo() {
-		Envelope envelope = new Envelope.Builder()
+		Envelope envelope = Envelope.builder()
 		.from(Lists.newArrayList(new Address(FROM)))
 		.cc(Lists.newArrayList(new Address(CC)))
 		.subject(SUBJECT)

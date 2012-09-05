@@ -86,7 +86,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 	public EmailView fetch(long uid) throws EmailViewPartsFetcherException {
 		try {
-			Builder emailViewBuilder = new EmailView.Builder().uid(uid);
+			Builder emailViewBuilder = EmailView.builder().uid(uid);
 			fetchFlags(emailViewBuilder, uid);
 			fetchEnvelope(emailViewBuilder, uid);
 			
@@ -215,7 +215,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			throws MailException, IOException, ParserException {
 
 		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
-		ICalendar iCalendar = new ICalendar.Builder()
+		ICalendar iCalendar = ICalendar.builder()
 			.inputStream(chooseInputStreamFormater(mp, inputStream)).build();
 		emailViewBuilder.iCalendar(iCalendar);
 	}

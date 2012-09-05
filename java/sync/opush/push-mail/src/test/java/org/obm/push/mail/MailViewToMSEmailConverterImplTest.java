@@ -507,14 +507,14 @@ public class MailViewToMSEmailConverterImplTest {
 
 	private void buildICalendar() throws IOException, ParserException {
 		if (emailViewFixture.attachmentInputStream != null) {
-			emailViewFixture.iCalendar = new ICalendar.Builder().inputStream(emailViewFixture.attachmentInputStream).build();
+			emailViewFixture.iCalendar = ICalendar.builder().inputStream(emailViewFixture.attachmentInputStream).build();
 		}
 	}
 	
 	private EmailView newEmailViewFromFixture() throws IOException, ParserException {
 		buildICalendar();
 		
-		return new EmailView.Builder()
+		return EmailView.builder()
 			.uid(emailViewFixture.uid)
 			.flags(flagsListFromFixture())
 			.envelope(envelopeFromFixture())
@@ -543,7 +543,7 @@ public class MailViewToMSEmailConverterImplTest {
 	}
 
 	private Envelope envelopeFromFixture() {
-		return new Envelope.Builder()
+		return Envelope.builder()
 			.from(emailViewFixture.from)
 			.to(emailViewFixture.to)
 			.cc(emailViewFixture.cc)

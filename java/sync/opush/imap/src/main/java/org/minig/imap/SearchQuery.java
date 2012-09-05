@@ -39,12 +39,16 @@ public class SearchQuery {
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
 	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, true);
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private Date before;
 		private Date after;
 		private boolean includeDeleted;
 		
-		public Builder() {
+		private Builder() {
 			this.includeDeleted = false;
 		}
 		

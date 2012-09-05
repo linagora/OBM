@@ -51,17 +51,17 @@ public class ICalendarTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testEmptyICalendarBuilder() throws IOException, ParserException {
-		new ICalendar.Builder().build();
+		ICalendar.builder().build();
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void testNullStreamICalendarBuilder() throws IOException, ParserException {
-		new ICalendar.Builder().inputStream(null).build();
+		ICalendar.builder().inputStream(null).build();
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void testNullStringICalendarBuilder() throws IOException, ParserException {
-		new ICalendar.Builder().iCalendar(null).build();
+		ICalendar.builder().iCalendar(null).build();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -74,6 +74,6 @@ public class ICalendarTest {
 		if (in == null) {
 			Assert.fail("Cannot load " + filename);
 		}
-		return new ICalendar.Builder().inputStream(in).build();	
+		return ICalendar.builder().inputStream(in).build();	
 	}
 }

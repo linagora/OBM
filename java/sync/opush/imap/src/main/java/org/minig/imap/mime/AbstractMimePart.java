@@ -45,7 +45,7 @@ public abstract class AbstractMimePart implements IMimePart {
 
 	protected AbstractMimePart() {
 		children = new LinkedList<IMimePart>();
-		bodyParams = new BodyParams.Builder().build();
+		bodyParams = BodyParams.builder().build();
 	}
 	
 	@Override

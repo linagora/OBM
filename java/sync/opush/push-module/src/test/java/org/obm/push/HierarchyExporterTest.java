@@ -87,19 +87,19 @@ public class HierarchyExporterTest {
 	
 	@Test
 	public void testHierarchyItemsChangesBuilder() {
-		HierarchyItemsChanges itemsChanges = new HierarchyItemsChanges.Builder().build();
+		HierarchyItemsChanges itemsChanges = HierarchyItemsChanges.builder().build();
 		assertThat(itemsChanges.getChangedItems()).isEmpty();
 		assertThat(itemsChanges.getDeletedItems()).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testHierarchyItemsChangesBuilderChangesNPE() {
-		new HierarchyItemsChanges.Builder().changes(null).build();
+		HierarchyItemsChanges.builder().changes(null).build();
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testHierarchyItemsChangesBuilderDeletionsNPE() {
-		new HierarchyItemsChanges.Builder().deletions(null).build();
+		HierarchyItemsChanges.builder().deletions(null).build();
 	}
 	
 	@Test
@@ -109,14 +109,13 @@ public class HierarchyExporterTest {
 		ItemChange item3 = new ItemChange("2-ADD");
 		ItemChange item4 = new ItemChange("2-REMOVE");
 
-		HierarchyItemsChanges hierarchyItemsChanges1 = new HierarchyItemsChanges.Builder()
+		HierarchyItemsChanges hierarchyItemsChanges1 = HierarchyItemsChanges.builder()
 			.changes(Lists.newArrayList(item1, item2)).build();
 		
-		HierarchyItemsChanges hierarchyItemsChanges2 = new HierarchyItemsChanges.Builder()
+		HierarchyItemsChanges hierarchyItemsChanges2 = HierarchyItemsChanges.builder()
 		.changes(Lists.newArrayList(item3)).deletions(Lists.newArrayList(item4)).build();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges
-				.Builder()
+		HierarchyItemsChanges hierarchyItemsChanges = HierarchyItemsChanges.builder()
 				.mergeItems(hierarchyItemsChanges1)
 				.mergeItems(hierarchyItemsChanges2).build();
 		
@@ -202,7 +201,7 @@ public class HierarchyExporterTest {
 		
 		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
-		Builder builder = new HierarchyItemsChanges.Builder()
+		Builder builder = HierarchyItemsChanges.builder()
 			.mergeItems(mailHierarchyItemsChanges);
 		
 		assertThat(hierarchyItemsChanges).equals(builder.build());
@@ -239,7 +238,7 @@ public class HierarchyExporterTest {
 	}
 	
 	private HierarchyItemsChanges buildEmptyHierarchyItemsChanges() {
-		return new HierarchyItemsChanges.Builder().build();
+		return HierarchyItemsChanges.builder().build();
 	}
 	
 	private void expectHierarchyChangesForBackend(PIMBackend backend,
@@ -251,7 +250,7 @@ public class HierarchyExporterTest {
 	}
 
 	private HierarchyItemsChanges buildHierarchyItemsChanges(String collectionId) {
-		return new HierarchyItemsChanges.Builder()
+		return HierarchyItemsChanges.builder()
 			.changes(buildItemChanged(collectionId))
 			.deletions(buildItemDeleted(collectionId))
 			.build();

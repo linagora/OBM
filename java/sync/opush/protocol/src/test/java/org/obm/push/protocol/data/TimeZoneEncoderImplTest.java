@@ -88,7 +88,7 @@ public class TimeZoneEncoderImplTest {
 	}
 	
 	private ASSystemTime anySystemTime() {
-		return new ASSystemTime.Builder()
+		return ASSystemTime.builder()
 			.year(UnsignedShort.checkedCast(0))
 			.month(UnsignedShort.checkedCast(0))
 			.dayOfWeek(UnsignedShort.checkedCast(0))
@@ -309,7 +309,7 @@ public class TimeZoneEncoderImplTest {
 	}
 
 	public ASTimeZone.Builder requirementsInitializedBuilder() {
-		return new ASTimeZone.Builder()
+		return ASTimeZone.builder()
 			.bias(defaultBiasInMinutes)
 			.standardBias(defaultStandardBiasInMinutes)
 			.standardDate(defaultStandardDate)

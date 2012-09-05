@@ -63,7 +63,7 @@ public class IntegrationPushTestUtils {
 	public static void mockHierarchyChangesOnlyInbox(ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, UnexpectedObmSyncServerException, InvalidSyncKeyException {
 		
-		HierarchyItemsChanges hierarchyItemsChanges = new HierarchyItemsChanges.Builder()
+		HierarchyItemsChanges hierarchyItemsChanges = HierarchyItemsChanges.builder()
 			.changes(Lists.newArrayList(buildInboxFolder()))
 			.build();
 		
@@ -117,7 +117,7 @@ public class IntegrationPushTestUtils {
 	}
 
 	private static HierarchyItemsChanges emptyChange() {
-		return new HierarchyItemsChanges.Builder().build();
+		return HierarchyItemsChanges.builder().build();
 	}
 	
 	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, String newSyncKey) {

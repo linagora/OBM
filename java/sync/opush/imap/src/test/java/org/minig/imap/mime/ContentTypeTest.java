@@ -38,7 +38,7 @@ public class ContentTypeTest {
 
 	@Test
 	public void testContentType() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -47,7 +47,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testContentTypeWithSeparator() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain;").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain;").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -56,19 +56,19 @@ public class ContentTypeTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void testContenTypeWithNullPrimaryType() {
-		ContentType.Builder builder = new ContentType.Builder().primaryType(null).subType("subType");
+		ContentType.Builder builder = ContentType.builder().primaryType(null).subType("subType");
 		builder.build();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testContenTypeWithNullSubType() {
-		ContentType.Builder builder = new ContentType.Builder().primaryType("primaryType").subType(null);
+		ContentType.Builder builder = ContentType.builder().primaryType("primaryType").subType(null);
 		builder.build();
 	}
 	
 	@Test
 	public void testContentTypeWithParameter() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain; charset=utf-8").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain; charset=utf-8").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -77,7 +77,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testContentTypeWithParameterAndSepartor() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain; charset=utf-8;").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain; charset=utf-8;").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -86,7 +86,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testContentTypeWithParameters() {
-		ContentType contentType = new ContentType.Builder().
+		ContentType contentType = ContentType.builder().
 				contentType("text/plain; charset=utf-8; method=REQUEST").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
@@ -97,7 +97,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testContentTypeWithSpaceCharacterInParameter() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain; charset= utf-8").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain; charset= utf-8").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -106,7 +106,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testContentTypeWithInSensitiveParameter() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain; CHARSET=utf-8").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain; CHARSET=utf-8").build();
 		
 		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
 		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
@@ -115,7 +115,7 @@ public class ContentTypeTest {
 	
 	@Test
 	public void testTrimKeyOnContentTypeBodyParams() {
-		ContentType contentType = new ContentType.Builder().contentType("text/plain;         charset=utf-8").build();
+		ContentType contentType = ContentType.builder().contentType("text/plain;         charset=utf-8").build();
 		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
 	}
 }

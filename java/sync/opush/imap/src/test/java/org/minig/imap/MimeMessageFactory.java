@@ -44,7 +44,7 @@ public class MimeMessageFactory {
 
 	private static <T extends MimePart> T fillSimpleMimePart(T mimePart, String mimeType, String mimeSubtype, String contentId, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
 		mimePart.setContentType( buildMimeType(mimeType, mimeSubtype) );
-		BodyParams.Builder params = new BodyParams.Builder();
+		BodyParams.Builder params = BodyParams.builder();
 		for (Entry<String, String> entry: bodyParams.entrySet()) {
 			params.add(new BodyParam(entry.getKey(), entry.getValue()));
 		}
@@ -61,7 +61,7 @@ public class MimeMessageFactory {
 	}
 	
 	private static ContentType buildMimeType(String mimeType, String mimeSubtype) {
-		ContentType.Builder builder = new ContentType.Builder();
+		ContentType.Builder builder = ContentType.builder();
 		return builder.primaryType(mimeType).subType(mimeSubtype).build();
 	}
 	

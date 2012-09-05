@@ -146,7 +146,7 @@ public class CalendarDecoderTest {
 	}
 	
 	private ASSystemTime zeroSystemTime() {
-		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		ASSystemTime.Builder asSystemTimeBuilder = ASSystemTime.builder();
 		asSystemTimeBuilder.year(zeroUnsignedShort())
 			.month(zeroUnsignedShort())
 			.dayOfWeek(zeroUnsignedShort())
@@ -161,7 +161,7 @@ public class CalendarDecoderTest {
 	private ASTimeZone gmtTimeZone() {
 		String gmtName = "Greenwich Mean Time";
 		
-		ASTimeZone.Builder asTimeZoneBuilder = new ASTimeZone.Builder();
+		ASTimeZone.Builder asTimeZoneBuilder = ASTimeZone.builder();
 		asTimeZoneBuilder.bias(0)
 			.standardName(gmtName)
 			.standardDate(zeroSystemTime())
@@ -233,7 +233,7 @@ public class CalendarDecoderTest {
 	}
 	
 	private ASSystemTime asSummerTime() {
-		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		ASSystemTime.Builder asSystemTimeBuilder = ASSystemTime.builder();
 		asSystemTimeBuilder.year(UnsignedShort.checkedCast(2012))
 			.month(UnsignedShort.checkedCast(10))
 			.dayOfWeek(UnsignedShort.checkedCast(0))
@@ -246,7 +246,7 @@ public class CalendarDecoderTest {
 	}
 	
 	private ASSystemTime asWinterTime() {
-		ASSystemTime.Builder asSystemTimeBuilder = new ASSystemTime.Builder();
+		ASSystemTime.Builder asSystemTimeBuilder = ASSystemTime.builder();
 		asSystemTimeBuilder.year(UnsignedShort.checkedCast(2012))
 			.month(UnsignedShort.checkedCast(03))
 			.dayOfWeek(UnsignedShort.checkedCast(0))
@@ -259,7 +259,7 @@ public class CalendarDecoderTest {
 	}
 	
 	private ASTimeZone parisTimeZone() {
-		ASTimeZone.Builder asTimeZoneBuilder = new ASTimeZone.Builder();
+		ASTimeZone.Builder asTimeZoneBuilder = ASTimeZone.builder();
 		asTimeZoneBuilder.bias(1)
 			.standardName("Central European Summer Time")
 			.standardDate(asSummerTime())

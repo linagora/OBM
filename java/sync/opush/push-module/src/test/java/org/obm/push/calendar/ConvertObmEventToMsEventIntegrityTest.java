@@ -113,12 +113,12 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		event.setType(EventType.VEVENT);
 		event.setUid(new EventObmId(121));
 		event.addAttendees(Arrays.asList(
-				new Attendee.Builder().email("jaures@sfio.fr")
+				Attendee.builder().email("jaures@sfio.fr")
 					.displayName("Jean Jaures")
 					.participationState(ParticipationState.ACCEPTED)
 					.participationRole(ParticipationRole.REQ)
 					.asOrganizer().build(),
-				new Attendee.Builder().email("blum@sfio.fr")
+				Attendee.builder().email("blum@sfio.fr")
 					.displayName("Léon Blum")
 					.participationState(ParticipationState.NEEDSACTION)
 					.participationRole(ParticipationRole.OPT)
@@ -140,11 +140,11 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(msEvent).isNotNull();
 		assertThat(msEvent.getAllDayEvent()).isFalse();
 		assertThat(msEvent.getAttendees()).containsOnly(
-				new MSAttendee.Builder().withEmail("jaures@sfio.fr")
+				MSAttendee.builder().withEmail("jaures@sfio.fr")
 					.withName("Jean Jaures")
 					.withStatus(AttendeeStatus.ACCEPT)
 					.withType(AttendeeType.REQUIRED).build(),
-				new MSAttendee.Builder().withEmail("blum@sfio.fr")
+				MSAttendee.builder().withEmail("blum@sfio.fr")
 					.withName("Léon Blum")
 					.withStatus(AttendeeStatus.NOT_RESPONDED)
 					.withType(AttendeeType.OPTIONAL).build());
@@ -314,7 +314,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		eventRecurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday));
 		
 		Event secondOccurence = new Event();
-		secondOccurence.addAttendee(new Attendee.Builder().email("jaures@sfio.fr")
+		secondOccurence.addAttendee(Attendee.builder().email("jaures@sfio.fr")
 				.displayName("Jean Jaures")
 				.participationState(ParticipationState.DECLINED)
 				.participationRole(ParticipationRole.REQ).build());
@@ -331,7 +331,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		assertThat(exceptions).hasSize(1);
 		MSEventException exception = Iterables.getOnlyElement(exceptions);
 		assertThat(exception).isNotNull();
-		assertThat(msEvent.getAttendees()).contains(new MSAttendee.Builder().withEmail("jaures@sfio.fr")
+		assertThat(msEvent.getAttendees()).contains(MSAttendee.builder().withEmail("jaures@sfio.fr")
 				.withName("Jean Jaures")
 				.withStatus(AttendeeStatus.ACCEPT)
 				.withType(AttendeeType.REQUIRED).build());

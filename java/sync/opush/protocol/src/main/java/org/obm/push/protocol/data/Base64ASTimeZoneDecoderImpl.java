@@ -82,7 +82,7 @@ public class Base64ASTimeZoneDecoderImpl implements Base64ASTimeZoneDecoder {
 		ASSystemTime dayLightDate = byteArrayToASSystemTime(byteASTimeZone, rangeStartingIndex);
 		int dayLightBias = byteArrayToInt(byteASTimeZone, rangeStartingIndex);
 	
-		return new ASTimeZone.Builder()
+		return ASTimeZone.builder()
 			.bias(bias)
 			.dayLightBias(dayLightBias)
 			.dayLightDate(dayLightDate)

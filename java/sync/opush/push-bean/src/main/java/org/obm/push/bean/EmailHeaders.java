@@ -40,11 +40,15 @@ import com.google.common.collect.Sets;
 
 public class EmailHeaders implements Iterable<EmailHeader> {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder implements org.obm.push.bean.Builder<EmailHeaders> {
 
 		private final List<EmailHeader> headers;
 		
-		public Builder() {
+		private Builder() {
 			headers = Lists.newArrayList();
 		}
 
