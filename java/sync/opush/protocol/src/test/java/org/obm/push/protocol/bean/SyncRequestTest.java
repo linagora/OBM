@@ -85,4 +85,27 @@ public class SyncRequestTest {
 		
 		assertThat(syncRequest.isPartial()).isFalse();
 	}
+	@Test
+	public void testBuilderWindowSizeIsNotRequired() {
+		SyncRequest syncRequest = new SyncRequest.Builder().build();
+		
+		assertThat(syncRequest.getWindowSize()).isNull();
+	}
+
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testBuilderWindowSizeZero() {
+		new SyncRequest.Builder().windowSize(0).build();
+	}
+
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testBuilderWindowSizeMoreThanValid() {
+		new SyncRequest.Builder().windowSize(513).build();
+	}
+
+	@Test
+	public void testBuilderWindowSizeValid() {
+		SyncRequest syncRequest = new SyncRequest.Builder().windowSize(511).build();
+		
+		assertThat(syncRequest.getWindowSize()).isEqualTo(511);
+	}
 }

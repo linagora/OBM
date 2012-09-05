@@ -44,6 +44,7 @@ public class SyncRequest {
 		
 		private Integer waitInMinute;
 		private Boolean partial;
+		private Integer windowSize;
 
 		public Builder waitInMinute(Integer waitInMinute) {
 			this.waitInMinute = waitInMinute;
@@ -54,11 +55,17 @@ public class SyncRequest {
 			this.partial = partial;
 			return this;
 		}
+		
+		public Builder windowSize(Integer windowSize) {
+			this.windowSize = windowSize;
+			return this;
+		}
 
 		public SyncRequest build() {
 			assertWait();
+			assertWindowSize();
 			
-			return new SyncRequest(waitInMinute, partial);
+			return new SyncRequest(waitInMinute, partial, windowSize);
 		}
 
 		private void assertWait() {
@@ -66,14 +73,22 @@ public class SyncRequest {
 				throw new ASRequestIntegerFieldException("Wait should be between 0 and 59 : " + waitInMinute);
 			}
 		}
+
+		private void assertWindowSize() {
+			if (windowSize != null && (windowSize < 1 || windowSize > 512)) {
+				throw new ASRequestIntegerFieldException("WindowSize should be between 0 and 512 : " + windowSize);
+			}
+		}
 	}
 	
 	private final Integer waitInMinute;
 	private final Boolean partial;
+	private final Integer windowSize;
 	
-	protected SyncRequest(Integer waitInMinute, Boolean partial) {
+	protected SyncRequest(Integer waitInMinute, Boolean partial, Integer windowSize) {
 		this.waitInMinute = waitInMinute;
 		this.partial = partial;
+		this.windowSize = windowSize;
 	}
 	
 	public Integer getWaitInMinute() {
@@ -89,12 +104,12 @@ public class SyncRequest {
 	}
 
 	public Integer getWindowSize() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return windowSize;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(waitInMinute, partial);
+		return Objects.hashCode(waitInMinute, partial, windowSize);
 	}
 	
 	@Override
@@ -102,7 +117,8 @@ public class SyncRequest {
 		if (object instanceof SyncRequest) {
 			SyncRequest that = (SyncRequest) object;
 			return Objects.equal(this.waitInMinute, that.waitInMinute)
-				&& Objects.equal(this.partial, that.partial);
+				&& Objects.equal(this.partial, that.partial)
+				&& Objects.equal(this.windowSize, that.windowSize);
 		}
 		return false;
 	}
@@ -112,6 +128,7 @@ public class SyncRequest {
 		return Objects.toStringHelper(this)
 			.add("waitInMinute", waitInMinute)
 			.add("partial", partial)
+			.add("windowSize", windowSize)
 			.toString();
 	}
 }

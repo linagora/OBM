@@ -36,8 +36,8 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
@@ -243,5 +243,61 @@ public class SyncDecoderTest {
 		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
 
 		assertThat(isPartial).isTrue();
+	}
+
+	@Test
+	public void testWindowSizeByDefault() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+
+		assertThat(windowSize).isNull();
+	}
+
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testWindowSizeWhenNotANumber() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<WindowSize>a1</WindowSize>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+
+		assertThat(windowSize).isNull();
+	}
+
+	@Test
+	public void testWindowSize() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<WindowSize>150</WindowSize>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+
+		assertThat(windowSize).isEqualTo(150);
 	}
 }

@@ -34,7 +34,8 @@ package org.obm.push.protocol.data;
 public enum SyncRequestFields {
 
 	WAIT("Wait"),
-	PARTIAL("Partial");
+	PARTIAL("Partial"),
+	WINDOW_SIZE("WindowSize");
 	
 	private final String name;
 

@@ -33,10 +33,10 @@ package org.obm.push.protocol.data;
 
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequest.Builder;
 import org.obm.push.utils.DOMUtils;
@@ -66,25 +66,20 @@ public class SyncDecoder {
 		
 		requestBuilder.waitInMinute(getWait(root));
 		requestBuilder.partial(isPartial(root));
+		requestBuilder.windowSize(getWindowSize(root));
 		return requestBuilder.build();
 	}
 
 	@VisibleForTesting Integer getWait(Element root) {
-		String wait = DOMUtils.getElementText(root, SyncRequestFields.WAIT.getName());
-		logger.debug("Wait value : " + wait);
-		
-		if (wait != null) {
-			try {
-				return Integer.parseInt(wait);
-			} catch (NumberFormatException e) {
-				throw new ASRequestIntegerFieldException("Failed to parse field : " + SyncRequestFields.WAIT.getName(), e);
-			}
-		}
-		return null;
+		return uniqueIntegerFieldValue(root, SyncRequestFields.WAIT);
 	}
 
 	@VisibleForTesting Boolean isPartial(Element root) {
 		return uniqueBooleanFieldValue(root, SyncRequestFields.PARTIAL);
+	}
+
+	@VisibleForTesting Integer getWindowSize(Element root) {
+		return uniqueIntegerFieldValue(root, SyncRequestFields.WINDOW_SIZE);
 	}
 
 	private Boolean uniqueBooleanFieldValue(Element root, SyncRequestFields booleanField) {
@@ -101,5 +96,19 @@ public class SyncDecoder {
 			throw new ASRequestBooleanFieldException("Failed to parse field : " + booleanField.getName());
 		}
 		return elementText.equalsIgnoreCase(AS_BOOLEAN_TRUE);
+	}
+
+	private Integer uniqueIntegerFieldValue(Element root, SyncRequestFields integerField) {
+		String element = DOMUtils.getElementText(root, integerField.getName());
+		logger.debug(integerField.getName() + " value : " + element);
+		
+		if (element != null) {
+			try {
+				return Integer.parseInt(element);
+			} catch (NumberFormatException e) {
+				throw new ASRequestIntegerFieldException(e);
+			}
+		}
+		return null;
 	}
 }
