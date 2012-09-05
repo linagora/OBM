@@ -18,7 +18,8 @@ License: GPLv2+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: jetty.xml.sample
 Source1: jetty-logging.xml.sample
-Source2: jetty-default
+Source2: jetty-sysconfig
+Source3: jetty-init
 BuildArch: noarch
 Requires(post): jetty6
 
@@ -34,13 +35,14 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/obm-jetty
 install -p -m 644 %{SOURCE0} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty.xml.sample
 install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-logging.xml.sample
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-default
-
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-sysconfig.sample
+install -p -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_docdir}/obm-jetty/jetty-init.sample
 %files
 %defattr(-,root,root,-)
 %{_docdir}/obm-jetty/jetty.xml.sample
 %{_docdir}/obm-jetty/jetty-logging.xml.sample
-%{_docdir}/obm-jetty/jetty-default
+%{_docdir}/obm-jetty/jetty-sysconfig.sample
+%{_docdir}/obm-jetty/jetty-init.sample
 
 %post
 for f in jetty.xml jetty-logging.xml ; do
@@ -52,6 +54,7 @@ for f in jetty.xml jetty-logging.xml ; do
   cp -p %{_docdir}/obm-jetty/${f}.sample %{obmjettyconf}/${f}
 done
 
-cp -p %{_docdir}/obm-jetty/jetty-default %{_sysconfdir}/default/jetty6
+cp -p %{_docdir}/obm-jetty/jetty-sysconfig.sample %{_sysconfdir}/sysconfig/jetty6
+cp -p %{_docdir}/obm-jetty/jetty-init.sample %{_sysconfdir}/init.d/jetty6
 
-service jetty6 restart > /dev/null 2>&1 || :
+service jetty6 restart || :
