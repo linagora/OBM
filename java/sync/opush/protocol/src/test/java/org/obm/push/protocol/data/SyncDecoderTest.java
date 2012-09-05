@@ -657,6 +657,82 @@ public class SyncDecoderTest {
 		return new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
 	}
 
+	@Test
+	public void testOptionToZero() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Options>" +
+								"<FilterType>0</FilterType>" +
+								"<Conflict>0</Conflict>" +
+								"<MIMETruncation>0</MIMETruncation>" +
+								"<MIMESupport>0</MIMESupport>" +
+							"</Options>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, 0, 0, 0, 0);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollectionOptions syncCollectionOptions = sync.getCollection(syncingCollectionId).getOptions();
+		assertThat(syncCollectionOptions.getBodyPreferences()).isEmpty();
+		assertThat(syncCollectionOptions.getConflict()).isEqualTo(0);
+		assertThat(syncCollectionOptions.getFilterType()).isEqualTo(FilterType.ALL_ITEMS);
+		assertThat(syncCollectionOptions.getMimeSupport()).isEqualTo(0);
+		assertThat(syncCollectionOptions.getMimeTruncation()).isEqualTo(0);
+	}
+
+	@Test
+	public void testOptionToNonZero() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Options>" +
+								"<FilterType>5</FilterType>" +
+								"<Conflict>1</Conflict>" +
+								"<MIMETruncation>8</MIMETruncation>" +
+								"<MIMESupport>2</MIMESupport>" +
+							"</Options>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, 5, 1, 8, 2);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollectionOptions syncCollectionOptions = sync.getCollection(syncingCollectionId).getOptions();
+		assertThat(syncCollectionOptions.getBodyPreferences()).isEmpty();
+		assertThat(syncCollectionOptions.getConflict()).isEqualTo(1);
+		assertThat(syncCollectionOptions.getFilterType()).isEqualTo(FilterType.ONE_MONTHS_BACK);
+		assertThat(syncCollectionOptions.getMimeSupport()).isEqualTo(2);
+		assertThat(syncCollectionOptions.getMimeTruncation()).isEqualTo(8);
+	}
+	
 	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {
 		String foundPath = collectionPath(syncingCollectionId);
 		CollectionDao collectionDao = mocks.createMock(CollectionDao.class);
@@ -669,14 +745,34 @@ public class SyncDecoderTest {
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, defaultWindowSize);
 	}
 
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey,
+			Integer filterType, Integer conflict, Integer mimeTruncation, Integer mimeSupport) {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setFilterType(FilterType.fromSpecificationValue(String.valueOf(filterType)));
+		options.setConflict(conflict);
+		options.setMimeTruncation(mimeTruncation);
+		options.setMimeSupport(mimeSupport);
+
+		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setSyncKey(new SyncKey(syncKey));
+		syncCollection.setOptions(options);
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);
+	}
+
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(
 			int collectionId, String syncKey, Integer windowSize) {
-		SyncedCollectionDao syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(credentials, device, collectionId)).andReturn(null);
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
 		syncCollection.setDataType(PIMDataType.EMAIL);
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		syncCollection.setWindowSize(windowSize);
+
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);
+	}
+
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(
+			int collectionId, SyncCollection syncCollection) {
+		expect(syncedCollectionDao.get(credentials, device, collectionId)).andReturn(null);
 		syncedCollectionDao.put(credentials, device, syncCollection);
 		expectLastCall();
 		return syncedCollectionDao;
