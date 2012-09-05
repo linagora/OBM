@@ -527,7 +527,7 @@ fi
 %{_datadir}/%{name}/auto
 %{_datadir}/%{name}-services/updates
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}-services
-%attr(750, apache, apache) %{_localstatedir}/log/%{name}-services
+%attr(2750, apache, apache) %{_localstatedir}/log/%{name}-services
 
 
 %post           -n %{name}-services
