@@ -31,23 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.mime;
 
-public enum ContentDisposition {
-	INLINE("inline"),
-	ATTACHMENT("attachment"),
-	UNKNOWN("");
+import static org.fest.assertions.api.Assertions.assertThat;
+import org.junit.Test;
 
-	private final String header;
 
-	private ContentDisposition(String header) {
-		this.header = header;
+public class ContentDispositionTest {
+
+	@Test
+	public void testAttachment() {
+		ContentDisposition actual = ContentDisposition.fromString("attachment");
+		assertThat(actual).isEqualTo(ContentDisposition.ATTACHMENT);
 	}
 	
-	public static ContentDisposition fromString(String value) {
-		for (ContentDisposition cd: values()) {
-			if (cd.header.equalsIgnoreCase(value)) {
-				return cd;
-			}
-		}
-		return UNKNOWN;
+	@Test
+	public void testAttachmentBadCase() {
+		ContentDisposition actual = ContentDisposition.fromString("atTaChment");
+		assertThat(actual).isEqualTo(ContentDisposition.ATTACHMENT);
+	}
+	
+	@Test
+	public void testInline() {
+		ContentDisposition actual = ContentDisposition.fromString("inline");
+		assertThat(actual).isEqualTo(ContentDisposition.INLINE);
+	}
+	
+	@Test
+	public void testEmpty() {
+		ContentDisposition actual = ContentDisposition.fromString("");
+		assertThat(actual).isEqualTo(ContentDisposition.UNKNOWN);
+	}
+	
+	@Test
+	public void testNull() {
+		ContentDisposition actual = ContentDisposition.fromString(null);
+		assertThat(actual).isEqualTo(ContentDisposition.UNKNOWN);
 	}
 }
