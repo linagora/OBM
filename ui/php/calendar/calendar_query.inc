@@ -2645,13 +2645,17 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $obm_q->query($query);
 
     $exception_id = $obm_q->lastid();
-    of_entity_insert('event', $exception_id);
+    $exception_entity_id = of_entity_insert('event', $exception_id);
     $entities = get_calendar_event_entity($id);
     foreach ($entities as $entity => $data) {
       foreach ($data['entity'] as $entity_id => $entity_data) {
         # Ensure that both the new exception, the recurring event and the old
         # exceptions have the same participation state and organizer.
-        run_query_calendar_insert_entity_event($entity, $entity_id, $exception_id, $entity_data['state'], $entity_data['is_organizer']);
+      	if($entity != 'document') {
+          run_query_calendar_insert_entity_event($entity, $entity_id, $exception_id, $entity_data['state'], $entity_data['is_organizer']);
+        } else {
+          run_query_calendar_attach_document($entity_id, $exception_entity_id);
+        }
       }
     }
   }
