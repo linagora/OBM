@@ -257,9 +257,10 @@ public class SyncDecoder {
 				Element bodyPreference = (Element) bodyPreferences.item(i);
 				String truncationSize = DOMUtils.getElementText(bodyPreference, "TruncationSize");
 				String type = DOMUtils.getElementText(bodyPreference, "Type");
-				String allOrNone = DOMUtils.getElementText(bodyPreference, "AllOrNone");
+				String allOrNoneAsString = DOMUtils.getElementText(bodyPreference, "AllOrNone");
+				boolean allOrNone = "1".equalsIgnoreCase(allOrNoneAsString);
 				BodyPreference.Builder bp = BodyPreference.builder().
-						bodyType(MSEmailBodyType.getValueOf(Integer.parseInt(type))).allOrNone(Boolean.valueOf(allOrNone));
+						bodyType(MSEmailBodyType.getValueOf(Integer.parseInt(type))).allOrNone(allOrNone);
 				if (truncationSize != null) {
 					bp.truncationSize(Integer.parseInt(truncationSize));
 				}
