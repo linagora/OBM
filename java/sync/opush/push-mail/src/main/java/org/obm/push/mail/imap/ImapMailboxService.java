@@ -337,18 +337,31 @@ public class ImapMailboxService implements PrivateMailboxService {
 
 			store.select(srcMailBox);
 			List<Long> uids = ImmutableList.of(uid);
-			Collection<Long> newUid = store.uidCopy(uids, dstMailBox);
-			FlagsList fl = new FlagsList();
-			fl.add(Flag.DELETED);
-			logger.info("delete conv id = ", uid);
-			store.uidStore(uids, fl, true);
-			store.expunge();
+			Collection<Long> newUid = copyMessage(store, dstMailBox, uids);
+			deleteMessage(store, uids);
+			
 			return Iterables.getOnlyElement(newUid);
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		} finally {
 			store.logout();
 		}
+	}
+
+	private Collection<Long> copyMessage(StoreClient store, String dstMailBox, List<Long> uids) {
+		Collection<Long> newUids = store.uidCopy(uids, dstMailBox);
+		if (newUids == null || newUids.size() != 1) {
+			throw new ImapMessageNotFoundException("Message with uid " + Iterables.getOnlyElement(uids) + " not found");
+		}
+		return newUids;
+	}
+
+	private void deleteMessage(StoreClient store, List<Long> uids) {
+		FlagsList fl = new FlagsList();
+		fl.add(Flag.DELETED);
+		logger.info("delete conv id = ", Iterables.getOnlyElement(uids));
+		store.uidStore(uids, fl, true);
+		store.expunge();
 	}
 	
 	private void assertMoveItemIsSupported(StoreClient store) throws UnsupportedBackendFunctionException {

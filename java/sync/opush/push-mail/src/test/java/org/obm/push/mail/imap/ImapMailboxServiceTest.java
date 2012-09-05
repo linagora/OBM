@@ -31,10 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -63,6 +65,7 @@ import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxFolders;
 import org.obm.push.utils.DateUtils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -276,6 +279,35 @@ public class ImapMailboxServiceTest {
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+	}
+	
+	@Test
+	public void testMoveItem() throws Exception {
+		String trash = EmailConfiguration.IMAP_TRASH_NAME;
+		MailboxFolder trashFolder = folder(trash);
+		mailboxService.createFolder(udr, trashFolder);
+		
+		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
+		mailboxService.storeInInbox(udr, tinyInputStream, true);
+		
+		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		String trashCollectionName = testUtils.mailboxPath(trash);
+		
+		long newUid = mailboxService.moveItem(udr, inboxCollectionName, trashCollectionName, 1);
+		assertThat(mailboxService.fetchEmails(udr, inboxCollectionName, ImmutableList.<Long> of(newUid))).isEmpty();
+		Collection<Email> trashEmails = mailboxService.fetchEmails(udr, trashCollectionName, ImmutableList.<Long> of(newUid));
+		assertThat(trashEmails).hasSize(1);
+		assertThat(Iterables.getFirst(trashEmails, null).getUid()).isEqualTo(newUid);
+	}
+	
+	@Ignore("Greenmail replied that the command succeed")
+	@Test(expected=ImapMessageNotFoundException.class)
+	public void testMoveItemEmptyMailbox() throws Exception {
+		String trash = EmailConfiguration.IMAP_TRASH_NAME;
+		MailboxFolder trashFolder = folder(trash);
+		mailboxService.createFolder(udr, trashFolder);
+		
+		mailboxService.moveItem(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), testUtils.mailboxPath(trash), 1);
 	}
 	
 	private void consumeInputStream(InputStream inputStream) throws IOException {
