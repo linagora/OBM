@@ -43,16 +43,22 @@ public class SyncRequest {
 	public static class Builder {
 		
 		private Integer waitInMinute;
+		private Boolean partial;
 
 		public Builder waitInMinute(Integer waitInMinute) {
 			this.waitInMinute = waitInMinute;
 			return this;
 		}
 
+		public Builder partial(Boolean partial) {
+			this.partial = partial;
+			return this;
+		}
+
 		public SyncRequest build() {
 			assertWait();
 			
-			return new SyncRequest(waitInMinute);
+			return new SyncRequest(waitInMinute, partial);
 		}
 
 		private void assertWait() {
@@ -63,9 +69,11 @@ public class SyncRequest {
 	}
 	
 	private final Integer waitInMinute;
+	private final Boolean partial;
 	
-	protected SyncRequest(Integer waitInMinute) {
+	protected SyncRequest(Integer waitInMinute, Boolean partial) {
 		this.waitInMinute = waitInMinute;
+		this.partial = partial;
 	}
 	
 	public Integer getWaitInMinute() {
@@ -73,7 +81,7 @@ public class SyncRequest {
 	}
 	
 	public Boolean isPartial() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return partial;
 	}
 	
 	public List<SyncRequestCollection> getCollections() {
@@ -86,14 +94,15 @@ public class SyncRequest {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(waitInMinute);
+		return Objects.hashCode(waitInMinute, partial);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof SyncRequest) {
 			SyncRequest that = (SyncRequest) object;
-			return Objects.equal(this.waitInMinute, that.waitInMinute);
+			return Objects.equal(this.waitInMinute, that.waitInMinute)
+				&& Objects.equal(this.partial, that.partial);
 		}
 		return false;
 	}
@@ -102,6 +111,7 @@ public class SyncRequest {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("waitInMinute", waitInMinute)
+			.add("partial", partial)
 			.toString();
 	}
 }

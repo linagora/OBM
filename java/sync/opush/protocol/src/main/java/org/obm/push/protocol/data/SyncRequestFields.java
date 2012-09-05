@@ -33,7 +33,8 @@ package org.obm.push.protocol.data;
 
 public enum SyncRequestFields {
 
-	WAIT("Wait");
+	WAIT("Wait"),
+	PARTIAL("Partial");
 	
 	private final String name;
 

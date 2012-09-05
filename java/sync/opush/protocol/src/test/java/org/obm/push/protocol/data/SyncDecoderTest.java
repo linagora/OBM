@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
@@ -150,5 +151,97 @@ public class SyncDecoderTest {
 		int wait = new SyncDecoder().getWait(request.getDocumentElement());
 
 		assertThat(wait).isEqualTo(1000);
+	}
+
+	@Test(expected=ASRequestBooleanFieldException.class)
+	public void testPartialWhenNotBoolean() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial>yeah</Partial>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		new SyncDecoder().isPartial(request.getDocumentElement());
+	}
+
+	@Test
+	public void testPartialWhenNotPresent() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+
+		assertThat(isPartial).isNull();
+	}
+
+	@Test
+	public void testPartialWhenEmptyIsTrue() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial/>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+
+		assertThat(isPartial).isTrue();
+	}
+
+	@Test
+	public void testPartialFalse() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial>0</Partial>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+
+		assertThat(isPartial).isFalse();
+	}
+
+	@Test
+	public void testPartialTrue() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial>1</Partial>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+
+		assertThat(isPartial).isTrue();
 	}
 }

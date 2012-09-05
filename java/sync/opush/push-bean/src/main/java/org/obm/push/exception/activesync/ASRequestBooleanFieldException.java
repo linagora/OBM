@@ -29,60 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.exception.activesync;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+public class ASRequestBooleanFieldException extends ActiveSyncException {
 
-@RunWith(SlowFilterRunner.class)
-public class SyncRequestTest {
-
-	@Test
-	public void testBuilderWaitIsNotRequired() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
-		
-		assertThat(syncRequest.getWaitInMinute()).isNull();
+	public ASRequestBooleanFieldException() {
+		super();
 	}
 
-	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWaitNegative() {
-		new SyncRequest.Builder().waitInMinute(-1).build();
+	public ASRequestBooleanFieldException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWaitMoreThanValid() {
-		new SyncRequest.Builder().waitInMinute(60).build();
+	public ASRequestBooleanFieldException(String message) {
+		super(message);
 	}
 
-	@Test
-	public void testBuilderWaitValid() {
-		SyncRequest syncRequest = new SyncRequest.Builder().waitInMinute(58).build();
-		
-		assertThat(syncRequest.getWaitInMinute()).isEqualTo(58);
+	public ASRequestBooleanFieldException(Throwable cause) {
+		super(cause);
 	}
 
-	@Test
-	public void testBuilderPartialIsNotRequired() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
-		
-		assertThat(syncRequest.isPartial()).isNull();
-	}
-
-	@Test
-	public void testBuilderPartialTrue() {
-		SyncRequest syncRequest = new SyncRequest.Builder().partial(true).build();
-		
-		assertThat(syncRequest.isPartial()).isTrue();
-	}
-
-	@Test
-	public void testBuilderPartialFalse() {
-		SyncRequest syncRequest = new SyncRequest.Builder().partial(false).build();
-		
-		assertThat(syncRequest.isPartial()).isFalse();
-	}
 }

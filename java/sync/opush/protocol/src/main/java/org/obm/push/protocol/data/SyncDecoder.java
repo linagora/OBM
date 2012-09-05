@@ -33,9 +33,10 @@ package org.obm.push.protocol.data;
 
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequest.Builder;
 import org.obm.push.utils.DOMUtils;
@@ -53,6 +54,8 @@ public class SyncDecoder {
 
 	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
 
+	private static final String AS_BOOLEAN_TRUE = "1";
+	
 	@Inject
 	protected SyncDecoder() {}
 
@@ -62,6 +65,7 @@ public class SyncDecoder {
 		Element root = doc.getDocumentElement();
 		
 		requestBuilder.waitInMinute(getWait(root));
+		requestBuilder.partial(isPartial(root));
 		return requestBuilder.build();
 	}
 
@@ -77,5 +81,25 @@ public class SyncDecoder {
 			}
 		}
 		return null;
+	}
+
+	@VisibleForTesting Boolean isPartial(Element root) {
+		return uniqueBooleanFieldValue(root, SyncRequestFields.PARTIAL);
+	}
+
+	private Boolean uniqueBooleanFieldValue(Element root, SyncRequestFields booleanField) {
+		Element element = DOMUtils.getUniqueElement(root, booleanField.getName());
+		if (element == null) {
+			return null;
+		}
+		
+		String elementText = DOMUtils.getElementText(element);
+		logger.debug(booleanField.getName() + " value : " + elementText);
+		if (elementText == null) {
+			return true;
+		} else if( !elementText.equals("1") && !elementText.equals("0")) {
+			throw new ASRequestBooleanFieldException("Failed to parse field : " + booleanField.getName());
+		}
+		return elementText.equalsIgnoreCase(AS_BOOLEAN_TRUE);
 	}
 }
