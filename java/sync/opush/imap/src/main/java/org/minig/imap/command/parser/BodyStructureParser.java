@@ -35,16 +35,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.BodyParams;
+import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.impl.BodyParamParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -55,10 +53,7 @@ import org.parboiled.support.ParsingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class BodyStructureParser {
 
@@ -104,7 +99,7 @@ public class BodyStructureParser {
 		boolean pushBodyParams() {
 			swap();
 			pop();
-			Set<BodyParam> bodyParams = (Set<BodyParam>)pop();
+			BodyParams.Builder bodyParams = (BodyParams.Builder)pop();
 			List<Object> list = (List<Object>)peek();
 			list.add(bodyParams);
 			return true;
@@ -179,7 +174,7 @@ public class BodyStructureParser {
 		boolean addBodyParam() {
 			swap();
 			BodyParam bodyParam = BodyParamParser.parse((String)pop(), (String)pop());
-			HashSet<BodyParam> bodyParams = (HashSet<BodyParam>)peek();
+			BodyParams.Builder bodyParams = (BodyParams.Builder)peek();
 			bodyParams.add(bodyParam);
 			return true;
 		}
@@ -188,7 +183,7 @@ public class BodyStructureParser {
 
 			return FirstOf(
 					Sequence(
-							push(new HashSet<BodyParam>()),
+							push(new BodyParams.Builder()),
 							'(', 
 							string(),
 							whitespaces(),
@@ -198,7 +193,7 @@ public class BodyStructureParser {
 									whitespaces(), string(), whitespaces(), string(), 
 									addBodyParam()), 
 					')'),
-					Sequence(nil(), drop() && push(ImmutableSet.of())));
+					Sequence(nil(), drop() && push(new BodyParams.Builder())));
 		}
 
 		Rule bodyType1part() {
@@ -211,17 +206,17 @@ public class BodyStructureParser {
 
 		boolean mergeBodyParams() {
 			List<Object> extParts = (List<Object>)pop();
-			Set<BodyParam> extBodyParams = (Set<BodyParam>)extParts.get(0);
+			BodyParams.Builder extBodyParams = (BodyParams.Builder)extParts.get(0);
 			IMimePart mt = (IMimePart) peek();
 
 			if (extBodyParams != null) {
-				Set<BodyParam> newParams = Sets.newHashSet();
-				Collection<BodyParam> bodyParams = mt.getBodyParams();
+				BodyParams.Builder newParams = new BodyParams.Builder();
+				BodyParams bodyParams = mt.getBodyParams();
 				if (bodyParams != null) {
 					newParams.addAll(bodyParams);
 				}
-				newParams.addAll(extBodyParams);
-				mt.setBodyParams(newParams);
+				newParams.addAll(extBodyParams.build());
+				mt.setBodyParams(newParams.build());
 			}
 			return true;
 		}
@@ -255,8 +250,10 @@ public class BodyStructureParser {
 			MimePart message = (MimePart) peek();
 			IMimePart child = message.getChildren().get(0);
 			if (child.isMultipart()) {
-				Collection<BodyParam> params = Lists.newArrayList(
-						Iterables.concat(message.getBodyParams(), child.getBodyParams()));
+				BodyParams params = new BodyParams.Builder()
+					.addAll(message.getBodyParams())
+					.addAll(child.getBodyParams())
+					.build();
 				message.setBodyParams(params);
 				message.setChildren(child.getChildren());
 				message.setMultipartSubtype(child.getSubtype());
@@ -273,11 +270,11 @@ public class BodyStructureParser {
 			int size = (Integer)pop();
 			String contentTransfertEncoding = (String)pop();
 			String bodyId = (String)pop();
-			Set<BodyParam> bodyParams = (Set<BodyParam>) pop();
+			BodyParams.Builder bodyParams = (BodyParams.Builder) pop();
 			ContentType mimeType = (ContentType) pop();
 			MimePart mimePart = new MimePart();
 			mimePart.setContentType(mimeType);
-			mimePart.setBodyParams(bodyParams);
+			mimePart.setBodyParams(bodyParams.build());
 			mimePart.setContentId(bodyId);
 			mimePart.setContentTransfertEncoding(contentTransfertEncoding);
 			mimePart.setSize(size);

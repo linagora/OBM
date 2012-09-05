@@ -31,26 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.BodyParams;
+import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
-import org.minig.imap.mime.ContentType;
-
-import com.google.common.collect.Sets;
 
 public class MimeMessageFactory {
 
 	private static <T extends MimePart> T fillSimpleMimePart(T mimePart, String mimeType, String mimeSubtype, String contentId, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
 		mimePart.setContentType( buildMimeType(mimeType, mimeSubtype) );
-		HashSet<BodyParam> params = Sets.newHashSet();
+		BodyParams.Builder params = new BodyParams.Builder();
 		for (Entry<String, String> entry: bodyParams.entrySet()) {
 			params.add(new BodyParam(entry.getKey(), entry.getValue()));
 		}
-		mimePart.setBodyParams(params);
+		mimePart.setBodyParams(params.build());
 		for (MimePart part: parts) {
 			mimePart.addPart(part);
 		}

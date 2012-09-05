@@ -31,23 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.command.parser;
 
+import static org.minig.imap.MimeMessageFactory.createSimpleMimeMessage;
 import static org.minig.imap.MimeMessageFactory.createSimpleMimePart;
 import static org.minig.imap.MimeMessageFactory.createSimpleMimeTree;
-import static org.minig.imap.MimeMessageFactory.createSimpleMimeMessage;
 import static org.minig.imap.MimeMessageTestUtils.checkMimeTree;
 
 import java.util.HashMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
-
-import com.google.common.collect.ImmutableMap;
-
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class BodyStructureParserTest {

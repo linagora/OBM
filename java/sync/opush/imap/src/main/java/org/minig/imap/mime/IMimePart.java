@@ -52,7 +52,7 @@ public interface IMimePart {
 	
 	MimeAddress getAddressInternal();
 
-	Collection<BodyParam> getBodyParams();
+	BodyParams getBodyParams();
 
 	BodyParam getBodyParam(final String param);
 
@@ -74,7 +74,7 @@ public interface IMimePart {
 
 	boolean isCancelInvitation();
 
-	void setBodyParams(Collection<BodyParam> newParams);
+	void setBodyParams(BodyParams bodyParams);
 
 	void setContentType(ContentType mimetype);
 
@@ -109,4 +109,5 @@ public interface IMimePart {
 	boolean hasMimePart(ContentType contentType);
 	
 	boolean isICSAttachment();
+
 }

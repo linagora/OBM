@@ -35,12 +35,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.BodyParams;
 import org.minig.imap.mime.ContentType;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.MimeAddress;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -59,12 +61,23 @@ public class BeansTest {
 					.add(Address.class)
 					.add(Envelope.class)
 					.add(FastFetch.class)
-					.add(ContentType.class)
 					.add(BodyParam.class)
 					.add(MimeAddress.class)
 					.add(ListInfo.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+		
+		equalsVerifierUtilsTest.createEqualsVerifier(ContentType.class)
+			.withPrefabValues(BodyParams.class, 
+					new BodyParams.Builder().add(new BodyParam("white", "wine")).build(),
+					new BodyParams.Builder().add(new BodyParam("blond", "beer")).build())
+			.verify();
+		
+		equalsVerifierUtilsTest.createEqualsVerifier(BodyParams.class)
+			.withPrefabValues(ImmutableMap.class, 
+					ImmutableMap.of("key", "value"),
+					ImmutableMap.of("first", "second"))
+			.verify();
 	}
 	
 }

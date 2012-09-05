@@ -32,24 +32,21 @@
 package org.minig.imap.mime;
 
 import java.util.Collection;
-import java.util.Iterator;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.base.Objects;
 
 public class ContentType {
 
 	public static class Builder {
 		private String primaryType = null;
 		private String subType = null;
-		private Collection<BodyParam> bodyParams;
+		private BodyParams.Builder bodyParamsBuilder;
 		
 		public Builder() {
-			bodyParams = Lists.newArrayList();
+			bodyParamsBuilder = new BodyParams.Builder();
 		}
 		
 		public Builder primaryType(String primaryType) {
@@ -63,7 +60,7 @@ public class ContentType {
 		}
 		
 		public Builder addBodyParams(Collection<BodyParam> bodyParams) {
-			this.bodyParams = bodyParams;
+			bodyParamsBuilder.addAll(bodyParams);
 			return this;
 		}
 		
@@ -90,37 +87,22 @@ public class ContentType {
 		}
 		
 		private void addBodyParams(String contentType) {
-			// multipart/mixed;boundary="----=_Part_0_1330682067197"
-			Iterator<String> itr = Splitter.on(";").split(contentType).iterator();
-			if (itr.hasNext()) {
-				itr.next();
-			}
-			while (itr.hasNext()) {
-				// boundary="----=_Part_2_1330682067197"
-				String equalCharacter = "=";
-				String next = itr.next();
-				String key = Iterables.getFirst(Splitter.on("=").split(next), null);
-				if (!Strings.isNullOrEmpty(key)) {
-					String value = next.substring(key.length() + equalCharacter.length());
-					BodyParam bodyParam = new BodyParam(key, value.trim());
-					this.bodyParams.add(bodyParam);
-				}
-			}
+			bodyParamsBuilder.addBodyParam(contentType);
 		}
 		
 		public ContentType build() {
 			Preconditions.checkNotNull(primaryType);
 			Preconditions.checkNotNull(subType);
 			return new ContentType(primaryType.toLowerCase(), 
-					subType.toLowerCase(), bodyParams);
+					subType.toLowerCase(), bodyParamsBuilder.build());
 		}
 	}
 
 	private final String primaryType;
 	private final String subType;
-	private final Collection<BodyParam> bodyParams;
+	private final BodyParams bodyParams;
 	
-	private ContentType(String primaryType, String subType, Collection<BodyParam> bodyParams) {
+	private ContentType(String primaryType, String subType, BodyParams bodyParams) {
 		this.primaryType = primaryType;
 		this.subType = subType;
 		this.bodyParams = bodyParams;
@@ -134,7 +116,7 @@ public class ContentType {
 		return subType;
 	}
 	
-	public Collection<BodyParam> getBodyParams() {
+	public BodyParams getBodyParams() {
 		return bodyParams;
 	}
 

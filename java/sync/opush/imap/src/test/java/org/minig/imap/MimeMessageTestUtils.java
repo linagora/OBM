@@ -31,10 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Assert;
 import org.minig.imap.mime.IMimePart;
 import org.obm.push.mail.MimeAddress;
 
@@ -45,14 +46,13 @@ public class MimeMessageTestUtils {
 	}
 	
 	public static void checkMimeTree(IMimePart expected, IMimePart actual) {
-		Assert.assertEquals(prefixMessage(expected) + " has wrong number of children", 
-				expected.getChildren().size(), actual.getChildren().size());
-		Assert.assertEquals(prefixMessage(expected), expected.getPrimaryType(), actual.getPrimaryType());
-		Assert.assertEquals(prefixMessage(expected), expected.getSubtype(), actual.getSubtype());
-		Assert.assertEquals(prefixMessage(expected), expected.getContentTransfertEncoding(), actual.getContentTransfertEncoding());
-		Assert.assertEquals(prefixMessage(expected), expected.getContentId(), actual.getContentId());
-		Assert.assertArrayEquals(prefixMessage(expected), expected.getBodyParams().toArray(), actual.getBodyParams().toArray());
-		Assert.assertEquals(prefixMessage(expected), expected.getSize(), actual.getSize());
+		assertThat(actual.getChildren().size()).isEqualTo(expected.getChildren().size()).describedAs(prefixMessage(expected) + "has wrong number of children"); 
+		assertThat(actual.getPrimaryType()).isEqualTo(expected.getPrimaryType()).describedAs(prefixMessage(expected));
+		assertThat(actual.getSubtype()).isEqualTo(expected.getSubtype()).describedAs(prefixMessage(expected));
+		assertThat(actual.getContentTransfertEncoding()).isEqualTo(expected.getContentTransfertEncoding()).describedAs(prefixMessage(expected));
+		assertThat(actual.getContentId()).isEqualTo(expected.getContentId()).describedAs(prefixMessage(expected));
+		assertThat(actual.getBodyParams()).isEqualTo(expected.getBodyParams()).as(prefixMessage(expected));
+		assertThat(actual.getSize()).isEqualTo(expected.getSize()).describedAs(prefixMessage(expected));
 		Iterator<IMimePart> expectedParts = expected.getChildren().iterator();
 		Iterator<IMimePart> actualParts = actual.getChildren().iterator();
 		while (actualParts.hasNext()) {

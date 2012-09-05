@@ -132,7 +132,7 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
-	public Collection<BodyParam> getBodyParams() {
+	public BodyParams getBodyParams() {
 		return from.getBodyParams();
 	}
 
@@ -182,7 +182,7 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
-	public void setBodyParams(Collection<BodyParam> newParams) {
+	public void setBodyParams(BodyParams newParams) {
 		from.setBodyParams(newParams);
 	}
 	
