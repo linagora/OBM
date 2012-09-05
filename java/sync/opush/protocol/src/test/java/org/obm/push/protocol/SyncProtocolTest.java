@@ -230,10 +230,6 @@ public class SyncProtocolTest {
 		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
 		expect(syncDecoder.decodeSync(request, udr)).andReturn(null);
 		replay(syncDecoder);
-		
-		new SyncProtocol(syncDecoder).getRequest(request, udr);
-
-		verify(syncDecoder);
 	}
 	
 }

@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -52,10 +53,12 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSContact;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
@@ -73,6 +76,8 @@ import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
+
+	private final int DEFAULT_WINDOW_SIZE = 100;
 	
 	private Device device;
 	private UserDataRequest udr;
@@ -850,6 +855,490 @@ public class SyncDecoderTest {
 		assertThat(syncCollectionOptions.getBodyPreferences()).containsOnly(bodyPreference(8, maxSpecTruncationSize, true));
 	}
 
+	@Test
+	public void testCommandsAdd() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>123</ServerId>" +
+									"<ClientId>13579</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+
+		MSContact expectedMSContact = new MSContact();
+		expectedMSContact.setEmail1Address("opush@obm.org");
+		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
+		expectedMSContact.setFirstName("JoLynn");
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", "13579", "Add", expectedMSContact, PIMDataType.CONTACTS);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
+	}
+
+	@Test
+	public void testCommandsTwoAdd() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>123</ServerId>" +
+									"<ClientId>13579</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Add>" +
+									"<ServerId>456</ServerId>" +
+									"<ClientId>02468</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush2@obm.org\"&lt;opush2@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney2, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn2</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+
+		MSContact expectedMSContact = new MSContact();
+		expectedMSContact.setEmail1Address("opush@obm.org");
+		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
+		expectedMSContact.setFirstName("JoLynn");
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", "13579", "Add", expectedMSContact, PIMDataType.CONTACTS);
+		
+		MSContact expectedMSContact2 = new MSContact();
+		expectedMSContact2.setEmail1Address("opush2@obm.org");
+		expectedMSContact2.setFileAs("Dobney2, JoLynn Julie");
+		expectedMSContact2.setFirstName("JoLynn2");
+		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
+				"456", "02468", "Add", expectedMSContact2, PIMDataType.CONTACTS);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange, expectedSyncCollectionChange2);
+	}
+
+	@Test
+	public void testCommandsChange() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Change>" +
+									"<ServerId>123</ServerId>" +
+									"<ClientId>13579</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		MSContact expectedMSContact = new MSContact();
+		expectedMSContact.setEmail1Address("opush@obm.org");
+		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
+		expectedMSContact.setFirstName("JoLynn");
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", "13579", "Change", expectedMSContact, PIMDataType.CONTACTS);
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
+	}
+
+	@Test
+	public void testCommandsTwoChange() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Change>" +
+									"<ServerId>123</ServerId>" +
+									"<ClientId>13579</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Change>" +
+									"<ServerId>456</ServerId>" +
+									"<ClientId>02468</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush2@obm.org\"&lt;opush2@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney2, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn2</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+
+		MSContact expectedMSContact = new MSContact();
+		expectedMSContact.setEmail1Address("opush@obm.org");
+		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
+		expectedMSContact.setFirstName("JoLynn");
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", "13579", "Change", expectedMSContact, PIMDataType.CONTACTS);
+		
+		MSContact expectedMSContact2 = new MSContact();
+		expectedMSContact2.setEmail1Address("opush2@obm.org");
+		expectedMSContact2.setFileAs("Dobney2, JoLynn Julie");
+		expectedMSContact2.setFirstName("JoLynn2");
+		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
+				"456", "02468", "Change", expectedMSContact2, PIMDataType.CONTACTS);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange, expectedSyncCollectionChange2);
+	}
+
+	@Test
+	public void testCommandsFetch() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Fetch>" +
+									"<ServerId>123</ServerId>" +
+								"</Fetch>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", null, "Fetch", null, PIMDataType.EMAIL);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
+		assertThat(syncCollection.getFetchIds()).containsOnly("123");
+	}
+
+	@Test
+	public void testCommandsTwoFetch() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Fetch>" +
+									"<ServerId>123</ServerId>" +
+								"</Fetch>" +
+								"<Fetch>" +
+									"<ServerId>456</ServerId>" +
+								"</Fetch>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", null, "Fetch", null, PIMDataType.EMAIL);
+		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
+				"456", null, "Fetch", null, PIMDataType.EMAIL);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(
+				expectedSyncCollectionChange, expectedSyncCollectionChange2);
+		assertThat(syncCollection.getFetchIds()).containsOnly("123", "456");
+	}
+
+
+	@Test
+	public void testCommandsDelete() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Delete>" +
+									"<ServerId>123</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", null, "Delete", null, PIMDataType.EMAIL);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
+	}
+
+	@Test
+	public void testCommandsTwoDelete() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Delete>" +
+									"<ServerId>123</ServerId>" +
+								"</Delete>" +
+								"<Delete>" +
+									"<ServerId>456</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
+		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"123", null, "Delete", null, PIMDataType.EMAIL);
+		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
+				"456", null, "Delete", null, PIMDataType.EMAIL);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(
+				expectedSyncCollectionChange, expectedSyncCollectionChange2);
+	}
+
+	@Test
+	public void testCommandsAddChangeFetchDelete() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>12</ServerId>" +
+									"<ClientId>120</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Add>" +
+									"<ServerId>13</ServerId>" +
+									"<ClientId>130</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Change>" +
+									"<ServerId>34</ServerId>" +
+									"<ClientId>340</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Change>" +
+									"<ServerId>35</ServerId>" +
+									"<ClientId>350</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Fetch>" +
+									"<ServerId>56</ServerId>" +
+								"</Fetch>" +
+								"<Fetch>" +
+									"<ServerId>57</ServerId>" +
+								"</Fetch>" +
+								"<Delete>" +
+									"<ServerId>78</ServerId>" +
+								"</Delete>" +
+								"<Delete>" +
+									"<ServerId>79</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+
+		mocks.replay();
+		Sync sync = newSyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper).decodeSync(request, udr);
+		mocks.verify();
+
+		MSContact expectedMSContact = new MSContact();
+		expectedMSContact.setEmail1Address("opush@obm.org");
+		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
+		expectedMSContact.setFirstName("JoLynn");
+
+		SyncCollectionChange expectedSyncCollectionAdd = new SyncCollectionChange(
+				"12", "120", "Add", expectedMSContact, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionAdd2 = new SyncCollectionChange(
+				"13", "130", "Add", expectedMSContact, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
+				"34", "340", "Change", expectedMSContact, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
+				"35", "350", "Change", expectedMSContact, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionFetch = new SyncCollectionChange(
+				"56", null, "Fetch", null, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionFetch2 = new SyncCollectionChange(
+				"57", null, "Fetch", null, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionDelete = new SyncCollectionChange(
+				"78", null, "Delete", null, PIMDataType.CONTACTS);
+		SyncCollectionChange expectedSyncCollectionDelete2 = new SyncCollectionChange(
+				"79", null, "Delete", null, PIMDataType.CONTACTS);
+		
+		SyncCollection syncCollection = sync.getCollection(syncingCollectionId);
+		assertThat(syncCollection.getChanges()).containsOnly(
+				expectedSyncCollectionAdd, expectedSyncCollectionAdd2,
+				expectedSyncCollectionChange, expectedSyncCollectionChange2,
+				expectedSyncCollectionFetch,  expectedSyncCollectionFetch2,
+				expectedSyncCollectionDelete, expectedSyncCollectionDelete2);
+		assertThat(syncCollection.getFetchIds()).containsOnly("56", "57");
+	}
+
 	private BodyPreference bodyPreference(Integer bodyType, Integer truncationSize, Boolean allOrNone) {
 		return BodyPreference.builder()
 			.bodyType(MSEmailBodyType.getValueOf(bodyType))
@@ -857,16 +1346,19 @@ public class SyncDecoderTest {
 			.allOrNone(allOrNone)
 			.build();
 	}
-	
+
 	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {
-		String foundPath = collectionPath(syncingCollectionId);
+		return mockFindCollectionPathForId(PIMDataType.EMAIL, syncingCollectionId);
+	}
+
+	private CollectionDao mockFindCollectionPathForId(PIMDataType pimDataType, int syncingCollectionId) throws Exception {
+		String foundPath = collectionPath(pimDataType, syncingCollectionId);
 		expect(collectionDao.getCollectionPath(syncingCollectionId)).andReturn(foundPath);
 		return collectionDao;
 	}
 
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey) {
-		int defaultWindowSize = 100;
-		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, defaultWindowSize);
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, DEFAULT_WINDOW_SIZE);
 	}
 
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey,
@@ -899,13 +1391,24 @@ public class SyncDecoderTest {
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);
 	}
 
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, Integer windowSize) {
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, windowSize, PIMDataType.EMAIL,
+				Collections.<String>emptyList());
+	}
+
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, PIMDataType pimDataType) {
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, DEFAULT_WINDOW_SIZE, pimDataType,
+				Collections.<String>emptyList());
+	}
+
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(
-			int collectionId, String syncKey, Integer windowSize) {
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
-		syncCollection.setDataType(PIMDataType.EMAIL);
+			int collectionId, String syncKey, Integer windowSize, PIMDataType pimDataType,
+			List<String> fetchIds) {
+		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(pimDataType, collectionId));
+		syncCollection.setDataType(pimDataType);
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		syncCollection.setWindowSize(windowSize);
-
+		syncCollection.setFetchIds(fetchIds);
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);
 	}
 
@@ -918,13 +1421,21 @@ public class SyncDecoderTest {
 	}
 
 	private CollectionPathHelper mockCollectionPathHelperRecognizeDataType() {
-		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class)))
-			.andReturn(PIMDataType.EMAIL);
+		return mockCollectionPathHelperRecognizeDataType(PIMDataType.EMAIL);
+	}
+
+	private CollectionPathHelper mockCollectionPathHelperRecognizeDataType(PIMDataType pimDataType) {
+		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(pimDataType);
 		return collectionPathHelper;
 	}
 
 	private String collectionPath(int collectionId) {
-		return "obm:\\\\" + user.getLoginAtDomain() + "\\" + PIMDataType.EMAIL + "\\" + collectionId;
+		return collectionPath(PIMDataType.EMAIL, collectionId);
 	}
+
+	private String collectionPath(PIMDataType pimDataType, int collectionId) {
+		return "obm:\\\\" + user.getLoginAtDomain() + "\\" + pimDataType.asCollectionPathValue() + "\\" + collectionId;
+	}
+	
 	
 }
