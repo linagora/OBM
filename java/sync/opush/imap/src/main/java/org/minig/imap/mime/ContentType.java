@@ -93,18 +93,33 @@ public class ContentType {
 		public ContentType build() {
 			Preconditions.checkNotNull(primaryType);
 			Preconditions.checkNotNull(subType);
+			BodyParams params = bodyParamsBuilder.build();
+			
 			return new ContentType(primaryType.toLowerCase(), 
-					subType.toLowerCase(), bodyParamsBuilder.build());
+					subType.toLowerCase(), buildContentDisposition(params), params);
+		}
+
+		private ContentDisposition buildContentDisposition(BodyParams params) {
+			BodyParam contentDispositionParam = params.get("content-disposition");
+			if (contentDispositionParam != null) {
+				ContentDisposition parsedValue = ContentDisposition.fromString(contentDispositionParam.getValue());
+				if (parsedValue != ContentDisposition.UNKNOWN) {
+					return parsedValue;
+				}
+			}
+			return ContentDisposition.INLINE;
 		}
 	}
 
 	private final String primaryType;
 	private final String subType;
 	private final BodyParams bodyParams;
+	private final ContentDisposition contentDisposition;
 	
-	private ContentType(String primaryType, String subType, BodyParams bodyParams) {
+	private ContentType(String primaryType, String subType, ContentDisposition contentDisposition, BodyParams bodyParams) {
 		this.primaryType = primaryType;
 		this.subType = subType;
+		this.contentDisposition = contentDisposition;
 		this.bodyParams = bodyParams;
 	}
 	
@@ -122,6 +137,10 @@ public class ContentType {
 
 	public String getFullMimeType() {
 		return primaryType + "/" + subType;
+	}
+	
+	public ContentDisposition getContentDisposition() {
+		return contentDisposition;
 	}
 	
 	@Override

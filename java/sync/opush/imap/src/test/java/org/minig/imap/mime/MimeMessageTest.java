@@ -243,6 +243,20 @@ public class MimeMessageTest {
 		
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
 	}
+
+	@Test
+	public void testIsAttachmentWhenTwoMixedTextParts() {
+		IMimePart firstPart = buildMimePart("text/plain");
+		IMimePart secondPart = buildMimePart("text/plain;Content-Disposition=attachment");
+
+		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		firstPart.defineParent(parentMimePart, 1);
+		secondPart.defineParent(parentMimePart, 2);
+		
+		Assertions.assertThat(firstPart.isAttachment()).isFalse();
+		Assertions.assertThat(secondPart.isAttachment()).isTrue();
+	}
+
 	
 	@Test
 	public void testIsAttachmentIsFalseWhenMultipartAlternative() {
