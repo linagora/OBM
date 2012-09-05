@@ -34,37 +34,84 @@ package org.obm.push.protocol.bean;
 import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+import org.obm.push.exception.activesync.ASRequestStringFieldException;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 public class SyncRequestCollection {
 
 	public static class Builder {
 
+		private Integer id;
+		private SyncKey syncKey;
+		private String dataClass;
+		private Integer windowSize;
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+		
+		public Builder syncKey(SyncKey syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
+		
+		public Builder dataClass(String dataClass) {
+			this.dataClass = dataClass;
+			return this;
+		}
+		
+		public Builder windowSize(Integer windowSize) {
+			this.windowSize = windowSize;
+			return this;
+		}
+		
 		public SyncRequestCollection build() {
-			return new SyncRequestCollection();
+			if (id == null) {
+				throw new ASRequestIntegerFieldException("Collection id field is required");
+			}
+			if (syncKey == null || Strings.isNullOrEmpty(syncKey.getSyncKey())) {
+				throw new ASRequestStringFieldException("Collection SyncKey field is required");
+			}
+			
+			return new SyncRequestCollection(id, syncKey, dataClass, windowSize);
 		}
 
 	}
 	
-	protected SyncRequestCollection() {}
+	private final int id;
+	private final SyncKey syncKey;
+	private final String dataClass;
+	private final Integer windowSize;
+	
+	protected SyncRequestCollection(int id, SyncKey syncKey, String dataClass, Integer windowSize) {
+		this.id = id;
+		this.syncKey = syncKey;
+		this.dataClass = dataClass;
+		this.windowSize = windowSize;
+	}
 	
 	public int getId() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return id;
 	}
 
 	public String getDataClass() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return dataClass;
 	}
 
 	public SyncKey getSyncKey() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return syncKey;
 	}
 
 	public Integer getWindowSize() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return windowSize;
 	}
 	
 	public boolean hasWindowSize() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return windowSize != null;
 	}
 
 	public SyncCollectionOptions getOptions() {
@@ -73,5 +120,32 @@ public class SyncRequestCollection {
 	
 	public SyncRequestCollectionCommands getCommands() {
 		throw new NotImplementedException("Will be implemented in next commits");
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(id, syncKey, dataClass, windowSize);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncRequestCollection) {
+			SyncRequestCollection that = (SyncRequestCollection) object;
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.dataClass, that.dataClass)
+				&& Objects.equal(this.windowSize, that.windowSize);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("id", id)
+			.add("syncKey", syncKey)
+			.add("dataClass", dataClass)
+			.add("windowSize", windowSize)
+			.toString();
 	}
 }

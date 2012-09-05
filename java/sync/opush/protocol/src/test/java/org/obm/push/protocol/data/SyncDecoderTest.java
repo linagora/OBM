@@ -36,8 +36,12 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
+import org.obm.push.exception.activesync.ASRequestStringFieldException;
+import org.obm.push.protocol.bean.SyncRequest;
+import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
@@ -299,5 +303,89 @@ public class SyncDecoderTest {
 		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
 
 		assertThat(windowSize).isEqualTo(150);
+	}
+
+	@Test
+	public void testCollectionWhenNotPresent() throws Exception {
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncRequest syncRequest = new SyncDecoder().decodeSync(request);
+
+		assertThat(syncRequest.getCollections()).isEmpty();
+	}
+
+	@Test
+	public void testCollectionNoOptionNoCommand() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Class>Email</Class>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getSyncKey()).isEqualTo(new SyncKey("ddcf2e35-9834-49de-96ff-09979c7e2aa0"));
+		assertThat(collection.getId()).isEqualTo(2);
+		assertThat(collection.getDataClass()).isEqualTo("Email");
+		assertThat(collection.getWindowSize()).isEqualTo(150);
+	}
+
+	@Test(expected=ASRequestStringFieldException.class)
+	public void testCollectionWhenNoSyncKey() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Class>Email</Class>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		new SyncDecoder().getCollection(request.getDocumentElement());
+	}
+
+	@Test(expected=ASRequestIntegerFieldException.class)
+	public void testCollectionWhenNoId() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<Class>Email</Class>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		new SyncDecoder().getCollection(request.getDocumentElement());
+	}
+
+	@Test
+	public void testCollectionWhenNoClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		
+		assertThat(collection.getDataClass()).isNull();
+	}
+
+	@Test
+	public void testCollectionWhenNoWindowSize() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Class>Email</Class>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		
+		assertThat(collection.getWindowSize()).isNull();
 	}
 }

@@ -33,10 +33,10 @@ package org.obm.push.protocol.bean;
 
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
 public class SyncRequest {
 
@@ -45,6 +45,7 @@ public class SyncRequest {
 		private Integer waitInMinute;
 		private Boolean partial;
 		private Integer windowSize;
+		private List<SyncRequestCollection> collections;
 
 		public Builder waitInMinute(Integer waitInMinute) {
 			this.waitInMinute = waitInMinute;
@@ -61,11 +62,20 @@ public class SyncRequest {
 			return this;
 		}
 
+		public Builder collections(List<SyncRequestCollection> collections) {
+			this.collections = collections;
+			return this;
+		}
+
 		public SyncRequest build() {
 			assertWait();
 			assertWindowSize();
 			
-			return new SyncRequest(waitInMinute, partial, windowSize);
+			if (collections == null) {
+				collections = ImmutableList.of();
+			}
+
+			return new SyncRequest(waitInMinute, partial, windowSize, collections);
 		}
 
 		private void assertWait() {
@@ -84,11 +94,14 @@ public class SyncRequest {
 	private final Integer waitInMinute;
 	private final Boolean partial;
 	private final Integer windowSize;
+	private final List<SyncRequestCollection> collections;
 	
-	protected SyncRequest(Integer waitInMinute, Boolean partial, Integer windowSize) {
+	protected SyncRequest(Integer waitInMinute, Boolean partial, Integer windowSize,
+			List<SyncRequestCollection> collections) {
 		this.waitInMinute = waitInMinute;
 		this.partial = partial;
 		this.windowSize = windowSize;
+		this.collections = collections;
 	}
 	
 	public Integer getWaitInMinute() {
@@ -100,7 +113,7 @@ public class SyncRequest {
 	}
 	
 	public List<SyncRequestCollection> getCollections() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return collections;
 	}
 
 	public Integer getWindowSize() {
@@ -109,7 +122,7 @@ public class SyncRequest {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(waitInMinute, partial, windowSize);
+		return Objects.hashCode(waitInMinute, partial, windowSize, collections);
 	}
 	
 	@Override
@@ -118,7 +131,8 @@ public class SyncRequest {
 			SyncRequest that = (SyncRequest) object;
 			return Objects.equal(this.waitInMinute, that.waitInMinute)
 				&& Objects.equal(this.partial, that.partial)
-				&& Objects.equal(this.windowSize, that.windowSize);
+				&& Objects.equal(this.windowSize, that.windowSize)
+				&& Objects.equal(this.collections, that.collections);
 		}
 		return false;
 	}
@@ -129,6 +143,7 @@ public class SyncRequest {
 			.add("waitInMinute", waitInMinute)
 			.add("partial", partial)
 			.add("windowSize", windowSize)
+			.add("collections", collections)
 			.toString();
 	}
 }

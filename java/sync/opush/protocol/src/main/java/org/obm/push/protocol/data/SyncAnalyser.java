@@ -66,6 +66,7 @@ public class SyncAnalyser {
 	private static final Logger logger = LoggerFactory.getLogger(SyncAnalyser.class);
 
 	private static final int DEFAULT_WAIT = 0;
+	private static final int DEFAULT_WINDOW_SIZE = 100;
 	
 	private final CollectionDao collectionDao;
 	private final SyncedCollectionDao syncedCollectionStoreService;
@@ -94,10 +95,12 @@ public class SyncAnalyser {
 
 		Sync.Builder builder = Sync.builder()
 				.waitInMinutes(getWait(syncRequest));
+	
+		int defaultRequestWindowSize = getWindowSize(syncRequest);
 
 		for (SyncRequestCollection syncRequestCollection : syncRequest.getCollections()) {
 			builder.addCollection(getCollection(userDataRequest, syncRequestCollection,
-					syncRequest.getWindowSize(), false));
+					defaultRequestWindowSize, false));
 		}
 		Sync sync = builder.build();
 		syncedCollectionStoreService.put(userDataRequest.getCredentials(), userDataRequest.getDevice(), sync.getCollections());
@@ -110,6 +113,13 @@ public class SyncAnalyser {
 		}
 	}
 	
+	private int getWindowSize(SyncRequest syncRequest) {
+		if (syncRequest.getWindowSize() != null) {
+			return syncRequest.getWindowSize();
+		}
+		return DEFAULT_WINDOW_SIZE;
+	}
+
 	private int getWait(SyncRequest syncRequest) {
 		if (syncRequest.getWaitInMinute() != null) {
 			return syncRequest.getWaitInMinute();

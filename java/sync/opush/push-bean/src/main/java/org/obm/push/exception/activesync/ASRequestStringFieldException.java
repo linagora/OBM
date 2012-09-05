@@ -29,26 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.exception.activesync;
 
-public enum SyncRequestFields {
 
-	WAIT("Wait"),
-	PARTIAL("Partial"),
-	WINDOW_SIZE("WindowSize"),
-	COLLECTION("Collection"),
-	COLLECTION_ID("CollectionId"),
-	SYNC_KEY("SyncKey"),
-	DATA_CLASS("Class");
-	
-	private final String name;
+public class ASRequestStringFieldException extends ActiveSyncException {
 
-	private SyncRequestFields(String name) {
-		this.name = name;
+	public ASRequestStringFieldException() {
+		super();
 	}
 
-	public String getName() {
-		return name;
+	public ASRequestStringFieldException(String message, Throwable cause) {
+		super(message, cause);
 	}
-	
+
+	public ASRequestStringFieldException(String message) {
+		super(message);
+	}
+
+	public ASRequestStringFieldException(Throwable cause) {
+		super(cause);
+	}
+
 }

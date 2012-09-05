@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.util.List;
+
+import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
@@ -39,13 +42,17 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequest.Builder;
+import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -67,6 +74,14 @@ public class SyncDecoder {
 		requestBuilder.waitInMinute(getWait(root));
 		requestBuilder.partial(isPartial(root));
 		requestBuilder.windowSize(getWindowSize(root));
+		
+		List<SyncRequestCollection> syncRequestCollections = Lists.newArrayList();
+		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
+		for (int i = 0; i < collectionNodes.getLength(); i++) {
+			syncRequestCollections.add(getCollection((Element)collectionNodes.item(i)));
+		}
+		requestBuilder.collections(syncRequestCollections);
+		
 		return requestBuilder.build();
 	}
 
@@ -80,6 +95,34 @@ public class SyncDecoder {
 
 	@VisibleForTesting Integer getWindowSize(Element root) {
 		return uniqueIntegerFieldValue(root, SyncRequestFields.WINDOW_SIZE);
+	}
+
+	@VisibleForTesting SyncRequestCollection getCollection(Element collection) {
+		SyncRequestCollection.Builder builder = new SyncRequestCollection.Builder()
+			.id(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
+			.syncKey(syncKey(uniqueStringFieldValue(collection, SyncRequestFields.SYNC_KEY)))
+			.dataClass(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS))
+			.windowSize(uniqueIntegerFieldValue(collection, SyncRequestFields.WINDOW_SIZE));
+		
+		return builder.build();
+	}
+
+	private SyncKey syncKey(String syncKey) {
+		if(Strings.isNullOrEmpty(syncKey)) {
+			return null;
+		}
+		return new SyncKey(syncKey);
+	}
+
+	private String uniqueStringFieldValue(Element root, SyncRequestFields stringField) {
+		Element element = DOMUtils.getUniqueElement(root, stringField.getName());
+		if (element == null) {
+			return null;
+		}
+		
+		String elementText = DOMUtils.getElementText(element);
+		logger.debug(stringField.getName() + " value : " + elementText);
+		return elementText;
 	}
 
 	private Boolean uniqueBooleanFieldValue(Element root, SyncRequestFields booleanField) {

@@ -33,102 +33,86 @@ package org.obm.push.protocol.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
-
-import com.google.common.collect.Lists;
+import org.obm.push.exception.activesync.ASRequestStringFieldException;
+import org.obm.push.protocol.bean.SyncRequestCollection.Builder;
 
 @RunWith(SlowFilterRunner.class)
-public class SyncRequestTest {
-
-	@Test
-	public void testBuilderWaitIsNotRequired() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
-		
-		assertThat(syncRequest.getWaitInMinute()).isNull();
-	}
+public class SyncRequestCollectionTest {
 
 	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWaitNegative() {
-		new SyncRequest.Builder().waitInMinute(-1).build();
-	}
-
-	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWaitMoreThanValid() {
-		new SyncRequest.Builder().waitInMinute(60).build();
+	public void testBuilderIdIsRequired() {
+		builderWithRequirement().id(null).build();
 	}
 
 	@Test
-	public void testBuilderWaitValid() {
-		SyncRequest syncRequest = new SyncRequest.Builder().waitInMinute(58).build();
+	public void testBuilderIdValid() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().id(135).build();
 		
-		assertThat(syncRequest.getWaitInMinute()).isEqualTo(58);
+		assertThat(syncRequestCollection.getId()).isEqualTo(135);
+	}
+	
+	@Test(expected=ASRequestStringFieldException.class)
+	public void testBuilderSyncKeyIsRequired() {
+		builderWithRequirement().syncKey(null).build();
 	}
 
 	@Test
-	public void testBuilderPartialIsNotRequired() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
+	public void testBuilderSyncKeyValid() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().syncKey(new SyncKey("blabla")).build();
 		
-		assertThat(syncRequest.isPartial()).isNull();
+		assertThat(syncRequestCollection.getSyncKey()).isEqualTo(new SyncKey("blabla"));
+	}
+	
+	@Test
+	public void testBuilderDataClassIsNotRequired() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().dataClass(null).build();
+		
+		assertThat(syncRequestCollection.getDataClass()).isNull();
 	}
 
 	@Test
-	public void testBuilderPartialTrue() {
-		SyncRequest syncRequest = new SyncRequest.Builder().partial(true).build();
+	public void testBuilderDataClassValid() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().dataClass("Email").build();
 		
-		assertThat(syncRequest.isPartial()).isTrue();
+		assertThat(syncRequestCollection.getDataClass()).isEqualTo("Email");
 	}
-
-	@Test
-	public void testBuilderPartialFalse() {
-		SyncRequest syncRequest = new SyncRequest.Builder().partial(false).build();
-		
-		assertThat(syncRequest.isPartial()).isFalse();
-	}
+	
 	@Test
 	public void testBuilderWindowSizeIsNotRequired() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(null).build();
 		
-		assertThat(syncRequest.getWindowSize()).isNull();
-	}
-
-	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWindowSizeZero() {
-		new SyncRequest.Builder().windowSize(0).build();
-	}
-
-	@Test(expected=ASRequestIntegerFieldException.class)
-	public void testBuilderWindowSizeMoreThanValid() {
-		new SyncRequest.Builder().windowSize(513).build();
+		assertThat(syncRequestCollection.getWindowSize()).isNull();
 	}
 
 	@Test
 	public void testBuilderWindowSizeValid() {
-		SyncRequest syncRequest = new SyncRequest.Builder().windowSize(511).build();
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
-		assertThat(syncRequest.getWindowSize()).isEqualTo(511);
+		assertThat(syncRequestCollection.getWindowSize()).isEqualTo(5);
+	}
+	
+	@Test
+	public void testHasWindowSizeWhenNull() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(null).build();
+		
+		assertThat(syncRequestCollection.hasWindowSize()).isFalse();
 	}
 
 	@Test
-	public void testBuilderCollectionsByDefault() {
-		SyncRequest syncRequest = new SyncRequest.Builder().build();
+	public void testHasWindowSizeWhenValid() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
-		assertThat(syncRequest.getCollections()).isEmpty();
+		assertThat(syncRequestCollection.hasWindowSize()).isTrue();
 	}
 
-	@Test
-	public void testBuilderCollectionsNonEmpty() {
-		List<SyncRequestCollection> collections = Lists.newArrayList(new SyncRequestCollection.Builder()
-				.id(1)
-				.syncKey(new SyncKey("1234"))
-				.build());
-		SyncRequest syncRequest = new SyncRequest.Builder().collections(collections).build();
-		
-		assertThat(syncRequest.getCollections()).hasSize(1);
+	private Builder builderWithRequirement() {
+		return new SyncRequestCollection.Builder()
+			.id(140)
+			.syncKey(new SyncKey("1234"));
 	}
 }
