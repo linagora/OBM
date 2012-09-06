@@ -36,6 +36,8 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
@@ -108,6 +110,40 @@ public class SyncRequestCollectionTest {
 		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
 		assertThat(syncRequestCollection.hasWindowSize()).isTrue();
+	}
+	
+	@Test
+	public void testBuilderOptionsIsNotRequired() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(null).build();
+		
+		assertThat(syncRequestCollection.getOptions()).isNull();
+	}
+
+	@Test
+	public void testBuilderOptionsValid() {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setFilterType(FilterType.ONE_DAY_BACK);
+		options.setConflict(2);
+		options.setMimeTruncation(3);
+		options.setMimeSupport(4);
+		
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(options).build();
+		
+		assertThat(syncRequestCollection.getOptions()).isEqualTo(options);
+	}
+	
+	@Test
+	public void testHasOptionsWhenNull() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(null).build();
+		
+		assertThat(syncRequestCollection.hasOptions()).isFalse();
+	}
+
+	@Test
+	public void testHasOptionsWhenValid() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(new SyncCollectionOptions()).build();
+		
+		assertThat(syncRequestCollection.hasOptions()).isTrue();
 	}
 
 	private Builder builderWithRequirement() {

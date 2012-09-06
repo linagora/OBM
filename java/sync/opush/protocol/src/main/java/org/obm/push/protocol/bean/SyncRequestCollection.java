@@ -48,6 +48,7 @@ public class SyncRequestCollection {
 		private SyncKey syncKey;
 		private String dataClass;
 		private Integer windowSize;
+		private SyncCollectionOptions options;
 
 		public Builder id(Integer id) {
 			this.id = id;
@@ -69,6 +70,11 @@ public class SyncRequestCollection {
 			return this;
 		}
 		
+		public Builder options(SyncCollectionOptions options) {
+			this.options = options;
+			return this;
+		}
+		
 		public SyncRequestCollection build() {
 			if (id == null) {
 				throw new ASRequestIntegerFieldException("Collection id field is required");
@@ -77,7 +83,7 @@ public class SyncRequestCollection {
 				throw new ASRequestStringFieldException("Collection SyncKey field is required");
 			}
 			
-			return new SyncRequestCollection(id, syncKey, dataClass, windowSize);
+			return new SyncRequestCollection(id, syncKey, dataClass, windowSize, options);
 		}
 
 	}
@@ -86,12 +92,15 @@ public class SyncRequestCollection {
 	private final SyncKey syncKey;
 	private final String dataClass;
 	private final Integer windowSize;
+	private final SyncCollectionOptions options;
 	
-	protected SyncRequestCollection(int id, SyncKey syncKey, String dataClass, Integer windowSize) {
+	protected SyncRequestCollection(int id, SyncKey syncKey, String dataClass, Integer windowSize,
+			SyncCollectionOptions options) {
 		this.id = id;
 		this.syncKey = syncKey;
 		this.dataClass = dataClass;
 		this.windowSize = windowSize;
+		this.options = options;
 	}
 	
 	public int getId() {
@@ -115,7 +124,11 @@ public class SyncRequestCollection {
 	}
 
 	public SyncCollectionOptions getOptions() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return options;
+	}
+	
+	public boolean hasOptions() {
+		return options != null;
 	}
 	
 	public SyncRequestCollectionCommands getCommands() {
@@ -124,7 +137,7 @@ public class SyncRequestCollection {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(id, syncKey, dataClass, windowSize);
+		return Objects.hashCode(id, syncKey, dataClass, windowSize, options);
 	}
 	
 	@Override
@@ -134,7 +147,8 @@ public class SyncRequestCollection {
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.syncKey, that.syncKey)
 				&& Objects.equal(this.dataClass, that.dataClass)
-				&& Objects.equal(this.windowSize, that.windowSize);
+				&& Objects.equal(this.windowSize, that.windowSize)
+				&& Objects.equal(this.options, that.options);
 		}
 		return false;
 	}
@@ -146,6 +160,7 @@ public class SyncRequestCollection {
 			.add("syncKey", syncKey)
 			.add("dataClass", dataClass)
 			.add("windowSize", windowSize)
+			.add("options", options)
 			.toString();
 	}
 }

@@ -34,6 +34,10 @@ package org.obm.push.protocol.data;
 import java.util.List;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
@@ -102,7 +106,8 @@ public class SyncDecoder {
 			.id(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
 			.syncKey(syncKey(uniqueStringFieldValue(collection, SyncRequestFields.SYNC_KEY)))
 			.dataClass(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS))
-			.windowSize(uniqueIntegerFieldValue(collection, SyncRequestFields.WINDOW_SIZE));
+			.windowSize(uniqueIntegerFieldValue(collection, SyncRequestFields.WINDOW_SIZE))
+			.options(getOptions(DOMUtils.getUniqueElement(collection, SyncRequestFields.OPTIONS.getName())));
 		
 		return builder.build();
 	}
@@ -112,6 +117,54 @@ public class SyncDecoder {
 			return null;
 		}
 		return new SyncKey(syncKey);
+	}
+	
+	@VisibleForTesting SyncCollectionOptions getOptions(Element optionElement) {
+		if(optionElement == null) {
+			return null;
+		}
+		
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setConflict(uniqueIntegerFieldValue(optionElement, SyncRequestFields.CONFLICT));
+		options.setMimeSupport(uniqueIntegerFieldValue(optionElement, SyncRequestFields.MIME_SUPPORT));
+		options.setMimeTruncation(uniqueIntegerFieldValue(optionElement, SyncRequestFields.MIME_TRUNCATION));
+		
+		String filterType = uniqueStringFieldValue(optionElement, SyncRequestFields.FILTER_TYPE);
+		if (Strings.isNullOrEmpty(filterType)) {
+			options.setFilterType(null);
+		} else {
+			options.setFilterType(FilterType.fromSpecificationValue(filterType));
+		}
+		
+		options.setBodyPreferences(getBodyPreferences(optionElement));
+		return options;
+	}
+
+	@VisibleForTesting List<BodyPreference> getBodyPreferences(Element optionElement) {
+		NodeList bodyPreferenceNodes = optionElement.getElementsByTagName(SyncRequestFields.BODY_PREFERENCE.getName());
+		List<BodyPreference> bodyPreferences = Lists.newArrayList();
+		for (int i = 0; i < bodyPreferenceNodes.getLength(); i++) {
+			bodyPreferences.add(getBodyPreference((Element)bodyPreferenceNodes.item(i)));
+		}
+		return bodyPreferences;
+	}
+
+	@VisibleForTesting BodyPreference getBodyPreference(Element bodyPreferenceElement) {
+		Integer truncation = uniqueIntegerFieldValue(bodyPreferenceElement, SyncRequestFields.TRUNCATION_SIZE);
+		Integer type = uniqueIntegerFieldValue(bodyPreferenceElement, SyncRequestFields.TYPE);
+		Boolean allOrNone = uniqueBooleanFieldValue(bodyPreferenceElement, SyncRequestFields.ALL_OR_NONE);
+		
+		BodyPreference.Builder builder = BodyPreference.builder();
+		if (truncation != null) {
+			builder.truncationSize(truncation);
+		}
+		if (type != null) {
+			builder.bodyType(MSEmailBodyType.getValueOf(type));
+		}
+		if (allOrNone != null) {
+			builder.allOrNone(allOrNone);
+		}
+		return builder.build();
 	}
 
 	private String uniqueStringFieldValue(Element root, SyncRequestFields stringField) {

@@ -39,7 +39,16 @@ public enum SyncRequestFields {
 	COLLECTION("Collection"),
 	COLLECTION_ID("CollectionId"),
 	SYNC_KEY("SyncKey"),
-	DATA_CLASS("Class");
+	DATA_CLASS("Class"),
+	OPTIONS("Options"),
+	CONFLICT("Conflict"),
+	MIME_SUPPORT("MIMESupport"),
+	MIME_TRUNCATION("MIMETruncation"),
+	FILTER_TYPE("FilterType"),
+	BODY_PREFERENCE("BodyPreference"),
+	TRUNCATION_SIZE("TruncationSize"),
+	TYPE("Type"),
+	ALL_OR_NONE("AllOrNone");
 	
 	private final String name;
 

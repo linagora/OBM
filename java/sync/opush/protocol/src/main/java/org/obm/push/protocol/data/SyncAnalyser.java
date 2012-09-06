@@ -39,6 +39,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
@@ -153,7 +154,12 @@ public class SyncAnalyser {
 				collection.setWindowSize(requestDefaultWindowSize);
 			}
 			
-			collection.setOptions(requestCollection.getOptions());
+			if (requestCollection.hasOptions()) {
+				SyncCollectionOptions requestOptions = requestCollection.getOptions();
+				collection.setOptions(SyncCollectionOptions.cloneOnlyByExistingFields(requestOptions));
+			} else {
+				collection.setOptions(new SyncCollectionOptions());
+			}
 			
 			appendCommand(collection, requestCollection);
 		} catch (CollectionNotFoundException e) {

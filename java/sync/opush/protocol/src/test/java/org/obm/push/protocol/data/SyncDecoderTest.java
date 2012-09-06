@@ -36,6 +36,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
@@ -387,5 +390,165 @@ public class SyncDecoderTest {
 		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getWindowSize()).isNull();
+	}
+
+	@Test
+	public void testCollectionOptionsWhenNot() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions()).isNull();
+		assertThat(collection.hasOptions()).isFalse();
+	}
+
+	@Test
+	public void testCollectionOptions() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<FilterType>5</FilterType>" +
+						"<Conflict>1</Conflict>" +
+						"<MIMETruncation>8</MIMETruncation>" +
+						"<MIMESupport>2</MIMESupport>" +
+						"<BodyPreference>" +
+							"<Type>4</Type>" +
+							"<TruncationSize>1000</TruncationSize>" +
+							"<AllOrNone>1</AllOrNone>" +
+						"</BodyPreference>" +
+						"<BodyPreference>" +
+							"<Type>2</Type>" +
+							"<TruncationSize>5000</TruncationSize>" +
+							"<AllOrNone>0</AllOrNone>" +
+						"</BodyPreference>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getFilterType()).isEqualTo(FilterType.ONE_MONTHS_BACK);
+		assertThat(collection.getOptions().getConflict()).isEqualTo(1);
+		assertThat(collection.getOptions().getMimeTruncation()).isEqualTo(8);
+		assertThat(collection.getOptions().getMimeSupport()).isEqualTo(2);
+		assertThat(collection.getOptions().getBodyPreferences()).containsOnly(
+				BodyPreference.builder().bodyType(MSEmailBodyType.MIME).truncationSize(1000).allOrNone(true).build(),
+				BodyPreference.builder().bodyType(MSEmailBodyType.HTML).truncationSize(5000).allOrNone(false).build());
+	}
+
+	@Test
+	public void testCollectionOptionsFilterTypeIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<Conflict>1</Conflict>" +
+						"<MIMETruncation>8</MIMETruncation>" +
+						"<MIMESupport>2</MIMESupport>" +
+						"<BodyPreference>" +
+							"<Type>4</Type>" +
+							"<TruncationSize>1000</TruncationSize>" +
+							"<AllOrNone>1</AllOrNone>" +
+						"</BodyPreference>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getFilterType()).isNull();
+	}
+
+	@Test
+	public void testCollectionOptionsConflictIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<FilterType>5</FilterType>" +
+						"<MIMETruncation>8</MIMETruncation>" +
+						"<MIMESupport>2</MIMESupport>" +
+						"<BodyPreference>" +
+							"<Type>4</Type>" +
+							"<TruncationSize>1000</TruncationSize>" +
+							"<AllOrNone>1</AllOrNone>" +
+						"</BodyPreference>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getConflict()).isNull();
+	}
+
+	@Test
+	public void testCollectionOptionsMimeTruncationIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<FilterType>5</FilterType>" +
+						"<Conflict>1</Conflict>" +
+						"<MIMESupport>2</MIMESupport>" +
+						"<BodyPreference>" +
+							"<Type>4</Type>" +
+							"<TruncationSize>1000</TruncationSize>" +
+							"<AllOrNone>1</AllOrNone>" +
+						"</BodyPreference>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getMimeTruncation()).isNull();
+	}
+
+	@Test
+	public void testCollectionOptionsMimeSupportIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<FilterType>5</FilterType>" +
+						"<Conflict>1</Conflict>" +
+						"<MIMETruncation>8</MIMETruncation>" +
+						"<BodyPreference>" +
+							"<Type>4</Type>" +
+							"<TruncationSize>1000</TruncationSize>" +
+							"<AllOrNone>1</AllOrNone>" +
+						"</BodyPreference>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getMimeSupport()).isNull();
+	}
+
+	@Test
+	public void testCollectionOptionsBodyPreferenceIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Options>" +
+						"<FilterType>5</FilterType>" +
+						"<Conflict>1</Conflict>" +
+						"<MIMETruncation>8</MIMETruncation>" +
+						"<MIMESupport>2</MIMESupport>" +
+					"</Options>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+
+		assertThat(collection.getOptions().getBodyPreferences()).isEmpty();
 	}
 }

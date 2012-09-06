@@ -56,7 +56,7 @@ public class SyncCollectionOptions implements Serializable {
 		this.conflict = 1;
 		this.truncation = SYNC_TRUNCATION_ALL;
 		this.deletesAsMoves = true;
-		this.filterType = FilterType.THREE_DAYS_BACK;
+		this.filterType = FilterType.ALL_ITEMS;
 	}
 	
 	public SyncCollectionOptions() {
@@ -78,7 +78,7 @@ public class SyncCollectionOptions implements Serializable {
 		this.truncation = truncation;
 	}
 
-	public boolean isDeletesAsMoves() {
+	public Boolean isDeletesAsMoves() {
 		return deletesAsMoves;
 	}
 
@@ -131,6 +131,29 @@ public class SyncCollectionOptions implements Serializable {
 			}
 		});
 		this.bodyPreferences = Lists.newArrayList(bp);
+	}
+
+	public static SyncCollectionOptions cloneOnlyByExistingFields(SyncCollectionOptions cloningFromOptions) {
+		SyncCollectionOptions cloned = new SyncCollectionOptions();
+		if (cloningFromOptions.getConflict() != null) {
+			cloned.setConflict(cloningFromOptions.getConflict());
+		}
+		if (cloningFromOptions.getFilterType() != null) {
+			cloned.setFilterType(cloningFromOptions.getFilterType());
+		}
+		if (cloningFromOptions.getMimeSupport() != null) {
+			cloned.setMimeSupport(cloningFromOptions.getMimeSupport());
+		}
+		if (cloningFromOptions.getMimeTruncation() != null) {
+			cloned.setMimeTruncation(cloningFromOptions.getMimeTruncation());
+		}
+		if (cloningFromOptions.getTruncation() != null) {
+			cloned.setTruncation(cloningFromOptions.getTruncation());
+		}
+		if (cloningFromOptions.getBodyPreferences() != null) {
+			cloned.setBodyPreferences(cloningFromOptions.getBodyPreferences());
+		}
+		return cloned;
 	}
 	
 	@Override
