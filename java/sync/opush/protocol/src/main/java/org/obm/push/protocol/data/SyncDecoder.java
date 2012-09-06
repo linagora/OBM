@@ -47,6 +47,8 @@ import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequest.Builder;
 import org.obm.push.protocol.bean.SyncRequestCollection;
+import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
+import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
 import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,7 @@ public class SyncDecoder {
 
 	public SyncRequest decodeSync(Document doc) 
 			throws PartialException, ProtocolException, DaoException, CollectionPathException {
-		Builder requestBuilder = new SyncRequest.Builder();
+		Builder requestBuilder = SyncRequest.builder();
 		Element root = doc.getDocumentElement();
 		
 		requestBuilder.waitInMinute(getWait(root));
@@ -102,14 +104,14 @@ public class SyncDecoder {
 	}
 
 	@VisibleForTesting SyncRequestCollection getCollection(Element collection) {
-		SyncRequestCollection.Builder builder = new SyncRequestCollection.Builder()
+		return SyncRequestCollection.builder()
 			.id(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
 			.syncKey(syncKey(uniqueStringFieldValue(collection, SyncRequestFields.SYNC_KEY)))
 			.dataClass(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS))
 			.windowSize(uniqueIntegerFieldValue(collection, SyncRequestFields.WINDOW_SIZE))
-			.options(getOptions(DOMUtils.getUniqueElement(collection, SyncRequestFields.OPTIONS.getName())));
-		
-		return builder.build();
+			.options(getOptions(DOMUtils.getUniqueElement(collection, SyncRequestFields.OPTIONS.getName())))
+			.commands(getCommands(DOMUtils.getUniqueElement(collection, SyncRequestFields.COMMANDS.getName())))
+			.build();
 	}
 
 	private SyncKey syncKey(String syncKey) {
@@ -138,6 +140,35 @@ public class SyncDecoder {
 		
 		options.setBodyPreferences(getBodyPreferences(optionElement));
 		return options;
+	}
+
+	@VisibleForTesting SyncRequestCollectionCommands getCommands(Element commandsElement) {
+		if (commandsElement == null) {
+			return null;
+		}
+
+		List<String> fetchIds = Lists.newArrayList();
+		List<SyncRequestCollectionCommand> commands = Lists.newArrayList();
+		
+		NodeList collectionNodes = commandsElement.getChildNodes();
+		for (int i = 0; i < collectionNodes.getLength(); i++) {
+			SyncRequestCollectionCommand command = getCommand((Element)collectionNodes.item(i));
+			commands.add(command);
+			if (command.getName().equals("Fetch")) {
+				fetchIds.add(command.getServerId());
+			}
+		}
+		
+		return SyncRequestCollectionCommands.builder().commands(commands).fetchIds(fetchIds).build();
+	}
+	
+	@VisibleForTesting SyncRequestCollectionCommand getCommand(Element commandElement) {
+		return SyncRequestCollectionCommand.builder()
+			.name(commandElement.getNodeName())
+			.serverId(uniqueStringFieldValue(commandElement, SyncRequestFields.SERVER_ID))
+			.clientId(uniqueStringFieldValue(commandElement, SyncRequestFields.CLIENT_ID))
+			.applicationData(DOMUtils.getUniqueElement(commandElement, SyncRequestFields.APPLICATION_DATA.getName()))
+			.build();
 	}
 
 	@VisibleForTesting List<BodyPreference> getBodyPreferences(Element optionElement) {

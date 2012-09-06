@@ -29,39 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.protocol.bean;
 
-public enum SyncRequestFields {
+import static org.fest.assertions.api.Assertions.assertThat;
 
-	WAIT("Wait"),
-	PARTIAL("Partial"),
-	WINDOW_SIZE("WindowSize"),
-	COLLECTION("Collection"),
-	COLLECTION_ID("CollectionId"),
-	SYNC_KEY("SyncKey"),
-	DATA_CLASS("Class"),
-	OPTIONS("Options"),
-	CONFLICT("Conflict"),
-	MIME_SUPPORT("MIMESupport"),
-	MIME_TRUNCATION("MIMETruncation"),
-	FILTER_TYPE("FilterType"),
-	BODY_PREFERENCE("BodyPreference"),
-	TRUNCATION_SIZE("TruncationSize"),
-	TYPE("Type"),
-	ALL_OR_NONE("AllOrNone"),
-	COMMANDS("Commands"),
-	SERVER_ID("ServerId"),
-	CLIENT_ID("ClientId"),
-	APPLICATION_DATA("ApplicationData");
-	
-	private final String name;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-	private SyncRequestFields(String name) {
-		this.name = name;
+import com.google.common.collect.ImmutableList;
+
+@RunWith(SlowFilterRunner.class)
+public class SyncRequestCollectionCommandsTest {
+
+	@Test
+	public void testBuilderFetchIdsIsNotRequired() {
+		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+			.fetchIds(null).build();
+		
+		assertThat(commands.getFetchIds()).isEmpty();
 	}
 
-	public String getName() {
-		return name;
+	@Test
+	public void testBuilderFetchIdsValid() {
+		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+			.fetchIds(ImmutableList.of("1234", "5678")).build();
+		
+		assertThat(commands.getFetchIds()).containsOnly("1234", "5678");
+	}
+
+	@Test
+	public void testBuilderCommandsIsNotRequired() {
+		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+			.commands(null).build();
+		
+		assertThat(commands.getCommands()).isEmpty();
+	}
+
+	@Test
+	public void testBuilderCommandsValid() {
+		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+			.commands(ImmutableList.of(
+					SyncRequestCollectionCommand.builder().name("Delete").serverId("3").build(),
+					SyncRequestCollectionCommand.builder().name("Fetch").serverId("8").build())).build();
+		
+		assertThat(commands.getCommands()).containsOnly(
+				SyncRequestCollectionCommand.builder().name("Delete").serverId("3").build(),
+				SyncRequestCollectionCommand.builder().name("Fetch").serverId("8").build());
 	}
 	
 }

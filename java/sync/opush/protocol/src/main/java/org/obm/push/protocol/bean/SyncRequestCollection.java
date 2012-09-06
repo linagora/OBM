@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
@@ -42,6 +41,10 @@ import com.google.common.base.Strings;
 
 public class SyncRequestCollection {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 
 		private Integer id;
@@ -49,7 +52,10 @@ public class SyncRequestCollection {
 		private String dataClass;
 		private Integer windowSize;
 		private SyncCollectionOptions options;
+		private SyncRequestCollectionCommands commands;
 
+		private Builder() {}
+		
 		public Builder id(Integer id) {
 			this.id = id;
 			return this;
@@ -75,6 +81,11 @@ public class SyncRequestCollection {
 			return this;
 		}
 		
+		public Builder commands(SyncRequestCollectionCommands commands) {
+			this.commands = commands;
+			return this;
+		}
+		
 		public SyncRequestCollection build() {
 			if (id == null) {
 				throw new ASRequestIntegerFieldException("Collection id field is required");
@@ -83,7 +94,7 @@ public class SyncRequestCollection {
 				throw new ASRequestStringFieldException("Collection SyncKey field is required");
 			}
 			
-			return new SyncRequestCollection(id, syncKey, dataClass, windowSize, options);
+			return new SyncRequestCollection(id, syncKey, dataClass, windowSize, options, commands);
 		}
 
 	}
@@ -93,14 +104,16 @@ public class SyncRequestCollection {
 	private final String dataClass;
 	private final Integer windowSize;
 	private final SyncCollectionOptions options;
+	private final SyncRequestCollectionCommands commands;
 	
 	protected SyncRequestCollection(int id, SyncKey syncKey, String dataClass, Integer windowSize,
-			SyncCollectionOptions options) {
+			SyncCollectionOptions options, SyncRequestCollectionCommands commands) {
 		this.id = id;
 		this.syncKey = syncKey;
 		this.dataClass = dataClass;
 		this.windowSize = windowSize;
 		this.options = options;
+		this.commands = commands;
 	}
 	
 	public int getId() {
@@ -132,12 +145,12 @@ public class SyncRequestCollection {
 	}
 	
 	public SyncRequestCollectionCommands getCommands() {
-		throw new NotImplementedException("Will be implemented in next commits");
+		return commands;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(id, syncKey, dataClass, windowSize, options);
+		return Objects.hashCode(id, syncKey, dataClass, windowSize, options, commands);
 	}
 	
 	@Override
@@ -148,7 +161,8 @@ public class SyncRequestCollection {
 				&& Objects.equal(this.syncKey, that.syncKey)
 				&& Objects.equal(this.dataClass, that.dataClass)
 				&& Objects.equal(this.windowSize, that.windowSize)
-				&& Objects.equal(this.options, that.options);
+				&& Objects.equal(this.options, that.options)
+				&& Objects.equal(this.commands, that.commands);
 		}
 		return false;
 	}
@@ -161,6 +175,7 @@ public class SyncRequestCollection {
 			.add("dataClass", dataClass)
 			.add("windowSize", windowSize)
 			.add("options", options)
+			.add("commands", commands)
 			.toString();
 	}
 }

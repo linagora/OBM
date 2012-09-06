@@ -43,6 +43,8 @@ import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import org.obm.push.protocol.bean.SyncRequestCollection.Builder;
 
+import com.google.common.collect.ImmutableList;
+
 @RunWith(SlowFilterRunner.class)
 public class SyncRequestCollectionTest {
 
@@ -145,9 +147,29 @@ public class SyncRequestCollectionTest {
 		
 		assertThat(syncRequestCollection.hasOptions()).isTrue();
 	}
+	
+	@Test
+	public void testBuilderCommandsIsNotRequired() {
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().commands(null).build();
+		
+		assertThat(syncRequestCollection.getCommands()).isNull();
+	}
+
+	@Test
+	public void testBuilderCommandsValid() {
+		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+			.fetchIds(ImmutableList.of("1234"))
+			.commands(ImmutableList.of(
+					SyncRequestCollectionCommand.builder().serverId("100").name("Delete").build()))
+			.build();
+		
+		SyncRequestCollection syncRequestCollection = builderWithRequirement().commands(commands).build();
+		
+		assertThat(syncRequestCollection.getCommands()).isEqualTo(commands);
+	}
 
 	private Builder builderWithRequirement() {
-		return new SyncRequestCollection.Builder()
+		return SyncRequestCollection.builder()
 			.id(140)
 			.syncKey(new SyncKey("1234"));
 	}

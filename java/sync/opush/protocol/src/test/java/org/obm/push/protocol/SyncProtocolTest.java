@@ -46,7 +46,6 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,9 +71,9 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -245,7 +244,6 @@ public class SyncProtocolTest {
 		verify(syncDecoder);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testGetWaitWhen0() throws Exception {
 		int syncingCollectionId = 3;
@@ -301,7 +299,6 @@ public class SyncProtocolTest {
 		syncProtocol.decodeRequest(request);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test(expected=PartialException.class)
 	public void testPartialRequest() throws Exception {
 		int syncingCollectionId = 3;
@@ -323,7 +320,6 @@ public class SyncProtocolTest {
 		syncProtocol.analyzeRequest(udr, syncRequest);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testSyncCollectionDefaultValues() throws Exception {
 		int syncingCollectionId = 3;
@@ -366,7 +362,6 @@ public class SyncProtocolTest {
 		assertThat(analyzedRequest.getSync().getCollection(syncingCollectionId)).isEqualTo(expectedSyncCollection);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testWindowSizeIsTookInParentSync() throws Exception {
 		int syncingCollectionId = 3;
@@ -399,7 +394,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getWindowSize()).isEqualTo(150);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testWindowSizeDifferentInSyncAndCollection() throws Exception {
 		int syncingCollectionId = 3;
@@ -433,7 +427,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getWindowSize()).isEqualTo(75);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testOptionToZero() throws Exception {
 		int syncingCollectionId = 3;
@@ -475,7 +468,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollectionOptions.getMimeTruncation()).isEqualTo(0);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testOptionToNonZero() throws Exception {
 		int syncingCollectionId = 3;
@@ -517,7 +509,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollectionOptions.getMimeTruncation()).isEqualTo(8);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testOptionsBodyPreferencesMinSpecValues() throws Exception {
 		int syncingCollectionId = 3;
@@ -556,7 +547,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollectionOptions.getBodyPreferences()).containsOnly(bodyPreference(1, 0, false));
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testOptionsBodyPreferencesMaxSpecValues() throws Exception {
 		int syncingCollectionId = 3;
@@ -605,7 +595,6 @@ public class SyncProtocolTest {
 				bodyPreference(8, maxSpecTruncationSize, true));
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testOptionsBodyPreferencesTwoEntries() throws Exception {
 		int syncingCollectionId = 3;
@@ -645,7 +634,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollectionOptions.getBodyPreferences()).containsOnly(bodyPreference(8, maxSpecTruncationSize, true));
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsAdd() throws Exception {
 		int syncingCollectionId = 3;
@@ -696,7 +684,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsTwoAdd() throws Exception {
 		int syncingCollectionId = 3;
@@ -763,7 +750,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange, expectedSyncCollectionChange2);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsChange() throws Exception {
 		int syncingCollectionId = 3;
@@ -815,7 +801,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsTwoChange() throws Exception {
 		int syncingCollectionId = 3;
@@ -882,7 +867,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange, expectedSyncCollectionChange2);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsFetch() throws Exception {
 		int syncingCollectionId = 3;
@@ -924,7 +908,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getFetchIds()).containsOnly("123");
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsTwoFetch() throws Exception {
 		int syncingCollectionId = 3;
@@ -973,7 +956,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getFetchIds()).containsOnly("123", "456");
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsDelete() throws Exception {
 		int syncingCollectionId = 3;
@@ -1014,7 +996,6 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getChanges()).containsOnly(expectedSyncCollectionChange);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsTwoDelete() throws Exception {
 		int syncingCollectionId = 3;
@@ -1062,7 +1043,6 @@ public class SyncProtocolTest {
 				expectedSyncCollectionChange, expectedSyncCollectionChange2);
 	}
 
-	@Ignore("Sync decoding is in progress")
 	@Test
 	public void testCommandsAddChangeFetchDelete() throws Exception {
 		int syncingCollectionId = 3;

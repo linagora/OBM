@@ -49,8 +49,8 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequestCollection;
+import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands.Command;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.slf4j.Logger;
@@ -173,14 +173,16 @@ public class SyncAnalyser {
 
 	private void appendCommand(SyncCollection collection, SyncRequestCollection requestCollection) {
 		SyncRequestCollectionCommands commands = requestCollection.getCommands();
-		collection.setFetchIds(commands.getFetchIds());
-		
-		for (Command command : commands.getCommands()) {
-			collection.addChange(getChange(collection, command));
+		if (commands != null) {
+			collection.setFetchIds(commands.getFetchIds());
+			
+			for (SyncRequestCollectionCommand command : commands.getCommands()) {
+				collection.addChange(getChange(collection, command));
+			}
 		}
 	}
 
-	private SyncCollectionChange getChange(SyncCollection collection, Command command) {
+	private SyncCollectionChange getChange(SyncCollection collection, SyncRequestCollectionCommand command) {
 		String modType = command.getName();
 		String serverId = command.getServerId();
 		String clientId = command.getClientId();

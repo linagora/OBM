@@ -40,6 +40,10 @@ import com.google.common.collect.ImmutableList;
 
 public class SyncRequest {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		
 		private Integer waitInMinute;
@@ -47,6 +51,8 @@ public class SyncRequest {
 		private Integer windowSize;
 		private List<SyncRequestCollection> collections;
 
+		private Builder() {}
+		
 		public Builder waitInMinute(Integer waitInMinute) {
 			this.waitInMinute = waitInMinute;
 			return this;

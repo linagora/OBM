@@ -45,8 +45,10 @@ import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequestCollection;
+import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
@@ -550,5 +552,102 @@ public class SyncDecoderTest {
 		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getBodyPreferences()).isEmpty();
+	}
+
+	@Test
+	public void testCollectionCommands() throws Exception {
+		String applicationData = 
+				"<ApplicationData>" +
+					"<Email1Address>opush@obm.org</Email1Address>" +
+					"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+					"<FirstName>JoLynn</FirstName>" +
+				"</ApplicationData>";
+		
+		Element request = DOMUtils.parse(
+				"<Collection>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<Commands>" +
+						"<Add>" +
+							"<ServerId>12</ServerId>" +
+							"<ClientId>120</ClientId>" +
+							applicationData +
+						"</Add>" +
+						"<Change>" +
+							"<ServerId>35</ServerId>" +
+							"<ClientId>350</ClientId>" +
+							applicationData +
+						"</Change>" +
+						"<Fetch>" +
+							"<ServerId>56</ServerId>" +
+						"</Fetch>" +
+						"<Delete>" +
+							"<ServerId>79</ServerId>" +
+						"</Delete>" +
+					"</Commands>" +
+				"</Collection>").getDocumentElement();
+		
+		SyncRequestCollection collection = new SyncDecoder().getCollection(request);
+		
+		Element addElement = DOMUtils.getUniqueElement(request, "Add");
+		Element addDataElement = DOMUtils.getUniqueElement(addElement, "ApplicationData");
+		Element changeElement = DOMUtils.getUniqueElement(request, "Change");
+		Element changeDataElement = DOMUtils.getUniqueElement(changeElement, "ApplicationData");
+		
+		assertThat(collection.getCommands().getFetchIds()).containsOnly("56");
+		assertThat(collection.getCommands().getCommands()).containsOnly(
+				SyncRequestCollectionCommand.builder()
+					.name("Add").serverId("12").clientId("120").applicationData(addDataElement).build(),
+				SyncRequestCollectionCommand.builder()
+					.name("Change").serverId("35").clientId("350").applicationData(changeDataElement).build(),
+				SyncRequestCollectionCommand.builder().name("Fetch").serverId("56").build(),
+				SyncRequestCollectionCommand.builder().name("Delete").serverId("79").build());
+	}
+
+	@Test
+	public void testCollectionCommandsServerIdIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+						"<Name>" +
+							"<ClientId>120</ClientId>" +
+							"<ApplicationData>" +
+								"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+								"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+								"<FirstName>JoLynn</FirstName>" +
+							"</ApplicationData>" +
+						"</Name>");
+		
+		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		
+		assertThat(command.getServerId()).isNull();
+	}
+
+	@Test
+	public void testCollectionCommandsClientIdIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+						"<Name>" +
+							"<ServerId>12</ServerId>" +
+							"<ApplicationData>" +
+								"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+								"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+								"<FirstName>JoLynn</FirstName>" +
+							"</ApplicationData>" +
+						"</Name>");
+		
+		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		
+		assertThat(command.getClientId()).isNull();
+	}
+
+	@Test
+	public void testCollectionCommandsApplicationDataIsNotRequired() throws Exception {
+		Document request = DOMUtils.parse(
+						"<Name>" +
+							"<ServerId>12</ServerId>" +
+							"<ClientId>120</ClientId>" +
+						"</Name>");
+		
+		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		
+		assertThat(command.getApplicationData()).isNull();
 	}
 }
