@@ -37,9 +37,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.DateTime;
@@ -81,6 +83,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.FindException;
@@ -440,15 +443,57 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@VisibleForTesting void inheritsParticipationStateOnExceptions(Event before, Event event) {
 		List<Event> beforeExceptions = before.getEventsExceptions();
-		List<Event> eventExceptions = event.getEventsExceptions();
+		TreeMap<Event, Event> eventExceptions = buildTreeMap(event.getEventsExceptions());
 		
-		if (beforeExceptions != null && eventExceptions != null) {
-			for (Event eventException : beforeExceptions) {
-				int eventIndexOf = eventExceptions.indexOf(eventException);
-				if (eventIndexOf != -1) {
-					inheritsParticipationStateFromExistingEvent(eventException, eventExceptions.get(eventIndexOf));
-				}
+		for (Event beforeException : beforeExceptions) {
+			if (eventExceptions.containsKey(beforeException)) {
+				inheritsParticipationStateFromExistingEvent(beforeException, eventExceptions.get(beforeException));
 			}
+		}
+	}
+
+	@VisibleForTesting TreeMap<Event, Event> buildTreeMap(List<Event> events) {
+		if (events == null) {
+			return new TreeMap<Event, Event>();
+		}
+		TreeMap<Event, Event> treeMap = Maps.<Event, Event, Event>newTreeMap(new EventExtIdComparator());
+		for (Event event : events) {
+			treeMap.put(event, event);
+		}
+		return treeMap;
+	}
+	
+	private static class EventExtIdComparator implements Comparator<Event> {
+		
+		public int compare(Event first, Event second) {
+			if (areNullEventOrNullEventExtId(first, second)) {
+				return -1;
+			}
+			if (areIdenticalEventsExtIds(first, second)) {
+				return 0;
+			}
+			return compare(first.getExtId(), second.getExtId());
+		}
+		
+		private boolean areNullEventOrNullEventExtId(Event first, Event second) {
+			if (first == null || second == null) {
+				return true;
+			}
+			if (first.getExtId() == null || second.getExtId() == null) {
+				return true;
+			}
+			return false;
+		}
+		
+		private boolean areIdenticalEventsExtIds(Event first, Event second) {
+			if (first.getExtId().equals(second.getExtId())) {
+				return true;
+			}
+			return false;
+		}
+		
+		private int compare(EventExtId firstEventExtId, EventExtId secondEventExtId) {
+			return firstEventExtId.getExtId().compareTo(secondEventExtId.getExtId());
 		}
 	}
 

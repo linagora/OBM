@@ -49,6 +49,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
 
@@ -1852,6 +1853,149 @@ public class CalendarBindingImplTest {
 		
 		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+	}
+
+	@Test
+	public void testRecursiveInheritsParticipationStateFromExistingEventEmptyExceptions() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+		Event beforeException = createEvent(expectedAttendeesException);
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		before.addEventException(beforeException);
+		String expectedExtId = "123";
+		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
+		beforeException.setExtId(expectedEventExtId);
+		
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(after.getEventsExceptions()).isEmpty();
+	}
+
+	@Test
+	public void testRecursiveInheritsParticipationStateFromExistingEventComparator() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+		Event beforeException = createEvent(expectedAttendeesException);
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		before.addEventException(beforeException);
+		String expectedExtId = "123";
+		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
+		beforeException.setExtId(expectedEventExtId);
+		
+		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		afterException.setExtId(new EventExtId(expectedExtId));
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		after.addEventException(afterException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+	}
+
+	@Test
+	public void testRecursiveInheritsParticipationStateFromExistingEventMultipleExceptions() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+		Event beforeException = createEvent(expectedAttendeesException);
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		Event before = createEvent(expectedAttendees);
+		before.addEventException(beforeException);
+		String expectedExtId = "123";
+		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
+		beforeException.setExtId(expectedEventExtId);
+		
+		Event firstException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		firstException.setExtId(new EventExtId("012"));
+		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		afterException.setExtId(new EventExtId(expectedExtId));
+		Event thirdException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		thirdException.setExtId(new EventExtId("234"));
+		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		after.addEventException(thirdException);
+		after.addEventException(firstException);
+		after.addEventException(afterException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+	}
+
+	@Test
+	public void testRecursiveInheritsParticipationStateFromExistingEventNotFoundExceptions() {
+		Event beforeException = createEvent(createOrganiserAndContactAttendees(ParticipationState.DECLINED));
+		
+		Event before = createEvent(createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION));
+		before.addEventException(beforeException);
+		beforeException.setExtId(new EventExtId("123"));
+		
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		Event firstException = createEvent(expectedAttendees);
+		firstException.setExtId(new EventExtId("012"));
+		Event afterException = createEvent(expectedAttendees);
+		afterException.setExtId(new EventExtId("123"));
+		Event thirdException = createEvent(expectedAttendees);
+		thirdException.setExtId(new EventExtId("234"));
+		Event after = createEvent(expectedAttendees);
+		after.addEventException(thirdException);
+		after.addEventException(firstException);
+		after.addEventException(afterException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendees);
+	}
+	
+	@Test
+	public void testBuildTreeMapEmptyList() {
+		ImmutableList<Event> events = ImmutableList.<Event> of();
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(events);
+		assertThat(treeMap).isEmpty();
+	}
+	
+	@Test
+	public void testBuildTreeMapNullList() {
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(null);
+		assertThat(treeMap).isEmpty();
+	}
+	
+	@Test
+	public void testBuildTreeMap() {
+		List<Attendee> attendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		Event firstException = createEvent(attendees);
+		firstException.setExtId(new EventExtId("012"));
+		Event secondException = createEvent(attendees);
+		secondException.setExtId(new EventExtId("123"));
+		Event thirdException = createEvent(attendees);
+		thirdException.setExtId(new EventExtId("234"));
+		Event[] expectedEvents = new Event[] { firstException, secondException, thirdException };
+		
+		ImmutableList<Event> events = ImmutableList.<Event> of(thirdException, secondException, firstException);
+		
+		CalendarBindingImpl calendarService = 
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(events);
+		Event[] eventsArray = Iterables.toArray(treeMap.keySet(), Event.class);
+		assertThat(eventsArray).isEqualTo(expectedEvents);
 	}
 
 	private Event createEvent(List<Attendee> expectedAttendees) {
