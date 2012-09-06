@@ -74,7 +74,7 @@ start() {
 #	  	rebuild-jar-repository -s ${JETTY_HOME}/ext
 
         if [ -r /etc/rc.d/init.d/functions ]; then
-                daemon --user $JETTY_USER JETTY_PID=$JETTY_PID JETTY_CFG=\"$JETTY_CFG\" JAVA_HOME=$JAVA_HOME JETTY_PORT=$JETTY_PORT JAVA_OPTS=$JAVA_OPTS $JETTY_SCRIPT
+                daemon --user $JETTY_USER JETTY_PID=$JETTY_PID JETTY_CFG=\"$JETTY_CFG\" JAVA_HOME=$JAVA_HOME JETTY_PORT=$JETTY_PORT JAVA_OPTS=\"$JAVA_OPTS\" $JETTY_SCRIPT
         else
                 su - $JETTY_USER -c "JETTY_PID=$JETTY_PID JETTY_CFG="$JETTY_CFG" JAVA_OPTS=$JAVA_OPTS $JETTY_SCRIPT"
         fi

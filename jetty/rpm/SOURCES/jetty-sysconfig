@@ -21,12 +21,12 @@ JAVA_HOME="/usr/lib/jvm/java"
 #JAVA_OPTS="-Xminf0.1 -Xmaxf0.3"
 
 # Use JAVA_OPTS to set java.library.path 
-JAVA_OPTS=$JAVA_OPTS'" -DSTART=etc/start.config -Djetty.lib=/usr/share/jetty6/lib "'
+JAVA_OPTS="$JAVA_OPTS -DSTART=etc/start.config -Djetty.lib=/usr/share/jetty6/lib "
 
 # You can change your tomcat locale here
 #LANG="en_US"
 
-# Connector port is 8081 for this jetty6 instance
+# Connector port is 8082 for this jetty6 instance
 JETTY_PORT=8082 
 
 # If you wish to further customize your tomcat environment,
