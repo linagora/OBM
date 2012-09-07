@@ -53,7 +53,7 @@ public class EncoderFactory {
 	private final Provider<MSEmailMetadataEncoder> emailMetadataEncoder;
 
 	@Inject
-	private EncoderFactory(Provider<CalendarEncoder> calendarProvider,
+	protected EncoderFactory(Provider<CalendarEncoder> calendarProvider,
 			Provider<ContactEncoder> contactProvider,
 			Provider<TaskEncoder> taskEncoder,
 			Provider<MSEmailEncoder> emailEncoder,

@@ -48,7 +48,7 @@ public class ContactEncoder {
 	private SimpleDateFormat sdf;
 
 	@Inject
-	private ContactEncoder() {
+	protected ContactEncoder() {
 		sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}

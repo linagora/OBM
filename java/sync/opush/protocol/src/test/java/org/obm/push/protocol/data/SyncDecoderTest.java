@@ -67,7 +67,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		new SyncDecoder().getWait(request.getDocumentElement());
+		new SyncDecoder(null).getWait(request.getDocumentElement());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 
-		Integer wait = new SyncDecoder().getWait(request.getDocumentElement());
+		Integer wait = new SyncDecoder(null).getWait(request.getDocumentElement());
 		
 		assertThat(wait).isNull();
 	}
@@ -103,7 +103,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		new SyncDecoder().getWait(request.getDocumentElement());
+		new SyncDecoder(null).getWait(request.getDocumentElement());
 	}
 	
 	@Test
@@ -119,7 +119,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Integer wait = new SyncDecoder().getWait(request.getDocumentElement());
+		Integer wait = new SyncDecoder(null).getWait(request.getDocumentElement());
 
 		assertThat(wait).isNull();
 	}
@@ -138,7 +138,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		int wait = new SyncDecoder().getWait(request.getDocumentElement());
+		int wait = new SyncDecoder(null).getWait(request.getDocumentElement());
 
 		assertThat(wait).isEqualTo(0);
 	}
@@ -157,7 +157,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		int wait = new SyncDecoder().getWait(request.getDocumentElement());
+		int wait = new SyncDecoder(null).getWait(request.getDocumentElement());
 
 		assertThat(wait).isEqualTo(1000);
 	}
@@ -176,7 +176,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		new SyncDecoder().isPartial(request.getDocumentElement());
+		new SyncDecoder(null).isPartial(request.getDocumentElement());
 	}
 
 	@Test
@@ -192,7 +192,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+		Boolean isPartial = new SyncDecoder(null).isPartial(request.getDocumentElement());
 
 		assertThat(isPartial).isNull();
 	}
@@ -211,7 +211,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+		Boolean isPartial = new SyncDecoder(null).isPartial(request.getDocumentElement());
 
 		assertThat(isPartial).isTrue();
 	}
@@ -230,7 +230,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+		Boolean isPartial = new SyncDecoder(null).isPartial(request.getDocumentElement());
 
 		assertThat(isPartial).isFalse();
 	}
@@ -249,7 +249,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Boolean isPartial = new SyncDecoder().isPartial(request.getDocumentElement());
+		Boolean isPartial = new SyncDecoder(null).isPartial(request.getDocumentElement());
 
 		assertThat(isPartial).isTrue();
 	}
@@ -267,7 +267,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+		Integer windowSize = new SyncDecoder(null).getWindowSize(request.getDocumentElement());
 
 		assertThat(windowSize).isNull();
 	}
@@ -286,7 +286,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+		Integer windowSize = new SyncDecoder(null).getWindowSize(request.getDocumentElement());
 
 		assertThat(windowSize).isNull();
 	}
@@ -305,7 +305,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		Integer windowSize = new SyncDecoder().getWindowSize(request.getDocumentElement());
+		Integer windowSize = new SyncDecoder(null).getWindowSize(request.getDocumentElement());
 
 		assertThat(windowSize).isEqualTo(150);
 	}
@@ -319,7 +319,7 @@ public class SyncDecoderTest {
 					"</Collections>" +
 				"</Sync>");
 		
-		SyncRequest syncRequest = new SyncDecoder().decodeSync(request);
+		SyncRequest syncRequest = new SyncDecoder(null).decodeSync(request);
 
 		assertThat(syncRequest.getCollections()).isEmpty();
 	}
@@ -334,7 +334,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getSyncKey()).isEqualTo(new SyncKey("ddcf2e35-9834-49de-96ff-09979c7e2aa0"));
 		assertThat(collection.getId()).isEqualTo(2);
@@ -351,7 +351,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		new SyncDecoder().getCollection(request.getDocumentElement());
+		new SyncDecoder(null).getCollection(request.getDocumentElement());
 	}
 
 	@Test(expected=ASRequestIntegerFieldException.class)
@@ -363,7 +363,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		new SyncDecoder().getCollection(request.getDocumentElement());
+		new SyncDecoder(null).getCollection(request.getDocumentElement());
 	}
 
 	@Test
@@ -375,7 +375,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getDataClass()).isNull();
 	}
@@ -389,7 +389,7 @@ public class SyncDecoderTest {
 					"<Class>Email</Class>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getWindowSize()).isNull();
 	}
@@ -402,7 +402,7 @@ public class SyncDecoderTest {
 					"<CollectionId>2</CollectionId>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions()).isNull();
 		assertThat(collection.hasOptions()).isFalse();
@@ -432,7 +432,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getFilterType()).isEqualTo(FilterType.ONE_MONTHS_BACK);
 		assertThat(collection.getOptions().getConflict()).isEqualTo(1);
@@ -461,7 +461,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getFilterType()).isNull();
 	}
@@ -484,7 +484,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getConflict()).isNull();
 	}
@@ -507,7 +507,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getMimeTruncation()).isNull();
 	}
@@ -530,7 +530,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getMimeSupport()).isNull();
 	}
@@ -549,7 +549,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request.getDocumentElement());
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getBodyPreferences()).isEmpty();
 	}
@@ -587,7 +587,7 @@ public class SyncDecoderTest {
 					"</Commands>" +
 				"</Collection>").getDocumentElement();
 		
-		SyncRequestCollection collection = new SyncDecoder().getCollection(request);
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request);
 		
 		Element addElement = DOMUtils.getUniqueElement(request, "Add");
 		Element addDataElement = DOMUtils.getUniqueElement(addElement, "ApplicationData");
@@ -616,7 +616,7 @@ public class SyncDecoderTest {
 							"</ApplicationData>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getServerId()).isNull();
 	}
@@ -633,7 +633,7 @@ public class SyncDecoderTest {
 							"</ApplicationData>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getClientId()).isNull();
 	}
@@ -646,7 +646,7 @@ public class SyncDecoderTest {
 							"<ClientId>120</ClientId>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder().getCommand(request.getDocumentElement());
+		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getApplicationData()).isNull();
 	}

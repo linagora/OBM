@@ -29,64 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.protocol.data;
 
-import java.util.Map;
+public enum SyncResponseFields implements ActiveSyncFields {
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-
-public enum PIMDataType implements DBEnum {
-
-	UNKNOWN("Unknown", "unknown"),
-	EMAIL("Email", "email"), 
-	CALENDAR("Calendar", "calendar"),
-	CONTACTS("Contacts", "contacts"),
-	TASKS("Tasks", "tasks");
-
-	private static final String DB_FIELD_NAME = "pimdata_type";
+	COLLECTION("Collection"),
+	COLLECTION_ID("CollectionId"),
+	SYNC_KEY("SyncKey"),
+	DATA_CLASS("Class"),
+	COMMANDS("Commands"),
+	SERVER_ID("ServerId"),
+	APPLICATION_DATA("ApplicationData"),
+	STATUS("Status"),
+	MORE_AVAILABLE("MoreAvailable"),
+	RESPONSES("Responses");
 	
-	private final String xmlValue;
-	private final String collectionPathValue;
-	
-	private PIMDataType(String xmlValue, String collectionPathValue) {
-		this.xmlValue = xmlValue;
-		this.collectionPathValue = collectionPathValue;
-	}
-	
-	public String asXmlValue() {
-		return xmlValue;
-	}
-	
-	public String asCollectionPathValue() {
-		return collectionPathValue;
+	private final String name;
+
+	private SyncResponseFields(String name) {
+		this.name = name;
 	}
 
 	@Override
-	public String getDbFieldName() {
-		return DB_FIELD_NAME;
+	public String getName() {
+		return name;
 	}
-
-	@Override
-	public String getDbValue() {
-		return asCollectionPathValue().toUpperCase();
-	}
-
-    
-    public static PIMDataType fromSpecificationValue(String specificationValue) {
-    	if (specValueToEnum.containsKey(specificationValue)) {
-    		return specValueToEnum.get(specificationValue);
-    	}
-		return null;
-    }
-
-    private static Map<String, PIMDataType> specValueToEnum;
-    
-    static {
-    	Builder<String, PIMDataType> builder = ImmutableMap.builder();
-    	for (PIMDataType status : PIMDataType.values()) {
-    		builder.put(status.asXmlValue(), status);
-    	}
-    	specValueToEnum = builder.build();
-    }
+	
 }

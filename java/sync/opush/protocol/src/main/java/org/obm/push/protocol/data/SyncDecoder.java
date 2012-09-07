@@ -32,12 +32,21 @@
 package org.obm.push.protocol.data;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.PartialException;
@@ -47,22 +56,31 @@ import org.obm.push.protocol.bean.SyncRequest.Builder;
 import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class SyncDecoder extends ActiveSyncDecoder {
 
+	private final DecoderFactory decoderFactory;
+
 	@Inject
-	protected SyncDecoder() {}
+	protected SyncDecoder(DecoderFactory decoderFactory) {
+		this.decoderFactory = decoderFactory;
+	}
 
 	public SyncRequest decodeSync(Document doc) 
 			throws PartialException, ProtocolException, DaoException, CollectionPathException {
@@ -188,5 +206,159 @@ public class SyncDecoder extends ActiveSyncDecoder {
 			builder.allOrNone(allOrNone);
 		}
 		return builder.build();
+	}
+
+	public SyncResponse decodeSyncResponse(Document responseDocument) {
+		Element root = responseDocument.getDocumentElement();
+		
+		Map<String, String> processedClientIds = Maps.newHashMap();
+		List<SyncCollectionResponse> responseCollections = Lists.newArrayList();
+		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
+		for (int i = 0; i < collectionNodes.getLength(); i++) {
+			ProcessedSyncCollectionResponse collection = buildCollectionResponse((Element)collectionNodes.item(i));
+			responseCollections.add(collection.getSyncCollectionResponse());
+			processedClientIds.putAll(collection.getProcessedClientIds());
+		}
+		
+		return new SyncResponse(responseCollections, processedClientIds);
+	}
+
+	private ProcessedSyncCollectionResponse buildCollectionResponse(Element collectionEl) {
+		SyncCollection syncCollection = new SyncCollection();
+
+		syncCollection.setDataClass(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS));
+		syncCollection.setSyncKey(syncKey(uniqueStringFieldValue(collectionEl, SyncResponseFields.SYNC_KEY)));
+		syncCollection.setCollectionId(uniqueIntegerFieldValue(collectionEl, SyncResponseFields.COLLECTION_ID));
+		syncCollection.setStatus(getCollectionStatus(collectionEl));
+		syncCollection.setMoreAvailable(getMoreAvailable(collectionEl));
+		PIMDataType dataType = recognizePimDataType(syncCollection.getDataClass());
+		syncCollection.setDataType(dataType);
+		
+		Map<String, String> processedClientIds = appendResponsesAndGetProcessedIds(syncCollection, collectionEl);
+		appendCommands(syncCollection, collectionEl);
+		
+		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
+		syncCollectionResponse.setNewSyncKey(syncCollection.getSyncKey());
+		syncCollectionResponse.setCollectionValidity(true);
+		syncCollectionResponse.setItemChanges(identifyChanges(syncCollection.getChanges()));
+		syncCollectionResponse.setItemChangesDeletion(identifyDeletions(syncCollection.getChanges()));
+		
+		return new ProcessedSyncCollectionResponse(syncCollectionResponse, processedClientIds);
+	}
+	
+	private PIMDataType recognizePimDataType(String dataClass) {
+		return PIMDataType.fromSpecificationValue(dataClass);
+	}
+
+	private SyncStatus getCollectionStatus(Element collectionEl) {
+		String status = uniqueStringFieldValue(collectionEl, SyncResponseFields.STATUS);
+		if (!Strings.isNullOrEmpty(status)) {
+			return SyncStatus.fromSpecificationValue(status);
+		}
+		return null;
+	}
+
+	private boolean getMoreAvailable(Element collectionEl) {
+		Boolean moreAvailable = uniqueBooleanFieldValue(collectionEl, SyncResponseFields.MORE_AVAILABLE);
+		return Objects.firstNonNull(moreAvailable, false);
+	}
+
+	private Map<String, String> appendResponsesAndGetProcessedIds(SyncCollection syncCollection, Element collectionEl) {
+		Element responsesEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.RESPONSES.getName());
+		if (responsesEl == null) {
+			return ImmutableMap.of();
+		}
+
+		List<String> fetchIds = Lists.newArrayList();
+		Map<String, String> processedClientIds = Maps.newHashMap();
+		NodeList collectionNodes = responsesEl.getChildNodes();
+		for (int i = 0; i < collectionNodes.getLength(); i++) {
+			SyncCollectionChange change = buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType());
+			syncCollection.addChange(change);
+			if (change.getModType().equals("Fetch")) {
+				fetchIds.add(change.getServerId());
+			}
+			processedClientIds.put(change.getServerId(), change.getClientId());
+		}
+		syncCollection.setFetchIds(fetchIds);
+		return processedClientIds;
+	}
+
+	private void appendCommands(SyncCollection syncCollection, Element collectionEl) {
+		Element commandsEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.COMMANDS.getName());
+		if (commandsEl == null) {
+			return;
+		}
+		
+		NodeList collectionNodes = commandsEl.getChildNodes();
+		for (int i = 0; i < collectionNodes.getLength(); i++) {
+			syncCollection.addChange(buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType()));
+		}
+	}
+
+	private SyncCollectionChange buildChangeFromCommandElement(Element commandElement, PIMDataType dataType) {
+		SyncRequestCollectionCommand command = getCommand(commandElement);
+
+		IApplicationData applicationData = getCommandApplicationData(command, dataType);
+		
+		SyncCollectionChange change = new SyncCollectionChange(
+				command.getServerId(), command.getClientId(), command.getName(), applicationData, dataType);
+		return change;
+	}
+
+	private IApplicationData getCommandApplicationData(SyncRequestCollectionCommand command, PIMDataType dataType) {
+		if (dataType != null && command.getApplicationData() != null) {
+			return decoderFactory.decode(command.getApplicationData(), dataType);
+		}
+		return null;
+	}
+
+	private List<ItemChange> identifyChanges(Set<SyncCollectionChange> changes) {
+		List<ItemChange> itemChanges = Lists.newArrayList();
+		for (SyncCollectionChange change : changes) {
+			if (!change.getModType().equalsIgnoreCase("Delete")) {
+				ItemChange itemChange = new ItemChange(change.getServerId());
+				itemChange.setNew(isNewChange(change));
+				itemChange.setData(change.getData());
+				itemChanges.add(itemChange);
+			}
+		}
+		return itemChanges;
+	}
+
+	private boolean isNewChange(SyncCollectionChange change) {
+		return change.getModType().equalsIgnoreCase("Add");
+	}
+
+	private List<ItemDeletion> identifyDeletions(Set<SyncCollectionChange> changes) {
+		List<ItemDeletion> deletions = Lists.newArrayList();
+		for (SyncCollectionChange change : changes) {
+			if (change.getModType().equalsIgnoreCase("Delete")) {
+				deletions.add(ItemDeletion.builder().serverId(change.getServerId()).build());
+			}
+		}
+		return deletions;
+	}
+	
+	private static class ProcessedSyncCollectionResponse {
+		
+		private final SyncCollectionResponse syncCollectionResponse;
+		private final Map<String, String> processedClientIds;
+
+		public ProcessedSyncCollectionResponse(
+				SyncCollectionResponse syncCollectionResponse,
+				Map<String, String> processedClientIds) {
+			
+			this.syncCollectionResponse = syncCollectionResponse;
+			this.processedClientIds = processedClientIds;
+		}
+
+		public SyncCollectionResponse getSyncCollectionResponse() {
+			return syncCollectionResponse;
+		}
+
+		public Map<String, String> getProcessedClientIds() {
+			return processedClientIds;
+		}
 	}
 }

@@ -40,11 +40,15 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,7 +83,9 @@ import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.ContactDecoder;
+import org.obm.push.protocol.data.ContactEncoder;
 import org.obm.push.protocol.data.DecoderFactory;
+import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.data.MSEmailMetadataDecoder;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
@@ -87,6 +93,7 @@ import org.obm.push.protocol.data.SyncEncoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.xml.AcceptDifferentNamespaceXMLUnit;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
@@ -116,7 +123,7 @@ public class SyncProtocolTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 		user = Factory.create().createUser(mailbox, mailbox, "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), new BigDecimal("12.1"));
 		credentials = new Credentials(user, password);
 		udr = new UserDataRequest(credentials, "noCommand", device);
 	}
@@ -1341,6 +1348,195 @@ public class SyncProtocolTest {
 		assertThat(request).isEqualTo(DOMUtils.serialize(encodedRequest));
 	}
 
+	@Test
+	public void testDecodeAddResponse() throws Exception {
+		String response = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<Class>Contacts</Class>" +
+							"<SyncKey>a8480e22-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+							"<CollectionId>55</CollectionId>" +
+							"<Status>1</Status>" +
+							"<Responses>" +
+								"<Add>" +
+									"<ClientId>1337</ClientId>" +
+									"<ServerId>55:8</ServerId>" +
+									"<Status>1</Status>" +
+								"</Add>" +
+							"</Responses>" +
+						"</Collection>" +	
+						"<Collection>" +
+							"<Class>Contacts</Class>" +
+							"<SyncKey>b9061a11-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+							"<CollectionId>58</CollectionId>" +
+							"<Status>1</Status>" +
+							"<Responses>" +
+								"<Add>" +
+									"<ClientId>1339</ClientId>" +
+									"<ServerId>58:12</ServerId>" +
+									"<Status>1</Status>" +
+								"</Add>" +
+							"</Responses>" +
+						"</Collection>" +	
+					"</Collections>" +
+				"</Sync>";
+
+		SyncProtocol syncProtocol = newSyncProtocol(null, null, null);
+		SyncResponse decodedSyncResponse = syncProtocol.decodeResponse(DOMUtils.parse(response));
+		Document encodedResponse = syncProtocol.encodeResponse(decodedSyncResponse);
+		
+		assertThat(DOMUtils.serialize(encodedResponse)).isEqualTo(response);
+	}
+
+	@Test
+	public void testDecodeFetchResponse() throws Exception {
+		String response = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+				"<Collections>" +
+					"<Collection>" +
+						"<Class>Contacts</Class>" +
+						"<SyncKey>a8480e22-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+						"<CollectionId>55</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Responses>" +
+							"<Fetch>" +
+								"<ServerId>55:3</ServerId>" +
+								"<Status>1</Status>" +
+								"<ApplicationData>" +
+									"<FileAs>name0 lastname</FileAs>" +
+									"<FirstName>name0</FirstName>" +
+									"<LastName>lastname</LastName>" +
+									"<Email1Address>name0.lastname@thilaire.lng.org</Email1Address>" +
+									"<Body>" +
+										"<Type>1</Type>" +
+										"<EstimatedDataSize>0</EstimatedDataSize>" +
+									"</Body>" +
+									"<NativeBodyType>3</NativeBodyType>" +
+								"</ApplicationData>" +
+							"</Fetch>" +
+						"</Responses>" +
+					"</Collection>" +	
+					"<Collection>" +
+						"<Class>Contacts</Class>" +
+						"<SyncKey>b9061a11-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+						"<CollectionId>58</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Responses>" +
+							"<Fetch>" +
+								"<ServerId>58:10</ServerId>" +
+								"<Status>1</Status>" +
+								"<ApplicationData>" +
+									"<FileAs>name lastname</FileAs>" +
+									"<FirstName>name</FirstName>" +
+									"<LastName>lastname</LastName>" +
+									"<Email1Address>name.lastname@thilaire.lng.org</Email1Address>" +
+									"<Body>" +
+										"<Type>1</Type>" +
+										"<EstimatedDataSize>0</EstimatedDataSize>" +
+									"</Body>" +
+									"<NativeBodyType>3</NativeBodyType>" +
+								"</ApplicationData>" +
+							"</Fetch>" +
+						"</Responses>" +
+					"</Collection>" +	
+				"</Collections>" +
+			"</Sync>";
+
+		SyncProtocol syncProtocol = newSyncProtocol(null, null, null);
+		Document inputResponse = DOMUtils.parse(response);
+		SyncResponse decodedSyncResponse = syncProtocol.decodeResponse(inputResponse);
+		Document encodedResponse = syncProtocol.encodeResponse(decodedSyncResponse);
+
+		Diff compareXML = XMLUnit.compareXML(inputResponse, encodedResponse);
+		compareXML.overrideElementQualifier(AcceptDifferentNamespaceXMLUnit.newElementQualifier());
+		compareXML.overrideDifferenceListener(AcceptDifferentNamespaceXMLUnit.newDifferenceListener());
+		XMLAssert.assertXMLEqual(compareXML, true);
+	}
+
+	@Test
+	public void testDecodeComplexeResponse() throws Exception {
+		String response = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<Sync>" +
+				"<Collections>" +
+					"<Collection>" +
+						"<Class>Contacts</Class>" +
+						"<SyncKey>a8480e22-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+						"<CollectionId>55</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Responses>" +
+							"<Add>" +
+								"<ClientId>1337</ClientId>" +
+								"<ServerId>55:8</ServerId>" +
+								"<Status>1</Status>" +
+							"</Add>" +
+						"</Responses>" +
+					"</Collection>" +
+					"<Collection>" +
+						"<Class>Contacts</Class>" +
+						"<SyncKey>a1f2f8z9-1072-40eb-b4d9-da486b4c245b</SyncKey>" +
+						"<CollectionId>56</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Responses>" +
+							"<Fetch>" +
+								"<ServerId>56:16</ServerId>" +
+								"<Status>1</Status>" +
+								"<ApplicationData>" +
+									"<FileAs>name2 lastname</FileAs>" +
+									"<FirstName>name2</FirstName>" +
+									"<LastName>lastname</LastName>" +
+									"<Email1Address>name2.lastname@thilaire.lng.org</Email1Address>" +
+									"<Body>" +
+										"<Type>1</Type>" +
+										"<EstimatedDataSize>0</EstimatedDataSize>" +
+									"</Body>" +
+									"<NativeBodyType>3</NativeBodyType>" +
+								"</ApplicationData>" +
+							"</Fetch>" +
+						"</Responses>" +
+					"</Collection>" +	
+					"<Collection>" +
+						"<Class>Contacts</Class>" +
+						"<SyncKey>adfbf3a5-840e-4215-b0de-783da605d760</SyncKey>" +
+						"<CollectionId>65</CollectionId>" +
+						"<Status>1</Status>" +
+						"<Commands>" +
+							"<Add>" +
+								"<ServerId>65:3</ServerId>" +
+								"<ApplicationData>" +
+									"<FileAs>name lastname</FileAs>" +
+									"<FirstName>name</FirstName>" +
+									"<LastName>lastname</LastName>" +
+									"<Email1Address>name.lastname@thilaire.lng.org</Email1Address>" +
+									"<Body>" +
+										"<Type>1</Type>" +
+										"<EstimatedDataSize>0</EstimatedDataSize>" +
+									"</Body>" +
+									"<NativeBodyType>3</NativeBodyType>" +
+								"</ApplicationData>" +
+							"</Add>" +
+							"<Delete>" +
+								"<ServerId>65:2</ServerId>" +
+							"</Delete>" +
+						"</Commands>" +
+					"</Collection>" +
+				"</Collections>" +
+			"</Sync>";
+
+		SyncProtocol syncProtocol = newSyncProtocol(null, null, null);
+		Document inputResponse = DOMUtils.parse(response);
+		SyncResponse decodedSyncResponse = syncProtocol.decodeResponse(inputResponse);
+		Document encodedResponse = syncProtocol.encodeResponse(decodedSyncResponse);
+
+		Diff compareXML = XMLUnit.compareXML(inputResponse, encodedResponse);
+		compareXML.overrideElementQualifier(AcceptDifferentNamespaceXMLUnit.newElementQualifier());
+		compareXML.overrideDifferenceListener(AcceptDifferentNamespaceXMLUnit.newDifferenceListener());
+		XMLAssert.assertXMLEqual(compareXML, true);
+	}
+
 	private BodyPreference bodyPreference(Integer bodyType, Integer truncationSize, Boolean allOrNone) {
 		return BodyPreference.builder()
 			.bodyType(MSEmailBodyType.getValueOf(bodyType))
@@ -1357,8 +1553,9 @@ public class SyncProtocolTest {
 			CollectionPathHelper collectionPathHelper) {
 		SyncDecoder syncDecoder = new SyncDecoderTest();
 		SyncEncoder syncEncoder = new SyncEncoderTest();
+		EncoderFactory encoderFactory = new EncoderFactoryTest();
 		SyncAnalyser syncAnalyser = new SyncAnalyserTest(syncedCollectionDao, collectionDao, collectionPathHelper);
-		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder, null, udr);
+		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder, encoderFactory, udr);
 	}
 
 	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {
@@ -1464,7 +1661,12 @@ public class SyncProtocolTest {
 		return "obm:\\\\" + user.getLoginAtDomain() + "\\" + pimDataType.asCollectionPathValue() + "\\" + collectionId;
 	}
 	
-	static class SyncDecoderTest extends SyncDecoder {}
+	static class SyncDecoderTest extends SyncDecoder {
+
+		protected SyncDecoderTest() {
+			super(new DecoderFactoryTest());
+		}
+	}
 	
 	static class SyncEncoderTest extends SyncEncoder {}
 	
@@ -1474,23 +1676,42 @@ public class SyncProtocolTest {
 				SyncedCollectionDao syncedCollectionStoreService,
 				CollectionDao collectionDao,
 				CollectionPathHelper collectionPathHelper) {
-			super(syncedCollectionStoreService, collectionDao, collectionPathHelper,
-					new DecoderFactory(
-							null, new Provider<ContactDecoder>() {
-								@Override
-								public ContactDecoder get() {
-									return new ContactDecoder(null, null);
-								}
-							},
-							null, new Provider<MSEmailMetadataDecoder>() {
-								@Override
-								public MSEmailMetadataDecoder get() {
-									return new MSEmailMetadataDecoder(null, null);
-								}
-							}) {}
-				);
-			}
+			super(syncedCollectionStoreService, collectionDao, collectionPathHelper, new DecoderFactoryTest());
+		}
 
 	}
 	
+	static class DecoderFactoryTest extends DecoderFactory {
+
+		protected DecoderFactoryTest() {
+			super(null,
+					new Provider<ContactDecoder>() {
+						@Override
+						public ContactDecoder get() {
+							return new ContactDecoder(null, null);
+						}
+					},
+					null,
+					new Provider<MSEmailMetadataDecoder>() {
+						@Override
+						public MSEmailMetadataDecoder get() {
+							return new MSEmailMetadataDecoder(null, null);
+						}
+					});
+		}
+	}
+	
+	static class EncoderFactoryTest extends EncoderFactory {
+
+		protected EncoderFactoryTest() {
+			super(null,
+					new Provider<ContactEncoder>() {
+						@Override
+						public ContactEncoder get() {
+							return new ContactEncoder(){};
+						}
+					},
+					null, null, null);
+		}
+	}
 }

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -133,6 +132,10 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 			for (SyncCollectionResponse collectionResponse: syncResponse.getCollectionResponses()) {
 
 				final Element ce = DOMUtils.createElement(cols, "Collection");
+				if (collectionResponse.getSyncCollection().getDataClass() != null) {
+					DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
+				}
+				
 				SyncStatus status = collectionResponse.getSyncCollection().getStatus();
 				if (!collectionResponse.collectionValidity()) {
 					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
@@ -308,7 +311,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 
 	@Override
 	public SyncResponse decodeResponse(Document responseDocument) throws ProtocolException {
-		throw new NotImplementedException();
+		return syncDecoder.decodeSyncResponse(responseDocument);
 	}
 	
 }
