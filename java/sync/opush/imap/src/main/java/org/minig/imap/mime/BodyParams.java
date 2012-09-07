@@ -33,6 +33,7 @@ package org.minig.imap.mime;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
@@ -67,6 +68,13 @@ public class BodyParams implements Iterable<BodyParam> {
 			return this;
 		}
 
+		public Builder bodyParams(Map<String, String> bodyParams) {
+			for (Entry<String, String> param: bodyParams.entrySet()) {
+				add(new BodyParam(param.getKey(), param.getValue()));
+			}
+			return this;
+		}
+		
 		public Builder addBodyParam(String contentType) {
 			// multipart/mixed;boundary="----=_Part_0_1330682067197"
 			Iterator<String> itr = Splitter.on(";").split(contentType).iterator();

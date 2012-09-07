@@ -50,8 +50,8 @@ import com.google.common.collect.ImmutableMap;
 @RunWith(SlowFilterRunner.class)
 public class BodyStructureParserTest {
 
-	private IMimePart parseStringAsBodyStructure(String bs) {
-		return new BodyStructureParser().parseBodyStructure(bs);
+	private MimeMessage parseStringAsBodyStructure(String bs) {
+		return new BodyStructureParser().parseBodyStructure(bs).build();
 	}
 	
 	@Test

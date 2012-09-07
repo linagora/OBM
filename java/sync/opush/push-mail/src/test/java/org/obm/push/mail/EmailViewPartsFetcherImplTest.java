@@ -476,9 +476,8 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(shouldGetEmptyAttachmentListViewBuilder)
 			.once();
 		
-		IMimePart multipartLeaf = new MimePart();
+		IMimePart multipartLeaf = MimePart.builder().contentType(contentType).build();
 		int multipartLeafIndex = 5;
-		multipartLeaf.setContentType(ContentType.builder().contentType(contentType).build());
 
 		IMimePart parentMimePart = createMock(IMimePart.class);
 		expect(parentMimePart.findRootMimePartInTree()).andReturn(parentMimePart);

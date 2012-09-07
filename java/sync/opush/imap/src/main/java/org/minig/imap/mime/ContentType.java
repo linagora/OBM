@@ -48,6 +48,7 @@ public class ContentType {
 		private String primaryType = null;
 		private String subType = null;
 		private BodyParams.Builder bodyParamsBuilder;
+		private String contentDisposition;
 		
 		private Builder() {
 			bodyParamsBuilder = BodyParams.builder();
@@ -63,7 +64,12 @@ public class ContentType {
 			return this;
 		}
 		
-		public Builder addBodyParams(Collection<BodyParam> bodyParams) {
+		public Builder add(BodyParams bodyParams) {
+			bodyParamsBuilder.addAll(bodyParams);
+			return this;
+		}
+		
+		public Builder add(Collection<BodyParam> bodyParams) {
 			bodyParamsBuilder.addAll(bodyParams);
 			return this;
 		}
@@ -71,6 +77,11 @@ public class ContentType {
 		public Builder contentType(String contentType) {
 			setPrimayTypeAndSubType(contentType);
 			addBodyParams(contentType);
+			return this;
+		}
+		
+		public Builder contentDisposition(String contentDisposition) {
+			this.contentDisposition = contentDisposition;
 			return this;
 		}
 
@@ -104,6 +115,13 @@ public class ContentType {
 		}
 
 		private ContentDisposition buildContentDisposition(BodyParams params) {
+			if (contentDisposition != null) {
+				ContentDisposition parsedValue = ContentDisposition.fromString(contentDisposition);
+				if (parsedValue != ContentDisposition.UNKNOWN) {
+					return parsedValue;
+				}
+			}
+			
 			BodyParam contentDispositionParam = params.get("content-disposition");
 			if (contentDispositionParam != null) {
 				ContentDisposition parsedValue = ContentDisposition.fromString(contentDispositionParam.getValue());
@@ -111,8 +129,10 @@ public class ContentType {
 					return parsedValue;
 				}
 			}
+			
 			return ContentDisposition.INLINE;
 		}
+
 	}
 
 	private final String primaryType;

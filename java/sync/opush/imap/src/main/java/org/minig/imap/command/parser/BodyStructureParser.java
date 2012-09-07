@@ -35,14 +35,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
 import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.BodyParams;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
+import org.minig.imap.mime.MimePart.Builder;
 import org.minig.imap.mime.impl.BodyParamParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -52,8 +51,6 @@ import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParsingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 public class BodyStructureParser {
 
@@ -85,41 +82,27 @@ public class BodyStructureParser {
 			return nstringNoStack();
 		}
 
-		boolean addMimePart() {
-			IMimePart obj = (IMimePart) pop();
-			IMimePart mimeParent = (IMimePart) peek();
-			mimeParent.addPart(obj);
-			return true;
-		}
-				
 		Rule body() {
 			return Sequence('(', FirstOf(bodyType1part(), bodyTypeMPart()), ')');
 		}
 
-		boolean pushBodyParams() {
-			swap();
-			pop();
-			BodyParams.Builder bodyParams = (BodyParams.Builder)pop();
-			List<Object> list = (List<Object>)peek();
-			list.add(bodyParams);
-			return true;
-		}
-		
 		Rule bodyExt1Part() {
-			return Sequence(bodyFldMd5(), drop() && push(Lists.newArrayList()),
-					Optional(whitespaces(), bodyFldDsp(), pushBodyParams(),
+			return Sequence(
+						bodyFldMd5(),
+						Optional(whitespaces(), bodyFldDsp(),
 							Optional(whitespaces(), bodyFldLang(),
 									Optional(whitespaces(), bodyFldLoc(),
 											ZeroOrMore(whitespaces(), bodyExtension())))));
 		}
 		
 		Rule bodyExtension() {
-			return FirstOf(nstring(), drop(), number(), drop(), Sequence('(', bodyExtension(), ZeroOrMore(whitespaces(), bodyExtension()), ')'));
+			return FirstOf(nstringNoStack(), numberNoStack(), Sequence('(', bodyExtension(), ZeroOrMore(whitespaces(), bodyExtension()), ')'));
 		}
 
 		Rule bodyExtMPart() {
-			return Sequence(bodyFldParam(), push(Lists.newArrayList(pop())),
-					Optional(whitespaces(), bodyFldDsp(), drop() && drop(),
+			return Sequence(
+						bodyFldParam(),
+						Optional(whitespaces(), bodyFldDsp(),
 							Optional(whitespaces(), bodyFldLang(), 
 									Optional(whitespaces(), bodyFldLoc(),
 											ZeroOrMore(whitespaces(), bodyExtension())))));
@@ -131,155 +114,98 @@ public class BodyStructureParser {
 		}
 
 		Rule bodyFldDesc() {
-			return Sequence(nstring(), drop());
+			return nstringNoStack();
 		}
 
 		Rule bodyFldDsp() {
-			return FirstOf(Sequence('(', string(), whitespaces(), bodyFldParam(), ')'), 
-					Sequence(nil(), push(null)));
+			
+			return FirstOf
+					(Sequence('(', string(), recordContentDisposition(), whitespaces(), bodyFldParam(), ')'), 
+					nilNoStack());
 		}
 
 		Rule bodyFldEnc() {
-			return FirstOf(
-					Sequence('"', 
-							FirstOf("7BIT", "8BIT", "BINARY", "BASE64", "QUOTED-PRINTABLE"), push(match()), 
-							'"'),
-					string());
+			return Sequence(
+					FirstOf(
+						Sequence('"', 
+								FirstOf("7BIT", "8BIT", "BINARY", "BASE64", "QUOTED-PRINTABLE"), push(match()), 
+								'"'),
+						string()),
+					recordEncoding());
 		}
 
 		Rule bodyFldId() {
-			return nstring();
+			return Sequence(nstring(), recordId());
 		}
 
 		Rule bodyFldLang() {
-			return FirstOf(Sequence(nstring(), drop()), Sequence('(', string(), drop(), ZeroOrMore(whitespaces(), string(), drop()), ')'));
+			return FirstOf(nstringNoStack(), Sequence('(', stringNoStack(), ZeroOrMore(whitespaces(), stringNoStack()), ')'));
 		}
 
 		Rule bodyFldLines() {
-			return Sequence(number(), drop());
+			return numberNoStack();
 		}
 
 		Rule bodyFldLoc() {
-			return Sequence(nstring(), drop());
+			return nstringNoStack();
 		}
 
 		Rule bodyFldMd5() {
-			return nstring();
+			return nstringNoStack();
 		}
 
 		Rule bodyFldOctets() {
-			return number();
+			return Sequence(number(), recordSize());
 		}
 
-		boolean addBodyParam() {
-			swap();
-			BodyParam bodyParam = BodyParamParser.parse((String)pop(), (String)pop());
-			BodyParams.Builder bodyParams = (BodyParams.Builder)peek();
-			bodyParams.add(bodyParam);
-			return true;
-		}
-		
 		Rule bodyFldParam() {
 
-			return FirstOf(
-					Sequence(
-							push(BodyParams.builder()),
-							'(', 
-							string(),
-							whitespaces(),
-							string(),
-							addBodyParam(),
-							ZeroOrMore(
-									whitespaces(), string(), whitespaces(), string(), 
-									addBodyParam()), 
-					')'),
-					Sequence(nil(), drop() && push(BodyParams.builder())));
+			return Sequence(
+					push(BodyParams.builder()),
+					FirstOf(
+						Sequence(
+								'(', 
+								string(),
+								whitespaces(),
+								string(),
+								addBodyParam(),
+								ZeroOrMore(
+										whitespaces(), string(), whitespaces(), string(), 
+										addBodyParam()), 
+						')'),
+						nilNoStack()),
+					recordBodyParams());
 		}
 
 		Rule bodyType1part() {
 			//be careful, bodyTypeBasic is an incompatible superset of bodyTypeText
 			//so rules must be kept in this order
-			return Sequence(FirstOf(bodyTypeText(), bodyTypeMsg(), bodyTypeBasic()),
-					Optional(whitespaces(), bodyExt1Part(), mergeBodyParams()),
-					addMimePart());
-		}
-
-		boolean mergeBodyParams() {
-			List<Object> extParts = (List<Object>)pop();
-			BodyParams.Builder extBodyParams = (BodyParams.Builder)extParts.get(0);
-			IMimePart mt = (IMimePart) peek();
-
-			if (extBodyParams != null) {
-				BodyParams.Builder newParams = BodyParams.builder();
-				BodyParams bodyParams = mt.getBodyParams();
-				if (bodyParams != null) {
-					newParams.addAll(bodyParams);
-				}
-				newParams.addAll(extBodyParams.build());
-				mt.setBodyParams(newParams.build());
-			}
-			return true;
+			return Sequence( 
+						FirstOf(bodyTypeText(), bodyTypeMsg(), bodyTypeBasic()),
+						Optional(whitespaces(), bodyExt1Part()),
+						addMimePart());
 		}
 
 		Rule bodyTypeBasic() {
-			return Sequence(mediaBasic(), whitespaces(), bodyFields(), createMimePart());
+			return Sequence(push(MimePart.builder()), mediaBasic(), whitespaces(), bodyFields());
 		}
 
 		Rule bodyTypeMPart() {
-			return Sequence(push(new MimePart()), OneOrMore(body()), 
-							whitespaces(), push("multipart"), mediaSubType(), 
-							createMimeType(), setMimeType(),
-					Optional(whitespaces(), bodyExtMPart(), mergeBodyParams()),
-					addMimePart());
+			return Sequence(
+						push(MimePart.builder().primaryMimeType("multipart")), 
+						OneOrMore(body()), 
+						whitespaces(), mediaSubType(), recordMimeSubtype(), 
+						Optional(whitespaces(), bodyExtMPart()),
+						addMimePart());
 		}
 
-		boolean setMimeType() {
-			ContentType mimetype = (ContentType) pop();
-			IMimePart mimePart = (IMimePart) peek();
-			mimePart.setContentType(mimetype);
-			return true;
-		}
-		
 		Rule bodyTypeMsg() {
-			return Sequence(mediaMessage(), whitespaces(), bodyFields(), whitespaces(), envelope(), 
-					createMimePart(),
-					whitespaces(), body(), whitespaces(), bodyFldLines(), mergeMultipartWithMessage());
-		}
-		
-		boolean mergeMultipartWithMessage() {
-			MimePart message = (MimePart) peek();
-			IMimePart child = message.getChildren().get(0);
-			if (child.isMultipart()) {
-				BodyParams params = BodyParams.builder()
-					.addAll(message.getBodyParams())
-					.addAll(child.getBodyParams())
-					.build();
-				message.setBodyParams(params);
-				message.setChildren(child.getChildren());
-				message.setMultipartSubtype(child.getSubtype());
-			}
-			return true;
+			return Sequence(push(MimePart.embeddedMessageBuilder()), mediaMessage(), whitespaces(), bodyFields(), whitespaces(), envelope(), 
+					whitespaces(), body(), whitespaces(), bodyFldLines());
 		}
 		
 		Rule bodyTypeText() {
-			return Sequence(mediaText(), whitespaces(), bodyFields(), whitespaces(), bodyFldLines(),
-					createMimePart());
-		}
-
-		boolean createMimePart() {
-			int size = (Integer)pop();
-			String contentTransfertEncoding = (String)pop();
-			String bodyId = (String)pop();
-			BodyParams.Builder bodyParams = (BodyParams.Builder) pop();
-			ContentType mimeType = (ContentType) pop();
-			MimePart mimePart = new MimePart();
-			mimePart.setContentType(mimeType);
-			mimePart.setBodyParams(bodyParams.build());
-			mimePart.setContentId(bodyId);
-			mimePart.setContentTransfertEncoding(contentTransfertEncoding);
-			mimePart.setSize(size);
-			push(mimePart);
-			return true;
+			return Sequence(push(MimePart.builder()), mediaText(), whitespaces(), bodyFields(), whitespaces(), bodyFldLines());
 		}
 
 		Rule envBcc() {
@@ -340,25 +266,19 @@ public class BodyStructureParser {
 		}
 
 		Rule mediaBasic() {
-			return Sequence(FirstOf(
-						Sequence('"', FirstOf("APPLICATION", "AUDIO", "IMAGE", "MESSAGE", "VIDEO"), push(match()), '"'),
-						string()),
-					whitespaces(),
-					mediaSubType(),
-					createMimeType()
+			return Sequence(
+						FirstOf(
+							Sequence('"', FirstOf("APPLICATION", "AUDIO", "IMAGE", "MESSAGE", "VIDEO"), push(match()), '"'),
+							string()),
+						recordMimeType(),
+						whitespaces(),
+						mediaSubType(),
+						recordMimeSubtype()
 					);
-		}
-
-		boolean createMimeType() {
-			swap();
-			push(
-					ContentType.builder().primaryType((String) pop()).subType((String) pop()).build());
-			return true;
 		}
 		
 		Rule mediaMessage() {
-			ContentType.Builder builder = ContentType.builder().primaryType("MESSAGE").subType("RFC822");
-			return Sequence("\"MESSAGE\"", whitespaces(), "\"RFC822\"", push(builder.build()));
+			return Sequence("\"MESSAGE\"", whitespaces(), "\"RFC822\"", recordMessageRfc822());
 		}
 
 		Rule mediaSubType() {
@@ -366,40 +286,108 @@ public class BodyStructureParser {
 		}
 
 		Rule mediaText() {
-			return Sequence("\"TEXT\"", whitespaces(), mediaSubType(), 
-					push(ContentType.builder().primaryType("TEXT").subType((String) pop()).build()));
+			return Sequence("\"TEXT\"", whitespaces(), mediaSubType(), recordTextMimeType());
 		}
 
 		public Rule rule() {
-			return Sequence(push(new MimePart()), body(), EOI, takeFirstMimePart());
+			return Sequence(push(MimeMessage.builder()), body(), EOI);
+		}
+		
+		boolean addBodyParam() {
+			swap();
+			BodyParam bodyParam = BodyParamParser.parse((String)pop(), (String)pop());
+			BodyParams.Builder bodyParams = (BodyParams.Builder)peek();
+			bodyParams.add(bodyParam);
+			return true;
+		}
+		
+		boolean addMimePart() {
+			MimePart.Builder obj = (MimePart.Builder) pop();
+			IMimePart.Builder<?> mimeParent = (IMimePart.Builder<?>) peek();
+			mimeParent.addChild(obj.build());
+			return true;
+		}
+				
+		boolean recordContentDisposition() {
+			String contentDisposition = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.contentDisposition(contentDisposition);
+			return true;
+		}
+		
+		boolean recordEncoding() {
+			String encoding = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.encoding(encoding);
+			return true;
 		}
 
-		boolean takeFirstMimePart() {
-			IMimePart tree = (IMimePart) pop();
-			IMimePart mimePart = tree.getChildren().get(0);
-			mimePart.defineParent(null, 0);
-			push(mimePart);
+		
+		boolean recordId() {
+			String contentId = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.contentId(contentId);
+			return true;
+		}
+
+		boolean recordBodyParams() {
+			BodyParams.Builder bodyParamsBuilder = (BodyParams.Builder)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.bodyParams(bodyParamsBuilder.build());
+			return true;
+		}
+
+		boolean recordMimeType() {
+			String primaryMimeType = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.primaryMimeType(primaryMimeType);
+			return true;
+		}
+
+		
+		boolean recordMimeSubtype() {
+			String mimeType = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.subMimeType(mimeType);
+			return true;
+		}
+
+		boolean recordTextMimeType() {
+			String subMimeType = (String) pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.primaryMimeType("TEXT").subMimeType(subMimeType);
+			return true;
+		}
+		
+		boolean recordMessageRfc822() {
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.primaryMimeType("MESSAGE").subMimeType("RFC822");
+			return true;
+		}
+		
+		boolean recordSize() {
+			Integer size = (Integer)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.size(size);
 			return true;
 		}
 	}
 	
 	private static final Rules parser = Parboiled.createParser(BodyStructureParser.Rules.class);
 	
-	public MimeMessage parseBodyStructureDebug(String payload) {
+	public org.minig.imap.mime.MimeMessage.Builder parseBodyStructureDebug(String payload) {
 		Rules parserInstance = parser.newInstance();
-		TracingParseRunner<IMimePart> runner = new TracingParseRunner<IMimePart>(parserInstance.rule());
+		TracingParseRunner<MimeMessage.Builder> runner = new TracingParseRunner<MimeMessage.Builder>(parserInstance.rule());
 		try {
-			ParsingResult<IMimePart> result = runner.run(payload);
-			IMimePart mimeContainer = result.resultValue;
-			MimeMessage mimeMessage = new MimeMessage(mimeContainer);
-			return mimeMessage;
+			ParsingResult<MimeMessage.Builder> result = runner.run(payload);
+			return result.resultValue;
 		} finally {
 			logToFile(runner);
 		}
 	}
 
 
-	private static void logToFile(TracingParseRunner<IMimePart> runner) {
+	private static void logToFile(TracingParseRunner<MimeMessage.Builder> runner) {
 		FileOutputStream fileOutputStream = null;
 		try {
 			fileOutputStream = new FileOutputStream("/tmp/log");
@@ -422,16 +410,14 @@ public class BodyStructureParser {
 	}
 
 	
-	public MimeMessage parseBodyStructure(String payload) {
+	public MimeMessage.Builder parseBodyStructure(String payload) {
 		Rules parserInstance = parser.newInstance();
-		RecoveringParseRunner<IMimePart> runner = 
+		RecoveringParseRunner<MimeMessage.Builder> runner = 
 			//new RecoveringParseRunner<MimeTree>(parserInstance.rule(), new DebugValueStack());
-			new RecoveringParseRunner<IMimePart>(parserInstance.rule());
+			new RecoveringParseRunner<MimeMessage.Builder>(parserInstance.rule());
 
-		ParsingResult<IMimePart> result = runner.run(payload);
-		IMimePart mimeContainer = result.resultValue;
-		MimeMessage mimeMessage = new MimeMessage(mimeContainer);
-		return mimeMessage;
+		ParsingResult<MimeMessage.Builder> result = runner.run(payload);
+		return result.resultValue;
 
 		//logger.info(ParseTreeUtils.printNodeTree(result));
 	}

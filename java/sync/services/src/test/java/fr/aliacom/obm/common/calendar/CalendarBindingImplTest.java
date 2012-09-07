@@ -1730,7 +1730,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testInheritsParticipationStateForSpecificAttendee() {
-		Attendee expectedAttendee = new Attendee.Builder()
+		Attendee expectedAttendee = Attendee.builder()
 			.email("attendee@test.lng")
 			.participationState(ParticipationState.NEEDSACTION)
 			.build();
@@ -1739,7 +1739,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 
-		Attendee attendee = new Attendee.Builder()
+		Attendee attendee = Attendee.builder()
 			.email("attendee@test.lng")
 			.participationState(ParticipationState.ACCEPTED)
 			.build();
@@ -1863,11 +1863,11 @@ public class CalendarBindingImplTest {
 
 	private List<Attendee> createOrganiserAndContactAttendees(ParticipationState contactState) {
 		return Arrays.asList(
-				new Attendee.Builder()
+				Attendee.builder()
 				.asOrganizer()
 				.participationState(ParticipationState.ACCEPTED)
 				.email("organiser@test.lng").build(),
-				new Attendee.Builder()
+				Attendee.builder()
 				.asContact()
 				.participationState(contactState)
 				.email("attendee@test.lng").build());

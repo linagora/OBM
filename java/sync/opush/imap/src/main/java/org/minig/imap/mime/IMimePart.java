@@ -38,8 +38,12 @@ import org.obm.push.mail.MimeAddress;
 
 public interface IMimePart {
 
-	void addPart(IMimePart child);
-
+	interface Builder<T extends IMimePart> {
+		
+		Builder<T> addChild(IMimePart mimePart);
+		
+	}
+	
 	String getPrimaryType();
 
 	String getSubtype();
@@ -74,17 +78,11 @@ public interface IMimePart {
 
 	boolean isCancelInvitation();
 
-	void setBodyParams(BodyParams bodyParams);
-
-	void setContentType(ContentType mimetype);
-
 	String getName();
 
 	boolean isMultipart();
 
 	String getMultipartSubtype();
-
-	void setMultipartSubtype(String subtype);
 
 	boolean isAttachment();
 
@@ -97,8 +95,6 @@ public interface IMimePart {
 	IMimePart findMainMessage(ContentType contentType);
 
 	Integer getSize();
-
-	void setSize(int size);
 
 	boolean hasMultiPartMixedParent();
 

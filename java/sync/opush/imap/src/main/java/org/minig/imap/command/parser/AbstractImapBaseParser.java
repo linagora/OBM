@@ -132,6 +132,10 @@ public class AbstractImapBaseParser extends BaseParser<Object> {
 	Rule number() {
 		return Sequence(OneOrMore(CharRange('0', '9')), push(match()), convertTopFromStringToInt());
 	}
+	
+	Rule numberNoStack() {
+		return Sequence(number(), drop());
+	}
 
 	boolean convertTopFromStringToInt() {
 		String s = (java.lang.String) pop();

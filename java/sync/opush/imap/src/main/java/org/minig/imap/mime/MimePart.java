@@ -33,27 +33,140 @@
 package org.minig.imap.mime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.obm.push.mail.MimeAddress;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 
 public class MimePart extends AbstractMimePart implements IMimePart {
 
-	private IMimePart parent;
-	private ContentType contentType;
-	private int idx;
-	private String contentTransfertEncoding;
-	private String contentId;
-	private String multipartSubtype;
-	private Integer size;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	public MimePart() {
-		super();
+	public static Builder embeddedMessageBuilder() {
+		return new EmbeddedMessageBuilder();
+	}
+	
+	public static class Builder implements IMimePart.Builder<MimePart> {
+		
+		protected String multipartSubType;
+		protected String contentId;
+		protected String encoding;
+		protected Integer size;
+		protected List<IMimePart> children;
+		protected org.minig.imap.mime.ContentType.Builder contentTypeBuilder;
+
+		private Builder() {
+			children = Lists.newArrayList();
+			contentTypeBuilder = ContentType.builder();
+		}
+		
+		public Builder primaryMimeType(String primaryMimeType) {
+			this.contentTypeBuilder.primaryType(primaryMimeType);
+			return this;
+		}
+		
+		public Builder subMimeType(String subMimeType) {
+			this.contentTypeBuilder.subType(subMimeType);
+			return this;
+		}
+		
+		public Builder contentId(String contentId) {
+			this.contentId = contentId;
+			return this;
+		}
+		
+		public Builder encoding(String encoding) {
+			this.encoding = encoding;
+			return this;
+		}
+		
+		public Builder size(Integer size) {
+			this.size = size;
+			return this;
+		}
+		
+		public Builder bodyParams(BodyParams bodyParams) {
+			this.contentTypeBuilder.add(bodyParams);
+			return this;
+		}
+
+		public Builder contentDisposition(String contentDisposition) {
+			this.contentTypeBuilder.contentDisposition(contentDisposition);
+			return this;
+		}
+
+		public Builder contentType(	String contentType) {
+			this.contentTypeBuilder.contentType(contentType);
+			return this;
+		}
+		
+		@Override
+		public Builder addChild(IMimePart mimePart) {
+			this.children.add(mimePart);
+			return this;
+		}
+		
+		public Builder addChildren(MimePart... mimeParts) {
+			return addChildren(Arrays.asList(mimeParts));
+		}
+		
+		public Builder addChildren(Iterable<MimePart> mimeParts) {
+			for (MimePart mimePart: mimeParts) {
+				addChild(mimePart);
+			}
+			return this;
+		}
+		
+		public MimePart build() {
+			return new MimePart(contentTypeBuilder.build(), children, contentId, encoding, size, multipartSubType);
+		}
+
+	}
+
+	public static class EmbeddedMessageBuilder extends Builder {
+		
+		private void mergeMultipartWithMessage() {
+			IMimePart firstChild = Iterables.getFirst(children, null);
+			if (firstChild == null) {
+				throw new IllegalStateException("Embedded Message/RFC822 must have at least one mime part");
+			}
+			if (firstChild.isMultipart()) {
+				bodyParams(firstChild.getBodyParams());
+				this.children = firstChild.getChildren();
+				this.multipartSubType = firstChild.getSubtype();
+			}
+		}
+		
+		@Override
+		public MimePart build() {
+			mergeMultipartWithMessage();
+			return super.build();
+		}
+	}
+	
+	private IMimePart parent;
+	private int idx;
+	private final ContentType contentType;
+	private final String contentTransfertEncoding;
+	private final String contentId;
+	private final Integer size;
+	private final String multipartSubType;
+	
+	private MimePart(ContentType contentType, List<IMimePart> children, String contentId, String encoding, Integer size, String multipartSubType) {
+		super(children, contentType.getBodyParams());
+		this.contentType = contentType;
+		this.contentId = contentId;
+		this.contentTransfertEncoding = encoding;
+		this.size = size;
+		this.multipartSubType = multipartSubType;
 	}
 
 	@Override
@@ -65,12 +178,6 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	@Override
 	public String getPrimaryType() {
 		return contentType.getPrimaryType();
-	}
-	
-	@Override
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-		this.setBodyParams(contentType.getBodyParams());
 	}
 	
 	@Override
@@ -123,10 +230,6 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		return contentTransfertEncoding;
 	}
 
-	public void setContentTransfertEncoding(String contentTransfertEncoding) {
-		this.contentTransfertEncoding = contentTransfertEncoding;
-	}
-
 	@Override
 	public String getCharset() {
 		BodyParam bodyParam = getBodyParam("charset");
@@ -157,10 +260,6 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	@Override
 	public String getContentId() {
 		return contentId;
-	}
-
-	public void setContentId(String contentId) {
-		this.contentId = contentId;
 	}
 
 	@Override
@@ -210,17 +309,12 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	
 	@Override
 	public String getMultipartSubtype() {
-		if (multipartSubtype != null) {
-			return multipartSubtype;
+		if (multipartSubType != null) {
+			return multipartSubType;
 		}
 		return getSubtype();
 	}
 	
-	@Override
-	public void setMultipartSubtype(String subtype) {
-		this.multipartSubtype = subtype;
-	}
-
 	@Override
 	public List<IMimePart> getSibling() {
 		if (parent != null) {
@@ -234,11 +328,6 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	@Override
 	public Integer getSize() {
 		return size;
-	}
-
-	@Override
-	public void setSize(int size) {
-		this.size = size;
 	}
 
 	@Override

@@ -98,10 +98,9 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 				
 				try {
 					//remove closing brace
-					MimeMessage message = bodyStructureParser.parseBodyStructure(bs.substring(0, bs.length() - 1));
-					message.setUid(uid);
-					message.setSize(size);
-					mts.add(message);
+					MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bs.substring(0, bs.length() - 1));
+					messageBuilder.uid(uid).size(size);
+					mts.add(messageBuilder.build());
 				} catch (RuntimeException re) {
 					logger.error("error parsing:\n" + new String(s));
 					logger.error("payload was:\n" + s);

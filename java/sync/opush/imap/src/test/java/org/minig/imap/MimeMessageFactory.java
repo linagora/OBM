@@ -32,52 +32,32 @@
 package org.minig.imap;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.minig.imap.mime.BodyParam;
 import org.minig.imap.mime.BodyParams;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
 
 public class MimeMessageFactory {
 
-	private static <T extends MimePart> T fillSimpleMimePart(T mimePart, String mimeType, String mimeSubtype, String contentId, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
-		mimePart.setContentType( buildMimeType(mimeType, mimeSubtype) );
-		BodyParams.Builder params = BodyParams.builder();
-		for (Entry<String, String> entry: bodyParams.entrySet()) {
-			params.add(new BodyParam(entry.getKey(), entry.getValue()));
-		}
-		mimePart.setBodyParams(params.build());
-		for (MimePart part: parts) {
-			mimePart.addPart(part);
-		}
-		mimePart.setContentId(contentId);
-		mimePart.setContentTransfertEncoding(encoding);
-		if (size != null) {
-			mimePart.setSize(size);
-		}
-		return mimePart;
-	}
-	
-	private static ContentType buildMimeType(String mimeType, String mimeSubtype) {
-		ContentType.Builder builder = ContentType.builder();
-		return builder.primaryType(mimeType).subType(mimeSubtype).build();
-	}
-	
 	public static MimePart createSimpleMimePart(String mimeType, String mimeSubtype, String contentId, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
-		MimePart tree = new MimePart();
-		fillSimpleMimePart(tree, mimeType, mimeSubtype, contentId, encoding, size, bodyParams, parts);
-		return tree;
+		return MimePart.builder()
+			.primaryMimeType(mimeType)
+			.subMimeType(mimeSubtype)
+			.contentId(contentId)
+			.encoding(encoding)
+			.size(size)
+			.bodyParams(BodyParams.builder().bodyParams(bodyParams).build())
+			.addChildren(parts)
+			.build();
 	}
 
 	public static MimeMessage createSimpleMimeMessage(String mimeType, String mimeSubtype, String contentId, String encoding, int size, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = new MimeMessage(createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, size, bodyParams, parts));
+		MimeMessage tree = MimeMessage.builder().from(createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, size, bodyParams, parts)).build();
 		return tree;
 	}
 	
 	public static MimeMessage createSimpleMimeTree(String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = new MimeMessage(createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, null, bodyParams, parts));
+		MimeMessage tree = MimeMessage.builder().from((createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, null, bodyParams, parts))).build();
 		return tree;
 	}
 

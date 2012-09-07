@@ -57,13 +57,11 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.FastFetch;
 import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
 import org.obm.push.bean.Email;
 import org.obm.push.mail.MailException;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
@@ -180,9 +178,7 @@ public class ImapMailBoxUtils {
 		Collection<MimeMessage> mimeMessageCollection = new ArrayList<MimeMessage>();
 		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
 			MimePart mimePart = buildMimePartTree(entry.getValue());
-			MimeMessage mimeMessage = new MimeMessage(mimePart);
-			mimeMessage.setUid(entry.getKey());
-			mimeMessageCollection.add(mimeMessage);
+			mimeMessageCollection.add(MimeMessage.builder().from(mimePart).uid(entry.getKey()).build());
 		}
 		return mimeMessageCollection;
 	}
@@ -211,44 +207,32 @@ public class ImapMailBoxUtils {
 			throws MessagingException, MailException {
 		
 		IMAPMultipartDataSource imapMultipartDataSource = (IMAPMultipartDataSource) getDataSource(mimePart);
-		MimePart parentMimePart = buildMimePart(mimePart);
-		addChildMimePartToParentMimePart(parentMimePart, imapMultipartDataSource);
+		MimePart parentMimePart = mimePartBuilder(mimePart).addChildren(childMimePart(imapMultipartDataSource)).build();
 		return parentMimePart;
 	}
 
-	private MimePart buildMimePart(ContentType contentType, String contentId, String encoding, int size) {
-		MimePart mimePart = new MimePart();
-		mimePart.setContentType(contentType);
-		if (!Strings.isNullOrEmpty(contentId)) {
-			mimePart.setContentId(contentId);
-		}
-		if (!Strings.isNullOrEmpty(encoding)) {
-			mimePart.setContentTransfertEncoding(encoding);
-		}
-		mimePart.setBodyParams(contentType.getBodyParams());
-		mimePart.setSize(size);
-		return mimePart;
-	}
-
-	private void addChildMimePartToParentMimePart(MimePart parentMimePart, IMAPMultipartDataSource imapMultipartDataSource) 
+	private List<MimePart> childMimePart(IMAPMultipartDataSource imapMultipartDataSource) 
 			throws MessagingException, MailException {
 		
 		int countChild = imapMultipartDataSource.getCount();
+		List<MimePart> parts = Lists.newArrayList();
 		for (int cpt = 0; cpt < countChild; cpt++) {
 			MimeBodyPart mimeBodyPart = (MimeBodyPart) imapMultipartDataSource.getBodyPart(cpt);
-			parentMimePart.addPart( buildMimePartTree(mimeBodyPart) );
+			parts.add(buildMimePartTree(mimeBodyPart) );
 		}
+		return parts;
 	}
 
-	private MimePart buildMimePart(javax.mail.internet.MimePart mimePart) throws MessagingException {
-		ContentType contentType = buildContentType(mimePart.getContentType());
-		return buildMimePart(contentType, mimePart.getContentID(), mimePart.getEncoding(), mimePart.getSize());
+	private MimePart.Builder mimePartBuilder(javax.mail.internet.MimePart mimePart) throws MessagingException {
+		return MimePart.builder()
+			.contentType(mimePart.getContentType())
+			.contentId(mimePart.getContentID())
+			.encoding(mimePart.getEncoding())
+			.size(mimePart.getSize());
 	}
 	
-	private ContentType buildContentType(String contentType) {
-		ContentType.Builder builder = ContentType.builder();
-		builder.contentType(contentType);
-		return builder.build();
+	private MimePart buildMimePart(javax.mail.internet.MimePart mimePart) throws MessagingException {
+		return mimePartBuilder(mimePart).build();
 	}
 	
 	private MimePart buildMimePartFromIMAPNestedMessage(javax.mail.internet.MimePart mimePart) 

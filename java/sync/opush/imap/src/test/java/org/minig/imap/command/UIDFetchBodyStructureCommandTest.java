@@ -69,16 +69,18 @@ public class UIDFetchBodyStructureCommandTest {
 	public void testResponseReceived() {
 		BodyStructureParser resultCallback = EasyMock.createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
-		MimeMessage mimeMessage = EasyMock.createNiceMock(MimeMessage.class);
-		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(mimeMessage);
-		EasyMock.replay(resultCallback);
+		MimeMessage.Builder mimeMessageBuilder = EasyMock.createNiceMock(MimeMessage.Builder.class);
+		EasyMock.expect(mimeMessageBuilder.uid(EasyMock.anyLong())).andReturn(mimeMessageBuilder);
+		EasyMock.expect(mimeMessageBuilder.size(EasyMock.anyInt())).andReturn(mimeMessageBuilder);
+		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(mimeMessageBuilder);
+		EasyMock.replay(resultCallback, mimeMessageBuilder);
 		UIDFetchBodyStructureCommand uidFetchBodyStructureCommand = 
 			new UIDFetchBodyStructureCommand(resultCallback, ImmutableList.of(54l));
 		IMAPResponse response = new IMAPResponse("OK", INPUT_LINE1);
 		response.setStreamData(new ByteArrayInputStream(INPUT_BYTESTREAM.getBytes()));
 		uidFetchBodyStructureCommand.responseReceived(
 				Arrays.asList(response, new IMAPResponse("OK", "")));
-		EasyMock.verify(resultCallback);
+		EasyMock.verify(resultCallback, mimeMessageBuilder);
 		Assert.assertEquals(OUTPUT, result.getValue());
 	}
 

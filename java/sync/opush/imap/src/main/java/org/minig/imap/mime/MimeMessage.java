@@ -45,12 +45,51 @@ import com.google.common.collect.ImmutableList;
  */
 public class MimeMessage implements IMimePart {
 
-	private long uid;
-	private final IMimePart from;
+	public static Builder builder() {
+		return new Builder();
+	}
 
-	public MimeMessage(IMimePart from) {
+	public static class Builder implements IMimePart.Builder<MimeMessage> {
+		
+		private IMimePart part;
+		private Integer size;
+		private Long uid;
+
+		@Override
+		public Builder addChild(IMimePart mimePart) {
+			from(mimePart);
+			return this;
+		}
+		
+		public Builder from(IMimePart mimePart) {
+			this.part = mimePart;
+			return this;
+		}
+		
+		public Builder size(Integer size) {
+			this.size = size;
+			return this;
+		}
+		
+		public Builder uid(Long uid) {
+			this.uid = uid;
+			return this;
+		}
+		
+		public MimeMessage build() {
+			return new MimeMessage(part, uid, size);
+		}
+	}
+	
+	private final Long uid;
+	private final IMimePart from;
+	private final Integer size;
+
+	private MimeMessage(IMimePart from, Long uid, Integer size) {
 		super();
 		this.from = from;
+		this.uid = uid;
+		this.size = size;
 	}
 
 	public String toString() {
@@ -95,15 +134,6 @@ public class MimeMessage implements IMimePart {
 	
 	public long getUid() {
 		return uid;
-	}
-
-	public void setUid(long uid) {
-		this.uid = uid;
-	}
-
-	@Override
-	public void addPart(IMimePart child) {
-		from.addPart(child);
 	}
 
 	@Override
@@ -182,16 +212,6 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
-	public void setBodyParams(BodyParams newParams) {
-		from.setBodyParams(newParams);
-	}
-	
-	@Override
-	public void setContentType(ContentType mimetype) {
-		from.setContentType(mimetype);		
-	}
-	
-	@Override
 	public String getName() {
 		return from.getName();
 	}
@@ -204,11 +224,6 @@ public class MimeMessage implements IMimePart {
 	@Override
 	public String getMultipartSubtype() {
 		return from.getSubtype();
-	}
-	
-	@Override
-	public void setMultipartSubtype(String subtype) {
-		from.setMultipartSubtype(subtype);
 	}
 
 	@Override
@@ -247,12 +262,10 @@ public class MimeMessage implements IMimePart {
 
 	@Override
 	public Integer getSize() {
+		if (size != null) {
+			return size;
+		}
 		return from.getSize();
-	}
-
-	@Override
-	public void setSize(int size) {
-		from.setSize(size);
 	}
 
 	@Override
@@ -279,4 +292,5 @@ public class MimeMessage implements IMimePart {
 	public boolean isICSAttachment() {
 		return from.isICSAttachment();
 	}
+
 }

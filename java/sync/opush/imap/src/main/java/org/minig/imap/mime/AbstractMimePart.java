@@ -43,15 +43,13 @@ public abstract class AbstractMimePart implements IMimePart {
 	private List<IMimePart> children;
 	private BodyParams bodyParams;
 
-	protected AbstractMimePart() {
-		children = new LinkedList<IMimePart>();
-		bodyParams = BodyParams.builder().build();
+	protected AbstractMimePart(List<IMimePart> children, BodyParams bodyParams) {
+		setChildren(children);
+		this.bodyParams = bodyParams;
 	}
 	
-	@Override
-	public void addPart(IMimePart child) {
-		children.add(child);
-		child.defineParent(this, children.size());
+	protected AbstractMimePart() {
+		this(new LinkedList<IMimePart>(), BodyParams.builder().build());
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public abstract class AbstractMimePart implements IMimePart {
 		return Collections.unmodifiableList(children);
 	}
 	
-	public void setChildren(List<IMimePart> children) {
+	private void setChildren(List<IMimePart> children) {
 		int i = 1;
 		for (IMimePart child: children) {
 			child.defineParent(this, i++);
@@ -80,11 +78,6 @@ public abstract class AbstractMimePart implements IMimePart {
 	@Override
 	public BodyParam getBodyParam(final String param) {
 		return bodyParams.get(param);
-	}
-	
-	@Override
-	public void setBodyParams(BodyParams bodyParams) {
-		this.bodyParams = bodyParams;
 	}
 	
 	@Override
