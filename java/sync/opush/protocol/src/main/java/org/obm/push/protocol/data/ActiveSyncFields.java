@@ -31,39 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-public enum SyncRequestFields implements ActiveSyncFields {
+public interface ActiveSyncFields {
 
-	WAIT("Wait"),
-	PARTIAL("Partial"),
-	WINDOW_SIZE("WindowSize"),
-	COLLECTIONS("Collections"),
-	COLLECTION("Collection"),
-	COLLECTION_ID("CollectionId"),
-	SYNC_KEY("SyncKey"),
-	DATA_CLASS("Class"),
-	OPTIONS("Options"),
-	CONFLICT("Conflict"),
-	MIME_SUPPORT("MIMESupport"),
-	MIME_TRUNCATION("MIMETruncation"),
-	FILTER_TYPE("FilterType"),
-	BODY_PREFERENCE("BodyPreference"),
-	TRUNCATION_SIZE("TruncationSize"),
-	TYPE("Type"),
-	ALL_OR_NONE("AllOrNone"),
-	COMMANDS("Commands"),
-	SERVER_ID("ServerId"),
-	CLIENT_ID("ClientId"),
-	APPLICATION_DATA("ApplicationData");
-	
-	private final String name;
-
-	private SyncRequestFields(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
+	String getName();
 	
 }

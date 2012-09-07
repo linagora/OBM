@@ -40,8 +40,6 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
-import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -50,8 +48,6 @@ import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
 import org.obm.push.utils.DOMUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -63,12 +59,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SyncDecoder {
+public class SyncDecoder extends ActiveSyncDecoder {
 
-	private static final Logger logger = LoggerFactory.getLogger(SyncDecoder.class);
-
-	private static final String AS_BOOLEAN_TRUE = "1";
-	
 	@Inject
 	protected SyncDecoder() {}
 
@@ -196,46 +188,5 @@ public class SyncDecoder {
 			builder.allOrNone(allOrNone);
 		}
 		return builder.build();
-	}
-
-	private String uniqueStringFieldValue(Element root, SyncRequestFields stringField) {
-		Element element = DOMUtils.getUniqueElement(root, stringField.getName());
-		if (element == null) {
-			return null;
-		}
-		
-		String elementText = DOMUtils.getElementText(element);
-		logger.debug(stringField.getName() + " value : " + elementText);
-		return elementText;
-	}
-
-	private Boolean uniqueBooleanFieldValue(Element root, SyncRequestFields booleanField) {
-		Element element = DOMUtils.getUniqueElement(root, booleanField.getName());
-		if (element == null) {
-			return null;
-		}
-		
-		String elementText = DOMUtils.getElementText(element);
-		logger.debug(booleanField.getName() + " value : " + elementText);
-		if (elementText == null) {
-			return true;
-		} else if( !elementText.equals("1") && !elementText.equals("0")) {
-			throw new ASRequestBooleanFieldException("Failed to parse field : " + booleanField.getName());
-		}
-		return elementText.equalsIgnoreCase(AS_BOOLEAN_TRUE);
-	}
-
-	private Integer uniqueIntegerFieldValue(Element root, SyncRequestFields integerField) {
-		String element = DOMUtils.getElementText(root, integerField.getName());
-		logger.debug(integerField.getName() + " value : " + element);
-		
-		if (element != null) {
-			try {
-				return Integer.parseInt(element);
-			} catch (NumberFormatException e) {
-				throw new ASRequestIntegerFieldException(e);
-			}
-		}
-		return null;
 	}
 }

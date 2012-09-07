@@ -82,6 +82,7 @@ import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
+import org.obm.push.protocol.data.SyncEncoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
@@ -218,7 +219,7 @@ public class SyncProtocolTest {
 		
 		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
 		
-		new SyncProtocol(syncDecoder, null).decodeRequest(request);
+		new SyncProtocol(syncDecoder, null, null).decodeRequest(request);
 	}
 	
 	@Test
@@ -239,7 +240,7 @@ public class SyncProtocolTest {
 		expect(syncDecoder.decodeSync(request)).andReturn(null);
 		replay(syncDecoder);
 		
-		new SyncProtocol(syncDecoder, null).decodeRequest(request);
+		new SyncProtocol(syncDecoder, null, null).decodeRequest(request);
 
 		verify(syncDecoder);
 	}
@@ -1156,6 +1157,187 @@ public class SyncProtocolTest {
 		assertThat(syncCollection.getFetchIds()).containsOnly("56", "57");
 	}
 
+	@Test
+	public void testEncodeDecodeLoopForPartialNoCollectionSyncRequest() throws Exception {
+		String request = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial>1</Partial>" +
+					"<Wait>30</Wait>" +
+				"</Sync>";
+		
+		SyncProtocol syncProtocol = newSyncProtocol();
+		SyncRequest decodedSyncRequest = syncProtocol.decodeRequest(DOMUtils.parse(request));
+		Document encodedRequest = syncProtocol.encodeRequest(decodedSyncRequest);
+		
+		assertThat(request).isEqualTo(DOMUtils.serialize(encodedRequest));
+	}
+
+	@Test
+	public void testEncodeDecodeLoopForSimpleSyncRequest() throws Exception {
+		String request = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>1234-5678</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+							"<Commands>" +
+								"<Delete>" +
+									"<ServerId>79</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>";
+		
+		SyncProtocol syncProtocol = newSyncProtocol();
+		SyncRequest decodedSyncRequest = syncProtocol.decodeRequest(DOMUtils.parse(request));
+		Document encodedRequest = syncProtocol.encodeRequest(decodedSyncRequest);
+		
+		assertThat(request).isEqualTo(DOMUtils.serialize(encodedRequest));
+	}
+
+	@Test
+	public void testEncodeDecodeLoopForComplexeSyncRequest() throws Exception {
+		String request = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Partial>1</Partial>" +
+					"<Wait>30</Wait>" +
+					"<WindowSize>150</WindowSize>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>1234-5678</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+							"<WindowSize>75</WindowSize>" +
+							"<Options>" +
+								"<FilterType>0</FilterType>" +
+								"<Conflict>0</Conflict>" +
+								"<MIMETruncation>0</MIMETruncation>" +
+								"<MIMESupport>0</MIMESupport>" +
+							"</Options>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>12</ServerId>" +
+									"<ClientId>120</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Add>" +
+									"<ServerId>13</ServerId>" +
+									"<ClientId>130</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Change>" +
+									"<ServerId>34</ServerId>" +
+									"<ClientId>340</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Change>" +
+									"<ServerId>35</ServerId>" +
+									"<ClientId>350</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Fetch>" +
+									"<ServerId>56</ServerId>" +
+								"</Fetch>" +
+								"<Fetch>" +
+									"<ServerId>57</ServerId>" +
+								"</Fetch>" +
+								"<Delete>" +
+									"<ServerId>78</ServerId>" +
+								"</Delete>" +
+								"<Delete>" +
+									"<ServerId>79</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+						"<Collection>" +
+							"<SyncKey>1235-6789</SyncKey>" +
+							"<CollectionId>5</CollectionId>" +
+							"<Options>" +
+								"<FilterType>1</FilterType>" +
+								"<Conflict>1</Conflict>" +
+								"<MIMETruncation>1</MIMETruncation>" +
+								"<MIMESupport>1</MIMESupport>" +
+							"</Options>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>22</ServerId>" +
+									"<ClientId>220</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Add>" +
+									"<ServerId>23</ServerId>" +
+									"<ClientId>230</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Add>" +
+								"<Change>" +
+									"<ServerId>44</ServerId>" +
+									"<ClientId>440</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Change>" +
+									"<ServerId>55</ServerId>" +
+									"<ClientId>550</ClientId>" +
+									"<ApplicationData>" +
+										"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
+										"<FileAs>Dobney, JoLynn Julie</FileAs>" +
+										"<FirstName>JoLynn</FirstName>" +
+									"</ApplicationData>" +
+								"</Change>" +
+								"<Fetch>" +
+									"<ServerId>66</ServerId>" +
+								"</Fetch>" +
+								"<Fetch>" +
+									"<ServerId>77</ServerId>" +
+								"</Fetch>" +
+								"<Delete>" +
+									"<ServerId>88</ServerId>" +
+								"</Delete>" +
+								"<Delete>" +
+									"<ServerId>99</ServerId>" +
+								"</Delete>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>";
+		
+		SyncProtocol syncProtocol = newSyncProtocol();
+		SyncRequest decodedSyncRequest = syncProtocol.decodeRequest(DOMUtils.parse(request));
+		Document encodedRequest = syncProtocol.encodeRequest(decodedSyncRequest);
+		
+		assertThat(request).isEqualTo(DOMUtils.serialize(encodedRequest));
+	}
+
 	private BodyPreference bodyPreference(Integer bodyType, Integer truncationSize, Boolean allOrNone) {
 		return BodyPreference.builder()
 			.bodyType(MSEmailBodyType.getValueOf(bodyType))
@@ -1164,11 +1346,16 @@ public class SyncProtocolTest {
 			.build();
 	}
 	
+	private SyncProtocol newSyncProtocol() {
+		return newSyncProtocol(null, null, null);
+	}
+	
 	private SyncProtocol newSyncProtocol(SyncedCollectionDao syncedCollectionDao, CollectionDao collectionDao,
 			CollectionPathHelper collectionPathHelper) {
 		SyncDecoder syncDecoder = new SyncDecoderTest();
+		SyncEncoder syncEncoder = new SyncEncoderTest();
 		SyncAnalyser syncAnalyser = new SyncAnalyserTest(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
-		return new SyncProtocol(syncDecoder, syncAnalyser);
+		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder );
 	}
 
 	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {
@@ -1275,6 +1462,8 @@ public class SyncProtocolTest {
 	}
 	
 	static class SyncDecoderTest extends SyncDecoder {}
+	
+	static class SyncEncoderTest extends SyncEncoder {}
 	
 	static class SyncAnalyserTest extends SyncAnalyser {
 

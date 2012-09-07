@@ -57,6 +57,7 @@ import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
+import org.obm.push.protocol.data.SyncEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -71,11 +72,14 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 	
 	private final SyncDecoder syncDecoder;
 	private final SyncAnalyser syncAnalyser;
+	private final SyncEncoder syncEncoder;
 
 	@Inject
-	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser) {
+	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
+			SyncEncoder syncEncoder) {
 		this.syncDecoder = syncDecoder;
 		this.syncAnalyser = syncAnalyser;
+		this.syncEncoder = syncEncoder;
 	}
 	
 	@Override
@@ -278,7 +282,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 
 	@Override
 	public Document encodeRequest(SyncRequest request) throws ProtocolException {
-		throw new NotImplementedException();
+		return syncEncoder.encodeSync(request);
 	}
 
 	@Override
