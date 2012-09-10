@@ -50,6 +50,14 @@ echo -e "o Plese enter LDAP server name : \c"
 read value
 echo "OBM_LDAPSERVER=$value" >> $obmconf
 
+# Correctly set ldap url observer in configuration file
+opushconf="/etc/opush/ldap_conf.ini"
+if [ -f $opushconf ] ; then
+	cp -f $opushconf $opushconf.old
+	perl -i -pe"s@search.ldap.url=.*\$@search.ldap.url=ldap://$value@" $opushconf
+fi
+
+
 # Modules stuff
 for modules in LDAP MAIL SAMBA WEB ; do
 	echo -e "o Enable module $modules, (y)es (n)o : \c"
