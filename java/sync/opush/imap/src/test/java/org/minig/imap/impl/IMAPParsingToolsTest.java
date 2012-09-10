@@ -31,25 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.impl;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public class IMAPParsingTools {
+import org.junit.Test;
+
+public class IMAPParsingToolsTest {
 	
-	public static String getNextNumber(String content) {
-		if (content == null) {
-			return null;
-		}
-		
-		ImmutableList<Character> chars = Lists.charactersOf(content);
-		StringBuilder longAsString = new StringBuilder();
-		for (Character c: chars) {
-			if (Character.isDigit(c)) {
-				longAsString.append(c);
-			} else {
-				break;
-			}
-		}
-		return longAsString.toString();
+	@Test
+	public void testGetNextNumberNullString() {
+		String nextNumber = IMAPParsingTools.getNextNumber(null);
+		assertThat(nextNumber).isNull();
+	}
+	
+	@Test
+	public void testGetNextNumberEmptyString() {
+		String nextNumber = IMAPParsingTools.getNextNumber("");
+		assertThat(nextNumber).isEmpty();
+	}
+	
+	@Test
+	public void testGetNextNumberWithoutDigit() {
+		String nextNumber = IMAPParsingTools.getNextNumber("sdqf");
+		assertThat(nextNumber).isEmpty();
+	}
+	
+	@Test
+	public void testGetNextNumberOnlyDigits() {
+		String nextNumber = IMAPParsingTools.getNextNumber("1234");
+		assertThat(nextNumber).isEqualTo("1234");
+	}
+	
+	@Test
+	public void testGetNextNumber() {
+		String nextNumber = IMAPParsingTools.getNextNumber("1234a");
+		assertThat(nextNumber).isEqualTo("1234");
 	}
 }
