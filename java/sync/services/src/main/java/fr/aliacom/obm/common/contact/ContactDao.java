@@ -372,13 +372,13 @@ public class ContactDao {
 		return c;
 	}
 
-	private void indexContact(AccessToken at, Contact c) {
+	private void indexContact(AccessToken at, Contact c) throws ServerFault {
 		try {
 			// no need to pass the sql connection as indexing will be done in a
 			// separate thread
 			solrHelperFactory.createClient(at).createOrUpdate(c);
 		} catch (Exception e) {
-			logger.error("Error indexing contact", e);
+			throw new ServerFault("Indexing server is unavailable", e);
 		}
 	}
 
@@ -1076,7 +1076,7 @@ public class ContactDao {
 		}
 	}
 
-	private Contact removeContact(AccessToken at, Contact c) throws SQLException {
+	private Contact removeContact(AccessToken at, Contact c) throws ServerFault, SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -1095,15 +1095,15 @@ public class ContactDao {
 		return c;
 	}
 
-	private void removeContactFromSolr(AccessToken at, Contact c) {
+	private void removeContactFromSolr(AccessToken at, Contact c) throws ServerFault {
 		try {
 			solrHelperFactory.createClient(at).delete(c);
 		} catch (Exception e) {
-			logger.error("Error indexing contact", e);
+			throw new ServerFault("Indexing server is unavailable", e);
 		}
 	}
 
-	public Contact removeContact(AccessToken at, int contactId) throws SQLException, ContactNotFoundException, NoPermissionException {
+	public Contact removeContact(AccessToken at, int contactId) throws ServerFault, SQLException, ContactNotFoundException, NoPermissionException {
 		Contact c = findContact(at, contactId);
 		if (!hasRightsOn(at, contactId)) {
 			throw new NoPermissionException("Contact " + contactId + " removal not permitted for " + at.getUserEmail());

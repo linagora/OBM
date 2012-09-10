@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -111,8 +113,8 @@ public class SolrHelper {
 		}
 	}
 	
-	private CommonsHttpSolrServer sContact;
-	private CommonsHttpSolrServer sEvent;
+	private final CommonsHttpSolrServer sContact;
+	private final CommonsHttpSolrServer sEvent;
 	private final ExecutorService executor;
 	private final ContactIndexer.Factory contactIndexerFactory;
 	private final ObmDomain domain;
@@ -144,13 +146,17 @@ public class SolrHelper {
 		return sEvent;
 	}
 	
-	public void createOrUpdate(Contact c) {
+	public void createOrUpdate(Contact c) throws SolrServerException, IOException {
+		assertSolrAvailable(sContact);
+		
 		logger.info("[contact " + c.getUid() + "] scheduled for solr indexing");
 		ContactIndexer ci = contactIndexerFactory.createIndexer(sContact, c);
 		executor.execute(ci);
 	}
 
-	public void delete(Contact c) {
+	public void delete(Contact c) throws SolrServerException, IOException {
+		assertSolrAvailable(sContact);
+		
 		logger.info("[contact " + c.getUid() + "] scheduled for solr removal");
 		Remover rm = new Remover(sContact, c.getUid().toString());
 		executor.execute(rm);
@@ -166,5 +172,10 @@ public class SolrHelper {
 		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
 		EventIndexer ci = eventIndexerFactory.createIndexer(sEvent, domain, ev);
 		executor.execute(ci);
+	}
+	
+	private void assertSolrAvailable(CommonsHttpSolrServer server) throws SolrServerException, IOException
+	{
+		server.ping();
 	}
 }
