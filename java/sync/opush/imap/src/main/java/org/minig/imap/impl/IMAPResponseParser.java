@@ -90,32 +90,14 @@ public class IMAPResponseParser {
 		}
 		r.setClientDataExpected(clientDataExpected);
 
+		r.setPayload(response);
+		
 		if (msg.hasFragments()) {
-			r.setPayload(removeContinuationSize(response));
 			byte[] rawData = Bytes.concat(msg.getFragments().toArray(new byte[0][]));
 			r.setStreamData(new ByteArrayInputStream(rawData));
-		} else {
-			r.setPayload(response);			
-		}
-
-		return r;
-	}
-
-	private String removeContinuationSize(String response) {
-		int openingCurlyBrace = response.lastIndexOf('{');
-		if (openingCurlyBrace == -1) {
-			throw new IllegalArgumentException("response doesn't contains a continuation size");
-		}
-		int lastCurlyBrace = response.lastIndexOf('}');
-		if (lastCurlyBrace == -1 || openingCurlyBrace == lastCurlyBrace + 1) {
-			throw new IllegalArgumentException("unexpected response continuation size");
 		}
 		
-		String number = IMAPParsingTools.getNextNumber(response.substring(openingCurlyBrace + 1));
-		if (number.length() == 0 || openingCurlyBrace + number.length() != response.length() - "{}".length()) {
-			throw new IllegalArgumentException("unexpected response content");
-		}
-		return response.substring(0, openingCurlyBrace);
+		return r;
 	}
 
 	public void setServerHelloReceived(boolean serverHelloReceived) {
