@@ -21,7 +21,7 @@ public class TrustedLoginBindingImpl extends LoginBindingImpl {
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
-		return sessionManagement.trustedLogin(user, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
+		return sessionManagement.trustedLogin(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}
 
 }
