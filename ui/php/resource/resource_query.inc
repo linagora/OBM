@@ -297,7 +297,8 @@ function run_query_resource_insert($resource) {
      resource_name
      $q_delegation[field],
      resource_description,
-     resource_qty
+     resource_qty,
+     resource_email
    ) VALUES (
     null,
     '".date('Y-m-d H:i:s')."',
@@ -308,14 +309,21 @@ function run_query_resource_insert($resource) {
     '".$obm_q->escape($name)."'
     $q_delegation[value],
     '".$obm_q->escape($desc)."',
-    '".$obm_q->escape($qty)."'
+    '".$obm_q->escape($qty)."',
+    NULL
    )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_resource_insert()');
   $retour = $obm_q->query($query);
-
+error_log("GOT RETOUR: $retour");
   if ($retour) {
     $id = $obm_q->lastid();
+
+    $obm_q->query("UPDATE Resource r SET resource_email=".$obm_q->CONCAT(
+            array("'res-$id@'",
+            "(SELECT d.domain_name FROM Domain d WHERE d.domain_id=r.resource_domain_id)")).
+        "WHERE resource_id=$id");
+
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $resource['entity_id'] = $id;
     
