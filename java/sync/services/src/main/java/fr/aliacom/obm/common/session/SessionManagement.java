@@ -167,12 +167,12 @@ public class SessionManagement {
 				+ remoteIP + " origin: " + origin + " lemonLogin: "
 				+ lemonLogin + " lemonDomain: " + lemonDomain);
 
-		String[] split = login.split("@", 2);
-		String userLogin = split[0];
+		String[] splited = login.split("@", 2);
+		String userLogin = splited[0];
 		String domainName = null;
 
-		if (split.length == 2) {
-			domainName = split[1];
+		if (splited.length == 2) {
+			domainName = splited[1];
 		}
 
 		IAuthentificationService authService = authentificationServiceFactory.get();
