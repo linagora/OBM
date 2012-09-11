@@ -195,12 +195,13 @@ public class SyncProtocolTest {
 	}
 
 	private String encodeResponse(SyncCollectionResponse collectionResponse) throws TransformerException {
-		Document endcodedResponse = new SyncProtocol(null, null, null).encodeResponse(syncResponse(collectionResponse));
+		Document endcodedResponse = new SyncProtocol(null, null, null, null, udr)
+			.encodeResponse(syncResponse(collectionResponse));
 		return DOMUtils.serialize(endcodedResponse);
 	}
 	
 	private SyncResponse syncResponse(SyncCollectionResponse collectionResponse) {
-		return new SyncResponse(Sets.newHashSet(collectionResponse), udr, null, Collections.<String, String>emptyMap());
+		return new SyncResponse(Sets.newHashSet(collectionResponse), Collections.<String, String>emptyMap());
 	}
 
 	private SyncCollectionResponse newSyncCollectionResponse(int collectionId) {
@@ -219,7 +220,7 @@ public class SyncProtocolTest {
 		
 		SyncDecoder syncDecoder = createStrictMock(SyncDecoder.class);
 		
-		new SyncProtocol(syncDecoder, null, null).decodeRequest(request);
+		new SyncProtocol(syncDecoder, null, null, null, null).decodeRequest(request);
 	}
 	
 	@Test
@@ -240,7 +241,7 @@ public class SyncProtocolTest {
 		expect(syncDecoder.decodeSync(request)).andReturn(null);
 		replay(syncDecoder);
 		
-		new SyncProtocol(syncDecoder, null, null).decodeRequest(request);
+		new SyncProtocol(syncDecoder, null, null, null, null).decodeRequest(request);
 
 		verify(syncDecoder);
 	}
@@ -1355,7 +1356,7 @@ public class SyncProtocolTest {
 		SyncDecoder syncDecoder = new SyncDecoderTest();
 		SyncEncoder syncEncoder = new SyncEncoderTest();
 		SyncAnalyser syncAnalyser = new SyncAnalyserTest(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
-		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder );
+		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder, null, udr);
 	}
 
 	private CollectionDao mockFindCollectionPathForId(int syncingCollectionId) throws Exception {

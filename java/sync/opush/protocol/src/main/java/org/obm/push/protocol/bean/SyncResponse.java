@@ -37,10 +37,8 @@ import java.util.Map;
 
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
-import org.obm.push.protocol.data.EncoderFactory;
 
 public class SyncResponse {
 
@@ -88,29 +86,13 @@ public class SyncResponse {
 	}
 	
 	private final Collection<SyncCollectionResponse> collectionResponses;
-	private final UserDataRequest userDataRequest;
-	private final EncoderFactory encoderFactory;
 	private final Map<String, String> processedClientIds;
 	
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, UserDataRequest udr, EncoderFactory encoderFactory, Map<String, String> processedClientIds) {
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds) {
 		this.collectionResponses = collectionResponses;
-		this.userDataRequest = udr;
-		this.encoderFactory = encoderFactory;
 		this.processedClientIds = processedClientIds;
 	}
-	
-	public SyncResponse() {
-		this(null, null, null, null);
-	}
 
-	public UserDataRequest getUserDataRequest() {
-		return userDataRequest;
-	}
-	
-	public EncoderFactory getEncoderFactory() {
-		return encoderFactory;
-	}
-	
 	public Collection<SyncCollectionResponse> getCollectionResponses() {
 		return collectionResponses;
 	}
@@ -118,5 +100,4 @@ public class SyncResponse {
 	public Map<String, String> getProcessedClientIds() {
 		return processedClientIds;
 	}
-	
 }

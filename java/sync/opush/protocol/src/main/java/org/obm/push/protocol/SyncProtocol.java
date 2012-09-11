@@ -75,29 +75,35 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		private final SyncDecoder syncDecoder;
 		private final SyncAnalyser syncAnalyser;
 		private final SyncEncoder syncEncoder;
+		private final EncoderFactory encoderFactory;
 
 		@Inject
 		public Factory(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
-				SyncEncoder syncEncoder) {
+				SyncEncoder syncEncoder, EncoderFactory encoderFactory) {
 			this.syncDecoder = syncDecoder;
 			this.syncAnalyser = syncAnalyser;
 			this.syncEncoder = syncEncoder;
+			this.encoderFactory = encoderFactory;
 		}
 		
-		public SyncProtocol create() {
-			return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder);
+		public SyncProtocol create(UserDataRequest udr) {
+			return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder, encoderFactory, udr);
 		}
 	}
 	
 	private final SyncDecoder syncDecoder;
 	private final SyncAnalyser syncAnalyser;
 	private final SyncEncoder syncEncoder;
+	private final EncoderFactory encoderFactory;
+	private final UserDataRequest udr;
 
 	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
-			SyncEncoder syncEncoder) {
+			SyncEncoder syncEncoder, EncoderFactory encoderFactory, UserDataRequest udr) {
 		this.syncDecoder = syncDecoder;
 		this.syncAnalyser = syncAnalyser;
 		this.syncEncoder = syncEncoder;
+		this.encoderFactory = encoderFactory;
+		this.udr = udr;
 	}
 	
 	@Override
@@ -144,11 +150,9 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 	
 					if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
 						if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
-							buildUpdateItemChange(syncResponse.getUserDataRequest(), collectionResponse, 
-									syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
+							buildUpdateItemChange(collectionResponse, syncResponse.getProcessedClientIds(), ce);
 						} else {
-							buildFetchItemChange(syncResponse.getUserDataRequest(), collectionResponse, ce, 
-									syncResponse.getEncoderFactory());
+							buildFetchItemChange(collectionResponse, ce);
 						}
 					}
 					
@@ -180,8 +184,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		return ret;
 	}
 
-	private void buildFetchItemChange(UserDataRequest udr, SyncCollectionResponse c, Element ce, 
-			EncoderFactory encoderFactory) throws IOException {
+	private void buildFetchItemChange(SyncCollectionResponse c, Element ce) throws IOException {
 		
 		Element commands = DOMUtils.createElement(ce, "Responses");
 		for (ItemChange ic : c.getItemChanges()) {
@@ -190,19 +193,19 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 			DOMUtils.createElementAndText(add, "Status",
 					SyncStatus.OK.asSpecificationValue());
 			c.getSyncCollection().getOptions().initTruncation();
-			serializeChange(udr, add, ic, encoderFactory);
+			serializeChange(add, ic);
 		}
 	}
 	
-	private void serializeChange(UserDataRequest udr, Element col,
-			ItemChange ic, EncoderFactory encoderFactory) throws IOException {
-		
-		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoderFactory.encode(udr.getDevice(), apData, ic.getData(), true);
+	private void serializeChange(Element col, ItemChange ic) throws IOException {
+		if (encoderFactory != null && ic.getData() != null) {
+			Element apData = DOMUtils.createElement(col, "ApplicationData");
+			encoderFactory.encode(udr.getDevice(), apData, ic.getData(), true);
+		}
 	}
 	
-	private void buildUpdateItemChange(UserDataRequest udr, SyncCollectionResponse c,	Map<String, String> processedClientIds, 
-			Element ce, EncoderFactory encoderFactory) throws IOException {
+	private void buildUpdateItemChange(SyncCollectionResponse c, Map<String, String> processedClientIds, 
+			Element ce) throws IOException {
 		
 		Element responses = DOMUtils.createElement(ce, "Responses");
 		if (c.getSyncCollection().isMoreAvailable()) {
@@ -233,7 +236,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 				String commandName = selectCommandName(ic);
 				Element command = DOMUtils.createElement(commands, commandName);
 				DOMUtils.createElementAndText(command, "ServerId", ic.getServerId());
-				serializeChange(udr, command, ic, encoderFactory);
+				serializeChange(command, ic);
 			}
 			processedClientIds.remove(ic.getServerId());
 		}

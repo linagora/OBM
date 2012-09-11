@@ -167,7 +167,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
-		SyncProtocol syncProtocol = syncProtocolFactory.create();
+		SyncProtocol syncProtocol = syncProtocolFactory.create(udr);
 		try {
 			SyncRequest syncRequest = syncProtocol.decodeRequest(doc);
 			AnalysedSyncRequest analyzedSyncRequest = syncProtocol.analyzeRequest(udr, syncRequest);
@@ -378,7 +378,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	public void sendResponse(UserDataRequest udr, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
 		try {
 			if (enablePush) {
-				SyncProtocol syncProtocol = syncProtocolFactory.create();
+				SyncProtocol syncProtocol = syncProtocolFactory.create(udr);
 				SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 						Collections.EMPTY_MAP, continuation);
 				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
@@ -413,9 +413,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
-		return new SyncResponse(syncCollectionResponses, udr, getEncoders(), processedClientIds);
+		return new SyncResponse(syncCollectionResponses, processedClientIds);
 	}
-
+	
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
@@ -527,7 +527,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	public void sendError(Device device, Responder responder, String errorStatus, IContinuation continuation) {
 		try {
 			logger.info("Resp for requestId = {}", continuation.getReqId());
-			SyncProtocol syncProtocol = syncProtocolFactory.create();
+			SyncProtocol syncProtocol = syncProtocolFactory.create(continuation.getUserDataRequest());
 			responder.sendWBXMLResponse("AirSync", syncProtocol.encodeResponse(errorStatus) );
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
