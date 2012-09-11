@@ -87,6 +87,12 @@ class HashEventExtId extends UpdateObject {
         $con->begin();
         try {
             $con->lock_table_for_writing('opush_event_mapping');
+
+		$con->query('CREATE TABLE opush_event_mappingTmp AS SELECT * FROM opush_event_mapping e1 JOIN (SELECT MAX(id) unique_id FROM opush_event_mapping GROUP BY device_id, event_ext_id) e2 ON e1.id=e2.unique_id');	
+		$con->query('DELETE FROM opush_event_mapping');	
+		$con->query('INSERT INTO opush_event_mapping (id, device_id, event_uid, event_ext_id) SELECT id, device_id, event_uid, event_ext_id FROM opush_event_mappingTmp;');	
+		$con->query('DROP TABLE opush_event_mappingTmp;');	
+
             $con->query('ALTER TABLE opush_event_mapping '.
                 'ADD COLUMN event_ext_id_hash BINARY(20)');
 
