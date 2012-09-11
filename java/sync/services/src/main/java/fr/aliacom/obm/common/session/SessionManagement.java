@@ -173,14 +173,18 @@ public class SessionManagement {
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
-		IAuthentificationService authService = authentificationServiceFactory.get();
+		Login login = new Login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain));
 
-		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
 		logLoginTrial(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
+
+		IAuthentificationService authService = authentificationServiceFactory.get();
+		if (!login.hasDomain()) {
+			login = login.withDomain(authService.getObmDomain(login.getLogin()));
+		}
 
 		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
 		if (obmDomain == null) {
-			logNoDomain(login.getDomain());
+			logger.warn("cannot figure out domain for the domain_name "	+ login.getDomain());
 			return null;
 		}
 
@@ -193,18 +197,6 @@ public class SessionManagement {
 		}
 		logLoginFailure(login.getLogin(), authService, obmDomain.getName());
 		return null;
-	}
-
-	private void logNoDomain(String domainName) {
-		logger.warn("cannot figure out domain for the domain_name "	+ domainName);
-	}
-
-	private Login prepareLogin(String specifiedLogin, String lemonLogin,
-			String lemonDomain, IAuthentificationService authService) {
-		Login login = new Login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain));
-		return login.hasDomain()
-				? login
-				: login.withDomain(authService.getObmDomain(login.getLogin()));
 	}
 
 	private AccessToken login(String origin, String userLogin, ObmDomain obmDomain, String authServiceType) {
