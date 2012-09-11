@@ -1,33 +1,33 @@
 /* ***** BEGIN LICENSE BLOCK *****
- *
+ * 
  * Copyright (C) 2011-2012  Linagora
  *
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version, provided you comply
- * with the Additional Terms applicable for OBM connector by Linagora
- * pursuant to Section 7 of the GNU Affero General Public License,
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain
- * the “Message sent thanks to OBM, Free Communication by Linagora”
- * signature notice appended to any and all outbound messages
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain
- * from infringing Linagora intellectual property rights over its trademarks
- * and commercial brands. Other Additional Terms apply,
- * see <http://www.linagora.com/licenses/> for more details.
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
  *
- * You should have received a copy of the GNU Affero General Public License
- * and its applicable Additional Terms for OBM along with this program. If not,
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to
- * OBM connectors.
- *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
@@ -50,7 +50,7 @@ import fr.aliacom.obm.common.user.UserSettings;
 
 /**
  * Responds to the following urls :
- *
+ * 
  * <code>/login/doLogin?login=xx&password=yy</code>
  */
 public class LoginHandler implements ISyncHandler {
@@ -79,9 +79,7 @@ public class LoginHandler implements ISyncHandler {
 		String method = request.getMethod();
 
 		if ("doLogin".equals(method)) {
-			authLogin(request, responder);
-		} else if ("trustedLogin".equals(method)) {
-			trustedLogin(request, responder);
+			doLogin(request, responder);
 		} else if ("doLogout".equals(method)) {
 			doLogout(request);
 		} else {
@@ -91,67 +89,50 @@ public class LoginHandler implements ISyncHandler {
 
 	}
 
-
 	private void doLogout(Request request) {
 		request.destroySession();
 		binding.logout(request.getParameter("sid"));
 	}
 
-	private void trustedLogin(Request request, XmlResponder responder) {
-		responder.sendToken(doLogin(request, responder));
-	}
-
-	private void authLogin(Request request, XmlResponder responder) {
-		responder.sendToken(doLogin(request, responder));
-	}
-
-	private AccessToken doLogin(Request request, XmlResponder responder) {
+		
+	private void doLogin(Request request, XmlResponder responder) {
 		request.createSession();
-
 		String login = request.getParameter("login");
 		String pass = request.getParameter("password");
-
 		String origin = request.getParameter("origin");
-		if (origin == null) {
-			responder.sendError("login refused with null origin");
-			return null;
-		}
-
-		boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null ? Boolean
+	    
+        boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null ? Boolean
 				.valueOf(request.getParameter("isPasswordHashed")) : false;
-
-		if (logger.isDebugEnabled()) {
-			request.dumpHeaders();
-		}
-
-		AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
-				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
-		if(token == null) {
-			responder.sendError("Login failed for user '" + login + "'");
-			return null;
-		}
-
+	
 		try {
-			versionValidator.checkObmConnectorVersion(token);
+			if (origin == null) {
+				responder.sendError("login refused with null origin");
+				return;
+			}
+		
+			if (logger.isDebugEnabled()) {
+				request.dumpHeaders();
+			}
+			
+			AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+					request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
+			
+			if (token != null) {
+				versionValidator.checkObmConnectorVersion(token);
+				responder.sendToken(token);
+			} else {
+				responder.sendError("Login failed for user '" + login + "'");
+			}
 		} catch (OBMConnectorVersionException e) {
-			responder.sendError("Connector version not supported");
-			notifyConnectorVersionError(e);
-			return null;
+			logger.error(e.getToken().getOrigin() + " is not supported anymore.");
+			ObmUser user = userService.getUserFromAccessToken(e.getToken());
+			UserSettings settings = settingsService.getSettings(user);
+			errorMailer.notifyConnectorVersionError(e.getToken(), e
+					.getConnectorVersion().toString(), settings.locale(),
+					settings.timezone());
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
-			return null;
 		}
-		return token;
-	}
-
-	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
-		logger.error(e.getToken().getOrigin() + " is not supported anymore.");
-		ObmUser user = userService.getUserFromAccessToken(e.getToken());
-		UserSettings settings = settingsService.getSettings(user);
-		errorMailer.notifyConnectorVersionError(
-				e.getToken(),
-				e.getConnectorVersion().toString(),
-				settings.locale(),
-				settings.timezone());
+		
 	}
 }
