@@ -1,33 +1,33 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * Copyright (C) 2011-2012  Linagora
  *
- * This program is free software: you can redistribute it and/or 
- * modify it under the terms of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
- * License, or (at your option) any later version, provided you comply 
- * with the Additional Terms applicable for OBM connector by Linagora 
- * pursuant to Section 7 of the GNU Affero General Public License, 
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
- * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
- * from infringing Linagora intellectual property rights over its trademarks 
- * and commercial brands. Other Additional Terms apply, 
- * see <http://www.linagora.com/licenses/> for more details. 
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version, provided you comply
+ * with the Additional Terms applicable for OBM connector by Linagora
+ * pursuant to Section 7 of the GNU Affero General Public License,
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain
+ * the “Message sent thanks to OBM, Free Communication by Linagora”
+ * signature notice appended to any and all outbound messages
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain
+ * from infringing Linagora intellectual property rights over its trademarks
+ * and commercial brands. Other Additional Terms apply,
+ * see <http://www.linagora.com/licenses/> for more details.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
- * for more details. 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License 
- * and its applicable Additional Terms for OBM along with this program. If not, 
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
- * OBM connectors. 
- * 
+ * You should have received a copy of the GNU Affero General Public License
+ * and its applicable Additional Terms for OBM along with this program. If not,
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to
+ * OBM connectors.
+ *
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.session;
 
@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.Login;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
@@ -73,7 +74,7 @@ public class SessionManagement {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SessionManagement.class);
-	
+
 	private final AtomicInteger conversationUidGenerator;
 	private final AuthentificationServiceFactory authentificationServiceFactory;
 	private final UserDao userManagementDAO;
@@ -81,12 +82,12 @@ public class SessionManagement {
 	private final ObmSyncConfigurationService configuration;
 	private final SpecialAccounts specialAccounts;
 	private final HelperService helperService;
-	
+
 	@Inject
-	private SessionManagement(AuthentificationServiceFactory authentificationServiceFactory, 
-			DomainService domainService, UserDao userDao, ObmSyncConfigurationService constantService, 
+	private SessionManagement(AuthentificationServiceFactory authentificationServiceFactory,
+			DomainService domainService, UserDao userDao, ObmSyncConfigurationService constantService,
 			SpecialAccounts specialAccounts, HelperService helperService) {
-		
+
 		this.userManagementDAO = userDao;
 		this.configuration = constantService;
 		this.specialAccounts = specialAccounts;
@@ -106,7 +107,7 @@ public class SessionManagement {
 					public void onRemoval(
 							RemovalNotification<String, AccessToken> notification) {
 						logSessionRemoval(notification.getValue());
-						
+
 					}
 				})
 				.build(new CacheLoader<String, AccessToken>() {
@@ -154,59 +155,95 @@ public class SessionManagement {
 	}
 
 	/**
+	 * logs user without authenticating (simply accepts as a valid login) this should
+	 * either not be exposed to the outside world or have its result encrypted lest
+	 * one wants everyone to be able to login as anyone!
+	 */
+	public AccessToken trustedLogin(String specifiedLogin, String origin,
+			String clientIP, String remoteIP, String lemonLogin, String lemonDomain) {
+		IAuthentificationService authService = authentificationServiceFactory.get();
+
+		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
+		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
+
+		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
+		if (obmDomain == null) {
+			logNoDomain(login.getDomain());
+			return null;
+		}
+
+		return login(origin, login.getLogin(), obmDomain, authService.getType());
+	}
+
+	/**
 	 * @return null if the credential are not valid
-	 * @throws ObmSyncVersionNotFoundException 
+	 * @throws ObmSyncVersionNotFoundException
 	 */
 	public AccessToken login(String specifiedLogin, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
-		
-		String login = chooseLogin(specifiedLogin, lemonLogin, lemonDomain);
-		logger.debug("Login trial for login: " + login
-				+ " from client ip: " + clientIP + ", remoteIP: "
-				+ remoteIP + " origin: " + origin + " lemonLogin: "
-				+ lemonLogin + " lemonDomain: " + lemonDomain);
-
-		String[] splited = login.split("@", 2);
-		String userLogin = splited[0];
-		String domainName = null;
-
-		if (splited.length == 2) {
-			domainName = splited[1];
-		}
 
 		IAuthentificationService authService = authentificationServiceFactory.get();
 
-		if (domainName == null) {
-			domainName = authService.getObmDomain(userLogin);
-		}
-		ObmDomain obmDomain = domainService.findDomainByName(domainName);
+		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
+		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
+
+		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
 		if (obmDomain == null) {
-			logger.warn("cannot figure out domain for the domain_name "	+ domainName);
+			logNoDomain(login.getDomain());
 			return null;
 		}
 
-		boolean valid = false;
-		if (lemonLogin != null && lemonDomain != null) {
-			valid = doAuthLemonLdap(remoteIP);
-		} else {
-			valid = doAuthSpecialAccount(userLogin, obmDomain, clientIP);
-			if (!valid) {
-				valid = authService.doAuth(userLogin, obmDomain, password, isPasswordHashed);
-			}
+		if ((lemonLogin != null && lemonDomain != null
+				&& doAuthLemonLdap(remoteIP))
+			|| doAuthSpecialAccount(login.getLogin(), obmDomain, clientIP)
+			|| authService.doAuth(login.getLogin(), obmDomain, password, isPasswordHashed)) {
+
+			return login(origin, login.getLogin(), obmDomain, authService.getType());
 		}
-		if (valid) {
-			AccessToken token = buildAccessToken(origin, userLogin, obmDomain);
-			registerTokenInSession(token);
-			logger.info(LogUtils.prefix(token) + login + " logged in from " + token.getOrigin()
-					+ ". auth type: " + authService.getType() + " (mail: " + token.getUserEmail()
-					+ ") on obm-sync " + token.getVersion());
-			return token;
-		}
-		logger.info("access refused to login: '" + userLogin
-				+ "' domain: '" + obmDomain.getName() + "' auth type: "
-				+ authService.getType());
+		logLoginFailure(login.getLogin(), authService, obmDomain.getName());
 		return null;
+	}
+
+	private void logNoDomain(String domainName) {
+		logger.warn("cannot figure out domain for the domain_name "	+ domainName);
+	}
+
+	private Login prepareLogin(String specifiedLogin, String lemonLogin,
+			String lemonDomain, IAuthentificationService authService) {
+		Login login = new Login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain));
+		return login.hasDomain()
+				? login
+				: login.withDomain(authService.getObmDomain(login.getLogin()));
+	}
+
+	private AccessToken login(String origin, String userLogin, ObmDomain obmDomain, String authServiceType) {
+		AccessToken token = buildAccessToken(origin, userLogin, obmDomain);
+		registerTokenInSession(token);
+		logLoginSuccess(userLogin, obmDomain.getName(), authServiceType, token);
+		return token;
+	}
+
+	private void logLoginFailure(String userLogin,
+			IAuthentificationService authService, String obmDomainName) {
+		logger.info("access refused to login: '" + userLogin
+				+ "' domain: '" + obmDomainName + "' auth type: "
+				+ authService.getType());
+	}
+
+	private void logLoginSuccess(String login,
+			String domainName, String authServiceType, AccessToken token) {
+		logger.info(LogUtils.prefix(token) + login + "@" + domainName + " logged in from " + token.getOrigin()
+				+ ". auth type: " + authServiceType + " (mail: " + token.getUserEmail()
+				+ ") on obm-sync " + token.getVersion());
+	}
+
+	private void logLoginAttempt(String origin, String clientIP, String remoteIP,
+			String lemonLogin, String lemonDomain, Login login) {
+		logger.debug("Login trial for login: " + login.getFullLogin()
+				+ " from client ip: " + clientIP + ", remoteIP: "
+				+ remoteIP + " origin: " + origin + " lemonLogin: "
+				+ lemonLogin + " lemonDomain: " + lemonDomain);
 	}
 
 	private String chooseLogin(String specifiedLogin, String lemonLogin, String lemonDomain) {
@@ -232,10 +269,10 @@ public class SessionManagement {
 		token.setDomain(obmDomain);
 		token.setUserDisplayName(databaseUser.getDisplayName());
 		token.setUserLogin(userLogin);
-		
+
 		String userEmail = helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName());
 		token.setUserEmail(userEmail);
-		
+
 		token.setSessionId(newSessionId());
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
 		token.setVersion(ObmSyncVersion.current());
@@ -267,7 +304,7 @@ public class SessionManagement {
 		at.setVersion(u.getVersion());
 		at.setRootAccount(u.isRootAccount());
 		at.setConversationUid(u.getConversationUid());
-		
+
 		/* restart expiration timer */
 		sessions.put(u.getSessionId(), u);
 	}

@@ -2294,6 +2294,35 @@ function get_user_info($id='') {
   return $u;
 }
 
+/**
+ * Updates, then retrieves a trust token from the database.
+ * 
+ * @param $username The username to get the token for.
+ * 
+ * @return String The trust token.
+ */
+function get_trust_token($username){
+	global $cdg_sql;
+	
+	$obm_q = new DB_OBM ;
+	$deleteQuery = "DELETE FROM TrustToken WHERE login='$username'";
+	$insertQuery = "INSERT INTO TrustToken (login, token) VALUES ('$username', UUID())";
+	$query = "SELECT token FROM TrustToken WHERE login='$username'";
+	
+	display_debug_msg($query, $cdg_sql, 'get_trust_token()');
+	
+	$obm_q->query($deleteQuery);
+	$obm_q->query($insertQuery);
+	$obm_q->query($query);
+	$obm_q->next_record();
+
+	if (is_array($obm_q->Record)) {
+		$token = $obm_q->Record[0];
+	}
+	
+	return $token;
+}
+
 
 /**
  * Get the contact infos
