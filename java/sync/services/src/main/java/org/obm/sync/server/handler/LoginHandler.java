@@ -102,13 +102,7 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	private void trustedLogin(Request request, XmlResponder responder) {
-		final AccessToken token = doLogin(request, responder, trustedBinding);
-		responder.emitResponse(
-				responder.prepareAccessTokenXML(
-						token.getSessionId(),
-						token.getUserEmail(),
-						token.getVersion(),
-						token.getDomain()));
+		responder.sendToken(doLogin(request, responder, trustedBinding));
 	}
 
 	private void authLogin(Request request, XmlResponder responder) {
