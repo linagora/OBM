@@ -106,35 +106,33 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	private AccessToken doLogin(Request request, XmlResponder responder) {
-		try {
-			request.createSession();
+		request.createSession();
 
-			String origin = request.getParameter("origin");
-			if (origin == null) {
-				responder.sendError("login refused with null origin");
-				return null;
-			}
+		String login = request.getParameter("login");
+		String pass = request.getParameter("password");
 
-			String login = request.getParameter("login");
-			String pass = request.getParameter("password");
+		String origin = request.getParameter("origin");
+		if (origin == null) {
+			responder.sendError("login refused with null origin");
+			return null;
+		}
 
-			boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null
-				? Boolean.valueOf(request.getParameter("isPasswordHashed"))
-				: false;
+		boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null ? Boolean
+				.valueOf(request.getParameter("isPasswordHashed")) : false;
 
-			if (logger.isDebugEnabled()) {
-				request.dumpHeaders();
-			}
+		if (logger.isDebugEnabled()) {
+			request.dumpHeaders();
+		}
 
-			AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+		AccessToken token = binding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
 				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
-			if(token == null) {
-				responder.sendError("Login failed for user '" + login + "'");
-				return null;
-			}
+		if(token == null) {
+			responder.sendError("Login failed for user '" + login + "'");
+			return null;
+		}
 
+		try {
 			versionValidator.checkObmConnectorVersion(token);
-			return token;
 		} catch (OBMConnectorVersionException e) {
 			responder.sendError("Connector version not supported");
 			notifyConnectorVersionError(e);
@@ -143,6 +141,7 @@ public class LoginHandler implements ISyncHandler {
 			responder.sendError("Invalid obm-sync server version");
 			return null;
 		}
+		return token;
 	}
 
 	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
