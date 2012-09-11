@@ -1899,8 +1899,6 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
 
-  $user_group_array = array();
-
   // Get the final user list
   $users_array = $sel_entity_id['user'];
   $user_group_array = array();
@@ -1996,7 +1994,6 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   $updatedEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   
   $entities = get_calendar_event_entity($event_id);
-  
   $new_entities = array();
   $entity_types = array('user', 'contact', 'resource', 'document');
   $db = new DB_OBM;
@@ -2531,7 +2528,7 @@ function run_query_calendar_reset_occurrence_links($users, $contacts, $resources
  * @access public
  * @return mixed exception id if an exception event has been created in the event table, null otherwise
  */
-function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $run_observers = false, $date_occurrence = null) {
+function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $run_observers = false, $date_occurrence = null, $sel_entity_id = null) {
   global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
@@ -2544,8 +2541,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     if ($obm_q->next_record())
       return array('already_set' => true, 'id' => $obm_q->f('eventexception_child_id'));
 
-    $title = sql_parse_text($calendar['event_title']);
-    $event_duration = $calendar['event_duration'];
     $exception_recurrence_id_date = $date_occurrence;
   } else {
     $id = sql_parse_id($calendar['calendar_id']);
@@ -2560,7 +2555,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   $isMovedException = is_object($event_q);
 
   if ($isMovedException) {
-    $privacy = $event_q->f('event_privacy'); 
+    $privacy = $calendar['privacy']? $calendar['privacy'] : $event_q->f('event_privacy');
     $repeat_kind = $event_q->f('event_repeatkind');
     $repeat_days = $event_q->f('event_repeatdays');
     if ($event_q->f('event_endrepeat')) {
@@ -2570,12 +2565,12 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
       $repeat_end = 'NULL';
     }
     $repeatfrequency = $event_q->f('event_repeatfrequence');
-    $category1_id = sql_parse_id( $event_q->f('event_category1_id'));
-    $priority = sql_parse_int( $event_q->f('event_priority'));
+    $category1_id = $calendar['category1'] ? sql_parse_id($calendar['category1']) : sql_parse_id( $event_q->f('event_category1_id'));
+    $priority = $calendar['priority'] ? sql_parse_int($calendar['priority']) : sql_parse_int( $event_q->f('event_priority'));
     $event_tag_id = $event_q->f('tag_id') ;
     if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
     if (is_null($event_tag_id)) $event_tag_id = 'NULL' ;
-    $description = $event_q->f('event_description');
+    $description = $calendar['description'] ? sql_parse_text($calendar['description']) : $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
     $location = $calendar['location'] ? $calendar['location'] : $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
@@ -2718,7 +2713,17 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   if ($shouldUpdateAttendees) {
 	  run_query_quick_attendee_update($calendar, $exception_id);
   }
-  
+
+  if($sel_entity_id) {
+  	run_query_update_link_event_exception($entities, $sel_entity_id, $exception_id, $exception_entity_id, $oldEvent);
+    if (!is_numeric($calendar['organizer']) || $calendar['organizer'] <= 0) {
+  		$organizerId = $obm['uid'];
+  	} else {
+  		$organizerId = $calendar['organizer'];
+  	}
+  	run_query_calendar_event_alert_insert($exception_id, $organizerId, $calendar['alert']);
+  }
+
   if($run_observers) {
   	// Send mail session var
   	$GLOBALS['send_notification_mail'] = isset($calendar['attendees_notification'])
@@ -2743,8 +2748,110 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   if ( $date_occurrence != null){
     return array('already_set' => false, 'id' => $exception_id);
   }
+
   return $exception_id;
 }
+
+function run_query_update_link_event_exception($entities, $sel_entity_id, $exception_id, $exception_entity_id, $oldEvent) {
+	global $cdg_sql, $obm;
+
+	$groups = $sel_entity_id['group'];
+	$users = $sel_entity_id['user'];
+	if (is_array($groups)) {
+		$user_group_array = array();
+		foreach($groups as $group_id) {
+			$user_group_array = array_merge($user_group_array, of_usergroup_get_group_users($group_id));
+		}
+		$users = array_merge($users, $user_group_array);
+		$users = array_unique($users);
+	}
+
+	$old_users = get_calendar_event_users_info($exception_id);
+	if (is_array($old_users)) {
+		$new_users = array_diff($users, $old_users);
+		$removed_users = array_diff($old_users, $users);
+		if (count($removed_users) > 0) {
+			run_query_calendar_deletedEvent_inserts($exception_id, $oldEvent, $removed_users);
+			run_query_calendar_delete_event_links('user', $removed_users, $exception_id);
+		}
+	} else {
+		$new_users = $users;
+	}
+
+	$resources = $sel_entity_id['resource'] ? array_unique($sel_entity_id['resource']) : array();
+	if (is_array($entities['resource']['ids'])) {
+		$new_resources = array_diff($resources, $entities['resource']['ids']);
+		$removed_resources = array_diff($entities['resource']['ids'], $resources);
+		if(count($removed_resources) > 0) {
+			run_query_calendar_delete_event_links('resource', $removed_resources, $exception_id);
+		}
+	} else {
+		$new_resources = $resources;
+	}
+
+	$contacts = $sel_entity_id['contact'] ? array_unique($sel_entity_id['contact']) : array();
+	if (is_array($entities['contact']['ids'])) {
+		$new_contacts = array_diff($contacts, $entities['contact']['ids']);
+		$removed_contacts = array_diff($entities['contact']['ids'], $contacts);
+		if(count($removed_contacts) > 0) {
+			run_query_calendar_delete_event_links('contact', $removed_contacts, $exception_id);
+		}
+	} else {
+		$new_contacts = $contacts;
+	}
+
+	run_query_calendar_add_event_links($new_users, $new_contacts, $new_resources, $exception_id);
+
+	$documents = $sel_entity_id['document'] ? array_unique($sel_entity_id['document']) : array();
+	$removed_documents = array();
+	if (is_array($entities['document']['ids'])) {
+		$new_documents = array_diff($documents, $entities['document']['ids']);
+		$removed_documents = array_diff($entities['document']['ids'], $documents);
+	} else {
+		$new_documents = $documents;
+	}
+
+	foreach ($new_documents as $document_id) {
+		run_query_calendar_attach_document($document_id, $exception_entity_id);
+	}
+
+	foreach ($removed_documents as $document_id) {
+		run_query_calendar_detach_document($document_id, $exception_entity_id);
+	}
+}
+
+function run_query_calendar_delete_event_links($type, $removed_entities, $event_id) {
+	global $cdg_sql;
+
+	$db = new DB_OBM;
+	$query = "DELETE FROM EventLink WHERE eventlink_entity_id IN ".of_entity_subquery($type, $removed_entities)." AND eventlink_event_id = $event_id";
+	$db->query($query);
+}
+
+function run_query_calendar_deletedEvent_inserts($event_id, $oldEvent, $removed_users) {
+	global $cdg_sql;
+
+	$db = new DB_OBM;
+	foreach($removed_users as $user_id) {
+		$query = "INSERT INTO DeletedEvent (
+		          deletedevent_event_id,
+		          deletedevent_event_ext_id,
+		          deletedevent_user_id,
+		          deletedevent_origin,
+		          deletedevent_type,
+		          deletedevent_timestamp)
+		          VALUES (
+		            $event_id,
+		            '".$db->escape($oldEvent->uid)."',
+		            $user_id,
+		            '$db->escape($GLOBALS[c_origin_web])',
+		            'VEVENT',
+		            NOW())";
+		display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(1)');
+		$retour = $db->query($query);
+	}
+}
+
 /**
  * Delete all exceptions for an event 
  * 

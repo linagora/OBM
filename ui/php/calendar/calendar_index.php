@@ -481,7 +481,7 @@ if ($action == 'search') {
           $params['event_id'] = $params['calendar_id'];
           $eve_q = run_query_calendar_detail($params['calendar_id']);
           $date_occurrence = new Of_Date($params['date_edit_occurrence']);
-          $result = run_query_calendar_event_exception_insert($params, $eve_q, true, $date_occurrence);
+          $result = run_query_calendar_event_exception_insert($params, $eve_q, true, $date_occurrence, $entities);
           $id = $result['id'];
         }
         else {
@@ -913,8 +913,7 @@ if ($action == 'search') {
 } elseif ($action == 'download_document') {
 ///////////////////////////////////////////////////////////////////////////////
   require '../document/document_query.inc';
-  require '../document/document_display.inc';
-  
+
   if (!check_user_attendance($params['event_id'], $obm['uid'])
     || !in_array($params['document_id'], get_calendar_event_document_ids($params['event_id']))) {
     $display['msg'] .= display_err_msg("$l_err_file_access_forbidden");
@@ -2335,7 +2334,7 @@ function check_upload_errors() {
 
 function add_upload_error_message_too_big()
 {
-	global $l_other_files_upload_error, $c_quota_private_document;;
+	global $l_other_files_upload_error, $c_quota_private_document;
 
 	$result = '';
 	$filename_list = array();
