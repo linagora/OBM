@@ -130,9 +130,4 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 	public boolean usePersistentCache() {
 		return false;
 	}
-
-	@Override
-	public int trustTokenTimeoutInSeconds() {
-		return 60;
-	}
 }

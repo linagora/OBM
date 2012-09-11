@@ -59,9 +59,6 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
     private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
     private static final int TRANSACTION_TIMEOUT_DEFAULT = 1;
 
-	private static final String TRUST_TOKEN_TIMEOUT_KEY = "trust-token-timeout";
-	private static final int TRUST_TOKEN_TIMEOUT_DEFAULT = 60;
-
     private final static String ASCMD = "Microsoft-Server-ActiveSync";
 
     private final static String EXTERNAL_URL_KEY = "external-url";
@@ -208,9 +205,5 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	public boolean usePersistentCache() {
 		return true;
 	}
-
-	@Override
-	public int trustTokenTimeoutInSeconds() {
-		return getIntValue(TRUST_TOKEN_TIMEOUT_KEY, TRUST_TOKEN_TIMEOUT_DEFAULT);
-	}
+	
 }

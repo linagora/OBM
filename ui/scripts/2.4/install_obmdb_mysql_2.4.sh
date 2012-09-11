@@ -75,7 +75,4 @@ mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
   < "updates/update-2.4.1~beta3.mysql.sql" >> /tmp/data_insert.log 2>&1
 
-mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
-  < "updates/update-2.4.1~beta2.mysql.sql" >> /tmp/data_insert.log 2>&1
-
 echo "DONE."

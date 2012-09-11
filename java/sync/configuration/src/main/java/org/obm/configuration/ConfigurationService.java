@@ -72,6 +72,4 @@ public interface ConfigurationService {
 	int transactionTimeoutInSeconds();
 
 	boolean usePersistentCache();
-
-	int trustTokenTimeoutInSeconds();
 }

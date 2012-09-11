@@ -2294,30 +2294,6 @@ function get_user_info($id='') {
   return $u;
 }
 
-/**
- * Retrieves the trust token from the database.
- * 
- * @return String The trust token.
- */
-function get_trust_token(){
-	global $cdg_sql;
-	
-	$obm_q = new DB_OBM ;
-	$db_type = $obm_q->type;
-	$query = "SELECT token FROM TrustToken";
-	
-	display_debug_msg($query, $cdg_sql, 'get_trust_token()');
-	
-	$obm_q->query($query);
-	$obm_q->next_record();
-
-	if (is_array($obm_q->Record)) {
-		$token = $obm_q->Record[0];
-	}
-	
-	return $token;
-}
-
 
 /**
  * Get the contact infos

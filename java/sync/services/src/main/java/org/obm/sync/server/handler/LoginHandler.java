@@ -103,11 +103,12 @@ public class LoginHandler implements ISyncHandler {
 
 	private void trustedLogin(Request request, XmlResponder responder) {
 		final AccessToken token = doLogin(request, responder, trustedBinding);
-
-		// Send token if loggin succeeded
-		// Do nothing otherwise as an error would have been sent already
-		if (token != null)
-			responder.sendToken(token);
+		responder.emitResponse(
+				responder.prepareAccessTokenXML(
+						token.getSessionId(),
+						token.getUserEmail(),
+						token.getVersion(),
+						token.getDomain()));
 	}
 
 	private void authLogin(Request request, XmlResponder responder) {
