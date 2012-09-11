@@ -29,8 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.trust;
 
-import java.util.Date;
-
 import com.google.common.base.Objects;
 
 /**
@@ -38,52 +36,79 @@ import com.google.common.base.Objects;
  * A {@link TrustToken} is used for implicit logins to OBM-Sync from other OBM servers.
  */
 public class TrustToken {
-	private final String token;
-	private final Date creationDate;
+	private String token;
+	private long created;
 
+	/**
+	 * Builds a new, empty {@link TrustToken}.
+	 */
+	public TrustToken() {
+		this("");
+	}
+
+	/**
+	 * Builds a new {@link TrustToken} for the given {@code token}.<br />
+	 * This is equivalent to calling: {@code new TrustToken(token, System.currentTimeMillis());}.
+	 * 
+	 * @param token The actual trust {@code token}.
+	 */
 	public TrustToken(String token) {
-		this(token, new Date());
+		this(token, System.currentTimeMillis());
 	}
 
-	public TrustToken(String token, Date creationDate) {
+	/**
+	 * Builds a new {@link TrustToken}.
+	 * 
+	 * @param token The actual trust {@code token}.
+	 * @param created The timestamp of the token creation.
+	 */
+	public TrustToken(String token, long created) {
 		this.token = token;
-		this.creationDate = creationDate;
+		this.created = created;
 	}
 
+	/**
+	 * Checks whether or not this {@link TrustToken} is expired in regards to the given timeout.
+	 * 
+	 * @param timeoutInSeconds The timeout (in seconds) for the {@link TrustToken}.
+	 * 
+	 * @return @code true} if and only if the {@link TrustToken} is expired.
+	 */
 	public boolean isExpired(long timeoutInSeconds) {
-		return (System.currentTimeMillis() - creationDate.getTime()) >= (timeoutInSeconds * 1000);
+		return (System.currentTimeMillis() - created) >= (timeoutInSeconds * 1000);
 	}
 
+	/**
+	 * Checks and returns whether the given {@code token} is valid by comparing it to the actual trust {@code token} of this {@link TrustToken} instance.
+	 * 
+	 * @param token The token to check.
+	 * 
+	 * @return {@code true} if and only if the given token is valid.
+	 */
 	public boolean isTokenValid(String token) {
 		return Objects.equal(this.token, token);
 	}
 
+	/**
+	 * Getter for field {@link #token} of type {@code String}.
+	 * 
+	 * @return The value of {@link #token}.
+	 */
 	public String getToken() {
 		return token;
 	}
 
-	public Date getCreatedDate() {
-		return creationDate;
+	/**
+	 * Getter for field {@link #created} of type {@code long}.
+	 * 
+	 * @return The value of {@link #created}.
+	 */
+	public long getCreated() {
+		return created;
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("token", token).add("created", creationDate).toString();
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hashCode(getToken(), getCreatedDate());
-	}
-
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj != null && obj instanceof TrustToken) {
-			TrustToken other = (TrustToken) obj;
-			
-			return Objects.equal(token, other.token) && Objects.equal(creationDate, other.creationDate);
-		}
-		
-		return false;
+		return Objects.toStringHelper(this).add("token", token).add("created", created).toString();
 	}
 }

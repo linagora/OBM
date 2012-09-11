@@ -4,10 +4,9 @@
 BEGIN;
 
 CREATE TABLE TrustToken (
-  id int(8) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  token char(36) NOT NULL UNIQUE,
-  login varchar(80) NOT NULL,
-  time_created timestamp
+  token varchar(255) NOT NULL,
+  time_created timestamp NULL default CURRENT_TIMESTAMP
 );
+INSERT INTO TrustToken (token) VALUES (UUID());
 
 COMMIT;

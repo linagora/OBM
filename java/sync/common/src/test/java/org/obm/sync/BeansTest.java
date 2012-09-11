@@ -43,7 +43,6 @@ import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.trust.TrustToken;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -58,7 +57,7 @@ public class BeansTest {
 	@Test
 	public void test() {
 		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class, Event.class,
-				EventRecurrence.class, EventChanges.class, Contact.class, TrustToken.class);
+				EventRecurrence.class, EventChanges.class, Contact.class);
 	}
 	
 }

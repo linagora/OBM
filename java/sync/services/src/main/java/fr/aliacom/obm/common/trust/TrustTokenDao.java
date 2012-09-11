@@ -33,44 +33,102 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.utils.ObmHelper;
 
+/**
+ * A Dao {@link Class} used to manipulate the {@code Trust} token in the database.
+ */
 @Singleton
 public class TrustTokenDao {
+	private static final Logger logger = LoggerFactory.getLogger(TrustTokenDao.class);
 	private final ObmHelper obmHelper;
 
+	/**
+	 * Builds a new {@link TrustTokenDao}.
+	 * 
+	 * @param obmHelper The {@link ObmHelper} instance to access the DB.
+	 */
 	@Inject
 	private TrustTokenDao(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
 	}
 
-	public TrustToken getTrustToken(String user) throws SQLException {
+	/**
+	 * Retrieves the trust {@code token} from the database.
+	 * 
+	 * @return The {@link TrustToken} if it exists or {@code null} if no token is found.
+	 */
+	public TrustToken getTrustToken() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String query = "SELECT token, time_created FROM TrustToken WHERE login=?";
+		String query = "SELECT token, time_created FROM TrustToken LIMIT 1";
 
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
-			ps.setString(1, user);
-			
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return new TrustToken(rs.getString("token"), rs.getTimestamp("time_created"));
+				return new TrustToken(rs.getString("token"), rs.getTimestamp("time_created").getTime());
 			}
+		}
+		catch (SQLException e) {
+			logger.error(e.getMessage(), e);
 		}
 		finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
 
 		return null;
+	}
+
+	/**
+	 * Updates the trust {@code token} in the database.
+	 */
+	public void updateTrustToken() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		String deleteQuery = "DELETE FROM TrustToken";
+		String insertQuery = "INSERT INTO TrustToken (token) VALUES (?)";
+
+		if (logger.isDebugEnabled())
+			logger.debug("Updating trust token in database.");
+
+		try {
+			String newToken = newToken();
+
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(deleteQuery);
+			ps.executeUpdate();
+			obmHelper.cleanup(null, ps, null);
+
+			ps = con.prepareStatement(insertQuery);
+			ps.setString(1, newToken);
+			ps.executeUpdate();
+		}
+		catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		}
+		finally {
+			obmHelper.cleanup(con, ps, null);
+		}
+	}
+
+	/**
+	 * Builds and returns a new trust {@code token}, as a {@link String}.
+	 * 
+	 * @return The created trust token.
+	 */
+	private String newToken() {
+		return UUID.randomUUID().toString();
 	}
 }
