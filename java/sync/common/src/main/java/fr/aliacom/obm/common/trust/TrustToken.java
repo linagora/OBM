@@ -68,7 +68,7 @@ public class TrustToken {
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("token", token).add("creationDate", creationDate).toString();
+		return Objects.toStringHelper(this).add("token", token).add("created", creationDate).toString();
 	}
 
 	@Override
