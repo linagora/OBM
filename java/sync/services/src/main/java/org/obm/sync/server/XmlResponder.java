@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -70,8 +69,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Strings;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class XmlResponder {
 
@@ -116,38 +113,33 @@ public class XmlResponder {
 	}
 
 	public String sendToken(AccessToken at) {
+		if(at == null) {
+			return null;
+		}
+		String res = "";
 		try {
-			return emitResponse(toXML(at));
+			Document doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/token.xsd", "token");
+			Element root = doc.getDocumentElement();
+			DOMUtils.createElementAndText(root, "sid", at.getSessionId());
+			Element v = DOMUtils.createElement(root, "version");
+			MavenVersion version = at.getVersion();
+			v.setAttribute("major", version.getMajor());
+			v.setAttribute("minor", version.getMinor());
+			v.setAttribute("release", version.getRelease());
+
+            DOMUtils.createElementAndText(root, "email", at.getUserEmail());
+
+			Element domain = DOMUtils.createElementAndText(root, "domain", at.getDomain().getName());
+			domain.setAttribute("uuid", at.getDomain().getUuid());
+			res = emitResponse(doc);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
-		return "";
+		return res;
 	}
 
-	public Document toXML(AccessToken at) throws FactoryConfigurationError {
-		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain());
-	}
-
-	public Document prepareAccessTokenXML(String sessionId, String userEmail,
-			MavenVersion version, ObmDomain tokenDomain)
-			throws FactoryConfigurationError {
-		Document doc = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/token.xsd", "token");
-		Element root = doc.getDocumentElement();
-		DOMUtils.createElementAndText(root, "sid", sessionId);
-		Element v = DOMUtils.createElement(root, "version");
-		v.setAttribute("major", version.getMajor());
-		v.setAttribute("minor", version.getMinor());
-		v.setAttribute("release", version.getRelease());
-
-		DOMUtils.createElementAndText(root, "email", userEmail);
-
-		Element domain = DOMUtils.createElementAndText(root, "domain", tokenDomain.getName());
-		domain.setAttribute("uuid", tokenDomain.getUuid());
-		return doc;
-	}
-
-	public String emitResponse(Document doc) {
+	private String emitResponse(Document doc) {
 		String res = "";
 		try {
 			resp.setContentType("text/xml;charset=UTF-8");
