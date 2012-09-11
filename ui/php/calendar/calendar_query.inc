@@ -1495,7 +1495,7 @@ function run_icalendar_obmsync_insert($ics){
   $iterator = new ArrayIterator($obmSyncServer);
   $obmSyncServer = $iterator->current();
   $obmSyncRootPath = "http://".$obmSyncServer[0]["ip"].":8080";
-  $loginPath = "/obm-sync/services/login/trustedLogin";
+  $loginPath = "/obm-sync/services/login/doLogin";
   $username = $userInfo["login"];
   $password = $userInfo["password"];
   $origin= $GLOBALS['c_origin_web'];
