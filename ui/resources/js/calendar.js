@@ -1111,7 +1111,14 @@ Obm.CalendarManager = new Class({
 	            eventData.all = 1;
 	        });
 	        obm.calendarManager.popupManager.addEvent('update_one', function () {
-				window.location=window.location+'?action=detailupdate&date_edit_occurrence='+encodeURIComponent(eventData.eventdate) + "&calendar_id="+ encodeURIComponent(eventData.calendar_id);
+	          var href = window.location.href;
+	          var argLocation = href.indexOf("?");
+	          var GETdetailUpdateForOccurrence = '?action=detailupdate&date_edit_occurrence='+encodeURIComponent(eventData.eventdate) + "&calendar_id="+ encodeURIComponent(eventData.calendar_id);
+	          if(argLocation != -1) {
+	            window.location = href.substr(0, argLocation)+GETdetailUpdateForOccurrence;
+	          } else {
+			    window.location = window.location+GETdetailUpdateForOccurrence;
+	          }
 	        });
 	        obm.calendarManager.popupManager.addEvent('complete', function () {
 	            obm.calendarManager.DetailUpdateRequest(eventData);
