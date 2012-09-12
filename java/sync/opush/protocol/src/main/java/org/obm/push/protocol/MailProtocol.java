@@ -31,20 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.MailRequestStatus;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.protocol.request.SendEmailSyncRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.stream.SizeLimitExceededException;
 import org.obm.push.utils.stream.SizeLimitingInputStream;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -95,4 +99,33 @@ public class MailProtocol {
 		return ret;
 	}
 
+	public SendEmailSyncRequest encodeRequest(MailRequest request) throws QuotaExceededException {
+		return new SendEmailSyncRequest.Builder()
+			.parameters(buildParametersMap(request))
+			.inputStream(buildStreamData(request.getMailContent()))
+			.build();
+	}
+
+	private Map<String, String> buildParametersMap(MailRequest request) {
+		Map<String, String> parameters = Maps.newHashMap();
+		parameters.put("CollectionId", request.getCollectionId());
+		parameters.put("ItemId", request.getServerId());
+		if (request.isSaveInSent()) {
+			parameters.put("SaveInSent", "T");
+		}
+		return parameters;
+	}
+	
+	private InputStream buildStreamData(byte[] mailContent) throws QuotaExceededException {
+		if (mailContent == null) {
+			return new ByteArrayInputStream(new byte[0]);
+		}
+		
+		int maxSize = emailConfiguration.getMessageMaxSize();
+		if (mailContent.length > maxSize) {
+			throw new QuotaExceededException("The message must be smaller than " + maxSize, maxSize, mailContent);
+		}
+		
+		return new ByteArrayInputStream(mailContent);
+	}
 }

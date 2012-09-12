@@ -59,6 +59,7 @@ import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
+import org.obm.push.protocol.request.SendEmailSyncRequest;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -101,6 +102,7 @@ public class BeansTest {
 					.add(SyncRequestCollection.class)
 					.add(SyncRequestCollectionCommand.class)
 					.add(SyncRequestCollectionCommands.class)
+					.add(SendEmailSyncRequest.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

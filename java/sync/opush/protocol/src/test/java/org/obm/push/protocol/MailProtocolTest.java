@@ -31,64 +31,116 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.push.exception.QuotaExceededException;
-import org.obm.push.protocol.request.ActiveSyncRequest;
-
-
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.exception.QuotaExceededException;
+import org.obm.push.protocol.bean.MailRequest;
+import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.protocol.request.SendEmailSyncRequest;
+
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class MailProtocolTest {
 	
 	@Test
 	public void testWithBigMessageMaxSize() throws IOException, QuotaExceededException {
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
-		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
+		EmailConfiguration emailConfiguration = createMock(EmailConfigurationImpl.class);
+		ActiveSyncRequest request = createMock(ActiveSyncRequest.class);
 		
-		EasyMock.expect(request.getParameter("CollectionId")).andReturn("1").once();
-		EasyMock.expect(request.getParameter("ItemId")).andReturn("1").once();
-		EasyMock.expect(request.getInputStream()).andReturn(loadDataFile("bigEml.eml")).once();
-		EasyMock.expect(request.getParameter("SaveInSent")).andReturn("T").once();
+		expect(request.getParameter("CollectionId")).andReturn("1").once();
+		expect(request.getParameter("ItemId")).andReturn("1").once();
+		expect(request.getInputStream()).andReturn(loadDataFile("bigEml.eml")).once();
+		expect(request.getParameter("SaveInSent")).andReturn("T").once();
 		
-		EasyMock.expect(emailConfiguration.getMessageMaxSize()).andReturn(10485760).once();
-		EasyMock.replay(request, emailConfiguration);
+		expect(emailConfiguration.getMessageMaxSize()).andReturn(10485760).once();
+		replay(request, emailConfiguration);
 		
 		MailProtocol mailProtocol = new MailProtocol(emailConfiguration);
 		mailProtocol.getRequest(request);
-		EasyMock.verify(request, emailConfiguration);
-		
+		verify(request, emailConfiguration);
 	}
 	
 	@Test(expected=QuotaExceededException.class)
 	public void testWithSmallMessageMaxSize() throws IOException, QuotaExceededException {
-		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfigurationImpl.class);
-		ActiveSyncRequest request = EasyMock.createMock(ActiveSyncRequest.class);
+		EmailConfiguration emailConfiguration = createMock(EmailConfigurationImpl.class);
+		ActiveSyncRequest request = createMock(ActiveSyncRequest.class);
 		
-		EasyMock.expect(request.getParameter("CollectionId")).andReturn("1").once();
-		EasyMock.expect(request.getParameter("ItemId")).andReturn("1").once();
-		EasyMock.expect(request.getInputStream()).andReturn(loadDataFile("bigEml.eml")).once();
-		EasyMock.expect(request.getParameter("SaveInSent")).andReturn("T").once();
+		expect(request.getParameter("CollectionId")).andReturn("1").once();
+		expect(request.getParameter("ItemId")).andReturn("1").once();
+		expect(request.getInputStream()).andReturn(loadDataFile("bigEml.eml")).once();
+		expect(request.getParameter("SaveInSent")).andReturn("T").once();
 		
-		EasyMock.expect(emailConfiguration.getMessageMaxSize()).andReturn(1024).once();
-		EasyMock.replay(request, emailConfiguration);
+		expect(emailConfiguration.getMessageMaxSize()).andReturn(1024).once();
+		replay(request, emailConfiguration);
 		
 		MailProtocol mailProtocol = new MailProtocol(emailConfiguration);
 		mailProtocol.getRequest(request);
-		EasyMock.verify(request, emailConfiguration);
-		
+		verify(request, emailConfiguration);
 	}
-
-	protected InputStream loadDataFile(String name) {
+	
+	private InputStream loadDataFile(String name) {
 		return getClass().getClassLoader().getResourceAsStream(
 				"file/" + name);
+	}
+
+	@Test
+	public void testEncodeRequest() throws Exception {
+		EmailConfiguration emailConfiguration = createMock(EmailConfigurationImpl.class);
+		byte[] mailContent = new byte[] {123, 54, 23, 87, 10, 23, 10, 23 };
+		MailRequest sendSimpleEmailRequest = new MailRequest("23", "12", true, mailContent);
+		
+		ActiveSyncRequest expectedActiveSyncRequest = new SendEmailSyncRequest.Builder()
+			.parameters(ImmutableMap.<String, String> of("CollectionId", "23", "ItemId", "12", "SaveInSent", "T"))
+			.inputStream(new ByteArrayInputStream(mailContent))
+			.build();
+		
+		expect(emailConfiguration.getMessageMaxSize()).andReturn(1024).once();
+		replay(emailConfiguration);
+		
+		MailProtocol mailProtocol = new MailProtocol(emailConfiguration);
+		ActiveSyncRequest encodedRequest = mailProtocol.encodeRequest(sendSimpleEmailRequest);
+		
+		verify(emailConfiguration);
+		
+		assertThat(encodedRequest).isEqualTo(expectedActiveSyncRequest);
+	}
+
+	@Test(expected=QuotaExceededException.class)
+	public void testEncodeRequestMaxSizeException() throws Exception {
+		EmailConfiguration emailConfiguration = createMock(EmailConfigurationImpl.class);
+		MailRequest sendSimpleEmailRequest = new MailRequest("23", "12", true, new byte[] {123, 54, 23, 87, 10, 23, 10, 23 });
+		
+		expect(emailConfiguration.getMessageMaxSize()).andReturn(2).once();
+		replay(emailConfiguration);
+		
+		MailProtocol mailProtocol = new MailProtocol(emailConfiguration);
+		mailProtocol.encodeRequest(sendSimpleEmailRequest);
+	}
+
+	@Test
+	public void testEncodeRequestEmptyMailContent() throws Exception {
+		MailRequest sendSimpleEmailRequest = new MailRequest("23", "12", true, null);
+		
+		MailProtocol mailProtocol = new MailProtocol(null);
+		ActiveSyncRequest encodedRequest = mailProtocol.encodeRequest(sendSimpleEmailRequest);
+		
+		ByteArrayInputStream byteArrayInputStream = (ByteArrayInputStream) encodedRequest.getInputStream();
+		byte[] bytes = new byte[byteArrayInputStream.available()];
+		byteArrayInputStream.read(bytes);
+		assertThat(bytes).isEmpty();
 	}
 }
