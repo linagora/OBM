@@ -220,10 +220,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.iCalendar(iCalendar);
 	}
 
-	private InputStream chooseInputStreamFormater(IMimePart mp, InputStream inputStream) {
-		if (QUOTED_PRINTABLE.equals(mp.getContentTransfertEncoding())) {
+	@VisibleForTesting static InputStream chooseInputStreamFormater(IMimePart mp, InputStream inputStream) {
+		if (QUOTED_PRINTABLE.equalsIgnoreCase(mp.getContentTransfertEncoding())) {
 			return new QPDecoderStream(inputStream);
-		} else if (BASE64.equals(mp.getContentTransfertEncoding())) {
+		} else if (BASE64.equalsIgnoreCase(mp.getContentTransfertEncoding())) {
 			return new Base64InputStream(inputStream);
 		} else {
 			return inputStream;

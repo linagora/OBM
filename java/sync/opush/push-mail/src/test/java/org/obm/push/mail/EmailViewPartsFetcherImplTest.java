@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +80,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import com.sun.mail.util.QPDecoderStream;
 
 @RunWith(SlowFilterRunner.class)
 public class EmailViewPartsFetcherImplTest {
@@ -470,6 +472,72 @@ public class EmailViewPartsFetcherImplTest {
 		testNoAttachmentFoundWhenLeafHasContentTypeOf("multipart/alternative");
 	}
 
+	@Test
+	public void testContentTransfertEncodingBase64() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn("BASE64").atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isInstanceOf(Base64InputStream.class);
+		verify(mimePart);
+	}
+
+	@Test
+	public void testContentTransfertEncodingBaSe64IgnoreCase() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn("BaSe64").atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isInstanceOf(Base64InputStream.class);
+		verify(mimePart);
+	}
+
+	@Test
+	public void testContentTransfertEncodingQuotedPrintable() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn("QUOTED-PRINTABLE").atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isInstanceOf(QPDecoderStream.class);
+		verify(mimePart);
+	}
+
+	@Test
+	public void testContentTransfertEncodingQuotedPrinTableIgnoreCase() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn("Quoted-PrinTable").atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isInstanceOf(QPDecoderStream.class);
+		verify(mimePart);
+	}
+
+	@Test
+	public void testBadContentTransfert() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn("Toto").atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isSameAs(inputStream);
+		verify(mimePart);
+	}
+	
+	@Test
+	public void testDefaultContentTransfert() {
+		IMimePart mimePart = createMock(IMimePart.class);
+		expect(mimePart.getContentTransfertEncoding()).andReturn(null).atLeastOnce();
+		replay(mimePart);
+		InputStream inputStream = createMock(InputStream.class);
+		Object actual = EmailViewPartsFetcherImpl.chooseInputStreamFormater(mimePart, inputStream);
+		assertThat(actual).isSameAs(inputStream);
+		verify(mimePart);
+	}
+	
 	private void testNoAttachmentFoundWhenLeafHasContentTypeOf(String contentType) {
 		EmailView.Builder shouldGetEmptyAttachmentListViewBuilder = createStrictMock(EmailView.Builder.class);
 		expect(shouldGetEmptyAttachmentListViewBuilder.attachments(Collections.<EmailViewAttachment>emptyList()))
