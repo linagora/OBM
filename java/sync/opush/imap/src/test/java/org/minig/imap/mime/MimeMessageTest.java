@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.mime;
 
+import static org.easymock.EasyMock.createMock;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.io.InputStream;
+
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
@@ -304,6 +309,54 @@ public class MimeMessageTest {
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isTrue();
+	}
+	
+	@Test
+	public void testContentTransfertEncodingBase64() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("BASE64").build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
+	}
+
+	@Test
+	public void testContentTransfertEncodingBaSe64IgnoreCase() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("BaSe64").build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
+	}
+
+	@Test
+	public void testContentTransfertEncodingQuotedPrintable() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("QUOTED-PRINTABLE").build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
+	}
+
+	@Test
+	public void testContentTransfertEncodingQuotedPrinTableIgnoreCase() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("Quoted-PrinTable").build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
+	}
+
+	@Test
+	public void testBadContentTransfert() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("Toto").build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
+	}
+	
+	@Test
+	public void testDefaultContentTransfert() {
+		InputStream inputStream = createMock(InputStream.class);
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding(null).build()).build();
+		Object actual = mimePart.decodeMimeStream(inputStream);
+		assertThat(actual).isSameAs(inputStream);
 	}
 
 	private MimePart buildMimePart(String contentType) {

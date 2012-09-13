@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.mime;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,5 +106,12 @@ public interface IMimePart {
 	boolean hasMimePart(ContentType contentType);
 	
 	boolean isICSAttachment();
+	
+	
+	/**
+	 * This method decodes an InputStream representing itself
+	 * by using Content-Transfer-Encoding header
+	 */
+	InputStream decodeMimeStream(InputStream rawStream);
 
 }

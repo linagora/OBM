@@ -32,6 +32,7 @@
 
 package org.minig.imap.mime;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -291,6 +292,11 @@ public class MimeMessage implements IMimePart {
 	@Override
 	public boolean isICSAttachment() {
 		return from.isICSAttachment();
+	}
+	
+	@Override
+	public InputStream decodeMimeStream(InputStream rawStream) {
+		return rawStream;
 	}
 
 }

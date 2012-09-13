@@ -39,7 +39,6 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.apache.commons.codec.binary.Base64InputStream;
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.IMimePart;
@@ -60,13 +59,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
-import com.sun.mail.util.QPDecoderStream;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
-	private static final String BASE64 = "BASE64";
-	private static final String QUOTED_PRINTABLE = "QUOTED-PRINTABLE";
 
 	private final PrivateMailboxService privateMailboxService;
 	private final UserDataRequest udr;
@@ -135,7 +131,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		
 		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
 		 
-		emailViewBuilder.bodyMimePartData(chooseInputStreamFormater(fetchInstructions.getMimePart(), bodyData));
+		emailViewBuilder.bodyMimePartData(fetchInstructions.getMimePart().decodeMimeStream(bodyData));
 		emailViewBuilder.bodyType(fetchInstructions.getBodyType());
 		emailViewBuilder.estimatedDataSize(fetchInstructions.getMimePart().getSize());
 		emailViewBuilder.truncated(fetchInstructions.mustTruncate());
@@ -216,17 +212,8 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
 		ICalendar iCalendar = ICalendar.builder()
-			.inputStream(chooseInputStreamFormater(mp, inputStream)).build();
+			.inputStream(mp.decodeMimeStream(inputStream)).build();
 		emailViewBuilder.iCalendar(iCalendar);
 	}
 
-	@VisibleForTesting static InputStream chooseInputStreamFormater(IMimePart mp, InputStream inputStream) {
-		if (QUOTED_PRINTABLE.equalsIgnoreCase(mp.getContentTransfertEncoding())) {
-			return new QPDecoderStream(inputStream);
-		} else if (BASE64.equalsIgnoreCase(mp.getContentTransfertEncoding())) {
-			return new Base64InputStream(inputStream);
-		} else {
-			return inputStream;
-		}
-	}
 }

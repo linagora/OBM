@@ -32,10 +32,13 @@
 
 package org.minig.imap.mime;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.obm.push.mail.MimeAddress;
 
 import com.google.common.base.Objects;
@@ -43,9 +46,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-
 public class MimePart extends AbstractMimePart implements IMimePart {
 
+	private static final String BASE64 = "BASE64";
+	private static final String QUOTED_PRINTABLE = "QUOTED-PRINTABLE";
+	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -362,5 +367,16 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 		return Objects.toStringHelper(getClass())
 			.add("mime-type", getFullMimeType())
 			.add("addr", getAddress()).toString();
+	}
+	
+	@Override
+	public InputStream decodeMimeStream(InputStream rawStream) {
+		if (QUOTED_PRINTABLE.equalsIgnoreCase(getContentTransfertEncoding())) {
+			return new QuotedPrintableInputStream(rawStream);
+		} else if (BASE64.equalsIgnoreCase(getContentTransfertEncoding())) {
+			return new Base64InputStream(rawStream);
+		} else {
+			return rawStream;
+		}
 	}
 }

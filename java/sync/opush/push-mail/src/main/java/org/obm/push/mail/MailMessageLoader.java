@@ -32,7 +32,6 @@
 package org.obm.push.mail;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.Base64;
 import org.minig.imap.Address;
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
@@ -56,7 +54,6 @@ import org.obm.mail.conversation.MessageId;
 import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
 import org.obm.mail.message.MessageLoader;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmail;
@@ -65,6 +62,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
@@ -73,7 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
-import com.sun.mail.util.QPDecoderStream;
+import com.google.common.io.ByteStreams;
 
 /**
  * Creates a {@link MailMessage} from a {@link MessageId}.
@@ -165,17 +163,17 @@ public class MailMessageLoader {
 		msEmail.setCc(convertAllAdressToMSAddress(mailMessage.getCc()));
 		
 		if (mailMessage.getInvitation() != null) {
-			setInvitation(msEmail, udr, mailMessage.getInvitation(), uid, messageId);
+			setInvitation(msEmail, udr, mailMessage.getInvitation(), uid);
 		}
 		
 		return msEmail;
 	}
 
-	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final long uid, 
-			final long messageId) throws ConversionException {
+	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final long uid)
+			throws ConversionException {
 		
 		try {	
-			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid, messageId);
+			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid);
 			final MSEvent event = getInvitation(udr, inputStreamInvitation);
 			if (mimePart.isInvitation()) {
 				msEmail.setInvitation(event, MSMessageClass.SCHEDULE_MEETING_REQUEST);
@@ -187,10 +185,9 @@ public class MailMessageLoader {
 		}
 	}
 	
-	private InputStream extractInputStreamInvitation(final IMimePart mp, final long uid, final long messageId) throws IOException {
-		byte[] data = null;
+	private InputStream extractInputStreamInvitation(final IMimePart mp, final long uid) throws IOException {
 		final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
-		data = extractPartData(mp, part, messageId);
+		byte[] data = extractPartData(mp, part);
 		if (data != null) {
 			return new ByteArrayInputStream(data);
 		}
@@ -273,24 +270,8 @@ public class MailMessageLoader {
 		}
 	}
 	
-	private byte[] extractPartData(final IMimePart mp, final InputStream bodyText, final long messageId) throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		FileUtils.transfer(bodyText, out, true);
-		byte[] rawData = out.toByteArray();
-		if (logger.isDebugEnabled()) {
-			logger.debug("[" + messageId + "] transfer encoding for part: "
-					+ mp.getContentTransfertEncoding() + " "
-					+ mp.getFullMimeType());
-		}
-		if ("QUOTED-PRINTABLE".equals(mp.getContentTransfertEncoding())) {
-			out = new ByteArrayOutputStream();
-			InputStream in = new QPDecoderStream(new ByteArrayInputStream(rawData));
-			FileUtils.transfer(in, out, true);
-			rawData = out.toByteArray();
-		} else if ("BASE64".equals(mp.getContentTransfertEncoding())) {
-			rawData = new Base64().decode(rawData);
-		}
-		return rawData;
+	private byte[] extractPartData(final IMimePart mp, final InputStream bodyText) throws IOException {
+		return ByteStreams.toByteArray(mp.decodeMimeStream(bodyText));
 	}
 	
 	private MSAttachement extractAttachmentData(final IMimePart mp, final long uid, 
@@ -298,9 +279,8 @@ public class MailMessageLoader {
 		try {
 			
 			if (mp.getName() != null || mp.getContentId() != null) {
-				byte[] data = null;
 				final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
-				data = extractPartData(mp, part, messageId);
+				byte[] data = extractPartData(mp, part);
 				
 				final String id = AttachmentHelper.getAttachmentId(collectionId.toString(), String.valueOf(messageId), 
 						mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());

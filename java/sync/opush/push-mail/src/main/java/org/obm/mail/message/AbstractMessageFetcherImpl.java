@@ -38,7 +38,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Map;
 
-import org.apache.james.mime4j.codec.Base64InputStream;
 import org.minig.imap.IMAPHeaders;
 import org.minig.imap.command.parser.HeadersParser;
 import org.minig.imap.mime.IMimePart;
@@ -47,8 +46,6 @@ import org.obm.mail.conversation.MailMessage;
 import org.obm.push.mail.MimeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.mail.util.QPDecoderStream;
 
 
 public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
@@ -106,23 +103,13 @@ public abstract class AbstractMessageFetcherImpl implements MessageFetcher {
 	@Override
 	public InputStream fetchPart(MimeMessage message, IMimePart mimePart) throws IOException {
 		InputStream encodedStream = uidFetchPart(message, mimePart);
-		return decodeStream(mimePart, encodedStream);
+		return mimePart.decodeMimeStream(encodedStream);
 	}
 
 	@Override
 	public InputStream fetchPart(MailMessage message, IMimePart mimePart) throws IOException {
 		InputStream encodedStream = uidFetchPart(message, mimePart);
-		return decodeStream(mimePart, encodedStream);
-	}
-
-	protected InputStream decodeStream(IMimePart chosenPart, InputStream encodedStream) {
-		
-		if ("QUOTED-PRINTABLE".equals(chosenPart.getContentTransfertEncoding())) {
-			return new QPDecoderStream(encodedStream);
-		} else if ("BASE64".equals(chosenPart.getContentTransfertEncoding())) {
-			return new Base64InputStream(encodedStream);
-		}
-		return encodedStream;
+		return mimePart.decodeMimeStream(encodedStream);
 	}
 	
 	
