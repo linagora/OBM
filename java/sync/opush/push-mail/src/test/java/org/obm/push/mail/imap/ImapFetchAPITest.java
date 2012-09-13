@@ -121,7 +121,6 @@ public class ImapFetchAPITest {
 	@Test
 	public void testFetchEnvelope() throws MailException {
 		Envelope envelope = Envelope.builder().date(DateUtils.date("2010-09-17T17:12:26")).
-		messageNumber(1).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
 		from(Lists.newArrayList(new Address("Ad Min", "admin@opush.test"))).
@@ -147,7 +146,6 @@ public class ImapFetchAPITest {
 		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 2l);
 	}
 	
-	@Ignore("Greenmail doesn't respect element orders in its response")
 	@Test
 	public void testFetchEnvelopeMsgnoDifferentThanUID() throws MailException, ImapMessageNotFoundException {
 		testUtils.sendEmailToInbox();
@@ -160,7 +158,6 @@ public class ImapFetchAPITest {
 		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, mailboxPath, email3.getUid());
 		Assertions.assertThat(uidEnvelope).isNotNull();
 		Assertions.assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
-		Assertions.assertThat(uidEnvelope.getEnvelope().getMsgno()).isEqualTo(2);
 	}
 	
 	@Test

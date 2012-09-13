@@ -40,14 +40,11 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.minig.imap.command.parser.BodyStructureParser;
-import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPParsingTools;
+import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.impl.AtomHelper;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 
@@ -98,7 +95,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 				
 				try {
 					//remove closing brace
-					MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bs.substring(0, bs.length() - 1));
+					MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bs);
 					messageBuilder.uid(uid).size(size);
 					mts.add(messageBuilder.build());
 				} catch (RuntimeException re) {
@@ -144,18 +141,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 			return null;
 		}
 		String content = fullPayload.substring(contentStart);
-		ImmutableList<Character> chars = Lists.charactersOf(content);
-		int scope = 1;
-		int position = 0;
-		for (Character c: chars) {
-			position++;
-			if (c == '(') scope++;
-			if (c == ')') scope--;
-			if (scope == 0) {
-				return content.substring(0, position);
-			}
-		}
-		return null;
+		return IMAPParsingTools.substringFromOpeningToClosingBracket(content);
 	}
 	
 }

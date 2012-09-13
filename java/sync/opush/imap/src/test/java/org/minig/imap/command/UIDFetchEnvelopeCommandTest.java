@@ -31,19 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.command;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.minig.imap.Address;
+import org.minig.imap.Envelope;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPResponseParser;
 import org.minig.imap.impl.MinaIMAPMessage;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
 
+import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
@@ -67,5 +73,45 @@ public class UIDFetchEnvelopeCommandTest {
 		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(Arrays.asList(20l));
 		command.responseReceived(ImmutableList.of(response, new IMAPResponse("OK", "")));
 		Assert.assertNotNull(command.getReceivedData());
+	}
+	
+	@Test
+	public void testParseEnvelopeSyntax() {
+		String envelopeData = "(\"Thu, 13 Sep 2012 14:16:45 +0200\"" +
+				" \"subject\" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"toName toName\" NIL \"toName\" \"thilaire.lng.org\"))" +
+				" NIL NIL NIL \"<5051CEAD.8020706@thilaire.lng.org>\")";
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(ImmutableList.<Long>of());
+
+		Envelope envelope = command.parseEnvelope(envelopeData.getBytes());
+		
+		assertThat(envelope.getFrom()).containsOnly(new Address("sender", "sender@thilaire.lng.org"));
+		assertThat(envelope.getTo()).containsOnly(new Address("toName toName", "toName@thilaire.lng.org"));
+		assertThat(envelope.getCc()).isEmpty();
+		assertThat(envelope.getBcc()).isEmpty();
+		assertThat(envelope.getDate()).isEqualTo(DateUtils.date("2012-09-13T14:16:45+02"));
+		assertThat(envelope.getMessageId()).isEqualTo("<5051CEAD.8020706@thilaire.lng.org>");
+		assertThat(envelope.getReplyTo()).isEmpty();
+		assertThat(envelope.getSubject()).isEqualTo("subject");
+	}
+	
+	@Test
+	public void testParseEnvelopePayloadInIMAPResponse() {
+		String expectedEnvelopePayload = 
+				"(\"Thu, 13 Sep 2012 14:16:45 +0200\"" +
+				" \"subject\" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
+				" ((\"toName toName\" NIL \"toName\" \"thilaire.lng.org\"))" +
+				" NIL NIL NIL \"<5051CEAD.8020706@thilaire.lng.org>\")";
+		
+		String fullPayload = "* 2 FETCH (UID 28 ENVELOPE " + expectedEnvelopePayload + ")";
+		
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(ImmutableList.<Long>of());
+
+		String parsedEnvelope = command.getEnvelopePayload(fullPayload);
+		assertThat(parsedEnvelope).isEqualTo(expectedEnvelopePayload);
 	}
 }

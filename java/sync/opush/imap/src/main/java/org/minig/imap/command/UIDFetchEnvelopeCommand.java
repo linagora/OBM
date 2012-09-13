@@ -46,11 +46,16 @@ import org.minig.imap.EncodedWord;
 import org.minig.imap.Envelope;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.impl.DateParser;
+import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
 import org.minig.imap.mime.impl.AtomHelper;
 import org.minig.imap.mime.impl.ParenListParser;
 import org.minig.imap.mime.impl.ParenListParser.TokenType;
+import org.obm.push.mail.MailException;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 
 /**
  * @author tom
@@ -98,28 +103,13 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 					logger.warn("not a fetch: " + payload);
 					continue;
 				}
-				int uidIdx = payload.indexOf("(UID ") + "(UID ".length();
-				int endUid = payload.indexOf(' ', uidIdx);
-				String uidStr = payload.substring(uidIdx, endUid);
-				long uid = 0;
-				try {
-					uid = Long.parseLong(uidStr);
-				} catch (NumberFormatException nfe) {
-					logger.error("cannot parse uid for string '" + uid
-							+ "' (payload: " + payload + ")");
-					continue;
-				}
-
-				String envel = payload.substring(
-						endUid + " ENVELOPE (".length(), payload.length());
-
-				String envelData = AtomHelper.getFullResponse(envel,
-						r.getStreamData());
+				String fullPayload = AtomHelper.getFullResponse(payload, r.getStreamData());
+				long uid = getUid(fullPayload);
+				String envel = getEnvelopePayload(fullPayload);
 
 				try {
-					Envelope envelope = parseEnvelope(envelData.substring(0, envelData.length() - 1).getBytes());
-					logger.info("uid: " + uid + " env.from: "
-								+ envelope.getFrom());
+					Envelope envelope = parseEnvelope(envel.getBytes(Charsets.US_ASCII));
+					logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
 					tmp.add( new UIDEnvelope(uid, envelope) );
 				} catch (Throwable t) {
 					logger.error("fail parsing envelope for message UID " + uid, t);
@@ -136,6 +126,37 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		}
 	}
 
+	private long getUid(String fullPayload) {
+		try {
+			String longAsString = getNumberForField(fullPayload, "UID ");
+			return Long.valueOf(longAsString);
+		} catch(NumberFormatException e) {
+			throw new MailException("Cannot find UID in response : " + fullPayload);
+		}
+	}
+	
+	private String getNumberForField(String fullPayload, String field) {
+		String uidStartToken = field;
+		int uidIdx = fullPayload.indexOf(uidStartToken);
+		String content = fullPayload.substring(uidIdx + uidStartToken.length());
+		return IMAPParsingTools.getNextNumber(content);
+	}
+
+	@VisibleForTesting String getEnvelopePayload(String fullPayload) {
+		String envelopeStartToken = "ENVELOPE ";
+		int bsIdx = fullPayload.indexOf(envelopeStartToken);
+		if (bsIdx == -1) {
+			return null;
+		}
+		int contentStart = bsIdx + envelopeStartToken.length();
+		if (fullPayload.charAt(contentStart) != '(') {
+			return null;
+		}
+		String content = fullPayload.substring(contentStart);
+		return IMAPParsingTools.substringFromOpeningToClosingBracket(content);
+	}
+
+	
 	/**
 	 * <pre>
 	 * (        
@@ -165,11 +186,14 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	 * 		)
 	 * </pre>
 	 **/
-	private Envelope parseEnvelope(byte[] env) {
+	@VisibleForTesting Envelope parseEnvelope(byte[] envelopeWithContainer) {
 		ParenListParser parser = new ParenListParser();
 		int pos = 0;
+		
+		parser.consumeToken(pos, envelopeWithContainer);
+		byte[] envelope = parser.getLastReadToken();
 
-		pos = parser.consumeToken(pos, env);
+		pos = parser.consumeToken(pos, envelope);
 		String date = new String(parser.getLastReadToken());
 		Date d = null;
 		try {
@@ -177,7 +201,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		} catch (ParseException e) {
 		}
 
-		pos = parser.consumeToken(pos, env);
+		pos = parser.consumeToken(pos, envelope);
 		String subject = "[Empty subject]";
 		if (parser.getLastTokenType() == TokenType.STRING
 				|| parser.getLastTokenType() == TokenType.ATOM) {
@@ -186,29 +210,29 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		}
 
 		// FROM
-		pos = parser.consumeToken(pos, env); // (("Raymon" NIL "ra" "cg82.fr"))
+		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
 		List<Address> from = null;
 		if (parser.getLastTokenType() == TokenType.LIST) {
 			from = parseList(parser.getLastReadToken(), parser);
 		}
 
-		pos = parser.consumeToken(pos, env); // sender
-		pos = parser.consumeToken(pos, env); // reply to
+		pos = parser.consumeToken(pos, envelope); // sender
+		pos = parser.consumeToken(pos, envelope); // reply to
 
 		// TO
-		pos = parser.consumeToken(pos, env); // (("Raymon" NIL "ra" "cg82.fr"))
+		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
 		List<Address> to = parseList(parser.getLastReadToken(), parser);
 
 		// CC
-		pos = parser.consumeToken(pos, env); // (("Raymon" NIL "ra" "cg82.fr"))
+		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
 		List<Address> cc = parseList(parser.getLastReadToken(), parser);
 
-		pos = parser.consumeToken(pos, env); // (("Raymon" NIL "ra" "cg82.fr"))
+		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
 		List<Address> bcc = parseList(parser.getLastReadToken(), parser);
 
-		pos = parser.consumeToken(pos, env); // In-Reply-To
+		pos = parser.consumeToken(pos, envelope); // In-Reply-To
 
-		parser.consumeToken(pos, env); // Message-ID
+		parser.consumeToken(pos, envelope); // Message-ID
 		String mid = new String(parser.getLastReadToken());
 		
 		return Envelope.builder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(from).

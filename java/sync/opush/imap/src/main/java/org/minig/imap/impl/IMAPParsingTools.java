@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.impl;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -51,5 +52,34 @@ public class IMAPParsingTools {
 			}
 		}
 		return longAsString.toString();
+	}
+	
+	public static String substringFromOpeningToClosingBracket(String content) {
+		if (Strings.isNullOrEmpty(content)) {
+			return null;
+		}
+
+		char openingChar = '(';
+		char closingChar = ')';
+		int indexOf = content.indexOf(openingChar);
+		if (indexOf != -1) {
+			return substringFromOpeningToClosingChar(openingChar, closingChar, content.substring(indexOf));
+		}
+		return null;
+	}
+
+	private static String substringFromOpeningToClosingChar(char openingChar, char closingChar, String interestingContent) {
+		int scope = 0;
+		int position = 0;
+		ImmutableList<Character> chars = Lists.charactersOf(interestingContent);
+		for (Character c: chars) {
+			position++;
+			if (c == openingChar) scope++;
+			if (c == closingChar) scope--;
+			if (scope == 0) {
+				return interestingContent.substring(0, position);
+			}
+		}
+		return null;
 	}
 }

@@ -44,7 +44,6 @@ public class Envelope {
 	}
 	
 	public static class Builder {
-		private int msgno;
 		private Date date;
 		private String subject;
 		private List<Address> to;
@@ -55,12 +54,6 @@ public class Envelope {
 		private List<Address> replyTo;
 		
 		private Builder() {
-			this.msgno = -1;
-		}
-		
-		public Builder messageNumber(int msgno) {
-			this.msgno = msgno;
-			return this;
 		}
 		
 		public Builder date(Date date) {
@@ -119,12 +112,11 @@ public class Envelope {
 			if (replyTo == null) {
 				this.replyTo = ImmutableList.<Address>of();
 			}
-			return new Envelope(this.msgno, this.date, this.subject, this.messageId,  
+			return new Envelope(this.date, this.subject, this.messageId,  
 					this.from, this.to, this.cc, this.bcc, this.replyTo);
 		}
 	}
 	
-	private final int msgno;
 	private final Date date;
 	private final String subject;
 	private final String messageId;
@@ -134,11 +126,10 @@ public class Envelope {
 	private final List<Address> bcc;
 	private final List<Address> replyTo;
 
-	private Envelope(int msgno, Date date, String subject, String messageId, 
+	private Envelope(Date date, String subject, String messageId, 
 			List<Address> from, List<Address> to, List<Address> cc, List<Address> bcc, List<Address> replyTo) {
 		
 		super();
-		this.msgno = msgno;
 		this.date = date;
 		this.subject = subject;
 		this.messageId = messageId;
@@ -147,10 +138,6 @@ public class Envelope {
 		this.cc = cc;
 		this.bcc = bcc;
 		this.replyTo = replyTo;
-	}
-
-	public int getMsgno() {
-		return msgno;
 	}
 	
 	public Date getDate() {
@@ -187,15 +174,14 @@ public class Envelope {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(msgno, date, subject, to, cc, bcc, from, messageId, replyTo);
+		return Objects.hashCode(date, subject, to, cc, bcc, from, messageId, replyTo);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof Envelope) {
 			Envelope that = (Envelope) object;
-				return Objects.equal(this.msgno, that.msgno)
-				&& Objects.equal(this.date, that.date)
+				return Objects.equal(this.date, that.date)
 				&& Objects.equal(this.subject, that.subject)
 				&& Objects.equal(this.to, that.to)
 				&& Objects.equal(this.cc, that.cc)
@@ -210,7 +196,6 @@ public class Envelope {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("msgno", msgno)
 			.add("date", date)
 			.add("subject", subject)
 			.add("from", from)

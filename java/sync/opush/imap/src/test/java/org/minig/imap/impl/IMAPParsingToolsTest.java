@@ -36,34 +36,82 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 
 public class IMAPParsingToolsTest {
-	
+
 	@Test
 	public void testGetNextNumberNullString() {
 		String nextNumber = IMAPParsingTools.getNextNumber(null);
 		assertThat(nextNumber).isNull();
 	}
-	
+
 	@Test
 	public void testGetNextNumberEmptyString() {
 		String nextNumber = IMAPParsingTools.getNextNumber("");
 		assertThat(nextNumber).isEmpty();
 	}
-	
+
 	@Test
 	public void testGetNextNumberWithoutDigit() {
 		String nextNumber = IMAPParsingTools.getNextNumber("sdqf");
 		assertThat(nextNumber).isEmpty();
 	}
-	
+
 	@Test
 	public void testGetNextNumberOnlyDigits() {
 		String nextNumber = IMAPParsingTools.getNextNumber("1234");
 		assertThat(nextNumber).isEqualTo("1234");
 	}
-	
+
 	@Test
 	public void testGetNextNumber() {
 		String nextNumber = IMAPParsingTools.getNextNumber("1234a");
 		assertThat(nextNumber).isEqualTo("1234");
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketSameOpenCloseCount() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket("(a b (c) (d)((e)f))");
+		assertThat(parsedInnerBracketContent).isEqualTo("(a b (c) (d)((e)f))");
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketMoreClose() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket("(a b (c) (d)((e)f)))");
+		assertThat(parsedInnerBracketContent).isEqualTo("(a b (c) (d)((e)f))");
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketCloseBeforeEnd() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket("(a b (c)) (d)((e)f))");
+		assertThat(parsedInnerBracketContent).isEqualTo("(a b (c))");
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketBeginWithOtherChar() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket(" a (a b (c) (d)((e)f))");
+		assertThat(parsedInnerBracketContent).isEqualTo("(a b (c) (d)((e)f))");
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketNoMatchedClose() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket("(a b (c) (d)((ef))");
+		assertThat(parsedInnerBracketContent).isNull();
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketWithNullArg() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket(null);
+		assertThat(parsedInnerBracketContent).isNull();
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketWithEmptyArg() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket("");
+		assertThat(parsedInnerBracketContent).isNull();
+	}
+
+	@Test
+	public void testSubstringFromOpeningToClosingBracketWithOnlySpaceArg() {
+		String parsedInnerBracketContent = IMAPParsingTools.substringFromOpeningToClosingBracket(" ");
+		assertThat(parsedInnerBracketContent).isNull();
 	}
 }

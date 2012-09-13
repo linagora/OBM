@@ -103,7 +103,6 @@ public class ImapMailBoxUtils {
 	
 	public Envelope buildEnvelopeFromMessage(IMAPMessage message) throws MailException {
 		try {
-			int msgno = message.getMessageNumber();
 			Date sentDate = message.getSentDate();
 			String subject = message.getSubject();
 			String messageID = message.getMessageID();
@@ -113,7 +112,7 @@ public class ImapMailBoxUtils {
 			List<Address> from = buildAddressListFromJavaMailAddress(message.getFrom());
 			List<Address> replyTo = buildAddressListFromJavaMailAddress(message.getReplyTo());
 			
-			return Envelope.builder().messageNumber(msgno).
+			return Envelope.builder().
 					date(sentDate).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
 					messageID(messageID).replyTo(replyTo).build();
 		} catch (MessagingException e) {
