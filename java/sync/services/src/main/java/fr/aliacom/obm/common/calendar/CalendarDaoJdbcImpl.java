@@ -1343,6 +1343,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
 			ps.setInt(1, user.getUid());
+			if (helper != null) {
+				query += helper.insertValues(ps, 2);
+			}
 
 			rs = ps.executeQuery();
 
@@ -1372,6 +1375,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throws FindException {
 		Set<CalendarInfo> rights = this.listCalendarRights(user, calendarEmails);
 		return rights;
+	}
+
+	@Override
+	public Collection<ResourceInfo> getResourceMetadata(ObmUser user, Collection<String> resourceEmails)
+			throws FindException {
+		return this.listResources(user, resourceEmails);
 	}
 
 	private void processRightsRow(ResultSet rs, Set<CalendarInfo> dbResults, ObmUser user)

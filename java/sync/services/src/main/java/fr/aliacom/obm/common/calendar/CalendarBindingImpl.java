@@ -87,6 +87,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
+import java.util.Arrays;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -230,6 +231,26 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+
+	@Override
+	@Transactional(readOnly=true)
+	public ResourceInfo[] getResourceMetadata(AccessToken token, String[] resourceEmails) throws ServerFault {
+		if (resourceEmails == null || resourceEmails.length == 0) {
+			return new ResourceInfo[0];
+		}
+
+		ObmUser user = userService.getUserFromAccessToken(token);
+		Collection<ResourceInfo> resourceInfo;
+		try {
+			resourceInfo = calendarDao.getResourceMetadata(user, Arrays.asList(resourceEmails));
+		} catch (FindException e) {
+			throw new ServerFault(e);
+		}
+		ResourceInfo[] ret = new ResourceInfo[resourceInfo.size()];
+		resourceInfo.toArray(ret);
+		return ret;
 	}
 
 	private Collection<CalendarInfo> getRights(AccessToken t) throws FindException {

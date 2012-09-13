@@ -257,7 +257,55 @@ public class CalendarBindingImplTest {
 		CalendarInfo[] result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
 		assertEquals(new HashSet<CalendarInfo>(Arrays.asList(expectedCalendarInfos)), new HashSet<CalendarInfo>(Arrays.asList(result)));
 	}
-	
+
+	@Test
+	public void testGetResourceMetadata() throws FindException, ServerFault {
+		ObmUser defaultUser = ToolBox.getDefaultObmUser();
+
+		ResourceInfo resource1 = buildResourceInfo1();
+		ResourceInfo resource2 = buildResourceInfo2();
+		Collection<ResourceInfo> resourceInfo = Arrays.asList(new ResourceInfo[] { resource1,
+				resource2 });
+
+		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
+		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
+
+		UserService userService = createMock(UserService.class);
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultUser);
+
+		String[] resources = {"res-1@domain.com", "res-2@domain.com"};
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.getResourceMetadata(defaultUser, Arrays.asList(resources))).andReturn(resourceInfo);
+
+		Object[] mocks = { accessToken, calendarDao, userService };
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
+				calendarDao, null, null, null, null);
+		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 },
+				calendarService.getResourceMetadata(accessToken,
+						resources));
+
+		EasyMock.verify(mocks);
+	}
+
+	@Test
+	public void testGetResourceMetadataWithNoResource() throws ServerFault {
+		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
+
+		Object[] mocks = { accessToken };
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null,
+				null, null, null, null, null);
+		Assert.assertArrayEquals(new ResourceInfo[0],
+				calendarService.getResourceMetadata(accessToken,
+						new String[0]));
+
+		EasyMock.verify(mocks);
+	}
+
 	@Test(expected=ServerFault.class)
 	public void testCalendarOwnerNotAnAttendee() throws ServerFault, FindException, EventAlreadyExistException {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();

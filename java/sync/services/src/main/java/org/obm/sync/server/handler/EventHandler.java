@@ -202,7 +202,11 @@ public class EventHandler extends SecureSyncHandler {
 		}
 		else if (method.equals("getCalendarMetadata")) {
 			return getCalendarMetadata(at, request, responder);
-		} else {
+		}
+		else if (method.equals("getResourceMetadata")) {
+			return getResourceMetadata(at, request, responder);
+		}
+		else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
 			return "";
 		}
@@ -213,6 +217,13 @@ public class EventHandler extends SecureSyncHandler {
 		String[] calendarEmails = request.getParameterValues("calendar");
 		CalendarInfo[] lc = binding.getCalendarMetadata(at, calendarEmails);
 		return responder.sendCalendarInformations(lc);
+	}
+
+	private String getResourceMetadata(AccessToken at, Request request,
+			XmlResponder responder) throws ServerFault {
+		String[] resourceEmails = request.getParameterValues("resource");
+		ResourceInfo[] ri = binding.getResourceMetadata(at, resourceEmails);
+		return responder.sendResourceInformation(ri);
 	}
 
 	private String parseFreeBusyToICS(

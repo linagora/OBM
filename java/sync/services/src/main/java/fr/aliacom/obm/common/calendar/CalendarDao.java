@@ -126,6 +126,9 @@ public interface CalendarDao {
 	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;
 
+	Collection<ResourceInfo> getResourceMetadata(ObmUser user, Collection<String> resources)
+			throws FindException;
+
 	boolean changeParticipationState(AccessToken token, ObmUser calendar,
 			EventExtId extId, ParticipationState participationState)
 			throws SQLException;

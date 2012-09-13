@@ -82,6 +82,17 @@ public interface ICalendar {
 			throws ServerFault;
 
 	/**
+	 * Returns resource metadata for a list of given resources.
+	 * 
+	 * @param token
+	 * 			  must contains a valid session to execute this service
+	 * @param resources
+	 * 			  the OBM emails associated to the resources we want to retrieve.
+	 */
+	ResourceInfo[] getResourceMetadata(AccessToken token, String[] resources)
+			throws ServerFault;
+
+	/**
 	 * Remove an event from database if user has enough access rights on the
 	 * event referenced by eventId.
 	 * 

@@ -515,7 +515,19 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
 	}
-	
+
+	@Override
+	public ResourceInfo[] getResourceMetadata(AccessToken token,
+			String[] resources) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		for (String resource : resources) {
+			params.put("resource", resource);
+		}
+		Document doc = execute(token, type + "/getResourceMetadata", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseResourceInfo(doc);
+	}
+
 	@Override
 	protected Locator getLocator() {
 		return locator;
