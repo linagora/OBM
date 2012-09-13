@@ -142,6 +142,28 @@ private CalendarItemsWriter writer;
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
+	@Test
+	public void testGetResourceInfo() throws IOException, SAXException, TransformerException {
+		ResourceInfo resourceInfo = ResourceInfo.builder().id(42).name("myresource")
+				.mail("res-42@somedomain.com").description("mydescription").read(true).write(false)
+				.build();
+
+		String expectedXML = loadXmlFile("ResourceInfo.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testGetResourceInfoWithoutDescription() throws IOException, SAXException, TransformerException {
+		ResourceInfo resourceInfo = ResourceInfo.builder().id(42).name("myresource")
+				.mail("res-42@somedomain.com").read(true).write(false)
+				.build();
+
+		String expectedXML = loadXmlFile("ResourceInfoWithoutDescription.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
 	private EventChanges getFakeEventChanges() {
 		EventChanges eventChanges = new EventChanges();
 		DateTime date = new DateTime(2012, 3, 5, 14, 26, 29);

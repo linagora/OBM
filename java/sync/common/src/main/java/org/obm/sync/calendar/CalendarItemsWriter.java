@@ -45,6 +45,8 @@ import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
+
 /**
  * Serializes calendar related items to XML
  */
@@ -96,6 +98,14 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 				"http://www.obm.org/xsd/sync/event.xsd", "event");
 		Element root = doc.getDocumentElement();
 		appendUpdatedEvent(root, event);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(ResourceInfo resourceInfo) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/resourceinfo.xsd", "resourceInfo");
+		Element root = doc.getDocumentElement();
+		this.appendResourceInfoAttributes(root, resourceInfo);
 		return doc;
 	}
 
@@ -268,6 +278,21 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		DOMUtils.createElementAndText(info, "uid", ci.getUid());
 		DOMUtils.createElementAndText(info, "read", "" + ci.isRead());
 		DOMUtils.createElementAndText(info, "write", "" + ci.isWrite());
+	}
+
+
+	public void appendResourceInfo(Element root, ResourceInfo ri) {
+		Element info = DOMUtils.createElement(root, "resourceInfo");
+		appendResourceInfoAttributes(info, ri);
+	}
+
+	public void appendResourceInfoAttributes(Element node, ResourceInfo ri) {
+		DOMUtils.createElementAndText(node, "id", ri.getId());
+		DOMUtils.createElementAndText(node, "name", ri.getName());
+		DOMUtils.createElementAndText(node, "mail", ri.getMail());
+		DOMUtils.createElementAndText(node, "description", Strings.nullToEmpty(ri.getDescription()));
+		DOMUtils.createElementAndText(node, "read", Boolean.toString(ri.isRead()));
+		DOMUtils.createElementAndText(node, "write", Boolean.toString(ri.isWrite()));
 	}
 
 	public String getEventString(Event event) throws TransformerException {

@@ -53,6 +53,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
@@ -62,6 +63,12 @@ public interface ICalendar {
 	 * List all Calendars on which authenticated user as some rights
 	 */
 	CalendarInfo[] listCalendars(AccessToken token) throws ServerFault;
+
+
+	/**
+	 * List all resources on which authenticated user as some rights
+	 */
+	ResourceInfo[] listResources(AccessToken token) throws ServerFault;
 
 	/**
 	 * Returns calendar metadata for a list of given calendars.

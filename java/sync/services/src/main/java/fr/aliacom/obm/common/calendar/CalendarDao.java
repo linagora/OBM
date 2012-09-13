@@ -52,6 +52,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
@@ -93,6 +94,8 @@ public interface CalendarDao {
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);
 
 	Collection<CalendarInfo> listCalendars(ObmUser user) throws FindException;
+
+	Collection<ResourceInfo> listResources(ObmUser user) throws FindException;
 
 	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException, EventNotFoundException, ServerFault;
 

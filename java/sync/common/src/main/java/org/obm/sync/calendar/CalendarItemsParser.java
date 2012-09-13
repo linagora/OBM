@@ -249,6 +249,25 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		return ci;
 	}
 
+	public ResourceInfo[] parseResourceInfo(Document doc) {
+		NodeList resourceInfoList = doc.getElementsByTagName("resourceInfo");
+		ResourceInfo[] resourceInfo = new ResourceInfo[resourceInfoList.getLength()];
+		for (int i = 0; i < resourceInfoList.getLength(); i++) {
+			resourceInfo[i] = parseResourceInfo((Element) resourceInfoList.item(i));
+		}
+		return resourceInfo;
+	}
+
+	public ResourceInfo parseResourceInfo(Element item) {
+		return ResourceInfo.builder().id(i(item, "id")).
+				name(s(item, "name")).
+				mail(s(item, "mail")).
+				description(Strings.emptyToNull(s(item, "description"))).
+				read("true".equals(s(item, "read"))).
+				write("true".equals(s(item, "write"))).
+				build();
+	}
+
 	public List<Category> parseCategories(Element documentElement) {
 		NodeList nl = documentElement.getElementsByTagName("cat");
 		ArrayList<Category> ret = new ArrayList<Category>(nl.getLength());

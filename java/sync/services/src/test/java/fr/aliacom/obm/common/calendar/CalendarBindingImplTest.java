@@ -46,6 +46,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -77,6 +78,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ImportICalendarException;
@@ -997,6 +999,35 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(ParticipationState.ACCEPTED, userAttendee.getState());
 		Assert.assertEquals(ParticipationState.ACCEPTED, guestAttendee1.getState());
 		Assert.assertEquals(ParticipationState.NEEDSACTION, guestAttendee2.getState());
+	}
+
+	@Test
+	public void testListResources() throws FindException, ServerFault {
+		ObmUser defaultUser = ToolBox.getDefaultObmUser();
+
+		ResourceInfo resource1 = buildResourceInfo1();
+		ResourceInfo resource2 = buildResourceInfo2();
+		Collection<ResourceInfo> resourceInfo = Arrays.asList(new ResourceInfo[] { resource1,
+				resource2 });
+
+		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
+		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
+
+		UserService userService = createMock(UserService.class);
+		expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultUser);
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		expect(calendarDao.listResources(defaultUser)).andReturn(resourceInfo);
+
+		Object[] mocks = { accessToken, calendarDao, userService };
+		EasyMock.replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
+				calendarDao, null, null, null, null);
+		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 },
+				calendarService.listResources(accessToken));
+
+		EasyMock.verify(mocks);
 	}
 	
 	private Ical4jHelper mockIcal4jHelper(Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
@@ -2015,5 +2046,13 @@ public class CalendarBindingImplTest {
 				.asContact()
 				.participationState(contactState)
 				.email("attendee@test.lng").build());
+	}
+
+	private ResourceInfo buildResourceInfo1() {
+		return ResourceInfo.builder().id(1).name("resource1").mail("res-1@domain.com").read(true).write(true).build();
+	}
+
+	private ResourceInfo buildResourceInfo2() {
+		return ResourceInfo.builder().id(1).name("resource2").mail("res-2@domain.com").read(true).write(false).build();
 	}
 }

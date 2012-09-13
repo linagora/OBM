@@ -88,6 +88,7 @@ import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
@@ -1313,6 +1314,57 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		calendarRights.addAll(calendarUserRights);
 		calendarRights.addAll(calendarGroupRights);
 		return calendarRights;
+	}
+
+	@Override
+	public Collection<ResourceInfo> listResources(ObmUser user) throws FindException {
+		return listResources(user, null);
+	}
+
+	private Collection<ResourceInfo> listResources(ObmUser user, Collection<String> emails) throws FindException {
+		String query = "SELECT resource_id, resource_name, resource_email, resource_description, SUM(e.entityright_read), SUM(e.entityright_write) "
+			+ "FROM Resource r "
+				+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
+				+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
+				+ "INNER JOIN UserEntity ue ON e.entityright_consumer_id=ue.userentity_entity_id "
+			+ "WHERE ue.userentity_user_id=? ";
+		StringSQLCollectionHelper helper = null;
+		if (emails != null) {
+			helper = new StringSQLCollectionHelper(emails);
+			query += " AND r.resource_email IN (" + helper.asPlaceHolders() + ") ";
+		}
+		query += "GROUP BY resource_id, resource_name, resource_email, resource_description";
+		Connection con = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		Set<ResourceInfo> resourceInfo = new HashSet<ResourceInfo>();
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setInt(1, user.getUid());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				resourceInfo.add(buildResourceInfo(rs));
+			}
+		} catch (SQLException e) {
+			logger.error("Error finding resources", e);
+			throw new FindException(e);
+		} finally {
+			try {
+				obmHelper.cleanup(con, ps, rs);
+			} catch (Exception e) {
+				logger.error("Could not clean up jdbc stuff", e);
+			}
+		}
+		return resourceInfo;
+	}
+
+	private ResourceInfo buildResourceInfo(ResultSet rs) throws SQLException {
+		return ResourceInfo.builder().id(rs.getInt(1)).name(rs.getString(2)).mail(rs.getString(3)).
+				description(rs.getString(4)).read(rs.getBoolean(5)).write(rs.getBoolean(6)).build();
 	}
 
 	@Override

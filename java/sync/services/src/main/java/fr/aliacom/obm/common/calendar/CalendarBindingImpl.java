@@ -72,6 +72,7 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
@@ -156,7 +157,26 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e.getMessage());
 		}
 	}
-	
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public ResourceInfo[] listResources(AccessToken token) throws ServerFault {
+		try {
+			Collection<ResourceInfo> resourceInfo = getResources(token);
+			logger.info(String.format("%s Returning %d resource info", LogUtils.prefix(token),
+					resourceInfo.size()));
+			return resourceInfo.toArray(new ResourceInfo[resourceInfo.size()]);
+		} catch (Exception e) {
+			throw new ServerFault(e);
+		}
+	}
+
+	private Collection<ResourceInfo> getResources(AccessToken token) throws FindException {
+		ObmUser user = userService.getUserFromAccessToken(token);
+		return calendarDao.listResources(user);
+	}
+
 	@Override
 	@Transactional(readOnly=true)
 	public CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars) throws ServerFault {

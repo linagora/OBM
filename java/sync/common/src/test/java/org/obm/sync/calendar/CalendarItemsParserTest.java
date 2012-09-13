@@ -408,4 +408,46 @@ public class CalendarItemsParserTest {
 		assertThat(evEx.getAttendees().size()).isEqualTo(2);
 		assertThat(ev.getRecurrence().getDays()).isEqualTo(EnumSet.noneOf(RecurrenceDay.class));
 	}
+
+
+	@Test
+	public void testParseResourceInfo() throws SAXException, IOException {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<resourceInfo>" +
+				"    <id>42</id>" +
+				"    <name>myresource</name>" +
+				"    <mail>res-42@somedomain.com</mail>" +
+				"    <description>mydescription</description>" +
+				"    <read>true</read>" +
+				"    <write>false</write>" +
+				"</resourceInfo>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		ResourceInfo resourceInfo = parser.parseResourceInfo(doc.getDocumentElement());
+		Assert.assertEquals(42, resourceInfo.getId());
+		Assert.assertEquals("myresource", resourceInfo.getName());
+		Assert.assertEquals("mydescription", resourceInfo.getDescription());
+		Assert.assertEquals("res-42@somedomain.com", resourceInfo.getMail());
+		Assert.assertTrue(resourceInfo.isRead());
+		Assert.assertFalse(resourceInfo.isWrite());
+	}
+
+	@Test
+	public void testParseResourceInfoWithoutDescription() throws SAXException, IOException {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<resourceInfo>" +
+				"    <id>42</id>" +
+				"    <name>myresource</name>" +
+				"    <mail>res-42@somedomain.com</mail>" +
+				"    <read>true</read>" +
+				"    <write>false</write>" +
+				"</resourceInfo>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		ResourceInfo resourceInfo = parser.parseResourceInfo(doc.getDocumentElement());
+		Assert.assertEquals(42, resourceInfo.getId());
+		Assert.assertEquals("myresource", resourceInfo.getName());
+		Assert.assertEquals("res-42@somedomain.com", resourceInfo.getMail());
+		Assert.assertNull(resourceInfo.getDescription());
+		Assert.assertTrue(resourceInfo.isRead());
+		Assert.assertFalse(resourceInfo.isWrite());
+	}
 }

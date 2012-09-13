@@ -54,6 +54,7 @@ import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.EventChanges;
@@ -226,6 +227,23 @@ public class XmlResponder {
 			Element root = doc.getDocumentElement();
 			for (CalendarInfo ci : lc) {
 				ciw.appendInfo(root, ci);
+			}
+			res = emitResponse(doc);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+		return res;
+	}
+
+	public String sendResourceInformation(ResourceInfo[] resourceInfo) {
+		String res = "";
+		try {
+			Document doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/resourceinfo.xsd",
+			"resourceInfoGroup");
+			Element root = doc.getDocumentElement();
+			for (ResourceInfo ri : resourceInfo) {
+				ciw.appendResourceInfo(root, ri);
 			}
 			res = emitResponse(doc);
 		} catch (Exception ex) {

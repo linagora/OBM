@@ -57,6 +57,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
@@ -204,6 +205,14 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		Document doc = execute(token, type + "/listCalendars", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
+	}
+
+	@Override
+	public ResourceInfo[] listResources(AccessToken token) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		Document doc = execute(token, type + "/listResources", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseResourceInfo(doc);
 	}
 
 	@Override

@@ -59,6 +59,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.Request;
@@ -151,6 +152,8 @@ public class EventHandler extends SecureSyncHandler {
 			return getEventFromId(at, request, responder);
 		} else if (method.equals("listCalendars")) {
 			return listCalendars(at, responder);
+		} else if (method.equals("listResources")) {
+			return listResources(at, responder);
 		} else if (method.equals("listCategories")) {
 			return listCategories(at, responder);
 		} else if (method.equals("getEventTwinKeys")) {
@@ -369,6 +372,11 @@ public class EventHandler extends SecureSyncHandler {
 	private String listCalendars(AccessToken at, XmlResponder responder) throws ServerFault {
 		CalendarInfo[] lc = binding.listCalendars(at);
 		return responder.sendCalendarInformations(lc);
+	}
+
+	private String listResources(AccessToken at, XmlResponder responder) throws ServerFault {
+		ResourceInfo[] resourceInfo = binding.listResources(at);
+		return responder.sendResourceInformation(resourceInfo);
 	}
 
 	private String getEventFromId(AccessToken at, Request request, XmlResponder responder)
