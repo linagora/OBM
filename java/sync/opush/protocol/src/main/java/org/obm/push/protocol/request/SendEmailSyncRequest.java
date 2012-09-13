@@ -37,6 +37,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.obm.push.bean.DeviceId;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
@@ -47,7 +49,7 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 		private Map<String, String> parameters;
 		private InputStream inputStream;
 		private Map<String, String> headers;
-		private String deviceId;
+		private DeviceId deviceId;
 		private String deviceType;
 		private String userAgent;
 		private String command;
@@ -78,7 +80,7 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 			return this;
 		}
 		
-		public Builder deviceId(String deviceId) {
+		public Builder deviceId(DeviceId deviceId) {
 			this.deviceId = deviceId;
 			return this;
 		}
@@ -124,7 +126,7 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 	private Map<String, String> parameters;
 	private InputStream inputStream;
 	private Map<String, String> headers;
-	private String deviceId;
+	private DeviceId deviceId;
 	private String deviceType;
 	private String userAgent;
 	private String command;
@@ -134,7 +136,7 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 	private SendEmailSyncRequest(Map<String, String> parameters, 
 		InputStream inputStream, 
 		Map<String, String> headers, 
-		String deviceId, 
+		DeviceId deviceId, 
 		String deviceType, 
 		String userAgent, 
 		String command, 
@@ -181,7 +183,7 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 	}
 
 	@Override
-	public String getDeviceId() {
+	public DeviceId getDeviceId() {
 		return deviceId;
 	}
 

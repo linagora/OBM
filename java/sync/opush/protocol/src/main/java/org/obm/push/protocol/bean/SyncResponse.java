@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
@@ -87,10 +88,17 @@ public class SyncResponse {
 	
 	private final Collection<SyncCollectionResponse> collectionResponses;
 	private final Map<String, String> processedClientIds;
+	private final SyncStatus status;
 	
 	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds) {
+		this(collectionResponses, processedClientIds, SyncStatus.OK);
+	}
+
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds,
+			SyncStatus status) {
 		this.collectionResponses = collectionResponses;
 		this.processedClientIds = processedClientIds;
+		this.status = status;
 	}
 
 	public Collection<SyncCollectionResponse> getCollectionResponses() {
@@ -100,4 +108,9 @@ public class SyncResponse {
 	public Map<String, String> getProcessedClientIds() {
 		return processedClientIds;
 	}
+
+	public SyncStatus getStatus() {
+		return status;
+	}
+	
 }

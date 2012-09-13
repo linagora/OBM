@@ -1349,6 +1349,34 @@ public class SyncProtocolTest {
 	}
 
 	@Test
+	public void testDecodePartialErrorResponse() throws Exception {
+		String response = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Status>13</Status>" +
+				"</Sync>";
+
+		SyncProtocol syncProtocol = newSyncProtocol(null, null, null);
+		SyncResponse decodedSyncResponse = syncProtocol.decodeResponse(DOMUtils.parse(response));
+		
+		assertThat(decodedSyncResponse.getStatus()).isEqualTo(SyncStatus.PARTIAL_REQUEST);
+	}
+
+	@Test
+	public void testDecodeProvisionErrorResponse() throws Exception {
+		String response = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Status>11</Status>" +
+				"</Sync>";
+
+		SyncProtocol syncProtocol = newSyncProtocol(null, null, null);
+		SyncResponse decodedSyncResponse = syncProtocol.decodeResponse(DOMUtils.parse(response));
+		
+		assertThat(decodedSyncResponse.getStatus()).isEqualTo(SyncStatus.NOT_YET_PROVISIONNED);
+	}
+
+	@Test
 	public void testDecodeAddResponse() throws Exception {
 		String response = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

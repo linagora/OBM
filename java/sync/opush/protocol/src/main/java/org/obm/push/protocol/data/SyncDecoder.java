@@ -211,6 +211,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	public SyncResponse decodeSyncResponse(Document responseDocument) {
 		Element root = responseDocument.getDocumentElement();
 		
+		SyncStatus status = getCollectionStatus(root);
 		Map<String, String> processedClientIds = Maps.newHashMap();
 		List<SyncCollectionResponse> responseCollections = Lists.newArrayList();
 		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
@@ -220,7 +221,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 			processedClientIds.putAll(collection.getProcessedClientIds());
 		}
 		
-		return new SyncResponse(responseCollections, processedClientIds);
+		return new SyncResponse(responseCollections, processedClientIds, status);
 	}
 
 	private ProcessedSyncCollectionResponse buildCollectionResponse(Element collectionEl) {
