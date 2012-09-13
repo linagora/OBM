@@ -79,8 +79,8 @@ public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
 	}
 
 	@Override
-	protected MoveItemsResponse parseResponse(Element root) {
-		NodeList responses = root.getElementsByTagName("Response");
+	protected MoveItemsResponse parseResponse(Document document) {
+		NodeList responses = document.getDocumentElement().getElementsByTagName("Response");
 		
 		List<MoveResult> moveResults = Lists.newArrayList();
 		for (int i = 0 ; i < responses.getLength(); i++) {

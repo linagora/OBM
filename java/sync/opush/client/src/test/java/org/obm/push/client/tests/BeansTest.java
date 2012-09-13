@@ -36,17 +36,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.push.client.ItemOperationFetchResponse;
-import org.obm.sync.push.client.ItemOperationResponse;
-import org.obm.sync.push.client.MoveItemsResponse;
-import org.obm.sync.push.client.ProvisionResponse;
 import org.obm.sync.push.client.beans.AccountInfos;
-import org.obm.sync.push.client.beans.Add;
-import org.obm.sync.push.client.beans.Collection;
-import org.obm.sync.push.client.beans.Delete;
 import org.obm.sync.push.client.beans.Folder;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 
@@ -65,16 +57,8 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 				.add(AccountInfos.class)
-				.add(Add.class)
-				.add(Collection.class)
 				.add(Folder.class)
 				.add(GetItemEstimateSingleFolderResponse.class)
-				.add(SyncResponse.class)
-				.add(Delete.class)
-				.add(ProvisionResponse.class)
-				.add(ItemOperationResponse.class)
-				.add(ItemOperationFetchResponse.class)
-				.add(MoveItemsResponse.class)
 				.build();
 		equalsVerifierUtilsTest.test(list);
 	}

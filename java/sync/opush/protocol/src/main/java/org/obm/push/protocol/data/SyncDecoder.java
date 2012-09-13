@@ -308,7 +308,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	}
 
 	private IApplicationData getCommandApplicationData(SyncRequestCollectionCommand command, PIMDataType dataType) {
-		if (dataType != null && command.getApplicationData() != null) {
+		if (decoderFactory != null && dataType != null && command.getApplicationData() != null) {
 			return decoderFactory.decode(command.getApplicationData(), dataType);
 		}
 		return null;

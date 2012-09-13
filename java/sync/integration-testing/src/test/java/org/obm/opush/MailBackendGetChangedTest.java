@@ -41,6 +41,7 @@ import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -68,11 +69,14 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -80,12 +84,7 @@ import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.push.client.Change;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.beans.Add;
-import org.obm.sync.push.client.beans.Collection;
-import org.obm.sync.push.client.beans.Delete;
-import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -211,11 +210,14 @@ public class MailBackendGetChangedTest {
 		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
+
+		SyncCollectionResponse firstInboxResponse = getCollectionWithId(firstSyncResponse, inboxCollectionIdAsString);
+		SyncCollectionResponse secondInboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
 		
-		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).containsOnly(
-				new Add(inboxCollectionIdAsString + emailId1),
-				new Add(inboxCollectionIdAsString + emailId2));
+		assertThat(firstInboxResponse.getItemChanges()).isEmpty();
+		assertThat(secondInboxResponse.getItemChanges()).containsOnly(
+				new ItemChangeBuilder().serverId(inboxCollectionIdAsString + emailId1).withNewFlag(true).build(),
+				new ItemChangeBuilder().serverId(inboxCollectionIdAsString + emailId2).withNewFlag(true).build());
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -275,9 +277,12 @@ public class MailBackendGetChangedTest {
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
+
+		SyncCollectionResponse firstInboxResponse = getCollectionWithId(firstSyncResponse, inboxCollectionIdAsString);
+		SyncCollectionResponse secondInboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
 		
-		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
+		assertThat(firstInboxResponse.getItemChanges()).isEmpty();
+		assertThat(secondInboxResponse.getItemChanges()).isEmpty();
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -342,12 +347,15 @@ public class MailBackendGetChangedTest {
 		sendTwoEmailsToImapServer();
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
-		
-		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).containsOnly(
-				new Add(inboxCollectionIdAsString + emailId3),
-				new Add(inboxCollectionIdAsString + emailId4));
 
+		SyncCollectionResponse firstInboxResponse = getCollectionWithId(firstSyncResponse, inboxCollectionIdAsString);
+		SyncCollectionResponse secondInboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		
+		assertThat(firstInboxResponse.getItemChanges()).isEmpty();
+		assertThat(secondInboxResponse.getItemChanges()).containsOnly(
+				new ItemChangeBuilder().serverId(inboxCollectionIdAsString + emailId3).withNewFlag(true).build(),
+				new ItemChangeBuilder().serverId(inboxCollectionIdAsString + emailId4).withNewFlag(true).build());
+		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 4);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
@@ -408,9 +416,10 @@ public class MailBackendGetChangedTest {
 		sendTwoEmailsToImapServer();
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.ONE_DAY_BACK, 100);
 		mocksControl.verify();
+
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
 		
-		Collection inboxCollectionResponse = syncResponse.getCollection(inboxCollectionIdAsString);
-		assertThat(inboxCollectionResponse.getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
+		assertThat(inboxResponse.getSyncCollection().getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
 	
 	@Test(expected=AssertionError.class)
@@ -467,10 +476,10 @@ public class MailBackendGetChangedTest {
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.deleteEmail(secondAllocatedSyncKey, inboxCollectionId, inboxCollectionId + emailId1);
 		mocksControl.verify();
-		
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getDeletes()).isEmpty();
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
 
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		assertThat(inboxResponse.getItemChanges()).isEmpty();
+		assertThat(inboxResponse.getItemChangesDeletion()).isEmpty();
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 	}
 
@@ -545,11 +554,12 @@ public class MailBackendGetChangedTest {
 		opClient.syncEmail(initialSyncKey, trashCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKeyTrash, trashCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
-		
-		assertThat(syncResponse.getCollection(trashCollectionIdAsString).getDeletes()).isEmpty();
-		assertThat(syncResponse.getCollection(trashCollectionIdAsString).getAdds()).containsOnly(
-				new Add(trashCollectionId + trashEmailId));
 
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, trashCollectionIdAsString);
+		assertThat(inboxResponse.getItemChangesDeletion()).isEmpty();
+		assertThat(inboxResponse.getItemChanges()).containsOnly(
+				new ItemChangeBuilder().serverId(trashCollectionId + trashEmailId).withNewFlag(true).build());
+		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 	}
 	
@@ -611,9 +621,10 @@ public class MailBackendGetChangedTest {
 		
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 		mocksControl.verify();
-		
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getChanges())
-			.containsOnly(new Change(inboxCollectionId + ":" + emailId));
+
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		assertThat(inboxResponse.getItemChanges()).containsOnly(
+				new ItemChangeBuilder().serverId(inboxCollectionId + emailId).withNewFlag(true).build());
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -679,9 +690,10 @@ public class MailBackendGetChangedTest {
 		
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
-		
-		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getDeletes())
-			.containsOnly(new Delete(inboxCollectionId + ":" + emailId));
+
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		assertThat(inboxResponse.getItemChangesDeletion()).containsOnly(
+				ItemDeletion.builder().serverId(inboxCollectionId + ":" + emailId).build());
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -751,20 +763,22 @@ public class MailBackendGetChangedTest {
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendNEmailsToImapServer(numberOfEmails);
 		
+		
 		SyncResponse initialSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
-		assertThat(initialSyncResponse.getCollection(inboxCollectionIdAsString).getSyncKey()).isEqualTo(firstAllocatedSyncKey);
+		SyncCollectionResponse initialInboxResponse = getCollectionWithId(initialSyncResponse, inboxCollectionIdAsString);
+		assertThat(initialInboxResponse.getAllocateNewSyncKey()).isEqualTo(firstAllocatedSyncKey);
 		
 		SyncResponse firstPartSyncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
-		Collection firstCollection = firstPartSyncResponse.getCollection(inboxCollectionIdAsString);
-		assertThat(firstCollection.getAdds()).hasSize(windowSize);
-		assertThat(firstCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey);
+		SyncCollectionResponse inboxResponse = getCollectionWithId(firstPartSyncResponse, inboxCollectionIdAsString);
+		assertThat(inboxResponse.getItemChanges()).hasSize(windowSize);
+		assertThat(inboxResponse.getAllocateNewSyncKey()).isEqualTo(secondAllocatedSyncKey);
 		
 		SyncResponse lastPartSyncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
 		mocksControl.verify();
 		
-		Collection lastCollection = lastPartSyncResponse.getCollection(inboxCollectionIdAsString);
-		assertThat(lastCollection.getAdds()).hasSize(numberOfEmails - windowSize);
-		assertThat(lastCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey);
+		SyncCollectionResponse lastInboxResponse = getCollectionWithId(lastPartSyncResponse, inboxCollectionIdAsString);
+		assertThat(lastInboxResponse.getItemChanges()).hasSize(numberOfEmails - windowSize);
+		assertThat(lastInboxResponse.getAllocateNewSyncKey()).isEqualTo(secondAllocatedSyncKey);
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, numberOfEmails);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -828,8 +842,9 @@ public class MailBackendGetChangedTest {
 		SyncResponse syncResponseWithFetch = opClient.syncEmailWithFetch(secondAllocatedSyncKey, inboxCollectionIdAsString, serverId);
 		
 		mocksControl.verify();
-		
-		assertThat(syncResponseWithFetch.getCollection(inboxCollectionIdAsString).getSyncKey()).isEqualTo(newAllocatedSyncKey);
+
+		SyncCollectionResponse lastInboxResponse = getCollectionWithId(syncResponseWithFetch, inboxCollectionIdAsString);
+		assertThat(lastInboxResponse.getAllocateNewSyncKey()).isEqualTo(newAllocatedSyncKey);
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();

@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -43,7 +44,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
@@ -54,6 +54,7 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
@@ -62,6 +63,8 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -69,10 +72,9 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.push.client.beans.Add;
-import org.obm.sync.push.client.beans.Delete;
-import org.obm.sync.push.client.beans.SyncResponse;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -80,37 +82,49 @@ import com.google.common.collect.Iterables;
 public class EmailSyncTestUtils {
 	
 	public static void checkMailFolderHasNoChange(SyncResponse response, String serverId) {
-		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
-		Assertions.assertThat(inboxCollection.getAdds()).isEmpty();
-		Assertions.assertThat(inboxCollection.getDeletes()).isEmpty();
+		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
+		assertThat(collection.getItemChanges()).isEmpty();
+		assertThat(collection.getItemChangesDeletion()).isEmpty();
 	}
 
-	public static void checkMailFolderHasAddItems(SyncResponse response, String serverId, Add... changes) {
-		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
-		Assertions.assertThat(inboxCollection.getAdds()).containsOnly(changes);
-		Assertions.assertThat(inboxCollection.getDeletes()).isEmpty();
+	public static void checkMailFolderHasAddItems(SyncResponse response, String serverId, ItemChange... changes) {
+		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
+		assertThat(collection.getItemChanges()).containsOnly(changes);
+		assertThat(collection.getItemChangesDeletion()).isEmpty();
 	}
 
-	public static void checkMailFolderHasDeleteItems(SyncResponse response, String serverId, Delete... deletes) {
-		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(response, serverId);
-		Assertions.assertThat(inboxCollection.getAdds()).isEmpty();
-		Assertions.assertThat(inboxCollection.getDeletes()).containsOnly(deletes);
+	public static void checkMailFolderHasDeleteItems(SyncResponse response, String serverId, ItemDeletion... deletes) {
+		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
+		assertThat(collection.getItemChanges()).isEmpty();
+		assertThat(collection.getItemChangesDeletion()).containsOnly(deletes);
 	}
-	
+
 	public static void checkMailFolderHasItems(
-			SyncResponse response, String serverId, Iterable<Add> adds, Iterable<Delete> deletes) {
-		org.obm.sync.push.client.beans.Collection inboxCollection = checkCollectionIsInResponse(
-				response, serverId);
-		Assertions.assertThat(inboxCollection.getAdds()).containsOnly(Iterables.toArray(adds, Add.class));
-		Assertions.assertThat(inboxCollection.getDeletes()).containsOnly(Iterables.toArray(deletes, Delete.class));
+			SyncResponse response, String serverId, Iterable<ItemChange> changes, Iterable<ItemDeletion> deletes) {
+		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
+		assertThat(collection.getItemChanges()).containsOnly(Iterables.toArray(changes, ItemChange.class));
+		assertThat(collection.getItemChangesDeletion()).containsOnly(Iterables.toArray(deletes, ItemDeletion.class));
 	}
 
-	private static org.obm.sync.push.client.beans.Collection checkCollectionIsInResponse(
-			SyncResponse response, String serverId) {
-		Assertions.assertThat(response).isNotNull();
-		org.obm.sync.push.client.beans.Collection inboxCollection = response.getCollection(serverId);
-		Assertions.assertThat(inboxCollection).isNotNull();
-		return inboxCollection;
+	public static SyncCollectionResponse getCollectionWithId(SyncResponse response, String serverId) {
+		for (SyncCollectionResponse collection : response.getCollectionResponses()) {
+			if (serverId.equals(String.valueOf(collection.getSyncCollection().getCollectionId()))) {
+				return collection;
+			}
+		}
+		return null;
+	}
+
+	public static CollectionChange lookupInbox(Iterable<CollectionChange> items) {
+		return FluentIterable
+				.from(items)
+				.firstMatch(new Predicate<CollectionChange>() {
+		
+					@Override
+					public boolean apply(CollectionChange input) {
+						return input.getFolderType() == org.obm.push.bean.FolderType.DEFAULT_INBOX_FOLDER;
+					}
+				}).get();
 	}
 
 	public static void mockEmailSyncClasses(

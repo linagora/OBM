@@ -85,8 +85,8 @@ public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResp
 	}
 
 	@Override
-	protected ItemOperationResponse parseResponse(Element root) {
-		NodeList fetchs = root.getElementsByTagName("Fetch");
+	protected ItemOperationResponse parseResponse(Document document) {
+		NodeList fetchs = document.getDocumentElement().getElementsByTagName("Fetch");
 		
 		List<ItemOperationFetchResponse> fetchResponses = Lists.newArrayList();
 		for (int i = 0 ; i < fetchs.getLength(); i++) {

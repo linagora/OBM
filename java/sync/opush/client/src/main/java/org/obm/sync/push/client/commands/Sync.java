@@ -33,11 +33,12 @@ package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
 
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Folder;
 import org.obm.sync.push.client.beans.NS;
-import org.obm.sync.push.client.beans.SyncResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -68,7 +69,8 @@ public class Sync extends AbstractCommand<SyncResponse> {
 
 	@Override
 	protected SyncResponse parseResponse(Document responseDocument) {
-		return new SyncResponse.XmlParser().parse(responseDocument.getDocumentElement());
+		SyncDecoder decoder = new SyncDecoder(null) {};
+		return decoder.decodeSyncResponse(responseDocument);
 	}
 
 }

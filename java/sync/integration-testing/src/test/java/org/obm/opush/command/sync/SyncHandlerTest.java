@@ -46,6 +46,8 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasAd
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasDeleteItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasNoChange;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.lookupInbox;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 import static org.obm.push.bean.FilterType.THREE_DAYS_BACK;
 
@@ -56,7 +58,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -93,6 +94,8 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.bean.FolderSyncResponse;
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -101,14 +104,8 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.beans.Add;
-import org.obm.sync.push.client.beans.Collection;
-import org.obm.sync.push.client.beans.Delete;
-import org.obm.sync.push.client.beans.SyncResponse;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -189,7 +186,7 @@ public class SyncHandlerTest {
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
 
 		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
-				new Add(syncEmailCollectionId + ":" + 0));
+				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":" + 0).withNewFlag(true).build());
 	}
 
 	@Test
@@ -223,9 +220,9 @@ public class SyncHandlerTest {
 		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
 
-		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
-				new Add(syncEmailCollectionId + ":" + 0),
-				new Add(syncEmailCollectionId + ":" + 1));
+		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(), 
+				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":" + 0).withNewFlag(true).build(),
+				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":" + 1).withNewFlag(true).build()); 
 	}
 
 	@Test
@@ -254,7 +251,7 @@ public class SyncHandlerTest {
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
 
 		checkMailFolderHasDeleteItems(syncEmailResponse, inbox.getCollectionId(),
-				new Delete(syncEmailCollectionId + ":" + 0));
+				ItemDeletion.builder().serverId(syncEmailCollectionId + ":" + 0).build());
 	}
 
 	@Test
@@ -287,8 +284,8 @@ public class SyncHandlerTest {
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
 
 		checkMailFolderHasItems(syncEmailResponse, inbox.getCollectionId(), 
-				ImmutableSet.of(new Add(syncEmailCollectionId + ":123")),
-				ImmutableSet.of(new Delete(syncEmailCollectionId + ":122")));
+				ImmutableSet.of(new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123").withNewFlag(true).build()),
+				ImmutableSet.of(ItemDeletion.builder().serverId(syncEmailCollectionId + ":122").build()));
 	}
 
 	@Test
@@ -362,8 +359,9 @@ public class SyncHandlerTest {
 		opClient.syncEmail(initialSyncKey, collectionIdAsString, THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, THREE_DAYS_BACK, 100);
 		mocksControl.verify();
-		
-		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
+
+		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, collectionIdAsString);
+		assertThat(inboxResponse.getSyncCollection().getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
 
 	@Test
@@ -522,19 +520,7 @@ public class SyncHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId, THREE_DAYS_BACK, 25);
 
-		Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
-		Assertions.assertThat(unexistingCollection.getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
-	}
-
-	private CollectionChange lookupInbox(Iterable<CollectionChange> items) {
-		return FluentIterable
-				.from(items)
-				.firstMatch(new Predicate<CollectionChange>() {
-		
-					@Override
-					public boolean apply(CollectionChange input) {
-						return input.getFolderType() == org.obm.push.bean.FolderType.DEFAULT_INBOX_FOLDER;
-					}
-				}).get();
+		SyncCollectionResponse mailboxResponse = getCollectionWithId(syncEmailResponse, String.valueOf(syncEmailUnexistingCollectionId));
+		assertThat(mailboxResponse.getSyncCollection().getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
 }
