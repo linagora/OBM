@@ -31,18 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -52,6 +44,7 @@ import org.obm.sync.calendar.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -69,65 +62,54 @@ public class SolrHelper {
 	public static class Factory {
 		private final HttpClient client;
 		private final MultiThreadedHttpConnectionManager manager;
-		private final ExecutorService executor;
 		private final ContactIndexer.Factory contactIndexerFactory;
 		private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
-		private final LinkedBlockingQueue<Runnable> workQueue;
-		private final Timer debugTimer;
 		private final LocatorService locatorService;
+		private final SolrManager solrManager;
 		
 		@Inject
-		private Factory(ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, 
-				LocatorService locatorService) {
+		@VisibleForTesting
+		protected Factory(ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, 
+				LocatorService locatorService, SolrManager solrManager) {
 			
 			this.contactIndexerFactory = contactIndexerFactory;
 			this.eventIndexerFactory = eventIndexerFactory;
 			this.locatorService = locatorService;
+			this.solrManager = solrManager;
 			manager = new MultiThreadedHttpConnectionManager();
-			workQueue = new LinkedBlockingQueue<Runnable>();
-			executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, workQueue);
 			client = new HttpClient(manager);
-			debugTimer = new Timer();
-			if (logger.isInfoEnabled()) {
-				scheduleFixedRateDebugLog();
-			}
 		}
 
-		private void scheduleFixedRateDebugLog() {
-			debugTimer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					logger.info("SolR indexing queue size : " + workQueue.size());
-				}
-			}, 0, 10000);
-		}
-		
 		public void shutdown() {
-			executor.shutdown();
 			manager.shutdown();
-			debugTimer.cancel();
 		}
 
 		public SolrHelper createClient(AccessToken at) throws MalformedURLException, LocatorClientException {
-			return new SolrHelper(at, locatorService, client, executor, contactIndexerFactory, eventIndexerFactory);
+			if(!solrManager.isSolrAvailable()) {
+				throw new IllegalStateException("SolR is unavailable");
+			}
+			
+			return new SolrHelper(at, locatorService, client, contactIndexerFactory, eventIndexerFactory, solrManager);
 		}
 	}
 	
-	private final CommonsHttpSolrServer sContact;
+	@VisibleForTesting
+	protected CommonsHttpSolrServer sContact;
+	
 	private final CommonsHttpSolrServer sEvent;
-	private final ExecutorService executor;
 	private final ContactIndexer.Factory contactIndexerFactory;
 	private final ObmDomain domain;
 	private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
+	private final SolrManager solrManager;
 
-	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, ExecutorService executor, 
-			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) 
+	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, 
+			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, SolrManager solrManager) 
 					throws MalformedURLException, LocatorClientException {
 		
 		this.eventIndexerFactory = eventIndexerFactory;
 		this.domain = at.getDomain();
-		this.executor = executor;
 		this.contactIndexerFactory = contactIndexerFactory;
+		this.solrManager = solrManager;
 
 		sContact = new CommonsHttpSolrServer("http://"
 				+ locatorClient.getServiceLocation("solr/contact", at.getUserLogin() + "@"
@@ -146,36 +128,27 @@ public class SolrHelper {
 		return sEvent;
 	}
 	
-	public void createOrUpdate(Contact c) throws SolrServerException, IOException {
-		assertSolrAvailable(sContact);
-		
+	public void createOrUpdate(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr indexing");
 		ContactIndexer ci = contactIndexerFactory.createIndexer(sContact, c);
-		executor.execute(ci);
+		solrManager.process(ci);
 	}
 
-	public void delete(Contact c) throws SolrServerException, IOException {
-		assertSolrAvailable(sContact);
-		
+	public void delete(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr removal");
 		Remover rm = new Remover(sContact, c.getUid().toString());
-		executor.execute(rm);
+		solrManager.process(rm);
 	}
 
 	public void delete(Event e) {
 		logger.info("[event " + e.getObmId() + "] scheduled for solr removal");
 		Remover rm = new Remover(sEvent, Integer.toString(e.getObmId().getObmId()));
-		executor.execute(rm);
+		solrManager.process(rm);
 	}
 
 	public void createOrUpdate(Event ev) {
 		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
 		EventIndexer ci = eventIndexerFactory.createIndexer(sEvent, domain, ev);
-		executor.execute(ci);
-	}
-	
-	private void assertSolrAvailable(CommonsHttpSolrServer server) throws SolrServerException, IOException
-	{
-		server.ping();
+		solrManager.process(ci);
 	}
 }

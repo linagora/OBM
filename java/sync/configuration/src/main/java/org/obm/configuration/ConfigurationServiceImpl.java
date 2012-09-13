@@ -61,6 +61,9 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	private static final String TRUST_TOKEN_TIMEOUT_KEY = "trust-token-timeout";
 	private static final int TRUST_TOKEN_TIMEOUT_DEFAULT = 60;
+	
+	private static final String SOLR_CHECKING_INTERVAL_KEY = "solr-checking-interval";
+	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
     private final static String ASCMD = "Microsoft-Server-ActiveSync";
 
@@ -161,6 +164,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 		return DEFAULT_ENCODING;
 	}
 
+	@Override
 	public String getActiveSyncServletUrl() {
 		return "https://" + getExternalUrl() + "/" + ASCMD;
 	}
@@ -212,5 +216,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 	@Override
 	public int trustTokenTimeoutInSeconds() {
 		return getIntValue(TRUST_TOKEN_TIMEOUT_KEY, TRUST_TOKEN_TIMEOUT_DEFAULT);
+	}
+
+	@Override
+	public int solrCheckingInterval() {
+		return getIntValue(SOLR_CHECKING_INTERVAL_KEY, SOLR_CHECKING_INTERVAL_DEFAULT);
 	}
 }

@@ -31,14 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -46,21 +49,15 @@ import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.book.InstantMessagingId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.utils.ObmHelper;
 
-public class ContactIndexer implements Runnable {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContactIndexer.class);
+public class ContactIndexer extends SolrRequest {
 
 	private final ObmHelper obmHelper;
-	private final CommonsHttpSolrServer srv;
 	private final int cid;
 	private final Contact c;
 
@@ -81,14 +78,15 @@ public class ContactIndexer implements Runnable {
 	}
 	
 	private ContactIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, Contact c) {
-		this.srv = srv;
+		super(srv);
+		
 		this.obmHelper = obmHelper;
 		this.cid = c.getUid();
 		this.c = c;
 	}
 
 	@Override
-	public void run() {
+	public void run() throws Exception {
 		int i = 0;
 		while (true && i++ < 10) {
 			boolean found = doIndex();
@@ -105,7 +103,7 @@ public class ContactIndexer implements Runnable {
 		}
 	}
 
-	private boolean doIndex() {
+	private boolean doIndex() throws IOException, SolrServerException {
 		Connection con = null;
 		ResultSet rs = null;
 		Statement st = null;
@@ -249,10 +247,10 @@ public class ContactIndexer implements Runnable {
 			}
 			f(sid, "categoryId", catId);
 
-			srv.add(sid);
-			srv.commit();
+			server.add(sid);
+			server.commit();
 			logger.info("[" + c.getUid() + "] indexed in SOLR");
-		} catch (Throwable t) {
+		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, st, rs);

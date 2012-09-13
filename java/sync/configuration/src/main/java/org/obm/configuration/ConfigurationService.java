@@ -74,4 +74,6 @@ public interface ConfigurationService {
 	boolean usePersistentCache();
 
 	int trustTokenTimeoutInSeconds();
+	
+	int solrCheckingInterval();
 }

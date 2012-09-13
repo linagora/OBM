@@ -14,5 +14,9 @@
 	<topic name="eventChanges">
 		<entry name="/topic/eventChanges" />
 	</topic>
+	
+	<topic name="indexingRequests">
+		<entry name="/topic/indexingRequests" />
+	</topic>
 
 </configuration>

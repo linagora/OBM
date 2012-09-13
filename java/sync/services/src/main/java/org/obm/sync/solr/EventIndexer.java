@@ -31,13 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -46,8 +49,6 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -57,11 +58,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.utils.ObmHelper;
 
-public class EventIndexer implements Runnable {
+public class EventIndexer extends SolrRequest {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(EventIndexer.class);
-	
 	@Singleton
 	public static class Factory {
 
@@ -80,23 +78,23 @@ public class EventIndexer implements Runnable {
 
 	}
 
-	private CommonsHttpSolrServer srv;
-	private Event e;
-	private ObmDomain domain;
+	private final Event e;
+	private final ObmDomain domain;
 	private final ObmHelper obmHelper;
 	private final UserDao userDao;
 
 	
 	private EventIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, UserDao userDao, ObmDomain domain, Event e) {
+		super(srv);
+		
 		this.obmHelper = obmHelper;
 		this.userDao = userDao;
 		this.domain = domain;
-		this.srv = srv;
 		this.e = e;
 	}
 
 	@Override
-	public void run() {
+	public void run() throws Exception {
 		if (e.getType() != EventType.VEVENT) {
 			return;
 		}
@@ -117,7 +115,7 @@ public class EventIndexer implements Runnable {
 		}
 	}
 
-	private boolean doIndex() {
+	private boolean doIndex() throws IOException, SolrServerException {
 		SolrInputDocument sid = new SolrInputDocument();
 
 		f(sid, "id", e.getObmId().getObmId());
@@ -174,10 +172,10 @@ public class EventIndexer implements Runnable {
 				f(sid, "tag", rs.getString(1));
 			}
 
-			srv.add(sid);
-			srv.commit();
+			server.add(sid);
+			server.commit();
 			logger.info("[" + e.getObmId() + "] indexed in SOLR");
-		} catch (Throwable t) {
+		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, st, rs);

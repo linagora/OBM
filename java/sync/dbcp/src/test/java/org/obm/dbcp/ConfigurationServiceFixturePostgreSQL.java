@@ -135,4 +135,9 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 	public int trustTokenTimeoutInSeconds() {
 		return 60;
 	}
+
+	@Override
+	public int solrCheckingInterval() {
+		return 10;
+	}
 }
