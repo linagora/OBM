@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -64,6 +63,7 @@ public class SessionServiceTest {
 	private DeviceId deviceId;
 	private String command;
 	private Device device;
+	private BigDecimal protocolVersion;
 	private UserDataRequest userDataRequest;
 
 	@Before
@@ -72,7 +72,8 @@ public class SessionServiceTest {
 		credentials = new Credentials(user, "test");
 		deviceId = new DeviceId("devId");
 		command = "autodiscover";
-		device = new Device(1, "devType", deviceId, new Properties());
+		protocolVersion = new BigDecimal("12.1");
+		device = new Device(1, "devType", deviceId, new Properties(), protocolVersion);
 		bindActiveSyncRequest();
 	}
 	
@@ -98,11 +99,11 @@ public class SessionServiceTest {
 	
 	private SessionService createSessionService() throws DaoException {
 		UserDataRequest.Factory userDataRequestFactory = createMock(UserDataRequest.Factory.class);
-		expect(userDataRequestFactory.createUserDataRequest(eq(credentials), eq(command), eq(device), anyObject(BigDecimal.class)))
+		expect(userDataRequestFactory.createUserDataRequest(eq(credentials), eq(command), eq(device)))
 			.andReturn(userDataRequest);
 		
 		DeviceService deviceService = createMock(DeviceService.class);
-		expect(deviceService.getDevice(user, deviceId, user.getDisplayName()))
+		expect(deviceService.getDevice(user, deviceId, user.getDisplayName(), protocolVersion))
 			.andReturn(device);
 		
 		replay(userDataRequestFactory, deviceService);

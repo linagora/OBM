@@ -111,11 +111,10 @@ public class MailboxBackendTest {
 	public void setUp() {
 		mailbox = "to@localhost.com";
 		password = "password";
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, 
-						device, null);
+						.createUser(mailbox, mailbox, null), password), null, device);
 		mocks = createControl();
 		mailboxService = mocks.createMock(MailboxService.class);
 		mappingService = mocks.createMock(MappingService.class);

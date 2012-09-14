@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import java.math.BigDecimal;
+
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -48,6 +50,7 @@ public class SingleUserFixture {
 		public String password;
 		public String deviceType;
 		public DeviceId deviceId;
+		public BigDecimal deviceProtocolVersion;
 		public String userAgent;
 		public AccessToken accessToken;
 		public Credentials credentials;
@@ -65,14 +68,14 @@ public class SingleUserFixture {
 		jaures.password = "jaures";
 		jaures.deviceType = "BellLabsWiredPhone";
 		jaures.deviceId = new DeviceId("blwp123");
+		jaures.deviceProtocolVersion = new BigDecimal("12.1");
 		jaures.userAgent = "BellLabsWiredPhoneAgent";
-		jaures.device = new Device.Factory().create(2, jaures.deviceType, jaures.userAgent, jaures.deviceId);
 		jaures.accessToken = new AccessToken(1, "o-push");
 		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());
 		jaures.accessToken.setUserEmail(jaures.user.getEmail());
 		jaures.credentials = new Credentials(jaures.user, jaures.password);
-		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId);
-		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device, null);
+		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId, jaures.deviceProtocolVersion);
+		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device);
 		jaures.rootCollectionPath = "obm:\\\\" + jaures.user.getLoginAtDomain();
 	}
 	

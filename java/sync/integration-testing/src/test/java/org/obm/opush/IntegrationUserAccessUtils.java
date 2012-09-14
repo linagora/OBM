@@ -79,9 +79,10 @@ public class IntegrationUserAccessUtils {
 	public static void expectUserDeviceAccess(DeviceDao deviceDao, OpushUser user) throws DaoException {
 		expect(deviceDao.getDevice(user.user, 
 				user.deviceId, 
-				user.userAgent))
+				user.userAgent,
+				user.deviceProtocolVersion))
 				.andReturn(
-						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties()))
+						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties(), user.deviceProtocolVersion))
 						.anyTimes();
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId)).andReturn(0l).anyTimes();
 	}

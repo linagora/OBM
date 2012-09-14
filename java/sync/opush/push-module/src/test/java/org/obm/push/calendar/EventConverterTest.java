@@ -225,7 +225,7 @@ public class EventConverterTest {
 	
 	private UserDataRequest buildUserDataRequest(Credentials credentials) {
 		UserDataRequest udr = new UserDataRequest(credentials,
-				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties()), new BigDecimal("12.5"));
+				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5")));
 		return udr;
 	}
 	

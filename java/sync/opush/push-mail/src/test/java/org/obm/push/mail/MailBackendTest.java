@@ -115,8 +115,8 @@ public class MailBackendTest {
 	@Before
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		collectionPathBuilder = createMock(Builder.class);
 		expect(collectionPathBuilder.userDataRequest(udr)).andReturn(collectionPathBuilder).anyTimes();
 		expect(collectionPathBuilder.pimType(PIMDataType.EMAIL)).andReturn(collectionPathBuilder).anyTimes();

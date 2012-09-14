@@ -144,7 +144,7 @@ public class EmailViewPartsFetcherImplTest {
 		password = "password";
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null);
 		
 		messageFixture = new MessageFixture();
 		messageFixture.attachment = Resources.getResource("ics/attendee.ics").openStream();

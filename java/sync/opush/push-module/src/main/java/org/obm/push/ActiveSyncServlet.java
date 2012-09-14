@@ -32,6 +32,7 @@
 package org.obm.push;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -209,8 +210,9 @@ public class ActiveSyncServlet extends HttpServlet {
 		DeviceId deviceId = request.getDeviceId();
 		String deviceType = request.getDeviceType();
 		String userAgent = request.getUserAgent();
+		BigDecimal protocolVersion = new BigDecimal(request.getMSASProtocolVersion());
 		
-		deviceService.initDevice(credentials.getUser(), deviceId, deviceType, userAgent);
+		deviceService.initDevice(credentials.getUser(), deviceId, deviceType, userAgent, protocolVersion);
 		boolean syncAutho = deviceService.syncAuthorized(credentials.getUser(), deviceId);
 		if (syncAutho) {
 			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 

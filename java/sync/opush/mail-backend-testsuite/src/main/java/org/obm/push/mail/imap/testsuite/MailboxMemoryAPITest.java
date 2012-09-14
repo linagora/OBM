@@ -104,7 +104,7 @@ public abstract class MailboxMemoryAPITest {
 		
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null);
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getImapPort());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getSmtpPort());

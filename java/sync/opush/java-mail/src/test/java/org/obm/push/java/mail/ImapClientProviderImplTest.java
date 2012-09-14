@@ -64,8 +64,8 @@ public class ImapClientProviderImplTest {
 	@Before
 	public void setup() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		mocksControl = EasyMock.createControl();
 	}
 	

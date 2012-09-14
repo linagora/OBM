@@ -160,7 +160,7 @@ public class SyncProtocol {
 			ItemChange ic, EncoderFactory encoderFactory) throws IOException {
 		
 		Element apData = DOMUtils.createElement(col, "ApplicationData");
-		encoderFactory.encode(udr, apData, ic.getData(), true);
+		encoderFactory.encode(udr.getDevice(), apData, ic.getData(), true);
 	}
 	
 	private void buildUpdateItemChange(UserDataRequest udr, SyncCollectionResponse c,	Map<String, String> processedClientIds, 

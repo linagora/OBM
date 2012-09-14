@@ -187,7 +187,7 @@ public class ItemOperationsProtocol {
 				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
-			encoderFactory.encode(udr, dataElem, data, true);
+			encoderFactory.encode(udr.getDevice(), dataElem, data, true);
 		}
 	}
 	

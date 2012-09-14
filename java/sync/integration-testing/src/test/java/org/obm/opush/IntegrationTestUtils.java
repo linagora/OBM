@@ -105,9 +105,10 @@ public class IntegrationTestUtils {
 	public static void expectUserDeviceAccess(DeviceDao deviceDao, OpushUser user) throws DaoException {
 		expect(deviceDao.getDevice(user.user, 
 				user.deviceId, 
-				user.userAgent))
+				user.userAgent,
+				user.deviceProtocolVersion))
 				.andReturn(
-						new Device(user.hashCode(), user.deviceType, user.deviceId, new Properties()))
+						new Device(user.hashCode(), user.deviceType, user.deviceId, new Properties(), user.deviceProtocolVersion))
 						.anyTimes();
 	}
 	

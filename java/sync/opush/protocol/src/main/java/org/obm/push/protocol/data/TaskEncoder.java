@@ -36,11 +36,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
 import org.obm.push.bean.RecurrenceDayOfWeek;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -58,7 +58,7 @@ public class TaskEncoder extends Encoder {
 		this.sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 	
-	public void encode(UserDataRequest udr, Element p, IApplicationData data) {
+	public void encode(Device device, Element p, IApplicationData data) {
 		MSTask ta = (MSTask) data;
 
 		s(p, "Tasks:Subject", ta.getSubject());
@@ -80,7 +80,7 @@ public class TaskEncoder extends Encoder {
 			s(p, "Tasks:ReminderTime", ta.getReminderTime(),sdf);
 			s(p, "Tasks:ReminderSet", ta.getReminderSet());
 		}
-		encodeBody(udr, p, ta);
+		encodeBody(device, p, ta);
 	}
 
 	private void encodeRecurrence(Element p, MSTask task) {
@@ -125,13 +125,13 @@ public class TaskEncoder extends Encoder {
 		}
 	}
 
-	private void encodeBody(UserDataRequest udr, Element p,
+	private void encodeBody(Device device, Element p,
 			MSTask task) {
 		String body = "";
 		if (task.getDescription() != null) {
 			body = task.getDescription().trim();
 		}
-		if (udr.getProtocolVersion().compareTo(new BigDecimal("12")) >= 0) {
+		if (device.getProtocolVersion().compareTo(new BigDecimal("12")) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			s(d, "AirSyncBase:EstimatedDataSize", "" + body.length());

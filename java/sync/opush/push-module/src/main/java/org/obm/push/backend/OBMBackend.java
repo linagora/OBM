@@ -140,10 +140,10 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(UserDataRequest udr) {
-		if (udr.getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
+		if (udr.getDevice().getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
 			return new MSWAPProvisioningXML();
 		} else {
-			return new MSEASProvisioingWBXML(udr.getProtocolVersion());
+			return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
 		}
 	}
 

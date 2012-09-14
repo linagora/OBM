@@ -45,7 +45,6 @@ import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -315,8 +314,7 @@ public class SyncHandlerTest {
 
 		UserDataRequest userDataRequest = new UserDataRequest(singleUserFixture.jaures.credentials, 
 				"Sync", 
-				singleUserFixture.jaures.device, 
-				new BigDecimal(12.1).setScale(1, BigDecimal.ROUND_HALF_UP));
+				singleUserFixture.jaures.device);
 		
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));

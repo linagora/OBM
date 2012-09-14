@@ -66,7 +66,7 @@ public class EventServiceImplTest {
 	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, AuthFault, DaoException {
 		
 		UserDataRequest udr = new UserDataRequest(
-				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null, null);
+				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null);
 		
 		LoginService loginService = EasyMock.createMock(LoginService.class);
 		AccessToken accessToken = new AccessToken(1, "origin");
@@ -210,7 +210,7 @@ public class EventServiceImplTest {
 	}
 
 	private Device device() {
-		return new Device(1, "devType", new DeviceId("devId"), null);
+		return new Device(1, "devType", new DeviceId("devId"), null, null);
 	}
 
 	private MSEventUid msEventUid() {

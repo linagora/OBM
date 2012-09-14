@@ -74,7 +74,7 @@ public class MappingServiceImplTest {
 		CollectionPath expectedCollectionPathTasks = new CollectionPathTest(collectionTasks, PIMDataType.TASKS, "login@domain");
 		
 		UserDataRequest udr = createMock(UserDataRequest.class);
-		expect(udr.getDevice()).andReturn(new Device(1, "DevType", new DeviceId("DevId"), null));
+		expect(udr.getDevice()).andReturn(new Device(1, "DevType", new DeviceId("DevId"), null, null));
 
 		CollectionDao collectionDao = mockCollectionDaoForCollectionPaths(
 				collectionEmail, collectionCalendar, collectionContacts, collectionTasks);

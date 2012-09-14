@@ -131,8 +131,8 @@ public class CalendarBackendTest {
 	@Before
 	public void setUp() {
 		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
-		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		this.token = new AccessToken(0, "OBM");
 		this.lastKnownState = buildFolderSyncState(new SyncKey("1234567890a"));
 		this.outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
@@ -225,9 +225,9 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
-
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "test@test";
 		String calendar1CollectionPath = rootCalendarPath + calendar1DisplayName;
@@ -283,9 +283,9 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
-
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "added@test";
 		String calendar1CollectionPath = rootCalendarPath + calendar1DisplayName;
@@ -358,9 +358,6 @@ public class CalendarBackendTest {
 
 	@Test
 	public void collectionDisplayNameForMultipleCalendar() throws Exception {
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
-		
 		int calendarMappingId = 1;
 		String calendarBackendName = "test@test";
 		String calendarDisplayName = calendarBackendName + " calendar";
@@ -370,6 +367,9 @@ public class CalendarBackendTest {
 		String calendar2BackendName = "test2@test";
 		String calendar2DisplayName = calendar2BackendName + " calendar";
 		String calendar2CollectionPath = rootCalendarPath + calendar2BackendName;
+
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		
 		expectLoginBehavior();
 		expectObmSyncCalendarChanges(

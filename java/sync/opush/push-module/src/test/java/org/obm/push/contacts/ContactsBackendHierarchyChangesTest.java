@@ -103,8 +103,8 @@ public class ContactsBackendHierarchyChangesTest {
 	@Before
 	public void setUp() throws Exception {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		accessToken = new AccessToken(0, "OBM");
 		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);

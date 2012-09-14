@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Properties;
 
@@ -56,7 +55,6 @@ public class UserDataRequestTest {
 	private Credentials credentials;
 	private String command;
 	private Device device;
-	private BigDecimal protocolVersion;
 	private Resource resource1, resource2;
 	
 	@Before
@@ -64,8 +62,7 @@ public class UserDataRequestTest {
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		credentials = new Credentials(user, "test");
 		command = "command";
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
-		protocolVersion = new BigDecimal(1.23);
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 	}
 	
 	@Test
@@ -96,12 +93,6 @@ public class UserDataRequestTest {
 	public void testGetCommand() {
 		UserDataRequest userDataRequest = createUserDataRequest();
 		assertThat(userDataRequest.getCommand()).isEqualTo(command);
-	}
-	
-	@Test
-	public void testGetProtocolVersion() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getProtocolVersion()).isEqualTo(protocolVersion);
 	}
 	
 	@Test
@@ -267,6 +258,6 @@ public class UserDataRequestTest {
 	}
 	
 	private UserDataRequest createUserDataRequest() {
-		return new UserDataRequest(credentials, command, device, protocolVersion);
+		return new UserDataRequest(credentials, command, device);
 	}
 }

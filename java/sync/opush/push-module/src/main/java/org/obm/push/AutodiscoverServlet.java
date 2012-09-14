@@ -80,7 +80,7 @@ public class AutodiscoverServlet extends HttpServlet {
 			Credentials credentials = getCheckedCredentials(request);
 			loggerService.defineCommand("autodiscover");
 			
-			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null, null);
+			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null);
 			SimpleQueryString queryString = new SimpleQueryString(request);
 			Responder responder = responderFactory.createResponder(request, response);
 			

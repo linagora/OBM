@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service.impl;
 
+import java.math.BigDecimal;
+
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -63,9 +65,9 @@ public class DeviceServiceImpl implements DeviceService {
 	
 	@Override
 	public void initDevice(User loginAtDomain, DeviceId deviceId, 
-			String deviceType, String userAgent) {
+			String deviceType, String userAgent, BigDecimal protocolVersion) {
 		try {
-			Device opushDeviceId = deviceDao.getDevice(loginAtDomain, deviceId, userAgent);
+			Device opushDeviceId = deviceDao.getDevice(loginAtDomain, deviceId, userAgent, protocolVersion);
 			if (opushDeviceId == null) {
 				deviceDao.registerNewDevice(loginAtDomain, deviceId, deviceType);
 			}
@@ -103,8 +105,8 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public Device getDevice(User user, DeviceId deviceId, String userAgent) throws DaoException {
-		return deviceDao.getDevice(user, deviceId, userAgent);
+	public Device getDevice(User user, DeviceId deviceId, String userAgent, BigDecimal protocolVersion) throws DaoException {
+		return deviceDao.getDevice(user, deviceId, userAgent, protocolVersion);
 	}
 
 	@Override

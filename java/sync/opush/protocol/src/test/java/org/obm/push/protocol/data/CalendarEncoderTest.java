@@ -53,7 +53,6 @@ import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
-import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.MSAttendee;
@@ -62,9 +61,6 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceType;
-import org.obm.push.bean.User;
-import org.obm.push.bean.User.Factory;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.IntEncoder;
@@ -103,16 +99,9 @@ public class CalendarEncoderTest {
 		return msEvent;
 	}
 
-	private UserDataRequest getFakeUserDataRequest() {
-		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"),
-				"Sync", getFakeDevice(), new BigDecimal("12.5"));
-		return udr;
-	}
-
 	private String encodeMSEventAsString(MSEvent event) throws TransformerException {
 		Document doc = DOMUtils.createDoc("test", "ApplicationData");
-		encoder.encode(getFakeUserDataRequest(), doc.getDocumentElement(),
+		encoder.encode(getFakeDevice(), doc.getDocumentElement(),
 				event, true);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, outputStream);
@@ -337,6 +326,6 @@ public class CalendarEncoderTest {
 	}
 
 	private Device getFakeDevice() {
-		return new Device(1, "devType", new DeviceId("devId"), new Properties());
+		return new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 	}
 }

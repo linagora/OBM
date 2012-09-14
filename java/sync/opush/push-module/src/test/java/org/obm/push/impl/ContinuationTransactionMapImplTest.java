@@ -61,7 +61,7 @@ public class ContinuationTransactionMapImplTest {
 	
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 	}
 	
 	@Test

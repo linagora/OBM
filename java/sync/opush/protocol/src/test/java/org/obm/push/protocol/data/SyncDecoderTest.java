@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.easymock.IMocksControl;
@@ -81,9 +80,9 @@ public class SyncDecoderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		udr = new UserDataRequest(new Credentials(user, "test"), "Sync", device, new BigDecimal("12.5"));
+		udr = new UserDataRequest(new Credentials(user, "test"), "Sync", device);
 		collectionPath = "INBOX";
 		collectionId = 5;
 

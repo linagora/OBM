@@ -77,8 +77,8 @@ public class GetItemEstimateHandlerTest {
 	public void init() {
 		control = createControl();
 		
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
-		udr = new UserDataRequest(null,  null, device, null);
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
+		udr = new UserDataRequest(null,  null, device);
 		
 		contentsExporter = control.createMock(ContentsExporter.class);
 		stMachine = control.createMock(StateMachine.class);

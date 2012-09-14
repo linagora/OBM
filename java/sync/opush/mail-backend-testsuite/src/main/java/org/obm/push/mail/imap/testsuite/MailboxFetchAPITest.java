@@ -107,7 +107,7 @@ public abstract class MailboxFetchAPITest {
 	    this.greenMailUser = this.greenMail.setUser(mailbox, password);
 	    this.udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null);
 	    this.testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	

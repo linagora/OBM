@@ -42,6 +42,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.CalendarMeetingStatus;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
@@ -49,7 +50,6 @@ import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
@@ -85,7 +85,7 @@ public class CalendarEncoder extends Encoder {
 	// <StartTime>20010101T000000Z</StartTime>
 	// <UID>74455CE0E49D486DBDBC7CB224C5212D00000000000000000000000000000000</UID>
 	// <MeetingStatus>0</MeetingStatus>
-	public void encode(UserDataRequest udr, Element p, IApplicationData data, boolean isResponse) {
+	public void encode(Device device, Element p, IApplicationData data, boolean isResponse) {
 
 		MSEvent ev = (MSEvent) data;
 
@@ -115,7 +115,7 @@ public class CalendarEncoder extends Encoder {
 			s(p, ASCalendar.ORGANIZER_EMAIL.asASValue(), ev.getOrganizerEmail());
 		}
 
-		if (udr.checkHint("hint.loadAttendees", true)) {
+		if (device.checkHint("hint.loadAttendees", true)) {
 			if(ev.getAttendees().size()>0){
 				Element at = DOMUtils.createElement(p, ASCalendar.ATTENDEES.asASValue());
 				for (MSAttendee ma : ev.getAttendees()) {
@@ -136,7 +136,7 @@ public class CalendarEncoder extends Encoder {
 					
 					s(ae, ASCalendar.ATTENDEE_NAME.asASValue(), ma.getName());
 
-					if (udr.getProtocolVersion().compareTo(TWELVE) >= 0) {
+					if (device.getProtocolVersion().compareTo(TWELVE) >= 0) {
 						s(ae, ASCalendar.ATTENDEE_STATUS.asASValue(), ma.getAttendeeStatus()
 							.asIntString());
 						s(ae, ASCalendar.ATTENDEE_TYPE.asASValue(), ma.getAttendeeType()
@@ -150,11 +150,11 @@ public class CalendarEncoder extends Encoder {
 		s(p, ASCalendar.END_TIME.asASValue(), 
 				ev.getEndTime(), sdf);
 
-		encodeBody(udr, p, ev.getDescription());
+		encodeBody(device, p, ev.getDescription());
 
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev, sdf, timeZone);
-			encodeExceptions(udr, ev, p, ev.getExceptions(), sdf);
+			encodeExceptions(device, ev, p, ev.getExceptions(), sdf);
 		}
 
 		s(p, ASCalendar.SENSITIVITY.asASValue(), ev.getSensitivity().asIntString());
@@ -166,7 +166,7 @@ public class CalendarEncoder extends Encoder {
 			s(p, ASCalendar.ALL_DAY_EVENT.asASValue(), "0");
 		}
 
-		if (udr.checkHint("hint.loadAttendees", true)
+		if (device.checkHint("hint.loadAttendees", true)
 				&& ev.getAttendees().size() > 1) {
 			s(p, ASCalendar.MEETING_STATUS.asASValue(), CalendarMeetingStatus.IS_A_MEETING
 					.asIntString());
@@ -175,7 +175,7 @@ public class CalendarEncoder extends Encoder {
 					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
-		if (isResponse && udr.getProtocolVersion().compareTo(TWELVE) > 0) {
+		if (isResponse && device.getProtocolVersion().compareTo(TWELVE) > 0) {
 			s(p, "AirSyncBase:NativeBodyType", Type.PLAIN_TEXT.toString());
 		}
 
@@ -201,7 +201,7 @@ public class CalendarEncoder extends Encoder {
 		return timeZoneEncoder.encode(asTimeZone);
 	}
 	
-	private void encodeExceptions(UserDataRequest udr,
+	private void encodeExceptions(Device device,
 			MSEvent parent,
 			Element p,
 			List<MSEventException> excepts,
@@ -219,7 +219,7 @@ public class CalendarEncoder extends Encoder {
 						CalendarMeetingStatus.MEETING_IS_CANCELED.asIntString());
 
 				} else {
-					if (udr.checkHint("hint.loadAttendees", true)
+					if (device.checkHint("hint.loadAttendees", true)
 						&& parent.getAttendees().size() > 1) {
 						s(e, ASCalendar.MEETING_STATUS.asASValue(),
 							CalendarMeetingStatus.IS_A_MEETING.asIntString());
@@ -229,7 +229,7 @@ public class CalendarEncoder extends Encoder {
 							.asIntString());
 					}
 
-					encodeBody(udr, e, ex.getDescription());
+					encodeBody(device, e, ex.getDescription());
 
 					s(e, ASCalendar.LOCATION.asASValue(), ex.getLocation());
 					s(e, ASCalendar.SENSITIVITY.asASValue(), ex.getSensitivity().asIntString());
@@ -253,10 +253,10 @@ public class CalendarEncoder extends Encoder {
 		}
 	}
 
-	private void encodeBody(UserDataRequest udr, Element p,
+	private void encodeBody(Device device, Element p,
 			String description) {
 		String body = Strings.nullToEmpty(description).trim();
-		if (udr.getProtocolVersion().compareTo(TWELVE) >= 0) {
+		if (device.getProtocolVersion().compareTo(TWELVE) >= 0) {
 			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
 			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			s(d, "AirSyncBase:EstimatedDataSize", body.length());

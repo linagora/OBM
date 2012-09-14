@@ -46,8 +46,8 @@ public class OpushUser {
 		result.login = login;
 		result.password = password;
 		result.credentials = new Credentials(user, password);
-		result.device = new Device.Factory().create(1, "linphone", "linagent", new DeviceId("my phone"));
-		result.userDataRequest = new UserDataRequest(result.credentials, null, result.device, null);
+		result.device = new Device.Factory().create(1, "linphone", "linagent", new DeviceId("my phone"), null);
+		result.userDataRequest = new UserDataRequest(result.credentials, null, result.device);
 		return result;
 	}
 	

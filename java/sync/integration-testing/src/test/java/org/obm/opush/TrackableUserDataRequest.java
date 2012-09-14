@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.math.BigDecimal;
-
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.UserDataRequest;
@@ -56,15 +54,14 @@ public class TrackableUserDataRequest extends UserDataRequest {
 		}
 		
 		@Override
-		public UserDataRequest createUserDataRequest(Credentials credentials,
-				String command, Device device, BigDecimal protocolVersion) {
-			return new TrackableUserDataRequest(credentials, command, device, protocolVersion, pendingQueries);
+		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device) {
+			return new TrackableUserDataRequest(credentials, command, device, pendingQueries);
 		}
 	}
 	
 	
-	public TrackableUserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion, PendingQueriesLock pendingQueries) {
-		super(credentials, command, device, protocolVersion);
+	public TrackableUserDataRequest(Credentials credentials, String command, Device device, PendingQueriesLock pendingQueries) {
+		super(credentials, command, device);
 		this.pendingQueries = pendingQueries;
 		
 		try {

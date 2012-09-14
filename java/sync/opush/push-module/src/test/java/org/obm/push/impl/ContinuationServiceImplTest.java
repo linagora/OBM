@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import net.sf.ehcache.Element;
@@ -60,7 +59,7 @@ public class ContinuationServiceImplTest {
 
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 	}
 	
 	@Test
@@ -97,7 +96,7 @@ public class ContinuationServiceImplTest {
 	
 	private UserDataRequest getFakeUserDataRequest() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"), "Cmd", device, new BigDecimal("12.5"));
+		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"), "Cmd", device);
 		return udr;
 	}
 	

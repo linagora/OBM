@@ -33,6 +33,7 @@ package org.obm.push.bean;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
@@ -47,10 +48,12 @@ public class Device implements Serializable {
 	
 	public static class Factory {
 	
-		public Device create(Integer databaseId, String devType, String userAgent, DeviceId devId) {
+		public Device create(Integer databaseId, String devType, String userAgent,
+				DeviceId devId, BigDecimal protocolVersion) {
+			
 			Properties hints = getHints(userAgent, devType);
 			String rewritenDevType = rewriteDevType(userAgent, devType);
-			return new Device(databaseId, rewritenDevType, devId, hints);
+			return new Device(databaseId, rewritenDevType, devId, hints, protocolVersion);
 		}
 				
 		private String rewriteDevType(String userAgent, String devType) {
@@ -101,12 +104,14 @@ public class Device implements Serializable {
 	private final Properties hints;
 	private final DeviceId devId;
 	private final Integer databaseId;
+	private final BigDecimal protocolVersion;
 	
-	public Device(Integer databaseId, String devType, DeviceId devId, Properties hints) {
+	public Device(Integer databaseId, String devType, DeviceId devId, Properties hints, BigDecimal protocolVersion) {
 		this.databaseId = databaseId;
 		this.devType = devType;
 		this.devId = devId;
 		this.hints = hints;
+		this.protocolVersion = protocolVersion;
 	}	
 	
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -129,9 +134,13 @@ public class Device implements Serializable {
 		return databaseId;
 	}
 
+	public BigDecimal getProtocolVersion() {
+		return protocolVersion;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(devType, hints, devId, databaseId);
+		return Objects.hashCode(devType, hints, devId, databaseId, protocolVersion);
 	}
 	
 	@Override
@@ -141,7 +150,8 @@ public class Device implements Serializable {
 			return Objects.equal(this.devType, that.devType)
 				&& Objects.equal(this.hints, that.hints)
 				&& Objects.equal(this.devId, that.devId)
-				&& Objects.equal(this.databaseId, that.databaseId);
+				&& Objects.equal(this.databaseId, that.databaseId)
+				&& Objects.equal(this.protocolVersion, that.protocolVersion);
 		}
 		return false;
 	}
@@ -153,6 +163,7 @@ public class Device implements Serializable {
 			.add("hints", hints)
 			.add("devId", devId)
 			.add("databaseId", databaseId)
+			.add("protocolVersion", protocolVersion)
 			.toString();
 	}
 	

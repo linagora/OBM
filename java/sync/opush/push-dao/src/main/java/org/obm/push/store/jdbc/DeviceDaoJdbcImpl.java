@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.jdbc;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,7 +61,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Device getDevice(User user, DeviceId deviceId, String userAgent) 
+	public Device getDevice(User user, DeviceId deviceId, String userAgent, BigDecimal protocolVersion) 
 			throws DaoException {
 	
 		Connection con = null;
@@ -81,7 +82,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 				String devId = rs.getString("identifier");
 				String devType = rs.getString("type");
 				
-				return deviceFactory.create(databaseId, devType, userAgent, new DeviceId(devId));
+				return deviceFactory.create(databaseId, devType, userAgent, new DeviceId(devId), protocolVersion);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);

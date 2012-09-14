@@ -33,8 +33,8 @@ package org.obm.push.protocol.data;
 
 import java.io.IOException;
 
+import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailMetadata;
 import org.w3c.dom.Element;
@@ -66,19 +66,19 @@ public class EncoderFactory {
 		this.emailMetadataEncoder = emailMetadataEncoder;
 	}
 	
-	public void encode(UserDataRequest udr, Element parent, 
+	public void encode(Device device, Element parent, 
 			IApplicationData data, boolean isResponse) throws IOException {
 		
 		if (data != null) {
 			switch (data.getType()) {
 			case CALENDAR:
-				calendarProvider.get().encode(udr, parent, data, isResponse);
+				calendarProvider.get().encode(device, parent, data, isResponse);
 				break;
 			case CONTACTS:
-				contactProvider.get().encode(udr, parent, data);
+				contactProvider.get().encode(device, parent, data);
 				break;
 			case TASKS:
-				taskEncoder.get().encode(udr, parent, data);
+				taskEncoder.get().encode(device, parent, data);
 				break;
 			case EMAIL:
 				if (data instanceof MSEmail) {

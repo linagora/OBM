@@ -80,8 +80,8 @@ public class HierarchyExporterTest {
 	@Before
 	public void setUp() {
 		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
-		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 	}
 	
 	@Test

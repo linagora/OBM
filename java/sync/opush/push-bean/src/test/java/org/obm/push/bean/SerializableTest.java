@@ -37,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -143,7 +144,7 @@ public class SerializableTest {
 	
 	@Test
 	public void testDevice() throws IOException {
-		Device obj = new Device(1, "toto", new DeviceId("toto"), new Properties());
+		Device obj = new Device(1, "toto", new DeviceId("toto"), new Properties(), new BigDecimal("12.1"));
 		objectOutputStream.writeObject(obj);
 	}
 

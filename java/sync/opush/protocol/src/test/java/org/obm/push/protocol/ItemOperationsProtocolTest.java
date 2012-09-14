@@ -31,7 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyBoolean;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
@@ -49,9 +55,8 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderType;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
@@ -59,6 +64,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
@@ -86,9 +92,9 @@ public class ItemOperationsProtocolTest {
 	public void setup() {
 		itemOperationsProtocol = new ItemOperationsProtocol(null);
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		Device device = new Device(1, "devType", "devId", new Properties());
+		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 		Credentials credentials = new Credentials(user, "test");
-		udr = new UserDataRequest(credentials, "Sync", device, new BigDecimal("12.5"));
+		udr = new UserDataRequest(credentials, "Sync", device);
 	}
 	
 	@Test
@@ -147,7 +153,7 @@ public class ItemOperationsProtocolTest {
 
 	@Test
 	public void testMailboxEncodingResponse() throws Exception {
-		ItemChange itemChange = new ItemChange("1", "2", "test", FolderType.DEFAULT_INBOX_FOLDER, false);
+		ItemChange itemChange = new ItemChange("2", true, false);
 		itemChange.setData(msEmail("my message"));
 
 		String fetchItemResultServerId = "1:2";
@@ -188,7 +194,7 @@ public class ItemOperationsProtocolTest {
 
 	@Test
 	public void testMailboxServerErrorEncodingResponse() throws Exception {
-		ItemChange itemChange = new ItemChange("1", "2", "test", FolderType.DEFAULT_INBOX_FOLDER, false);
+		ItemChange itemChange = new ItemChange("2", true, false);
 		itemChange.setData(msEmail("my message"));
 
 		String fetchItemResultServerId = "1:2";
@@ -256,16 +262,16 @@ public class ItemOperationsProtocolTest {
 	
 	private EncoderFactory assertApplicationDataEncodeIsCalled() throws Exception {
 		EncoderFactory encoderFactory = createMock(EncoderFactory.class);
-		encoderFactory.encode(anyObject(UserDataRequest.class), anyObject(Element.class),
+		encoderFactory.encode(anyObject(Device.class), anyObject(Element.class),
 				anyObject(IApplicationData.class), anyBoolean());
 		expectLastCall();
 		return encoderFactory;
 	}
 	
 	private MSEmail msEmail(String message) {
-		return new MSEmail.MSEmailBuilder()
+		return MSEmail.builder()
 			.uid(1l)
-			.header(new MSEmailHeader.Builder().build())
+			.header(MSEmailHeader.builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream(message.getBytes())), MSEmailBodyType.MIME, 0, Charsets.UTF_8, false))
 			.build();

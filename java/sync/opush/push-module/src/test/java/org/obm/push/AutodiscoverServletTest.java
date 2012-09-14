@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -126,7 +125,7 @@ public class AutodiscoverServletTest {
 		bindProcess(responder);
 
 		UserDataRequest.Factory userDataRequestFactory = mocksControl.createMock(UserDataRequest.Factory.class);
-		expect(userDataRequestFactory.createUserDataRequest(same(credentials), eq("autodiscover"), isNull(Device.class), isNull(BigDecimal.class)))
+		expect(userDataRequestFactory.createUserDataRequest(same(credentials), eq("autodiscover"), isNull(Device.class)))
 			.andReturn(userDataRequest).anyTimes();
 		
 		return new AutodiscoverServlet(

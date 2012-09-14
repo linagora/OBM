@@ -184,7 +184,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null);
+		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 	
 	private boolean contains(Set<? extends ASItem> expected, ASItem actual) {

@@ -92,7 +92,7 @@ public abstract class MailboxMoveAPITest {
 	    greenMail.setUser(mailbox, password);
 	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, null);
 	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	

@@ -139,7 +139,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null);
+		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 	
 }

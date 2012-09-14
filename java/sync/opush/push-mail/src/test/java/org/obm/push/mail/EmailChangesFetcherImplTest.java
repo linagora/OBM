@@ -77,7 +77,7 @@ public class EmailChangesFetcherImplTest {
 	public void setUp() {
 		collectionId = 385;
 		collectionPath = "obm:\\\\login@domain\\email\\INBOX";
-		udr = new UserDataRequest(null,  null, null, null);
+		udr = new UserDataRequest(null,  null, null);
 		bodyPreferences = ImmutableList.<BodyPreference>of();
 
 		mocks = createControl();

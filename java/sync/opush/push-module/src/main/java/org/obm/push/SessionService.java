@@ -73,10 +73,10 @@ public class SessionService {
 		String userAgent = r.getUserAgent();
 		DeviceId devId = r.getDeviceId();
 		
-		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent);
+		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent, getProtocolVersion(r));
 		
 		UserDataRequest udr = userDataRequestFactory.createUserDataRequest(credentials, 
-				r.getCommand(), device, getProtocolVersion(r));
+				r.getCommand(), device);
 		
 		logger.debug("New session = {}", sessionId);
 		return udr;

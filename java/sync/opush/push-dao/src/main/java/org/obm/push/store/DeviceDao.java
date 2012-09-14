@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
+import java.math.BigDecimal;
+
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
@@ -43,7 +45,7 @@ public interface DeviceDao {
 	 */
 	boolean syncAuthorized(User user, DeviceId deviceId) throws DaoException;
 
-	Device getDevice(User user, DeviceId deviceId, String userAgent)
+	Device getDevice(User user, DeviceId deviceId, String userAgent, BigDecimal protocolVersion)
 			throws DaoException;
 
 	void registerNewDevice(User user, DeviceId deviceId,

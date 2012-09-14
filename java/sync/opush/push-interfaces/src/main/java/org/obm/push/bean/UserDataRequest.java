@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,8 +44,8 @@ public class UserDataRequest {
 
 	@Singleton
 	public static class Factory {
-		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
-			return new UserDataRequest(credentials, command, device, protocolVersion);
+		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device) {
+			return new UserDataRequest(credentials, command, device);
 		}
 	}
 	
@@ -55,15 +54,13 @@ public class UserDataRequest {
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
-	private final BigDecimal protocolVersion;
 	private final Map<String, Resource> resources;
 
-	public UserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion) {
+	public UserDataRequest(Credentials credentials, String command, Device device) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
 		this.device = device;
-		this.protocolVersion = protocolVersion;
 		this.resources = new HashMap<String, Resource>();
 	}
 
@@ -91,10 +88,6 @@ public class UserDataRequest {
 		return command;
 	}
 
-	public BigDecimal getProtocolVersion() {
-		return this.protocolVersion;
-	}
-	
 	public Credentials getCredentials() {
 		return credentials;
 	}
@@ -139,7 +132,7 @@ public class UserDataRequest {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(credentials, device, command, protocolVersion, resources);
+		return Objects.hashCode(credentials, device, command, resources);
 	}
 	
 	@Override
@@ -149,7 +142,6 @@ public class UserDataRequest {
 			return Objects.equal(this.credentials, that.credentials)
 				&& Objects.equal(this.device, that.device)
 				&& Objects.equal(this.command, that.command)
-				&& Objects.equal(this.protocolVersion, that.protocolVersion)
 				&& Objects.equal(this.resources, that.resources);
 		}
 		return false;
@@ -161,7 +153,6 @@ public class UserDataRequest {
 			.add("credentials", credentials)
 			.add("device", device)
 			.add("command", command)
-			.add("protocolVersion", protocolVersion)
 			.add("resources", resources)
 			.toString();
 	}
