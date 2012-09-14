@@ -1318,22 +1318,51 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Collection<ResourceInfo> listResources(ObmUser user) throws FindException {
-		return listResources(user, null);
+		return listUserAndPublicResources(user, null);
 	}
 
-	private Collection<ResourceInfo> listResources(ObmUser user, Collection<String> emails) throws FindException {
-		String query = "SELECT resource_id, resource_name, resource_email, resource_description, SUM(e.entityright_read), SUM(e.entityright_write) "
+	private String buildUserResourcesQuery(StringSQLCollectionHelper helper) {
+		String query = "SELECT resource_id, resource_name, resource_email, "
+				+ "resource_description, e.entityright_read, e.entityright_write "
 			+ "FROM Resource r "
 				+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
 				+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
 				+ "INNER JOIN UserEntity ue ON e.entityright_consumer_id=ue.userentity_entity_id "
 			+ "WHERE ue.userentity_user_id=? ";
+		if (helper != null)
+			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+		return query;
+	}
+
+	private String buildPublicResourcesQuery(StringSQLCollectionHelper helper) {
+		String query = "SELECT resource_id, resource_name, resource_email, "
+				+ "resource_description, e.entityright_read, e.entityright_write "
+			+ "FROM Resource r "
+				+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
+				+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
+				+ "WHERE e.entityright_consumer_id IS NULL ";
+		if (helper != null)
+			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+		return query;
+	}
+
+	private String buildUserAndPublicResourcesQuery(String publicQuery, String userQuery) {
+		return String.format("SELECT resource_id, resource_name, resource_email, resource_description, "
+				+ "SUM(entityright_read), SUM(entityright_write) "
+				+ "FROM (%s UNION %s) resource_union "
+				+ "GROUP BY resource_id, resource_name, resource_email, resource_description",
+				publicQuery, userQuery);
+	}
+
+	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails) throws FindException {
 		StringSQLCollectionHelper helper = null;
 		if (emails != null) {
 			helper = new StringSQLCollectionHelper(emails);
-			query += " AND r.resource_email IN (" + helper.asPlaceHolders() + ") ";
 		}
-		query += "GROUP BY resource_id, resource_name, resource_email, resource_description";
+		String publicQuery = buildPublicResourcesQuery(helper);
+		String userQuery = buildUserResourcesQuery(helper);
+		String query = buildUserAndPublicResourcesQuery(publicQuery, userQuery);
+
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -1342,9 +1371,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
-			ps.setInt(1, user.getUid());
+
+			int pos = 1;
+			// For the public query
 			if (helper != null) {
-				query += helper.insertValues(ps, 2);
+				pos = helper.insertValues(ps, pos);
+			}
+			// For the user query
+			ps.setInt(pos, user.getUid());
+			pos++;
+			if (helper != null) {
+				pos = helper.insertValues(ps, pos);
 			}
 
 			rs = ps.executeQuery();
@@ -1380,7 +1417,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	@Override
 	public Collection<ResourceInfo> getResourceMetadata(ObmUser user, Collection<String> resourceEmails)
 			throws FindException {
-		return this.listResources(user, resourceEmails);
+		return this.listUserAndPublicResources(user, resourceEmails);
 	}
 
 	private void processRightsRow(ResultSet rs, Set<CalendarInfo> dbResults, ObmUser user)
