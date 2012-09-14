@@ -54,16 +54,31 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-@Singleton
 public class ItemOperationsProtocol {
 
+	@Singleton
+	public static class Factory {
+
+		private final EncoderFactory encoderFactory;
+
+		@Inject
+		private Factory(EncoderFactory encoderFactory) {
+			this.encoderFactory = encoderFactory;
+		}
+		
+		public ItemOperationsProtocol create() {
+			return new ItemOperationsProtocol(encoderFactory);
+		}
+		
+	}
+	
 	private final EncoderFactory encoderFactory;
 
-	@Inject
-	/* package */ ItemOperationsProtocol(EncoderFactory encoderFactory) {
+	@VisibleForTesting ItemOperationsProtocol(EncoderFactory encoderFactory) {
 		this.encoderFactory = encoderFactory;
 	}
 	

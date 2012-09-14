@@ -88,7 +88,7 @@ import com.google.inject.Singleton;
 public class ItemOperationsHandler extends WbxmlRequestHandler {
 
 	private static final String NAMESPACE = "ItemOperations";
-	private final ItemOperationsProtocol protocol;
+	private final ItemOperationsProtocol.Factory protocolFactory;
 	private final MailBackend mailBackend;
 	private final CollectionPathHelper collectionPathHelper;
 
@@ -96,14 +96,14 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	protected ItemOperationsHandler(IBackend backend,
 			EncoderFactory encoderFactory, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter,
-			StateMachine stMachine, ItemOperationsProtocol protocol,
+			StateMachine stMachine, ItemOperationsProtocol.Factory protocolFactory,
 			CollectionDao collectionDao, WBXMLTools wbxmlTools,
 			MailBackend mailBackend, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
-		this.protocol = protocol;
+		this.protocolFactory = protocolFactory;
 		this.mailBackend = mailBackend;
 		this.collectionPathHelper = collectionPathHelper;
 	}
@@ -112,23 +112,26 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
+		ItemOperationsProtocol protocol = protocolFactory.create();
 		try {
 			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
 			ItemOperationsResponse response = doTheJob(udr, itemOperationRequest);
 			Document document = protocol.encodeResponse(response, udr);
 			sendResponse(responder, document, response);
 		} catch (CollectionNotFoundException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
+			sendErrorResponse(responder, protocol, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (UnsupportedStoreException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
+			sendErrorResponse(responder, protocol, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
 		} catch (ProcessingEmailException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		} catch (IOException e) {
-			sendErrorResponse(responder, ItemOperationsStatus.SERVER_ERROR, e);
+			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		} 
 	}
 	
-	private void sendErrorResponse(Responder responder, ItemOperationsStatus status, Exception exception) {
+	private void sendErrorResponse(Responder responder, ItemOperationsProtocol protocol,
+			ItemOperationsStatus status, Exception exception) {
+		
 		logger.error(exception.getMessage(), exception);
 		responder.sendWBXMLResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
 	}
