@@ -1346,12 +1346,26 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return query;
 	}
 
-	private String buildUserAndPublicResourcesQuery(String publicQuery, String userQuery) {
+	private String buildGroupResourcesQuery(StringSQLCollectionHelper helper) {
+		String query = "SELECT resource_id, resource_name, resource_email, "
+			+ "resource_description, e.entityright_read, e.entityright_write "
+		+ "FROM Resource r "
+			+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
+			+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
+			+ "INNER JOIN GroupEntity ge ON e.entityright_consumer_id=ge.groupentity_entity_id "
+			+ "INNER JOIN of_usergroup ug ON ge.groupentity_group_id=ug.of_usergroup_group_id "
+		+ "WHERE ug.of_usergroup_user_id=? ";
+		if (helper != null)
+			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+		return query;
+	}
+
+	private String buildPublicAndUserAndGroupResourcesQuery(String publicQuery, String groupQuery, String userQuery) {
 		return String.format("SELECT resource_id, resource_name, resource_email, resource_description, "
 				+ "SUM(entityright_read), SUM(entityright_write) "
-				+ "FROM (%s UNION %s) resource_union "
+				+ "FROM (%s UNION %s UNION %s) resource_union "
 				+ "GROUP BY resource_id, resource_name, resource_email, resource_description",
-				publicQuery, userQuery);
+				publicQuery, groupQuery, userQuery);
 	}
 
 	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails) throws FindException {
@@ -1361,7 +1375,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		String publicQuery = buildPublicResourcesQuery(helper);
 		String userQuery = buildUserResourcesQuery(helper);
-		String query = buildUserAndPublicResourcesQuery(publicQuery, userQuery);
+		String groupQuery = buildGroupResourcesQuery(helper);
+		String query = buildPublicAndUserAndGroupResourcesQuery(publicQuery, groupQuery, userQuery);
 
 		Connection con = null;
 		ResultSet rs = null;
@@ -1373,10 +1388,19 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(query);
 
 			int pos = 1;
+
 			// For the public query
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+
+			// For the group query
+			ps.setInt(pos, user.getUid());
+			pos++;
+			if (helper != null) {
+				pos = helper.insertValues(ps, pos);
+			}
+
 			// For the user query
 			ps.setInt(pos, user.getUid());
 			pos++;
