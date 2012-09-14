@@ -31,7 +31,6 @@ package org.obm.sync.solr;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.obm.configuration.ConfigurationService;
@@ -46,7 +45,7 @@ import com.google.inject.Singleton;
 public class SolrManager {
 	private boolean solrAvailable;
 	private Indexer indexer;
-	private Checker checker;
+	private Timer checker;
 	private int solrCheckingInterval;
 
 	private final Timer debugTimer;
@@ -85,11 +84,15 @@ public class SolrManager {
 
 	@VisibleForTesting
 	protected synchronized void setSolrAvailable(boolean solrAvailable) {
+		if (this.solrAvailable == solrAvailable) {
+			return;
+		}
+		
 		this.solrAvailable = solrAvailable;
 
 		if (solrAvailable) {
 			if (checker != null) {
-				checker.interrupt();
+				checker.cancel();
 			}
 
 			(indexer = new Indexer()).start();
@@ -99,13 +102,8 @@ public class SolrManager {
 				indexer.interrupt();
 			}
 
-			(checker = new Checker()).start();
+			(checker = new Timer()).scheduleAtFixedRate(new Checker(), solrCheckingInterval, solrCheckingInterval);
 		}
-	}
-
-	@VisibleForTesting
-	protected BlockingDeque<SolrRequest> getWorkQueue() {
-		return workQueue;
 	}
 
 	@VisibleForTesting
@@ -143,33 +141,22 @@ public class SolrManager {
 		}
 	}
 
-	private class Checker extends Thread {
+	private class Checker extends TimerTask {
 		@Override
 		public void run() {
-			while (!interrupted()) {
-				SolrRequest request = workQueue.peek();
+			SolrRequest request = workQueue.peek();
 
-				// We should have at least one element in the queue if a Checker is running
-				// because the manager is available at startup and as such, accepts requests
-				// So even if SolR is down at startup, the checker will only run when the first request comes in
-				if (request != null) {
-					try {
-						request.getServer().ping();
-
-						logger.info("SolR server is available, resuming indexing.");
-						setSolrAvailable(true);
-
-						break;
-					}
-					catch (Exception e) {
-					}
-				}
-
+			// We should have at least one element in the queue if a Checker is running
+			// because the manager is available at startup and as such, accepts requests
+			// So even if SolR is down at startup, the checker will only run when the first request comes in
+			if (request != null) {
 				try {
-					sleep(solrCheckingInterval);
+					request.getServer().ping();
+
+					logger.info("SolR server is available, resuming indexing.");
+					setSolrAvailable(true);
 				}
-				catch (InterruptedException e) {
-					break;
+				catch (Exception e) {
 				}
 			}
 		}
