@@ -35,11 +35,11 @@ import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpHeaderValues;
 import org.eclipse.jetty.http.HttpHeaders;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.StoreName;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.Fetch;
@@ -66,20 +66,22 @@ public class ItemOperationsProtocol {
 		private final EncoderFactory encoderFactory;
 
 		@Inject
-		private Factory(EncoderFactory encoderFactory) {
+		@VisibleForTesting Factory(EncoderFactory encoderFactory) {
 			this.encoderFactory = encoderFactory;
 		}
 		
-		public ItemOperationsProtocol create() {
-			return new ItemOperationsProtocol(encoderFactory);
+		public ItemOperationsProtocol create(Device device) {
+			return new ItemOperationsProtocol(encoderFactory, device);
 		}
 		
 	}
 	
 	private final EncoderFactory encoderFactory;
+	private final Device device;
 
-	@VisibleForTesting ItemOperationsProtocol(EncoderFactory encoderFactory) {
+	@VisibleForTesting ItemOperationsProtocol(EncoderFactory encoderFactory, Device device) {
 		this.encoderFactory = encoderFactory;
+		this.device = device;
 	}
 	
 	public ItemOperationsRequest getRequest(ActiveSyncRequest request, Document document) {
@@ -158,13 +160,13 @@ public class ItemOperationsProtocol {
 				|| "T".equalsIgnoreCase(request.getParameter("AcceptMultiPart"));
 	}
 
-	public Document encodeResponse(ItemOperationsResponse response, UserDataRequest udr) throws IOException {
+	public Document encodeResponse(ItemOperationsResponse response) throws IOException {
 		Document document = DOMUtils.createDoc(null, "ItemOperations");
 		Element root = document.getDocumentElement();
 		if (response.getEmptyFolderContentsResult() != null) {
 			encodeEmptyFolderOperation(response.getEmptyFolderContentsResult(), root);
 		} else if (response.getMailboxFetchResult() != null) {
-			encodeMailboxFetchResult(response.getMailboxFetchResult(), root, response.isMultipart(), udr);
+			encodeMailboxFetchResult(response.getMailboxFetchResult(), root, response.isMultipart());
 		}
 		return document;
 	}
@@ -178,21 +180,17 @@ public class ItemOperationsProtocol {
 	}
 
 	private void encodeMailboxFetchResult(MailboxFetchResult mailboxFetchResult, Element root, 
-			boolean multipart, UserDataRequest udr) throws IOException {
+			boolean multipart) throws IOException {
 		
 		if (mailboxFetchResult.getFetchItemResult() != null) {
-			encodeFetchItemResult(udr, root, mailboxFetchResult.getFetchItemResult());
+			encodeFetchItemResult(root, mailboxFetchResult.getFetchItemResult());
 		} else if (mailboxFetchResult.getFileReferenceFetch() != null) {
 			encodeFetchAttachmentResult(root, mailboxFetchResult.getFileReferenceFetch(), multipart);
 		}
 	}
 
-	
-	private void encodeFetchItemResult(UserDataRequest udr, Element root, FetchItemResult fetchItemResult) 
-			throws IOException {
-		
-		DOMUtils.createElementAndText(root, "Status",
-				ItemOperationsStatus.SUCCESS.asSpecificationValue());
+	private void encodeFetchItemResult(Element root, FetchItemResult fetchItemResult) throws IOException {
+		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(root, "Response");
 		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
 		DOMUtils.createElementAndText(fetchResp, "Status", fetchItemResult.getStatus().asSpecificationValue());
@@ -202,7 +200,7 @@ public class ItemOperationsProtocol {
 				fetchItemResult.getSyncCollection() != null) {
 			Element dataElem = DOMUtils.createElement(fetchResp, "Properties");
 			IApplicationData data = fetchItemResult.getItemChange().getData();
-			encoderFactory.encode(udr.getDevice(), dataElem, data, true);
+			encoderFactory.encode(device, dataElem, data, true);
 		}
 	}
 	

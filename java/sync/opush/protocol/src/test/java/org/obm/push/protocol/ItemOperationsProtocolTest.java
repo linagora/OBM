@@ -90,11 +90,11 @@ public class ItemOperationsProtocolTest {
 
 	@Before
 	public void setup() {
-		itemOperationsProtocol = new ItemOperationsProtocol(null);
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 		Credentials credentials = new Credentials(user, "test");
 		udr = new UserDataRequest(credentials, "Sync", device);
+		itemOperationsProtocol = new ItemOperationsProtocol.Factory(null).create(device);
 	}
 	
 	@Test
@@ -174,7 +174,8 @@ public class ItemOperationsProtocolTest {
 		EncoderFactory applicationDataEncoder = assertApplicationDataEncodeIsCalled();
 		replay(applicationDataEncoder);
 		
-		Document doc = new ItemOperationsProtocol(applicationDataEncoder).encodeResponse(response, udr);
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+		Document doc = protocol.encodeResponse(response);
 
 		verify(applicationDataEncoder);
 		
@@ -213,7 +214,8 @@ public class ItemOperationsProtocolTest {
 		response.setMailboxFetchResult(mailboxFetchResult);
 
 		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
-		Document doc = new ItemOperationsProtocol(applicationDataEncoder).encodeResponse(response, udr);
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+		Document doc = protocol.encodeResponse(response);
 
 		assertThat(DOMUtils.serialize(doc)).isEqualTo(
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -245,7 +247,8 @@ public class ItemOperationsProtocolTest {
 		response.setEmptyFolderContentsResult(emptyFolderContentsResult);
 
 		EncoderFactory applicationDataEncoder = createMock(EncoderFactory.class);
-		Document doc = new ItemOperationsProtocol(applicationDataEncoder).encodeResponse(response, udr);
+		ItemOperationsProtocol protocol = new ItemOperationsProtocol.Factory(applicationDataEncoder).create(udr.getDevice());
+		Document doc = protocol.encodeResponse(response);
 
 		assertThat(DOMUtils.serialize(doc)).isEqualTo(
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

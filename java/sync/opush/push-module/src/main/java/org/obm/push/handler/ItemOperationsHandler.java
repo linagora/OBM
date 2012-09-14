@@ -112,11 +112,11 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	public void process(IContinuation continuation, UserDataRequest udr,
 			Document doc, ActiveSyncRequest request, Responder responder) {
 
-		ItemOperationsProtocol protocol = protocolFactory.create();
+		ItemOperationsProtocol protocol = protocolFactory.create(udr.getDevice());
 		try {
 			ItemOperationsRequest itemOperationRequest = protocol.getRequest(request, doc);
 			ItemOperationsResponse response = doTheJob(udr, itemOperationRequest);
-			Document document = protocol.encodeResponse(response, udr);
+			Document document = protocol.encodeResponse(response);
 			sendResponse(responder, document, response);
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.DOCUMENT_LIBRARY_STORE_UNKNOWN, e);
