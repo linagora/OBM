@@ -47,6 +47,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
@@ -738,6 +739,24 @@ public class CalendarBindingImpl implements ICalendar {
 		for (Attendee att: event.getAttendees()) {
 			boolean isWriteOnCalendar = !StringUtils.isEmpty(att.getEmail()) && helperService.canWriteOnCalendar(token,  att.getEmail());
 			att.setCanWriteOnCalendar(isWriteOnCalendar);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public Collection<Event> getResourceEvents(int resourceId, Date date)
+			throws ServerFault {
+		try {
+			ResourceInfo resourceInfo = calendarDao.getResource(resourceId);
+			if (resourceInfo == null) {
+				throw new ServerFault(String.format("No such resource %d", resourceId));
+			}
+			Date threeMonthsBefore = new org.joda.time.DateTime(date).minus(Months.THREE).toDate();
+			Date sixMonthsAfter = new org.joda.time.DateTime(date).plus(Months.SIX).toDate();
+			SyncRange syncRange = new SyncRange(sixMonthsAfter, threeMonthsBefore);
+			return calendarDao.getResourceEvents(resourceInfo, syncRange);
+		} catch (FindException ex) {
+			throw new ServerFault(ex);
 		}
 	}
 	

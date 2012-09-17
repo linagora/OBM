@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Calendar;
@@ -43,12 +45,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class CalendarItemsParserTest {
@@ -423,12 +423,12 @@ public class CalendarItemsParserTest {
 				"</resourceInfo>";
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
 		ResourceInfo resourceInfo = parser.parseResourceInfo(doc.getDocumentElement());
-		Assert.assertEquals(42, resourceInfo.getId());
-		Assert.assertEquals("myresource", resourceInfo.getName());
-		Assert.assertEquals("mydescription", resourceInfo.getDescription());
-		Assert.assertEquals("res-42@somedomain.com", resourceInfo.getMail());
-		Assert.assertTrue(resourceInfo.isRead());
-		Assert.assertFalse(resourceInfo.isWrite());
+		assertThat(resourceInfo.getId()).isEqualTo(42);
+		assertThat(resourceInfo.getName()).isEqualTo("myresource");
+		assertThat("mydescription").isEqualTo(resourceInfo.getDescription());
+		assertThat("res-42@somedomain.com").isEqualTo(resourceInfo.getMail());
+		assertThat(resourceInfo.isRead()).isTrue();
+		assertThat(resourceInfo.isWrite()).isFalse();
 	}
 
 	@Test
@@ -443,11 +443,11 @@ public class CalendarItemsParserTest {
 				"</resourceInfo>";
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
 		ResourceInfo resourceInfo = parser.parseResourceInfo(doc.getDocumentElement());
-		Assert.assertEquals(42, resourceInfo.getId());
-		Assert.assertEquals("myresource", resourceInfo.getName());
-		Assert.assertEquals("res-42@somedomain.com", resourceInfo.getMail());
-		Assert.assertNull(resourceInfo.getDescription());
-		Assert.assertTrue(resourceInfo.isRead());
-		Assert.assertFalse(resourceInfo.isWrite());
+		assertThat(42).isEqualTo(resourceInfo.getId());
+		assertThat("myresource").isEqualTo(resourceInfo.getName());
+		assertThat("res-42@somedomain.com").isEqualTo(resourceInfo.getMail());
+		assertThat(resourceInfo.getDescription()).isNull();
+		assertThat(resourceInfo.isRead()).isTrue();
+		assertThat(resourceInfo.isWrite()).isFalse();
 	}
 }

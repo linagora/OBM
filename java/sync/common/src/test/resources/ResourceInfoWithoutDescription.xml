@@ -3,7 +3,7 @@
   <id>42</id>
   <name>myresource</name>
   <mail>res-42@somedomain.com</mail>
-  <description>mydescription</description>
+  <description/>
   <read>true</read>
   <write>false</write>
 </resourceInfo>

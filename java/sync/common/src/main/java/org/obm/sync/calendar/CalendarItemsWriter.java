@@ -291,8 +291,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		DOMUtils.createElementAndText(node, "name", ri.getName());
 		DOMUtils.createElementAndText(node, "mail", ri.getMail());
 		DOMUtils.createElementAndText(node, "description", Strings.nullToEmpty(ri.getDescription()));
-		DOMUtils.createElementAndText(node, "read", Boolean.toString(ri.isRead()));
-		DOMUtils.createElementAndText(node, "write", Boolean.toString(ri.isWrite()));
+		DOMUtils.createElementAndText(node, "read", String.valueOf(ri.isRead()));
+		DOMUtils.createElementAndText(node, "write", String.valueOf(ri.isWrite()));
 	}
 
 	public String getEventString(Event event) throws TransformerException {

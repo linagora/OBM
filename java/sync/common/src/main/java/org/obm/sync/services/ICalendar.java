@@ -32,6 +32,7 @@
 package org.obm.sync.services;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -326,4 +327,5 @@ public interface ICalendar {
 	 */
 	void purge(AccessToken token, String calendar) throws ServerFault;
 
+	Collection<Event> getResourceEvents(int resourceId, Date date) throws ServerFault;
 }

@@ -621,7 +621,7 @@ public class Ical4jHelper {
 
 	}
 
-	public String parseEvents(Ical4jUser iCal4jUser, List<Event> listEvent, AccessToken token) {
+	public String parseEvents(Ical4jUser iCal4jUser, Collection<Event> listEvent, AccessToken token) {
 
 		Calendar calendar = initCalendar();
 
@@ -730,7 +730,9 @@ public class Ical4jHelper {
 		}
 		appendRecurenceIdToICS(prop, event);
 		appendXMozLastAck(prop);
-		appendXObmOrigin(prop, token);
+		if (token != null) {
+			appendXObmOrigin(prop, token);
+		}
 		if(iCal4jUser != null){
 			appendXObmDomainProperties(iCal4jUser, prop);
 		}

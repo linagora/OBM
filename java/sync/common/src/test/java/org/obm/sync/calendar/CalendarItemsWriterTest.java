@@ -42,6 +42,7 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,6 +70,7 @@ private CalendarItemsWriter writer;
 	@Before
 	public void initCalendarWriter(){
 		writer = new CalendarItemsWriter();
+		XMLUnit.setIgnoreWhitespace(true);
 	}
 
 	@Test
@@ -147,7 +149,6 @@ private CalendarItemsWriter writer;
 		ResourceInfo resourceInfo = ResourceInfo.builder().id(42).name("myresource")
 				.mail("res-42@somedomain.com").description("mydescription").read(true).write(false)
 				.build();
-
 		String expectedXML = loadXmlFile("ResourceInfo.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));

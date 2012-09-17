@@ -90,6 +90,11 @@ public interface CalendarDao {
 
 	List<FreeBusy> getFreeBusy(ObmDomain domain, FreeBusyRequest request);
 
+	Collection<Event> getResourceEvents(ResourceInfo resourceInfo,
+			SyncRange syncRange) throws FindException;
+
+	ResourceInfo getResource(int resourceId) throws FindException;
+
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);
 

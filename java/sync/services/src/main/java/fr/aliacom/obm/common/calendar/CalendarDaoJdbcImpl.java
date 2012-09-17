@@ -102,6 +102,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -111,6 +112,8 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.SQLUtils;
+import fr.aliacom.obm.common.calendar.loader.EventLoader;
+import fr.aliacom.obm.common.calendar.loader.ResourceLoader;
 import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -919,6 +922,43 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
+	}
+
+	@Override
+	public ResourceInfo getResource(int resourceId) throws FindException {
+		Connection conn = null;
+		try {
+			conn = obmHelper.getConnection();
+			ResourceLoader loader = ResourceLoader.builder().connection(conn).ids(resourceId).build();
+			Collection<ResourceInfo> res = loader.load();
+			return Iterables.getFirst(res, null);
+		}
+		catch (SQLException ex) {
+			throw new FindException(ex);
+		}
+		finally {
+			obmHelper.cleanup(conn, null, null);
+		}
+	}
+
+	@Override
+	public Collection<Event> getResourceEvents(ResourceInfo resourceInfo,
+			SyncRange syncRange)
+			throws FindException {
+		Calendar cal = getGMTCalendar();
+		Connection conn = null;
+		try {
+			conn = obmHelper.getConnection();
+			EventLoader loader = EventLoader.builder().connection(conn).calendar(cal).occurringBetween(syncRange).
+				usingResources(resourceInfo.getId()).withExceptions(true).build();
+			Map<EventObmId, Event> events = loader.load();
+			return events.values();
+		}
+		catch (SQLException ex) {
+			throw new FindException(ex);
+		} finally {
+			obmHelper.cleanup(conn, null, null);
+		}
 	}
 
 	@Override

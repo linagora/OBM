@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.calendar;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -526,6 +527,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		Document doc = execute(token, type + "/getResourceMetadata", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseResourceInfo(doc);
+	}
+
+	@Override
+	public Collection<Event> getResourceEvents(int resourceId, Date date) throws ServerFault {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

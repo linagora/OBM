@@ -38,6 +38,8 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -56,6 +58,7 @@ import net.fortuna.ical4j.data.ParserException;
 
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
+import org.joda.time.Months;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,6 +82,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ImportICalendarException;
@@ -2076,6 +2080,33 @@ public class CalendarBindingImplTest {
 		Event[] eventsArray = Iterables.toArray(treeMap.keySet(), Event.class);
 		assertThat(eventsArray).isEqualTo(expectedEvents);
 	}
+
+    @Test
+	public void testGetResourceIcs() throws ServerFault, FindException {
+		int resourceId = 1;
+		Event mockEvent1 = createMock(Event.class);
+		Event mockEvent2 = createMock(Event.class);
+		Collection<Event> expectedEvents = Lists.newArrayList(mockEvent1, mockEvent2);
+
+		Date date = new Date();
+		Date threeMonthsBefore = new org.joda.time.DateTime(date).minus(Months.THREE).toDate();
+		Date sixMonthsAfter = new org.joda.time.DateTime(date).plus(Months.SIX).toDate();
+		SyncRange syncRange = new SyncRange(sixMonthsAfter, threeMonthsBefore);
+		CalendarDao mockDao = createMock(CalendarDao.class);
+		ResourceInfo mockResource = createMock(ResourceInfo.class);
+		expect(mockDao.getResource(resourceId)).andReturn(mockResource);
+		expect(mockDao.getResourceEvents(mockResource, syncRange)).andReturn(expectedEvents);
+
+		Object[] mocks = { mockEvent1, mockEvent2, mockDao, mockResource };
+		replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
+				null, null, null, null);
+		Collection<Event> events = calendarService.getResourceEvents(resourceId, date);
+		assertThat(events).isEqualTo(expectedEvents);
+
+		verify(mocks);
+    }
 
 	private Event createEvent(List<Attendee> expectedAttendees) {
 		Event event = new Event();
