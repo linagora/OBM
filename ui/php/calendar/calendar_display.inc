@@ -9290,7 +9290,10 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     $this->onedayperpage = $calendar['onedayperpage'];
 
     if ($this->range == "week") {
-      $display_days = $calendar['repeat_days'];
+      $display_days= '';
+      for ($i=0; $i<7; $i++) {
+          $display_days .= isset($calendar["repeatday_$i"]) ? '1' : '0';
+      }
       $i=0;
       foreach($this->updated as $date => $column){
         if (!$display_days[$i]) unset($this->updated[$date]);
