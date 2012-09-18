@@ -45,6 +45,8 @@ import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
+import org.obm.push.mail.transformer.Identity;
+import org.obm.push.mail.transformer.Transformer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -65,6 +67,9 @@ public class OpushMailModule extends AbstractModule {
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(MailBackend.class);
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
+		Multibinder<Transformer.Factory> transformers = 
+				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
+		transformers.addBinding().to(Identity.Factory.class);
 	}
 
 }

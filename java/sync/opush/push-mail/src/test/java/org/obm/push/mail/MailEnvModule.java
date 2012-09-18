@@ -48,12 +48,15 @@ import org.obm.push.mail.imap.ImapStoreManagerImpl;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
+import org.obm.push.mail.transformer.Identity;
+import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.service.EventService;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
@@ -96,6 +99,9 @@ public class MailEnvModule extends AbstractModule {
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(PrivateMailboxService.class).to(ImapMailboxService.class);
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
+		Multibinder<Transformer.Factory> transformers = 
+				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
+		transformers.addBinding().to(Identity.Factory.class);
 	}
 	
 }

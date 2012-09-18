@@ -86,6 +86,7 @@ import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
@@ -116,18 +117,22 @@ public class ImapMailboxService implements PrivateMailboxService {
 	private final CollectionPathHelper collectionPathHelper;
 
 	private final MailViewToMSEmailConverter msEmailConverter;
+
+	private final TransformersFactory transformersFactory;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, EventService eventService, ImapClientProvider imapClientProvider, 
 			CollectionPathHelper collectionPathHelper, 
-			MailViewToMSEmailConverter msEmailConverter) {
+			MailViewToMSEmailConverter msEmailConverter,
+			TransformersFactory transformersFactory) {
 		
 		this.smtpProvider = smtpSender;
 		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
 		this.collectionPathHelper = collectionPathHelper;
 		this.msEmailConverter = msEmailConverter;
+		this.transformersFactory = transformersFactory;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
@@ -163,7 +168,7 @@ public class ImapMailboxService implements PrivateMailboxService {
 		
 		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
 		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
-				new EmailViewPartsFetcherImpl(this, bodyPreferences, udr, collectionName, collectionId);
+				new EmailViewPartsFetcherImpl(transformersFactory, this, bodyPreferences, udr, collectionName, collectionId);
 		
 		for (Long uid: uids) {
 			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);

@@ -73,6 +73,8 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.ImapMailboxService;
+import org.obm.push.mail.transformer.TestIdentityTransformerFactory;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -493,7 +495,7 @@ public class EmailViewPartsFetcherImplTest {
 		replay(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
 
 		long messageUid = 1l;
-		EmailViewPartsFetcherImpl partsFetcher = new EmailViewPartsFetcherImpl(null, null, null, null, null);
+		EmailViewPartsFetcherImpl partsFetcher = new EmailViewPartsFetcherImpl(identityMailTransformerFactory(), null, null, null, null, null);
 		partsFetcher.fetchAttachments(shouldGetEmptyAttachmentListViewBuilder, fetchInstructions, messageUid);
 		
 		verify(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
@@ -584,8 +586,16 @@ public class EmailViewPartsFetcherImplTest {
 
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
 		return new EmailViewPartsFetcherImpl(
+				identityMailTransformerFactory(),
 				messageFixtureToMailboxServiceMock(), bodyPreferences(),
 				udr, messageCollectionName, messageCollectionId);
+	}
+
+	private TransformersFactory identityMailTransformerFactory() {
+		TransformersFactory transformersFactory = createMock(TransformersFactory.class);
+		expect(transformersFactory.create(anyObject(FetchInstructions.class))).andDelegateTo(new TestIdentityTransformerFactory()).anyTimes();
+		replay(transformersFactory);
+		return transformersFactory;
 	}
 
 	public Address newEmptyAddress() {

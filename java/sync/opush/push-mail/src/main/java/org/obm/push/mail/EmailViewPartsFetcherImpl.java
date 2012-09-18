@@ -52,6 +52,8 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.mail.transformer.Transformer;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,15 +66,17 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
 
+	private final TransformersFactory transformersFactory;
 	private final PrivateMailboxService privateMailboxService;
 	private final UserDataRequest udr;
 	private final String collectionName;
 	private final Integer collectionId;
 	private final List<BodyPreference> bodyPreferences;
 
-	public EmailViewPartsFetcherImpl(PrivateMailboxService privateMailboxService, 
+	public EmailViewPartsFetcherImpl(TransformersFactory transformersFactory, PrivateMailboxService privateMailboxService, 
 			List<BodyPreference> bodyPreferences, UserDataRequest udr, String collectionName, Integer collectionId) {
 		
+		this.transformersFactory = transformersFactory;
 		this.privateMailboxService = privateMailboxService;
 		this.udr = udr;
 		this.collectionName = collectionName;
@@ -130,9 +134,11 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			long uid) throws MailException {
 		
 		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
-		 
-		emailViewBuilder.bodyMimePartData(fetchInstructions.getMimePart().decodeMimeStream(bodyData));
-		emailViewBuilder.bodyType(fetchInstructions.getBodyType());
+		
+		Transformer transformedMail = transformersFactory.create(fetchInstructions);
+		
+		emailViewBuilder.bodyMimePartData(transformedMail.transform(fetchInstructions.getMimePart().decodeMimeStream(bodyData)));
+		emailViewBuilder.bodyType(transformedMail.targetType());
 		emailViewBuilder.estimatedDataSize(fetchInstructions.getMimePart().getSize());
 		emailViewBuilder.truncated(fetchInstructions.mustTruncate());
 		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
