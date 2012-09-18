@@ -67,14 +67,32 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-@Singleton
 public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncResponse>{
+
+	@Singleton
+	public static class Factory {
+		
+		private final SyncDecoder syncDecoder;
+		private final SyncAnalyser syncAnalyser;
+		private final SyncEncoder syncEncoder;
+
+		@Inject
+		public Factory(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
+				SyncEncoder syncEncoder) {
+			this.syncDecoder = syncDecoder;
+			this.syncAnalyser = syncAnalyser;
+			this.syncEncoder = syncEncoder;
+		}
+		
+		public SyncProtocol create() {
+			return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder);
+		}
+	}
 	
 	private final SyncDecoder syncDecoder;
 	private final SyncAnalyser syncAnalyser;
 	private final SyncEncoder syncEncoder;
 
-	@Inject
 	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
 			SyncEncoder syncEncoder) {
 		this.syncDecoder = syncDecoder;

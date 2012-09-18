@@ -195,7 +195,7 @@ public class SyncProtocolTest {
 	}
 
 	private String encodeResponse(SyncCollectionResponse collectionResponse) throws TransformerException {
-		Document endcodedResponse = new SyncProtocol(null, null).encodeResponse(syncResponse(collectionResponse));
+		Document endcodedResponse = new SyncProtocol(null, null, null).encodeResponse(syncResponse(collectionResponse));
 		return DOMUtils.serialize(endcodedResponse);
 	}
 	

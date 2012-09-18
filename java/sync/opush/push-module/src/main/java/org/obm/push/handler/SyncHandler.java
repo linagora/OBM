@@ -127,7 +127,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		public Map<String, String> processedClientIds = new HashMap<String, String>();
 	}
 	
-	private final SyncProtocol syncProtocol;
+	private final SyncProtocol.Factory syncProtocolFactory;
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
@@ -141,7 +141,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
 			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
-			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
+			MonitoredCollectionDao monitoredCollectionService, SyncProtocol.Factory syncProtocolFactory,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
 			ResponseWindowingService responseWindowingProcessor,
@@ -155,7 +155,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
-		this.syncProtocol = SyncProtocol;
+		this.syncProtocolFactory = syncProtocolFactory;
 		this.itemTrackingDao = itemTrackingDao;
 		this.collectionPathHelper = collectionPathHelper;
 		this.responseWindowingProcessor = responseWindowingProcessor;
@@ -167,6 +167,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
+		SyncProtocol syncProtocol = syncProtocolFactory.create();
 		try {
 			SyncRequest syncRequest = syncProtocol.decodeRequest(doc);
 			AnalysedSyncRequest analyzedSyncRequest = syncProtocol.analyzeRequest(udr, syncRequest);
@@ -181,35 +182,35 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
 			}
 		} catch (InvalidServerId e) {
-			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, continuation, e);
 		} catch (ProtocolException convExpt) {
-			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, convExpt);
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, continuation, convExpt);
 		} catch (PartialException pe) {
-			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, pe);
+			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, continuation, pe);
 		} catch (CollectionNotFoundException ce) {
 			sendError(udr.getDevice(), responder, SyncStatus.OBJECT_NOT_FOUND, continuation, ce);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, e);
+			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, continuation, e);
 		} catch (WaitIntervalOutOfRangeException e) {
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (WaitSyncFolderLimitException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), null);
 		} catch (DaoException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ProcessingEmailException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (CollectionPathException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ConversionException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (UnsupportedBackendFunctionException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ServerErrorException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		}
 	}
 
@@ -377,6 +378,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	public void sendResponse(UserDataRequest udr, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
 		try {
 			if (enablePush) {
+				SyncProtocol syncProtocol = syncProtocolFactory.create();
 				SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 						Collections.EMPTY_MAP, continuation);
 				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
@@ -385,19 +387,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY.asSpecificationValue(), continuation);
 			}
 		} catch (DaoException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (CollectionNotFoundException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.OBJECT_NOT_FOUND, continuation, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ProcessingEmailException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (InvalidServerId e) {
-			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);			
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, continuation, e);			
 		} catch (ConversionException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ServerErrorException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		}
 	}
 
@@ -507,11 +509,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 	
-	private void sendError(Device device, Responder responder, SyncStatus errorStatus, Exception exception) {
-		sendError(device, responder, errorStatus, null, exception);
-	}
-	
-	private void sendError(Device device, Responder responder, SyncStatus errorStatus, IContinuation continuation, Exception exception) {
+	private void sendError(Device device, Responder responder, SyncStatus errorStatus,
+			IContinuation continuation, Exception exception) {
 		logError(errorStatus, exception);
 		sendError(device, responder, errorStatus.asSpecificationValue(), continuation);
 	}
@@ -527,9 +526,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Override
 	public void sendError(Device device, Responder responder, String errorStatus, IContinuation continuation) {
 		try {
-			if (continuation != null) {
-				logger.info("Resp for requestId = {}", continuation.getReqId());
-			}
+			logger.info("Resp for requestId = {}", continuation.getReqId());
+			SyncProtocol syncProtocol = syncProtocolFactory.create();
 			responder.sendWBXMLResponse("AirSync", syncProtocol.encodeResponse(errorStatus) );
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
