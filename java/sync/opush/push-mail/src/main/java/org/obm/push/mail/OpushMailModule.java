@@ -45,6 +45,7 @@ import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
+import org.obm.push.mail.transformer.HtmlToText;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 
@@ -70,6 +71,7 @@ public class OpushMailModule extends AbstractModule {
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
+		transformers.addBinding().to(HtmlToText.Factory.class);
 	}
 
 }
