@@ -29,20 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.protocol.bean;
 
-public class DaoException extends RuntimeException {
+import java.util.List;
 
-	public DaoException(String message, Throwable cause) {
-		super(message, cause);
+import org.apache.commons.lang.NotImplementedException;
+import org.w3c.dom.Element;
+
+public class SyncRequestCollectionCommands {
+	
+	public static class Command {
+
+		public String getName() {
+			throw new NotImplementedException("Will be implemented in next commits");
+		}
+
+		public String getServerId() {
+			throw new NotImplementedException("Will be implemented in next commits");
+		}
+
+		public String getClientId() {
+			throw new NotImplementedException("Will be implemented in next commits");
+		}
+
+		public Element getApplicationData() {
+			throw new NotImplementedException("Will be implemented in next commits");
+		}
+		
 	}
-
-	public DaoException(String message) {
-		super(message);
+	
+	public List<String> getFetchIds() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
-
-	public DaoException(Throwable cause) {
-		super(cause);
+	
+	public List<Command> getCommands() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
-
+	
 }

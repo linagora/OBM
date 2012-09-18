@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,10 +74,12 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.SyncProtocol;
+import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
@@ -167,17 +168,17 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
-			SyncRequest syncRequest = syncProtocol.getRequest(doc, udr);
+			SyncRequest syncRequest = syncProtocol.decodeRequest(doc);
+			AnalysedSyncRequest analyzedSyncRequest = syncProtocol.analyzeRequest(udr, syncRequest);
 			
 			continuationService.cancel(udr.getDevice(), SyncStatus.NEED_RETRY.asSpecificationValue());
-			
-			ModificationStatus modificationStatus = processCollections(udr, syncRequest.getSync());
-			if (syncRequest.getSync().getWaitInSecond() > 0) {
-				registerWaitingSync(continuation, udr, syncRequest.getSync());
+			ModificationStatus modificationStatus = processCollections(udr, analyzedSyncRequest.getSync());
+			if (analyzedSyncRequest.getSync().getWaitInSecond() > 0) {
+				registerWaitingSync(continuation, udr, analyzedSyncRequest.getSync());
 			} else {
-				SyncResponse syncResponse = doTheJob(udr, syncRequest.getSync().getCollections(), 
+				SyncResponse syncResponse = doTheJob(udr, analyzedSyncRequest.getSync().getCollections(), 
 						 modificationStatus.processedClientIds, continuation);
-				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
+				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
 			}
 		} catch (InvalidServerId e) {
 			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);
@@ -207,7 +208,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnsupportedBackendFunctionException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
-		} catch (IOException e) {
+		} catch (ServerErrorException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}
@@ -378,7 +379,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (enablePush) {
 				SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 						Collections.EMPTY_MAP, continuation);
-				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
+				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
 			} else {
 				//Push is not supported, after the heartbeat interval is over, we ask the phone to retry
 				sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY.asSpecificationValue(), continuation);
@@ -395,7 +396,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);			
 		} catch (ConversionException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
-		} catch (IOException e) {
+		} catch (ServerErrorException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}

@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.Estimate;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
@@ -54,6 +55,9 @@ import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
+import org.obm.push.protocol.bean.SyncRequest;
+import org.obm.push.protocol.bean.SyncRequestCollection;
+import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -91,6 +95,7 @@ public class BeansTest {
 					.add(MoveItemsItem.class)
 					.add(SearchRequest.class)
 					.add(SearchResponse.class)
+					.add(AnalysedSyncRequest.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

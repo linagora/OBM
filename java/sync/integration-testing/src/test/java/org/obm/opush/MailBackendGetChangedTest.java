@@ -54,6 +54,7 @@ import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -94,6 +95,7 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+@Ignore("Sync decoding in progress until end of OBMFULL-4040")
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetChangedTest {

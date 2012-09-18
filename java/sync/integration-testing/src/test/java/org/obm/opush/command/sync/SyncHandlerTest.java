@@ -114,6 +114,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
+@Ignore("Sync decoding in progress until end of OBMFULL-4040")
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncHandlerTest {
 

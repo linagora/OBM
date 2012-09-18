@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -48,79 +49,94 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SyncProtocol {
+public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncResponse>{
 	
 	private final SyncDecoder syncDecoder;
+	private final SyncAnalyser syncAnalyser;
 
 	@Inject
-	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder) {
+	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser) {
 		this.syncDecoder = syncDecoder;
+		this.syncAnalyser = syncAnalyser;
 	}
 	
-	public SyncRequest getRequest(Document doc, UserDataRequest userDataRequest) 
-			throws NoDocumentException, PartialException, ProtocolException, DaoException, CollectionPathException {
+	@Override
+	public SyncRequest decodeRequest(Document doc) 
+			throws NoDocumentException, ProtocolException, DaoException, CollectionPathException {
 		if (doc == null) {
 			throw new NoDocumentException("Document of Sync request is null.");
 		}
-		return new SyncRequest( syncDecoder.decodeSync(doc, userDataRequest) );
+		return syncDecoder.decodeSync(doc);
+	}
+	
+	public AnalysedSyncRequest analyzeRequest(UserDataRequest userDataRequest, SyncRequest syncRequest) 
+			throws PartialException, ProtocolException, DaoException, CollectionPathException {
+		Preconditions.checkNotNull(userDataRequest);
+		Preconditions.checkNotNull(syncRequest);
+		
+		return new AnalysedSyncRequest( syncAnalyser.analyseSync(userDataRequest, syncRequest) );
 	}
 
-	public Document endcodeResponse(SyncResponse syncResponse) throws IOException {
-		Document reply = DOMUtils.createDoc(null, "Sync");
-		Element root = reply.getDocumentElement();
-		
-		final Element cols = DOMUtils.createElement(root, "Collections");
-		for (SyncCollectionResponse collectionResponse: syncResponse.getCollectionResponses()) {
+	@Override
+	public Document encodeResponse(SyncResponse syncResponse) throws ProtocolException {
+		try {
+			Document reply = DOMUtils.createDoc(null, "Sync");
+			Element root = reply.getDocumentElement();
 
-			Element ce = DOMUtils.createElement(cols, "Collection");
-			if (collectionResponse.getSyncCollection().getDataClass() != null) {
-				DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
-			}
-			
-			SyncStatus status = collectionResponse.getSyncCollection().getStatus();
-			if (!collectionResponse.collectionValidity()) {
-				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue());
-			} else if (status != SyncStatus.OK) {
-				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", collectionResponse.getSyncCollection().getStatus().asSpecificationValue());
-				if (status == SyncStatus.INVALID_SYNC_KEY) {
-					DOMUtils.createElementAndText(ce, "SyncKey", "0");
-				}
-			} else {
-				Element sk = DOMUtils.createElement(ce, "SyncKey");
-				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asSpecificationValue());
+			final Element cols = DOMUtils.createElement(root, "Collections");
+			for (SyncCollectionResponse collectionResponse: syncResponse.getCollectionResponses()) {
 
-				if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
-					if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
-						buildUpdateItemChange(syncResponse.getUserDataRequest(), collectionResponse, 
-								syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
-					} else {
-						buildFetchItemChange(syncResponse.getUserDataRequest(), collectionResponse, ce, 
-								syncResponse.getEncoderFactory());
+				final Element ce = DOMUtils.createElement(cols, "Collection");
+				SyncStatus status = collectionResponse.getSyncCollection().getStatus();
+				if (!collectionResponse.collectionValidity()) {
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+					DOMUtils.createElementAndText(ce, "Status", SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue());
+				} else if (status != SyncStatus.OK) {
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+					DOMUtils.createElementAndText(ce, "Status", collectionResponse.getSyncCollection().getStatus().asSpecificationValue());
+					if (status == SyncStatus.INVALID_SYNC_KEY) {
+						DOMUtils.createElementAndText(ce, "SyncKey", "0");
 					}
+				} else {
+					Element sk = DOMUtils.createElement(ce, "SyncKey");
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+					DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asSpecificationValue());
+	
+					if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
+						if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
+							buildUpdateItemChange(syncResponse.getUserDataRequest(), collectionResponse, 
+									syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
+						} else {
+							buildFetchItemChange(syncResponse.getUserDataRequest(), collectionResponse, ce, 
+									syncResponse.getEncoderFactory());
+						}
+					}
+					
+					sk.setTextContent(collectionResponse.getAllocateNewSyncKey().getSyncKey());
 				}
-				
-				sk.setTextContent(collectionResponse.getAllocateNewSyncKey().getSyncKey());
 			}
-			
+			return reply;
+		} catch (IOException e) {
+			throw new ServerErrorException(e);
 		}
-		return reply;
 	}
 	
 	public Document encodeResponse() {
@@ -258,6 +274,16 @@ public class SyncProtocol {
 	private static void serializeDeletion(Element commands, ItemDeletion deletion) {
 		Element del = DOMUtils.createElement(commands, "Delete");
 		DOMUtils.createElementAndText(del, "ServerId", deletion.getServerId());
+	}
+
+	@Override
+	public Document encodeRequest(SyncRequest request) throws ProtocolException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public SyncResponse decodeResponse(Document responseDocument) throws ProtocolException {
+		throw new NotImplementedException();
 	}
 	
 }

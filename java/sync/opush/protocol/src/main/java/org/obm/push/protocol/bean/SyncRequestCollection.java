@@ -29,20 +29,49 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.protocol.bean;
 
-public class DaoException extends RuntimeException {
+import org.apache.commons.lang.NotImplementedException;
+import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 
-	public DaoException(String message, Throwable cause) {
-		super(message, cause);
+public class SyncRequestCollection {
+
+	public static class Builder {
+
+		public SyncRequestCollection build() {
+			return new SyncRequestCollection();
+		}
+
+	}
+	
+	protected SyncRequestCollection() {}
+	
+	public int getId() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
 
-	public DaoException(String message) {
-		super(message);
+	public String getDataClass() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
 
-	public DaoException(Throwable cause) {
-		super(cause);
+	public SyncKey getSyncKey() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
 
+	public Integer getWindowSize() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+	
+	public boolean hasWindowSize() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+
+	public SyncCollectionOptions getOptions() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+	
+	public SyncRequestCollectionCommands getCommands() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
 }

@@ -29,20 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.protocol.bean;
 
-public class DaoException extends RuntimeException {
+import org.obm.push.bean.Sync;
 
-	public DaoException(String message, Throwable cause) {
-		super(message, cause);
+import com.google.common.base.Objects;
+
+public class AnalysedSyncRequest {
+
+	private final Sync sync;
+	
+	public AnalysedSyncRequest(Sync sync) {
+		this.sync = sync;
+	}
+	
+	public Sync getSync() {
+		return sync;
 	}
 
-	public DaoException(String message) {
-		super(message);
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(sync);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof AnalysedSyncRequest) {
+			AnalysedSyncRequest that = (AnalysedSyncRequest) object;
+			return Objects.equal(this.sync, that.sync);
+		}
+		return false;
 	}
 
-	public DaoException(Throwable cause) {
-		super(cause);
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("sync", sync)
+			.toString();
 	}
-
 }

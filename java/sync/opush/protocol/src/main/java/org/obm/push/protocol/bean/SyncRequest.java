@@ -31,18 +31,35 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import org.obm.push.bean.Sync;
+import java.util.List;
+
+import org.apache.commons.lang.NotImplementedException;
 
 public class SyncRequest {
 
-	private final Sync sync;
-	
-	public SyncRequest(Sync sync) {
-		this.sync = sync;
+	public static class Builder {
+
+		public SyncRequest build() {
+			return new SyncRequest();
+		}
 	}
 	
-	public Sync getSync() {
-		return sync;
+	protected SyncRequest() {}
+	
+	public Integer getWaitInMinute() {
+		throw new NotImplementedException("Will be implemented in next commits");
 	}
 	
+	public Boolean isPartial() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+	
+	public List<SyncRequestCollection> getCollections() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+
+	public Integer getWindowSize() {
+		throw new NotImplementedException("Will be implemented in next commits");
+	}
+
 }

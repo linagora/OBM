@@ -173,8 +173,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
-		} catch (DaoException e) {
-			logger.error(e.getMessage(), e);
 		} catch (AuthFault e) {
 			logger.info(e.getMessage());
 			httpErrorResponder.returnHttpUnauthorized(request, response);
