@@ -129,6 +129,7 @@ public class MimePartSelectorTest {
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(mimePart);
+		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(mimePart);
 	
 		replay(mimeMessage);
 		FetchInstruction mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);

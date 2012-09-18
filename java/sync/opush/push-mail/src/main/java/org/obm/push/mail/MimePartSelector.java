@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class MimePartSelector {
 	
@@ -62,32 +64,43 @@ public class MimePartSelector {
 	public FetchInstruction select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
 		
-		return fetchIntructions(
-					Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of()),
-					mimeMessage);
+		List<FetchInstruction> fetchInstructions = 
+			fetchIntructions(
+				Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of()),
+				mimeMessage);
+		return selectBetterFit(fetchInstructions, bodyPreferences);
 	}
 
-	private FetchInstruction fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
-		FetchInstruction fetchInstruction = selectMimePart(bodyPreferences, mimeMessage);
-		if (fetchInstruction != null) {
-			return fetchInstruction;
+	private List<FetchInstruction> fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		List<FetchInstruction> fetchInstructions = findMatchingInstructions(bodyPreferences, mimeMessage);
+		if (!fetchInstructions.isEmpty()) {
+			return fetchInstructions;
 		} else {
-			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
+			return findMatchingInstructions(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		}
 	}
 	
-	private FetchInstruction selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+
+
+	private FetchInstruction selectBetterFit(
+			List<FetchInstruction> fetchInstructions,
+			List<BodyPreference> bodyPreferences) {
+		return Iterables.getFirst(fetchInstructions, null);
+	}
+	
+	private List<FetchInstruction> findMatchingInstructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
 		for (BodyPreference bodyPreference: bodyPreferences) {
 			if (isContentType(bodyPreference)) {
 				IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
 				if (isMatching(mimePart, bodyPreference)) {
-					return buildFetchInstruction(mimePart, bodyPreference);
+					fetchInstructions.add(buildFetchInstruction(mimePart, bodyPreference));
 				}
 			} else {
-				return buildFetchInstruction(mimeMessage, bodyPreference);
+				fetchInstructions.add(buildFetchInstruction(mimeMessage, bodyPreference));
 			}
 		}
-		return null;
+		return fetchInstructions;
 	}
 
 	private boolean isMatching(IMimePart mimePart, BodyPreference bodyPreference) {
