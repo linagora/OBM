@@ -113,6 +113,7 @@ public class FetchInstructionsTest {
 		return FetchInstructions.builder()
 			.truncation(truncation)
 			.mimePart(mimePart)
+			.mailTransformation(MailTransformation.NONE)
 			.build();
 	}
 }

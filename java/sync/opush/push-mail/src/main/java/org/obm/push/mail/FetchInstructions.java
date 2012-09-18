@@ -47,6 +47,7 @@ public class FetchInstructions {
 		private IMimePart mimePart;
 		private Integer truncation;
 		private MSEmailBodyType bodyType;
+		private MailTransformation mailTransformation;
 		
 		private Builder() {}
 		
@@ -65,10 +66,15 @@ public class FetchInstructions {
 			return this;
 		}
 		
+		public Builder mailTransformation(MailTransformation mailTransformation) {
+			this.mailTransformation = mailTransformation;
+			return this;
+		}
+		
 		public FetchInstructions build() {
 			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
 			return new FetchInstructions(
-					this.mimePart, this.truncation, this.bodyType);
+					this.mimePart, this.truncation, this.bodyType, this.mailTransformation);
 		}
 
 	}
@@ -76,11 +82,13 @@ public class FetchInstructions {
 	private final IMimePart mimePart;
 	private final Integer truncation;
 	private final MSEmailBodyType bodyType;
+	private final MailTransformation mailTransformation;
 	
-	private FetchInstructions(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType) {
+	private FetchInstructions(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType, MailTransformation mailTransformation) {
 		this.mimePart = mimePart;
 		this.truncation = truncation;
 		this.bodyType = bodyType;
+		this.mailTransformation = mailTransformation;
 	}
 	
 	public IMimePart getMimePart() {
@@ -93,6 +101,10 @@ public class FetchInstructions {
 	
 	public MSEmailBodyType getBodyType() {
 		return bodyType;
+	}
+	
+	public MailTransformation getMailTransformation() {
+		return mailTransformation;
 	}
 	
 	public boolean hasMimePartAddressDefined() {

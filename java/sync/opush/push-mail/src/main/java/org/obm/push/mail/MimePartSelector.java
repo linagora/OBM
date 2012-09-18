@@ -107,6 +107,7 @@ public class MimePartSelector {
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())
 			.bodyType(bodyPreference.getType())
+			.mailTransformation(MailTransformation.NONE)
 			.build();
 	}
 

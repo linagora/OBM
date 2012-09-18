@@ -487,6 +487,7 @@ public class EmailViewPartsFetcherImplTest {
 		
 		FetchInstructions fetchInstructions = FetchInstructions.builder()
 			.mimePart(parentMimePart)
+			.mailTransformation(MailTransformation.NONE)
 			.build();
 		
 		replay(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
