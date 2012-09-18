@@ -41,6 +41,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 public class MimePartSelector {
@@ -61,23 +62,18 @@ public class MimePartSelector {
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
 		
-		if (bodyPreferences == null || bodyPreferences.isEmpty()) {
-			return fetchIntructions(DEFAULT_BODY_PREFERENCES, mimeMessage);
-		} else {
-			return fetchIntructions(bodyPreferences, mimeMessage);
-		}
+		return fetchIntructions(
+					Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of()),
+					mimeMessage);
 	}
 
 	private FetchInstructions fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		FetchInstructions fetchInstructions = selectMimePart(bodyPreferences, mimeMessage);
 		if (fetchInstructions != null) {
 			return fetchInstructions;
-		}
-		
-		if (!bodyPreferences.equals(DEFAULT_BODY_PREFERENCES)) {
+		} else {
 			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		}
-		return null;
 	}
 	
 	private FetchInstructions selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
