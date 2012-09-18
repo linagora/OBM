@@ -91,10 +91,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			fetchEnvelope(emailViewBuilder, uid);
 			
 			MimeMessage mimeMessage = getMimeMessage(uid);
-			FetchInstructions fetchInstructions = getFetchInstructions(mimeMessage);
-			if (fetchInstructions != null) {
-				fetchBody(emailViewBuilder, fetchInstructions, uid);
-				fetchAttachments(emailViewBuilder, fetchInstructions, uid);
+			FetchInstruction fetchInstruction = getFetchInstruction(mimeMessage);
+			if (fetchInstruction != null) {
+				fetchBody(emailViewBuilder, fetchInstruction, uid);
+				fetchAttachments(emailViewBuilder, fetchInstruction, uid);
 			}
 			fetchInvitation(emailViewBuilder, mimeMessage, uid);
 			
@@ -126,29 +126,29 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		return privateMailboxService.fetchBodyStructure(udr, collectionName, uid);
 	}
 
-	private FetchInstructions getFetchInstructions(MimeMessage mimeMessage) {
+	private FetchInstruction getFetchInstruction(MimeMessage mimeMessage) {
 		return new MimePartSelector().select(bodyPreferences, mimeMessage);
 	}
 	
-	private void fetchBody(Builder emailViewBuilder, FetchInstructions fetchInstructions, 
+	private void fetchBody(Builder emailViewBuilder, FetchInstruction fetchInstruction, 
 			long uid) throws MailException {
 		
-		InputStream bodyData = fetchBodyData(fetchInstructions, uid);
+		InputStream bodyData = fetchBodyData(fetchInstruction, uid);
 		
-		Transformer transformedMail = transformersFactory.create(fetchInstructions);
+		Transformer transformedMail = transformersFactory.create(fetchInstruction);
 		
-		emailViewBuilder.bodyMimePartData(transformedMail.transform(fetchInstructions.getMimePart().decodeMimeStream(bodyData)));
+		emailViewBuilder.bodyMimePartData(transformedMail.transform(fetchInstruction.getMimePart().decodeMimeStream(bodyData)));
 		emailViewBuilder.bodyType(transformedMail.targetType());
-		emailViewBuilder.estimatedDataSize(fetchInstructions.getMimePart().getSize());
-		emailViewBuilder.truncated(fetchInstructions.mustTruncate());
-		emailViewBuilder.charset(fetchInstructions.getMimePart().getCharset());
+		emailViewBuilder.estimatedDataSize(fetchInstruction.getMimePart().getSize());
+		emailViewBuilder.truncated(fetchInstruction.mustTruncate());
+		emailViewBuilder.charset(fetchInstruction.getMimePart().getCharset());
 	}
 
-	private InputStream fetchBodyData(FetchInstructions fetchInstructions, long uid) throws MailException {
+	private InputStream fetchBodyData(FetchInstruction fetchInstruction, long uid) throws MailException {
 		InputStream bodyData = null;
 		try {
-			if (fetchInstructions.hasMimePartAddressDefined()) {
-				bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstructions);
+			if (fetchInstruction.hasMimePartAddressDefined()) {
+				bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstruction);
 				if (bodyData != null) {
 					return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
 				} else {
@@ -165,9 +165,9 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		
 	}
 	
-	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstructions fetchInstructions, long uid) {
+	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstruction fetchInstruction, long uid) {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
-		IMimePart parentMessage = fetchInstructions.getMimePart().findRootMimePartInTree();
+		IMimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
 		int nbAttachments = 0;
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isAttachment() && !mp.isICSAttachment()) {

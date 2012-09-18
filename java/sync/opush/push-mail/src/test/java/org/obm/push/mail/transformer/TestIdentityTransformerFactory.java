@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.transformer;
 
-import org.obm.push.mail.FetchInstructions;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
 import com.google.common.collect.ImmutableSet;
@@ -43,7 +43,7 @@ public class TestIdentityTransformerFactory extends TransformersFactory {
 	}
 
 	@Override
-	public Transformer create(FetchInstructions fetchInstructions) {
-		return new Identity.Factory().create(fetchInstructions);
+	public Transformer create(FetchInstruction fetchInstruction) {
+		return new Identity.Factory().create(fetchInstruction);
 	}
 }

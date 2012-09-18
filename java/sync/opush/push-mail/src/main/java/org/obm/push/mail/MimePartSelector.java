@@ -59,7 +59,7 @@ public class MimePartSelector {
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
 					.build();
 	
-	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+	public FetchInstruction select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
 		
 		return fetchIntructions(
@@ -67,24 +67,24 @@ public class MimePartSelector {
 					mimeMessage);
 	}
 
-	private FetchInstructions fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
-		FetchInstructions fetchInstructions = selectMimePart(bodyPreferences, mimeMessage);
-		if (fetchInstructions != null) {
-			return fetchInstructions;
+	private FetchInstruction fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		FetchInstruction fetchInstruction = selectMimePart(bodyPreferences, mimeMessage);
+		if (fetchInstruction != null) {
+			return fetchInstruction;
 		} else {
 			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		}
 	}
 	
-	private FetchInstructions selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+	private FetchInstruction selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		for (BodyPreference bodyPreference: bodyPreferences) {
 			if (isContentType(bodyPreference)) {
 				IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
 				if (isMatching(mimePart, bodyPreference)) {
-					return buildFetchInstructions(mimePart, bodyPreference);
+					return buildFetchInstruction(mimePart, bodyPreference);
 				}
 			} else {
-				return buildFetchInstructions(mimeMessage, bodyPreference);
+				return buildFetchInstruction(mimeMessage, bodyPreference);
 			}
 		}
 		return null;
@@ -102,8 +102,8 @@ public class MimePartSelector {
 		}
 	}
 	
-	private FetchInstructions buildFetchInstructions(IMimePart mimePart, BodyPreference bodyPreference) {
-		return FetchInstructions.builder()
+	private FetchInstruction buildFetchInstruction(IMimePart mimePart, BodyPreference bodyPreference) {
+		return FetchInstruction.builder()
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())
 			.bodyType(bodyPreference.getType())

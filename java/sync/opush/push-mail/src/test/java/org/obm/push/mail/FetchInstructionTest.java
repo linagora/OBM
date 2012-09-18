@@ -43,7 +43,7 @@ import org.minig.imap.mime.IMimePart;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
-public class FetchInstructionsTest {
+public class FetchInstructionTest {
 
 	@Test
 	public void testHasMimePartAddressDefined() {
@@ -52,8 +52,8 @@ public class FetchInstructionsTest {
 		
 		replay(mimePart);
 		
-		FetchInstructions fetchInstructions = createFetchInstructions(100, mimePart);
-		assertThat(fetchInstructions.hasMimePartAddressDefined()).isTrue();
+		FetchInstruction fetchInstruction = createFetchInstruction(100, mimePart);
+		assertThat(fetchInstruction.hasMimePartAddressDefined()).isTrue();
 		
 		verify(mimePart);
 	}
@@ -65,8 +65,8 @@ public class FetchInstructionsTest {
 		
 		replay(mimePart);
 		
-		FetchInstructions fetchInstructions = createFetchInstructions(100, mimePart);
-		assertThat(fetchInstructions.hasMimePartAddressDefined()).isFalse();
+		FetchInstruction fetchInstruction = createFetchInstruction(100, mimePart);
+		assertThat(fetchInstruction.hasMimePartAddressDefined()).isFalse();
 		
 		verify(mimePart);
 	}
@@ -78,8 +78,8 @@ public class FetchInstructionsTest {
 		
 		replay(mimePart);
 		
-		FetchInstructions fetchInstructions = createFetchInstructions(100, mimePart);
-		assertThat(fetchInstructions.mustTruncate()).isTrue();
+		FetchInstruction fetchInstruction = createFetchInstruction(100, mimePart);
+		assertThat(fetchInstruction.mustTruncate()).isTrue();
 		
 		verify(mimePart);
 	}
@@ -90,8 +90,8 @@ public class FetchInstructionsTest {
 		
 		replay(mimePart);
 		
-		FetchInstructions fetchInstructions = createFetchInstructions(null, mimePart);
-		assertThat(fetchInstructions.mustTruncate()).isFalse();
+		FetchInstruction fetchInstruction = createFetchInstruction(null, mimePart);
+		assertThat(fetchInstruction.mustTruncate()).isFalse();
 		
 		verify(mimePart);
 	}
@@ -103,14 +103,14 @@ public class FetchInstructionsTest {
 		
 		replay(mimePart);
 		
-		FetchInstructions fetchInstructions = createFetchInstructions(100, mimePart);
-		assertThat(fetchInstructions.mustTruncate()).isFalse();
+		FetchInstruction fetchInstruction = createFetchInstruction(100, mimePart);
+		assertThat(fetchInstruction.mustTruncate()).isFalse();
 		
 		verify(mimePart);
 	}
 
-	private FetchInstructions createFetchInstructions(Integer truncation, IMimePart mimePart) {
-		return FetchInstructions.builder()
+	private FetchInstruction createFetchInstruction(Integer truncation, IMimePart mimePart) {
+		return FetchInstruction.builder()
 			.truncation(truncation)
 			.mimePart(mimePart)
 			.mailTransformation(MailTransformation.NONE)

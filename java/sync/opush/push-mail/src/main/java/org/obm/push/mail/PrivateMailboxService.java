@@ -55,7 +55,7 @@ public interface PrivateMailboxService extends MailboxService {
 
 	Collection<Flag> fetchFlags(UserDataRequest udr, String inbox, long uid) throws MailException;
 
-	InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, FetchInstructions fetchInstructions) 
+	InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, FetchInstruction fetchInstruction) 
 			throws MailException;
 
 	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;

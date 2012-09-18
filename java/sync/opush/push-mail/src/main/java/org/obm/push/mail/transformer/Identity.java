@@ -34,7 +34,7 @@ package org.obm.push.mail.transformer;
 import java.io.InputStream;
 
 import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.mail.FetchInstructions;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailTransformation;
 
 public class Identity implements Transformer {
@@ -46,15 +46,15 @@ public class Identity implements Transformer {
 		}
 		
 		@Override
-		public Transformer create(FetchInstructions fetchInstructions) {
-			return new Identity(fetchInstructions);
+		public Transformer create(FetchInstruction fetchInstruction) {
+			return new Identity(fetchInstruction);
 		}
 	}
 	
-	private final FetchInstructions fetchInstructions;
+	private final FetchInstruction fetchInstruction;
 	
-	private Identity(FetchInstructions fetchInstructions) {
-		this.fetchInstructions = fetchInstructions;
+	private Identity(FetchInstruction fetchInstruction) {
+		this.fetchInstruction = fetchInstruction;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class Identity implements Transformer {
 
 	@Override
 	public MSEmailBodyType targetType() {
-		return fetchInstructions.getBodyType();
+		return fetchInstruction.getBodyType();
 	}
 	
 }

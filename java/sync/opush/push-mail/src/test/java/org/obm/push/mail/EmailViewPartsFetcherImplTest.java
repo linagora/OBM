@@ -487,7 +487,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf));
 		multipartLeaf.defineParent(parentMimePart, multipartLeafIndex);
 		
-		FetchInstructions fetchInstructions = FetchInstructions.builder()
+		FetchInstruction fetchInstruction = FetchInstruction.builder()
 			.mimePart(parentMimePart)
 			.mailTransformation(MailTransformation.NONE)
 			.build();
@@ -496,7 +496,7 @@ public class EmailViewPartsFetcherImplTest {
 
 		long messageUid = 1l;
 		EmailViewPartsFetcherImpl partsFetcher = new EmailViewPartsFetcherImpl(identityMailTransformerFactory(), null, null, null, null, null);
-		partsFetcher.fetchAttachments(shouldGetEmptyAttachmentListViewBuilder, fetchInstructions, messageUid);
+		partsFetcher.fetchAttachments(shouldGetEmptyAttachmentListViewBuilder, fetchInstruction, messageUid);
 		
 		verify(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
 	}
@@ -546,7 +546,7 @@ public class EmailViewPartsFetcherImplTest {
 				anyObject(UserDataRequest.class),
 				anyObject(String.class),
 				anyLong(),
-				anyObject(FetchInstructions.class)))
+				anyObject(FetchInstruction.class)))
 			.andReturn(messageFixture.bodyData).once();
 		
 		expect(mailboxService.findAttachment(udr, messageCollectionName, messageFixture.uid, mimeAddress))
@@ -593,7 +593,7 @@ public class EmailViewPartsFetcherImplTest {
 
 	private TransformersFactory identityMailTransformerFactory() {
 		TransformersFactory transformersFactory = createMock(TransformersFactory.class);
-		expect(transformersFactory.create(anyObject(FetchInstructions.class))).andDelegateTo(new TestIdentityTransformerFactory()).anyTimes();
+		expect(transformersFactory.create(anyObject(FetchInstruction.class))).andDelegateTo(new TestIdentityTransformerFactory()).anyTimes();
 		replay(transformersFactory);
 		return transformersFactory;
 	}

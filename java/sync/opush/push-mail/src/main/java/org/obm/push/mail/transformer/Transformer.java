@@ -36,7 +36,7 @@ import java.util.EnumMap;
 import java.util.Set;
 
 import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.mail.FetchInstructions;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailTransformation;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,7 +46,7 @@ import com.google.inject.Singleton;
 public interface Transformer {
 
 	interface Factory {
-		Transformer create(FetchInstructions fetchInstructions);
+		Transformer create(FetchInstruction fetchInstruction);
 		MailTransformation describe();
 	}
 	
@@ -63,7 +63,7 @@ public interface Transformer {
 			}
 		}
 
-		public Transformer create(FetchInstructions fetchInstructions) {
+		public Transformer create(FetchInstruction fetchInstructions) {
 			return indexedTransformers.get(fetchInstructions.getMailTransformation()).create(fetchInstructions);
 		}		
 	}

@@ -76,7 +76,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
 import org.obm.push.mail.EmailViewPartsFetcherImpl;
-import org.obm.push.mail.FetchInstructions;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
@@ -646,17 +646,17 @@ public class ImapMailboxService implements PrivateMailboxService {
 	
 	@Override
 	public InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, 
-			FetchInstructions fetchInstructions) throws MailException {
+			FetchInstruction fetchInstruction) throws MailException {
 
-		Preconditions.checkNotNull(fetchInstructions);
+		Preconditions.checkNotNull(fetchInstruction);
 		StoreClient store = imapClientProvider.getImapClient(udr);
 		try {
 			login(store);
 			store.select(parseMailBoxName(udr, collectionName));
 			
-			MimeAddress address = fetchInstructions.getMimePart().getAddress();
+			MimeAddress address = fetchInstruction.getMimePart().getAddress();
 			String addressAsString = Objects.firstNonNull(address.getAddress(), "");
-			Integer truncation = fetchInstructions.getTruncation();
+			Integer truncation = fetchInstruction.getTruncation();
 			if (truncation != null) {
 				return store.uidFetchPart(uid, addressAsString, truncation);
 			} else {

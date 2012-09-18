@@ -37,7 +37,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import com.google.common.base.Preconditions;
 
 
-public class FetchInstructions {
+public class FetchInstruction {
 	
 	public static Builder builder() {
 		return new Builder();
@@ -71,9 +71,9 @@ public class FetchInstructions {
 			return this;
 		}
 		
-		public FetchInstructions build() {
+		public FetchInstruction build() {
 			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
-			return new FetchInstructions(
+			return new FetchInstruction(
 					this.mimePart, this.truncation, this.bodyType, this.mailTransformation);
 		}
 
@@ -84,7 +84,7 @@ public class FetchInstructions {
 	private final MSEmailBodyType bodyType;
 	private final MailTransformation mailTransformation;
 	
-	private FetchInstructions(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType, MailTransformation mailTransformation) {
+	private FetchInstruction(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType, MailTransformation mailTransformation) {
 		this.mimePart = mimePart;
 		this.truncation = truncation;
 		this.bodyType = bodyType;

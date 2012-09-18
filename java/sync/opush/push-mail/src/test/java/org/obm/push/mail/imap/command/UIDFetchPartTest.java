@@ -60,7 +60,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.FetchInstructions;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
@@ -298,12 +298,12 @@ public class UIDFetchPartTest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
-		Assertions.assertThat(data).hasSize(fetchInstructions.getMimePart().getSize());
+		Assertions.assertThat(data).hasSize(fetchInstruction.getMimePart().getSize());
 		Assertions.assertThat(data).isEqualTo("<b>bodydata</b>");
 	}
 	
@@ -321,9 +321,9 @@ public class UIDFetchPartTest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).hasSize(truncationSize);
@@ -342,9 +342,9 @@ public class UIDFetchPartTest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstructions fetchInstructions = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstructions);
+		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).isEqualTo("bodydata");
