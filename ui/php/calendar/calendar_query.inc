@@ -541,7 +541,7 @@ function run_query_calendar_insert_decision($calendar, $userId) {
 
   $concernedPeople = get_concerned_people_for_event($event_id);
 
-  if(count($concernedPeople) <= 1 && $state == "DECLINED"){
+  if($entity == 'user' && count($concernedPeople) <= 1 && $state == "DECLINED"){
     $query = "DELETE FROM Event WHERE event_id = $event_id";
     $obm_q = new DB_OBM;
     $obm_q->query($query);
