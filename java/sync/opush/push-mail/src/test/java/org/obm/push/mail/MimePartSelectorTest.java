@@ -122,11 +122,42 @@ public class MimePartSelectorTest {
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(mimeMessage);
 	}
+
+	@Test
+	public void testSelectDefaultBodyPreferencesTextPlain() {
+		MimePart mimePart = MimePart.builder().contentType("text/plain").build();
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
+		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(mimePart);
+	
+		replay(mimeMessage);
+		FetchInstructions mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
+	}
+
+	@Test
+	public void testSelectDefaultBodyPreferencesTextHtml() {
+		MimePart mimePart = MimePart.builder().contentType("text/html").build();
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
+		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(mimePart);
+	
+		replay(mimeMessage);
+		FetchInstructions mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
+	}
+
 	
 	@Test
-	public void testSelectDefaultBodyPreferences() {
+	public void testSelectDefaultBodyPreferencesApplicationPdf() {
+		MimePart mimePart = MimePart.builder().contentType("application/pdf").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
-		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null);
 	
