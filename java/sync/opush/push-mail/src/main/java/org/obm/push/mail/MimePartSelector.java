@@ -53,7 +53,10 @@ public class MimePartSelector {
 					.add(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText)
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
 					.add(BodyPreference.builder().bodyType(MSEmailBodyType.HTML)
-							.truncationSize(DEFAULT_TRUNCATION_SIZE).build()).build(); 
+							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
+					.add(BodyPreference.builder().bodyType(MSEmailBodyType.MIME)
+							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
+					.build();
 	
 	public FetchInstructions select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
@@ -72,12 +75,9 @@ public class MimePartSelector {
 		}
 		
 		if (!bodyPreferences.equals(DEFAULT_BODY_PREFERENCES)) {
-			fetchInstructions = selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
-			if (fetchInstructions != null) {
-				return fetchInstructions;
-			}
+			return selectMimePart(DEFAULT_BODY_PREFERENCES, mimeMessage);
 		}
-		return defaultFetchInstructions(mimeMessage);
+		return null;
 	}
 	
 	private FetchInstructions selectMimePart(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
@@ -92,13 +92,6 @@ public class MimePartSelector {
 			}
 		}
 		return null;
-	}
-
-	private FetchInstructions defaultFetchInstructions(MimeMessage mimeMessage) {
-		return FetchInstructions.builder()
-			.bodyType(MSEmailBodyType.MIME)
-			.mimePart(mimeMessage)
-			.truncation(DEFAULT_TRUNCATION_SIZE).build();
 	}
 
 	private boolean isMatching(IMimePart mimePart, BodyPreference bodyPreference) {
