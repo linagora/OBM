@@ -35,6 +35,7 @@ import org.minig.imap.mime.IMimePart;
 import org.obm.push.bean.MSEmailBodyType;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Objects;
 
 
 public class FetchInstruction {
@@ -120,4 +121,32 @@ public class FetchInstruction {
 		}
 		return false;
 	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(mimePart, truncation, bodyType, mailTransformation);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof FetchInstruction) {
+			FetchInstruction that = (FetchInstruction) object;
+			return Objects.equal(this.mimePart, that.mimePart)
+				&& Objects.equal(this.truncation, that.truncation)
+				&& Objects.equal(this.bodyType, that.bodyType)
+				&& Objects.equal(this.mailTransformation, that.mailTransformation);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("mimePart", mimePart)
+			.add("truncation", truncation)
+			.add("bodyType", bodyType)
+			.add("mailTransformation", mailTransformation)
+			.toString();
+	}
+	
 }

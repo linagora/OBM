@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.mail.conversation.EmailViewAttachment;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -55,6 +56,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(EmailViewAttachment.class)
+					.add(FetchInstruction.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
