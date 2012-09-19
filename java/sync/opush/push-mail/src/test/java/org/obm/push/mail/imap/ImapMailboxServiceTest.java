@@ -345,6 +345,19 @@ public class ImapMailboxServiceTest {
 		assertThat(bodyText).contains("Envoyé de mon iPhone");
 	}
 	
+	@Test
+	public void testFetchWithoutCorrespondingBodyPreference() throws Exception {
+		InputStream mailStream = testUtils.getInputStreamFromFile("OBMFULL-4123.eml");
+		mailboxService.storeInInbox(udr, mailStream, false);
+		
+		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
+				Arrays.asList(1l), 
+				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
+		MSEmail actual = Iterables.getOnlyElement(emails);
+		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(testUtils.getInputStreamFromFile("OBMFULL-4123.eml"));
+	}
+	
 	private void consumeInputStream(InputStream inputStream) throws IOException {
 		while (inputStream.read() != -1) {
 			// consume Inputstream
