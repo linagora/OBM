@@ -30,12 +30,10 @@
 package org.obm.sync.solr;
 
 import static org.easymock.EasyMock.*;
-
-import java.net.MalformedURLException;
-
 import junit.framework.Assert;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.dbcp.ConfigurationServiceFixturePostgreSQL;
@@ -43,8 +41,12 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
+import org.obm.sync.solr.jms.DefaultCommandConverter;
+
+import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class SolrHelperFactoryTest {
 
@@ -55,37 +57,46 @@ public class SolrHelperFactoryTest {
 	private ContactIndexer contactIndexer;
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
+	private QueueManager queueManager;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		queueManager = new QueueManager();
+		queueManager.start();
+
 		contact = new Contact();
 		accessToken = ToolBox.mockAccessToken();
 		locatorClient = createMock(LocatorService.class);
-		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer").createMock();
+		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer", CommonsHttpSolrServer.class, ObmDomain.class, Contact.class).createMock();
 		contactIndexer = createMockBuilder(ContactIndexer.class).createMock();
-		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL());
-		factory = new SolrHelper.Factory(contactIndexerFactory, null, locatorClient, manager);
+		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager);
+		factory = new SolrHelper.Factory(manager, locatorClient, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
 
 		contact.setUid(1);
 
 		expect(locatorClient.getServiceLocation(isA(String.class), isA(String.class))).andReturn(null).anyTimes();
-		expect(contactIndexerFactory.createIndexer(isA(CommonsHttpSolrServer.class), eq(contact))).andReturn(contactIndexer).once();
+		expect(contactIndexerFactory.createIndexer(isA(CommonsHttpSolrServer.class), isA(ObmDomain.class), eq(contact))).andReturn(contactIndexer).once();
 
 		replay(accessToken, locatorClient, contactIndexerFactory);
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		queueManager.stop();
+	}
+
 	@Test(expected = IllegalStateException.class)
-	public void create_contact_solr_remains_unavailable() throws MalformedURLException, LocatorClientException {
+	public void create_contact_solr_remains_unavailable() throws LocatorClientException {
 		index(false);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void delete_contact_solr_remains_unavailable() throws MalformedURLException, LocatorClientException {
+	public void delete_contact_solr_remains_unavailable() throws LocatorClientException {
 		delete(false);
 	}
 
 	@Test
-	public void create_contact_solr_available() throws MalformedURLException, LocatorClientException {
+	public void create_contact_solr_available() throws LocatorClientException {
 		try {
 			index(true);
 		}
@@ -95,7 +106,7 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test
-	public void delete_contact_solr_available() throws MalformedURLException, LocatorClientException {
+	public void delete_contact_solr_available() throws LocatorClientException {
 		try {
 			delete(true);
 		}
@@ -105,7 +116,7 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test
-	public void create_contact_solr_becomes_available() throws MalformedURLException, LocatorClientException {
+	public void create_contact_solr_becomes_available() throws  LocatorClientException {
 		try {
 			index(false);
 		}
@@ -115,7 +126,7 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test
-	public void delete_contact_solr_becomes_available() throws MalformedURLException, LocatorClientException {
+	public void delete_contact_solr_becomes_available() throws  LocatorClientException {
 		try {
 			delete(false);
 		}
@@ -125,23 +136,23 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void create_contact_solr_becomes_unavailable() throws MalformedURLException, LocatorClientException {
+	public void create_contact_solr_becomes_unavailable() throws Exception, LocatorClientException {
 		create_contact_solr_available();
 		index(false);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void delete_contact_solr_becomes_unavailable() throws MalformedURLException, LocatorClientException {
+	public void delete_contact_solr_becomes_unavailable() throws LocatorClientException {
 		delete_contact_solr_available();
 		delete(false);
 	}
 
-	private void index(boolean solrUp) throws MalformedURLException {
+	private void index(boolean solrUp) {
 		manager.setSolrAvailable(solrUp);
 		factory.createClient(accessToken).createOrUpdate(contact);
 	}
 
-	private void delete(boolean solrUp) throws MalformedURLException {
+	private void delete(boolean solrUp) {
 		manager.setSolrAvailable(solrUp);
 		factory.createClient(accessToken).delete(contact);
 	}

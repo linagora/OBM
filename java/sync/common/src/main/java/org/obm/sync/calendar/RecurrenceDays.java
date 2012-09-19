@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -42,7 +43,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-public class RecurrenceDays implements Set<RecurrenceDay> {
+public class RecurrenceDays implements Set<RecurrenceDay>, Serializable {
 	
 	public static final RecurrenceDays ALL_DAYS = new RecurrenceDays(RecurrenceDay.values());
 	

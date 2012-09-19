@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-public class InstantMessagingId implements IMergeable {
+import java.io.Serializable;
+
+public class InstantMessagingId implements IMergeable, Serializable {
 
 	private String protocol;
 	private String id;

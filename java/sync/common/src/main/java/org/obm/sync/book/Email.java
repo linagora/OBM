@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-public class Email implements IMergeable {
+import java.io.Serializable;
+
+public class Email implements IMergeable, Serializable {
 
 	public Email(String email) {
 		super();

@@ -61,7 +61,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class EventIndexer extends SolrRequest {
 
 	@Singleton
-	public static class Factory {
+	public static class Factory implements IndexerFactory<Event> {
 
 		private final ObmHelper obmHelper;
 		private final UserDao userDao;
@@ -72,6 +72,7 @@ public class EventIndexer extends SolrRequest {
 			this.userDao = userDao;
 		}
 		
+		@Override
 		public EventIndexer createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, Event e) {
 			return new EventIndexer(srv, obmHelper, userDao, domain, e);
 		}

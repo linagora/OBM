@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Objects;
 
-public class Contact {
+public class Contact implements Serializable {
 
 	private Integer uid;
 

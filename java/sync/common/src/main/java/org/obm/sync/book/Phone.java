@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-public class Phone implements IMergeable {
+import java.io.Serializable;
+
+public class Phone implements IMergeable, Serializable {
 
 	private String number;
 

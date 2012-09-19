@@ -27,38 +27,40 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
-
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+package org.obm.sync.solr.jms;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.sync.book.Contact;
+import org.obm.sync.solr.IndexerFactory;
+import org.obm.sync.solr.Remover;
+import org.obm.sync.solr.SolrRequest;
 
-public class PingSolrRequest extends SolrRequest {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	private final Lock lock;
-	private final Condition condition;
+public class ContactCommand extends Command<Contact> {
 
-	public PingSolrRequest(CommonsHttpSolrServer server, Lock lock, Condition condition) {
-		super(server);
-
-		this.lock = lock;
-		this.condition = condition;
+	public ContactCommand(ObmDomain domain, Contact data, Type type) {
+		super(domain, data, type);
 	}
 
 	@Override
-	public void run() throws Exception {
-		server.ping();
+	public String getQueueName() {
+		return "/topic/contact/changes";
 	}
 
 	@Override
-	public void postProcess() {
-		if (lock == null) {
-			return;
+	public String getSolrServiceName() {
+		return "solr/contact";
+	}
+
+	@Override
+	public SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<Contact> factory) {
+		switch (getType()) {
+			case DELETE:
+				return new Remover(server, String.valueOf(getObject().getUid()));
+			default:
+				return factory.createIndexer(server, getDomain(), getObject());
 		}
-		
-		lock.lock();
-		condition.signal();
-		lock.unlock();
 	}
+
 }

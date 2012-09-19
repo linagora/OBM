@@ -29,53 +29,83 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedBlockingDeque;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.configuration.ConfigurationService;
+import org.obm.sync.solr.jms.Command;
+import org.obm.sync.solr.jms.CommandConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.linagora.obm.sync.Producer;
+import com.linagora.obm.sync.QueueManager;
 
 @Singleton
 public class SolrManager {
+	private static final String CONTACT_CLIENT_ID = "solrManagerContactClientId";
+	private static final String EVENT_CLIENT_ID = "solrManagerEventClientId";
+	private static final String CONTACT_TOPIC = "/topic/contact/changes";
+	private static final String EVENT_TOPIC = "/topic/calendar/changes";
+	private static final String CONNECTION_CLIENT_ID = "solrManagerConnectionClientId";
+	
 	private boolean solrAvailable;
-	private Indexer indexer;
 	private Timer checker;
 	private int solrCheckingInterval;
+	private CommandConverter commandConverter;
+	private CommonsHttpSolrServer failingSolrServer;
 
-	private final Timer debugTimer;
-	private final LinkedBlockingDeque<SolrRequest> workQueue;
+	private final Connection jmsConnection;
+	private final Session jmsProducerSession;
+	private final Session jmsContactConsumerSession;
+	private final Session jmsEventConsumerSession;
+	private final MessageConsumer jmsEventConsumer;
+	private final MessageConsumer jmsContactConsumer;
+	private final Map<String, Producer> queueNameToProducerMap;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService) {
-		debugTimer = new Timer();
-		workQueue = new LinkedBlockingDeque<SolrRequest>();
+	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager) throws JMSException {
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
+		this.queueNameToProducerMap = new HashMap<String, Producer>();
+		
+		jmsConnection = queueManager.createConnection();
+		jmsConnection.setClientID(CONNECTION_CLIENT_ID);
+		
+		jmsProducerSession = queueManager.createSession(jmsConnection);
+		jmsContactConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
+		jmsEventConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
+		jmsContactConsumer = queueManager.createDurableConsumerOnTopic(jmsContactConsumerSession, CONTACT_TOPIC, CONTACT_CLIENT_ID);
+		jmsContactConsumer.setMessageListener(new Listener(jmsContactConsumerSession));
+		jmsEventConsumer = queueManager.createDurableConsumerOnTopic(jmsEventConsumerSession, EVENT_TOPIC, EVENT_CLIENT_ID);
+		jmsEventConsumer.setMessageListener(new Listener(jmsEventConsumerSession));
+		queueNameToProducerMap.put(CONTACT_TOPIC, queueManager.createProducerOnTopic(jmsProducerSession, CONTACT_TOPIC));
+		queueNameToProducerMap.put(EVENT_TOPIC, queueManager.createProducerOnTopic(jmsProducerSession, EVENT_TOPIC));
 
 		// We are supposedly available at startup for two reasons:
 		// 1. This is backwards compatible with the previous implementation
 		// 2. We need a SolR server instance in order to check its status, so we need at least one request in the queue
 		setSolrAvailable(true);
-
-		if (logger.isInfoEnabled()) {
-			scheduleFixedRateDebugLog();
-		}
 	}
 
-	private void scheduleFixedRateDebugLog() {
-		debugTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				logger.info("SolR indexing queue size : " + workQueue.size() + ", SolR available: " + solrAvailable);
-			}
-		}, 10000, 10000);
+	public void setCommandConverter(CommandConverter commandConverter) {
+		this.commandConverter = commandConverter;
 	}
 
 	public synchronized boolean isSolrAvailable() {
@@ -90,19 +120,21 @@ public class SolrManager {
 		
 		this.solrAvailable = solrAvailable;
 
-		if (solrAvailable) {
-			if (checker != null) {
-				checker.cancel();
-			}
+		try {
+			if (solrAvailable) {
+				if (checker != null) {
+					checker.cancel();
+				}
 
-			(indexer = new Indexer()).start();
+				// (Re)Starting the JMS connection will (re)start message delivery to the listeners
+				jmsConnection.start();
+			}
+			else {
+				(checker = new Timer()).scheduleAtFixedRate(new Checker(), solrCheckingInterval, solrCheckingInterval);
+			}
 		}
-		else {
-			if (indexer != null) {
-				indexer.interrupt();
-			}
-
-			(checker = new Timer()).scheduleAtFixedRate(new Checker(), solrCheckingInterval, solrCheckingInterval);
+		catch (Exception e) {
+			logger.error("Couldn't change state to '" + solrAvailable + "'.", e);
 		}
 	}
 
@@ -111,53 +143,79 @@ public class SolrManager {
 		this.solrCheckingInterval = solrCheckingInterval;
 	}
 
-	public void process(SolrRequest request) {
-		workQueue.offer(request);
-	}
-
-	private class Indexer extends Thread {
-		@Override
-		public void run() {
-			while (!interrupted()) {
-				try {
-					SolrRequest request = workQueue.take();
-
-					try {
-						request.run();
-					}
-					catch (Exception e) {
-						setSolrAvailable(false);
-						workQueue.offerFirst(request);
-
-						logger.warn("SolR server is unavailable, last request is kept in the queue.", e);
-
-						break;
-					}
-				}
-				catch (InterruptedException e) {
-					break;
-				}
+	public void process(Command<?> command) {
+		try {
+			String queueName = command.getQueueName();
+			Producer producer = queueNameToProducerMap.get(queueName);
+			
+			if (producer == null) {
+				throw new IllegalArgumentException("Unknown JMS queue '" + queueName + "'.");
 			}
+			
+			producer.send(jmsProducerSession.createObjectMessage(command));
+		}
+		catch (Exception e) {
+			throw new IllegalStateException("Couldn't create JMS message for SolR request", e);
 		}
 	}
 
 	private class Checker extends TimerTask {
 		@Override
 		public void run() {
-			SolrRequest request = workQueue.peek();
-
-			// We should have at least one element in the queue if a Checker is running
-			// because the manager is available at startup and as such, accepts requests
-			// So even if SolR is down at startup, the checker will only run when the first request comes in
-			if (request != null) {
+			// We should have stored the failing SolR server in the Indexing Thread
+			if (failingSolrServer != null) {
 				try {
-					request.getServer().ping();
+					failingSolrServer.ping();
+					failingSolrServer = null;
 
 					logger.info("SolR server is available, resuming indexing.");
 					setSolrAvailable(true);
 				}
 				catch (Exception e) {
+					// SolR is still unavailable, nothing to do
 				}
+			}
+		}
+	}
+	
+	private class Listener implements MessageListener {
+		private final Session session;
+		
+		private Listener(Session session) {
+			this.session = session;
+		}
+
+		@Override
+		public void onMessage(Message message) {
+			try {
+				// SolR has been marked unavailable, we should stop message processing
+				// This is handled directly in the MessageListener to not cause deadlocks if called from multiple threads 
+				if (!isSolrAvailable()) {
+					session.rollback();
+					jmsConnection.stop();
+					
+					return;
+				}
+				
+				Command<? extends Serializable> command = (Command<?>) ((ObjectMessage) message).getObject();
+				SolrRequest request = commandConverter.convert(command);
+				
+				try {
+					request.run();
+					session.commit();
+				}
+				catch (Exception e) {
+					session.rollback();
+					failingSolrServer = request.getServer();
+					setSolrAvailable(false);
+
+					logger.warn("SolR server is unavailable, last request is kept in the queue.", e);
+				} finally {
+					request.postProcess();
+				}
+			}
+			catch (Throwable e) {
+				logger.error("Couldn't process JMS message", e);
 			}
 		}
 	}

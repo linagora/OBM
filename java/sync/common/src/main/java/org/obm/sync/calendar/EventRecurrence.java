@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -45,7 +46,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-public class EventRecurrence implements Anonymizable<EventRecurrence> {
+public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializable {
 
 	private static final int UNSPECIFIED_FREQUENCY_VALUE = 0;
 	private RecurrenceDays days;
@@ -123,6 +124,7 @@ public class EventRecurrence implements Anonymizable<EventRecurrence> {
 		this.eventExceptions.add(eventException);
 	}
 
+	@Override
 	public EventRecurrence clone() {
 		EventRecurrence eventRecurrence = new EventRecurrence();
 		eventRecurrence.setDays(this.days);

@@ -31,9 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 
-public class Attendee {
+public class Attendee implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();
@@ -191,18 +193,23 @@ public class Attendee {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof Attendee))
+		}
+		if (!(obj instanceof Attendee)) {
 			return false;
+		}
 		Attendee other = (Attendee) obj;
 		if (email == null) {
-			if (other.email != null)
+			if (other.email != null) {
 				return false;
-		} else if (!email.equalsIgnoreCase(other.email))
+			}
+		} else if (!email.equalsIgnoreCase(other.email)) {
 			return false;
+		}
 		return true;
 	}
 	

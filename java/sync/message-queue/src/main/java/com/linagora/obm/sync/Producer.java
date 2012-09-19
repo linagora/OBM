@@ -32,6 +32,7 @@
 package com.linagora.obm.sync;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -49,6 +50,10 @@ public class Producer {
 	public void write(String message) throws JMSException {
 		TextMessage messageSent = session.createTextMessage(message);
 		producer.send(messageSent);
+	}
+	
+	public void send(Message message) throws JMSException {
+		producer.send(message);
 	}
 	
 	public void close() throws JMSException {

@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-public class Address implements IMergeable {
+import java.io.Serializable;
+
+public class Address implements IMergeable, Serializable {
 
 	private String street;
 	private String zipCode;

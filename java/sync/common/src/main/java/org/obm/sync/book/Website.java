@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
+import java.io.Serializable;
 
-public class Website {
+
+public class Website implements Serializable {
 
 	private String url;
 	private String label;
@@ -68,12 +70,15 @@ public class Website {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Website other = (Website) obj;
 		if (label != null && label.equalsIgnoreCase(other.label)) {
 			return true;

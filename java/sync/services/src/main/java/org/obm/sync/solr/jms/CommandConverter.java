@@ -27,38 +27,12 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.sync.solr.jms;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+import java.io.Serializable;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.sync.solr.SolrRequest;
 
-public class PingSolrRequest extends SolrRequest {
-
-	private final Lock lock;
-	private final Condition condition;
-
-	public PingSolrRequest(CommonsHttpSolrServer server, Lock lock, Condition condition) {
-		super(server);
-
-		this.lock = lock;
-		this.condition = condition;
-	}
-
-	@Override
-	public void run() throws Exception {
-		server.ping();
-	}
-
-	@Override
-	public void postProcess() {
-		if (lock == null) {
-			return;
-		}
-		
-		lock.lock();
-		condition.signal();
-		lock.unlock();
-	}
+public interface CommandConverter {
+	<T extends Serializable> SolrRequest convert(Command<T> command) throws Exception;
 }

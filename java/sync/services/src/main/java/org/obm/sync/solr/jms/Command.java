@@ -27,38 +27,47 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.sync.solr.jms;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+import java.io.Serializable;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.sync.solr.IndexerFactory;
+import org.obm.sync.solr.SolrRequest;
 
-public class PingSolrRequest extends SolrRequest {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	private final Lock lock;
-	private final Condition condition;
-
-	public PingSolrRequest(CommonsHttpSolrServer server, Lock lock, Condition condition) {
-		super(server);
-
-		this.lock = lock;
-		this.condition = condition;
+public abstract class Command<T extends Serializable> implements Serializable {
+	
+	private final ObmDomain domain;
+	private final T object;
+	private final Type type;
+	
+	protected Command(ObmDomain domain, T object, Type type) {
+		this.domain = domain;
+		this.object = object;
+		this.type = type;
 	}
 
-	@Override
-	public void run() throws Exception {
-		server.ping();
+	public ObmDomain getDomain() {
+		return domain;
 	}
 
-	@Override
-	public void postProcess() {
-		if (lock == null) {
-			return;
-		}
-		
-		lock.lock();
-		condition.signal();
-		lock.unlock();
+	public T getObject() {
+		return object;
+	}
+
+	public Type getType() {
+		return type;
+	}
+	
+	public abstract String getQueueName();
+	
+	public abstract String getSolrServiceName();
+	
+	public abstract SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<T> factory);
+
+	public static enum Type {
+		DELETE, CREATE_OR_UPDATE
 	}
 }

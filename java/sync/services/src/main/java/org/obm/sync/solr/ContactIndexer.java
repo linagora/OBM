@@ -53,6 +53,7 @@ import org.obm.sync.book.InstantMessagingId;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.utils.ObmHelper;
 
 public class ContactIndexer extends SolrRequest {
@@ -62,7 +63,7 @@ public class ContactIndexer extends SolrRequest {
 	private final Contact c;
 
 	@Singleton
-	public static class Factory {
+	public static class Factory implements IndexerFactory<Contact> {
 
 		private final ObmHelper obmHelper;
 
@@ -71,7 +72,8 @@ public class ContactIndexer extends SolrRequest {
 			this.obmHelper = obmHelper;
 		}
 		
-		ContactIndexer createIndexer(CommonsHttpSolrServer srv, Contact c) {
+		@Override
+		public ContactIndexer createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, Contact c) {
 			return new ContactIndexer(srv, obmHelper, c);
 		}
 

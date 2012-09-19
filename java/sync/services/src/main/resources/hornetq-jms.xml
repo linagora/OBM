@@ -15,8 +15,12 @@
 		<entry name="/topic/eventChanges" />
 	</topic>
 	
-	<topic name="indexingRequests">
-		<entry name="/topic/indexingRequests" />
+	<topic name="calendarChanges">
+		<entry name="/topic/calendar/changes" />
+	</topic>
+	
+	<topic name="contactChanges">
+		<entry name="/topic/contact/changes" />
 	</topic>
 
 </configuration>

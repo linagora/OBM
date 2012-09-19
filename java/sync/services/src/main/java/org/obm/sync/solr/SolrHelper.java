@@ -33,14 +33,16 @@ package org.obm.sync.solr;
 
 import java.net.MalformedURLException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.solr.jms.Command.Type;
+import org.obm.sync.solr.jms.ContactCommand;
+import org.obm.sync.solr.jms.DefaultCommandConverter;
+import org.obm.sync.solr.jms.EventCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,100 +57,67 @@ import fr.aliacom.obm.common.domain.ObmDomain;
  */
 public class SolrHelper {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SolrHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(SolrHelper.class);
 	
 	@Singleton
 	public static class Factory {
-		private final HttpClient client;
-		private final MultiThreadedHttpConnectionManager manager;
-		private final ContactIndexer.Factory contactIndexerFactory;
-		private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
-		private final LocatorService locatorService;
 		private final SolrManager solrManager;
+		private final LocatorService locatorService;
 		
 		@Inject
 		@VisibleForTesting
-		protected Factory(ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, 
-				LocatorService locatorService, SolrManager solrManager) {
-			
-			this.contactIndexerFactory = contactIndexerFactory;
-			this.eventIndexerFactory = eventIndexerFactory;
-			this.locatorService = locatorService;
+		protected Factory(SolrManager solrManager, LocatorService locatorService, DefaultCommandConverter converter) {
 			this.solrManager = solrManager;
-			manager = new MultiThreadedHttpConnectionManager();
-			client = new HttpClient(manager);
+			this.locatorService = locatorService;
+			this.solrManager.setCommandConverter(converter);
 		}
 
-		public void shutdown() {
-			manager.shutdown();
-		}
-
-		public SolrHelper createClient(AccessToken at) throws MalformedURLException, LocatorClientException {
+		public SolrHelper createClient(AccessToken at) {
 			if(!solrManager.isSolrAvailable()) {
 				throw new IllegalStateException("SolR is unavailable");
 			}
 			
-			return new SolrHelper(at, locatorService, client, contactIndexerFactory, eventIndexerFactory, solrManager);
+			return new SolrHelper(at, locatorService, solrManager);
 		}
 	}
 	
-	@VisibleForTesting
-	protected CommonsHttpSolrServer sContact;
-	
-	private final CommonsHttpSolrServer sEvent;
-	private final ContactIndexer.Factory contactIndexerFactory;
 	private final ObmDomain domain;
-	private final org.obm.sync.solr.EventIndexer.Factory eventIndexerFactory;
 	private final SolrManager solrManager;
+	private final LocatorService locatorClient;
+	private final AccessToken at;
 
-	private SolrHelper(AccessToken at, LocatorService locatorClient, HttpClient client, 
-			ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory, SolrManager solrManager) 
-					throws MalformedURLException, LocatorClientException {
-		
-		this.eventIndexerFactory = eventIndexerFactory;
+	private SolrHelper(AccessToken at, LocatorService locatorClient, SolrManager solrManager) {
+		this.at = at;
 		this.domain = at.getDomain();
-		this.contactIndexerFactory = contactIndexerFactory;
 		this.solrManager = solrManager;
-
-		sContact = new CommonsHttpSolrServer("http://"
-				+ locatorClient.getServiceLocation("solr/contact", at.getUserLogin() + "@"
-						+ at.getDomain().getName()) + ":8080/solr/contact", client);
-
-		sEvent = new CommonsHttpSolrServer("http://"
-				+ locatorClient.getServiceLocation("solr/event", at.getUserLogin() + "@"
-						+ at.getDomain().getName()) + ":8080/solr/event", client);
+		this.locatorClient = locatorClient;
 	}
 	
-	public CommonsHttpSolrServer getSolrContact(){
-		return sContact;
+	public CommonsHttpSolrServer getSolrContact() throws MalformedURLException, LocatorClientException {
+		return new CommonsHttpSolrServer("http://" + locatorClient.getServiceLocation("solr/contact", at.getUserLogin() + "@" + domain.getName()) + ":8080/solr/contact");
 	}
 	
-	public CommonsHttpSolrServer getSolrEvent(){
-		return sEvent;
+	public CommonsHttpSolrServer getSolrEvent() throws MalformedURLException, LocatorClientException {
+		return new CommonsHttpSolrServer("http://" + locatorClient.getServiceLocation("solr/event", at.getUserLogin() + "@" + domain.getName()) + ":8080/solr/event");
 	}
 	
 	public void createOrUpdate(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr indexing");
-		ContactIndexer ci = contactIndexerFactory.createIndexer(sContact, c);
-		solrManager.process(ci);
+		solrManager.process(new ContactCommand(domain, c, Type.CREATE_OR_UPDATE));
 	}
 
 	public void delete(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr removal");
-		Remover rm = new Remover(sContact, c.getUid().toString());
-		solrManager.process(rm);
+		solrManager.process(new ContactCommand(domain, c, Type.DELETE));
 	}
 
 	public void delete(Event e) {
 		logger.info("[event " + e.getObmId() + "] scheduled for solr removal");
-		Remover rm = new Remover(sEvent, Integer.toString(e.getObmId().getObmId()));
-		solrManager.process(rm);
+		solrManager.process(new EventCommand(domain, e, Type.DELETE));
 	}
 
 	public void createOrUpdate(Event ev) {
 		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
-		EventIndexer ci = eventIndexerFactory.createIndexer(sEvent, domain, ev);
-		solrManager.process(ci);
+		solrManager.process(new EventCommand(domain, ev, Type.CREATE_OR_UPDATE));
 	}
 }

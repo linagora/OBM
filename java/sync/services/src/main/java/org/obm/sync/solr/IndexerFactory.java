@@ -29,36 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+import java.io.Serializable;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
-public class PingSolrRequest extends SolrRequest {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	private final Lock lock;
-	private final Condition condition;
-
-	public PingSolrRequest(CommonsHttpSolrServer server, Lock lock, Condition condition) {
-		super(server);
-
-		this.lock = lock;
-		this.condition = condition;
-	}
-
-	@Override
-	public void run() throws Exception {
-		server.ping();
-	}
-
-	@Override
-	public void postProcess() {
-		if (lock == null) {
-			return;
-		}
-		
-		lock.lock();
-		condition.signal();
-		lock.unlock();
-	}
+public interface IndexerFactory<T extends Serializable> {
+	SolrRequest createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, T e);
 }

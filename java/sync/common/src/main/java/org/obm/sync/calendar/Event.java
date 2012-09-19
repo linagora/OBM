@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
@@ -54,7 +55,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class Event implements Indexed<Integer>, Anonymizable<Event> {
+public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializable {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	
@@ -303,6 +304,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event> {
 		this.meetingStatus = meetingStatus;
 	}
 
+	@Override
 	public Event clone() {
 		Event event = new Event();
 		event.alert = alert;

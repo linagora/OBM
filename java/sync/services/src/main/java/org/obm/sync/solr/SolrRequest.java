@@ -44,6 +44,13 @@ public class SolrRequest {
 	public void run() throws Exception {
 	}
 
+	/**
+	 * Gets called after processing of this {@link SolrRequest} is done.<br />
+	 * It's up to subclasses to implement any logic they need in this method (cleanup, etc.).
+	 */
+	public void postProcess() {
+	}
+
 	public CommonsHttpSolrServer getServer() {
 		return server;
 	}
