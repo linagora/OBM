@@ -2336,10 +2336,6 @@ function run_query_user_delete_profile($user_id)  {
         WHERE userentity_user_id $user_id )";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
-  
-  $query = "UPDATE Event SET event_owner = $obm[uid] WHERE event_owner $user_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
-  $obm_q->query($query);
 
   $query = "DELETE FROM Entity 
     WHERE entity_id IN (
@@ -2363,6 +2359,10 @@ function run_query_user_delete_profile($user_id)  {
     display_debug_msg($query2, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
     $obm_q2->query($query2);
   }
+
+  $query = "UPDATE Event SET event_owner = $obm[uid] WHERE event_owner $user_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
+  $obm_q->query($query);
 }
 
 
