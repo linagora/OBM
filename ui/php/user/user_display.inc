@@ -2753,74 +2753,45 @@ function dis_user_can_delete($p_id) {
 
   // Display entities where the user is referenced
   $obm_q = new DB_OBM;
-  $tables = $obm_q->table_names();
+  $tables = array("Event", "Contact", "Document");
 
-  $i = 0;
-  while ($tables[$i]['table_name']) {
-    $table = $tables[$i]['table_name'];
+  foreach($tables as $table_name) {
+    $usercreate = $table_name."_usercreate";
+    $query = "SELECT count(*)
+              FROM $table_name
+              WHERE $usercreate = '$p_id'";
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $nbc = $obm_q->f('0');
 
-    // We exclude POSTGRES meta table (sql_xxxx)
-    if ((! (substr($table, 0, 4) == 'sql_'))
-	&& (! (substr($table, 0, 2) == 'P_'))) {
-      $usercreate = $table . '_usercreate';
-      $userupdate = $table . '_userupdate';
-
-      $obm_qm = new DB_OBM;
-      $fields = $obm_qm->metadata($table, false);
-      $fieldexist_uc = false;
-      $fieldexist_uu = false;
-      $j = 0;
-      while ($fields[$j]['name']) {
-	if (strtoupper($fields[$j]['name']) == strtoupper($usercreate)) {
-	  $fieldexist_uc = true;
-	}
-	if (strtoupper($fields[$j]['name']) == strtoupper($userupdate)) {
-	  $fieldexist_uu = true;
-	}
-	$j++;
-      }
-      if ($fieldexist_uc) {
-	$query = "SELECT count(*) FROM $table WHERE $usercreate='$p_id'";
-	$c_q = new DB_OBM($query);
-	$c_q->next_record();
-	$nbc = $c_q->f('0');
-      }
-      if ($fieldexist_uu) {
-	$query = "SELECT count(*) FROM $table WHERE $userupdate='$p_id'";
-	$c_q = new DB_OBM($query);
-	$c_q->next_record();
-	$nbu = $c_q->f('0');
-      }
-      if ($fieldexist_uc || $fieldexist_uu) {
-	$dis_user .= "
-       <h1>$table</h1>
-       <ul>
-        <li><b>$nbc</b> $l_check_usercreate</li>
-        <li><b>$nbu</b> $l_check_userupdate</li>
-	</ul>";
-      } else {
-	$dis_user .= "
-        <h1>$table</h1>
-	<ul>
-        <li>$l_no_user</li>
-	</ul>";
-      }
-      $dis_user .= "<hr />";
+    if ($nbc > 0) {
+      $dis_user .=
+        "<h1>$table_name</h1>
+          <ul>
+            <li><b>$nbc</b> $l_check_usercreate</li>
+          </ul>";
+    } else {
+      $dis_user .=
+        "<h1>$table_name</h1>
+          <ul>
+            <li>$l_no_user</li>
+          </ul>";
     }
-    $i++;
+    $dis_user .= "<hr />";
   }
- 
-  $block .= "
-    <div class=\"buttons\">
-    $dis_delete
-    $dis_back
-    </div>
-    <br />
-    <h1>$l_user : $l_infos</h1>
 
-    <table>
-      $dis_user
-    </table>";
+  $block .=
+     "<div class=\"buttons\">
+       $dis_delete
+       $dis_back
+     </div>
+     <br />
+     <h1>$l_user : $l_infos</h1>
+
+     <table>
+       $dis_user
+     </table>";
 
   return $block;
 }
