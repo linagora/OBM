@@ -125,20 +125,36 @@ public class MimePartSelectorTest {
 	
 	@Test
 	public void testSelectDefaultBodyPreferences() {
-		MimePart mimePart = MimePart.builder().contentType("text/plain").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null);
-		expect(mimeMessage.getMimePart()).andReturn(mimePart);
 	
 		replay(mimeMessage);
 		FetchInstructions mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
 		verify(mimeMessage);
 	
-		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
+		assertThat(mimePartSelector.getMimePart()).isSameAs(mimeMessage);
 	}
 
+	@Test
+	public void testSelectNoMatchingMimePart() {
+		
+		MimeMessage mimeMessage = EasyMock.createMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null).anyTimes();
+		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null).anyTimes();
+	
+		replay(mimeMessage);
+		FetchInstructions instruction = mimeMessageSelector.select(ImmutableList.of(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(instruction.getMimePart()).isSameAs(mimeMessage);
+		assertThat(instruction.getBodyType()).isEqualTo(MSEmailBodyType.MIME);
+		assertThat(instruction.getTruncation()).isEqualTo(32*1024);
+	}
+
+	
 	@Test
 	public void testSelectSeveralBodyPreferences() {
 		MimePart expectedMimePart = MimePart.builder().contentType("text/html").build();

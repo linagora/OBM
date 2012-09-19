@@ -96,7 +96,8 @@ public class MimePartSelector {
 
 	private FetchInstructions defaultFetchInstructions(MimeMessage mimeMessage) {
 		return FetchInstructions.builder()
-			.mimePart(mimeMessage.getMimePart())
+			.bodyType(MSEmailBodyType.MIME)
+			.mimePart(mimeMessage)
 			.truncation(DEFAULT_TRUNCATION_SIZE).build();
 	}
 
