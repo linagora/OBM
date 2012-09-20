@@ -74,7 +74,7 @@ public class PushContinuation implements IContinuation {
 	
 	private final static String KEY_BACKEND_SESSION = "key_backend_session";
 	private final static String KEY_IS_ERROR = "key_is_error";
-	private final static String KEY_STATUS_ERROR = "key_stauts_error";
+	private final static String KEY_STATUS_ERROR = "key_status_error";
 	private final static String KEY_COLLECTION_CHANGE_LISTENER = "key_collection_change_listener";
 	private final static String KEY_LISTENER_REGISTRATION = "key_listener_registration";
 	private final static String KEY_ID_REQUEST = "key_id_request";
