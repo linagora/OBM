@@ -30,8 +30,7 @@
 package org.obm.sync.solr;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,6 +46,7 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.configuration.ConfigurationService;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
+import org.obm.sync.solr.jms.SolrJmsQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +60,6 @@ import com.linagora.obm.sync.QueueManager;
 public class SolrManager {
 	private static final String CONTACT_CLIENT_ID = "solrManagerContactClientId";
 	private static final String EVENT_CLIENT_ID = "solrManagerEventClientId";
-	private static final String CONTACT_TOPIC = "/topic/contact/changes";
-	private static final String EVENT_TOPIC = "/topic/calendar/changes";
 	private static final String CONNECTION_CLIENT_ID = "solrManagerConnectionClientId";
 	
 	private boolean solrAvailable;
@@ -76,14 +74,15 @@ public class SolrManager {
 	private final Session jmsEventConsumerSession;
 	private final MessageConsumer jmsEventConsumer;
 	private final MessageConsumer jmsContactConsumer;
-	private final Map<String, Producer> queueNameToProducerMap;
+	private final EnumMap<SolrJmsQueue, Producer> queueNameToProducerMap;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager) throws JMSException {
+	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager, CommandConverter commandConverter) throws JMSException {
+		this.commandConverter = commandConverter;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
-		this.queueNameToProducerMap = new HashMap<String, Producer>();
+		queueNameToProducerMap = new EnumMap<SolrJmsQueue, Producer>(SolrJmsQueue.class);
 		
 		jmsConnection = queueManager.createConnection();
 		jmsConnection.setClientID(CONNECTION_CLIENT_ID);
@@ -91,21 +90,17 @@ public class SolrManager {
 		jmsProducerSession = queueManager.createSession(jmsConnection);
 		jmsContactConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
 		jmsEventConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
-		jmsContactConsumer = queueManager.createDurableConsumerOnTopic(jmsContactConsumerSession, CONTACT_TOPIC, CONTACT_CLIENT_ID);
+		jmsContactConsumer = queueManager.createDurableConsumerOnTopic(jmsContactConsumerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName(), CONTACT_CLIENT_ID);
 		jmsContactConsumer.setMessageListener(new Listener(jmsContactConsumerSession));
-		jmsEventConsumer = queueManager.createDurableConsumerOnTopic(jmsEventConsumerSession, EVENT_TOPIC, EVENT_CLIENT_ID);
+		jmsEventConsumer = queueManager.createDurableConsumerOnTopic(jmsEventConsumerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName(), EVENT_CLIENT_ID);
 		jmsEventConsumer.setMessageListener(new Listener(jmsEventConsumerSession));
-		queueNameToProducerMap.put(CONTACT_TOPIC, queueManager.createProducerOnTopic(jmsProducerSession, CONTACT_TOPIC));
-		queueNameToProducerMap.put(EVENT_TOPIC, queueManager.createProducerOnTopic(jmsProducerSession, EVENT_TOPIC));
+		queueNameToProducerMap.put(SolrJmsQueue.CONTACT_CHANGES_QUEUE, queueManager.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName()));
+		queueNameToProducerMap.put(SolrJmsQueue.CALENDAR_CHANGES_QUEUE, queueManager.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName()));
 
 		// We are supposedly available at startup for two reasons:
 		// 1. This is backwards compatible with the previous implementation
 		// 2. We need a SolR server instance in order to check its status, so we need at least one request in the queue
 		setSolrAvailable(true);
-	}
-
-	public void setCommandConverter(CommandConverter commandConverter) {
-		this.commandConverter = commandConverter;
 	}
 
 	public synchronized boolean isSolrAvailable() {
@@ -145,11 +140,11 @@ public class SolrManager {
 
 	public void process(Command<?> command) {
 		try {
-			String queueName = command.getQueueName();
-			Producer producer = queueNameToProducerMap.get(queueName);
+			SolrJmsQueue queue = command.getQueue();
+			Producer producer = queueNameToProducerMap.get(queue);
 			
 			if (producer == null) {
-				throw new IllegalArgumentException("Unknown JMS queue '" + queueName + "'.");
+				throw new IllegalArgumentException("Unknown JMS queue '" + queue + "'.");
 			}
 			
 			producer.send(jmsProducerSession.createObjectMessage(command));

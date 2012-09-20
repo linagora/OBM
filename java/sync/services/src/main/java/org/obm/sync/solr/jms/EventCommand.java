@@ -29,38 +29,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr.jms;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.solr.IndexerFactory;
-import org.obm.sync.solr.Remover;
-import org.obm.sync.solr.SolrRequest;
+import org.obm.sync.solr.SolrService;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class EventCommand extends Command<Event> {
+public abstract class EventCommand extends Command<Event> {
 
-	public EventCommand(ObmDomain domain, Event data, Type type) {
-		super(domain, data, type);
+	public EventCommand(ObmDomain domain, Event data) {
+		super(domain, data);
 	}
 
 	@Override
-	public String getQueueName() {
-		return "/topic/calendar/changes";
+	public SolrJmsQueue getQueue() {
+		return SolrJmsQueue.CALENDAR_CHANGES_QUEUE;
 	}
 	
 	@Override
-	public String getSolrServiceName() {
-		return "solr/event";
-	}
-	
-	@Override
-	public SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<Event> factory) {
-		switch (getType()) {
-			case DELETE:
-				return new Remover(server, String.valueOf(getObject().getObmId().getObmId()));
-			default:
-				return factory.createIndexer(server, getDomain(), getObject());
-		}
+	public SolrService getSolrService() {
+		return SolrService.EVENT_SERVICE;
 	}
 	
 }

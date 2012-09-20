@@ -29,25 +29,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr.jms;
 
-import org.obm.sync.book.Contact;
-import org.obm.sync.solr.SolrService;
+public enum SolrJmsQueue
+{
+	CALENDAR_CHANGES_QUEUE("/topic/calendar/changes"),
+	CONTACT_CHANGES_QUEUE("/topic/contact/changes");
+	
+	private String name;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public abstract class ContactCommand extends Command<Contact> {
-
-	public ContactCommand(ObmDomain domain, Contact data) {
-		super(domain, data);
+	private SolrJmsQueue(String name) {
+		this.name = name;
 	}
 
-	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
+	public String getName() {
+		return name;
 	}
-
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.CONTACT_SERVICE;
-	}
-
 }

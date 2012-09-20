@@ -34,6 +34,7 @@ import java.io.Serializable;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.sync.solr.IndexerFactory;
 import org.obm.sync.solr.SolrRequest;
+import org.obm.sync.solr.SolrService;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -41,12 +42,10 @@ public abstract class Command<T extends Serializable> implements Serializable {
 	
 	private final ObmDomain domain;
 	private final T object;
-	private final Type type;
 	
-	protected Command(ObmDomain domain, T object, Type type) {
+	protected Command(ObmDomain domain, T object) {
 		this.domain = domain;
 		this.object = object;
-		this.type = type;
 	}
 
 	public ObmDomain getDomain() {
@@ -56,18 +55,10 @@ public abstract class Command<T extends Serializable> implements Serializable {
 	public T getObject() {
 		return object;
 	}
-
-	public Type getType() {
-		return type;
-	}
 	
-	public abstract String getQueueName();
+	public abstract SolrJmsQueue getQueue();
 	
-	public abstract String getSolrServiceName();
+	public abstract SolrService getSolrService();
 	
 	public abstract SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<T> factory);
-
-	public static enum Type {
-		DELETE, CREATE_OR_UPDATE
-	}
 }

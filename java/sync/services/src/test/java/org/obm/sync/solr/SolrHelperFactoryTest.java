@@ -69,8 +69,8 @@ public class SolrHelperFactoryTest {
 		locatorClient = createMock(LocatorService.class);
 		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer", CommonsHttpSolrServer.class, ObmDomain.class, Contact.class).createMock();
 		contactIndexer = createMockBuilder(ContactIndexer.class).createMock();
-		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager);
-		factory = new SolrHelper.Factory(manager, locatorClient, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
+		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
+		factory = new SolrHelper.Factory(manager, locatorClient);
 
 		contact.setUid(1);
 

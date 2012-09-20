@@ -33,6 +33,9 @@ import java.io.Serializable;
 
 import org.obm.sync.solr.SolrRequest;
 
+import com.google.inject.ImplementedBy;
+
+@ImplementedBy(DefaultCommandConverter.class)
 public interface CommandConverter {
 	<T extends Serializable> SolrRequest convert(Command<T> command) throws Exception;
 }

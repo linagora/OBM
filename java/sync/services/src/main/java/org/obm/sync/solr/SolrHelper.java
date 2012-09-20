@@ -39,10 +39,10 @@ import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.solr.jms.Command.Type;
-import org.obm.sync.solr.jms.ContactCommand;
-import org.obm.sync.solr.jms.DefaultCommandConverter;
-import org.obm.sync.solr.jms.EventCommand;
+import org.obm.sync.solr.jms.ContactDeleteCommand;
+import org.obm.sync.solr.jms.ContactUpdateCommand;
+import org.obm.sync.solr.jms.EventDeleteCommand;
+import org.obm.sync.solr.jms.EventUpdateCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +66,9 @@ public class SolrHelper {
 		
 		@Inject
 		@VisibleForTesting
-		protected Factory(SolrManager solrManager, LocatorService locatorService, DefaultCommandConverter converter) {
+		protected Factory(SolrManager solrManager, LocatorService locatorService) {
 			this.solrManager = solrManager;
 			this.locatorService = locatorService;
-			this.solrManager.setCommandConverter(converter);
 		}
 
 		public SolrHelper createClient(AccessToken at) {
@@ -103,21 +102,21 @@ public class SolrHelper {
 	
 	public void createOrUpdate(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr indexing");
-		solrManager.process(new ContactCommand(domain, c, Type.CREATE_OR_UPDATE));
+		solrManager.process(new ContactUpdateCommand(domain, c));
 	}
 
 	public void delete(Contact c) {
 		logger.info("[contact " + c.getUid() + "] scheduled for solr removal");
-		solrManager.process(new ContactCommand(domain, c, Type.DELETE));
+		solrManager.process(new ContactDeleteCommand(domain, c));
 	}
 
 	public void delete(Event e) {
 		logger.info("[event " + e.getObmId() + "] scheduled for solr removal");
-		solrManager.process(new EventCommand(domain, e, Type.DELETE));
+		solrManager.process(new EventDeleteCommand(domain, e));
 	}
 
 	public void createOrUpdate(Event ev) {
 		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
-		solrManager.process(new EventCommand(domain, ev, Type.CREATE_OR_UPDATE));
+		solrManager.process(new EventUpdateCommand(domain, ev));
 	}
 }

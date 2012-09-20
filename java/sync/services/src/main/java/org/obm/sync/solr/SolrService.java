@@ -27,27 +27,20 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.sync.solr;
 
-import org.obm.sync.book.Contact;
-import org.obm.sync.solr.SolrService;
+public enum SolrService
+{
+	EVENT_SERVICE("solr/event"),
+	CONTACT_SERVICE("solr/contact");
+	
+	private String name;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public abstract class ContactCommand extends Command<Contact> {
-
-	public ContactCommand(ObmDomain domain, Contact data) {
-		super(domain, data);
+	private SolrService(String name) {
+		this.name = name;
 	}
 
-	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
+	public String getName() {
+		return name;
 	}
-
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.CONTACT_SERVICE;
-	}
-
 }

@@ -44,7 +44,7 @@ import org.obm.sync.solr.EventIndexer;
 import org.obm.sync.solr.IndexerFactory;
 import org.obm.sync.solr.Remover;
 import org.obm.sync.solr.SolrRequest;
-import org.obm.sync.solr.jms.Command.Type;
+import org.obm.sync.solr.SolrService;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -86,56 +86,51 @@ public class DefaultCommandConverterTest {
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void testConvertDeleteFailsIfSolrServiceUnknown() throws Exception {
-		converter.convert(new UnkownCommand(Type.DELETE));
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testConvertCreateOrUpdateFailsIfSolrServiceUnknown() throws Exception {
-		converter.convert(new UnkownCommand(Type.CREATE_OR_UPDATE));
+	public void testConvertFailsIfSolrServiceUnknown() throws Exception {
+		converter.convert(new UnkownCommand());
 	}
 	
 	@Test
 	public void testConvertDeleteContactCommand() throws Exception {
-		SolrRequest request = converter.convert(new ContactCommand(domain, contact, Type.DELETE));
+		SolrRequest request = converter.convert(new ContactDeleteCommand(domain, contact));
 		
 		Assertions.assertThat(request).isInstanceOf(Remover.class);
 	}
 	
 	@Test
 	public void testConvertDeleteEventCommand() throws Exception {
-		SolrRequest request = converter.convert(new EventCommand(domain, event, Type.DELETE));
+		SolrRequest request = converter.convert(new EventDeleteCommand(domain, event));
 		
 		Assertions.assertThat(request).isInstanceOf(Remover.class);
 	}
 	
 	@Test
 	public void testConvertCreateOrUpdateContactCommand() throws Exception {
-		SolrRequest request = converter.convert(new ContactCommand(domain, contact, Type.CREATE_OR_UPDATE));
+		SolrRequest request = converter.convert(new ContactUpdateCommand(domain, contact));
 		
 		Assertions.assertThat(request).isInstanceOf(ContactIndexer.class);
 	}
 	
 	@Test
 	public void testConvertCreateOrUpdateEventCommand() throws Exception {
-		SolrRequest request = converter.convert(new EventCommand(domain, event, Type.CREATE_OR_UPDATE));
+		SolrRequest request = converter.convert(new EventUpdateCommand(domain, event));
 		
 		Assertions.assertThat(request).isInstanceOf(EventIndexer.class);
 	}
 	
 	private static class UnkownCommand extends Command<Integer> {
-		private UnkownCommand(Type type) {
-			super(null, 0, type);
+		private UnkownCommand() {
+			super(null, 0);
 		}
 
 		@Override
-		public String getQueueName() {
+		public SolrJmsQueue getQueue() {
 			return null;
 		}
 
 		@Override
-		public String getSolrServiceName() {
-			return "unknown/service";
+		public SolrService getSolrService() {
+			return null;
 		}
 
 		@Override

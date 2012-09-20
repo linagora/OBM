@@ -29,25 +29,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr.jms;
 
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.sync.book.Contact;
-import org.obm.sync.solr.SolrService;
+import org.obm.sync.solr.IndexerFactory;
+import org.obm.sync.solr.Remover;
+import org.obm.sync.solr.SolrRequest;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public abstract class ContactCommand extends Command<Contact> {
-
-	public ContactCommand(ObmDomain domain, Contact data) {
+public class ContactDeleteCommand extends ContactCommand {
+	
+	public ContactDeleteCommand(ObmDomain domain, Contact data) {
 		super(domain, data);
 	}
 
 	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
+	public SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<Contact> factory) {
+		return new Remover(server, String.valueOf(getObject().getUid()));
 	}
-
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.CONTACT_SERVICE;
-	}
-
 }

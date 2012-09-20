@@ -64,6 +64,7 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
+import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.QueueManager;
 
@@ -90,8 +91,7 @@ public class SolrManagerTest {
 		queueManager.start();
 		
 		pingCommand = new PingCommand();
-		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager);
-		manager.setCommandConverter(converter);
+		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager, converter);
 		lock = new ReentrantLock();
 		condition = lock.newCondition();
 		server = createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
@@ -160,8 +160,8 @@ public class SolrManagerTest {
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void request_rejected_if_queue_unknown() throws Exception {
-		manager.process(new PingCommand("unknown/queue/name"));
+	public void request_rejected_if_queue_unknown() {
+		manager.process(new PingCommand(null));
 	}
 	
 	@Test
@@ -226,26 +226,25 @@ public class SolrManagerTest {
 
 	private static class PingCommand extends Command<Integer> {
 
-		private static final String TOPIC_CONTACT_CHANGES = "/topic/contact/changes";
-		private String queueName;
+		private SolrJmsQueue queue;
 
 		public PingCommand() {
-			this(TOPIC_CONTACT_CHANGES);
+			this(SolrJmsQueue.CONTACT_CHANGES_QUEUE);
 		}
 		
-		public PingCommand(String queueName) {
-			super(null, 0, null);
+		public PingCommand(SolrJmsQueue queue) {
+			super(null, 0);
 			
-			this.queueName = queueName;
+			this.queue = queue;
 		}
 
 		@Override
-		public String getQueueName() {
-			return queueName;
+		public SolrJmsQueue getQueue() {
+			return queue;
 		}
 
 		@Override
-		public String getSolrServiceName() {
+		public SolrService getSolrService() {
 			return null;
 		}
 
