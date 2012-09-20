@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Ignore;
@@ -134,7 +135,7 @@ public class CustomerStoreTests extends LoggedTestCase {
 		Collection<Long> firstTwo = Arrays.asList(it.next(), it.next());
 		
 		long nstime = System.nanoTime();
-		Collection<FlagsList> h = sc.uidFetchFlags(firstTwo);
+		Map<Long, FlagsList> h = sc.uidFetchFlags(firstTwo);
 		nstime = System.nanoTime() - nstime;
 		assertEquals(firstTwo.size(), h.size());
 

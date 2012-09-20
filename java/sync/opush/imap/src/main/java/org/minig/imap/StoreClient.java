@@ -37,6 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
@@ -185,7 +186,7 @@ public class StoreClient {
 		return cs.uidFetchEnvelope(uids);
 	}
 
-	public Collection<FlagsList> uidFetchFlags(Collection<Long> uids) {
+	public Map<Long, FlagsList> uidFetchFlags(Collection<Long> uids) {
 		return cs.uidFetchFlags(uids);
 	}
 	

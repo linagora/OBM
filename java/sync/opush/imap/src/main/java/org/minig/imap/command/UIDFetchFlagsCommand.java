@@ -32,23 +32,28 @@
 
 package org.minig.imap.command;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.minig.imap.Flag;
 import org.minig.imap.FlagsList;
+import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
+import org.obm.push.mail.MailException;
 
-public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+
+public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	private Collection<Long> uids;
 
 	public UIDFetchFlagsCommand(Collection<Long> uid) {
-		this.uids = uid;
+		this.uids = ImmutableSet.copyOf(uid);
 	}
 
 	@Override
@@ -72,12 +77,12 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 		boolean isOK = isOk(rs);
 		
 		if (uids.isEmpty()) {
-			data = Collections.emptyList();
+			data = ImmutableMap.<Long, FlagsList>of();
 			return;
 		}
 		
 		if (isOK) {
-			ArrayList<FlagsList> list = new ArrayList<FlagsList>(rs.size() - 1);
+			Map<Long, FlagsList> result = Maps.newTreeMap();
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; i < rs.size() - 1; i++) {
 				IMAPResponse r = it.next();
@@ -98,23 +103,37 @@ public class UIDFetchFlagsCommand extends Command<Collection<FlagsList>> {
 							+ payload);
 				}
 
-				int uidIdx = payload.indexOf("UID ") + "UID ".length();
-				int endUid = uidIdx;
-				while (Character.isDigit(payload.charAt(endUid))) {
-					endUid++;
+				long uid = getUid(payload);
+				if (uids.contains(uid)) {
+					FlagsList flagsList = new FlagsList();
+					parseFlags(flags, flagsList);
+					result.put(uid, flagsList);
 				}
-				FlagsList flagsList = new FlagsList();
-				parseFlags(flags, flagsList);
-				list.add(flagsList);
 			}
-			data = list;
+			data = result;
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
 			logger.warn("error on fetch: " + ok.getPayload());
-			data = Collections.emptyList();
+			data = ImmutableMap.<Long, FlagsList>of();
 		}
 	}
 
+	private long getUid(String fullPayload) {
+		try {
+			String longAsString = getNumberForField(fullPayload, "UID ");
+			return Long.valueOf(longAsString);
+		} catch(NumberFormatException e) {
+			throw new MailException("Cannot find UID in response : " + fullPayload);
+		}
+	}
+
+	private String getNumberForField(String fullPayload, String field) {
+		String uidStartToken = field;
+		int uidIdx = fullPayload.indexOf(uidStartToken);
+		String content = fullPayload.substring(uidIdx + uidStartToken.length());
+		return IMAPParsingTools.getNextNumber(content);
+	}
+	
 	private void parseFlags(String flags, FlagsList flagsList) {
 		// TODO this is probably slow as hell
 		if (flags.contains("\\Seen")) {

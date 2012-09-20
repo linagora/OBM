@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -179,8 +180,12 @@ public class ImapMailboxService implements PrivateMailboxService {
 		try {
 			login(store);
 			store.select(parseMailBoxName(udr, collectionName));
-			Collection<FlagsList> fetchFlags = store.uidFetchFlags(ImmutableList.of(uid));
-			return Iterables.getOnlyElement(fetchFlags);
+			Map<Long, FlagsList> fetchFlags = store.uidFetchFlags(ImmutableList.of(uid));
+			FlagsList flagsList = fetchFlags.get(uid);
+			if (flagsList == null) {
+				throw new MailException("Unable to retrieve flags for message " + uid);
+			}
+			return flagsList;
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

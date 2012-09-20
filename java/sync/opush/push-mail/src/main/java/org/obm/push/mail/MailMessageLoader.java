@@ -132,7 +132,7 @@ public class MailMessageLoader {
 	}
 	
 	private void setMsEmailFlags(final MSEmail msEmail, final List<Long> messageIdAsList) {
-		final Collection<FlagsList> fl = storeClient.uidFetchFlags(messageIdAsList);
+		final Collection<FlagsList> fl = storeClient.uidFetchFlags(messageIdAsList).values();
 		if (!fl.isEmpty()) {
 			final FlagsList fl0 = fl.iterator().next();
 			msEmail.setRead(fl0.contains(Flag.SEEN));

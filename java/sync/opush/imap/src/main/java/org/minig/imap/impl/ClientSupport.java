@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -290,7 +291,7 @@ public class ClientSupport {
 		return run(new UIDFetchEnvelopeCommand(uids));
 	}
 
-	public Collection<FlagsList> uidFetchFlags(Collection<Long> uids) {
+	public Map<Long, FlagsList> uidFetchFlags(Collection<Long> uids) {
 		return run(new UIDFetchFlagsCommand(uids));
 	}
 
