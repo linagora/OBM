@@ -79,7 +79,7 @@ public class ResourceLoader {
 
 	private String buildQuery(IntegerSQLCollectionHelper idsHelper) {
 		return String.format("SELECT r.resource_id, r.resource_name, r.resource_email "
-				+ "FROM resource r "
+				+ "FROM Resource r "
 				+ "WHERE r.resource_id IN (%s)", idsHelper.asPlaceHolders());
 	}
 

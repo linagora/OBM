@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +41,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -128,4 +131,35 @@ public class ToolBox {
 		ex.setRecurrence(new EventRecurrence());
 		return ex;
 	}
+	
+	public static Event getFakeEvent( int id){
+		Event event = new Event();
+		Date date = new Date();
+		
+		String evtid = Integer.toString(id);
+		
+		event.setExtId(new EventExtId("fake_extId_"+evtid));
+		event.setTimeUpdate(date);
+		event.setTimeCreate(date);
+		event.setOpacity(EventOpacity.getValueOf("fake_event_opacity"));
+		event.setCategory("fake_eventcategory1_label");
+		event.setTitle("fake_event_title_"+evtid);
+		event.setLocation("fake_event_location");
+		event.setStartDate(date);
+		event.setDuration(3600);
+		event.setPriority(9);
+		event.setDescription("fake_event_description");
+		event.setAttendees(getFakeListOfAttendees());
+
+		return event;
+	}
+	
+	public static Collection<Event> getFakeEventCollection(int collectionSize){
+		Collection<Event> collection = new ArrayList<Event>();
+		for ( int i = 0 ; i < collectionSize; i++){
+			collection.add(getFakeEvent(i));
+		}
+		return collection;
+	}
+	
 }

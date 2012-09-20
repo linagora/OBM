@@ -21,6 +21,19 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
 
+	<!-- Resources -->
+	<servlet>
+		<servlet-name>ResourceServlet</servlet-name>
+		<display-name>OBM Resources Servlet</display-name>
+		<servlet-class>
+			org.obm.sync.resource.ResourceServlet
+    </servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ResourceServlet</servlet-name>
+		<url-pattern>/resources/*</url-pattern>
+	</servlet-mapping>
 
 	<!-- Free Busy -->
 	<servlet>

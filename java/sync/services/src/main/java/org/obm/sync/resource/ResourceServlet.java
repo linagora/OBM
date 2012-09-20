@@ -1,0 +1,112 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
+
+package org.obm.sync.resource;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.GuiceServletContextListener;
+import org.obm.sync.auth.ServerFault;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.services.ICalendar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Injector;
+
+public class ResourceServlet extends HttpServlet {
+
+	private Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private ICalendar calendarBinding;
+	private Ical4jHelper ical4jHelper;
+
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		Injector injector = (Injector) getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
+
+		calendarBinding = injector.getInstance(ICalendar.class);
+		ical4jHelper = injector.getInstance(Ical4jHelper.class);
+	}
+
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String stringId = request.getPathInfo();
+		
+		if ( stringId == null || stringId.isEmpty()){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			logger.error(" Resource Servlet : resourceId is null or empty ");
+			return;
+		}
+		
+		stringId = stringId.substring(1);
+		int resourceId = -1;
+		
+		try {
+			resourceId = Integer.parseInt(stringId);
+		} catch (NumberFormatException e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().write("Invalid format for the resource ID, should be an integer");
+			logger.warn("Resource Servlet : resourceId is not a number",  e);
+			return;
+		}
+		
+		try {
+			String resourceICS = getResourceICS(resourceId);
+			response.getWriter().write(resourceICS);
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		catch (ServerFault e) {
+			logger.error("ServerFault: ",  e);
+			response.reset();
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.flushBuffer();
+		}
+	}
+
+	@VisibleForTesting
+	String getResourceICS(int resourceId) throws ServerFault {
+		Date date = new Date();
+		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceId, date);
+		String resourceICS = this.ical4jHelper.buildIcs(null, resourceEvents, null);
+		return resourceICS;
+	}
+}
