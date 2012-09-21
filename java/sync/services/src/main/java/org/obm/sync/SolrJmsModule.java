@@ -27,12 +27,18 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.sync;
 
-import java.io.Serializable;
+import org.obm.sync.solr.jms.CommandConverter;
+import org.obm.sync.solr.jms.DefaultCommandConverter;
 
-import org.obm.sync.solr.SolrRequest;
+import com.google.inject.AbstractModule;
 
-public interface CommandConverter {
-	<T extends Serializable> SolrRequest convert(Command<T> command) throws Exception;
+public class SolrJmsModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+		bind(CommandConverter.class).to(DefaultCommandConverter.class);
+	}
+
 }

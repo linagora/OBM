@@ -88,7 +88,8 @@ public class GuiceServletContextListener implements ServletContextListener {
 	public static final String ATTRIBUTE_NAME = "GuiceInjecter";
 	private static final String APPLICATION_NAME = "obm-sync";
 	
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
+    @Override
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
     	XTrustProvider.install();
     	
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
@@ -141,14 +142,15 @@ public class GuiceServletContextListener implements ServletContextListener {
         		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
         		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             }
-        }, new MessageQueueModule(), new TransactionalModule());
+        }, new MessageQueueModule(), new TransactionalModule(), new SolrJmsModule());
     }
     
     private void failStartup(String message) { 
         throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
     }
     
-    public void contextDestroyed(ServletContextEvent servletContextEvent) { 
+    @Override
+	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
     	servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null); 
     }
 }
