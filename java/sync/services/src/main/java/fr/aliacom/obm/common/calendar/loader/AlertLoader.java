@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
+import fr.aliacom.obm.utils.ObmHelper;
 
 public class AlertLoader {
 	public static class Builder {
@@ -133,17 +134,6 @@ public class AlertLoader {
 	}
 	
 	private void cleanup(ResultSet rs, Statement stat) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (Throwable t) {
-			}
-		}
-		if (stat != null) {
-			try {
-				stat.close();
-			} catch (Throwable t) {
-			}
-		}
+		ObmHelper.cleanup(null, stat, rs);
 	}
 }

@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
+import fr.aliacom.obm.utils.ObmHelper;
 
 public class EventLoader {
 
@@ -393,17 +394,6 @@ public class EventLoader {
 	}
 
 	private void cleanup(ResultSet rs, Statement stat) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (Throwable t) {
-			}
-		}
-		if (stat != null) {
-			try {
-				stat.close();
-			} catch (Throwable t) {
-			}
-		}
+		ObmHelper.cleanup(null, stat, rs);
 	}
 }
