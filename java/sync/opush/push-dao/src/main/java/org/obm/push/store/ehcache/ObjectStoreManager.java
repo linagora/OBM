@@ -55,7 +55,9 @@ public class ObjectStoreManager {
 	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
 	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
+	public static final String PENDING_CONTINUATIONS = "pendingContinuation";
 	
+	private final static int UNLIMITED_CACHE_MEMORY = 0;
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final CacheManager singletonManager;
@@ -76,8 +78,17 @@ public class ObjectStoreManager {
 		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));
+		configuration.addCache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS));
 		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 		return configuration;
+	}
+	
+	private CacheConfiguration pendingContinuationConfiguration() {
+		return new CacheConfiguration()
+			.maxElementsInMemory(UNLIMITED_CACHE_MEMORY)
+			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
+			.transactionalMode(TransactionalMode.OFF)
+			.eternal(false);
 	}
 	
 	private CacheConfiguration defaultCacheConfiguration() {
