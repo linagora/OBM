@@ -48,6 +48,7 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 
 
@@ -373,11 +374,119 @@ public class MimePartSelectorTest {
 		assertThat(mimePartSelector.getTruncation()).isEqualTo(50);
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void selectBetterFitNoFetchInstructionEntry() {
+		new MimePartSelector().selectBetterFit(
+				ImmutableList.<FetchInstruction>of(), 
+				bodyPreferences(MSEmailBodyType.HTML));
+	}
+	
+	@Test
+	public void selectBetterFitNoBodyPreferenceEntry() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction onlyFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction actual = 
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(onlyFetchInstruction), 
+				bodyPreferences());
+		assertThat(actual).isSameAs(onlyFetchInstruction);
+	}
+	
+	@Test
+	public void selectBetterFitHtmlAndMimePreferences() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction mimeFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
+		FetchInstruction actual = 
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(htmlFetchInstruction, mimeFetchInstruction),
+				bodyPreferences());
+		assertThat(actual).isSameAs(htmlFetchInstruction);
+	}
+	
+	@Test
+	public void selectBetterFitHtmlAndMimePreferencesReverseOrder() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction mimeFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
+		FetchInstruction actual = 
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(mimeFetchInstruction, htmlFetchInstruction),
+				bodyPreferences());
+		assertThat(actual).isSameAs(htmlFetchInstruction);
+	}
+
+	@Test
+	public void selectBetterFitRespectPreferencesOrdering() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction plainFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		FetchInstruction rtfFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.RTF).mimePart(mimePart).build();
+		FetchInstruction actual =
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(plainFetchInstruction, htmlFetchInstruction, rtfFetchInstruction),
+				bodyPreferences(MSEmailBodyType.RTF, MSEmailBodyType.PlainText, MSEmailBodyType.HTML));
+		assertThat(actual).isSameAs(rtfFetchInstruction);
+	}
+	
 	private ContentType contentType(String mimeType) {
 		return ContentType.builder().contentType(mimeType).build();
 	}
 
+	private ImmutableList<BodyPreference> bodyPreferences(MSEmailBodyType... emailBodyTypes) {
+		Builder<BodyPreference> preferences = ImmutableList.builder();
+		for (MSEmailBodyType bodyType: emailBodyTypes) {
+			preferences.add(bodyPreference(bodyType));
+		}
+		 return preferences.build();
+	}
+	
 	private BodyPreference bodyPreference(MSEmailBodyType emailBodyType) {
 		 return BodyPreference.builder().bodyType(emailBodyType).build();
+	}
+	
+	@Test
+	public void bestFitComparatorPreferenceMatched() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.PlainText)).compare(plainInstruction, htmlInstruction);
+		assertThat(actual).isNegative();
+	}
+	
+	@Test
+	public void bestFitComparatorPreferencesOrderingTextThenHtml() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.PlainText, MSEmailBodyType.HTML)).compare(plainInstruction, htmlInstruction);
+		assertThat(actual).isNegative();
+	}
+
+	@Test
+	public void bestFitComparatorPreferencesOrderingHtmlThenText() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction htmlInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.PlainText)).compare(plainInstruction, htmlInstruction);
+		assertThat(actual).isPositive();
+	}
+	
+	@Test
+	public void bestFitComparatorMimeAlwaysLast() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction mimeInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
+		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.MIME, MSEmailBodyType.PlainText)).compare(plainInstruction, mimeInstruction);
+		assertThat(actual).isNegative();
+	}
+	
+	@Test
+	public void bestFitComparatorMimeAlwaysLastButCanMatch() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction mimeInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
+		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.MIME)).compare(plainInstruction, mimeInstruction);
+		assertThat(actual).isNegative();
 	}
 }

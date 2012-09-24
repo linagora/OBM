@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.minig.imap.mime.ContentType;
@@ -41,10 +42,15 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 public class MimePartSelector {
 	
@@ -82,10 +88,40 @@ public class MimePartSelector {
 	
 
 
-	private FetchInstruction selectBetterFit(
+	@VisibleForTesting FetchInstruction selectBetterFit(
 			List<FetchInstruction> fetchInstructions,
-			List<BodyPreference> bodyPreferences) {
-		return Iterables.getFirst(fetchInstructions, null);
+			final List<BodyPreference> bodyPreferences) {
+		Preconditions.checkArgument(!fetchInstructions.isEmpty());
+		return Ordering
+				.from(betterFitComparator(bodyPreferences))
+				.min(fetchInstructions);
+	}
+
+	@VisibleForTesting static Comparator<FetchInstruction> betterFitComparator(final List<BodyPreference> bodyPreferences) {
+		return new Comparator<FetchInstruction>() {
+
+			@Override
+			public int compare(FetchInstruction o1, FetchInstruction o2) {
+				if (o1.getBodyType().equals(o2.getBodyType())) {
+					return 0;
+				}
+				if (o1.getBodyType() == MSEmailBodyType.MIME) {
+					return 1;
+				} else if (o2.getBodyType() == MSEmailBodyType.MIME) {
+					return -1;
+				} else {
+					List<MSEmailBodyType> preferences = FluentIterable
+							.from(Iterables.concat(bodyPreferences, DEFAULT_BODY_PREFERENCES))
+							.transform(new Function<BodyPreference, MSEmailBodyType>() {
+								@Override
+								public MSEmailBodyType apply(BodyPreference input) {
+									return input.getType();
+								}
+							}).toImmutableList();
+					return preferences.indexOf(o1.getBodyType()) - preferences.indexOf(o2.getBodyType());
+				}
+			}
+		};
 	}
 	
 	private List<FetchInstruction> findMatchingInstructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
