@@ -75,7 +75,8 @@ public class FetchInstruction {
 		public FetchInstruction build() {
 			Preconditions.checkNotNull(this.mimePart, "MimePart can't be null.");
 			return new FetchInstruction(
-					this.mimePart, this.truncation, this.bodyType, this.mailTransformation);
+					this.mimePart, this.truncation, this.bodyType, 
+					Objects.firstNonNull(this.mailTransformation, MailTransformation.NONE));
 		}
 
 	}

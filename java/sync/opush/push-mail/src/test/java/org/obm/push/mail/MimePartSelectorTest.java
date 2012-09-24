@@ -429,6 +429,34 @@ public class MimePartSelectorTest {
 		assertThat(actual).isSameAs(rtfFetchInstruction);
 	}
 	
+	@Test
+	public void selectBetterFitTransformationIsNotTheBestFit() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction transformedHtmlFetchInstruction = FetchInstruction.builder()
+				.bodyType(MSEmailBodyType.HTML).mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML).mimePart(mimePart).build();
+		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+
+		FetchInstruction actual =
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(transformedHtmlFetchInstruction, htmlFetchInstruction),
+				bodyPreferences(MSEmailBodyType.HTML));
+		assertThat(actual).isSameAs(htmlFetchInstruction);
+	}
+	
+	@Test
+	public void selectBetterFitTransformationIsBetterThanFollowingPreferences() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction transformedHtmlFetchInstruction = FetchInstruction.builder()
+				.bodyType(MSEmailBodyType.HTML).mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML).mimePart(mimePart).build();
+		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
+
+		FetchInstruction actual =
+			new MimePartSelector().selectBetterFit(
+				ImmutableList.of(transformedHtmlFetchInstruction, htmlFetchInstruction),
+				bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.PlainText));
+		assertThat(actual).isSameAs(htmlFetchInstruction);
+	}
+	
 	private ContentType contentType(String mimeType) {
 		return ContentType.builder().contentType(mimeType).build();
 	}
@@ -488,5 +516,14 @@ public class MimePartSelectorTest {
 		FetchInstruction plainInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
 		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.MIME)).compare(plainInstruction, mimeInstruction);
 		assertThat(actual).isNegative();
+	}
+	
+	@Test
+	public void bestFitComparatorTransformationComesAfter() {
+		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
+		FetchInstruction transformedInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML).mimePart(mimePart).build();
+		FetchInstruction htmlInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
+		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.HTML)).compare(transformedInstruction, htmlInstruction);
+		assertThat(actual).isPositive();
 	}
 }

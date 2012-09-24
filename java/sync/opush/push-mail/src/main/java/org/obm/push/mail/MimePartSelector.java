@@ -70,11 +70,9 @@ public class MimePartSelector {
 	public FetchInstruction select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
 		
-		List<FetchInstruction> fetchInstructions = 
-			fetchIntructions(
-				Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of()),
-				mimeMessage);
-		return selectBetterFit(fetchInstructions, bodyPreferences);
+		List<BodyPreference> safeBodyPreferences = Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of());
+		List<FetchInstruction> fetchInstructions = fetchIntructions(safeBodyPreferences, mimeMessage);
+		return selectBetterFit(fetchInstructions, safeBodyPreferences);
 	}
 
 	private List<FetchInstruction> fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
@@ -98,11 +96,26 @@ public class MimePartSelector {
 	}
 
 	@VisibleForTesting static Comparator<FetchInstruction> betterFitComparator(final List<BodyPreference> bodyPreferences) {
+		final List<MSEmailBodyType> preferences = FluentIterable
+				.from(Iterables.concat(bodyPreferences, DEFAULT_BODY_PREFERENCES))
+				.transform(new Function<BodyPreference, MSEmailBodyType>() {
+					@Override
+					public MSEmailBodyType apply(BodyPreference input) {
+						return input.getType();
+					}
+				}).toImmutableList();
+		
 		return new Comparator<FetchInstruction>() {
-
+			
+			private int computeWeight(FetchInstruction instruction) {
+				int transformationWeight = instruction.getMailTransformation() == MailTransformation.NONE ? 0 : 1;
+				return preferences.indexOf(instruction.getBodyType()) + (preferences.size() * transformationWeight);
+			}
+			
 			@Override
 			public int compare(FetchInstruction o1, FetchInstruction o2) {
-				if (o1.getBodyType().equals(o2.getBodyType())) {
+				if (o1.getBodyType().equals(o2.getBodyType()) 
+						&& o1.getMailTransformation().equals(o2.getMailTransformation())) {
 					return 0;
 				}
 				if (o1.getBodyType() == MSEmailBodyType.MIME) {
@@ -110,15 +123,7 @@ public class MimePartSelector {
 				} else if (o2.getBodyType() == MSEmailBodyType.MIME) {
 					return -1;
 				} else {
-					List<MSEmailBodyType> preferences = FluentIterable
-							.from(Iterables.concat(bodyPreferences, DEFAULT_BODY_PREFERENCES))
-							.transform(new Function<BodyPreference, MSEmailBodyType>() {
-								@Override
-								public MSEmailBodyType apply(BodyPreference input) {
-									return input.getType();
-								}
-							}).toImmutableList();
-					return preferences.indexOf(o1.getBodyType()) - preferences.indexOf(o2.getBodyType());
+					return computeWeight(o1) - computeWeight(o2);
 				}
 			}
 		};
