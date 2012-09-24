@@ -46,6 +46,7 @@ import org.obm.push.handler.IContinuationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -57,7 +58,7 @@ public class PushContinuation implements IContinuation {
 		private final AtomicInteger id;
 		
 		@Inject
-		private Factory() {
+		@VisibleForTesting Factory() {
 			super();
 			this.id = new AtomicInteger();
 		}

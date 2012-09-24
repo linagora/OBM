@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
+import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IBackend;

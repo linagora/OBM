@@ -29,52 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.push;
 
-import static org.easymock.EasyMock.expect;
+import net.sf.ehcache.Element;
 
-import org.obm.push.ContinuationTransactionMap;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.task.TaskBackend;
-import org.obm.sync.client.CalendarType;
-import org.obm.sync.client.login.LoginService;
-import org.obm.sync.services.IAddressBook;
-import org.obm.sync.services.ICalendar;
-import org.obm.sync.services.IMailingList;
-import org.obm.sync.services.ISetting;
+import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.Device;
+import org.obm.push.exception.ElementNotFoundException;
 
-import com.google.inject.name.Names;
-
-public final class ObmSyncModule extends AbstractOverrideModule {
-
-	public ObmSyncModule() {
-		super();
-	}
-
-	@Override
-	protected void configureImpl() {
-		bindWithMock(IAddressBook.class);
-		ICalendar calendar = createAndRegisterMock(ICalendar.class);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.CALENDAR))
-			.toInstance(calendar);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.TODO))
-			.toInstance(calendar);
-		bindWithMock(LoginService.class);
-		bindWithMock(IMailingList.class);
-		bindWithMock(ISetting.class);
-		bindWithMock(CalendarBackend.class);
-		bindWithMock(ContactsBackend.class);
-		bindWithMock(TaskBackend.class);
-		CalendarBackend calendarBackend = getMock(CalendarBackend.class);
-		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR);
-		ContactsBackend contactBackend = getMock(ContactsBackend.class);
-		expect(contactBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS);
-		TaskBackend taskBackend = getMock(TaskBackend.class);
-		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS);
-		bindWithMock(ContinuationTransactionMap.class);
-	}
+public interface ContinuationTransactionMap {
+	
+	IContinuation getContinuationForDevice(Device device) throws ElementNotFoundException ;
+	
+	Element putContinuationForDevice(Device device, IContinuation continuation) ;
+	
+	void delete(Device device);
 }

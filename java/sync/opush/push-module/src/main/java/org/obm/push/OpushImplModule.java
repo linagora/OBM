@@ -51,6 +51,7 @@ import org.obm.push.calendar.EventConverter;
 import org.obm.push.calendar.EventConverterImpl;
 import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.impl.ContinuationTransactionMapImpl;
 import org.obm.push.protocol.ProtocolModule;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
@@ -121,6 +122,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
 		bind(Base64ASTimeZoneDecoder.class).to(Base64ASTimeZoneDecoderImpl.class);
 		bind(ASTimeZoneConverter.class).to(ASTimeZoneConverterImpl.class);
+		bind(ContinuationTransactionMap.class).to(ContinuationTransactionMapImpl.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
