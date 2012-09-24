@@ -99,8 +99,19 @@ public class CollectionPath {
 
 		private CollectionPath buildFromFullyQualifiedCollectionPath() {
 			PIMDataType recognizedPimType = collectionPathHelper.recognizePIMDataType(fullyQualifiedCollectionPath);
+			if (recognizedPimType != PIMDataType.UNKNOWN) {
+				return buildFromDiscoveredPimType(recognizedPimType);
+			}
+			return buildFromUnknownPimType();
+		}
+		
+		private CollectionPath buildFromDiscoveredPimType(PIMDataType recognizedPimType) {
 			String recognizedDisplayName = collectionPathHelper.extractFolder(userDataRequest, fullyQualifiedCollectionPath, recognizedPimType);
 			return new CollectionPath(fullyQualifiedCollectionPath, recognizedPimType, recognizedDisplayName);
+		}
+
+		private CollectionPath buildFromUnknownPimType() {
+			return new CollectionPath(fullyQualifiedCollectionPath, PIMDataType.UNKNOWN, null);
 		}
 	}
 

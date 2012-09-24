@@ -36,7 +36,9 @@ import org.obm.push.exception.CollectionPathException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -78,10 +80,7 @@ public class CollectionPathHelper {
 		} else if (pathStartWithTypedUserPath(collectionPath, userPath, PIMDataType.TASKS)) {
 			return PIMDataType.TASKS;
 		}
-		String msg = String.format( 
-				"Cannot reconize a PIMDataType from the collection path given . collection:{%s}",
-				collectionPath);
-		throw new CollectionPathException(msg);
+		return PIMDataType.UNKNOWN;
 	}
 
 	private boolean pathStartWithTypedUserPath(String pathToVerify, String userPath, PIMDataType dataType) {
@@ -95,7 +94,7 @@ public class CollectionPathHelper {
 	public String buildCollectionPath(UserDataRequest udr, PIMDataType collectionType, String...imapFolders) {
 		Preconditions.checkNotNull(udr);
 		Preconditions.checkNotNull(collectionType);
-		Preconditions.checkNotNull(udr);
+		Preconditions.checkArgument(collectionType != PIMDataType.UNKNOWN);
 		
 		StringBuilder userPath = getUserPathByCollection(udr, collectionType);
 		for (String folder: imapFolders) {
@@ -104,12 +103,6 @@ public class CollectionPathHelper {
 		}
 		return userPath.toString();
 	}
-	
-	public String buildDefaultCollectionPath(UserDataRequest udr, PIMDataType collectionType) {
-		Preconditions.checkNotNull(udr);
-		Preconditions.checkNotNull(collectionType);
-		return getUserPathByCollection(udr, collectionType).toString();
-	}
 
 	public String extractFolder(UserDataRequest udr, String collectionPath, PIMDataType collectionType)
 			throws CollectionPathException {
@@ -117,6 +110,7 @@ public class CollectionPathHelper {
 		Preconditions.checkNotNull(udr);
 		Preconditions.checkNotNull(collectionType);
 		Preconditions.checkNotNull(Strings.emptyToNull(collectionPath));
+		Preconditions.checkArgument(collectionType != PIMDataType.UNKNOWN);
 		
 		String userPath = getUserPathByCollection(udr, collectionType).toString();
 		
@@ -162,11 +156,33 @@ public class CollectionPathHelper {
 	}
 	
 	private StringBuilder getUserPath(String collectionPath) {
-		String collectionPathWihtoutProtocol = collectionPath.substring(PROTOCOL.length());
-		int userPathIndex = collectionPathWihtoutProtocol.indexOf(BACKSLASH);
-		
-		String user = collectionPath.substring(PROTOCOL.length(), userPathIndex + PROTOCOL.length());
-		return buildUserPath(user);
+		String collectionPathWihtoutProtocol = substringProtocol(collectionPath);
+		String userAtLogin = substringUserAtLogin(collectionPathWihtoutProtocol);
+		return buildUserPath(userAtLogin);
+	}
+
+	private String substringUserAtLogin(String collectionPathWihtoutProtocol) {
+		String userAtLogin = collectionPathWihtoutProtocol;
+		if (collectionPathWihtoutProtocol.contains(String.valueOf(BACKSLASH))) {
+			int firstBackslashIndex = collectionPathWihtoutProtocol.indexOf(BACKSLASH);
+			userAtLogin = collectionPathWihtoutProtocol.substring(0, firstBackslashIndex);
+		}
+		return checkUserAtLoginValidity(userAtLogin);
+	}
+
+	private String checkUserAtLoginValidity(String userAtLogin) {
+		Iterable<String> loginParts = Splitter.on('@').omitEmptyStrings().split(userAtLogin);
+		if (Iterables.size(loginParts) == 2) {
+			return userAtLogin;
+		}
+		throw new CollectionPathException("The collection path doesn't contain valid userAtLogin : " + userAtLogin); 
+	}
+
+	private String substringProtocol(String collectionPath) {
+		if (collectionPath.startsWith(PROTOCOL)) {
+			return collectionPath.substring(PROTOCOL.length());
+		}
+		throw new CollectionPathException("The collection path doesn't start with the protocol : " +collectionPath);
 	}
 	
 	private StringBuilder buildUserPath(String user) {

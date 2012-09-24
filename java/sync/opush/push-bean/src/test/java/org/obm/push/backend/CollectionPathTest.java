@@ -137,4 +137,43 @@ public class CollectionPathTest {
 		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.EMAIL);
 	}
 
+	@Test
+	public void testRootUserCollectionPathIsUnknownDataType() throws CollectionPathException {
+		String qualifiedCollectionPath = "obm:\\\\login@domain.org";
+
+		UserDataRequest udr = createMock(UserDataRequest.class);
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.UNKNOWN);
+		replay(collectionPathHelper, udr); 
+		
+		CollectionPath collectionPath = new CollectionPath.Builder(collectionPathHelper)
+			.userDataRequest(udr)	
+			.fullyQualifiedCollectionPath(qualifiedCollectionPath)
+			.build();
+
+		verify(collectionPathHelper, udr);
+		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
+		assertThat(collectionPath.displayName()).isNull();
+		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.UNKNOWN);
+	}
+
+	@Test
+	public void testUnexpectedCollectionPathIsUnknownDataType() throws CollectionPathException {
+		String qualifiedCollectionPath = "obm:\\\\login@domain.org\\unexpected\\contacts";
+
+		UserDataRequest udr = createMock(UserDataRequest.class);
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.UNKNOWN);
+		replay(collectionPathHelper, udr); 
+		
+		CollectionPath collectionPath = new CollectionPath.Builder(collectionPathHelper)
+			.userDataRequest(udr)	
+			.fullyQualifiedCollectionPath(qualifiedCollectionPath)
+			.build();
+
+		verify(collectionPathHelper, udr);
+		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
+		assertThat(collectionPath.displayName()).isNull();
+		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.UNKNOWN);
+	}
 }

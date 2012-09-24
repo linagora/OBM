@@ -33,6 +33,7 @@ package org.obm.push.bean;
 
 public enum PIMDataType implements DBEnum {
 
+	UNKNOWN("Unknown", "unknown"),
 	EMAIL("Email", "email"), 
 	CALENDAR("Calendar", "calendar"),
 	CONTACTS("Contacts", "contacts"),

@@ -43,6 +43,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -170,10 +171,15 @@ public class MappingServiceImpl implements MappingService {
 
 			@Override
 			public CollectionPath apply(String fullyQualifiedCollectionPath) {
-				return collectionPathBuilderProvider.get()
-					.userDataRequest(udr)
-					.fullyQualifiedCollectionPath(fullyQualifiedCollectionPath)
-					.build();
+				try {
+					return collectionPathBuilderProvider.get()
+						.userDataRequest(udr)
+						.fullyQualifiedCollectionPath(fullyQualifiedCollectionPath)
+						.build();
+				} catch (IndexOutOfBoundsException e) {
+					// Guava Lists.transform translates IndexOutOfBoundsException into NoSuchElementException 
+					throw new CollectionPathException("Unbuildable collection path : " + fullyQualifiedCollectionPath, e);
+				}
 			}
 		});
 	}
