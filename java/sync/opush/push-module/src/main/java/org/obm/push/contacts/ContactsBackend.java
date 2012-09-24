@@ -79,6 +79,7 @@ import org.obm.sync.services.IAddressBook;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -115,9 +116,11 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 		try {
 			FolderChanges folderChanges = listAddressBooksChanged(udr, lastKnownState);
-			Iterable<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
-			Iterable<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges);
 			Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
+			
+			Iterable<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
+			Iterable<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges, lastKnownCollections);
+			
 			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
 			
 			return computeChanges(udr, changedCollections, deletedCollections);
@@ -172,8 +175,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return new ItemChange(serverId, parentId, collectionPath.displayName(), itemType, isNew);
 	}
 
-	private Iterable<CollectionPath> deletedCollections(final UserDataRequest udr, FolderChanges folderChanges) {
-		return foldersToCollectionPaths(udr, folderChanges.getRemoved());
+	@VisibleForTesting Iterable<CollectionPath> deletedCollections(
+			final UserDataRequest udr, FolderChanges folderChanges, 
+			Set<CollectionPath> lastKnownCollections) {
+		
+		return FluentIterable
+				.from(foldersToCollectionPaths(udr, folderChanges.getRemoved()))
+				.filter(Predicates.in(lastKnownCollections));
 	}
 
 	private Iterable<CollectionPath> changedCollections(final UserDataRequest udr, FolderChanges folderChanges) {

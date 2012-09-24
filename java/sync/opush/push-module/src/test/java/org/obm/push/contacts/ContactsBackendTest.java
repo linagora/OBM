@@ -71,6 +71,7 @@ import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.FolderChanges;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -368,5 +369,29 @@ public class ContactsBackendTest {
 			super(COLLECTION_CONTACT_PREFIX + displayName, PIMDataType.CONTACTS, displayName);
 		}
 		
+	}
+	
+	@Test
+	public void filterUnknownDeletedItemsFromAddressBooksChanged() {
+		String folderOneName = "f1";
+		String folderTwoName = "f2";
+		Folder folder1 = createFolder(folderOneName, 1);
+		Folder folder2 = createFolder(folderTwoName, 2);
+		FolderChanges changes = FolderChanges.builder().removed(folder1, folder2).build();
+		
+		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folderOneName);
+		ImmutableSet<CollectionPath> lastKnown = ImmutableSet.<CollectionPath>of(f1CollectionPath);
+
+		Builder builder1 = expectBuildCollectionPath(folderOneName);
+		Builder builder2 = expectBuildCollectionPath(folderTwoName);
+		
+		replay(collectionPathBuilderProvider, builder1, builder2); 
+		
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
+		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown);
+		
+		verify(collectionPathBuilderProvider, builder1, builder2);
+		
+		assertThat(actual).containsOnly(f1CollectionPath);
 	}
 }

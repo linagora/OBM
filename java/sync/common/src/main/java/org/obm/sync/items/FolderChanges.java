@@ -37,19 +37,64 @@ import java.util.Set;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.book.Folder;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 public class FolderChanges {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+
+		private Set<Folder> updated;
+		private Set<Folder> removed;
+		private Date lastSync;
+		
+		private Builder() {
+			super();
+		}
+
+		public Builder updated(Folder... updated) {
+			this.updated = ImmutableSet.copyOf(updated);
+			return this;
+		}
+		
+		public Builder updated(Set<Folder> updated) {
+			this.updated = updated;
+			return this;
+		}
+		
+		public Builder removed(Set<Folder> removed) {
+			this.removed = removed;
+			return this;
+		}
+
+		public Builder removed(Folder... removed) {
+			this.removed = ImmutableSet.copyOf(removed);
+			return this;
+		}
+		
+		public Builder lastSync(Date lastSync) {
+			this.lastSync = lastSync;
+			return this;
+		}
+
+		public FolderChanges build() {
+			return new FolderChanges(
+					Objects.firstNonNull(updated, Sets.<Folder>newHashSet()),
+					Objects.firstNonNull(removed, Sets.<Folder>newHashSet()),
+					Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime())
+					);
+		}
+	}
+	
 	private Set<Folder> updated;
 	private Set<Folder> removed;
 	private Date lastSync;
 
-	public FolderChanges() {
-		this(Sets.<Folder>newHashSet(), Sets.<Folder>newHashSet(), 
-				DateUtils.getEpochPlusOneSecondCalendar().getTime()); 
-	}
-	
 	public FolderChanges(Set<Folder> updated, Set<Folder> removed, Date lastSync) {
 		this.updated = updated;
 		this.removed = removed;

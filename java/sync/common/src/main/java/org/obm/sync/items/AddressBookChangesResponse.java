@@ -46,7 +46,7 @@ public class AddressBookChangesResponse {
 
 	public AddressBookChangesResponse() {
 		contactChanges = new ContactChanges();
-		booksChanges = new FolderChanges();
+		booksChanges = FolderChanges.builder().build();
 	}
 
 	public Date getLastSync() {
