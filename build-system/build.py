@@ -25,7 +25,7 @@ def build_argument_parser(args):
     parser = argparse.ArgumentParser(description='Packages OBM')
 
     parser.add_argument('-o', '--oncommit', help='triggers an oncommit build',
-            default=False, action='store_true', dest='on_commit')
+            default=False, action='store_true', dest='oncommit')
 
     parser.add_argument('-c', '--config', help='build configuration file',
             default='build.cfg', dest='configuration_file', type=file)
@@ -64,7 +64,7 @@ def get_version_release(args, config, date, sha1):
     if args.package_type == 'rpm' and not obm_release:
         obm_release = 1
     short_sha1 = sha1[:7]
-    if args.on_commit:
+    if args.oncommit:
         formatter = string.Formatter()
         params = dict(obm_release=obm_release,
                 year=date.strftime("%Y"),
@@ -88,10 +88,10 @@ def get_version_release(args, config, date, sha1):
 
 def make_packagers(config, args, packages_dir, checkout_dir, packages):
     template = None
-    if args.on_commit:
+    if args.oncommit:
         template_section = "%s_templates" % args.package_type
         template = config.get(template_section,
-            'autocommit_changelog')
+            'oncommit_changelog')
         mode = ob.ChangelogUpdater.REPLACE
     else:
         template = None

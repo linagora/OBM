@@ -2,7 +2,7 @@ import string
 
 class ChangelogUpdater(object):
     """
-    This object updates the Debian changelog or RPM spec file in autocommit mode. Its
+    This object updates the Debian changelog or RPM spec file in oncommit mode. Its
     constructor accepts the following parameters:
         - *changelog_template*: the path to a Debian changelog template
         - *package_type*: one of `'deb'` or `'rpm'`
@@ -52,7 +52,7 @@ class ChangelogUpdater(object):
 
         debian_version = None
         if self.release:
-            # For autocommit without a version number, no tilde
+            # For oncommit without a version number, no tilde
             if self.release[0] == "+":
                 debian_version = "%s%s" % (self.version, self.release)
             else:
