@@ -241,11 +241,14 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return mappingService.collectionIdToString(collectionId);
 	}
 	
-	private String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws CollectionNotFoundException, DaoException {
-		if (!isDefaultFolder(collectionPath.displayName())) {
-			CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
-			String parentId = getServerIdFromCollectionPath(udr, defaultBookCollectionPath.collectionPath());
-			return Objects.firstNonNull(parentId, contactConfiguration.getDefaultParentId());
+	@VisibleForTesting String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws DaoException {
+		try {
+			if (!isDefaultFolder(collectionPath.displayName())) {
+				CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
+				return getServerIdFromCollectionPath(udr, defaultBookCollectionPath.collectionPath());
+			}
+		} catch (CollectionNotFoundException e) {
+			logger.info("Default main address book not found in mapping : " + contactConfiguration.getDefaultAddressBookName());
 		}
 		return contactConfiguration.getDefaultParentId();
 	}

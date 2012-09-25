@@ -81,6 +81,8 @@ import com.google.inject.Provider;
 public class ContactsBackendTest {
 
 	private static final String COLLECTION_CONTACT_PREFIX = "obm:\\\\test@test\\contacts\\";
+	private static final String DEFAULT_PARENT_BOOK_ID = "0";
+	private static final String DEFAULT_PARENT_BOOK_NAME = "contacts";
 	
 	private User user;
 	private Device device;
@@ -107,7 +109,7 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void sortedByDefaultFolderName() {
-		final String defaultFolderName = "contacts";
+		final String defaultFolderName = DEFAULT_PARENT_BOOK_NAME;
 		
 		Folder f1 = createFolder("users", -1);
 		Folder f2 = createFolder("collected_contacts", 2);
@@ -280,6 +282,23 @@ public class ContactsBackendTest {
 		assertThat(itemChanges).hasSize(1);
 		assertThat(itemChanges).contains(itemChange);
 	}
+
+	@Test
+	public void testGetParentIdFailedReturnsDefaultParentId() throws Exception {
+		Builder collectionPathBuilder = expectBuildCollectionPath(DEFAULT_PARENT_BOOK_NAME);
+		expectDefaultAddressAndParentForContactConfiguration();
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + DEFAULT_PARENT_BOOK_NAME))
+			.andThrow(new CollectionNotFoundException());
+		
+		replay(mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
+		
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, null, null, contactConfiguration, collectionPathBuilderProvider);
+		String parentId = contactsBackend.getParentId(userDataRequest, new ContactCollectionPath("my contacts"));
+		
+		verify(mappingService, contactConfiguration, collectionPathBuilderProvider, collectionPathBuilder);
+		
+		assertThat(parentId).isEqualTo(DEFAULT_PARENT_BOOK_ID);
+	}
 	
 	private void expectGetItemIdFromServerId(int contactId, String serverId) {
 		expect(mappingService.getItemIdFromServerId(serverId))
@@ -314,10 +333,10 @@ public class ContactsBackendTest {
 
 	private void expectDefaultAddressAndParentForContactConfiguration() {
 		expect(contactConfiguration.getDefaultAddressBookName())
-			.andReturn("contacts").anyTimes();
+			.andReturn(DEFAULT_PARENT_BOOK_NAME).anyTimes();
 		
 		expect(contactConfiguration.getDefaultParentId())
-			.andReturn("0").anyTimes();
+			.andReturn(DEFAULT_PARENT_BOOK_ID).anyTimes();
 	}
 
 	private void expectMappingServiceCollectionIdBehavior() 
