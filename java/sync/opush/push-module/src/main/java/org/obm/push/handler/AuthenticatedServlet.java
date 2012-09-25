@@ -67,15 +67,25 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 	}
 
 	protected void returnHttpUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-		authLogger.info("Invalid auth, sending http 401 ( uri = {}{}{} )", 
+		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_UNAUTHORIZED);
+	}
+
+	protected void returnHttpBadRequest(HttpServletRequest httpServletRequest, HttpServletResponse response) {
+		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_BAD_REQUEST);
+	}
+
+	private void returnHttpError(HttpServletRequest httpServletRequest,
+			HttpServletResponse response, int status) {
+		authLogger.info("Invalid authorization format, sending http {} ( uri = {}{}{} )", 
 				new Object[] { 
+					status,
 					httpServletRequest.getMethod(), 
 					httpServletRequest.getRequestURI(), 
 					httpServletRequest.getQueryString()});
 		
 		String s = "Basic realm=\"OBMPushService\"";
 		response.setHeader("WWW-Authenticate", s);
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setStatus(status);
 	}
 
 	protected Credentials authentication(HttpServletRequest request) throws AuthFault, BadRequestException {
@@ -96,10 +106,10 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 				}
 			}
 		}
-		throw new BadRequestException("There is not 'Authorization' field in HttpServletRequest.");
+		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(String userId, String password) throws AuthFault {
+	private Credentials getCredentials(String userId, String password) throws AuthFault, BadRequestException {
 		AccessToken accessToken = login(getLoginAtDomain(userId), password);
 		User user = createUser(userId, accessToken);
 		if (user != null) {
@@ -118,8 +128,12 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 		return userFactory.createUser(userId, accessToken.getUserEmail(), accessToken.getUserDisplayName());
 	}
 
-	protected String getLoginAtDomain(String userId) {
-		return userFactory.getLoginAtDomain(userId);
+	protected String getLoginAtDomain(String userId) throws BadRequestException {
+		try {
+			return userFactory.getLoginAtDomain(userId);
+		} catch (IllegalArgumentException e) {
+			throw new BadRequestException("The userId arg should matchs \"user@domain\" pattern : " + userId, e);
+		}
 	}
 
 	public LoggerService getLoggerService() {

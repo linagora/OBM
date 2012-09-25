@@ -162,7 +162,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			returnHttpUnauthorized(request, response);
 		} catch (BadRequestException e) {
 			logger.warn(e.getMessage());
-			returnHttpUnauthorized(request, response);
+			returnHttpBadRequest(request, response);
 		} finally {
 			getLoggerService().closeSession();
 		}
