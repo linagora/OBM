@@ -33,6 +33,7 @@ package org.obm.opush;
 
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
@@ -43,6 +44,7 @@ import java.util.Properties;
 import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
@@ -117,6 +119,12 @@ public class IntegrationTestUtils {
 
 	public static void expectCreateFolderMappingState(FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao) throws DaoException {
 		folderSyncStateBackendMappingDao.createMapping(anyObject(PIMDataType.class), anyObject(FolderSyncState.class));
+		expectLastCall().anyTimes();
+	}
+
+	public static void expectContinuationTransactionLifecycle(ContinuationTransactionMap continuationTransactionMap, Device device) throws ElementNotFoundException {
+		expectContinuationTransaction(continuationTransactionMap, device);
+		continuationTransactionMap.putContinuationForDevice(eq(device), anyObject(IContinuation.class));
 		expectLastCall().anyTimes();
 	}
 

@@ -60,6 +60,7 @@ import javax.xml.transform.TransformerException;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -119,17 +120,20 @@ public class PingHandlerTest {
 	}
 
 	@Test
+	@Ignore("OBMFULL-4125")
 	public void testInterval() throws Exception {
 		testHeartbeatInterval(5, 5, 5);
 	}
 
 
 	@Test
+	@Ignore("OBMFULL-4125")
 	public void testMinInterval() throws Exception {
 		testHeartbeatInterval(1, 5, 5);
 	}
 
 	@Test
+	@Ignore("OBMFULL-4125")
 	public void test3BlockingClient() throws Exception {
 		prepareMockNoChange();
 
@@ -156,6 +160,7 @@ public class PingHandlerTest {
 	}
 
 	@Test
+	@Ignore("OBMFULL-4125")
 	public void testPushNotificationOnBackendChangeShort() throws Exception {
 		prepareMockHasChanges(1);
 
@@ -172,6 +177,7 @@ public class PingHandlerTest {
 	}
 
 	@Test
+	@Ignore("OBMFULL-4125")
 	public void testPushNotificationOnBackendChangeLong() throws Exception {
 		prepareMockHasChanges(2);
 

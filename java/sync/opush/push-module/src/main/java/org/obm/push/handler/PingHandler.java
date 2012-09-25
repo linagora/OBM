@@ -33,6 +33,7 @@ package org.obm.push.handler;
 
 import java.util.Set;
 
+import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -40,6 +41,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
@@ -47,6 +49,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -79,6 +82,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private final PingProtocol protocol;
 	private final HearbeatDao hearbeatDao;
 	private final CollectionPathHelper collectionPathHelper;
+	private final ContinuationTransactionMap continuationTransactionMap;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
@@ -86,7 +90,8 @@ public class PingHandler extends WbxmlRequestHandler implements
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
 			CollectionDao collectionDao, HearbeatDao hearbeatDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
+			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
+			ContinuationTransactionMap continuationTransactionMap) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
@@ -95,6 +100,7 @@ public class PingHandler extends WbxmlRequestHandler implements
 		this.protocol = pingProtocol;
 		this.hearbeatDao = hearbeatDao;
 		this.collectionPathHelper = collectionPathHelper;
+		this.continuationTransactionMap = continuationTransactionMap;
 	}
 
 	@Override
@@ -120,10 +126,20 @@ public class PingHandler extends WbxmlRequestHandler implements
 	private void doTheJob(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) 
 			throws MissingRequestParameterException, DaoException, CollectionNotFoundException, CollectionPathException {
 		
+		cancelPreviousContinuation(udr.getDevice());
 		checkHeartbeatInterval(udr, pingRequest);
 		checkSyncCollections(udr, pingRequest);
 		startEmailMonitoringThreadIfNeeded(udr, pingRequest);
 		suspendContinuation(continuation, udr, pingRequest);
+	}
+
+	private void cancelPreviousContinuation(Device device) {
+		try {
+			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
+			continuation.resume();
+		}
+		catch (ElementNotFoundException e) {
+		}
 	}
 
 	private void checkHeartbeatInterval(UserDataRequest udr, PingRequest pingRequest) 
@@ -183,13 +199,16 @@ public class PingHandler extends WbxmlRequestHandler implements
 		}
 	}
 
-	private void suspendContinuation(IContinuation continuation,
-			UserDataRequest udr, PingRequest pingRequest) {
+	private void suspendContinuation(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) {
+		
+		continuation.error(PingStatus.FOLDER_SYNC_REQUIRED.asXmlValue());
 		continuation.setLastContinuationHandler(this);
 		CollectionChangeListener l = new CollectionChangeListener(udr, continuation, pingRequest.getSyncCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
+		continuationTransactionMap.putContinuationForDevice(udr.getDevice(), continuation);
+		
 		continuation.suspend(udr, pingRequest.getHeartbeatInterval());
 	}
 	
