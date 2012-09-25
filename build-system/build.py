@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 """
-OBM build script. This script is responsible for building the Debian and RPM
-packages for OBM (please note that at this time, support for RPM is not
-implemented yet). It is also able to upload the packages to the repository.
+OBM build script. This script is responsible for building OBM as Debian and RPM packages.
 
 See the documentation at http://obm.org/doku.php?id=building_obm_packages
 """
