@@ -34,6 +34,9 @@ package org.obm.push.mail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -131,17 +135,32 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 	
 	private void fetchBody(Builder emailViewBuilder, FetchInstruction fetchInstruction, 
-			long uid) throws MailException {
+			long uid) throws MailException, IOException {
 		
 		InputStream bodyData = fetchBodyData(fetchInstruction, uid);
 		
 		Transformer transformedMail = transformersFactory.create(fetchInstruction);
 		
-		emailViewBuilder.bodyMimePartData(transformedMail.transform(fetchInstruction.getMimePart().decodeMimeStream(bodyData)));
+		IMimePart mimePart = fetchInstruction.getMimePart();
+		emailViewBuilder.bodyMimePartData(transformedMail.transform(mimePart.decodeMimeStream(bodyData), transformationCharset(mimePart)));
 		emailViewBuilder.bodyType(transformedMail.targetType());
 		emailViewBuilder.estimatedDataSize(fetchInstruction.getMimePart().getSize());
 		emailViewBuilder.truncated(fetchInstruction.mustTruncate());
 		emailViewBuilder.charset(fetchInstruction.getMimePart().getCharset());
+	}
+
+	private Charset transformationCharset(IMimePart mimePart) {
+		try {
+			String charset = mimePart.getCharset();
+			if (charset != null) {
+				return Charset.forName(charset);
+			}
+		} catch (IllegalCharsetNameException e) {
+			logger.info("mail with illegal charset : " + mimePart.getCharset());
+		} catch (UnsupportedCharsetException e) {
+			logger.info("mail with unsupported charset : " + mimePart.getCharset());
+		}
+		return Charsets.UTF_8;
 	}
 
 	private InputStream fetchBodyData(FetchInstruction fetchInstruction, long uid) throws MailException {

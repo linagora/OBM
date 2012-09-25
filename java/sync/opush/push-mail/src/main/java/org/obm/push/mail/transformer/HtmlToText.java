@@ -31,11 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.transformer;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.List;
 
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailTransformation;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.io.CharStreams;
 
 public class HtmlToText implements Transformer {
 
@@ -53,8 +62,12 @@ public class HtmlToText implements Transformer {
 	}
 
 	@Override
-	public InputStream transform(InputStream input) {
-		return input;
+	public InputStream transform(InputStream input, Charset charset) throws IOException {
+		Preconditions.checkNotNull(input);
+		Preconditions.checkNotNull(charset);
+		List<String> lines = CharStreams.readLines(new InputStreamReader(input, charset));
+		String html = "<html><body>" + Joiner.on("<br/>").join(lines) + "</body></html>";
+		return new ByteArrayInputStream(html.getBytes(charset));
 	}
 
 	@Override

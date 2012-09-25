@@ -31,47 +31,48 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.transformer;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.EnumMap;
-import java.util.Set;
 
-import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.mail.FetchInstruction;
-import org.obm.push.mail.MailTransformation;
+import org.junit.Test;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.base.Charsets;
 
-public interface Transformer {
 
-	interface Factory {
-		Transformer create(FetchInstruction fetchInstruction);
-		MailTransformation describe();
+public class HtmlToTextTest {
+
+	@Test(expected=NullPointerException.class)
+	public void transformNull() throws IOException {
+		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
+		htmlToTextFactory.transform(null, Charsets.UTF_8);
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void transformNullCharset() throws IOException {
+		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
+		htmlToTextFactory.transform(new ByteArrayInputStream(new byte[] {0x22}), null);
 	}
 	
-	@Singleton
-	public class TransformersFactory {
-		
-		private final EnumMap<MailTransformation, Transformer.Factory> indexedTransformers;
+	@Test
+	public void transformSimpleString() throws IOException {
+		ByteArrayInputStream inputStream = stringToInputStream("simple string");
+		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
+		InputStream actual = htmlToTextFactory.transform(inputStream, Charsets.UTF_8);
+		assertThat(actual).hasContentEqualTo(stringToInputStream("<html><body>simple string</body></html>"));
+	}
 
-		@Inject
-		@VisibleForTesting TransformersFactory(Set<Transformer.Factory> transformers) {
-			this.indexedTransformers = new EnumMap<MailTransformation, Transformer.Factory>(MailTransformation.class);
-			for (Transformer.Factory factory: transformers) {
-				this.indexedTransformers.put(factory.describe(), factory);
-			}
-		}
-
-		public Transformer create(FetchInstruction fetchInstructions) {
-			return indexedTransformers.get(fetchInstructions.getMailTransformation()).create(fetchInstructions);
-		}		
+	@Test
+	public void transformMultilineString() throws IOException {
+		ByteArrayInputStream inputStream = stringToInputStream("line one\r\nline two\r\n");
+		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
+		InputStream actual = htmlToTextFactory.transform(inputStream, Charsets.UTF_8);
+		assertThat(actual).hasContentEqualTo(stringToInputStream("<html><body>line one<br/>line two</body></html>"));
 	}
 	
-	InputStream transform(InputStream input, Charset charset) throws IOException;
-	
-	MSEmailBodyType targetType();
-	
+	private ByteArrayInputStream stringToInputStream(String content) {
+		return new ByteArrayInputStream(content.getBytes(Charsets.UTF_8));
+	}
 }

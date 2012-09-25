@@ -556,7 +556,7 @@ public class EmailViewPartsFetcherImplTest {
 	private MimeMessage mockAggregateMimeMessage() {
 		
 		MimePart mimePart = createMock(MimePart.class);
-		expect(mimePart.getCharset()).andReturn(messageFixture.bodyCharset);
+		expect(mimePart.getCharset()).andReturn(messageFixture.bodyCharset).anyTimes();
 		expect(mimePart.getPrimaryType()).andReturn(messageFixture.bodyPrimaryType).anyTimes();
 		expect(mimePart.getSubtype()).andReturn(messageFixture.bodySubType).anyTimes();
 		expect(mimePart.findRootMimePartInTree()).andReturn(mimePart);

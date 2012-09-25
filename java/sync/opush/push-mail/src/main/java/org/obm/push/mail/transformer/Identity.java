@@ -32,6 +32,7 @@
 package org.obm.push.mail.transformer;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.FetchInstruction;
@@ -58,7 +59,7 @@ public class Identity implements Transformer {
 	}
 
 	@Override
-	public InputStream transform(InputStream input) {
+	public InputStream transform(InputStream input, Charset charset) {
 		return input;
 	}
 
