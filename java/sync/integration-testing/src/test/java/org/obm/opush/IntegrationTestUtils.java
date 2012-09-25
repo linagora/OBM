@@ -42,6 +42,7 @@ import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
@@ -49,6 +50,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
@@ -118,6 +120,12 @@ public class IntegrationTestUtils {
 		expectLastCall().anyTimes();
 	}
 
+	public static void expectContinuationTransaction(ContinuationTransactionMap continuationTransactionMap, Device device) throws ElementNotFoundException {
+		expect(continuationTransactionMap.getContinuationForDevice(device))
+			.andThrow(new ElementNotFoundException())
+			.anyTimes();
+	}
+	
 	public static void replayMocks(Iterable<Object> toReplay) {
 		EasyMock.replay(Iterables.toArray(toReplay, Object.class));
 	}

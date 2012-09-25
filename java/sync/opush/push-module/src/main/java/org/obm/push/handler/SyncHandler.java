@@ -50,6 +50,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
@@ -63,6 +64,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
@@ -118,17 +120,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		public Map<String, String> processedClientIds = new HashMap<String, String>();
 	}
 	
-	private static Map<Integer, IContinuation> waitContinuationCache;
 	private final SyncProtocol syncProtocol;
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
 	private final CollectionPathHelper collectionPathHelper;
 	private final ResponseWindowingService responseWindowingProcessor;
-
-	static {
-		waitContinuationCache = new HashMap<Integer, IContinuation>();
-	}
+	private final ContinuationTransactionMap continuationTransactionMap;
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
@@ -136,7 +134,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol SyncProtocol,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ResponseWindowingService responseWindowingProcessor) {
+			ResponseWindowingService responseWindowingProcessor,
+			ContinuationTransactionMap continuationTransactionMap) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -147,12 +146,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.itemTrackingDao = itemTrackingDao;
 		this.collectionPathHelper = collectionPathHelper;
 		this.responseWindowingProcessor = responseWindowingProcessor;
+		this.continuationTransactionMap = continuationTransactionMap;
 	}
 
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			SyncRequest syncRequest = syncProtocol.getRequest(doc, udr);
+			
+			cancelPreviousContinuation(udr.getDevice());
 			
 			ModificationStatus modificationStatus = processCollections(udr, syncRequest.getSync());
 			if (syncRequest.getSync().getWaitInSecond() > 0) {
@@ -193,6 +195,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
+	private void cancelPreviousContinuation(Device device) {
+		try {
+			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
+			continuation.resume();
+		}
+		catch (ElementNotFoundException e) {
+		}
+	}
+
 	private void sendResponse(Responder responder, Document document) {
 		responder.sendWBXMLResponse("AirSync", document);
 	}
@@ -214,6 +225,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 		}
 		
+		continuation.error(SyncStatus.NEED_RETRY.asSpecificationValue());
+		
 		continuation.setLastContinuationHandler(this);
 		monitoredCollectionService.put(udr.getCredentials(), udr.getDevice(), sync.getCollections());
 		CollectionChangeListener l = new CollectionChangeListener(udr,
@@ -221,10 +234,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
-		for (SyncCollection sc : sync.getCollections()) {
-			waitContinuationCache.put(sc.getCollectionId(),
-					continuation);
-		}
+		continuationTransactionMap.putContinuationForDevice(udr.getDevice(), continuation);
 		
 		continuation.suspend(udr, sync.getWaitInSecond());
 	}
@@ -260,13 +270,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
+		setContinuationAsNeedRetryIfAny(udr);
+		
 		for (SyncCollection collection : sync.getCollections()) {
-
-			// Disables last push request
-			IContinuation cont = waitContinuationCache.get(collection.getCollectionId());
-			if (cont != null) {
-				cont.error(SyncStatus.NEED_RETRY.asSpecificationValue());
-			}
 
 			// get our sync state for this collection
 			ItemSyncState collectionState = stMachine.getItemSyncState(collection.getSyncKey());
@@ -283,6 +289,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return modificationStatus;
 	}
 
+	private void setContinuationAsNeedRetryIfAny(UserDataRequest udr) {
+		// Disables last push request
+		try {
+			IContinuation cont= continuationTransactionMap.getContinuationForDevice(udr.getDevice());
+			cont.error(SyncStatus.NEED_RETRY.asSpecificationValue());
+		}
+		catch (ElementNotFoundException e) {
+		}
+	}
 	
 	/**
 	 * Handles modifications requested by mobile device
