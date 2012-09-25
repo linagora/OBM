@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -133,18 +134,26 @@ public class MimePartSelector {
 		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
 		for (BodyPreference bodyPreference: bodyPreferences) {
 			if (isContentType(bodyPreference)) {
-				IMimePart mimePart = findMimePartMatching(mimeMessage, bodyPreference);
-				if (isMatching(mimePart, bodyPreference)) {
-					fetchInstructions.add(buildFetchInstruction(mimePart, bodyPreference));
-				}
+				fetchInstructions.addAll(findMatchingInstruction(mimeMessage, bodyPreference));
 			} else {
-				fetchInstructions.add(buildFetchInstruction(mimeMessage, bodyPreference));
+				fetchInstructions.add(buildFetchInstruction(FetchInstruction.builder(), mimeMessage, bodyPreference));
 			}
 		}
 		return fetchInstructions;
 	}
 
-	private boolean isMatching(IMimePart mimePart, BodyPreference bodyPreference) {
+	private List<FetchInstruction> findMatchingInstruction(MimeMessage mimeMessage, BodyPreference bodyPreference) {
+		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
+		for (FetchHints hints: listContentTypes(bodyPreference.getType())) {
+			IMimePart mimePart =  mimeMessage.findMainMessage(hints.getContentType());
+			if (isOptionsMatching(mimePart, bodyPreference)) {
+				fetchInstructions.add(buildFetchInstruction(hints.getInstruction(), mimePart, bodyPreference));
+			}
+		}
+		return fetchInstructions;
+	}
+
+	private boolean isOptionsMatching(IMimePart mimePart, BodyPreference bodyPreference) {
 		if (mimePart != null) {
 			if (bodyPreference.isAllOrNone() && bodyPreference.getTruncationSize() != null) {
 				return mimePart.getSize() < bodyPreference.getTruncationSize();
@@ -156,20 +165,37 @@ public class MimePartSelector {
 		}
 	}
 	
-	private FetchInstruction buildFetchInstruction(IMimePart mimePart, BodyPreference bodyPreference) {
-		return FetchInstruction.builder()
+	private FetchInstruction buildFetchInstruction(FetchInstruction.Builder instruction, IMimePart mimePart, BodyPreference bodyPreference) {
+		return instruction
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())
 			.bodyType(bodyPreference.getType())
-			.mailTransformation(MailTransformation.NONE)
 			.build();
 	}
 
-	private IMimePart findMimePartMatching(MimeMessage mimeMessage, BodyPreference bodyPreference) {
-		ContentType contentType = toContentType(bodyPreference.getType());
-		return mimeMessage.findMainMessage(contentType);
+	private List<FetchHints> listContentTypes(MSEmailBodyType bodyType) {
+		switch (bodyType) {
+		case HTML:
+			return Arrays.asList(
+						FetchHints.builder()
+							.contentType(toContentType(MSEmailBodyType.HTML)).build(),
+						FetchHints.builder()
+							.contentType(toContentType(MSEmailBodyType.PlainText))
+							.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML))
+							.build());
+		case PlainText:
+			return Arrays.asList(
+					FetchHints.builder()
+					.contentType(toContentType(MSEmailBodyType.PlainText)).build());
+		case RTF:
+			return Arrays.asList(
+					FetchHints.builder()
+					.contentType(toContentType(MSEmailBodyType.RTF)).build());
+		default:
+			throw new IllegalArgumentException("Unexpected MSEmailBodyType");
+		}
 	}
-
+	
 	private boolean isContentType(BodyPreference bodyPreference) {
 		return bodyPreference.getType() != MSEmailBodyType.MIME;
 	}
