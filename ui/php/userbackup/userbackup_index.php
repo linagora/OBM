@@ -168,7 +168,7 @@ function get_user_params() {
 // User Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_action() {
-  global $actions, $cright_read, $cright_write_admin;
+  global $actions, $cright_read, $cright_write;
 
   
   of_category_user_module_action('userbackup');
@@ -185,15 +185,17 @@ function get_user_action() {
   $actions['userbackup']['restore'] = array (
     'Name'     => $GLOBALS['l_header_backup_restore'],
     'Url'      => "$path/userbackup/userbackup_index.php?action=restore",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
   );
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // User Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
+
 function update_user_action() {
   global $params, $actions, $path, $cgp_user, $obm, $profiles;
 
