@@ -1,75 +1,117 @@
 #!/bin/bash -x         
 
 set -e
+shopt -s extglob
 
-BACKUPPATH="/var/lib/obm/backup"
-OLDBACKUPROOT="/var/backups/obm"
-J1="$BACKUPPATH/Daily"
-S1="$BACKUPPATH/Weekly1"
-S2="$BACKUPPATH/Weekly2"
-M1="$BACKUPPATH/Monthly1"
-M2="$BACKUPPATH/Monthly2"
+BACKUPROOT="/var/lib/obm/backup"
+J1="$BACKUPROOT/Daily"
+S1="$BACKUPROOT/Weekly1"
+S2="$BACKUPROOT/Weekly2"
+M1="$BACKUPROOT/Monthly1"
+M2="$BACKUPROOT/Monthly2"
+
+FLAGFILE="$BACKUPROOT/successDailyBackup.txt"
+LOGFILE="/var/log/obm-cron.log"
+
+ADMINMAIL="admin@centos.obm.com"
+SUBJECT="The daily backup has failed."
+MAILMESSAGE="The daily backup has encountered an error and the flag file has not been moved. Please check the log /var/log/obm-cron.log to find out what has caused the fail."
 
 init() {
-    for i in $J1 $S1 $S2 $M1 $M2; 
+    /bin/mkdir -pv $J1
+    moveSatelliteBackup "$BACKUPROOT/*" $J1
+
+    find $BACKUPROOT/* -type d -not \
+        \( -path $J1 -prune \) \
+        -exec rm -rvf {} +
+    rm -rvf $FLAGFILE
+
+    for i in $S1 $S2 $M1 $M2; 
     do
         /bin/mkdir -pv $i
-        moveSatelliteBackup $i
+        moveSatelliteBackup "$J1/*" $i
     done
 }
 
 moveSatelliteBackup() {
-    if [ "$(ls -A $OLDBACKUPROOT)" ]
-    then
-        [ "$(ls -A $OLDBACKUPROOT)" ] && /bin/cp -rv $OLDBACKUPROOT/* $1
-    fi
+    echo "Moving old backup to $2"
+    $(which rsync) -avvz \
+                   --progress \
+                   --exclude Daily \
+                   --log-file=$LOGFILE \
+                   $1 $2
 }
 
-removeDailyBackup() {
+moveDailyBackup() {
     echo "Processing a daily backup"
-    forceRemove $J1
+    $(which rsync) -avvz \
+                   --delete-before \
+                   --progress \
+                   --exclude Daily \
+                   --exclude Monthly1 \
+                   --exclude Weekly1 \
+                   --exclude Monthly2 \
+                   --exclude Weekly2 \
+                   --log-file=$LOGFILE \
+                   $BACKUPROOT/* $J1
 }
 
 moveWeeklyBackup() {
     echo "Processing a weekly backup"
-    forceRemove $S2
     moveDir $S1 $S2
-    moveDailyTo $S1
+    moveDir $J1 $S1
 }
 
 moveMonthlyBackup() {
     echo "Processing a montly backup"
-    forceRemove $M2
     moveDir $M1 $M2
-    moveDailyTo $M1
+    moveDir $J1 $M1
 }
 
-forceRemove() {
-    /bin/rm -rfv $1/*
+
+forceRemoveFlagFile() {
+    echo "Deleting moved daily backups and flag file"
+    find $BACKUPROOT/* -type d -not \
+        \( -path $J1 -prune -o \
+           -path $S1 -prune -o \
+           -path $S2 -prune -o \
+           -path $M1 -prune -o \
+           -path $M2 -prune \) \
+        -exec rm -rvf {} +
+    /bin/rm -rvf $FLAGFILE
 }
 
 moveDir() {
-    if [ "$(ls -A $1)" ] 
-    then
-        /bin/mv -v $1/* $2
-    fi
+    $(which rsync) -avvz --delete-before --log-file=$LOGFILE $1/* $2
 }
 
-moveDailyTo() {
-    if [ "$(ls -A $J1)" ] 
+checkAndSendMail() {
+    if [ ! -d $BACKUPROOT ] || [ -f $FLAGFILE ]
     then
-        /bin/cp -rv $J1/* $1
+        echo $MAILMESSAGE | $(which mail) -s "$SUBJECT" "$ADMINMAIL"
     fi
 }
 
 case "$1" in
-    -d) removeDailyBackup
+    -d) moveDailyBackup
+        forceRemoveFlagFile
         ;;
-    -w) moveWeeklyBackup
+    -w) moveDailyBackup
+        moveWeeklyBackup
+        forceRemoveFlagFile
         ;;
-    -m) moveMonthlyBackup
+    -m) moveDailyBackup
+        moveMonthlyBackup
+        forceRemoveFlagFile
+        ;;
+    -mw)moveDailyBackup
+        moveWeeklyBackup
+        moveMonthlyBackup
+        forceRemoveFlagFile
+        ;;
+    -check)
+        checkAndSendMail
         ;;
     -init) init
         ;;
-esac
-    
+esac  
