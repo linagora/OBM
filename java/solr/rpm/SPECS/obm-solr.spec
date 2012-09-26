@@ -40,7 +40,6 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %build
 echo "java home: `ant -diagnostics|grep 'java.home'`"
-sleep 5
 LANG=en_US.UTF-8 ant install
 
 %install

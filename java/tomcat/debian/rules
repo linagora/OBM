@@ -1,7 +1,4 @@
 #!/usr/bin/make -f
-# Not buildable on etch
-
-#export VERSION = $(shell head -1 debian/changelog | cut -f2 -d\( | cut -f1 -d\) | cut -f1 -d\-)
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/ant.mk
@@ -9,11 +6,9 @@ include /usr/share/cdbs/1/class/ant.mk
 JAVA_HOME := /usr/lib/jvm/java-6-sun/
 ANT_HOME := /usr/share/ant
 
-#DEB_ANT_BUILD_TARGET := build 
 DEB_ANT_INSTALL_TARGET := dist
 
 DEB_UPDATE_RCD_PARAMS_obm-tomcat := "start 22 2 3 4 5 . stop 18 0 1 6 ."
 
-# Do not generate crappy dependencies for libs unused by obm things
 DEB_DH_SHLIBDEPS_ARGS_obm-jdk := "-Xlib"
 DEB_DH_SHLIBDEPS_ARGS_obm-tomcat := "-Xlib"
