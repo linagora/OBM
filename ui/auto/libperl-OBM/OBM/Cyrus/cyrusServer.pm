@@ -44,6 +44,7 @@ require Exporter;
 use strict;
 
 require OBM::Parameters::regexp;
+use OBM::Parameters::common;
 
 use constant IMAP_TCP_CONN_TIMEOUT => 20;
 
@@ -234,7 +235,8 @@ sub _connect {
 
     $self->_log( 'authentification en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' au '.$self->getDescription(), 3 );
 
-    if( !$self->{'ServerConn'}->authenticate( -user=>$self->{'serverDesc'}->{'cyrus_login'}, -password=>$self->{'serverDesc'}->{'cyrus_password'}, -mechanism=>'login') ) {
+    my %auth_opts = $self->_build_auth_opts();
+    if( !$self->{'ServerConn'}->authenticate(%auth_opts) ) {
         $self->_log( 'échec d\'authentification au '.$self->getDescription(), 0 );
         return 1;
     }
@@ -244,6 +246,33 @@ sub _connect {
     return 0;
 }
 
+sub _build_auth_opts {
+    my ($self) = @_;
+
+    my %auth_opts;
+    my %basic_auth_opts = (
+        -user =>        $self->{'serverDesc'}->{'cyrus_login'},
+        -password =>    $self->{'serverDesc'}->{'cyrus_password'},
+        -mechanism =>   'login');
+
+    if (defined $OBM::Parameters::common::cyrusKeyAndCert) {
+        my %tls_auth_opts = (
+            -tlskey =>  $OBM::Parameters::common::cyrusKeyAndCert);
+        if (defined $OBM::Parameters::common::cyrusCa) {
+            $tls_auth_opts{'-cafile'} = $OBM::Parameters::common::cyrusCa;
+        }
+        if (defined $OBM::Parameters::common::cyrusCaPath) {
+            $tls_auth_opts{'-capath'} = $OBM::Parameters::common::cyrusCaPath;
+        }
+        $self->_log("STARTTLS will be used with the certificate ".
+            $OBM::Parameters::common::cyrusKeyAndCert, 3);
+        %auth_opts = (%basic_auth_opts, %tls_auth_opts);
+    }
+    else {
+        %auth_opts = %basic_auth_opts;
+    }
+    return %auth_opts;
+}
 
 sub _ping {
     my $self = shift;

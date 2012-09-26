@@ -42,7 +42,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $ldapConnectionPooling);
+@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $cyrusKeyAndCert $cyrusCa $cyrusCaPath $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $ldapConnectionPooling);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -203,6 +203,11 @@ if( defined( $cyrusDomainPartition ) && lc($cyrusDomainPartition) eq "true" ) {
 }else {
     $cyrusDomainPartition = 0;
 }
+
+
+$cyrusKeyAndCert = $cfgFile->val('automate', 'cyrusKeyAndCert');
+$cyrusCa = $cfgFile->val('automate', 'cyrusCa');
+$cyrusCaPath = $cfgFile->val('automate', 'cyrusCaPath');
 
 # Publication des adresses principales des utilisateurs n'ayant pas le droit
 # mail activé

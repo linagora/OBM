@@ -129,7 +129,17 @@ ldapConnectionPooling=1
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
 cyrusPartition = true
-;
+
+; Certificate and key for Cyrus TLS support
+; cyrusKeyAndCert = /etc/obm/certs/obm_cert.pem
+
+; Certification authority for Cyrus TLS support (optional for TLS support)
+; cyrusCa = /var/lib/obm-ca/cacert.pem
+
+; Certification authority paths for Cyrus TLS support (optional for TLS support)
+; cyrusCaPath = /etc/ssl/certs
+
+
 ; ldapAllMainMailAddress :
 ;    false : publish user mail address only if mail right is enable - default
 ;    true : publish main user mail address, even if mail right is disable
