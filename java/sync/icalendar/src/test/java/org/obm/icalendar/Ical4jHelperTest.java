@@ -44,6 +44,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -1089,6 +1090,23 @@ public class Ical4jHelperTest {
 		event.addAttendee(at4);
 		return event;
 	}
+
+	private Event buildRecurrentEventWithExceptions() {
+		Event event = buildEvent();
+		event.setExtId(new EventExtId("99fbaea9-f1dd-4cd5-9d1b-553a8a083224"));
+		event.setTitle("recurrent event with exceptions");
+		event.getRecurrence().setKind(RecurrenceKind.daily);
+		Event eventEx = event.clone();
+		Date recurrenceId = new org.joda.time.DateTime(eventEx.getStartDate().getTime())
+				.plusDays(2).toDate();
+		eventEx.setRecurrenceId(recurrenceId);
+		Date exDate = new org.joda.time.DateTime(eventEx.getStartDate().getTime()).plusDays(4)
+				.toDate();
+
+		event.getRecurrence().addEventException(eventEx);
+		event.getRecurrence().addException(exDate);
+		return event;
+	}
 	
 	private Ical4jUser buildObmUser(final Attendee attendeeReply) {
 		final ObmDomain obmDomain = new ObmDomain();
@@ -1356,5 +1374,22 @@ public class Ical4jHelperTest {
 		Assertions.assertThat(icsRequest).contains(DTSTAMP);
 		Assertions.assertThat(icsCancel).contains(DTSTAMP);
 		Assertions.assertThat(icsReply).contains(DTSTAMP);
+	}
+
+	@Test
+	public void testBuildICS() throws IOException {
+		Event normalEvent = buildEvent();
+		Event eventWithExceptions = buildRecurrentEventWithExceptions();
+		Collection<Event> events = Lists.newArrayList(normalEvent, eventWithExceptions);
+
+		Ical4jUser obmUser = buildObmUser(normalEvent.findOrganizer());
+		AccessToken token = new AccessToken(0, "OBM");
+
+		InputStream stream = getStreamICS("eventsWithExceptions.ics");
+		String expectedICSWithoutTimestamp = stripTimestamps(IOUtils.toString(stream));
+		stream.close();
+
+		String ics = new Ical4jHelper().buildIcs(obmUser, events, token);
+		Assertions.assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
 	}
 }

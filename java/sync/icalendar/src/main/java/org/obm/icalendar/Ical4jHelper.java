@@ -217,6 +217,11 @@ public class Ical4jHelper {
 		return foldingWriterToString(calendar);
 	}
 	
+	public String buildIcs(Ical4jUser iCal4jUser, Collection<Event> events, AccessToken token) {
+		Calendar calendar = this.buildVEvents(iCal4jUser, events, null, null, token);
+		return foldingWriterToString(calendar);
+	}
+
 	private VEvent buildIcsInvitationVEventDefaultValue(Event event) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
@@ -652,17 +657,25 @@ public class Ical4jHelper {
 	}
 
 	private Calendar buildVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token) {
+		return buildVEvents(iCal4jUser, Lists.newArrayList(event), replyAttendee, method, token);
+	}
+
+	private Calendar buildVEvents(Ical4jUser iCal4jUser, Collection<Event> events, Attendee replyAttendee, Method method, AccessToken token) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method, token);
-		calendar.getComponents().add(vEvent);
-		if (event.isRecurrent()) {
-			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee, method, token);
-				calendar.getComponents().add(eventExt);
+		for (Event event : events) {
+			VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method, token);
+			calendar.getComponents().add(vEvent);
+			if (event.isRecurrent()) {
+				for (Event ee : event.getRecurrence().getEventExceptions()) {
+					VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee,
+							method, token);
+					calendar.getComponents().add(eventExt);
+				}
 			}
 		}
 		return calendar;
 	}
+
 	
 	private Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final Ical4jUser iCal4jUser) {
 		for (final Attendee attendee: attendees) {
