@@ -40,19 +40,74 @@ import org.obm.sync.calendar.Event;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 public class EventChanges implements Anonymizable<EventChanges> {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		
+		private Iterable<DeletedEvent> deletes;
+		private Iterable<Event> updates;
+		private Iterable<ParticipationChanges> participationChanges;
+		private Date lastSync;
+
+		private Builder() {
+			super();
+		}
+		
+		public Builder deletes(Iterable<DeletedEvent> deletes) {
+			this.deletes = deletes;
+			return this;
+		}
+		
+		public Builder updates(Iterable<Event> updates) {
+			this.updates = updates;
+			return this;
+		}
+		
+		public Builder participationChanges(Iterable<ParticipationChanges> participationChanges) {
+			this.participationChanges = participationChanges;
+			return this;
+		}
+		
+		public Builder lastSync(Date lastSync) {
+			this.lastSync = lastSync;
+			return this;
+		}
+		
+		public EventChanges build() {
+			Preconditions.checkState(lastSync != null);
+			return new EventChanges(
+					Objects.firstNonNull(deletes, ImmutableList.<DeletedEvent>of()),
+					Objects.firstNonNull(updates, ImmutableList.<Event>of()),
+					Objects.firstNonNull(participationChanges, ImmutableList.<ParticipationChanges>of()),
+					lastSync
+					);
+		}
+		
+	}
+	
 	private List<DeletedEvent> deletedEvents;
 	private List<Event> updatedEvents;
 	private List<ParticipationChanges> participationUpdated;
 	private Date lastSync;
 
 	public EventChanges() {
-		deletedEvents = Lists.newArrayList();
-		updatedEvents = Lists.newArrayList();
-		participationUpdated = Lists.newArrayList();
+		this(Lists.<DeletedEvent>newArrayList(), Lists.<Event>newArrayList(), Lists.<ParticipationChanges>newArrayList(), null);
+	}
+	
+	private EventChanges(Iterable<DeletedEvent> deletes, Iterable<Event> updates,
+						Iterable<ParticipationChanges> participationChanges, Date lastSync) {
+		this.deletedEvents = Lists.newArrayList(deletes);
+		this.updatedEvents = Lists.newArrayList(updates);
+		this.participationUpdated = Lists.newArrayList(participationChanges);
+		this.lastSync = lastSync;
 	}
 
 	public List<DeletedEvent> getDeletedEvents() {
