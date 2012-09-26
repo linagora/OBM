@@ -1179,6 +1179,7 @@ function run_query_vcard_insert($params, $addressbook) {
   foreach ($vcards as $vcard) {
     $contact = OBM_Contact::import($vcard);
     if (isset($contact['contact_id']) && run_query_check_contact_existence($contact['contact_id'], $addressbook)) {
+      $contact['addressbook']=$addressbook->id;
       if (run_query_contact_update($contact)) {
         $ids[] = $contact['contact_id'];
       }
