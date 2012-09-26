@@ -9,6 +9,7 @@ use 5.006_001;
 use ObmSatellite::Modules::abstract;
 @ISA = qw(ObmSatellite::Modules::abstract);
 use strict;
+use POSIX;
 
 eval {
     require ObmSatellite::Modules::BackupEntity::user;
@@ -21,6 +22,7 @@ eval {
 use File::Path;
 use File::Copy;
 use File::Find;
+use File::Basename;
 
 use Encode qw/encode decode/;
 
@@ -28,7 +30,7 @@ use HTTP::Status;
 use ObmSatellite::Misc::constant;
 use ObmSatellite::Misc::regex;
 
-use constant OBM_BACKUP_ROOT => '/var/backups/obm';
+use constant OBM_CONF_INI_FILE => '/etc/obm/obm_conf.ini';
 use constant RECONSTRUCT_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant RECONSTRUCT_CMD => 'reconstruct';
 use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
@@ -40,23 +42,35 @@ use constant BACKUP_FTP_TIMEOUT => 10;
 sub _setUri {
     my $self = shift;
 
-    return [ '/backupentity', '/restoreentity', '/availablebackup', '/retrievebackup' ];
+    return [ '/backupentity', '/restoreentity', '/availablebackup', '/retrievebackup', '/endOfBackups' ];
 }
 
 
 sub _initHook {
     my $self = shift;
+    
+    if( ! -f OBM_CONF_INI_FILE || ! -r OBM_CONF_INI_FILE ) {
+        print 'WARNING: Unable to open OBM configuration file '. OBM_CONF_INI_FILE ."\n";
+        return;
+    }
+
+    if( my $cfgFile = Config::IniFiles->new( -file => OBM_CONF_INI_FILE ) ) {
+    	$self->{'backupRoot'} = $cfgFile->val( 'global', 'backupRoot' );
+    	# In case the ini file contains quotes around the directory name
+    	$self->{'backupRoot'} =~ s/"//g;
+    	
+    	$self->_log('Backup root: ' . $self->{'backupRoot'}, 4);
+    }
 
     $self->{'neededServices'} = [ 'LDAP', 'CYRUS' ];
 
-    $self->{'backupRoot'} = OBM_BACKUP_ROOT;
     $self->{'imapdConfFile'} = IMAPD_CONF_FILE;
     $self->{'tmpDir'} = TMP_DIR;
     $self->{'tarCmd'} = OBM_TAR_COMMAND;
 
 
     # Load some options from module configuration file
-    my @params = ( 'backupRoot', 'imapdConfFile', 'tmpDir', 'tarCmd' );
+    my @params = ( 'imapdConfFile', 'tmpDir', 'tarCmd' );
     my $confFileParams = $self->_loadConfFile( \@params );
 
     $self->_log( $self->getModuleName().' module configuration :', 4 );
@@ -222,11 +236,36 @@ sub _postMethod {
         return $self->_postMethodRetrieveBackup($requestUri, $requestBody);
     }
 
+    if($requestUri =~ /^\/endOfBackups/) {
+        return $self->endOfBackups();
+    }
+
     return $self->_response( RC_BAD_REQUEST, {
         content => [ 'Invalid URI '.$requestUri ]
         } );
 }
 
+sub endOfBackups {
+    my $self = shift;
+    my $directory = $self->{'backupRoot'};
+    if (!(-d "$directory")) {
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [' The Directory : ' . $self->{'backupRoot'} . ' doesn\'t exist ! ' ]
+            } );
+    }
+    my $successFile = 'successDailyBackup.txt';
+    open( DESCR, "> $directory/$successFile" ) ||
+        return $self->_response( RC_BAD_REQUEST, {
+            content => [' Couldn\'t create file : ' . $successFile ]
+            } );
+    
+    my $response = $self->_response(RC_OK);
+    my $localtime=strftime("dailyBackupDate_%d-%b-%Y", localtime);
+    print DESCR $localtime . "\n";
+    close DESCR;
+
+    return $response;
+}
 
 sub _postMethodRestoreEntity {
     my $self = shift;
@@ -514,7 +553,7 @@ sub _restoreBackupBackupFile {
     my $self = shift;
     my( $entity ) = @_;
 
-    my $backupFullPath = $self->getBackupPath().'/'.$self->getBackupName();
+    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( -e $backupFullPathBackup ) {
@@ -909,13 +948,26 @@ sub _getAvailableBackupFile {
     my( $entity ) = @_;
 
     my $backupNamePrefix = $entity->getBackupNamePrefix();
-
-    opendir( DIR, $entity->getBackupPath() ) or return $self->_response(
-        RC_INTERNAL_SERVER_ERROR, {
-        content => [ 'Can\'t open backup path '.$entity->getBackupPath() ]
-        } );
-    my @availableBackup = grep( /^$backupNamePrefix/, readdir(DIR) );
-    close(DIR);
+    my $realm = $entity->getRealm();
+    my @availableBackup = ();
+    
+    # We now search the backupRoot recursively to be compliant with
+    # the new daily/weekly/monthly backups. This still finds the manual backups though...
+    if (-e $entity->getBackupRoot()) {
+    	$self->_log('Traversing directory ' . $entity->getBackupRoot() . ' to find available backups for '.$entity->getLogin().'@'.$entity->getRealm(), 4 );
+    	
+    	find( {wanted => sub {
+    		my $fname = "$File::Find::name";
+		    
+		    if ($fname =~ /$realm\/$backupNamePrefix/) {
+		    	push @availableBackup, basename($_);
+		    }
+    	}, no_chdir => 1}, $entity->getBackupRoot());
+    } else {
+    	return $self->_response(RC_INTERNAL_SERVER_ERROR, {
+        content => [ 'Can\'t open backup root ' . $entity->getBackupRoot() ]
+        });
+    }
 
     return \@availableBackup;
 }
@@ -949,15 +1001,33 @@ sub _restoreFromArchive {
 sub _getFilesFromArchive {
     my $self = shift;
     my( $entity, $restoreData ) = @_;
-
     my $entityArchive = $entity->getBackupFileName();
+    
+    # Before failing if the backlup doesn't exist, test if this is
+    # an automated backup by trying to locate it in the directory tree
     if( !(-f $entityArchive) || !(-r $entityArchive) ) {
-        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
-            content => [ 'Entity archive \''.$entityArchive.'\' doesn\'t exist or isn\'t readable' ]
-            } );
+        my $automaticBackup;
+        my $backupName = $entity->getBackupName();
+        
+        find( {wanted => sub {
+    		my $fname = basename($_);
+		    
+		    if ($fname eq $backupName) {
+		    	$automaticBackup = $File::Find::name;
+		    	$File::Find::prune = 1;
+		    }
+    	}, no_chdir => 1}, $entity->getBackupRoot());
+        
+        if ($automaticBackup) {
+        	$entity->setBackupFileName($automaticBackup);
+        } else {
+	        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+	            content => [ 'Entity archive \''.$entityArchive.'\' doesn\'t exist or isn\'t readable' ]
+	            } );
+        }
     }
 
-    $self->_log( 'Beginning \''.$restoreData.'\' restore for '.$entity->getLogin().'@'.$entity->getRealm(), 3 );
+    $self->_log( 'Beginning \''.$restoreData.'\' restore for '.$entity->getLogin().'@'.$entity->getRealm() . ' using backup: ' . $entity->getBackupFileName(), 3 );
 
     if( my $result = $self->_getIcsVcardFromArchive( $entity, $restoreData ) ) {
         return $result;

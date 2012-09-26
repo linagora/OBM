@@ -330,6 +330,9 @@ $auth_ldap_binddn = $ini_array['auth-ldap-binddn'];
 $auth_ldap_bindpw = $ini_array['auth-ldap-bindpw'];
 $auth_ldap_filter = $ini_array['auth-ldap-filter'];
 
+// satellite ini variables
+$admin_mail_address = $ini_array['admin_mail_address'];
+
 //------------------//
 // Services enabled //
 //------------------//
@@ -471,6 +474,7 @@ $cgp_use['property']['delegation'] = true;
 
 $cgp_show['module']['device'] = 'my';
 $cgp_show['module']['admin_device'] = 'admin';
+$cgp_show['module']['userbackup'] = 'my';
 
 // Specific user data
 $cgp_user = array();

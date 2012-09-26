@@ -30,7 +30,7 @@ applicable to the OBM software.
 ******************************************************************************/
 
 
-
+require_once 'obminclude/of/of_category.inc';
 require_once 'obminclude/of/of_search.php';
 
 class OBM_Contact implements OBM_ISearchable {
