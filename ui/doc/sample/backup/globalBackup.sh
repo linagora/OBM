@@ -1,5 +1,8 @@
 #!/bin/bash -x         
 
+# This file implements all needed stuff to accomplish
+# OBMFULL-3950 specification.
+
 set -e
 shopt -s extglob
 
