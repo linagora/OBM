@@ -553,7 +553,7 @@ sub _restoreBackupBackupFile {
     my $self = shift;
     my( $entity ) = @_;
 
-    my $backupFullPath = $self->getBackupPath().'/'.$self->getBackupName();
+    my $backupFullPath = $entity->getBackupPath().'/'.$entity->getBackupName();
     my $backupFullPathBackup = $backupFullPath.'.backup';
 
     if( -e $backupFullPathBackup ) {
