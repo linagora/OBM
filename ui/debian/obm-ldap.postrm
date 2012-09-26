@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#set -x
-
 . /usr/share/debconf/confmodule
 
 case "$1" in

@@ -6,7 +6,7 @@
 ###############################################################################
 
 
-#set -x
+
 set -e
 
 OBM_PATH_UPDATE="/usr/share/obm-storage/update-install/scripts/2.2"

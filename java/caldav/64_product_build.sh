@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 set -e
 # Author: Thomas Cataldo <thomas.cataldo@aliasource.fr>
 #

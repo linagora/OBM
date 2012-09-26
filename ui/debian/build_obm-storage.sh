@@ -2,7 +2,7 @@
 #sylvain.garcia@obm.org
 #build_hook for obm-storage - manage upgrade scripts
 set -e
-set -x
+
 CURDIR=$1
 BUILD_DEB_DIR="${CURDIR}/debian"
 BUILD_DEB_DIR_STORAGE="${BUILD_DEB_DIR}/obm-storage"

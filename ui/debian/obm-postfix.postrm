@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#set -x
-
 case "$1" in
 	purge|remove|failed-upgrade|abort-install|abort-upgrade|disappear)
 
