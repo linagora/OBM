@@ -33,6 +33,7 @@ package org.obm.opush.env;
 
 import static org.easymock.EasyMock.expect;
 
+import org.obm.push.ContinuationService;
 import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
@@ -76,5 +77,6 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 		TaskBackend taskBackend = getMock(TaskBackend.class);
 		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS);
 		bindWithMock(ContinuationTransactionMap.class);
+		bindWithMock(ContinuationService.class);
 	}
 }

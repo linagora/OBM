@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
-import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.ContinuationService;
 import org.obm.push.backend.CollectionChangeListener;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IBackend;
@@ -64,7 +64,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
@@ -126,7 +125,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final ItemTrackingDao itemTrackingDao;
 	private final CollectionPathHelper collectionPathHelper;
 	private final ResponseWindowingService responseWindowingProcessor;
-	private final ContinuationTransactionMap continuationTransactionMap;
+	private final ContinuationService continuationService;
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
@@ -135,7 +134,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
 			ResponseWindowingService responseWindowingProcessor,
-			ContinuationTransactionMap continuationTransactionMap) {
+			ContinuationService continuationService) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -146,7 +145,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.itemTrackingDao = itemTrackingDao;
 		this.collectionPathHelper = collectionPathHelper;
 		this.responseWindowingProcessor = responseWindowingProcessor;
-		this.continuationTransactionMap = continuationTransactionMap;
+		this.continuationService = continuationService;
 	}
 
 	@Override
@@ -154,7 +153,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		try {
 			SyncRequest syncRequest = syncProtocol.getRequest(doc, udr);
 			
-			cancelPreviousContinuation(udr.getDevice());
+			continuationService.cancel(udr.getDevice(), SyncStatus.NEED_RETRY.asSpecificationValue());
 			
 			ModificationStatus modificationStatus = processCollections(udr, syncRequest.getSync());
 			if (syncRequest.getSync().getWaitInSecond() > 0) {
@@ -165,42 +164,33 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			}
 		} catch (InvalidServerId e) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);
 		} catch (ProtocolException convExpt) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR, convExpt);
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, convExpt);
 		} catch (PartialException pe) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST, pe);
+			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, pe);
 		} catch (CollectionNotFoundException ce) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND, continuation, ce);
+			sendError(udr.getDevice(), responder, SyncStatus.OBJECT_NOT_FOUND, continuation, ce);
 		} catch (ContinuationThrowable e) {
 			throw e;
 		} catch (NoDocumentException e) {
-			sendError(responder, SyncStatus.PARTIAL_REQUEST, e);
+			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, e);
 		} catch (WaitIntervalOutOfRangeException e) {
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (DaoException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionPathException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ConversionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnsupportedBackendFunctionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
-		}
-	}
-
-	private void cancelPreviousContinuation(Device device) {
-		try {
-			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
-			continuation.resume();
-		}
-		catch (ElementNotFoundException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -234,9 +224,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
-		continuationTransactionMap.putContinuationForDevice(udr.getDevice(), continuation);
 		
-		continuation.suspend(udr, sync.getWaitInSecond());
+		continuationService.suspend(udr, continuation, sync.getWaitInSecond());
 	}
 
 	private Date doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
@@ -270,8 +259,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
-		setContinuationAsNeedRetryIfAny(udr);
-		
 		for (SyncCollection collection : sync.getCollections()) {
 
 			// get our sync state for this collection
@@ -287,16 +274,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 		}
 		return modificationStatus;
-	}
-
-	private void setContinuationAsNeedRetryIfAny(UserDataRequest udr) {
-		// Disables last push request
-		try {
-			IContinuation cont= continuationTransactionMap.getContinuationForDevice(udr.getDevice());
-			cont.error(SyncStatus.NEED_RETRY.asSpecificationValue());
-		}
-		catch (ElementNotFoundException e) {
-		}
 	}
 	
 	/**
@@ -372,19 +349,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 		} catch (DaoException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
-			sendError(responder, SyncStatus.OBJECT_NOT_FOUND, continuation, e);
+			sendError(udr.getDevice(), responder, SyncStatus.OBJECT_NOT_FOUND, continuation, e);
 		} catch (UnexpectedObmSyncServerException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (ProcessingEmailException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (InvalidServerId e) {
-			sendError(responder, SyncStatus.PROTOCOL_ERROR, e);			
+			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);			
 		} catch (ConversionException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (IOException e) {
-			sendError(responder, SyncStatus.SERVER_ERROR, e);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		}
 	}
 
@@ -462,13 +439,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 	
-	private void sendError(Responder responder, SyncStatus errorStatus, Exception exception) {
-		sendError(responder, errorStatus, null, exception);
+	private void sendError(Device device, Responder responder, SyncStatus errorStatus, Exception exception) {
+		sendError(device, responder, errorStatus, null, exception);
 	}
 	
-	private void sendError(Responder responder, SyncStatus errorStatus, IContinuation continuation, Exception exception) {
+	private void sendError(Device device, Responder responder, SyncStatus errorStatus, IContinuation continuation, Exception exception) {
 		logError(errorStatus, exception);
-		sendError(responder, errorStatus.asSpecificationValue(), continuation);
+		sendError(device, responder, errorStatus.asSpecificationValue(), continuation);
 	}
 
 	private void logError(SyncStatus errorStatus, Exception exception) {
@@ -480,7 +457,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	@Override
-	public void sendError(Responder responder, String errorStatus, IContinuation continuation) {
+	public void sendError(Device device, Responder responder, String errorStatus, IContinuation continuation) {
 		try {
 			if (continuation != null) {
 				logger.info("Resp for requestId = {}", continuation.getReqId());

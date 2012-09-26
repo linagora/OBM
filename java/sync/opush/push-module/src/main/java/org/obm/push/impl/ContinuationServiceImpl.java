@@ -33,46 +33,65 @@ package org.obm.push.impl;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.ContinuationService;
 import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ElementNotFoundException;
-import org.obm.push.store.ehcache.AbstractEhcacheDao;
-import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
-public class ContinuationTransactionMapImpl extends AbstractEhcacheDao implements ContinuationTransactionMap {
+public class ContinuationServiceImpl implements ContinuationService {
 
-	@Inject  
-	@VisibleForTesting ContinuationTransactionMapImpl(ObjectStoreManager objectStoreManager) {
-		super(objectStoreManager);
-	}
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Override
-	protected String getStoreName() {
-		return ObjectStoreManager.PENDING_CONTINUATIONS;
-	}
+	private final ContinuationTransactionMap continuationTransactionMap;
 	
+	@Inject
+	@VisibleForTesting ContinuationServiceImpl(ContinuationTransactionMap continuationTransactionMap) {
+		this.continuationTransactionMap = continuationTransactionMap;
+	}
+
 	@Override
-	public IContinuation getContinuationForDevice(Device device) throws ElementNotFoundException {
-		Element element = store.get(device);
-		if (element == null) {
-			throw new ElementNotFoundException();
+	public void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout) {
+		logger.debug("suspend {} {}", userDataRequest.getDevice(), secondsTimeout);
+		
+		Element previousElement = continuationTransactionMap.putContinuationForDevice(userDataRequest.getDevice(), continuation);
+		if (null != previousElement) {
+			logger.error("Continuation was already cached for device {}", userDataRequest.getDevice());
 		}
-		return (IContinuation) element.getObjectValue();
+		continuation.suspend(userDataRequest, secondsTimeout);
 	}
-	
+
 	@Override
-	public Element putContinuationForDevice(Device device, IContinuation continuation) {
-		Element previousElement = store.get(device);
-		store.put(new Element(device, continuation));
-		return previousElement;
+	public void resume(Device device) {
+		try {
+			logger.debug("resume {}", device);
+			
+			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
+			continuationTransactionMap.delete(device);
+			continuation.resume();
+		} catch (ElementNotFoundException e) {
+			logger.debug("resume device {} not found", device);
+		}
+		
 	}
-	
+
 	@Override
-	public void delete(Device device) {
-		store.remove(device);
+	public void cancel(Device device, String error) {
+		try {
+			logger.debug("cancel {} {}", device, error);
+			
+			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
+			continuationTransactionMap.delete(device);
+			continuation.error(error);
+			continuation.resume();
+		} catch (ElementNotFoundException e) {
+			logger.debug("cancel device {} not found", device);
+		}
 	}
 }

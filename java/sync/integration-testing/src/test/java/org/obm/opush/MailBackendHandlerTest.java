@@ -37,7 +37,7 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.expectContinuationTransaction;
+import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -60,7 +60,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.IContentsExporter;
@@ -152,7 +152,7 @@ public class MailBackendHandlerTest {
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockDao(serverId, syncState);
-		expectContinuationTransaction(classToInstanceMap.get(ContinuationTransactionMap.class), singleUserFixture.jaures.device);
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		
 		bindCollectionIdToPath(serverId);
 		bindChangedToDelta(delta);

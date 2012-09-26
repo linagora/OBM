@@ -185,7 +185,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
 		Responder responder = responderFactory.createResponder(response);
 		if (c.isError()) {
-			ph.sendError(responder, c.getErrorStatus(), c);
+			ph.sendError(udr.getDevice(), responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
 			ph.sendResponseWithoutHierarchyChanges(udr, responder, c);
 		}

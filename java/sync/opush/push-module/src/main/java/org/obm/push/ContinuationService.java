@@ -29,19 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push;
 
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.impl.Responder;
 
-public interface IContinuationHandler {
-	void sendResponse(UserDataRequest udr, Responder responder,
-			boolean sendHierarchyChanges, IContinuation continuation);
+public interface ContinuationService {
 	
-	void sendResponseWithoutHierarchyChanges(UserDataRequest udr, Responder responder,
-			IContinuation continuation);
+	void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout);
 	
-	void sendError(Device device, Responder responder, String errorStatus, IContinuation continuation);
+	void resume(Device device);
+	
+	void cancel(Device device, String error);
 }
