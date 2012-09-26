@@ -255,14 +255,14 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private DataDelta buildDataDelta(UserDataRequest udr, Integer collectionId,
+	@VisibleForTesting DataDelta buildDataDelta(UserDataRequest udr, Integer collectionId,
 			AccessToken token, EventChanges changes) throws ServerFault,
 			DaoException, ConversionException {
 		final String userEmail = calendarClient.getUserEmail(token);
 		Preconditions.checkNotNull(userEmail, "User has no email address");
 		
 		List<ItemChange> additions = addOrUpdateEventFilter(changes.getUpdated(), userEmail, collectionId, udr);
-		List<ItemChange> deletions = removeEventFilter(changes.getUpdated(), changes.getDeletedEvents(), userEmail, collectionId);
+		List<ItemChange> deletions = removeEventFilter(changes.getDeletedEvents(), collectionId);
 		Date syncDate = changes.getLastSync();
 		
 		return new DataDelta(additions, deletions, syncDate);
@@ -282,16 +282,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return items;
 	}
 	
-	private List<ItemChange> removeEventFilter(List<Event> events, List<DeletedEvent> eventsRemoved,
-			String userEmail, Integer collectionId) {
+	private List<ItemChange> removeEventFilter(List<DeletedEvent> eventsRemoved, Integer collectionId) {
 		
 		List<ItemChange> deletions = Lists.newArrayList();
-		for (final Event event : events) {
-			if (!checkIfEventCanBeAdded(event, userEmail)) {
-				deletions.add(getItemChange(collectionId, event.getObmId()));
-			}			
-		}
-		
 		for (final DeletedEvent eventRemove : eventsRemoved) {
 			deletions.add(getItemChange(collectionId, eventRemove.getId()));
 		}

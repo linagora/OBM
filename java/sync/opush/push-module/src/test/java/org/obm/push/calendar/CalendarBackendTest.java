@@ -41,6 +41,7 @@ import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -83,11 +84,13 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
@@ -724,4 +727,37 @@ public class CalendarBackendTest {
 		}
 		
 	}
+	
+	@Test
+	public void buildDeltaDataMustNotTransformDeclinedEventIntoRemoved() throws ServerFault, DaoException, ConversionException {
+		int collectionId = 1;
+		EventObmId eventObmId = new EventObmId(132453);
+		EventExtId eventExtId = new EventExtId("event-ext-id-bla-bla");
+		Attendee attendee = new Attendee();
+		attendee.setEmail(user.getLoginAtDomain());
+		attendee.setState(ParticipationState.DECLINED);
+		Event event = new Event();
+		event.setExtId(eventExtId);
+		event.setUid(eventObmId);
+		event.addAttendee(attendee);
+		DeletedEvent deletedEvent = createDeletedEvent(eventObmId, eventExtId);
+		EventChanges eventChanges = EventChanges.builder()
+			.deletes(Arrays.asList(deletedEvent))
+			.updates(Arrays.asList(event))
+			.lastSync(org.obm.DateUtils.date("2012-10-10"))
+			.build();
+		ItemChange expectedItemChange = new ItemChange("123456");
+		
+		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
+		expect(mappingService.getItemChange(collectionId, eventObmId.serializeToString())).andReturn(expectedItemChange).atLeastOnce();
+		
+		
+		replay(calendarClient, mappingService);
+		
+		DataDelta dataDelta = calendarBackend.buildDataDelta(userDataRequest, collectionId, token, eventChanges);
+		
+		verify(calendarClient, mappingService);
+		assertThat(dataDelta.getDeletions()).hasSize(1).containsOnly(expectedItemChange);
+	}
+
 }
