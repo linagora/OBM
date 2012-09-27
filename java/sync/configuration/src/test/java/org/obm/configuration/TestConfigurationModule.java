@@ -31,7 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
+import static org.easymock.EasyMock.createNiceMock;
+
+import org.obm.configuration.module.LoggerModule;
+import org.slf4j.Logger;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 
 public class TestConfigurationModule extends AbstractModule {
@@ -39,6 +45,8 @@ public class TestConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		Logger logger = createNiceMock(Logger.class);
+		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(logger);
 	}
 
 }

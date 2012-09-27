@@ -35,12 +35,16 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
+import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
 
@@ -48,6 +52,7 @@ import bitronix.tm.TransactionManagerServices;
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
+	private Logger logger;
 
 	public ObjectStoreManagerTest() {
 		super();
@@ -55,7 +60,8 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	
 	@Before
 	public void init() {
-		this.opushCacheManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
+		logger = EasyMock.createNiceMock(Logger.class);
+		this.opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
 	}
 
 	@After

@@ -34,6 +34,7 @@ package org.obm.sync.server.mailer;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
@@ -79,6 +80,7 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
+import org.slf4j.Logger;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -102,6 +104,8 @@ public class EventChangeMailerTest {
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
 
+	private Logger logger;
+
 	@Before
 	public void setup() {
 		accessToken = new AccessToken(1, "unitTest");
@@ -124,8 +128,8 @@ public class EventChangeMailerTest {
 		replay(constantService);
 		
 		mailService = createMock(MailService.class);
-		
-		eventChangeMailer = new EventChangeMailer(mailService, constantService, templateLoader);
+		logger = createNiceMock(Logger.class);
+		eventChangeMailer = new EventChangeMailer(mailService, constantService, templateLoader, logger);
 	}
 	
 	private static Attendee createAttendee(String name, String email) {
@@ -863,7 +867,7 @@ public class EventChangeMailerTest {
 
 		EasyMock.replay(constantService);
 
-		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null);
+		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
 
 		eventChangeMailer.buildUpdateParticipationStateDatamodel(event, obmUser, status, Locale.FRENCH);
 	}
