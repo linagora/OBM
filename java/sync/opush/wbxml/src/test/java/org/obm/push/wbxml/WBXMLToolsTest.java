@@ -136,13 +136,65 @@ public class WBXMLToolsTest {
 									"<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>" +
 								"</ApplicationData>" +
 							"</Fetch>" +
-						"</Responses>" +
+						"</Responses>" + 
 					"</Collection>" +
 				"</Collections>" +
 			"</Sync>";
-
 		InputStream dataInputStream = new ByteArrayInputStream(dataWithInvalidXML10Chars.getBytes(usedCharset));
-
+		
+		Document doc = DOMUtils.parse(xml);
+		Element docBody = DOMUtils.getUniqueElement(doc.getDocumentElement(), "AirSyncBase:Body");
+		DOMUtils.createElementAndCDataText(docBody, "AirSyncBase:Data", dataInputStream, usedCharset);
+		wbxmlTools.toWbxml("AirSync", doc);
+	}
+	
+	@Test
+	public void testIllegalCharInCDATASection() throws Exception {
+		Charset usedCharset = Charsets.UTF_8;
+		String invalidCDATAChars = "illegal cdata "+ (char) 0x92 +" char";
+		String xml =
+			"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+				"<Sync " +
+				"xmlns:Email=\"Email\" " +
+				"xmlns:AirSyncBase=\"AirSyncBase\" " +
+				"attributeFormDefault=\"unqualified\" " +
+				"elementFormDefault=\"qualified\" " +
+				"targetNamespace=\"Email:\" " +
+				">" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>5b22b86c-6195-48af-b2a9-1ba9af2b6141</SyncKey>" +
+							"<CollectionId>1528</CollectionId>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>1544:6514</ServerId>" +
+									"<ApplicationData>" +
+										"<Email:To>\"'Some body'\" &lt;some.body@thilaire.lng.org&gt;</Email:To>" +
+										"<Email:From>\"Any body\" &lt;any.body@thilaire.lng.org&gt; </Email:From>" +
+										"<Email:Subject>RE: my subject</Email:Subject>" +
+										"<Email:DateReceived>2012-07-23T06:41:18.000Z</Email:DateReceived>" +
+										"<Email:DisplayTo>\"'Some body'\" &lt;some.body@thilaire.lng.org&gt;</Email:DisplayTo>" +
+										"<Email:Importance>1</Email:Importance>" +
+										"<Email:Read>1</Email:Read>" +
+										"<AirSyncBase:Body>" +
+//											"<AirSyncBase:Data>replaced below data</AirSyncBase:Data>" 
+											"<AirSyncBase:Type>2</AirSyncBase:Type>" +
+											"<AirSyncBase:Truncated>1</AirSyncBase:Truncated>" +
+											"<AirSyncBase:EstimatedDataSize>3485</AirSyncBase:EstimatedDataSize>" +
+										"</AirSyncBase:Body>" +
+										"<Email:MessageClass>IPM.Note</Email:MessageClass>" +
+										"<Email:ContentClass>urn:content-classes:message</Email:ContentClass>" +
+										"<Email:InternetCPID>65001</Email:InternetCPID>" +
+										"<AirSyncBase:NativeBodyType>2</AirSyncBase:NativeBodyType>" +
+									"</ApplicationData>" +
+								"</Add>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>";
+		
+		InputStream dataInputStream = new ByteArrayInputStream(invalidCDATAChars.getBytes(usedCharset));
+		
 		Document doc = DOMUtils.parse(xml);
 		Element docBody = DOMUtils.getUniqueElement(doc.getDocumentElement(), "AirSyncBase:Body");
 		DOMUtils.createElementAndCDataText(docBody, "AirSyncBase:Data", dataInputStream, usedCharset);

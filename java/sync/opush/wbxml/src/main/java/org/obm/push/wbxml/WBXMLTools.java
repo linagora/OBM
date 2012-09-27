@@ -58,7 +58,7 @@ public class WBXMLTools {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public static final XMLVersion XML_SERIALIZING_VERSION = XMLVersion.XML_11;
+	public static final XMLVersion XML_SERIALIZING_VERSION = XMLVersion.XML_10;
 
 	@Inject
 	public WBXMLTools() {

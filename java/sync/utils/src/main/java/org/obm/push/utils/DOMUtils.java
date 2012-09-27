@@ -59,6 +59,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.html.dom.HTMLDocumentImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.cyberneko.html.parsers.DOMParser;
+import org.obm.push.utils.xml.XmlCharacterFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
@@ -261,47 +262,16 @@ public final class DOMUtils {
 		return null;
 	}
 
-	/**
-	 * This method ensures that the output String has only valid XML unicode
-	 * characters as specified by the XML 1.0 standard. For reference, please
-	 * see <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
-	 * standard</a>. This method will return an empty String if the input is
-	 * null or empty.
-	 * 
-	 * @param in
-	 *            The String whose non-valid characters we want to remove.
-	 * @return The in String, stripped of non-valid characters.
-	 */
-	public static final String stripNonValidXMLCharacters(String in) {
-		char[] current = in.toCharArray();
-		StringBuilder out = new StringBuilder(current.length);
-
-		for (int i = 0; i < current.length; i++) {
-			char c = current[i];
-			if (validXmlChar(c)) {
-				out.append(c);
-			}
-		}
-		return out.toString();
-	}
-
-	// Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] |
-	// [#x10000-#x10FFFF]
-	private static final boolean validXmlChar(int c) {
-		return c == 0x9 || c == 0xA || c == 0xD || (c >= 0x20 && c <= 0xD7FF)
-				|| (c >= 0xE000 && c <= 0xFFFD)
-				|| (c >= 0x10000 && c <= 0x10FFFF);
-	}
-
 	public static Element createElementAndText(Element parent,
 			String elementName, String text) {
 		if (text == null) {
 			throw new NullPointerException("null text");
 		}
+		
+		String validXml = XmlCharacterFilter.filter(text);
 		Element el = parent.getOwnerDocument().createElement(elementName);
 		parent.appendChild(el);
-		Text txt = el.getOwnerDocument().createTextNode(
-				stripNonValidXMLCharacters(text));
+		Text txt = el.getOwnerDocument().createTextNode(validXml);
 		el.appendChild(txt);
 		return el;
 	}
@@ -451,9 +421,11 @@ public final class DOMUtils {
 	
 	public static Element createElementAndCDataSection(Element parent, String elementName, String text) {
 		Preconditions.checkNotNull(text, "Text is required");
+		
+		String validXml = XmlCharacterFilter.filter(text);
 		Element el = parent.getOwnerDocument().createElement(elementName);
 		parent.appendChild(el);
-		el.appendChild(el.getOwnerDocument().createCDATASection(text));
+		el.appendChild(el.getOwnerDocument().createCDATASection(validXml));
 		return el;
 	}
 	

@@ -37,7 +37,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.xml.XmlCharacterFilter;
 
 public class HeadersParser {
 
@@ -88,7 +88,7 @@ public class HeadersParser {
 
 	private void saveCurrentAsParsed() {
 		if (currentKey != null) {
-			parsedHeaders.put(currentKey, DOMUtils.stripNonValidXMLCharacters(currentValue.toString()));			
+			parsedHeaders.put(currentKey, XmlCharacterFilter.filter(currentValue.toString()));			
 		}
 	}
 
