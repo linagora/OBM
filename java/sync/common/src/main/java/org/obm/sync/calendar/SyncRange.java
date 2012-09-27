@@ -33,6 +33,8 @@ package org.obm.sync.calendar;
 
 import java.util.Date;
 
+import com.google.common.base.Objects;
+
 public class SyncRange {
 	
 	private Date before;
@@ -52,4 +54,17 @@ public class SyncRange {
 		return after;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof SyncRange)) {
+			return false;
+		}
+		SyncRange otherRange = (SyncRange) o;
+		return Objects.equal(before, otherRange.before) && Objects.equal(after, otherRange.after);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(before, after);
+	}
 }
