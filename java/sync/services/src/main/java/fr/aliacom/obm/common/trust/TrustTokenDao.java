@@ -68,7 +68,7 @@ public class TrustTokenDao {
 			}
 		}
 		finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 
 		return null;

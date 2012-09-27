@@ -95,7 +95,7 @@ public class MailingListHome {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -125,7 +125,7 @@ public class MailingListHome {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -152,7 +152,7 @@ public class MailingListHome {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return new ArrayList<MailingList>(0);
 	}
@@ -164,7 +164,7 @@ public class MailingListHome {
 			con = obmHelper.getConnection();
 			ret = createMailingList(con, at, mailingList);
 		} finally {
-			obmHelper.cleanup(con, null, null);
+			ObmHelper.cleanup(con, null, null);
 		}
 		return ret;
 	}
@@ -192,7 +192,7 @@ public class MailingListHome {
 			ml.getEmails().clear();
 			ml.addEmails(mles);
 		} finally {
-			obmHelper.cleanup(con, ps, null);
+			ObmHelper.cleanup(con, ps, null);
 		}
 		return ml;
 	}
@@ -207,7 +207,7 @@ public class MailingListHome {
 			ps.setInt(2, at.getObmId());
 			ps.executeUpdate();
 		} finally {
-			obmHelper.cleanup(con, ps, null);
+			ObmHelper.cleanup(con, ps, null);
 		}
 	}
 
@@ -230,7 +230,7 @@ public class MailingListHome {
 			mlId = obmHelper.lastInsertId(con);
 			ml.setId(mlId);
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 		List<MLEmail> mles = createOrUpdateEmails(con, at, mlId,
 				ml.getEmails(), true);
@@ -265,7 +265,7 @@ public class MailingListHome {
 			
 			return getMailingListFromIds(con, at, mlId, ids);
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -308,7 +308,7 @@ public class MailingListHome {
 			con = obmHelper.getConnection();
 			return createOrUpdateEmails(con, at, mailingListId, emails, false);
 		} finally {
-			obmHelper.cleanup(con, null, null);
+			ObmHelper.cleanup(con, null, null);
 		}
 	}
 
@@ -329,7 +329,7 @@ public class MailingListHome {
 			ps.setInt(idx++, at.getObmId());
 			ps.executeUpdate();
 		} finally {
-			obmHelper.cleanup(con, ps, null);
+			ObmHelper.cleanup(con, ps, null);
 		}
 	}
 

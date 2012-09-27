@@ -238,7 +238,7 @@ public class ContactDao {
 			upd.setContacts(contacts);
 			
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return upd;
 	}
@@ -274,7 +274,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -309,7 +309,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -398,7 +398,7 @@ public class ContactDao {
 			con = obmHelper.getConnection();
 			c = createContactInAddressBook(con, at, c, addressbookId);
 		} finally {
-			obmHelper.cleanup(con, null, null);
+			ObmHelper.cleanup(con, null, null);
 		}
 		return c;
 	}
@@ -513,7 +513,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 		return null;
 	}
@@ -543,7 +543,7 @@ public class ContactDao {
 			}
 			ps.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -568,7 +568,7 @@ public class ContactDao {
 				}
 			}
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 
 	}
@@ -584,7 +584,7 @@ public class ContactDao {
 				ps.executeUpdate();
 			}
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -619,7 +619,7 @@ public class ContactDao {
 			}
 			ps.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 
 	}
@@ -649,7 +649,7 @@ public class ContactDao {
 			}
 			ps.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -677,7 +677,7 @@ public class ContactDao {
 			}
 			ps.executeBatch();
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 
 	}
@@ -700,7 +700,7 @@ public class ContactDao {
 
 			return rs.getInt(1);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -756,7 +756,7 @@ public class ContactDao {
 			return contactId;
 
 		} finally {
-			obmHelper.cleanup(null, ps, null);
+			ObmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -824,7 +824,7 @@ public class ContactDao {
 			createOrUpdateWebsites(con, c);
 			createOrUpdateIMIdentifiers(con, c.getEntityId(), c.getImIdentifiers());
 		} finally {
-			obmHelper.cleanup(con, ps, null);
+			ObmHelper.cleanup(con, ps, null);
 		}
 
 		indexContact(token, c);
@@ -872,7 +872,7 @@ public class ContactDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -920,7 +920,7 @@ public class ContactDao {
 			return ret;
 		
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 
@@ -953,7 +953,7 @@ public class ContactDao {
 			}
 			return contactId;
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 
@@ -978,7 +978,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, st, rs);
+			ObmHelper.cleanup(null, st, rs);
 		}
 	}
 
@@ -1005,7 +1005,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, st, rs);
+			ObmHelper.cleanup(null, st, rs);
 		}
 	}
 
@@ -1031,7 +1031,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, st, rs);
+			ObmHelper.cleanup(null, st, rs);
 		}
 	}
 
@@ -1055,7 +1055,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, st, rs);
+			ObmHelper.cleanup(null, st, rs);
 		}
 	}
 	
@@ -1077,7 +1077,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, st, rs);
+			ObmHelper.cleanup(null, st, rs);
 		}
 	}
 
@@ -1092,7 +1092,7 @@ public class ContactDao {
 			ps.setInt(2, c.getUid());
 			ps.executeUpdate();
 		} finally {
-			obmHelper.cleanup(con, ps, null);
+			ObmHelper.cleanup(con, ps, null);
 		}
 
 		removeContactFromSolr(at, c);
@@ -1139,7 +1139,7 @@ public class ContactDao {
 				l.add(rs.getInt(1));
 			}
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return l;
 	}
@@ -1181,7 +1181,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 		return result;
 	}
@@ -1217,7 +1217,7 @@ public class ContactDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 		cache.put(isoCode, result);
 		return result;
@@ -1348,7 +1348,7 @@ public class ContactDao {
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 
 		logger.info("[" + at.getUserLogin() + "] searchSimilar for '"
@@ -1403,7 +1403,7 @@ public class ContactDao {
 			}
 			return ret;
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 
@@ -1505,7 +1505,7 @@ public class ContactDao {
 			}
 
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			ObmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -1518,7 +1518,7 @@ public class ContactDao {
 			con = obmHelper.getConnection();
 			return searchContact(at, addrBooks, con, query, limit, offset);
 		} finally {
-			obmHelper.cleanup(con, null, null);
+			ObmHelper.cleanup(con, null, null);
 		}
 	}
 
@@ -1534,7 +1534,7 @@ public class ContactDao {
 		} catch (Throwable e1) {
 			logger.error(e1.getMessage(), e1);
 		} finally {
-			obmHelper.cleanup(con, null, null);
+			ObmHelper.cleanup(con, null, null);
 		}
 		return new ArrayList<Contact>();
 	}
@@ -1569,7 +1569,7 @@ public class ContactDao {
 			}
 
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 
 		logger.info("returning " + folders.size() + " folder(s) updated");
@@ -1609,7 +1609,7 @@ public class ContactDao {
 			}
 		
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return folders;
 	}
@@ -1640,7 +1640,7 @@ public class ContactDao {
 			}
 		
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return folders;
 	}
@@ -1667,7 +1667,7 @@ public class ContactDao {
 			st.setInt(2, databaseId);
 			st.execute();
 		} finally {
-			obmHelper.cleanup(con, st, null);
+			ObmHelper.cleanup(con, st, null);
 		}
 		return databaseId;
 	}
@@ -1690,7 +1690,7 @@ public class ContactDao {
 			st.setInt(2, at.getObmId());
 			return st.executeUpdate() > 0;
 		} finally {
-			obmHelper.cleanup(con, st, null);
+			ObmHelper.cleanup(con, st, null);
 		}
 	}
 
@@ -1704,7 +1704,7 @@ public class ContactDao {
 			st.setInt(2, at.getObmId());
 			return st.executeUpdate() > 0;
 		} finally {
-			obmHelper.cleanup(con, st, null);
+			ObmHelper.cleanup(con, st, null);
 		}
 	}
 
@@ -1743,7 +1743,7 @@ public class ContactDao {
 			return listAddressBooks;
 			
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 	
@@ -1766,7 +1766,7 @@ public class ContactDao {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 

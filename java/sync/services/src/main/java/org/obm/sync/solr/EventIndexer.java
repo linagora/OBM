@@ -180,7 +180,7 @@ public class EventIndexer implements Runnable {
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			obmHelper.cleanup(con, st, rs);
+			ObmHelper.cleanup(con, st, rs);
 		}
 		return true;
 	}

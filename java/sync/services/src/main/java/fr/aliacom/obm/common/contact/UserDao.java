@@ -133,7 +133,7 @@ public class UserDao {
 			cu.setContacts(contacts);
 			
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return cu;
 	}
@@ -241,7 +241,7 @@ public class UserDao {
 			}
 
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -273,7 +273,7 @@ public class UserDao {
 			logger.error("Could not find user domain", e);
 		} finally {
 			try {
-				obmHelper.cleanup(con, ps, rs);
+				ObmHelper.cleanup(con, ps, rs);
 			} catch (Exception e) {
 				logger.error("Could not clean up jdbc stuff");
 			}
@@ -308,7 +308,7 @@ public class UserDao {
 			throw new ContactNotFoundException("Contact user obm not found.", userId);
 		
 		} finally {
-			obmHelper.cleanup(con, ps, rs);
+			ObmHelper.cleanup(con, ps, rs);
 		}
 	}
 
