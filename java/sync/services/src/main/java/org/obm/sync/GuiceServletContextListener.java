@@ -46,6 +46,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.locator.store.LocatorService;
@@ -53,6 +54,8 @@ import org.obm.locator.store.LocatorCache;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.sync.services.ICalendar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -136,6 +139,7 @@ public class GuiceServletContextListener implements ServletContextListener {
                 }
                 
         		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+        		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             }
         }, new MessageQueueModule(), new TransactionalModule());
     }

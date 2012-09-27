@@ -51,10 +51,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.EhcacheRollbackException;
 
@@ -64,9 +65,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class EhcacheTransactionalModeTest {

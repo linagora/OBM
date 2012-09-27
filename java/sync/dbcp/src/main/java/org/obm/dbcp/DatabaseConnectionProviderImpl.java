@@ -43,6 +43,7 @@ import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseSystem;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 import org.obm.dbcp.jdbc.MySqlJDBCDriver;
 import org.obm.dbcp.jdbc.PgSqlJDBCDriver;
@@ -53,12 +54,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private final ITransactionAttributeBinder transactionAttributeBinder;
 
 	private DBConnectionPool ds;
@@ -76,7 +78,8 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	@Inject
 	public DatabaseConnectionProviderImpl(
 			ITransactionAttributeBinder transactionAttributeBinder,
-			ConfigurationService configuration) {
+			ConfigurationService configuration,
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
 		login = configuration.getDatabaseLogin();
 		password = configuration.getDatabasePassword();
@@ -84,9 +87,10 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		name = configuration.getDataBaseName();
 		system = configuration.getDataBaseSystem();
 		maxPoolSize = configuration.getDataBaseMaxConnectionPoolSize();
-		logger.info("Database system is " + system);
-		logger.info("Database used is " + name + " on " + host);
-		logger.info("Database connection pool size : " + maxPoolSize);
+		configurationLogger.info("Database system : {}", system);
+		configurationLogger.info("Database name {} on host {}", name, host);
+		configurationLogger.info("Database connection pool size : {}", maxPoolSize);
+		configurationLogger.info("Databse login : {}", login);
 		logger.info("Starting OBM connection pool...");
 		createDataSource();
 	}
