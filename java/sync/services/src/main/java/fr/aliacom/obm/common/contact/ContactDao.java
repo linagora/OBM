@@ -136,23 +136,17 @@ public class ContactDao {
 		this.obmHelper = obmHelper;
 	}
 
-	private String getSelectForFindUpdatedContacts(AccessToken at) {
+	private String getSelectForFindUpdatedContacts() {
 		String sql = "SELECT "
 				+ CONTACT_SELECT_FIELDS
 				+ ", contact_archive, now() as last_sync FROM Contact"
-				+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id="
-				+ at.getObmId()
-				+ ") "
+				+ " INNER JOIN SyncedAddressbook s ON (contact_addressbook_id=s.addressbook_id AND s.user_id=?) "
 				+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id "
+				+ "INNER JOIN UserEntity ON userentity_user_id=? "
 				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=s.addressbook_id "
 				+ "INNER JOIN AddressBook ON id=s.addressbook_id "
-				+ "LEFT JOIN EntityRight urights ON "
-				+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-				+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-				+ "AND grights.entityright_consumer_id IN ("
-				+ MY_GROUPS_QUERY
-				+ ") "
+				+ "LEFT JOIN EntityRight urights ON urights.entityright_entity_id=addressbookentity_entity_id AND urights.entityright_consumer_id=userentity_entity_id "
+				+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id AND grights.entityright_consumer_id IN (" + MY_GROUPS_QUERY + ") "
 				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
 				+ "WHERE "
 				+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
@@ -160,8 +154,8 @@ public class ContactDao {
 		return sql;
 	}
 	
-	private String getSelectForFindUpdatedContacts(Integer addressBookId, AccessToken at) {
-		String sql = getSelectForFindUpdatedContacts(at);
+	private String getSelectForFindUpdatedContacts(Integer addressBookId) {
+		String sql = getSelectForFindUpdatedContacts();
 		sql += " AND contact_addressbook_id = " + addressBookId;
 		return sql;
 	}
@@ -183,7 +177,7 @@ public class ContactDao {
 	}
 	
 	public ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) throws SQLException {
-		String sql = getSelectForFindUpdatedContacts(at);
+		String sql = getSelectForFindUpdatedContacts();
 		return findUpdatedContacts(sql, timestamp, at);
 	}
 	
@@ -202,6 +196,7 @@ public class ContactDao {
 			ps = con.prepareStatement(sql);
 
 			int idx = 1;
+			ps.setInt(idx++, at.getObmId());
 			ps.setInt(idx++, at.getObmId());
 			ps.setInt(idx++, at.getObmId());
 			ps.setInt(idx++, at.getObmId());
@@ -1709,7 +1704,7 @@ public class ContactDao {
 	}
 
 	public ContactUpdates findUpdatedContacts(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
-		String sql = getSelectForFindUpdatedContacts(addressBookId, token);
+		String sql = getSelectForFindUpdatedContacts(addressBookId);
 		return findUpdatedContacts(sql, lastSync, token);
 	}
 

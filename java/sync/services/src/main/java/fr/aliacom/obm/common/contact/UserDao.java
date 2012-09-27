@@ -100,13 +100,10 @@ public class UserDao {
 		ContactUpdates cu = new ContactUpdates();
 
 		String q = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name, "
+				+ "userobm_email, userobm_commonname, "
 				+ Joiner.on(", ").join(USEROBM_ALL_JOBS, USEROBM_ALL_PHONES, USEROBM_ALL_ADDRESSES) + " "
-				+ "from UserObm "
-				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
-				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
-				+ "WHERE userobm_archive != 1 and userobm_domain_id="
-				+ at.getDomain().getId() + " and userobm_hidden != 1 ";
+				+ "FROM UserObm "
+				+ "WHERE userobm_archive != 1 and userobm_domain_id=? and userobm_hidden != 1 ";
 		if (timestamp != null) {
 			q += " and (userobm_timecreate >= ? or userobm_timeupdate >= ? )";
 		}
@@ -119,13 +116,16 @@ public class UserDao {
 			List<Contact> contacts = new ArrayList<Contact>();
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
+			
+			ps.setInt(1, at.getDomain().getId());
 			if (timestamp != null) {
-				ps.setTimestamp(1, new Timestamp(timestamp.getTime()));
 				ps.setTimestamp(2, new Timestamp(timestamp.getTime()));
+				ps.setTimestamp(3, new Timestamp(timestamp.getTime()));
 			}
+			
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				contacts.add(loadUser(rs));
+				contacts.add(loadUser(rs, at));
 			}
 			rs.close();
 			rs = null;
@@ -138,7 +138,7 @@ public class UserDao {
 		return cu;
 	}
 
-	private Contact loadUser(ResultSet rs) throws SQLException {
+	private Contact loadUser(ResultSet rs, AccessToken at) throws SQLException {
 		Contact c = new Contact();
 		c.setFolderId(contactConfiguration.getAddressBookUserId());
 		
@@ -153,7 +153,7 @@ public class UserDao {
 		c.setComment(rs.getString("userobm_description"));
 			
 		c.addEmail(ContactLabel.EMAIL.getContactLabel(), new Email(
-				getEmail(rs.getString("userobm_email"), rs.getString("domain_name"))));
+				getEmail(rs.getString("userobm_email"), at.getDomain().getName())));
 		
 		addPhonesToContact(rs, c);
 		addAddressToContact(rs, c);
@@ -283,14 +283,10 @@ public class UserDao {
 
 	public Contact findUserObmContact(AccessToken token, Integer userId) throws SQLException, ContactNotFoundException {
 		
-		String sql = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, "
-				+ "userobm_email, userobm_commonname, userentity_entity_id, domain_name, "
+		String sql = "SELECT userobm_id, userobm_login, userobm_firstname, userobm_lastname, userobm_email, userobm_commonname, "
 				+ Joiner.on(", ").join(USEROBM_ALL_JOBS, USEROBM_ALL_PHONES, USEROBM_ALL_ADDRESSES) + " "
-				+ "from UserObm "
-				+ "INNER JOIN UserEntity on userobm_id=userentity_user_id "
-				+ "INNER JOIN Domain on userobm_domain_id=domain_id "
-				+ "WHERE userobm_archive != 1 and userobm_domain_id="
-				+ token.getDomain().getId() + " and userobm_hidden != 1 and userobm_id = ?";
+				+ "FROM UserObm "
+				+ "WHERE userobm_archive != 1 and userobm_domain_id=? and userobm_hidden != 1 and userobm_id = ?";
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -299,11 +295,14 @@ public class UserDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, userId);
+			
+			ps.setInt(1, token.getDomain().getId());
+			ps.setInt(2, userId);
+			
 			rs = ps.executeQuery();
 		
 			if (rs.next()) {
-				return loadUser(rs);
+				return loadUser(rs, token);
 			}
 			throw new ContactNotFoundException("Contact user obm not found.", userId);
 		
