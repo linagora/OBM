@@ -42,12 +42,13 @@ import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.module.LoggerModule;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class ObjectStoreManager {
@@ -59,14 +60,15 @@ public class ObjectStoreManager {
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final CacheManager singletonManager;
 
-	@Inject ObjectStoreManager(ConfigurationService configurationService) {
+	@Inject ObjectStoreManager(ConfigurationService configurationService,
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
 		boolean usePersistentCache = configurationService.usePersistentCache();
+		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
+		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache));
-		logger.info("initializing ehcache with transaction timeout = {} seconds", transactionTimeoutInSeconds);
 	}
 
 	@VisibleForTesting void shutdown() {
