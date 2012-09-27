@@ -52,6 +52,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.locator.store.LocatorCache;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
+import org.obm.sync.services.ICalendar;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -60,6 +61,7 @@ import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 
+import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 import fr.aliacom.obm.common.calendar.EventNotificationService;
@@ -118,6 +120,7 @@ public class GuiceServletContextListener implements ServletContextListener {
                 bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
                 bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
                 bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
+                bind(ICalendar.class).to(CalendarBindingImpl.class);
 
                 ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
                         .load(FreeBusyPluginModule.class);
