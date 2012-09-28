@@ -2108,6 +2108,26 @@ public class CalendarBindingImplTest {
 		verify(mocks);
     }
 
+	@Test(expected=ResourceNotFoundException.class)
+	public void testGetResourceEventsWithMissingResource() throws ServerFault, FindException {
+		String resourceEmail = "resource@domain";
+
+		CalendarDao mockDao = createMock(CalendarDao.class);
+		expect(mockDao.getResource(resourceEmail)).andReturn(null);
+
+		Object[] mocks = { mockDao };
+		replay(mocks);
+
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
+				null, null, null, null);
+		try {
+			calendarService.getResourceEvents(resourceEmail, new Date());
+		}
+		finally {
+			verify(mocks);
+		}
+	}
+
 	private Event createEvent(List<Attendee> expectedAttendees) {
 		Event event = new Event();
 		event.addAttendees(expectedAttendees);
