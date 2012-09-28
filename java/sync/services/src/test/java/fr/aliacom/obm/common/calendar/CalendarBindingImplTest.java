@@ -2082,7 +2082,7 @@ public class CalendarBindingImplTest {
 	}
 
     @Test
-	public void testGetResourceIcs() throws ServerFault, FindException {
+	public void testGetResourceEvents() throws ServerFault, FindException {
 		String resourceEmail = "resource@domain";
 		Event mockEvent1 = createMock(Event.class);
 		Event mockEvent2 = createMock(Event.class);
