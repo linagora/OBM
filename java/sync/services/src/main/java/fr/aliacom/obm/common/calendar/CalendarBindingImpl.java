@@ -749,7 +749,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ResourceInfo resourceInfo = calendarDao.getResource(resourceEmail);
 			if (resourceInfo == null) {
-				throw new ServerFault(String.format("No such resource %s", resourceEmail));
+				throw new ResourceNotFoundException(String.format("No such resource %s", resourceEmail));
 			}
 			Date threeMonthsBefore = new org.joda.time.DateTime(date).minus(Months.THREE).toDate();
 			Date sixMonthsAfter = new org.joda.time.DateTime(date).plus(Months.SIX).toDate();
