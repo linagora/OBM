@@ -41,6 +41,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.RecurrenceDays;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -61,7 +62,7 @@ public class BeansTest {
 	@Test
 	public void test() {
 		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class, Event.class,
-				EventRecurrence.class, EventChanges.class, Contact.class, TrustToken.class, Login.class);
+				EventRecurrence.class, EventChanges.class, Contact.class, TrustToken.class, Login.class, SyncRange.class);
 	}
 	
 }
