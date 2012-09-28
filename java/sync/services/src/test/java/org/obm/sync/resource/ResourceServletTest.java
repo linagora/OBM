@@ -45,13 +45,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.services.ICalendar;
 
 import com.google.inject.Injector;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 
 public class ResourceServletTest {
 
@@ -93,27 +93,27 @@ public class ResourceServletTest {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq(0), EasyMock.anyObject(Date.class)))
+				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
 				.andReturn(collectionEvents);
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding };
 		EasyMock.replay(mocks);
 		resourceServlet.init(servletConfig);
 
-		String ics = resourceServlet.getResourceICS(0);
+		String ics = resourceServlet.getResourceICS("resource@domain");
 		Assertions.assertThat(helper.parseICS(ics, iCalUser)).isNotNull().hasSize(collectionSize);
 		EasyMock.verify(mocks);
 	}
 
 	@Test
-	public void testDoGetIdValid() throws Exception {
+	public void testDoGetEmailValid() throws Exception {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq(1), EasyMock.anyObject(Date.class)))
+				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
 				.andReturn(collectionEvents);
 
-		String uid = "/1";
+		String uid = "/resource@domain";
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);
 
@@ -137,11 +137,11 @@ public class ResourceServletTest {
 	}
 
 	@Test
-	public void testDoGetNoId() throws Exception {
+	public void testDoGetNoEmail() throws Exception {
 		String uid = "";
 		EasyMock.expect(request.getPathInfo()).andReturn(uid);
 
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+		response.setStatus(EasyMock.eq(HttpServletResponse.SC_NOT_FOUND));
 		EasyMock.expectLastCall();
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
@@ -154,35 +154,15 @@ public class ResourceServletTest {
 	}
 
 	@Test
-	public void testDoGetInvalidId() throws Exception {
-		String uid = "/invalidId";
-		EasyMock.expect(request.getPathInfo()).andReturn(uid);
-
-		PrintWriter mockWriter = EasyMock.createMock(PrintWriter.class);
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_BAD_REQUEST));
-		EasyMock.expectLastCall();
-		EasyMock.expect(response.getWriter()).andReturn(mockWriter);
-		mockWriter.write("Invalid format for the resource ID, should be an integer");
-		EasyMock.expectLastCall();
-
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
-				response, mockWriter };
-		EasyMock.replay(mocks);
-
-		resourceServlet.init(servletConfig);
-		resourceServlet.doGet(request, response);
-		EasyMock.verify(mocks);
-	}
-
-	@Test
-	public void testDoGetNoResourceWithId() throws Exception {
-		String uid = "/99";
+	public void testDoGetNoResourceWithEmail() throws Exception {
+		String uid = "/resource@domain";
 		EasyMock.expect(request.getPathInfo()).andReturn(uid);
 		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq(99), EasyMock.anyObject(Date.class)))
-				.andThrow(new ServerFault("Resource with id doesn't exist"));
+				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
+				.andThrow(new ResourceNotFoundException("Resource with id doesn't exist"));
 
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+		response.setStatus(EasyMock.eq(HttpServletResponse.SC_NOT_FOUND));
+		response.flushBuffer();
 		EasyMock.expectLastCall();
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,

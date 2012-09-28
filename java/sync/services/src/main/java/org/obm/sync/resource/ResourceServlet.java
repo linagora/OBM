@@ -50,7 +50,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.inject.Injector;
+
+import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 
 public class ResourceServlet extends HttpServlet {
 
@@ -69,43 +72,45 @@ public class ResourceServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String stringId = request.getPathInfo();
-		
-		if ( stringId == null || stringId.isEmpty()){
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			logger.error(" Resource Servlet : resourceId is null or empty ");
-			return;
-		}
-		
-		stringId = stringId.substring(1);
-		int resourceId = -1;
-		
-		try {
-			resourceId = Integer.parseInt(stringId);
-		} catch (NumberFormatException e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().write("Invalid format for the resource ID, should be an integer");
-			logger.warn("Resource Servlet : resourceId is not a number",  e);
-			return;
+		String resourceEmail = extractResourceEmail(request);
+		if (resourceEmail == null) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			logger.warn("The email of the resource is null or empty ");
+			return;			
 		}
 		
 		try {
-			String resourceICS = getResourceICS(resourceId);
+			String resourceICS = getResourceICS(resourceEmail);
 			response.getWriter().write(resourceICS);
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
+		catch(ResourceNotFoundException e) {
+			logger.error(e.getMessage(),  e);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.flushBuffer();			
+		}
 		catch (ServerFault e) {
-			logger.error("ServerFault: ",  e);
-			response.reset();
+			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.flushBuffer();
 		}
 	}
 
+	private String extractResourceEmail(HttpServletRequest request) {
+		String pathInfo = Strings.nullToEmpty(request.getPathInfo()).replaceFirst("^/", "");
+		String resourceEmail;
+		if (Strings.isNullOrEmpty(pathInfo)) {
+			resourceEmail = null;
+		} else {
+			resourceEmail = pathInfo;
+		}
+		return resourceEmail;
+	}
+
 	@VisibleForTesting
-	String getResourceICS(int resourceId) throws ServerFault {
+	String getResourceICS(String resourceEmail) throws ServerFault {
 		Date date = new Date();
-		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceId, date);
+		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceEmail, date);
 		String resourceICS = this.ical4jHelper.buildIcs(null, resourceEvents, null);
 		return resourceICS;
 	}

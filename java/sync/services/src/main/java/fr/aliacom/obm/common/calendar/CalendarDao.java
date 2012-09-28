@@ -93,7 +93,7 @@ public interface CalendarDao {
 	Collection<Event> getResourceEvents(ResourceInfo resourceInfo,
 			SyncRange syncRange) throws FindException;
 
-	ResourceInfo getResource(int resourceId) throws FindException;
+	ResourceInfo getResource(String resourceEmail) throws FindException;
 
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);

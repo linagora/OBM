@@ -744,12 +744,12 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public Collection<Event> getResourceEvents(int resourceId, Date date)
+	public Collection<Event> getResourceEvents(String resourceEmail, Date date)
 			throws ServerFault {
 		try {
-			ResourceInfo resourceInfo = calendarDao.getResource(resourceId);
+			ResourceInfo resourceInfo = calendarDao.getResource(resourceEmail);
 			if (resourceInfo == null) {
-				throw new ServerFault(String.format("No such resource %d", resourceId));
+				throw new ServerFault(String.format("No such resource %s", resourceEmail));
 			}
 			Date threeMonthsBefore = new org.joda.time.DateTime(date).minus(Months.THREE).toDate();
 			Date sixMonthsAfter = new org.joda.time.DateTime(date).plus(Months.SIX).toDate();

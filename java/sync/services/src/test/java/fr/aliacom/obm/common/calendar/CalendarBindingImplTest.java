@@ -2083,7 +2083,7 @@ public class CalendarBindingImplTest {
 
     @Test
 	public void testGetResourceIcs() throws ServerFault, FindException {
-		int resourceId = 1;
+		String resourceEmail = "resource@domain";
 		Event mockEvent1 = createMock(Event.class);
 		Event mockEvent2 = createMock(Event.class);
 		Collection<Event> expectedEvents = Lists.newArrayList(mockEvent1, mockEvent2);
@@ -2094,7 +2094,7 @@ public class CalendarBindingImplTest {
 		SyncRange syncRange = new SyncRange(sixMonthsAfter, threeMonthsBefore);
 		CalendarDao mockDao = createMock(CalendarDao.class);
 		ResourceInfo mockResource = createMock(ResourceInfo.class);
-		expect(mockDao.getResource(resourceId)).andReturn(mockResource);
+		expect(mockDao.getResource(resourceEmail)).andReturn(mockResource);
 		expect(mockDao.getResourceEvents(mockResource, syncRange)).andReturn(expectedEvents);
 
 		Object[] mocks = { mockEvent1, mockEvent2, mockDao, mockResource };
@@ -2102,7 +2102,7 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
 				null, null, null, null);
-		Collection<Event> events = calendarService.getResourceEvents(resourceId, date);
+		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date);
 		assertThat(events).isEqualTo(expectedEvents);
 
 		verify(mocks);

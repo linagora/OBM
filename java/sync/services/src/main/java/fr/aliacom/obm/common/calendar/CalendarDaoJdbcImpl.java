@@ -925,11 +925,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public ResourceInfo getResource(int resourceId) throws FindException {
+	public ResourceInfo getResource(String resourceEmail) throws FindException {
 		Connection conn = null;
 		try {
 			conn = obmHelper.getConnection();
-			ResourceLoader loader = ResourceLoader.builder().connection(conn).ids(resourceId).build();
+			ResourceLoader loader = ResourceLoader.builder().connection(conn).emails(resourceEmail).build();
 			Collection<ResourceInfo> res = loader.load();
 			return Iterables.getFirst(res, null);
 		}
