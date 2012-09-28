@@ -66,7 +66,7 @@ public class AddressBookBindingImplTest {
 	private ObmHelper mockHelper() throws SQLException {
 		ObmHelper helper = EasyMock.createMock(ObmHelper.class);
 		expect(helper.getConnection()).andReturn(null);
-		ObmHelper.cleanup(null, null, null);
+		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		return helper;
 	}
@@ -157,14 +157,14 @@ public class AddressBookBindingImplTest {
 		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
 		
 		expect(helper.getConnection()).andReturn(null);
-		ObmHelper.cleanup(null, null, null);
+		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
 
 		expect(helper.getConnection()).andReturn(null);
-		ObmHelper.cleanup(null, null, null);
+		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
 		UserDao userDao = EasyMock.createMock(UserDao.class);
@@ -255,13 +255,13 @@ public class AddressBookBindingImplTest {
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
 		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
 		expect(helper.getConnection()).andReturn(null);
-		ObmHelper.cleanup(null, null, null);
+		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
 		expect(helper.getConnection()).andReturn(null);
-		ObmHelper.cleanup(null, null, null);
+		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
 		ObmSyncConfigurationService configuration = EasyMock.createMock(ObmSyncConfigurationService.class);

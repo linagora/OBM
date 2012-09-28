@@ -77,7 +77,7 @@ public class DomainDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return null;
 	}

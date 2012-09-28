@@ -122,7 +122,7 @@ public class DatabaseAuthentificationService implements
 		} catch (SQLException e) {
 			logger.error("Could not authentificate against OBM", e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -154,7 +154,7 @@ public class DatabaseAuthentificationService implements
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return dn;
 	}

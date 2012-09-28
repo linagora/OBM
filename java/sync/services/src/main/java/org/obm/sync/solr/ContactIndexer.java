@@ -255,7 +255,7 @@ public class ContactIndexer implements Runnable {
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			ObmHelper.cleanup(con, st, rs);
+			obmHelper.cleanup(con, st, rs);
 		}
 		return found;
 	}

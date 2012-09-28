@@ -107,7 +107,7 @@ public class HelperDao {
 		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}
@@ -168,7 +168,7 @@ public class HelperDao {
 		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return ret;
 	}

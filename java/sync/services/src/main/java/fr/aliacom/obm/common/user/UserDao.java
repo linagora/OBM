@@ -87,7 +87,7 @@ public class UserDao {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return ImmutableMap.of();
 	}
@@ -121,7 +121,7 @@ public class UserDao {
 			}
 
 		} finally {
-			ObmHelper.cleanup(null, st, rs);
+			obmHelper.cleanup(null, st, rs);
 		}
 		
 		return null;
@@ -184,7 +184,7 @@ public class UserDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			ObmHelper.cleanup(null, st, rs);
+			obmHelper.cleanup(null, st, rs);
 		}
 		return ret;
 	}
@@ -199,7 +199,7 @@ public class UserDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 		if (id != null && id > 0) {
 			return findUserById(id, domain);
@@ -232,7 +232,7 @@ public class UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return obmUser;
 	}
@@ -286,7 +286,7 @@ public class UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		return obmUser;
 	}
@@ -325,7 +325,7 @@ public class UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -366,7 +366,7 @@ public class UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}

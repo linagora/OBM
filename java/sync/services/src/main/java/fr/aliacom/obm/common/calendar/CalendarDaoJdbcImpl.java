@@ -276,7 +276,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ret = rs.getInt(1);
 			}
 		} finally {
-			ObmHelper.cleanup(null, st, rs);
+			obmHelper.cleanup(null, st, rs);
 		}
 		return ret;
 	}
@@ -290,7 +290,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			return createEvent(con, editor, calendar, ev, useObmUser);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 	}
 
@@ -398,7 +398,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			ps.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 		return newEvExcepts;
 	}
@@ -417,7 +417,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			ps.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -560,7 +560,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
             } catch (SQLException se) {
                     logger.error(se.getMessage(), se);
             } finally {
-                    ObmHelper.cleanup(con, ps, rs);
+                    obmHelper.cleanup(con, ps, rs);
             }
 
             return result;
@@ -611,7 +611,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 		throw new EventNotFoundException(uid);
 	}
@@ -680,7 +680,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, query, rs);
+			obmHelper.cleanup(con, query, rs);
 		}
 		return ret;
 	}
@@ -712,7 +712,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 
 		List<String> ret = new ArrayList<String>(result.size());
@@ -874,7 +874,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					} catch (SQLException e) {
 						logger.error(e.getMessage(), e);
 					} finally {
-						ObmHelper.cleanup(null, ps, rs);
+						obmHelper.cleanup(null, ps, rs);
 					}
 				} else {
 					logger.info("User " + att.getEmail() + " doesn't exist");
@@ -883,7 +883,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 		return ret;
 	}
@@ -919,7 +919,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -937,7 +937,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throw new FindException(ex);
 		}
 		finally {
-			ObmHelper.cleanup(conn, null, null);
+			obmHelper.cleanup(conn, null, null);
 		}
 	}
 
@@ -957,7 +957,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		catch (SQLException ex) {
 			throw new FindException(ex);
 		} finally {
-			ObmHelper.cleanup(conn, null, null);
+			obmHelper.cleanup(conn, null, null);
 		}
 	}
 
@@ -1062,7 +1062,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 		fetched.append(")");
 
@@ -1104,7 +1104,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			} catch (SQLException e) {
 				logger.error("error getting events", e);
 			} finally {
-				ObmHelper.cleanup(con, evps, evrs);
+				obmHelper.cleanup(con, evps, evrs);
 			}
 		}
 
@@ -1122,7 +1122,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				} catch (SQLException e) {
 					logger.error("error updating lastsync field", e);
 				} finally {
-					ObmHelper.cleanup(conDate, null, null);
+					obmHelper.cleanup(conDate, null, null);
 				}
 
 			} else {
@@ -1155,7 +1155,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error("error loading attendees, alerts, exceptions, eventException", e);
 		} finally {
-			ObmHelper.cleanup(conComp, null, null);
+			obmHelper.cleanup(conComp, null, null);
 		}
 		ret.setUpdated(changedEvent);
 		ret.setDeletedEvents(findDeletedEvents(calendarUser, lastSync, typeFilter,
@@ -1251,7 +1251,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throw new FindException(e);
 		} finally {
 			try {
-				ObmHelper.cleanup(con, ps, rs);
+				obmHelper.cleanup(con, ps, rs);
 			} catch (Exception e) {
 				logger.error("Could not clean up jdbc stuff");
 			}
@@ -1299,7 +1299,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throw new FindException(e);
 		} finally {
 			try {
-				ObmHelper.cleanup(con, ps, rs);
+				obmHelper.cleanup(con, ps, rs);
 			} catch (Exception e) {
 				logger.error("Could not clean up jdbc stuff");
 			}
@@ -1336,7 +1336,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throw new FindException(e);
 		} finally {
 			try {
-				ObmHelper.cleanup(con, ps, rs);
+				obmHelper.cleanup(con, ps, rs);
 			} catch (Exception e) {
 				logger.error("Could not clean up jdbc stuff");
 			}
@@ -1458,7 +1458,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throw new FindException(e);
 		} finally {
 			try {
-				ObmHelper.cleanup(con, ps, rs);
+				obmHelper.cleanup(con, ps, rs);
 			} catch (Exception e) {
 				logger.error("Could not clean up jdbc stuff", e);
 			}
@@ -1562,7 +1562,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			Multimap<EventObmId, Attendee> attsUsersByEvent = getUserAttendeesByEventIdFromCursor(rs, domainName);
 			appendAttendeeToEvent(eventById, attsUsersByEvent);
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		try {
 			//contact			
@@ -1573,7 +1573,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			appendAttendeeToEvent(eventById, attsContactsByEvent);
 			
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 		defineEventsInternalStatus(eventById.values());
 	}
@@ -1604,7 +1604,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 			}
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -1694,7 +1694,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			loadAttendees(con, evenExcepttById, changedIds, domainName);
 			loadAlerts(con, token, evenExcepttById, changedIds);
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -1725,7 +1725,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 			}
 		} finally {
-			ObmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(null, ps, rs);
 		}
 	}
 
@@ -1737,7 +1737,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			st.setInt(2, eventObmId.getObmId());
 			st.execute();
 		} finally {
-			ObmHelper.cleanup(null, st, null);
+			obmHelper.cleanup(null, st, null);
 		}
 		return eventObmId;
 	}
@@ -1755,7 +1755,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			modifyEventForcingSequence(con, at, calendar, ev, updateAttendees, sequence, useObmUser);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 
 		return findEventById(at, ev.getObmId());
@@ -1774,7 +1774,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			modifyEvent(con, at, calendar, ev, updateAttendees, useObmUser);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 
 		return findEventById(at, ev.getObmId());
@@ -1827,7 +1827,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						.getEventExceptions(), con, ev.getObmId(), useObmUser);
 			}
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 		
 		indexEvent(editor, ev);
@@ -1905,7 +1905,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				toDel.add(new EventObmId(rs.getInt(1)));
 			}
 		} finally {
-			ObmHelper.cleanup(null, idsFetch, rs);
+			obmHelper.cleanup(null, idsFetch, rs);
 		}
 
 		IntegerIndexedSQLCollectionHelper toDeleteIds = new IntegerIndexedSQLCollectionHelper(toDel);
@@ -1917,7 +1917,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			toDeleteIds.insertValues(dev, 1);
 			dev.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, dev, null);
+			obmHelper.cleanup(null, dev, null);
 		}
 
 		String q = "DELETE FROM EventException "
@@ -1929,7 +1929,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(1, idEventParent.getObmId());
 			ps.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -1954,7 +1954,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			ps.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 
 	}
@@ -1968,7 +1968,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(1, eventParent.getObmId().getObmId());
 			ps.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -1980,7 +1980,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			deletedEvent = removeEvent(con, token, eventType, event);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 
 		deletedEvent.setSequence(sequence);
@@ -1995,7 +1995,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			event = removeEventById(con, token, eventId, eventType, sequence);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 
 		return event;
@@ -2048,7 +2048,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			deleteStatement.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, deleteStatement, null);
+			obmHelper.cleanup(null, deleteStatement, null);
 		}
 	}
 
@@ -2071,7 +2071,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			insertStatement.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, insertStatement, null);
+			obmHelper.cleanup(null, insertStatement, null);
 		}
 	}
 
@@ -2082,7 +2082,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			deleteStatement.setInt(1, event.getObmId().getObmId());
 			deleteStatement.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, deleteStatement, null);
+			obmHelper.cleanup(null, deleteStatement, null);
 		}
 	}
 
@@ -2170,7 +2170,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			
 			ps.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 	
@@ -2184,7 +2184,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(1, eventId);
 			ps.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -2267,7 +2267,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			updatedAttendees = ps.executeBatch();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 
 		for (int i = 0; i < updatedAttendees.length; i++) {
@@ -2322,7 +2322,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			ps.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -2346,7 +2346,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			return (ps.executeUpdate() > 0);
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -2365,7 +2365,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(nextId, eventObmId.getObmId());
 			ps.executeUpdate();
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
@@ -2413,7 +2413,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 			
 		return null;
@@ -2469,7 +2469,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			logger.error(e.getMessage(), e);
 			throw e; 
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}	
 		return null;
 	}
@@ -2532,7 +2532,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 
 		return ret;
@@ -2587,7 +2587,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 
 		
@@ -2644,7 +2644,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 		return ret;
 	}
@@ -2718,7 +2718,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 		return ret;
 	}
@@ -2748,7 +2748,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			ObmHelper.cleanup(con, evps, evrs);
+			obmHelper.cleanup(con, evps, evrs);
 		}
 
 		if (lastCreate == null && lastUpdate == null) {
@@ -2800,7 +2800,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			event.setSequence(sequence);
 			return event;
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 	}
 
@@ -2839,7 +2839,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
-			ObmHelper.cleanup(null, dev, null);
+			obmHelper.cleanup(null, dev, null);
 		}
 
 		return ev;
@@ -2854,7 +2854,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			return changeParticipationState(con, token, extId, calendar, participationState);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 	}
 	
@@ -2889,7 +2889,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 		return false;
 	}
@@ -2903,7 +2903,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			return changeParticipationState(con, token, extId, recurrenceId, calendar, participationState);
 		} finally {
-			ObmHelper.cleanup(con, null, null);
+			obmHelper.cleanup(con, null, null);
 		}
 	}
 	
@@ -2949,7 +2949,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			logger.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			ObmHelper.cleanup(null, ps, null);
+			obmHelper.cleanup(null, ps, null);
 		}
 		return false;
 	}

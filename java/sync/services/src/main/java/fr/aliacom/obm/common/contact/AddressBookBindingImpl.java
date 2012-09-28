@@ -167,7 +167,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
 			throw new ServerFault(t);
 		} finally {
-			ObmHelper.cleanup(connection, null, null);
+			obmHelper.cleanup(connection, null, null);
 		}
 		
 		return response;
@@ -419,7 +419,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		} catch (SQLException ex) {
 			throw new ServerFault(ex);
 		} finally {
-			ObmHelper.cleanup(connection, null, null);
+			obmHelper.cleanup(connection, null, null);
 		}
 	}
 	

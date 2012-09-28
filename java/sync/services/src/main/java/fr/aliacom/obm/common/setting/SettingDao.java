@@ -107,7 +107,7 @@ public class SettingDao {
 			logger.error("Error fetching preferences for " + user + " at "
 					+ domain, se);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 		
 		ImmutableMap<String, String> data = mapBuilder.build();
@@ -152,7 +152,7 @@ public class SettingDao {
 			logger.error("Could not store vacation settings for "
 					+ token.getUserLogin(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, null);
+			obmHelper.cleanup(con, ps, null);
 		}
 	}
 
@@ -179,7 +179,7 @@ public class SettingDao {
 			logger.error("Could not store forwarding settings for "
 					+ token.getUserLogin(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, null);
+			obmHelper.cleanup(con, ps, null);
 		}
 	}
 
@@ -219,7 +219,7 @@ public class SettingDao {
 			logger.error("Could not load forwarding settings for "
 					+ token.getUserLogin(), e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 
 		return ret;
@@ -260,7 +260,7 @@ public class SettingDao {
 			logger.error("Could load vacation settings for " + token.getUserLogin(),
 					e);
 		} finally {
-			ObmHelper.cleanup(con, ps, rs);
+			obmHelper.cleanup(con, ps, rs);
 		}
 
 		return ret;
