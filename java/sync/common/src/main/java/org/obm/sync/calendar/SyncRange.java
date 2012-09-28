@@ -55,7 +55,7 @@ public class SyncRange {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if (!(o instanceof SyncRange)) {
 			return false;
 		}
@@ -64,7 +64,7 @@ public class SyncRange {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return Objects.hashCode(before, after);
 	}
 }
