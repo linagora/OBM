@@ -327,5 +327,9 @@ public interface ICalendar {
 	 */
 	void purge(AccessToken token, String calendar) throws ServerFault;
 
+	/**
+	 * Returns the events using the resource in a range of three months before
+	 * and six months after the date parameter.
+	 */
 	Collection<Event> getResourceEvents(int resourceId, Date date) throws ServerFault;
 }
