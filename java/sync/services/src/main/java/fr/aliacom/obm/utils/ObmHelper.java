@@ -70,27 +70,7 @@ public class ObmHelper {
 	 * Close every JDBC resources, checking that objects are not null
 	 */
 	public static void cleanup(Connection con, Statement st, ResultSet rs) {
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				logger.debug("error closing ResultSet", e);
-			}
-		}
-		if (st != null) {
-			try {
-				st.close();
-			} catch (SQLException e) {
-				logger.debug("error closing Statement", e);
-			}
-		}
-		if (con != null) {
-			try {
-				con.close();
-			} catch (SQLException e) {
-				logger.debug("error closing Connection", e);
-			}
-		}
+		DBUtils.cleanup(con, st, rs);
 	}
 
 	/**
