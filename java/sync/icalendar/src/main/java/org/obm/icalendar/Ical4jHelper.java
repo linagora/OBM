@@ -38,6 +38,7 @@ import java.io.Writer;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
@@ -657,7 +658,7 @@ public class Ical4jHelper {
 	}
 
 	private Calendar buildVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token) {
-		return buildVEvents(iCal4jUser, Lists.newArrayList(event), replyAttendee, method, token);
+		return buildVEvents(iCal4jUser, Arrays.asList(event), replyAttendee, method, token);
 	}
 
 	private Calendar buildVEvents(Ical4jUser iCal4jUser, Collection<Event> events, Attendee replyAttendee, Method method, AccessToken token) {
