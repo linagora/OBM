@@ -1410,7 +1410,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails) throws FindException {
 		StringSQLCollectionHelper helper = null;
-		if (emails != null) {
+		if (emails != null && !emails.isEmpty()) {
 			helper = new StringSQLCollectionHelper(emails);
 		}
 		String publicQuery = buildPublicResourcesQuery(helper);
