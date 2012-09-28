@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.Set;
 
@@ -17,7 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import fr.aliacom.obm.utils.ObmHelper;
+import fr.aliacom.obm.utils.DBUtils;
 
 public class ResourceLoader {
 
@@ -96,7 +95,7 @@ public class ResourceLoader {
 			rs = stat.executeQuery();
 			return buildResources(rs);
 		} finally {
-			cleanup(rs, stat);
+			DBUtils.cleanup(stat, rs);
 		}
 	}
 
@@ -142,9 +141,5 @@ public class ResourceLoader {
 	private ResourceInfo buildResource(ResultSet rs) throws SQLException {
 		return ResourceInfo.builder().id(rs.getInt(1)).name(rs.getString(2)).mail(rs.getString(3))
 				.read(false).write(false).build();
-	}
-
-	private void cleanup(ResultSet rs, Statement stat) {
-		ObmHelper.cleanup(null, stat, rs);
 	}
 }

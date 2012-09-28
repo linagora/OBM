@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,8 +16,8 @@ import org.obm.sync.calendar.EventRecurrence;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class ExceptionLoader {
 	public static class Builder {
@@ -91,7 +90,7 @@ public class ExceptionLoader {
 			rs = stat.executeQuery();
 			return buildExceptions(rs);
 		} finally {
-			cleanup(rs, stat);
+			DBUtils.cleanup(stat, rs);
 		}
 	}
 
@@ -138,9 +137,5 @@ public class ExceptionLoader {
 		}
 		EventRecurrence er = e.getRecurrence();
 		er.addException(exception);
-	}
-
-	private void cleanup(ResultSet rs, Statement stat) {
-		ObmHelper.cleanup(null, stat, rs);
 	}
 }

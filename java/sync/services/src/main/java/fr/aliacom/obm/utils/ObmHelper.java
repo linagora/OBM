@@ -69,7 +69,7 @@ public class ObmHelper {
 	/**
 	 * Close every JDBC resources, checking that objects are not null
 	 */
-	public static void cleanup(Connection con, Statement st, ResultSet rs) {
+	public void cleanup(Connection con, Statement st, ResultSet rs) {
 		DBUtils.cleanup(con, st, rs);
 	}
 

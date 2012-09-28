@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map;
 
 import org.obm.sync.calendar.Event;
@@ -13,8 +12,8 @@ import org.obm.sync.calendar.EventObmId;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class AlertLoader {
 	public static class Builder {
@@ -77,7 +76,7 @@ public class AlertLoader {
 			rs = stat.executeQuery();
 			return buildAlerts(rs);
 		} finally {
-			cleanup(rs, stat);
+			DBUtils.cleanup(stat, rs);
 		}
 	}
 
@@ -131,9 +130,5 @@ public class AlertLoader {
 					"Found an event %d not present in the parent events", eventId.getObmId()));
 		}
 		event.setAlert(alertDuration);
-	}
-	
-	private void cleanup(ResultSet rs, Statement stat) {
-		ObmHelper.cleanup(null, stat, rs);
 	}
 }

@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -24,8 +23,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class EventLoader {
 
@@ -211,7 +210,7 @@ public class EventLoader {
 			loadObjectGraph(eventsById);
 			return eventsById;
 		} finally {
-			cleanup(rs, stat);
+			DBUtils.cleanup(stat, rs);
 		}
 	}
 
@@ -391,9 +390,5 @@ public class EventLoader {
 			pos = resourcesHelper.insertValues(stat, pos);
 		}
 		return pos;
-	}
-
-	private void cleanup(ResultSet rs, Statement stat) {
-		ObmHelper.cleanup(null, stat, rs);
 	}
 }

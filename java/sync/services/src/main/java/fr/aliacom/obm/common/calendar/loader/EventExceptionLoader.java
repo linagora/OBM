@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -16,8 +15,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class EventExceptionLoader {
 	public static class Builder {
@@ -147,7 +146,7 @@ public class EventExceptionLoader {
 			rs = stat.executeQuery();
 			return buildEventExceptions(rs);
 		} finally {
-			cleanup(rs, stat);
+			DBUtils.cleanup(stat, rs);
 		}
 	}
 
@@ -192,9 +191,5 @@ public class EventExceptionLoader {
 	private void loadAlerts(Map<EventObmId, Event> eventExceptionsById) throws SQLException {
 		AlertLoader loader = AlertLoader.builder().connection(conn).eventsById(eventExceptionsById).build();
 		loader.load();
-	}
-	
-	private void cleanup(ResultSet rs, Statement stat) {
-		ObmHelper.cleanup(null, stat, rs);
 	}
 }
