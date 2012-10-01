@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 
 public abstract class AbstractConfigurationService {
-	
+
+    protected static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
+
 	protected Properties props;
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());

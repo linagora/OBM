@@ -37,6 +37,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseSystem;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
@@ -44,22 +45,20 @@ import org.obm.push.utils.JDBCUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-
 /**
  * Helper functions datasource management
  */
 @Singleton
 public class ObmHelper {
-	
+
 	private DatabaseSystem type = DatabaseSystem.PGSQL;
 
 	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
-	private ObmHelper(ObmSyncConfigurationService configuration, DatabaseConnectionProvider dbcp) {
+	private ObmHelper(DatabaseConfiguration configuration, DatabaseConnectionProvider dbcp) {
 		this.dbcp = dbcp;
-		type = configuration.getDataBaseSystem();
+		type = configuration.getDatabaseSystem();
 	}
 
 	/**

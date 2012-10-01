@@ -32,83 +32,30 @@
 
 package org.obm.dbcp;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.ConfigurationException;
-
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseSystem;
-import org.obm.configuration.resourcebundle.Control;
 
-import com.google.common.base.Charsets;
+public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfiguration {
 
-public class ConfigurationServiceFixturePostgreSQL implements ConfigurationService {
 
 	@Override
-	public String getLocatorUrl() throws ConfigurationException {
-		return "http://localhost.localdomain:8084/obm-locator/";
-	}
-
-	@Override
-	public String getObmUIBaseUrl() {
-		return "http://" + getExternalUrl();
-	}
-
-	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
-		return "http://" + getExternalUrl() + ":8080/obm-sync/services";
-	}
-
-	@Override
-	public int getLocatorCacheTimeout() {
-		return 30;
-	}
-
-	@Override
-	public TimeUnit getLocatorCacheTimeUnit() {
-		return TimeUnit.MINUTES;
-	}
-
-	@Override
-	public ResourceBundle getResourceBundle(Locale locale) {
-		return ResourceBundle.getBundle("Messages", locale, new Control());
-	}
-
-	@Override
-	public String getActiveSyncServletUrl() {
-		return "https://" + getExternalUrl() + "/Microsoft-Server-ActiveSync";
-	}
-
-	private String getExternalUrl() {
-		return "localhost.localdomain";
-	}
-
-	@Override
-	public Charset getDefaultEncoding() {
-		return Charsets.UTF_8;
-	}
-
-	@Override
-	public Integer getDataBaseMaxConnectionPoolSize() {
+	public Integer getDatabaseMaxConnectionPoolSize() {
 		return 10;
 	}
 
 	@Override
-	public DatabaseSystem getDataBaseSystem() {
+	public DatabaseSystem getDatabaseSystem() {
 		return DatabaseSystem.PGSQL;
 	}
 
 	@Override
-	public String getDataBaseName() {
+	public String getDatabaseName() {
 		return "obm";
 	}
 
 	@Override
-	public String getDataBaseHost() {
-		return getExternalUrl();
+	public String getDatabaseHost() {
+		return "localhost.localdomain";
 	}
 
 	@Override
@@ -121,23 +68,4 @@ public class ConfigurationServiceFixturePostgreSQL implements ConfigurationServi
 		return "obm";
 	}
 
-	@Override
-	public int transactionTimeoutInSeconds() {
-		return 60;
-	}
-	
-	@Override
-	public boolean usePersistentCache() {
-		return false;
-	}
-
-	@Override
-	public int trustTokenTimeoutInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public int solrCheckingInterval() {
-		return 10;
-	}
 }

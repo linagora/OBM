@@ -40,15 +40,15 @@ import javax.naming.ConfigurationException;
 
 import org.obm.configuration.resourcebundle.Control;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ConfigurationServiceImpl extends AbstractConfigurationService implements ConfigurationService {
-	
+public class ConfigurationServiceImpl extends AbstractConfigurationService
+        implements ConfigurationService {
+
     private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
     private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
@@ -69,14 +69,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
     private final static String EXTERNAL_URL_KEY = "external-url";
 
-    private static final String DB_TYPE_KEY = "dbtype";
-    private static final String DB_HOST_KEY = "host";
-    private static final String DB_NAME_KEY = "db";
-    private static final String DB_USER_KEY = "user";
-    private static final String DB_PASSWORD_KEY = "password";
-    private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
-    private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
-
+    private final static String LOCATOR_HOST_KEY = "host";
     private final static String LOCATOR_PORT = "8084";
     private final static String LOCATOR_APP_NAME = "obm-locator";
 
@@ -86,7 +79,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
     private final ImmutableMap<String, TimeUnit> timeUnits;
 
 	public ConfigurationServiceImpl() {
-		super("/etc/obm/obm_conf.ini");
+		super(GLOBAL_CONFIGURATION_FILE);
 		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,
 								"minutes", TimeUnit.MINUTES,
@@ -95,7 +88,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 
 	@Override
 	public String getLocatorUrl() throws ConfigurationException {
-		String locatorHost = getStringValue(DB_HOST_KEY);
+		String locatorHost = getStringValue(LOCATOR_HOST_KEY);
 		if (locatorHost == null) {
 			throw new ConfigurationException(
 					"Missing host key in configuration");
@@ -173,40 +166,6 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService imple
 		return getStringValue(EXTERNAL_URL_KEY);
 	}
 
-	@Override
-	public Integer getDataBaseMaxConnectionPoolSize() {
-		return getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
-	}
-
-	@Override
-	public DatabaseSystem getDataBaseSystem() {
-		return DatabaseSystem.valueOf(getStringValue(DB_TYPE_KEY).trim());
-	}
-
-	@Override
-	public String getDataBaseName() {
-		return getStringValue(DB_NAME_KEY);
-	}
-
-	@Override
-	public String getDataBaseHost() {
-		return getStringValue(DB_HOST_KEY);
-	}
-
-	@Override
-	public String getDatabaseLogin() {
-		return getStringValue(DB_USER_KEY);
-	}
-	
-	@VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
-	{
-	    return toUnquote.replaceAll("^\"(.+)\"$", "$1");
-	}
-
-	@Override
-	public String getDatabasePassword() {
-	    return removeEnclosingDoubleQuotes(getStringValue(DB_PASSWORD_KEY));
-	}
 
 	@Override
 	public boolean usePersistentCache() {

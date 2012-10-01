@@ -41,7 +41,7 @@ import java.sql.Statement;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseSystem;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.IJDBCDriver;
@@ -78,15 +78,15 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	@Inject
 	public DatabaseConnectionProviderImpl(
 			ITransactionAttributeBinder transactionAttributeBinder,
-			ConfigurationService configuration,
+			DatabaseConfiguration databaseConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
-		login = configuration.getDatabaseLogin();
-		password = configuration.getDatabasePassword();
-		host = configuration.getDataBaseHost();
-		name = configuration.getDataBaseName();
-		system = configuration.getDataBaseSystem();
-		maxPoolSize = configuration.getDataBaseMaxConnectionPoolSize();
+		login = databaseConfiguration.getDatabaseLogin();
+		password = databaseConfiguration.getDatabasePassword();
+		host = databaseConfiguration.getDatabaseHost();
+		name = databaseConfiguration.getDatabaseName();
+		system = databaseConfiguration.getDatabaseSystem();
+		maxPoolSize = databaseConfiguration.getDatabaseMaxConnectionPoolSize();
 		configurationLogger.info("Database system : {}", system);
 		configurationLogger.info("Database name {} on host {}", name, host);
 		configurationLogger.info("Database connection pool size : {}", maxPoolSize);

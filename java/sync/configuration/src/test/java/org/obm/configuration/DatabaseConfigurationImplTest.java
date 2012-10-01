@@ -32,36 +32,32 @@
 
 package org.obm.configuration;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
+import org.junit.Test;
 
-import javax.naming.ConfigurationException;
+public class DatabaseConfigurationImplTest {
 
-public interface ConfigurationService {
+    @Test
+    public void testGetDatabasePassword() {
+        String password = "\"obm\"";
 
-	String getLocatorUrl() throws ConfigurationException;
+        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        Assert.assertEquals(unquotedPassword, "obm");
+    }
 
-	String getObmUIBaseUrl();
+    @Test
+    public void testGetDatabasePasswordWithQuotes() {
+        String password = "obm";
 
-	String getObmSyncUrl(String obmSyncHost);
+        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        Assert.assertEquals(unquotedPassword, "obm");
+    }
 
-	int getLocatorCacheTimeout();
+    @Test
+    public void testGetDatabasePasswordWithOnlyQuotes() {
+        String password = "\"\"";
 
-	TimeUnit getLocatorCacheTimeUnit();
-
-	ResourceBundle getResourceBundle(Locale locale);
-	
-	String getActiveSyncServletUrl();
-
-	Charset getDefaultEncoding();
-
-	int transactionTimeoutInSeconds();
-
-	boolean usePersistentCache();
-
-	int trustTokenTimeoutInSeconds();
-	
-	int solrCheckingInterval();
+        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        Assert.assertEquals(unquotedPassword, "\"\"");
+    }
 }

@@ -40,6 +40,8 @@ import javax.servlet.ServletContextListener;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
@@ -78,6 +80,7 @@ public class GuiceServletContextListener implements ServletContextListener{
                bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
                bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
                bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+               bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
                bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
             }
         }, new TransactionalModule());

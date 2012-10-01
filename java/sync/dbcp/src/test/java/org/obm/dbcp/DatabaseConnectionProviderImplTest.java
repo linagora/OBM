@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
 import org.slf4j.Logger;
 
 
@@ -51,14 +51,14 @@ public class DatabaseConnectionProviderImplTest {
 
 	private DatabaseConnectionProviderImpl dbConnProvider;
 	private ITransactionAttributeBinder transactionAttributeBinder;
-	private ConfigurationService configuration;
+	private DatabaseConfiguration databaseConfiguration;
 
 	@Before
 	public void setUp() {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		transactionAttributeBinder = EasyMock.createMock(ITransactionAttributeBinder.class);
-		configuration = new ConfigurationServiceFixturePostgreSQL();
-		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, configuration, logger);
+		databaseConfiguration = new DatabaseConfigurationFixturePostgreSQL();
+		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, databaseConfiguration);
 	}
 
 	@Test(expected=SQLException.class)

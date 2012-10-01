@@ -32,33 +32,60 @@
 
 package org.obm.configuration;
 
-import org.junit.Assert;
-import org.junit.Test;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
+public class DatabaseConfigurationImpl extends AbstractConfigurationService
+        implements DatabaseConfiguration {
 
-public class ConfigurationServiceImplTest {
+    private static final String DB_TYPE_KEY = "dbtype";
+    private static final String DB_HOST_KEY = "host";
+    private static final String DB_NAME_KEY = "db";
+    private static final String DB_USER_KEY = "user";
+    private static final String DB_PASSWORD_KEY = "password";
+    private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
+    private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
-    @Test
-    public void testGetDatabasePassword() {
-        String password = "\"obm\"";
-        
-        String unquotedPassword = new ConfigurationServiceImpl().removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
+    @Inject
+    DatabaseConfigurationImpl()
+    {
+        super(GLOBAL_CONFIGURATION_FILE);
     }
-    
-    @Test
-    public void testGetDatabasePasswordWithQuotes() {
-        String password = "obm";
-        
-        String unquotedPassword = new ConfigurationServiceImpl().removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
+
+    @Override
+    public Integer getDatabaseMaxConnectionPoolSize() {
+        return getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
     }
-    
-    @Test
-    public void testGetDatabasePasswordWithOnlyQuotes() {
-        String password = "\"\"";
-        
-        String unquotedPassword = new ConfigurationServiceImpl().removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "\"\"");
+
+    @Override
+    public DatabaseSystem getDatabaseSystem() {
+        return DatabaseSystem.valueOf(getStringValue(DB_TYPE_KEY).trim());
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return getStringValue(DB_NAME_KEY);
+    }
+
+    @Override
+    public String getDatabaseHost() {
+        return getStringValue(DB_HOST_KEY);
+    }
+
+    @Override
+    public String getDatabaseLogin() {
+        return getStringValue(DB_USER_KEY);
+    }
+
+    @VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
+    {
+        return toUnquote.replaceAll("^\"(.+)\"$", "$1");
+    }
+
+    @Override
+    public String getDatabasePassword() {
+        return removeEnclosingDoubleQuotes(getStringValue(DB_PASSWORD_KEY));
     }
 }

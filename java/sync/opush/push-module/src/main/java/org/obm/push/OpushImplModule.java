@@ -34,6 +34,8 @@ package org.obm.push;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
@@ -103,6 +105,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(IBackend.class).to(OBMBackend.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);

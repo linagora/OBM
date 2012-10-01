@@ -32,36 +32,18 @@
 
 package org.obm.configuration;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+public interface DatabaseConfiguration {
 
-import javax.naming.ConfigurationException;
+    Integer getDatabaseMaxConnectionPoolSize();
 
-public interface ConfigurationService {
+    DatabaseSystem getDatabaseSystem();
 
-	String getLocatorUrl() throws ConfigurationException;
+    String getDatabaseName();
 
-	String getObmUIBaseUrl();
+    String getDatabaseHost();
 
-	String getObmSyncUrl(String obmSyncHost);
+    String getDatabaseLogin();
 
-	int getLocatorCacheTimeout();
+    String getDatabasePassword();
 
-	TimeUnit getLocatorCacheTimeUnit();
-
-	ResourceBundle getResourceBundle(Locale locale);
-	
-	String getActiveSyncServletUrl();
-
-	Charset getDefaultEncoding();
-
-	int transactionTimeoutInSeconds();
-
-	boolean usePersistentCache();
-
-	int trustTokenTimeoutInSeconds();
-	
-	int solrCheckingInterval();
 }
