@@ -59,7 +59,7 @@ public class MailProtocol {
 	private EmailConfiguration emailConfiguration;
 	
 	@Inject
-	/* package */ MailProtocol(EmailConfiguration emailConfiguration) {
+	/*package*/ MailProtocol(EmailConfiguration emailConfiguration) {
 		this.emailConfiguration = emailConfiguration;
 	}
 
