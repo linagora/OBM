@@ -47,6 +47,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,6 +76,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
+@Ignore("push is disable since OBMFULL-4125")
 public class FolderSyncHandlerTest {
 
 	@Rule

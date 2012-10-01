@@ -93,6 +93,7 @@ import org.w3c.dom.Document;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 //<?xml version="1.0" encoding="UTF-8"?>
 //<Sync>
@@ -126,6 +127,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final CollectionPathHelper collectionPathHelper;
 	private final ResponseWindowingService responseWindowingProcessor;
 	private final ContinuationService continuationService;
+	private final boolean enablePush;
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
@@ -134,7 +136,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
 			ResponseWindowingService responseWindowingProcessor,
-			ContinuationService continuationService) {
+			ContinuationService continuationService,
+			@Named("enable-push") boolean enablePush) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -146,6 +149,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.collectionPathHelper = collectionPathHelper;
 		this.responseWindowingProcessor = responseWindowingProcessor;
 		this.continuationService = continuationService;
+		this.enablePush = enablePush;
 	}
 
 	@Override
@@ -177,6 +181,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.PARTIAL_REQUEST, e);
 		} catch (WaitIntervalOutOfRangeException e) {
 			sendResponse(responder, syncProtocol.encodeResponse());
+		} catch (WaitSyncFolderLimitException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), null);
 		} catch (DaoException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (UnexpectedObmSyncServerException e) {
@@ -199,7 +205,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 	
 	private void registerWaitingSync(IContinuation continuation, UserDataRequest udr, Sync sync) 
-			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException, CollectionPathException {
+			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException, CollectionPathException, WaitSyncFolderLimitException {
+		
+		if (!enablePush) {
+			throw new WaitSyncFolderLimitException(0);
+		}
 		
 		if (sync.getWaitInSecond() > 3540) {
 			throw new WaitIntervalOutOfRangeException();

@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class OBMBackend implements IBackend {
@@ -71,6 +72,7 @@ public class OBMBackend implements IBackend {
 	private final LoginService loginService;
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final MailMonitoringBackend emailBackend;
+	private final boolean enablePush;
 	
 	@Inject
 	private OBMBackend(CollectionDao collectionDao,
@@ -78,12 +80,14 @@ public class OBMBackend implements IBackend {
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
 			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, 
 			LoginService loginService,
-			MailMonitoringBackend emailBackend) {
+			MailMonitoringBackend emailBackend,
+			@Named("enable-push") boolean enablePush) {
 		
 		this.collectionDao = collectionDao;
 		this.contentsExporter = contentsExporter;
 		this.loginService = loginService;
 		this.emailBackend = emailBackend;
+		this.enablePush = enablePush;
 		
 		this.registeredListeners = Collections
 				.synchronizedSet(new HashSet<ICollectionChangeListener>());
@@ -98,7 +102,9 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public void startMonitoring() {
-		startMonitoringThreads(calendarPushMonitor, contactsPushMonitor);
+		if (enablePush) {
+			startMonitoringThreads(calendarPushMonitor, contactsPushMonitor);
+		}
 	}
 	
 	private void startMonitoringThreads(
@@ -116,7 +122,9 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException {
-		emailBackend.startMonitoringCollection(udr, collectionId, registeredListeners);
+		if (enablePush) {
+			emailBackend.startMonitoringCollection(udr, collectionId, registeredListeners);
+		}
 	}
 
 	@Override

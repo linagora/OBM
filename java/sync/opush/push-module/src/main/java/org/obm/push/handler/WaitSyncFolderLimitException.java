@@ -29,20 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.push.mail.OpushMailModule;
+package org.obm.push.handler;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-
-public class OpushModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new LoggerModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
+public class WaitSyncFolderLimitException extends Exception {
+	private final int limit;
+	
+	public WaitSyncFolderLimitException(int limit) {
+		this.limit = limit;
+	}
+	
+	public int getLimit() {
+		return limit;
+	}
 }
