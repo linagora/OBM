@@ -409,7 +409,8 @@ function run_query_user_ext_search($user) {
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('UserObm.userobm');
 
-  $limit = $user['limit'];
+  $userLimit = $user['limit'];
+  $limit = $userLimit * 6; // This accounts for firstname, lastname, login and 3 emails per user
   if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
@@ -429,8 +430,7 @@ function run_query_user_ext_search($user) {
     $filterWhere = 'AND ( entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL) OR userobm_id = '.$obm['uid'].')';    
   }
 
-  $query = "SELECT 
-      DISTINCT
+  $query = "SELECT DISTINCT * FROM (SELECT 
       userobm_id,
       userobm_commonname,
       userobm_lastname,
@@ -446,7 +446,7 @@ function run_query_user_ext_search($user) {
       $filterWhere
       AND userobm_archive = 0
       $multidomain
-    LIMIT $limit OFFSET $first_row ";
+    LIMIT $limit OFFSET $first_row) AS unsorted ORDER BY userobm_id LIMIT $userLimit ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
   $rows =  array();
