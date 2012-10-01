@@ -63,7 +63,10 @@ class ThreeFolderSyncSimulation extends Simulation {
 			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
 			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
 					
-		val httpConf = httpConfig.baseURL(contextConfiguration.targetServerUrl).disableFollowRedirect
+		val httpConf = httpConfig
+			.baseURL(contextConfiguration.targetServerUrl)
+			.disableFollowRedirect
+			.disableCaching
 		List(folderSyncScenario.configure.users(1).ramp(10).protocolConfig(httpConf))
 		
 	}
