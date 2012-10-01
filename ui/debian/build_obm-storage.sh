@@ -99,6 +99,7 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~beta2
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta3.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1~beta3
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1.1~0.alpha1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.1.1~0.alpha1
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.alpha2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.alpha2
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
