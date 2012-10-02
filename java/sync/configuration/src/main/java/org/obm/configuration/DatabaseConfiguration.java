@@ -48,4 +48,6 @@ public interface DatabaseConfiguration {
 
     Boolean isPostgresSSLEnabled();
 
+    Boolean isPostgresSSLNonValidating();
+
 }
