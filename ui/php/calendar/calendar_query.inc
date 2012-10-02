@@ -1114,7 +1114,7 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
 //   - $event_id  :
 //   - $state     :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, $state, $is_organizer = false) {
+function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, $state, $is_organizer = false, $event_is_exception = false) {
   global $cdg_sql, $obm;
   $obm_q = new DB_OBM;
 
@@ -1139,6 +1139,20 @@ function run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 
     '".$obm_q->escape($state)."',
     $is_organizer,
     '')";
+  
+  // OBMFULL-3226
+  // This will propagate the new attendee to all moved exceptions
+  if (!$event_is_exception) {
+	  $exceptions = run_query_get_events_exception(array($event_id));
+	  
+	  while ($exceptions->next_record()) {
+	  	$child_id = $exceptions->f('eventexception_child_id');
+	  	
+	  	if ($child_id) {
+	  		run_query_calendar_insert_entity_event($entity, $entity_id, $child_id, $state, $is_organizer, true);
+	  	}
+	  }
+  }
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_entity_event()');
   $obm_q->query($query);
@@ -2023,7 +2037,20 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
       		run_query_calendar_detach_document($document_id, $event_entity_id);
 	      }			
         } else {
-          $query = "DELETE FROM EventLink WHERE eventlink_entity_id IN ".of_entity_subquery($type, $removed_entities)." AND eventlink_event_id = $event_id";
+        	$target_event_ids = array($event_id);
+        	$exceptions = run_query_get_events_exception(array($event_id));
+        	
+        	// OBMFULL-3226
+        	// This gathers the event_ids of all moved exceptions to propagate the removal of the attendee
+        	while ($exceptions->next_record()) {
+        		$child_id = $exceptions->f('eventexception_child_id');
+        	
+       			if ($child_id) {
+       				$target_event_ids[] = $child_id;
+       			}
+       		}
+        	
+          $query = "DELETE FROM EventLink WHERE eventlink_entity_id IN ".of_entity_subquery($type, $removed_entities)." AND eventlink_event_id IN (" . implode(',', $target_event_ids) . ")";
           $db->query($query);
         }
       }
