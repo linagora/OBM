@@ -2500,8 +2500,12 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
   if (is_array($users)) {
     $users = array_unique($users);
     foreach ($users as $user_id) {
-      if ($user_id != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
-        run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'NEEDS-ACTION');
+      if ($user_id != $obm['uid'] ) {
+	if ( !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
+		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'NEEDS-ACTION');
+	} else {
+		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'ACCEPTED');
+	}
       }
     }
   }
@@ -2526,8 +2530,12 @@ function run_query_calendar_reset_occurrence_links($users, $contacts, $resources
 	if (is_array($users)) {
 		$users = array_unique($users);
 		foreach ($users as $user_id) {
-			if ($user_id != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
-				run_query_calendar_update_entity_event('user', $user_id, $id, 'NEEDS-ACTION');
+			if ($user_id != $obm['uid'] ) {
+				if ( !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id) ) {
+					run_query_calendar_update_entity_event('user', $user_id, $id, 'NEEDS-ACTION');
+				} else {
+					run_query_calendar_update_entity_event('user', $user_id, $id, 'ACCEPTED');
+				}
 			}
 		}
 	}
