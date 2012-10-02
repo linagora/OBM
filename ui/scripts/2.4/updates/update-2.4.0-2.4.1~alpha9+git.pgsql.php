@@ -38,7 +38,7 @@ class HashEventExtId extends UpdateObject {
         try {
             $con->lock_table_for_writing('opush_event_mapping');
 
-	$con->query('DELETE FROM opush_event_mapping WHERE id NOT IN (SELECT MAX(id) FROM opush_event_mapping GROUP BY device_id, event_ext_id)');
+	    $con->query('DELETE FROM opush_event_mapping WHERE id NOT IN (SELECT MAX(id) FROM opush_event_mapping GROUP BY device_id, event_ext_id)');
 
             $con->query('ALTER TABLE opush_event_mapping '.
                 'ADD COLUMN event_ext_id_hash BYTEA');
