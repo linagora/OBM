@@ -68,4 +68,8 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 		return "obm";
 	}
 
+    @Override
+    public Boolean isPostgresSSLEnabled() {
+        return true;
+    }
 }

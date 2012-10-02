@@ -46,6 +46,7 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     private static final String DB_USER_KEY = "user";
     private static final String DB_PASSWORD_KEY = "password";
     private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
+    private static final String DB_PG_SSL = "database-postgres-ssl-enabled";
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
     @Inject
@@ -61,6 +62,11 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     @Override
     public DatabaseSystem getDatabaseSystem() {
         return DatabaseSystem.valueOf(getStringValue(DB_TYPE_KEY).trim());
+    }
+
+    @Override
+    public Boolean isPostgresSSLEnabled() {
+        return getBooleanValue(DB_PG_SSL);
     }
 
     @Override

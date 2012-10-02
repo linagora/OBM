@@ -64,6 +64,7 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 		builder.put("password", conf.getDatabasePassword());
 		builder.put("databaseName", conf.getDatabaseName());
 		builder.put("serverName", conf.getDatabaseHost());
+		builder.put("ssl", conf.isPostgresSSLEnabled().toString());
 		return builder.build();
 	}
 

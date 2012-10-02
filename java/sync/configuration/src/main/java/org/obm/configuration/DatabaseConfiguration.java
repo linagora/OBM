@@ -45,4 +45,7 @@ public interface DatabaseConfiguration {
     String getDatabaseLogin();
 
     String getDatabasePassword();
+
+    Boolean isPostgresSSLEnabled();
+
 }
