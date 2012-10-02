@@ -45,5 +45,4 @@ public interface DatabaseConfiguration {
     String getDatabaseLogin();
 
     String getDatabasePassword();
-
 }

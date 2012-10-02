@@ -34,6 +34,8 @@ package org.obm.dbcp.jdbc;
 
 import java.util.Map;
 
+import org.obm.configuration.DatabaseConfiguration;
+
 import com.google.common.collect.ImmutableMap;
 
 
@@ -56,12 +58,12 @@ public class PgSqlJDBCDriver implements IJDBCDriver {
 	}
 
 	@Override
-	public Map<String, String> getDriverProperties(String login, String password, String dbName, String dbHost) {
+	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		builder.put("user", login);
-		builder.put("password", password);
-		builder.put("databaseName", dbName);
-		builder.put("serverName", dbHost);
+		builder.put("user", conf.getDatabaseLogin());
+		builder.put("password", conf.getDatabasePassword());
+		builder.put("databaseName", conf.getDatabaseName());
+		builder.put("serverName", conf.getDatabaseHost());
 		return builder.build();
 	}
 

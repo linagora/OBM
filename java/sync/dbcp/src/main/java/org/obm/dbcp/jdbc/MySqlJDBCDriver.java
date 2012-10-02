@@ -33,6 +33,9 @@
 package org.obm.dbcp.jdbc;
 
 import java.util.Map;
+
+import org.obm.configuration.DatabaseConfiguration;
+
 import com.google.common.collect.ImmutableMap;
 
 
@@ -75,12 +78,12 @@ public class MySqlJDBCDriver implements IJDBCDriver {
 	}
 
 	@Override
-	public Map<String, String> getDriverProperties(String login, String password, String dbName, String dbHost) {
+	public Map<String, String> getDriverProperties(DatabaseConfiguration configuration) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		builder.put("user", login);
-		builder.put("password", password);
-		builder.put("databaseName", dbName);
-		builder.put("url", getJDBCUrl(dbHost, dbName));
+		builder.put("user", configuration.getDatabaseLogin());
+		builder.put("password", configuration.getDatabasePassword());
+		builder.put("databaseName", configuration.getDatabaseName());
+		builder.put("url", getJDBCUrl(configuration.getDatabaseHost(), configuration.getDatabaseName()));
 		return builder.build();
 	}
 	

@@ -33,6 +33,8 @@ package org.obm.dbcp.jdbc;
 
 import java.util.Map;
 
+import org.obm.configuration.DatabaseConfiguration;
+
 
 public interface IJDBCDriver {
 
@@ -42,7 +44,7 @@ public interface IJDBCDriver {
 	
 	String getUniqueName();
 
-	Map<String,String> getDriverProperties(String login, String password, String dbName, String dbHost);
+	Map<String,String> getDriverProperties(DatabaseConfiguration configuration);
 
 	boolean readOnlySupported();
 

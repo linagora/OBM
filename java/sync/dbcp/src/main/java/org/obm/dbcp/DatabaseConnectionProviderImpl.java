@@ -51,6 +51,8 @@ import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -62,18 +64,14 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final ITransactionAttributeBinder transactionAttributeBinder;
+	
+	private final DatabaseConfiguration databaseConfiguration;
 
-	private DBConnectionPool ds;
-	private IJDBCDriver cf;
+	private final IJDBCDriver driver;
 
-	private String lastInsertIdQuery;
+	private final PoolingDataSource poolds;
 
-	private DatabaseSystem system;
-	private String login;
-	private String password;
-	private String host;
-	private String name;
-	private int maxPoolSize;
+	private static final String VALIDATION_QUERY = "SELECT 666";
 
 	@Inject
 	public DatabaseConnectionProviderImpl(
@@ -81,23 +79,26 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 			DatabaseConfiguration databaseConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
-		login = databaseConfiguration.getDatabaseLogin();
-		password = databaseConfiguration.getDatabasePassword();
-		host = databaseConfiguration.getDatabaseHost();
-		name = databaseConfiguration.getDatabaseName();
-		system = databaseConfiguration.getDatabaseSystem();
-		maxPoolSize = databaseConfiguration.getDatabaseMaxConnectionPoolSize();
-		configurationLogger.info("Database system : {}", system);
-		configurationLogger.info("Database name {} on host {}", name, host);
-		configurationLogger.info("Database connection pool size : {}", maxPoolSize);
-		configurationLogger.info("Databse login : {}", login);
-		logger.info("Starting OBM connection pool...");
-		createDataSource();
-	}
+		this.databaseConfiguration = databaseConfiguration;
 
-	private void createDataSource() {
-		cf = buildJDBCConnectionFactory(system);
-		ds = new DBConnectionPool(cf, host, name, login, password, maxPoolSize);
+        configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
+		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
+		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
+		configurationLogger.info("Databse login : {}", databaseConfiguration.getDatabaseLogin());
+        logger.info("Starting OBM connection pool...");
+        
+        driver = buildJDBCConnectionFactory(databaseConfiguration.getDatabaseSystem());
+
+        poolds = new PoolingDataSource();
+        poolds.setClassName(driver.getDataSourceClassName());
+        poolds.setUniqueName(driver.getUniqueName());
+        poolds.setMaxPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
+        poolds.setAllowLocalTransactions(true);
+        poolds.getDriverProperties().putAll(
+                driver.getDriverProperties(databaseConfiguration));
+        poolds.setTestQuery(VALIDATION_QUERY);
+
+        poolds.init();
 	}
 
 	private IJDBCDriver buildJDBCConnectionFactory(DatabaseSystem dbType) {
@@ -111,7 +112,6 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		else {
 		    throw new IllegalArgumentException("No connection factory found for dbtype " + dbType);
 		}
-		lastInsertIdQuery = cf.getLastInsertIdQuery();
 		return cf;
 	}
 
@@ -121,7 +121,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		ResultSet rs = null;
 		try {
 			st = con.createStatement();
-			rs = st.executeQuery(lastInsertIdQuery);
+			rs = st.executeQuery(driver.getLastInsertIdQuery());
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
@@ -133,19 +133,19 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		Connection connection = ds.getConnection();
+		Connection connection = poolds.getConnection();
 		setConnectionReadOnlyIfNecessary(connection);
 		setTimeZoneToUTC(connection);
 		return connection;
 	}
 
 	private void setTimeZoneToUTC(Connection connection) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(cf.getGMTTimezoneQuery());
+		PreparedStatement ps = connection.prepareStatement(driver.getGMTTimezoneQuery());
 		ps.executeUpdate();
 	}
 
 	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
-		if(cf.readOnlySupported()){
+		if(driver.readOnlySupported()){
 			try {
 				boolean isReadOnlyTransaction = isReadOnlyTransaction();
 				if(connection.isReadOnly() != isReadOnlyTransaction){
@@ -164,12 +164,12 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	public void cleanup() {
-	    ds.cleanup();
+	    poolds.close();
 	}
 
 	@Override
 	public Object getJdbcObject(String type, String value) throws SQLException {
-		if (system == DatabaseSystem.PGSQL) {
+		if (databaseConfiguration.getDatabaseSystem() == DatabaseSystem.PGSQL) {
 			try {
 				Object o = Class.forName("org.postgresql.util.PGobject")
 						.newInstance();

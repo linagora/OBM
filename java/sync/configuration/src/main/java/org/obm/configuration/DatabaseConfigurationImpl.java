@@ -49,8 +49,7 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
     @Inject
-    DatabaseConfigurationImpl()
-    {
+    DatabaseConfigurationImpl() {
         super(GLOBAL_CONFIGURATION_FILE);
     }
 
