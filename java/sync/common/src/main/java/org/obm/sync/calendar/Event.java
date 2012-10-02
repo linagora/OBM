@@ -652,9 +652,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	private void changeAttendeesParticipationState() {
 		for (Attendee att: getAttendees()) {
 			if (att.isCanWriteOnCalendar()) {
-				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
-					att.setState(ParticipationState.ACCEPTED);
-				}
+				att.setState(ParticipationState.ACCEPTED);
 			} else {
 				att.setState(ParticipationState.NEEDSACTION);
 			}

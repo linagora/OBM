@@ -1366,4 +1366,52 @@ public class EventTest {
 
 		assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
 	}
+	
+	@Test
+	public void testDeclinedAttendeeWithoutDelegationEndsUpInNeedsAction() {
+		Event event = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = event.getAttendees();
+		Attendee att1 = Iterables.getFirst(attendees, null);
+		att1.setState(ParticipationState.DECLINED);
+		att1.setCanWriteOnCalendar(false);
+		event.updateParticipationState();
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+	}
+	
+	public void testAcceptedAttendeeWithoutDelegationEndsUpInNeedsAction() {
+		Event event = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = event.getAttendees();
+		Attendee att1 = Iterables.getFirst(attendees, null);
+		att1.setState(ParticipationState.ACCEPTED);
+		att1.setCanWriteOnCalendar(false);
+		event.updateParticipationState();
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+	}
+	
+	@Test
+	public void testDeclinedAttendeeWithDelegationEndsUpAutoAccepted() {
+		Event event = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = event.getAttendees();
+		Attendee att1 = Iterables.getFirst(attendees, null);
+		att1.setState(ParticipationState.DECLINED);
+		att1.setCanWriteOnCalendar(true);
+		event.updateParticipationState();
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+	}
+	
+	@Test
+	public void testNeedsActionAttendeeWithDelegationEndsUpAutoAccepted() {
+		Event event = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = event.getAttendees();
+		Attendee att1 = Iterables.getFirst(attendees, null);
+		att1.setState(ParticipationState.NEEDSACTION);
+		att1.setCanWriteOnCalendar(true);
+		event.updateParticipationState();
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+	}
+	
 }
