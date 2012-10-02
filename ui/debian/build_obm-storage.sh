@@ -164,5 +164,6 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~beta2
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1~beta3.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1~beta3
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.1.1~0.alpha1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.1.1~0.alpha1
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.alpha2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.0~0.alpha2
 
 exit 0
