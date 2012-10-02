@@ -5668,7 +5668,7 @@ function html_calendar_waiting_events($obm_wait) {
 //   - $current_view
 //   - $event_id
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_dis_delete($current_view, $event_id) {
+function html_calendar_dis_delete($current_view, $event_id, $exception_date) {
   $ent_q = run_query_get_events_attendee(array($event_id));
 
   if ($ent_q->nf() > 1 || ($ent_q->next_record() &&  $ent_q->f('eventlink_entity') == 'user' && $ent_q->f('eventlink_entity_id') != $GLOBALS['obm']['uid'])) {
@@ -5677,7 +5677,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
 
   $event_details_q = run_query_calendar_detail($event_id);
 
-  $is_recurrence = ($event_details_q->f('event_repeatkind') != 'none');
+  $is_recurrence = ($event_details_q->f('event_repeatkind') != 'none') && !isset($exception_date);
   $message = $is_recurrence ? $GLOBALS['l_confirm_delete_all'] :
       $GLOBALS['l_confirm_delete_single'];
   $block = "
@@ -5686,6 +5686,7 @@ function html_calendar_dis_delete($current_view, $event_id) {
     <form method='POST' id='deleteForm' action='$GLOBALS[path]/calendar/calendar_index.php'>
       <input type='hidden' name='action' value='delete' />
       <input type='hidden' name='calendar_id' value='$event_id' />
+      <input type='hidden' name='exception_date' value='$exception_date' />
       $mail
     </form>
     <input type='button' onclick=\"$('deleteForm').submit();\" value='$GLOBALS[l_yes]'/>

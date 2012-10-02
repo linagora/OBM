@@ -260,7 +260,7 @@ $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
 $l_select_pdf_day = "Vous devez sélectionner un jour";
 $l_confirm_delete_all = "Cette opération va supprimer toutes les occurrences de cet évènement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
-$l_confirm_delete_single = "Cette opération va supprimer cet évènement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
+$l_confirm_delete_single = "Cette opération va supprimer cet évènement ou occurrence pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
 $l_confirm_delete = "Cette opération va supprimer cette occurrence de l'évènement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
@@ -433,5 +433,7 @@ $l_addedit_alarm = "Ajouter / Modifier alerte";
 // decision popup
 $l_comment_decision = "Commenter votre décision";
 $l_addedit_comment = "Ajouter / Modifier un commentaire";
-$l_remainingChar = "caractères restants";
 $l_motivation = "Motivation";
+$l_without_comment = "Répondre sans commentaire";
+$l_with_comment = "Répondre avec commentaire";
+$l_remainingChar = "caractères restants";

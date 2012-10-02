@@ -851,7 +851,7 @@ if ($action == 'search') {
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
-    $display['detail'] = html_calendar_dis_delete($current_view, $params['calendar_id']);
+    $display['detail'] = html_calendar_dis_delete($current_view, $params['calendar_id'], $params['date_edit_occurrence']);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
@@ -864,9 +864,18 @@ if ($action == 'search') {
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_access($params['calendar_id'])) {
-    run_query_calendar_delete($params, false);
-    OBM_IndexingService::delete('event', $params['calendar_id']);
+  $id = $params['calendar_id'];
+  if (check_calendar_access($id)) {
+    if(!isset($params['exception_date'])) {
+        run_query_calendar_delete($params,false);
+        OBM_IndexingService::delete('event', $id);
+    } else {
+        $params['old_date_begin'] = of_isodate_convert($params['exception_date'],true);
+        if(!is_null($params['old_date_begin'])) {
+            $params['old_date_begin'] = new Of_Date($params['old_date_begin']);
+        }  
+        run_query_calendar_event_exception_insert($params,'',true);
+    }
     redirect_ok($params, "$l_event: $l_delete_ok");
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
@@ -1742,7 +1751,7 @@ function get_calendar_action() {
   $id = $params['calendar_id'];
   $date = $params['date'];
   if (isset($params['date_edit_occurrence'])){
-    $exception_update="&amp;date_edit_occurrence=".$params['date_edit_occurrence'];
+    $exception_date="&amp;date_edit_occurrence=".$params['date_edit_occurrence'];
   }
 
   // Index
@@ -1828,7 +1837,7 @@ function get_calendar_action() {
   // Detail Update
   $actions['calendar']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id$exception_update",
+    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id$exception_date",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','update_alert','update_decision', 'update_ext_decision') 
   );
@@ -1844,7 +1853,7 @@ function get_calendar_action() {
   // Check Delete
   $actions['calendar']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id",
+    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id$exception_date",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult')
   );
