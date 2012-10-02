@@ -72,11 +72,13 @@ class SendEmailCommandTest extends FunSuite {
 	}
 	
 	test("SendEmail message contains recipients") {
-		val sendEmailContext = new SendEmailContext(mailbox("from"), mailbox("to"), mailbox("cc"), true)
+		val sendEmailContext = new SendEmailContext(
+				mailbox("from"), mailbox("to"), mailbox("cc"), mailbox("bcc"))
 		val message = new SendEmailCommand(context, sendEmailContext).buildMail
 		assert(message.getTo().contains(mailbox("to")))
 		assert(message.getFrom().contains(mailbox("from")))
 		assert(message.getCc().contains(mailbox("cc")))
+		assert(message.getBcc().contains(mailbox("bcc")))
 	}
 	
 	def mailbox(login: String) = new Mailbox(login, "domain.org")

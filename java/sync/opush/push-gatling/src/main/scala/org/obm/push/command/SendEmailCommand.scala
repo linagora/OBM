@@ -69,6 +69,7 @@ class SendEmailCommand(httpContext: HttpContext, sendContext :SendEmailContext) 
 		message.setFrom(sendContext.from)
 		message.setTo(sendContext.to)
 		message.setCc(sendContext.cc)
+		message.setBcc(sendContext.bcc)
 		return message
 	}
 	

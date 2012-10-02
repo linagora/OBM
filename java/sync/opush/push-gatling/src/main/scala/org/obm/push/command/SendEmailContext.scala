@@ -38,4 +38,5 @@ case class SendEmailContext(
 		from: Mailbox = null,
 		to: Mailbox = null,
 		cc: Mailbox = null,
+		bcc: Mailbox = null,
 		saveInSent: Boolean = true) {}
