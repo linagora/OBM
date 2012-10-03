@@ -15,6 +15,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.utils.DisplayNameUtils;
+import org.obm.sync.utils.MailUtils;
 
 public class EventBuilder {
 	private Calendar cal;
@@ -101,16 +102,6 @@ public class EventBuilder {
 	}
 
 	private String getCreatorObmEmail(ResultSet rs, String domainName) throws SQLException {
-		String firstEmail = null;
-		String creatorEmailString = rs.getString("creatorEmail");
-		if (creatorEmailString != null) {
-			String[] alias = creatorEmailString.split("\r\n");
-			if (alias[0].contains("@")) {
-				firstEmail = alias[0];
-			} else {
-				firstEmail = alias[0] + "@" + domainName;
-			}
-		}
-		return firstEmail;
+		return MailUtils.extractFirstEmail(rs.getString("creatorEmail"), domainName);
 	}
 }

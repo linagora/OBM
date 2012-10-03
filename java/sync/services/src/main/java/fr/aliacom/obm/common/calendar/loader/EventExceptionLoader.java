@@ -21,12 +21,14 @@ import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 public class EventExceptionLoader {
 	public static class Builder {
 		private Connection conn;
+		private String domainName;
 		private Calendar cal;
 		private Map<EventObmId, Event> parentEventsById;
 		private EventObmId withAlertsFor;
 
 		public Builder() {
 			this.conn = null;
+			this.domainName = null;
 			this.cal = null;
 			this.parentEventsById = Maps.newHashMap();
 			this.withAlertsFor = null;
@@ -34,6 +36,11 @@ public class EventExceptionLoader {
 
 		public Builder connection(Connection conn) {
 			this.conn = conn;
+			return this;
+		}
+
+		public Builder domainName(String domainName) {
+			this.domainName = domainName;
 			return this;
 		}
 
@@ -55,10 +62,11 @@ public class EventExceptionLoader {
 
 		public EventExceptionLoader build() {
 			Preconditions.checkState(conn != null, "The connection parameter is mandatory");
+			Preconditions.checkState(domainName != null, "The domain name is mandatory");
 			Preconditions.checkState(cal != null, "The calendar parameter is mandatory");
 			Preconditions.checkState(!parentEventsById.isEmpty(),
 					"There should be at least one parent id");
-			return new EventExceptionLoader(conn, cal, parentEventsById, withAlertsFor);
+			return new EventExceptionLoader(conn, domainName, cal, parentEventsById, withAlertsFor);
 		}
 	}
 
@@ -109,13 +117,15 @@ public class EventExceptionLoader {
 					"ev_ex.eventexception_parent_id AS parent_id" });
 
 	private Connection conn;
+	private String domainName;
 	private Calendar cal;
 	private Map<EventObmId, Event> parentEventsById;
 	private EventObmId withAlertsFor;
 
-	public EventExceptionLoader(Connection conn, Calendar cal,
+	public EventExceptionLoader(Connection conn, String domainName, Calendar cal,
 			Map<EventObmId, Event> parentEventsById, EventObmId withAlertsFor) {
 		this.conn = conn;
+		this.domainName = domainName;
 		this.cal = cal;
 		this.parentEventsById = parentEventsById;
 		this.withAlertsFor = withAlertsFor;
@@ -168,10 +178,17 @@ public class EventExceptionLoader {
 			eventExceptionsByEventId.put(eventException.getObmId(), eventException);
 			addEventExceptionToEvent(parentEventId, eventException);
 		}
+		loadObjectGraph(eventExceptionsByEventId);
+		return eventExceptionsByEventId;
+	}
+
+	private void loadObjectGraph(Map<EventObmId, Event> eventExceptionsByEventId) throws SQLException {
+		if (eventExceptionsByEventId.isEmpty())
+			return;
+		this.loadAttendees(eventExceptionsByEventId);
 		if (this.withAlertsFor != null) {
 			this.loadAlerts(eventExceptionsByEventId);
 		}
-		return eventExceptionsByEventId;
 	}
 
 	private EventObmId buildParentEventId(ResultSet rs) throws SQLException {
@@ -186,6 +203,12 @@ public class EventExceptionLoader {
 		}
 		EventRecurrence er = e.getRecurrence();
 		er.addEventException(eventException);
+	}
+
+	private void loadAttendees(Map<EventObmId, Event> eventsById) throws SQLException {
+		AttendeeLoader attendeeLoader = AttendeeLoader.builder().connection(conn)
+				.domainName(domainName).eventsById(eventsById).build();
+		attendeeLoader.load();
 	}
 
 	private void loadAlerts(Map<EventObmId, Event> eventExceptionsById) throws SQLException {

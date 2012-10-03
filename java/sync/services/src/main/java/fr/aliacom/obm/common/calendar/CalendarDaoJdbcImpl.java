@@ -947,11 +947,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			SyncRange syncRange)
 			throws FindException {
 		Calendar cal = getGMTCalendar();
+		String domainName = resourceInfo.getDomainName();
 		Connection conn = null;
 		try {
 			conn = obmHelper.getConnection();
-			EventLoader loader = EventLoader.builder().connection(conn).calendar(cal).occurringBetween(syncRange).
-				usingResources(resourceInfo.getId()).withExceptions(true).build();
+			EventLoader loader = EventLoader.builder().connection(conn).domainName(domainName).calendar(cal).
+				occurringBetween(syncRange).usingResources(resourceInfo.getId()).withExceptions(true).build();
 			Map<EventObmId, Event> events = loader.load();
 			return events.values();
 		}

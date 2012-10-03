@@ -30,6 +30,7 @@ public class EventLoader {
 
 	public static class Builder {
 		private Connection conn;
+		private String domainName;
 		private Calendar cal;
 		private Set<EventObmId> ids;
 		private Set<Integer> usingResources;
@@ -41,6 +42,7 @@ public class EventLoader {
 
 		private Builder() {
 			this.conn = null;
+			this.domainName = null;
 			this.cal = null;
 			this.ids = Sets.newHashSet();
 			this.usingResources = Sets.newHashSet();
@@ -53,6 +55,11 @@ public class EventLoader {
 
 		public Builder connection(Connection conn) {
 			this.conn = conn;
+			return this;
+		}
+
+		public Builder domainName(String domainName) {
+			this.domainName = domainName;
 			return this;
 		}
 
@@ -114,6 +121,7 @@ public class EventLoader {
 
 		public EventLoader build() {
 			Preconditions.checkState(conn != null, "The connection parameter is mandatory");
+			Preconditions.checkState(domainName != null, "The domain name parameter is mandatory");
 			Preconditions.checkState(cal != null, "The calendar parameter is mandatory");
 			Preconditions.checkState((updatedAfter != null || updatedOrOccuringAfter != null
 					|| !ids.isEmpty() || !usingResources.isEmpty()),
@@ -121,8 +129,9 @@ public class EventLoader {
 			Preconditions
 					.checkState((updatedAfter == null || updatedOrOccuringAfter == null),
 							"The updatedAfter and updatedOrOccurringAfter arguments are mutually exclusive");
-			return new EventLoader(conn, cal, ids, updatedAfter, updatedOrOccuringAfter,
-					occurringBetween, usingResources, withExceptions, withAlertsFor);
+			return new EventLoader(conn, domainName, cal, ids, updatedAfter,
+					updatedOrOccuringAfter, occurringBetween, usingResources, withExceptions,
+					withAlertsFor);
 		}
 	}
 
@@ -171,6 +180,7 @@ public class EventLoader {
 					"c.userobm_commonname AS creatorCommonName",
 					"c.userobm_email AS creatorEmail" });
 	private Connection conn;
+	private String domainName;
 	private Calendar cal;
 	private Set<EventObmId> ids;
 	private Date updatedAfter;
@@ -180,12 +190,13 @@ public class EventLoader {
 	private boolean withExceptions;
 	private EventObmId withAlertsFor;
 
-	private EventLoader(Connection conn, Calendar cal, Set<EventObmId> ids, Date updatedAfter,
-			Date updatedOrOccuringAfter, SyncRange occurringBetween, Set<Integer> usingResources,
-			boolean withExceptions,	EventObmId withAlertsFor) {
+	private EventLoader(Connection conn, String domainName, Calendar cal, Set<EventObmId> ids,
+			Date updatedAfter, Date updatedOrOccuringAfter, SyncRange occurringBetween,
+			Set<Integer> usingResources, boolean withExceptions, EventObmId withAlertsFor) {
 		this.conn = conn;
-		this.ids = ids;
+		this.domainName = domainName;
 		this.cal = cal;
+		this.ids = ids;
 		this.updatedAfter = updatedAfter;
 		this.updatedOrOccuringAfter = updatedOrOccuringAfter;
 		this.occurringBetween = occurringBetween;
@@ -218,6 +229,7 @@ public class EventLoader {
 		if (eventsById.isEmpty()) {
 			return;
 		}
+		this.loadAttendees(eventsById);
 		if (this.withExceptions) {
 			this.loadExceptions(eventsById);
 			this.loadEventExceptions(eventsById);
@@ -225,6 +237,12 @@ public class EventLoader {
 		if (this.withAlertsFor != null) {
 			this.loadAlerts(eventsById);
 		}
+	}
+
+	private void loadAttendees(Map<EventObmId, Event> eventsById) throws SQLException {
+		AttendeeLoader attendeeLoader = AttendeeLoader.builder().connection(conn)
+				.domainName(domainName).eventsById(eventsById).build();
+		attendeeLoader.load();
 	}
 
 	private void loadExceptions(Map<EventObmId, Event> eventsById) throws SQLException {
@@ -237,8 +255,8 @@ public class EventLoader {
 	}
 
 	private void loadEventExceptions(Map<EventObmId, Event> eventsById) throws SQLException {
-		EventExceptionLoader.Builder builder = EventExceptionLoader.builder().connection(conn)
-				.calendar(cal).parentEventsById(eventsById);
+		EventExceptionLoader.Builder builder = EventExceptionLoader.builder().connection(conn).
+				domainName(domainName).calendar(cal).parentEventsById(eventsById);
 		if (this.withAlertsFor != null) {
 			builder = builder.withAlertsFor(withAlertsFor);
 		}
