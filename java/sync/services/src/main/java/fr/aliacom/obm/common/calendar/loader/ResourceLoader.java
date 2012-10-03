@@ -102,8 +102,9 @@ public class ResourceLoader {
 	private String buildQuery(IntegerSQLCollectionHelper idsHelper,
 			StringSQLCollectionHelper emailsHelper) {
 		Collection<String> filters = buildFilters(idsHelper, emailsHelper);
-		return String.format("SELECT r.resource_id, r.resource_name, r.resource_email "
-				+ "FROM Resource r WHERE %s", Joiner.on(" AND ").join(filters));
+		return String.format("SELECT r.resource_id, r.resource_name, r.resource_email, d.domain_name " +
+				"FROM Resource r JOIN Domain d ON r.resource_domain_id=d.domain_id " +
+				"WHERE %s", Joiner.on(" AND ").join(filters));
 	}
 
 	private Collection<String> buildFilters(IntegerSQLCollectionHelper idsHelper,
@@ -140,6 +141,6 @@ public class ResourceLoader {
 
 	private ResourceInfo buildResource(ResultSet rs) throws SQLException {
 		return ResourceInfo.builder().id(rs.getInt(1)).name(rs.getString(2)).mail(rs.getString(3))
-				.read(false).write(false).build();
+				.read(false).write(false).domainName(rs.getString(4)).build();
 	}
 }

@@ -265,6 +265,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 				description(Strings.emptyToNull(s(item, "description"))).
 				read("true".equals(s(item, "read"))).
 				write("true".equals(s(item, "write"))).
+				domainName(s(item, "domain")).
 				build();
 	}
 

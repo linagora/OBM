@@ -6,4 +6,5 @@
   <description/>
   <read>true</read>
   <write>false</write>
+  <domain>domain</domain>
 </resourceInfo>

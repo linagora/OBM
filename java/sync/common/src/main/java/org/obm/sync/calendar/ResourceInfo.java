@@ -11,6 +11,7 @@ public class ResourceInfo {
 	private String description;
 	private boolean read;
 	private boolean write;
+	private String domainName;
 
 	public static class Builder {
 		private int id;
@@ -19,6 +20,7 @@ public class ResourceInfo {
 		private String description;
 		private Boolean read;
 		private Boolean write;
+		private String domainName;
 
 		private Builder() {
 			id = -1;
@@ -54,13 +56,19 @@ public class ResourceInfo {
 			return this;
 		}
 
+		public Builder domainName(String domainName) {
+			this.domainName = domainName;
+			return this;
+		}
+
 		public ResourceInfo build() {
 			Preconditions.checkState(id > -1);
 			Preconditions.checkState(!Strings.isNullOrEmpty(name));
 			Preconditions.checkState(!Strings.isNullOrEmpty(mail));
 			Preconditions.checkState(read != null);
 			Preconditions.checkState(write != null);
-			return new ResourceInfo(id, name, mail, description, read, write);
+			Preconditions.checkState(domainName != null);
+			return new ResourceInfo(id, name, mail, description, read, write, domainName);
 		}
 	}
 
@@ -68,13 +76,14 @@ public class ResourceInfo {
 		return new Builder();
 	}
 
-	private ResourceInfo(int id, String name, String mail, String description, boolean read, boolean write) {
+	private ResourceInfo(int id, String name, String mail, String description, boolean read, boolean write, String domainName) {
 		this.id = id;
 		this.name = name;
 		this.mail = mail;
 		this.description = description;
 		this.read = read;
 		this.write = write;
+		this.domainName = domainName;
 	}
 
 	public int getId() {
@@ -99,6 +108,10 @@ public class ResourceInfo {
 
 	public boolean isWrite() {
 		return write;
+	}
+
+	public String getDomainName() {
+		return domainName;
 	}
 
 	@Override

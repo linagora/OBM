@@ -148,7 +148,7 @@ private CalendarItemsWriter writer;
 	public void testGetResourceInfo() throws IOException, SAXException, TransformerException {
 		ResourceInfo resourceInfo = ResourceInfo.builder().id(42).name("myresource")
 				.mail("res-42@somedomain.com").description("mydescription").read(true).write(false)
-				.build();
+				.domainName("domain").build();
 		String expectedXML = loadXmlFile("ResourceInfo.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
@@ -158,7 +158,7 @@ private CalendarItemsWriter writer;
 	public void testGetResourceInfoWithoutDescription() throws IOException, SAXException, TransformerException {
 		ResourceInfo resourceInfo = ResourceInfo.builder().id(42).name("myresource")
 				.mail("res-42@somedomain.com").read(true).write(false)
-				.build();
+				.domainName("domain").build();
 
 		String expectedXML = loadXmlFile("ResourceInfoWithoutDescription.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);

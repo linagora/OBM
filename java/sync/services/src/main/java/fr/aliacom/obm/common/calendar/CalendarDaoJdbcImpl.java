@@ -1423,7 +1423,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		Set<ResourceInfo> resourceInfo = new HashSet<ResourceInfo>();
-
+		String domainName = user.getDomain().getName();
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
@@ -1452,7 +1452,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
-				resourceInfo.add(buildResourceInfo(rs));
+				resourceInfo.add(buildResourceInfo(rs, domainName));
 			}
 		} catch (SQLException e) {
 			logger.error("Error finding resources", e);
@@ -1467,9 +1467,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return resourceInfo;
 	}
 
-	private ResourceInfo buildResourceInfo(ResultSet rs) throws SQLException {
+	private ResourceInfo buildResourceInfo(ResultSet rs, String domainName) throws SQLException {
 		return ResourceInfo.builder().id(rs.getInt(1)).name(rs.getString(2)).mail(rs.getString(3)).
-				description(rs.getString(4)).read(rs.getBoolean(5)).write(rs.getBoolean(6)).build();
+				description(rs.getString(4)).read(rs.getBoolean(5)).write(rs.getBoolean(6)).domainName(domainName).build();
 	}
 
 	@Override

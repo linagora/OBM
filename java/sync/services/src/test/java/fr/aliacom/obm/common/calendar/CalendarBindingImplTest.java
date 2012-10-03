@@ -2148,10 +2148,10 @@ public class CalendarBindingImplTest {
 	}
 
 	private ResourceInfo buildResourceInfo1() {
-		return ResourceInfo.builder().id(1).name("resource1").mail("res-1@domain.com").read(true).write(true).build();
+		return ResourceInfo.builder().id(1).name("resource1").mail("res-1@domain.com").read(true).write(true).domainName("domain").build();
 	}
 
 	private ResourceInfo buildResourceInfo2() {
-		return ResourceInfo.builder().id(1).name("resource2").mail("res-2@domain.com").read(true).write(false).build();
+		return ResourceInfo.builder().id(1).name("resource2").mail("res-2@domain.com").read(true).write(false).domainName("domain").build();
 	}
 }
