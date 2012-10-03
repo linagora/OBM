@@ -34,44 +34,50 @@ package org.obm.push.command
 import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
-import org.obm.push.bean.SyncKey
+import org.obm.push.protocol.bean.SyncResponse
 import scala.collection.JavaConversions._
 import org.obm.push.bean.FolderType
+import org.obm.push.bean.SyncKey
 
-class InitialFolderSyncContext extends FolderSyncContext {
+class InitialSyncContext(folderType: FolderType) extends SyncContext(folderType) {
 	
-	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
+	val initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY
 		
 	override def nextSyncKey(session: => Session) = initialSyncKey
 	
 }
 
-case class FolderSyncContext {
+case class SyncContext(folderType: FolderType) {
 	
-	val sessionKeyLastFolderSync = "lastFolderSync"
+	val sessionKeyLastSync = "lastSync"
 		
 	def nextSyncKey(session: => Session): SyncKey = {
-		val lastFolderSync = getLastFolderSync(session)
-		if (lastFolderSync != null) {
-			return lastFolderSync.getNewSyncKey()
+		if (session.isAttributeDefined(sessionKeyLastSync)) {
+			val lastSync = session.getTypedAttribute[SyncResponse](sessionKeyLastSync)
+			if (lastSync != null) {
+				return nextSyncKeyInResponse(session, lastSync)
+			}
+			throw new IllegalStateException("Cannot find the next SyncKey in previous Sync response")
+		} else {
+			throw new IllegalStateException("No last Sync in session")
 		}
-		throw new IllegalStateException("Cannot find the next SyncKey in previous FolderSync response")
 	}
 	
-	def collectionId(session: => Session, folderType: => FolderType): Int = {
-		val lastFolderSync = getLastFolderSync(session)
-		val collections = collectionAsScalaIterable(lastFolderSync.getCollectionsAddedAndUpdated())
-		for (collection <- collections if collection.getFolderType() == folderType) {
-			return collection.getCollectionId().toInt
+	private[this] def nextSyncKeyInResponse(session: Session, syncResponse: SyncResponse): SyncKey = {
+		val collectionId = this.findCollectionId(session)
+		val syncResponses = collectionAsScalaIterable(syncResponse.getCollectionResponses())
+		for (col <- syncResponses if col.getSyncCollection().getCollectionId() == collectionId) {
+			return col.getAllocateNewSyncKey()
 		}
-		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
+		throw new NoSuchElementException(
+				"Cannot find collection:{%d} in response:{%s}".format(collectionId, syncResponse))
 	}
 	
-	def getLastFolderSync(session: => Session): FolderSyncResponse = {
-		if (session.isAttributeDefined(sessionKeyLastFolderSync)) {
-			return session.getTypedAttribute[FolderSyncResponse](sessionKeyLastFolderSync)
+	private[this] var collectionId: Option[Int] = None
+	def findCollectionId(session: => Session): Int = {
+		if (collectionId.isEmpty) {
+			collectionId = Option.apply(new FolderSyncContext().collectionId(session, folderType))
 		}
-		throw new IllegalStateException("No last FolderSync in session")
+		collectionId.get
 	}
 }
