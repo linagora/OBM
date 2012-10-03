@@ -53,15 +53,15 @@ class ThreeFolderSyncSimulation extends Simulation {
 	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
 	val httpContext: HttpContext = new ActiveSyncHttpContext(contextConfiguration)
 	
-	val initialFolderSyncContext = new InitialFolderSyncContext(httpContext)
-	val folderSyncContext = new FolderSyncContext(httpContext)
+	val initialFolderSyncContext = new InitialFolderSyncContext()
+	val folderSyncContext = new FolderSyncContext()
 
 	def apply = {
 		
 		val folderSyncScenario = scenario("Three consecutive FolderSync request")
-			.exec(new FolderSyncCommand(initialFolderSyncContext, wbTools).buildCommand)
-			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
-			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
+			.exec(new FolderSyncCommand(httpContext, initialFolderSyncContext, wbTools).buildCommand)
+			.exec(new FolderSyncCommand(httpContext, folderSyncContext, wbTools).buildCommand)
+			.exec(new FolderSyncCommand(httpContext, folderSyncContext, wbTools).buildCommand)
 					
 		val httpConf = httpConfig
 			.baseURL(contextConfiguration.targetServerUrl)

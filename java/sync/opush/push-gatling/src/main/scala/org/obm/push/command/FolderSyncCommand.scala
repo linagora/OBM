@@ -43,7 +43,8 @@ import com.excilys.ebi.gatling.http.Predef.regex
 import com.google.common.base.Charsets
 import org.obm.push.protocol.bean.FolderSyncRequest
 
-class FolderSyncCommand(context: FolderSyncContext, wbTools: WBXMLTools) extends AbstractActiveSyncCommand(context.httpContext) {
+class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
+	extends AbstractActiveSyncCommand(httpContext) {
 
 	val folderSyncProtocol = new FolderSyncProtocol
 	val folderSyncNamespace = "FolderHierarchy"
@@ -57,11 +58,11 @@ class FolderSyncCommand(context: FolderSyncContext, wbTools: WBXMLTools) extends
 			.check(regex(".*")
 			    .find
 			    .transform((response: String) => toFolderSyncResponse(response))
-			    .saveAs(context.sessionKeyLastFolderSync))
+			    .saveAs(folderSyncContext.sessionKeyLastFolderSync))
 	}
 
 	def buildFolderSyncRequest(session: Session): Array[Byte] = {
-		val nextFolderSyncSyncKey = context.nextSyncKey(session)
+		val nextFolderSyncSyncKey = folderSyncContext.nextSyncKey(session)
 		val request = FolderSyncRequest.builder().syncKey(nextFolderSyncSyncKey).build()
 		val requestDoc = folderSyncProtocol.encodeRequest(request)
 		wbTools.toWbxml(folderSyncNamespace, requestDoc)

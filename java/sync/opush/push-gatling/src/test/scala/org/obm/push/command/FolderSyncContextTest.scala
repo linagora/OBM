@@ -45,29 +45,11 @@ import org.obm.push.bean.SyncKey
 class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 	
 	test("Initial FoldeSync context returns 0 for next synckey") {
-		val httpContext = new ActiveSyncHttpContext(new ContextConfiguration {
-			  val targetServerUrl = "192.168.0.1"
-			  val userDomain = "domain.org"
-			  val userLogin = "login"
-			  val userPassword = "pass"
-			  val userDeviceId = "deviceId"
-			  val userDeviceType = "deviceType"
-			  val userPolicyKey = "1234567890"
-		})
-		val context = new InitialFolderSyncContext(httpContext)
+		val context = new InitialFolderSyncContext()
 		assert(context.nextSyncKey(null) === new SyncKey("0"))
 	}
 	
 	test("nextSyncKey throw exception if no response in session") {
-		val httpContext = new ActiveSyncHttpContext(new ContextConfiguration {
-			  val targetServerUrl = "192.168.0.1"
-			  val userDomain = "domain.org"
-			  val userLogin = "login"
-			  val userPassword = "pass"
-			  val userDeviceId = "deviceId"
-			  val userDeviceType = "deviceType"
-			  val userPolicyKey = "1234567890"
-		})
 		val session = strictMock(manifest[Session])
 		expecting {
 			call(session.isAttributeDefined("lastFolderSync")).andReturn(false)
@@ -75,21 +57,12 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 		
 		whenExecuting(session) {
 			intercept[IllegalStateException] {
-				new FolderSyncContext(httpContext).nextSyncKey(session)
+				new FolderSyncContext().nextSyncKey(session)
 			}
 		}
 	}
 	
 	test("nextSyncKey throw exception if response in session is null") {
-		val httpContext = new ActiveSyncHttpContext(new ContextConfiguration {
-			  val targetServerUrl = "192.168.0.1"
-			  val userDomain = "domain.org"
-			  val userLogin = "login"
-			  val userPassword = "pass"
-			  val userDeviceId = "deviceId"
-			  val userDeviceType = "deviceType"
-			  val userPolicyKey = "1234567890"
-		})
 		val session = strictMock(manifest[Session])
 		expecting {
 			call(session.isAttributeDefined("lastFolderSync")).andReturn(true)
@@ -98,22 +71,12 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 		
 		whenExecuting(session) {
 			intercept[IllegalStateException] {
-				new FolderSyncContext(httpContext).nextSyncKey(session)
+				new FolderSyncContext().nextSyncKey(session)
 			}
 		}
 	}
 	
 	test("nextSyncKey reads in response") {
-		val httpContext = new ActiveSyncHttpContext(new ContextConfiguration {
-			  val targetServerUrl = "192.168.0.1"
-			  val userDomain = "domain.org"
-			  val userLogin = "login"
-			  val userPassword = "pass"
-			  val userDeviceId = "deviceId"
-			  val userDeviceType = "deviceType"
-			  val userPolicyKey = "1234567890"
-		})
-
 		val lastResponse = strictMock(manifest[FolderSyncResponse])
 		val session = strictMock(manifest[Session])
 		expecting {
@@ -123,7 +86,7 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 		}
 		
 		whenExecuting(lastResponse, session) {
-			assert(new FolderSyncContext(httpContext).nextSyncKey(session) === new SyncKey("1234-5678"))
+			assert(new FolderSyncContext().nextSyncKey(session) === new SyncKey("1234-5678"))
 		}
 	}
 }

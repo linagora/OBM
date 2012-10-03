@@ -59,7 +59,7 @@ class FolderSyncCommandTest extends FunSuite with BeforeAndAfter {
 			  val userDeviceType = "deviceType"
 			  val userPolicyKey = "1234567890"
 		})
-		val command = new FolderSyncCommand(new FolderSyncContext(context), wbxmlTools)
+		val command = new FolderSyncCommand(context, new FolderSyncContext(), wbxmlTools)
 		assert(command.commandName === "FolderSync")
 	}
 	

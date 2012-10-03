@@ -37,7 +37,7 @@ import org.obm.push.protocol.bean.FolderSyncResponse
 import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
 import org.obm.push.bean.SyncKey
 
-class InitialFolderSyncContext(httpContext: HttpContext) extends FolderSyncContext(httpContext) {
+class InitialFolderSyncContext extends FolderSyncContext {
 	
 	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
 		
@@ -45,7 +45,7 @@ class InitialFolderSyncContext(httpContext: HttpContext) extends FolderSyncConte
 	
 }
 
-case class FolderSyncContext(httpContext: HttpContext) {
+case class FolderSyncContext {
 	
 	val sessionKeyLastFolderSync = "lastFolderSync"
 		
