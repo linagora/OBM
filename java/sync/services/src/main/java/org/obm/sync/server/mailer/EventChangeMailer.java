@@ -46,7 +46,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -55,7 +54,6 @@ import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
-import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -68,7 +66,6 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventMail;
@@ -84,11 +81,9 @@ public class EventChangeMailer extends AbstractMailer {
 	private final String baseUrl;
 	
 	@Inject
-	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
 		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();
-		configurationLogger.info("OBM web interface URL : {}", baseUrl);
 	}
 	
 	public void notifyNeedActionNewUsers(final ObmUser user, Collection<Attendee> attendee, Event event, 

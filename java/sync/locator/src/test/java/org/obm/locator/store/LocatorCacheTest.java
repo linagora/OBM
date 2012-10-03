@@ -46,18 +46,15 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.slf4j.Logger;
 
 @RunWith(SlowFilterRunner.class)
 public class LocatorCacheTest {
 
 	private String loginAtDomain;
-	private Logger logger;
 
 	@Before
 	public void setUp() {
 		loginAtDomain = "test@test.obm.lng";
-		logger = EasyMock.createNiceMock(Logger.class);
 	}
 	
 	@Test
@@ -70,7 +67,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		String value = locatorCache.getServiceLocation(serviceSlashProperty, loginAtDomain);
 		
 		EasyMock.verify(configurationService, locatorClientImpl);
@@ -88,7 +85,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		locatorCache.getServiceLocation(service, loginAtDomain);
 		
 		EasyMock.verify(configurationService, locatorClientImpl);
@@ -106,7 +103,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		locatorCache.getServiceLocation(obmSyncService, loginAtDomain); // load value
 		locatorCache.getServiceLocation(obmSyncService, loginAtDomain); // get value from cache
 		Thread.sleep(5000);
@@ -124,7 +121,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		String value = locatorCache.getServiceLocation(service, loginAtDomain);
 		
 		EasyMock.verify(configurationService, locatorClientImpl);
@@ -147,7 +144,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		String obmSyncValue = locatorCache.getServiceLocation(obmSyncService, loginAtDomain);
 		String obmSyncValueCache = locatorCache.getServiceLocation(obmSyncService, loginAtDomain);
 		String opushValue = locatorCache.getServiceLocation(opushService, loginAtDomain);
@@ -206,7 +203,7 @@ public class LocatorCacheTest {
 		
 		EasyMock.replay(configurationService, locatorClientImpl);
 		
-		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl, logger);
+		LocatorCache locatorCache = new LocatorCache(configurationService, locatorClientImpl);
 		String firstValue = locatorCache.getServiceLocation(serviceKey, loginAtDomain);
 		String firstValueCache = locatorCache.getServiceLocation(serviceKey, loginAtDomain);
 		Thread.sleep(5000);

@@ -35,8 +35,6 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
-import org.slf4j.Logger;
 
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
@@ -44,7 +42,6 @@ import bitronix.tm.TransactionManagerServices;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
 public class TransactionProvider implements Provider<TransactionManager> {
@@ -52,13 +49,10 @@ public class TransactionProvider implements Provider<TransactionManager> {
 	private TransactionManager transactionManager;
 
 	@Inject
-	public TransactionProvider(TransactionConfiguration configuration,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws SystemException {
-		int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
-		configurationLogger.info("Transaction timeout in seconds : {}", transactionTimeOutInSecond);
+	public TransactionProvider(TransactionConfiguration configuration) throws SystemException {
 		configureBitronix(configuration);
 		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
+		transactionManager.setTransactionTimeout(configuration.getTimeOutInSecond());
 	}
 
 	private void configureBitronix(TransactionConfiguration configuration) {

@@ -40,7 +40,6 @@ import javax.transaction.TransactionManager;
 
 import junit.framework.Assert;
 
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +51,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
-import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
 
@@ -70,8 +68,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	public void init() throws NotSupportedException, SystemException {
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
-		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock() );
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

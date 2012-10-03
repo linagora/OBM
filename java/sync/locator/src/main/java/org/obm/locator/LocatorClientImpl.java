@@ -39,13 +39,10 @@ import javax.naming.ConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.store.LocatorService;
-import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
 public class LocatorClientImpl implements LocatorService {
@@ -53,10 +50,8 @@ public class LocatorClientImpl implements LocatorService {
 	private final String locatorUrl;
 
 	@Inject
-	private LocatorClientImpl(ConfigurationService obmConfigurationService,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws ConfigurationException {
+	private LocatorClientImpl(ConfigurationService obmConfigurationService) throws ConfigurationException {
 		locatorUrl = ensureTrailingSlash( obmConfigurationService.getLocatorUrl() );
-		configurationLogger.info("Locator service url : {}", locatorUrl);
 	}
 
 	private String ensureTrailingSlash(String url) {

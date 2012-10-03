@@ -34,7 +34,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
@@ -47,7 +46,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 
 
@@ -61,13 +59,10 @@ public class LocatorCache implements LocatorService {
 	private final LocatorClientImpl locatorClientImpl;
 
 	@Inject
-	/* package */ LocatorCache(ConfigurationService obmConfigurationService, LocatorClientImpl locatorClientImpl, 
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+	/* package */ LocatorCache(ConfigurationService obmConfigurationService, LocatorClientImpl locatorClientImpl) {
 		this.locatorClientImpl = locatorClientImpl;
-		int locatorCacheTimeout = obmConfigurationService.getLocatorCacheTimeout();
-		TimeUnit locatorCacheTimeUnit = obmConfigurationService.getLocatorCacheTimeUnit();
-		configurationLogger.info("Locator cache timeout : {} {}", locatorCacheTimeout, locatorCacheTimeUnit);
-		this.store = createStore(locatorCacheTimeout, locatorCacheTimeUnit); 
+		this.store = createStore(obmConfigurationService.getLocatorCacheTimeout(), 
+							   obmConfigurationService.getLocatorCacheTimeUnit()); 
 	}
 
 	private LoadingCache<Key, String> createStore(int duration, TimeUnit unit) {
