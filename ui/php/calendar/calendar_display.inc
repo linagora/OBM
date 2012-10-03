@@ -5227,15 +5227,16 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   while($cur_hour_b->compare($cur_hour_e) < 0) {
     $hour = $cur_hour_b->getOutputHour();
+    $formatedHour = $cur_hour_b->getHour();
     if ($begin->compareHour($cur_hour_b) == 0) {
-      $dis_hour_b .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
+      $dis_hour_b .= "<option value=\"$formatedHour\" selected=\"selected\">$hour</option>";
     } else {
-      $dis_hour_b .= "<option value=\"$hour\">$hour</option>";
+      $dis_hour_b .= "<option value=\"$formatedHour\">$hour</option>";
     }
    if ($end->compareHour($cur_hour_b) == 0) {
-     $dis_hour_e .= "<option value=\"$hour\" selected=\"selected\">$hour</option>";
+     $dis_hour_e .= "<option value=\"$formatedHour\" selected=\"selected\">$hour</option>";
    } else {
-     $dis_hour_e .= "<option value=\"$hour\">$hour</option>";
+     $dis_hour_e .= "<option value=\"$formatedHour\">$hour</option>";
    }    
 
     $cur_hour_b->addHour(1);
