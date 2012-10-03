@@ -2709,7 +2709,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
   // This is done here so that participation status is up-to-date BEFORE the email is sent
   // This allows the attached ICS to contain the correct PARTSTAT for the attendees
   $shouldUpdateAttendees = ($obm['uid'] == $oldOwner || OBM_Acl::canWrite($obm['uid'], 'calendar', $oldOwner))
-	&& ($exception_date != $exception_recurrence_id_date || $location != $oldEvent->location);
+	&& ($exception_date != $exception_recurrence_id_date || $location != $oldEvent->location || $event_duration != $oldEvent->duration);
   if ($shouldUpdateAttendees) {
 	  run_query_quick_attendee_update($calendar, $exception_id);
   }
