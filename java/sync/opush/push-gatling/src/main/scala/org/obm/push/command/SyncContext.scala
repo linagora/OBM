@@ -65,9 +65,9 @@ case class SyncContext(folderType: FolderType) {
 	
 	private[this] def nextSyncKeyInResponse(session: Session, syncResponse: SyncResponse): SyncKey = {
 		val collectionId = this.findCollectionId(session)
-		val syncResponses = collectionAsScalaIterable(syncResponse.getCollectionResponses())
-		for (col <- syncResponses if col.getSyncCollection().getCollectionId() == collectionId) {
-			return col.getAllocateNewSyncKey()
+		for (collection <- syncResponse.getCollectionResponses()
+			if collection.getSyncCollection().getCollectionId() == collectionId) {
+				return collection.getAllocateNewSyncKey()
 		}
 		throw new NoSuchElementException(
 				"Cannot find collection:{%d} in response:{%s}".format(collectionId, syncResponse))

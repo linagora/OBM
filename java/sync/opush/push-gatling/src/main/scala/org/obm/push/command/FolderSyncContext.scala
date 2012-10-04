@@ -61,9 +61,9 @@ case class FolderSyncContext {
 	
 	def collectionId(session: => Session, folderType: => FolderType): Int = {
 		val lastFolderSync = getLastFolderSync(session)
-		val collections = collectionAsScalaIterable(lastFolderSync.getCollectionsAddedAndUpdated())
-		for (collection <- collections if collection.getFolderType() == folderType) {
-			return collection.getCollectionId().toInt
+		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
+			if collection.getFolderType() == folderType) {
+				return collection.getCollectionId().toInt
 		}
 		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
 	}
