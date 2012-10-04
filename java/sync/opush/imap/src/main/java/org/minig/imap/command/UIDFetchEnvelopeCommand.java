@@ -113,6 +113,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 					tmp.add( new UIDEnvelope(uid, envelope) );
 				} catch (Throwable t) {
 					logger.error("fail parsing envelope for message UID " + uid, t);
+					logger.error("Envelope payload in error was : " + envel);
 					data = Collections.emptyList();
 					return;
 				}
