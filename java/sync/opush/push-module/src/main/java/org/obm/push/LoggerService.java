@@ -47,23 +47,34 @@ public class LoggerService {
 	private LoggerService() {
 	}
 	
-	public void initSession(User user, int requestId, String command) {
+	public void startSession(User user, int requestId, String command) {
+		startSession();
+		defineUser(user);
+		defineRequestId(requestId);
+		defineCommand(command);
+	}
+	
+	public void startSession() {
+		MDC.put("title", "Opush ActiveSync");
+		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
+	}
+	
+	public void defineUser(User user) {
 		Calendar date = Calendar.getInstance();
 		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
 		String now = dateformatter.format(date.getTime());
-
-		//to use with technicalLoggerService
-		//closePrecedentLogFile();
 		String sessionId = user.getLoginAtDomain() + "-" + now;
-		
-		MDC.put("title", "Opush ActiveSync");
 		MDC.put("user", user.getLoginAtDomain());
 		MDC.put("sessionId", sessionId);
-		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
-		MDC.put("requestId", String.valueOf(requestId));
-		MDC.put("command", command);
 	}
 	
+	public void defineRequestId(int requestId) {
+		MDC.put("requestId", String.valueOf(requestId));
+	}
+	
+	public void defineCommand(String command) {
+		MDC.put("command", command);
+	}
 
 	public void closeSession() {
 		MDC.clear();

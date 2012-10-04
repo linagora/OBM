@@ -29,66 +29,76 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.handler;
+package org.obm.push;
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServlet;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.obm.push.LoggerService;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.auth.BadRequestException;
 import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AuthenticatedServlet extends HttpServlet {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class AuthenticationFilter implements Filter {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	protected final Logger authLogger;
 	
 	private final LoggerService loggerService;
 	private final User.Factory userFactory;
 	private final LoginService loginService;
-
-	protected AuthenticatedServlet(LoginService loginService, 
-			LoggerService loggerService, User.Factory userFactory, Logger authLogger) {
-		
+	private final HttpErrorResponder httpErrorResponder;
+	
+	@Inject
+	private AuthenticationFilter(LoginService loginService, 
+			LoggerService loggerService, User.Factory userFactory, HttpErrorResponder httpErrorResponder) {
 		this.loginService = loginService;
 		this.loggerService = loggerService;
 		this.userFactory = userFactory;
-		this.authLogger = authLogger;
+		this.httpErrorResponder = httpErrorResponder;
+	}
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
 	}
 
-	protected void returnHttpUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_UNAUTHORIZED);
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+		try {
+			if ("POST".equals(httpRequest.getMethod())) {
+				Credentials credentials = authentication(httpRequest);
+				loggerService.defineUser(credentials.getUser());
+				httpRequest.setAttribute(RequestProperties.CREDENTIALS, credentials);
+			}
+			chain.doFilter(request, response);
+		} catch (AuthFault e) {
+			logger.info(e.getMessage());
+			httpErrorResponder.returnHttpUnauthorized(httpRequest, httpResponse);
+		}
+
 	}
 
-	protected void returnHttpBadRequest(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_BAD_REQUEST);
-	}
-
-	private void returnHttpError(HttpServletRequest httpServletRequest,
-			HttpServletResponse response, int status) {
-		authLogger.info("Invalid authorization format, sending http {} ( uri = {}{}{} )", 
-				new Object[] { 
-					status,
-					httpServletRequest.getMethod(), 
-					httpServletRequest.getRequestURI(), 
-					httpServletRequest.getQueryString()});
-		
-		String s = "Basic realm=\"OBMPushService\"";
-		response.setHeader("WWW-Authenticate", s);
-		response.setStatus(status);
-	}
-
-	protected Credentials authentication(HttpServletRequest request) throws AuthFault, BadRequestException {
+	private Credentials authentication(HttpServletRequest request) throws AuthFault {
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);
@@ -109,7 +119,7 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(String userId, String password) throws AuthFault, BadRequestException {
+	private Credentials getCredentials(String userId, String password) throws AuthFault {
 		AccessToken accessToken = login(getLoginAtDomain(userId), password);
 		User user = createUser(userId, accessToken);
 		if (user != null) {
@@ -128,16 +138,13 @@ public abstract class AuthenticatedServlet extends HttpServlet {
 		return userFactory.createUser(userId, accessToken.getUserEmail(), accessToken.getUserDisplayName());
 	}
 
-	protected String getLoginAtDomain(String userId) throws BadRequestException {
-		try {
-			return userFactory.getLoginAtDomain(userId);
-		} catch (IllegalArgumentException e) {
-			throw new BadRequestException("The userId arg should matchs \"user@domain\" pattern : " + userId, e);
-		}
+	protected String getLoginAtDomain(String userId) {
+		return userFactory.getLoginAtDomain(userId);
 	}
-
-	public LoggerService getLoggerService() {
-		return loggerService;
+	
+	@Override
+	public void destroy() {
 	}
+	
 	
 }

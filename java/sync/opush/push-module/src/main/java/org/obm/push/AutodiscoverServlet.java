@@ -34,70 +34,57 @@ package org.obm.push;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.User;
-import org.obm.push.handler.AuthenticatedServlet;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.handler.AutodiscoverHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.impl.ResponderImpl.Factory;
 import org.obm.push.protocol.request.SimpleQueryString;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.auth.BadRequestException;
-import org.obm.sync.client.login.LoginService;
-import org.slf4j.Logger;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
-public class AutodiscoverServlet extends AuthenticatedServlet {
+public class AutodiscoverServlet extends HttpServlet {
 
 	private final AutodiscoverHandler autodiscoverHandler;
 	private final Factory responderFactory;
 	private final UserDataRequest.Factory userDataRequestFactory;
+	private final LoggerService loggerService;
 	
 	@Inject
-	protected AutodiscoverServlet(LoginService loginService, AutodiscoverHandler autodiscoverHandler, 
-			User.Factory userFactory, LoggerService loggerService, ResponderImpl.Factory responderFactory, 
-			@Named(LoggerModule.AUTH)Logger authLogger, UserDataRequest.Factory userDataRequestFactory) {
+	@VisibleForTesting AutodiscoverServlet(AutodiscoverHandler autodiscoverHandler, 
+			ResponderImpl.Factory responderFactory, 
+			UserDataRequest.Factory userDataRequestFactory,
+			LoggerService loggerService) {
 		
-		super(loginService, loggerService, userFactory, authLogger);
+		super();
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
 		this.userDataRequestFactory = userDataRequestFactory;
+		this.loggerService = loggerService;
 	}
 
 	@Override
-	@Transactional
-	protected void service(HttpServletRequest request, HttpServletResponse response) 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+	
 		UserDataRequest userDataRequest = null;
 		try {
-			Credentials credentials = authentication(request);
-			getLoggerService().initSession(credentials.getUser(), 0, "autodiscover");
+			Credentials credentials = getCheckedCredentials(request);
+			loggerService.defineCommand("autodiscover");
 			
 			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null, null);
 			SimpleQueryString queryString = new SimpleQueryString(request);
 			Responder responder = responderFactory.createResponder(response);
 			
 			autodiscoverHandler.process(null, userDataRequest, queryString, responder);
-		} catch (AuthFault e) {
-			authLogger.info(e.getMessage());
-			returnHttpUnauthorized(request, response);
-			return;
-		} catch (BadRequestException e) {
-			logger.warn(e.getMessage());
-			returnHttpBadRequest(request, response);
-			return;
 		} finally {
 			if (userDataRequest != null) {
 				userDataRequest.closeResources();
@@ -105,5 +92,12 @@ public class AutodiscoverServlet extends AuthenticatedServlet {
 		}
 
 	}
-	
+
+	public Credentials getCheckedCredentials(HttpServletRequest request) {
+		Credentials credentials = (Credentials) request.getAttribute(RequestProperties.CREDENTIALS);
+		if (credentials == null) {
+			throw new IllegalStateException("Credentials must be handled by " + AuthenticationFilter.class.getSimpleName());
+		}
+		return credentials;
+	}
 }

@@ -33,7 +33,7 @@ package org.obm.push.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
@@ -63,7 +63,7 @@ public class PushContinuation implements IContinuation {
 			this.id = new AtomicInteger();
 		}
 		
-		public PushContinuation createContinuation(HttpServletRequest req) {
+		public PushContinuation createContinuation(ServletRequest req) {
 			Continuation continuation = ContinuationSupport.getContinuation(req);
 			Object attachedRequestId = continuation.getAttribute(KEY_ID_REQUEST);
 			if (attachedRequestId == null) {

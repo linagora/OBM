@@ -32,98 +32,79 @@
 package org.obm.push;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isNull;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
+import org.easymock.internal.MocksControl;
+import org.easymock.internal.MocksControl.MockType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.User;
-import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.handler.AutodiscoverHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 
 @RunWith(SlowFilterRunner.class)
 public class AutodiscoverServletTest {
 
-	private User user;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private AutodiscoverHandler autodiscoverHandler;
 	private Responder responder;
 	private UserDataRequest userDataRequest;
+	private Credentials credentials;
+	private MocksControl mocksControl;
 	
 	@Before
 	public void setUp() {
-		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
+		mocksControl = new MocksControl(MockType.DEFAULT);
 		
-		request = createMock(HttpServletRequest.class);
-		String credentialsString = user.getLogin() + ":test"; 
-		expect(request.getHeader("Authorization"))
-			.andReturn("Basic " + Base64.encodeBase64String(credentialsString.getBytes())).anyTimes();
-		replay(request);
+		credentials = mocksControl.createMock(Credentials.class);
 		
-		response = createMock(HttpServletResponse.class);
-		autodiscoverHandler = createMock(AutodiscoverHandler.class);
+		request = mocksControl.createMock(HttpServletRequest.class);
+		expect(request.getMethod()).andReturn("POST");
+		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
+		
+		response = mocksControl.createMock(HttpServletResponse.class);
+		autodiscoverHandler = mocksControl.createMock(AutodiscoverHandler.class);
 	}
 	
 	@Test
-	public void testClosingUserDataRequestResources() throws ServletException, IOException, AuthFault {
-		userDataRequest = createMock(UserDataRequest.class);
+	public void testClosingUserDataRequestResources() throws ServletException, IOException {
+		userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		userDataRequest.closeResources();
-		expectLastCall();
-		replay(userDataRequest);
 		
 		AutodiscoverServlet autodiscoverServlet = createAutodiscoverServlet(autodiscoverHandler);
+		mocksControl.replay();
 		
 		autodiscoverServlet.service(request, response);
 		
-		verify(userDataRequest);
-	}
-	
-	private LoginService bindAuthentication() throws AuthFault {
-		LoginService loginService = createMock(LoginService.class);
-		expect(loginService.authenticate(user.getLogin(), "test")).andReturn(new AccessToken(1, "o-push")).anyTimes();
-		return loginService;
-	}
-
-	private User.Factory createUser() {
-		User.Factory userFactory = createMock(User.Factory.class);
-		expect(userFactory.getLoginAtDomain(user.getLogin())).andReturn(user.getLogin()).anyTimes();
-		expect(userFactory.createUser(user.getLogin(), null, null)).andReturn(user).anyTimes();
-		return userFactory;
+		mocksControl.verify();
 	}
 	
 	private LoggerService bindLoggerService() {
-		LoggerService loggerService = createMock(LoggerService.class);
-		loggerService.initSession(user, 0, "autodiscover");
-		expectLastCall();
+		LoggerService loggerService = mocksControl.createMock(LoggerService.class);
+		loggerService.defineCommand("autodiscover");
 		return loggerService;
 	}
 	
 	private ResponderImpl.Factory bindResponderFactory(Responder responder) {
-		ResponderImpl.Factory responderFactory = createMock(ResponderImpl.Factory.class);
+		ResponderImpl.Factory responderFactory = mocksControl.createMock(ResponderImpl.Factory.class);
 		expect(responderFactory.createResponder(response)).andReturn(responder).anyTimes();
 		return responderFactory;
 	}
@@ -133,33 +114,25 @@ public class AutodiscoverServletTest {
 									anyObject(UserDataRequest.class), 
 									anyObject(ActiveSyncRequest.class), 
 									eq(responder));
-		expectLastCall();
 	}
 	
 	private AutodiscoverServlet createAutodiscoverServlet(AutodiscoverHandler autodiscoverHandler) 
-			throws AuthFault, IOException {
+			throws IOException {
 		
-		LoginService loginService = bindAuthentication();
-		User.Factory userFactory = createUser();
 		LoggerService loggerService = bindLoggerService();
 		
-		responder = createMock(Responder.class);
+		responder = mocksControl.createMock(Responder.class);
 		ResponderImpl.Factory responderFactory = bindResponderFactory(responder);
 		bindProcess(responder);
-		replay(loginService, autodiscoverHandler, userFactory, loggerService, responderFactory);
 
-		UserDataRequest.Factory userDataRequestFactory = createMock(UserDataRequest.Factory.class);
-		expect(userDataRequestFactory.createUserDataRequest(new Credentials(user, "test"), "autodiscover", null, null))
+		UserDataRequest.Factory userDataRequestFactory = mocksControl.createMock(UserDataRequest.Factory.class);
+		expect(userDataRequestFactory.createUserDataRequest(same(credentials), eq("autodiscover"), isNull(Device.class), isNull(BigDecimal.class)))
 			.andReturn(userDataRequest).anyTimes();
-		replay(userDataRequestFactory);
 		
 		return new AutodiscoverServlet(
-					loginService,
 					autodiscoverHandler, 
-					userFactory, 
-					loggerService, 
 					responderFactory, 
-					null, 
-					userDataRequestFactory);
+					userDataRequestFactory,
+					loggerService);
 	}
 }

@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,14 +47,10 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.handler.AuthenticatedServlet;
 import org.obm.push.handler.IContinuationHandler;
 import org.obm.push.handler.IRequestHandler;
-import org.obm.push.impl.PushContinuation;
-import org.obm.push.impl.PushContinuation.Factory;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -61,10 +58,10 @@ import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.auth.BadRequestException;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -74,29 +71,36 @@ import com.google.inject.name.Named;
  * handlers.
  */
 @Singleton
-public class ActiveSyncServlet extends AuthenticatedServlet {
+public class ActiveSyncServlet extends HttpServlet {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Handlers handlers;
 	private SessionService sessionService;
-	private PushContinuation.Factory continuationFactory;
 	private DeviceService deviceService;
 	
 	private final ResponderImpl.Factory responderFactory;
 	private final IBackend backend;
+	private final LoggerService loggerService;
+	private final Logger authLogger;
+	private final HttpErrorResponder httpErrorResponder;
 
 	@Inject
-	protected ActiveSyncServlet(LoginService loginService, SessionService sessionService, LoggerService loggerService,
-			IBackend backend, Factory continuationFactory, DeviceService deviceService, User.Factory userFactory, 
-			ResponderImpl.Factory responderFactory, Handlers handlers, @Named(LoggerModule.AUTH)Logger authLogger) {
+	@VisibleForTesting ActiveSyncServlet(SessionService sessionService, 
+			IBackend backend, DeviceService deviceService,  
+			ResponderImpl.Factory responderFactory, Handlers handlers,
+			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
+			HttpErrorResponder httpErrorResponder) {
 	
-		super(loginService, loggerService, userFactory, authLogger);
+		super();
 		
 		this.sessionService = sessionService;
 		this.backend = backend;
-		this.continuationFactory = continuationFactory;
 		this.deviceService = deviceService;
 		this.responderFactory = responderFactory;
 		this.handlers = handlers;
+		this.loggerService = loggerService;
+		this.authLogger = authLogger;
+		this.httpErrorResponder = httpErrorResponder;
 	}
 
 	@Override
@@ -106,40 +110,49 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 	}
 	
 	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		sendOptionsResponse(response);
+	}
+	
+	@Override
+	protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		sendOptionsResponse(response);
+	}
+	
+	@Override
 	@Transactional
-	protected void service(HttpServletRequest request,
+	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
 		try {
-			IContinuation c = continuationFactory.createContinuation(request);
-
+			IContinuation continuation = (IContinuation) request.getAttribute(RequestProperties.CONTINUATION);
+			if (continuation == null) {
+				throw new IllegalStateException("Requests must be handled by " + PushContinuationFilter.class.getSimpleName());
+			}
+			
 			logger.debug(
 					"query = {}, initial = {}, resume = {}, m = {}, num = {}",
-					new Object[] { request.getQueryString(), c.isInitial(),
-							c.isResumed(), request.getMethod(), c.getReqId() });
+					new Object[] { request.getQueryString(), continuation.isInitial(),
+							continuation.isResumed(), request.getMethod(), continuation.getReqId() });
 
-			if (c.isResumed() || !c.isInitial()) {
-				handleContinuation(response, c);
+			if (continuation.isResumed() || !continuation.isInitial()) {
+				handleContinuation(response, continuation);
 				return;
 			}
 
-			String m = request.getMethod();
-			if ("OPTIONS".equals(m)) {
-				sendOptionsResponse(response);
-				return;
-			}
-
-			if ("GET".equals(m)) { // htc sapphire does that
-				sendOptionsResponse(response);
-				return;
-			}
-
-			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 			/*Marker asXmlRequestMarker = TechnicalLogType.HTTP_REQUEST.getMarker();
 			logger.debug(asXmlRequestMarker, asrequest.getHttpServletRequest().toString());*/
-			Credentials creds = performAuthentication(asrequest);
+			Credentials credentials = (Credentials) request.getAttribute(RequestProperties.CREDENTIALS);
+			if (credentials == null) {
+				throw new IllegalStateException("Credentials must be handled by " + AuthenticationFilter.class.getSimpleName());
+			}
+			
+			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
+			loggerService.defineCommand(asrequest.getCommand());
 
-			getLoggerService().initSession(creds.getUser(), c.getReqId(), asrequest.getCommand());
+			checkAuthorizedDevice(asrequest, credentials);
 
 			String policy = asrequest.getMsPolicyKey();
 			if (policy != null && policy.equals("0") && !asrequest.getCommand().equals("Provision")) {
@@ -150,7 +163,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 				logger.debug("policy used = {}", policy);
 			}
 
-			processActiveSyncMethod(c, creds, asrequest.getDeviceId(), asrequest, response);
+			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response);
 			
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -158,13 +171,10 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} catch (AuthFault e) {
-			authLogger.info(e.getMessage());
-			returnHttpUnauthorized(request, response);
-		} catch (BadRequestException e) {
-			logger.warn(e.getMessage());
-			returnHttpBadRequest(request, response);
+			logger.info(e.getMessage());
+			httpErrorResponder.returnHttpUnauthorized(request, response);
 		} finally {
-			getLoggerService().closeSession();
+			loggerService.closeSession();
 		}
 	}
 
@@ -179,7 +189,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		if (udr == null) {
 			return;
 		}
-		getLoggerService().initSession(udr.getUser(), c.getReqId(), udr.getCommand());
+		loggerService.startSession(udr.getUser(), c.getReqId(), udr.getCommand());
 		logger.debug("continuation");
 		IContinuationHandler ph = c.getLastContinuationHandler();
 		ICollectionChangeListener ccl = c.getCollectionChangeListener();
@@ -191,8 +201,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		}
 	}
 	
-	private Credentials performAuthentication(ActiveSyncRequest request) throws AuthFault, DaoException, BadRequestException {
-		Credentials credentials = authentication(request.getHttpServletRequest());
+	private void checkAuthorizedDevice(ActiveSyncRequest request, Credentials credentials) throws AuthFault, DaoException {
 		
 		String deviceId = request.getDeviceId();
 		String deviceType = request.getDeviceType();
@@ -203,7 +212,6 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 		if (initDevice && syncAutho) {
 			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
 					new Object[]{ credentials.getUser().getEmail(), deviceType });
-			return credentials;
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}

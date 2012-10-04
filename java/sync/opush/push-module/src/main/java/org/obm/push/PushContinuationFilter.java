@@ -31,24 +31,50 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
+import java.io.IOException;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import org.obm.push.impl.PushContinuation;
+import org.obm.push.impl.PushContinuation.Factory;
+
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
 
-public class OpushServletModule extends ServletModule{
+@Singleton
+public class PushContinuationFilter implements Filter {
 
-	 @Override
-	    protected void configureServlets() {
-	        super.configureServlets();
+	private final LoggerService loggerService;
+	private final Factory factory;
 
-	        serve("/ActiveSyncServlet/*").with(ActiveSyncServlet.class);
-	        serve("/Autodiscover/*").with(AutodiscoverServlet.class);
+	@Inject
+	private PushContinuationFilter(LoggerService loggerService, PushContinuation.Factory factory) {
+		this.loggerService = loggerService;
+		this.factory = factory;
+	}
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+	}
 
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	    }
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+
+		PushContinuation pushContinuation = factory.createContinuation(request);
+		loggerService.startSession();
+		loggerService.defineRequestId(pushContinuation.getReqId());
+		request.setAttribute(RequestProperties.CONTINUATION, pushContinuation);
+		chain.doFilter(request, response);
+	}
+
+	@Override
+	public void destroy() {
+	}
+
 }

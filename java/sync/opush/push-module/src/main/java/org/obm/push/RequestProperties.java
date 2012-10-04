@@ -31,24 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
+public class RequestProperties {
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
-
-public class OpushServletModule extends ServletModule{
-
-	 @Override
-	    protected void configureServlets() {
-	        super.configureServlets();
-
-	        serve("/ActiveSyncServlet/*").with(ActiveSyncServlet.class);
-	        serve("/Autodiscover/*").with(AutodiscoverServlet.class);
-
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	    }
+	public static final String CREDENTIALS = "crendentials";
+	public static final String CONTINUATION = "requestId";
+	
 }

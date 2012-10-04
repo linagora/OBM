@@ -32,12 +32,11 @@
 package org.obm.push;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
 
@@ -45,8 +44,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
-import org.easymock.EasyMock;
+import org.easymock.internal.MocksControl;
+import org.easymock.internal.MocksControl.MockType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,14 +63,12 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 
 @RunWith(SlowFilterRunner.class)
 public class ActiveSyncServletTest {
 
+	private MocksControl mocksControl;
 	private User user;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
@@ -80,9 +77,11 @@ public class ActiveSyncServletTest {
 	private String userAgent;
 	private int requestId;
 	private String command;
+	private Credentials credentials;
 	
 	@Before
 	public void setUp() {
+		mocksControl = new MocksControl(MockType.DEFAULT);
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		
 		deviceId = "devId";
@@ -91,10 +90,15 @@ public class ActiveSyncServletTest {
 		requestId = 1;
 		command = "cmd";
 		
-		request = createMock(HttpServletRequest.class);
-		String credentialsString = user.getLogin() + ":test"; 
-		expect(request.getHeader("Authorization"))
-			.andReturn("Basic " + Base64.encodeBase64String(credentialsString.getBytes())).anyTimes();
+		credentials = mocksControl.createMock(Credentials.class);
+		expect(credentials.getUser()).andReturn(user).atLeastOnce();
+		
+		PushContinuation pushContinuation = mocksControl.createMock(PushContinuation.class);
+		expect(pushContinuation.isResumed()).andReturn(false).anyTimes();
+		expect(pushContinuation.isInitial()).andReturn(true).anyTimes();
+		expect(pushContinuation.getReqId()).andReturn(requestId).anyTimes();
+		
+		request = mocksControl.createMock(HttpServletRequest.class);
 		expect(request.getQueryString()).andReturn("Cmd=").anyTimes();
 		expect(request.getMethod()).andReturn("method").anyTimes();
 		expect(request.getParameter("DeviceId")).andReturn(deviceId).anyTimes();
@@ -102,131 +106,94 @@ public class ActiveSyncServletTest {
 		expect(request.getHeader("User-Agent")).andReturn(userAgent).anyTimes();
 		expect(request.getParameter("Cmd")).andReturn(command).anyTimes();
 		expect(request.getHeader("X-Ms-PolicyKey")).andReturn(null).anyTimes();
-		replay(request);
+		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
+		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
 		
-		response = createMock(HttpServletResponse.class);
+		response = mocksControl.createMock(HttpServletResponse.class);
+		response.setHeader(anyObject(String.class), anyObject(String.class));
+		expectLastCall().anyTimes();
 	}
 	
 	@Test
-	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, AuthFault, DaoException {
-		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
+	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, DaoException {
+		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		userDataRequest.closeResources();
 		expectLastCall();
 		expect(userDataRequest.getCommand()).andReturn(command).anyTimes();
-		replay(userDataRequest);
 		
 		ActiveSyncServlet activeSyncServlet = createActiveSyncServlet(userDataRequest);
+		mocksControl.replay();
 		
-		activeSyncServlet.service(request, response);
-		
-		verify(userDataRequest);
-	}
-	
-	private LoginService createLoginService() throws AuthFault {
-		LoginService loginService = createMock(LoginService.class);
-		expect(loginService.authenticate(user.getLogin(), "test")).andReturn(new AccessToken(1, "o-push")).anyTimes();
-		return loginService;
+		activeSyncServlet.doPost(request, response);
+		mocksControl.verify();
 	}
 	
 	private SessionService createSessionService(UserDataRequest userDataRequest) throws DaoException {
-		SessionService sessionService = createMock(SessionService.class);
-		expect(sessionService.getSession(eq(new Credentials(user, "test")), eq(deviceId), anyObject(ActiveSyncRequest.class)))
+		SessionService sessionService = mocksControl.createMock(SessionService.class);
+		expect(sessionService.getSession(same(credentials), eq(deviceId), anyObject(ActiveSyncRequest.class)))
 			.andReturn(userDataRequest).anyTimes();
 		return sessionService;
 	}
 	
 	private LoggerService createLoggerService() {
-		LoggerService loggerService = createMock(LoggerService.class);
+		LoggerService loggerService = mocksControl.createMock(LoggerService.class);
 		loggerService.closeSession();
 		expectLastCall();
-		loggerService.initSession(user, requestId, command);
+		loggerService.defineCommand(command);
 		return loggerService;
 	}
 	
 	private IBackend createBackend() {
-		IBackend backend = createMock(IBackend.class);
+		IBackend backend = mocksControl.createMock(IBackend.class);
 		return backend;
 	}
 
-	private PushContinuation.Factory bindContinuation() {
-		PushContinuation pushContinuation = createMock(PushContinuation.class);
-		expect(pushContinuation.isResumed()).andReturn(false).anyTimes();
-		expect(pushContinuation.isInitial()).andReturn(true).anyTimes();
-		expect(pushContinuation.getReqId()).andReturn(requestId).anyTimes();
-		replay(pushContinuation);
-		
-		PushContinuation.Factory pushContinuationFactory = createMock(PushContinuation.Factory.class);
-		expect(pushContinuationFactory.createContinuation(request)).andReturn(pushContinuation).anyTimes();
-		
-		return pushContinuationFactory;
-	}
-	
 	private DeviceService createDeviceService() throws DaoException {
-		DeviceService deviceService = createMock(DeviceService.class);
+		DeviceService deviceService = mocksControl.createMock(DeviceService.class);
 		expect(deviceService.initDevice(user, deviceId, deviceType, userAgent)).andReturn(true).anyTimes();
 		expect(deviceService.syncAuthorized(user, deviceId)).andReturn(true).anyTimes();
 		return deviceService;
 	}
 
-	private User.Factory createUserFactory() {
-		User.Factory userFactory = createMock(User.Factory.class);
-		expect(userFactory.getLoginAtDomain(user.getLogin())).andReturn(user.getLogin()).anyTimes();
-		expect(userFactory.createUser(user.getLogin(), null, null)).andReturn(user).anyTimes();
-		return userFactory;
-	}
-
 	private ResponderImpl.Factory createResponderFactory() {
-		ResponderImpl.Factory responderFactory = createMock(ResponderImpl.Factory.class);
+		ResponderImpl.Factory responderFactory = mocksControl.createMock(ResponderImpl.Factory.class);
 		expect(responderFactory.createResponder(response)).andReturn(null).anyTimes();
 		return responderFactory;
 	}
 
 	private Handlers createHandlers(UserDataRequest userDataRequest) throws IOException {
-		IRequestHandler requestHandler = createMock(IRequestHandler.class);
+		IRequestHandler requestHandler = mocksControl.createMock(IRequestHandler.class);
 		requestHandler.process(anyObject(IContinuation.class), eq(userDataRequest), anyObject(ActiveSyncRequest.class), (Responder) eq(null));
 		expectLastCall();
 		
-		Handlers handlers = createMock(Handlers.class);
+		Handlers handlers = mocksControl.createMock(Handlers.class);
 		expect(handlers.getHandler(command)).andReturn(requestHandler).anyTimes();
 		return handlers;
 	}
 
 	private Logger createLogger() {
-		Logger logger = createMock(Logger.class);
+		Logger logger = mocksControl.createMock(Logger.class);
 		Object[] array = new Object[] { user.getEmail(), deviceType};
-		logger.info(EasyMock.anyObject(String.class), EasyMock.aryEq(array));
-		expectLastCall();
+		logger.info(anyObject(String.class), aryEq(array));
+		mocksControl.anyTimes();
 		logger.debug(anyObject(String.class));
-		expectLastCall();
+		mocksControl.anyTimes();
 		logger.warn(anyObject(String.class));
-		expectLastCall();
+		mocksControl.anyTimes();
 		return logger;
 	}
 
-	private ActiveSyncServlet createActiveSyncServlet(UserDataRequest userDataRequest) throws AuthFault, DaoException, IOException {
-		LoginService loginService = createLoginService();
+	private ActiveSyncServlet createActiveSyncServlet(UserDataRequest userDataRequest) throws DaoException, IOException {
 		SessionService sessionService = createSessionService(userDataRequest);
 		LoggerService loggerService = createLoggerService();
 		IBackend backend = createBackend();
-		PushContinuation.Factory pushContinuationFactory = bindContinuation();
 		DeviceService deviceService = createDeviceService();
-		User.Factory userFactory = createUserFactory();
 		ResponderImpl.Factory responderFactory = createResponderFactory();
 		Handlers handlers = createHandlers(userDataRequest);
+		HttpErrorResponder httpErrorResponder = mocksControl.createMock(HttpErrorResponder.class);
 		
 		Logger logger = createLogger();
 		
-		replay(loginService, 
-				sessionService, 
-				loggerService, 
-				backend, 
-				pushContinuationFactory, 
-				deviceService, userFactory, 
-				responderFactory, 
-				handlers, 
-				logger);
-		
-		return new ActiveSyncServlet(loginService, sessionService, loggerService, backend, pushContinuationFactory, deviceService, 
-								userFactory, responderFactory, handlers, logger);
+		return new ActiveSyncServlet(sessionService, backend, deviceService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
 	}
 }

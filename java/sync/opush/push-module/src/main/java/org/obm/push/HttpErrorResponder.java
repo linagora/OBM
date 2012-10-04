@@ -31,24 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
+import org.obm.configuration.module.LoggerModule;
+import org.slf4j.Logger;
 
-public class OpushServletModule extends ServletModule{
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-	 @Override
-	    protected void configureServlets() {
-	        super.configureServlets();
+public class HttpErrorResponder {
+	
+	private final Logger authLogger;
 
-	        serve("/ActiveSyncServlet/*").with(ActiveSyncServlet.class);
-	        serve("/Autodiscover/*").with(AutodiscoverServlet.class);
+	@Inject
+	private HttpErrorResponder(@Named(LoggerModule.AUTH)Logger authLogger) {
+		this.authLogger = authLogger;
+	}
+	
+	public void returnHttpUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse response) {
+		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_UNAUTHORIZED);
+	}
 
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	    }
+	public void returnHttpBadRequest(HttpServletRequest httpServletRequest, HttpServletResponse response) {
+		returnHttpError(httpServletRequest, response, HttpServletResponse.SC_BAD_REQUEST);
+	}
+
+	private void returnHttpError(HttpServletRequest httpServletRequest,
+			HttpServletResponse response, int status) {
+		authLogger.info("Invalid authorization format, sending http {} ( uri = {}{}{} )", 
+				new Object[] { 
+					status,
+					httpServletRequest.getMethod(), 
+					httpServletRequest.getRequestURI(), 
+					httpServletRequest.getQueryString()});
+		
+		String s = "Basic realm=\"OBMPushService\"";
+		response.setHeader("WWW-Authenticate", s);
+		response.setStatus(status);
+	}
 }
