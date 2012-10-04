@@ -31,11 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 
 import com.google.common.base.Objects;
 
+@XmlRootElement(name = JAXBConstants.TRANSACTION_ROOT)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { JAXBConstants.ID, 
+			JAXBConstants.TRANSACTION_START_TIME, 
+			JAXBConstants.TRANSACTION_END_TIME },
+		factoryMethod = JAXBConstants.TRANSACTION_EMPTY_METHOD_NAME)
 public class Transaction {
 
 	public static Builder builder() {
@@ -73,8 +86,11 @@ public class Transaction {
 		}
 	}
 
+	@XmlAttribute
 	private final long id;
+	@XmlElement
 	private final DateTime transactionStartTime;
+	@XmlElement
 	private final DateTime transactionEndTime;
 	
 	private Transaction(long id, DateTime transactionStartTime, DateTime transactionEndTime) {

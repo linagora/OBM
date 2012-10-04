@@ -33,12 +33,29 @@ package org.obm.push.bean;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
+@XmlRootElement(name = JAXBConstants.REQUEST_ROOT)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { JAXBConstants.DEVICE_ID, 
+			JAXBConstants.DEVICE_TYPE, 
+			JAXBConstants.COMMAND, 
+			JAXBConstants.TRANSACTION_ID, 
+			JAXBConstants.REQUEST_START_TIME, 
+			JAXBConstants.REQUEST_END_TIME, 
+			JAXBConstants.RESOURCES },
+		factoryMethod = JAXBConstants.REQUEST_EMPTY_METHOD_NAME)
 public class Request {
 
 	public static Builder builder() {
@@ -107,12 +124,19 @@ public class Request {
 		}
 	}
 
+	@XmlAttribute
 	private final String deviceId;
+	@XmlAttribute
 	private final String deviceType;
+	@XmlAttribute
 	private final String command;
+	@XmlElement
 	private final long transactionId;
+	@XmlElement
 	private final DateTime requestStartTime;
+	@XmlElement
 	private final DateTime requestEndTime;
+	@XmlElement
 	private final List<Resource> resources;
 	
 	private Request(String deviceId, String deviceType, String command, long transactionId, DateTime requestStartTime, DateTime requestEndTime, List<Resource> resources) {

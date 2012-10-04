@@ -31,11 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 
 import com.google.common.base.Objects;
 
+@XmlRootElement(name = JAXBConstants.RESOURCE_ROOT)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { JAXBConstants.RESOURCE_ID, 
+			JAXBConstants.RESOURCE_TYPE, 
+			JAXBConstants.RESOURCE_START_TIME, 
+			JAXBConstants.RESOURCE_END_TIME },
+		factoryMethod = JAXBConstants.RESOURCE_EMPTY_METHOD_NAME)
 public class Resource {
 
 	public static Builder builder() {
@@ -79,9 +93,13 @@ public class Resource {
 		}
 	}
 	
+	@XmlAttribute
 	private final long resourceId;
+	@XmlElement
 	private final ResourceType resourceType;
+	@XmlElement
 	private final DateTime resourceStartTime;
+	@XmlElement
 	private final DateTime resourceEndTime;
 	
 	private Resource(long resourceId, ResourceType resourceType, DateTime resourceStartTime, DateTime resourceEndTime) {
