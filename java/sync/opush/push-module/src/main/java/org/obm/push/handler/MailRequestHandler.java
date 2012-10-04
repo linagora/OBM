@@ -71,9 +71,19 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, ActiveSyncRequest request, Responder responder) {
-		MailRequest mailRequest = null;
 		try {
-			mailRequest = mailProtocol.getRequest(request);
+			MailRequest mailRequest = mailProtocol.getRequest(request);
+			process(udr, mailRequest);
+		} catch (IOException e) {
+			responder.sendError(HttpStatus.BAD_REQUEST_400);
+			return;
+		} catch (QuotaExceededException e) {
+			notifyUserQuotaExceeded(udr, e);
+		}
+	}
+
+	private void process(UserDataRequest udr, MailRequest mailRequest) {
+		try {
 			if (mailDataLogger.isInfoEnabled()) {
 				mailDataLogger.info("Mail content : \n" + new String(mailRequest.getMailContent()));
 			}
@@ -81,13 +91,8 @@ public abstract class MailRequestHandler implements IRequestHandler {
 
 		} catch (ProcessingEmailException pe) {	
 			notifyUser(udr,  mailRequest.getMailContent(), pe);
-		} catch (IOException e) {
-			responder.sendError(HttpStatus.BAD_REQUEST_400);
-			return;
 		} catch (CollectionNotFoundException e) {
 			notifyUser(udr, mailRequest.getMailContent(), e);
-		} catch (QuotaExceededException e) {
-			notifyUserQuotaExceeded(udr, e);
 		} catch (ItemNotFoundException e) {
 			notifyUser(udr, mailRequest.getMailContent(), e);
 		}

@@ -41,7 +41,6 @@ import java.util.GregorianCalendar;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

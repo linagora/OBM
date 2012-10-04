@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.naming.NoPermissionException;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -53,8 +54,6 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;

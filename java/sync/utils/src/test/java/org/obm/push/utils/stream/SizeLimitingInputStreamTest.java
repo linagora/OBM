@@ -37,11 +37,9 @@ import java.io.IOException;
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.io.ByteStreams;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class SizeLimitingInputStreamTest {
@@ -73,6 +71,7 @@ public class SizeLimitingInputStreamTest {
 		sizeLimitingInputStream.mark(100);
 		sizeLimitingInputStream.read(new byte[50]);
 		sizeLimitingInputStream.reset();
+		sizeLimitingInputStream.close();
 	}
 	
 }

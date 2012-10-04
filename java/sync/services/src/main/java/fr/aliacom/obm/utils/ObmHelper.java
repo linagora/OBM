@@ -40,8 +40,6 @@ import java.util.Date;
 import org.obm.configuration.DatabaseSystem;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -54,8 +52,6 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 @Singleton
 public class ObmHelper {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
-
 	private DatabaseSystem type = DatabaseSystem.PGSQL;
 
 	private final DatabaseConnectionProvider dbcp;

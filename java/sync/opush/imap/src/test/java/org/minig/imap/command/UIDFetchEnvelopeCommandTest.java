@@ -38,20 +38,16 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPResponseParser;
 import org.minig.imap.impl.MinaIMAPMessage;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-
-
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
 public class UIDFetchEnvelopeCommandTest {

@@ -32,13 +32,12 @@
 package fr.aliasource.obm.autoconf.impl;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
@@ -58,14 +57,11 @@ public class DataSourceEnv {
 		Properties props = new Properties();
 		try {
 			InputStream in = new FileInputStream("test-data/db.properties");
-
-			if (in != null) {
-				props.load(in);
-			} else {
-				System.out
-						.println("test-data/db.properties not found. Null stream");
-				return;
-			}
+			props.load(in);
+		} catch (FileNotFoundException e) {
+			System.out.println("test-data/db.properties not found. Null stream");
+			return;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("no test-data/db.properties found");
@@ -98,7 +94,7 @@ public class DataSourceEnv {
 		System.out.println("Test case fully initialised.");
 	}
 
-	public void shutdown() throws NamingException, SQLException, InterruptedException {
+	public void shutdown() {
 		/*fr.aliacom.pool.DataSource pool = (fr.aliacom.pool.DataSource) new InitialContext().lookup(ObmHelper.DATA_SOURCE);
 		pool.stop();*/
 	}

@@ -97,6 +97,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
@@ -2133,11 +2134,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);
 			
 			for (final Attendee at : listAttendee) {
-				Boolean isOrganizer = at.isOrganizer();
+				boolean isOrganizer = Objects.firstNonNull(at.isOrganizer(), false);
+				
 				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
 
 				// There must be only one organizer in a given event
-				if (isOrganizer != null && isOrganizer) {
+				if (isOrganizer) {
 					shouldClearOrganizer = true;
 				}
 				

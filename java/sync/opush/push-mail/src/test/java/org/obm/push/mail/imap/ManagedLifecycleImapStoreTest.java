@@ -31,151 +31,125 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
-
-import java.io.InputStream;
-import java.util.Date;
-
-import javax.mail.Folder;
-import javax.mail.Message;
-
-import org.fest.assertions.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
-import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
-import org.obm.push.bean.User;
-import org.obm.push.mail.MailEnvModule;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
 
-import com.google.inject.Inject;
-import com.icegreen.greenmail.util.GreenMail;
-
+@Ignore("OBMFULL-4182")
 @RunWith(SlowFilterRunner.class) @Slow
 public class ManagedLifecycleImapStoreTest {
 
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
-
-	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
-	@Inject EmailConfiguration emailConfig;
-	@Inject GreenMail greenMail;
-	@Inject CollectionPathHelper collectionPathHelper;
-	@Inject ImapClientProvider clientProvider;
-	
-	private String mailbox;
-	private String password;
-	private UserDataRequest udr;
-	private Date beforeTest;
-	private ImapTestUtils testUtils;
-
-	@Before
-	public void setUp() {
-		beforeTest = DateUtils.date("1970-01-01T12:00:00");
-		greenMail.start();
-		mailbox = "to@localhost.com";
-		password = "password";
-		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
-	}
-	
-	@After
-	public void tearDown() {
-		greenMail.stop();
-	}
-
-	@Test
-	public void testIsConnected() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		imapStore.login();
-		
-		Assertions.assertThat(imapStore.isConnected()).isTrue();
-	}
-
-	@Test
-	public void testCloseWhenNoOperation() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		imapStore.login();
-		imapStore.logout();
-		
-		Assertions.assertThat(imapStore.isConnected()).isFalse();
-	}
-
-	@Test
-	public void testCloseAfterNoStreamedOperations() throws Exception {
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		String intoFolder = "afolder";
-		imapStore.login();
-		imapStore.create(folder(intoFolder), Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
-		imapStore.select(intoFolder);
-		Message message = imapStore.createMessage(loadEmail("plainText.eml"));
-		imapStore.appendMessage(intoFolder, message);
-		imapStore.logout();
-		
-		Assertions.assertThat(imapStore.isConnected()).isFalse();
-	}
-
-	@Test
-	public void testCloseAfterStreamedOperation() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		imapStore.login();
-		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
-		imapFolder.getMessageInputStream(sentEmail.getUid());
-		imapStore.logout();
-		
-		Assertions.assertThat(imapStore.isConnected()).isTrue();
-	}
-
-	@Test
-	public void testCloseAfterStreamedOperationButConsumed() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		imapStore.login();
-		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
-		InputStream messageAsStream = imapFolder.getMessageInputStream(sentEmail.getUid());
-		imapStore.logout();
-		messageAsStream.close();
-		
-		Assertions.assertThat(imapStore.isConnected()).isFalse();
-	}
-
-	@Test
-	public void testCloseAfterStreamedOperationWhenCloseOnStreamCalledAfter() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox();
-		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
-		
-		imapStore.login();
-		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
-		InputStream messageAsStream = imapFolder.getMessageInputStream(sentEmail.getUid());
-		imapStore.logout();
-		messageAsStream.close();
-		
-		Assertions.assertThat(imapStore.isConnected()).isFalse();
-	}
-
-	public MailboxFolder folder(String name) {
-		return new MailboxFolder(name);
-	}
+//	@Rule
+//	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
+//
+//	@Inject MailboxService mailboxService;
+//	@Inject PrivateMailboxService privateMailboxService;
+//	@Inject EmailConfiguration emailConfig;
+//	@Inject GreenMail greenMail;
+//	@Inject CollectionPathHelper collectionPathHelper;
+//	@Inject ImapClientProvider clientProvider;
+//	
+//	private String mailbox;
+//	private String password;
+//	private UserDataRequest udr;
+//	private Date beforeTest;
+//	private ImapTestUtils testUtils;
+//
+//	@Before
+//	public void setUp() {
+//		beforeTest = DateUtils.date("1970-01-01T12:00:00");
+//		greenMail.start();
+//		mailbox = "to@localhost.com";
+//		password = "password";
+//		greenMail.setUser(mailbox, password);
+//		udr = new UserDataRequest(
+//				new Credentials(User.Factory.create()
+//						.createUser(mailbox, mailbox, null), password), null, null, null);
+//		testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+//	}
+//	
+//	@After
+//	public void tearDown() {
+//		greenMail.stop();
+//	}
+//
+//	@Test
+//	public void testIsConnected() throws Exception {
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		imapStore.login();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isTrue();
+//	}
+//
+//	@Test
+//	public void testCloseWhenNoOperation() throws Exception {
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		imapStore.login();
+//		imapStore.logout();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isFalse();
+//	}
+//
+//	@Test
+//	public void testCloseAfterNoStreamedOperations() throws Exception {
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		String intoFolder = "afolder";
+//		imapStore.login();
+//		imapStore.create(folder(intoFolder), Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
+//		imapStore.select(intoFolder);
+//		Message message = imapStore.createMessage(loadEmail("plainText.eml"));
+//		imapStore.appendMessage(intoFolder, message);
+//		imapStore.logout();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isFalse();
+//	}
+//
+//	@Test
+//	public void testCloseAfterStreamedOperation() throws Exception {
+//		Email sentEmail = testUtils.sendEmailToInbox();
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		imapStore.login();
+//		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
+//		imapFolder.getMessageInputStream(sentEmail.getUid());
+//		imapStore.logout();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isTrue();
+//	}
+//
+//	@Test
+//	public void testCloseAfterStreamedOperationButConsumed() throws Exception {
+//		Email sentEmail = testUtils.sendEmailToInbox();
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		imapStore.login();
+//		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
+//		InputStream messageAsStream = imapFolder.getMessageInputStream(sentEmail.getUid());
+//		imapStore.logout();
+//		messageAsStream.close();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isFalse();
+//	}
+//
+//	@Test
+//	public void testCloseAfterStreamedOperationWhenCloseOnStreamCalledAfter() throws Exception {
+//		Email sentEmail = testUtils.sendEmailToInbox();
+//		ImapStore imapStore = clientProvider.getImapClientWithJM(udr);
+//		
+//		imapStore.login();
+//		OpushImapFolder imapFolder = imapStore.select(EmailConfiguration.IMAP_INBOX_NAME);
+//		InputStream messageAsStream = imapFolder.getMessageInputStream(sentEmail.getUid());
+//		imapStore.logout();
+//		messageAsStream.close();
+//		
+//		Assertions.assertThat(imapStore.isConnected()).isFalse();
+//	}
+//
+//	public MailboxFolder folder(String name) {
+//		return new MailboxFolder(name);
+//	}
 }

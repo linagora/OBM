@@ -79,6 +79,8 @@ public class EncoderFactory {
 			case EMAIL:
 				emailEncoder.get().encode(parent, data);
 				break;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 	}
