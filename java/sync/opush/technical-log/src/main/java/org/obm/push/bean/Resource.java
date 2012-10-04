@@ -50,7 +50,7 @@ import com.google.common.base.Objects;
 			JAXBConstants.RESOURCE_START_TIME, 
 			JAXBConstants.RESOURCE_END_TIME },
 		factoryMethod = JAXBConstants.RESOURCE_EMPTY_METHOD_NAME)
-public class Resource {
+public class Resource extends JAXBBean {
 
 	public static Builder builder() {
 		return new Builder();

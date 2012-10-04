@@ -56,7 +56,7 @@ import com.google.common.collect.Lists;
 			JAXBConstants.REQUEST_END_TIME, 
 			JAXBConstants.RESOURCES },
 		factoryMethod = JAXBConstants.REQUEST_EMPTY_METHOD_NAME)
-public class Request {
+public class Request extends JAXBBean {
 
 	public static Builder builder() {
 		return new Builder();

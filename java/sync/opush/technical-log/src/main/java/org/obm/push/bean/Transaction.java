@@ -49,7 +49,7 @@ import com.google.common.base.Objects;
 			JAXBConstants.TRANSACTION_START_TIME, 
 			JAXBConstants.TRANSACTION_END_TIME },
 		factoryMethod = JAXBConstants.TRANSACTION_EMPTY_METHOD_NAME)
-public class Transaction {
+public class Transaction extends JAXBBean {
 
 	public static Builder builder() {
 		return new Builder();
