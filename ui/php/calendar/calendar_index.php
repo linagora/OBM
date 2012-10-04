@@ -586,6 +586,7 @@ if ($action == 'search') {
     	$deleted_evt_ids = run_query_calendar_delete($params,false);
     } else {
       	run_query_calendar_event_exception_insert($params,'',true);
+      	run_query_increment_sequence($eve_q->f('event_ext_id'));
     }
 	
     json_ok_msg("$l_event : $l_delete_ok");
