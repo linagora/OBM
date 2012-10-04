@@ -363,29 +363,30 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>javax.transaction</groupId>
 				<artifactId>jta</artifactId>
 				<version>${jta.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
-                        	<groupId>org.codehaus.btm</groupId>
-                        	<artifactId>btm</artifactId>
-                        	<version>${btm.version}</version>
+            	<groupId>org.codehaus.btm</groupId>
+                <artifactId>btm</artifactId>
+                <version>${btm.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.codehaus.btm</groupId>
 						<artifactId>btm-jdbc3-stubs</artifactId>
 					</exclusion>
 				</exclusions>
-	                </dependency>
+	        </dependency>
 			<dependency>
-                                <groupId>org.codehaus.btm</groupId>
-                                <artifactId>btm-jdbc4</artifactId>
-                                <version>${btm.version}</version>
+            	<groupId>org.codehaus.btm</groupId>
+                <artifactId>btm-jdbc4</artifactId>
+                <version>${btm.version}</version>
 				<exclusions>
-                                        <exclusion>
-                                                <groupId>org.codehaus.btm</groupId>
-                                                <artifactId>btm-jdbc4-stubs</artifactId>
-                                        </exclusion>
-                                </exclusions>
-                        </dependency>
+                	<exclusion>
+                    	<groupId>org.codehaus.btm</groupId>
+                        <artifactId>btm-jdbc4-stubs</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>

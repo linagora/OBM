@@ -80,6 +80,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>greenmail</groupId>
 			<artifactId>greenmail</artifactId>
 		</dependency>
