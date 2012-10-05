@@ -76,6 +76,7 @@
 		<module>integration-testing</module>
 		<module>webapp-common-dependencies</module>
     		<module>icalendar</module>
+    		<module>qos-filter</module>
   </modules>
 
 	<build>
@@ -320,6 +321,16 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${servlet-api.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-continuation</artifactId>
+				<version>7.4.2.v20110526</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-http</artifactId>
+			<version>7.4.2.v20110526</version>
+		</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
 				<artifactId>mail</artifactId>
