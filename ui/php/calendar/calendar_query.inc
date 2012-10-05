@@ -5442,6 +5442,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
       }
     }
     $current->custom($pattern);
+    $current->setHour($date->getHour())->setMinute($date->getMinute());
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
     $current->setDay(1)->addMonth($repeatfrequence);
