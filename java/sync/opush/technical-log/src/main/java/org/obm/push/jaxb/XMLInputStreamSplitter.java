@@ -35,10 +35,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 
 import com.google.common.base.Preconditions;
 
-public class XMLInputStreamSplitter {
+public class XMLInputStreamSplitter implements Iterable<String> {
 	
 	private final static char OPENING_TAG_SYMBOL = '<';
 	private final static char CLOSING_TAG_SYMBOL = '>';
@@ -124,5 +125,10 @@ public class XMLInputStreamSplitter {
 		if (currentChar == OPENING_TAG_SYMBOL) {
 			hasEnteredXML = true;
 		}
+	}
+	
+	@Override
+	public Iterator<String> iterator() {
+		return new XMLSplitterIterator(this);
 	}
 }

@@ -35,6 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
@@ -45,6 +46,8 @@ import org.obm.push.bean.Request;
 import org.obm.push.bean.Resource;
 import org.obm.push.bean.ResourceType;
 import org.obm.push.bean.Transaction;
+
+import com.google.common.collect.Lists;
 
 public class JAXBParserTest {
 	
@@ -245,5 +248,92 @@ public class JAXBParserTest {
 		Transaction transaction = JAXBParser.unmarshal(Transaction.class, new ByteArrayInputStream(bytes));
 		
 		assertThat(transaction).isEqualTo(expectedTransaction);
+	}
+
+	@Test
+	public void testUnmarshalEmptyStream() throws Exception {
+		List<JAXBBean> beans = JAXBParser.unmarshal(new ByteArrayInputStream(new byte[] {} ));
+		assertThat(beans).hasSize(0);
+	}
+
+	@Test
+	public void testUnmarshaStreamSingleBean() throws Exception {
+		DateTime now = DateTime.now();
+		int resourceId = 1;
+		String log = 
+			"<resource resourceId=\"" + resourceId + "\">" +
+				"<resourceType>HTTP_CLIENT</resourceType>" +
+				"<resourceStartTime>" + now + "</resourceStartTime>" +
+			"</resource>";
+			
+		List<Resource> expectedResources = Lists.newArrayList();
+		expectedResources.add(Resource.builder()
+				.resourceId(resourceId)
+				.resourceType(ResourceType.HTTP_CLIENT)
+				.resourceStartTime(now)
+				.build());
+		
+		byte[] bytes = log.getBytes();
+		List<JAXBBean> beans = JAXBParser.unmarshal(new ByteArrayInputStream(bytes));
+		assertThat(beans).hasSize(resourceId);
+		assertThat(beans).isEqualTo(beans);
+	}
+
+	@Test
+	public void testUnmarshalStreamComplexeMultipleBeans() throws Exception {
+		DateTime now = DateTime.now();
+		int transactionId = 12;
+		int resourceId = 1;
+		int resourceId2 = 2;
+		String log = 
+			"<transaction id=\"" + transactionId + "\">" +
+				"<transactionStartTime>" + now + "</transactionStartTime>" +
+			"</transaction>" +
+			"<resource resourceId=\"" + resourceId + "\">" +
+				"<resourceType>HTTP_CLIENT</resourceType>" +
+				"<resourceStartTime>" + now + "</resourceStartTime>" +
+			"</resource>" +
+			"<request deviceId=\"devId\" deviceType=\"devType\" command=\"Ping\">" +
+				"<transactionId>1</transactionId>" +
+				"<requestStartTime>" + now + "</requestStartTime>" +
+				"<resources resourceId=\"" + resourceId2 + "\">" +
+					"<resourceType>IMAP_CONNECTION</resourceType>" +
+					"<resourceStartTime>" + now + "</resourceStartTime>" +
+				"</resources>" +
+			"</request>" +
+			"<resource resourceId=\"2\">" +
+				"<resourceType>IMAP_CONNECTION</resourceType>" +
+				"<resourceStartTime>" + now + "</resourceStartTime>" +
+			"</resource>";
+			
+		List<JAXBBean> expectedResources = Lists.newArrayList();
+		expectedResources.add(Transaction.builder()
+				.id(transactionId)
+				.transactionStartTime(now)
+				.build());
+		expectedResources.add(Resource.builder()
+				.resourceId(resourceId)
+				.resourceType(ResourceType.HTTP_CLIENT)
+				.resourceStartTime(now)
+				.build());
+		Resource resource2 = Resource.builder()
+				.resourceId(resourceId2)
+				.resourceType(ResourceType.IMAP_CONNECTION)
+				.resourceStartTime(now)
+				.build();
+		expectedResources.add(Request.builder()
+				.deviceId("devId")
+				.deviceType("devType")
+				.command("Ping")
+				.transactionId(resourceId)
+				.requestStartTime(now)
+				.add(resource2)
+				.build());
+		expectedResources.add(resource2);
+		
+		byte[] bytes = log.getBytes();
+		List<JAXBBean> beans = JAXBParser.unmarshal(new ByteArrayInputStream(bytes));
+		assertThat(beans).hasSize(4);
+		assertThat(beans).isEqualTo(beans);
 	}
 }

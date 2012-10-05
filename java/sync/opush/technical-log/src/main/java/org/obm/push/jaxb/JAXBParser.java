@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxb;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -40,6 +42,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.obm.push.bean.JAXBBean;
+
+import com.google.common.collect.Lists;
 
 public class JAXBParser {
 	
@@ -54,5 +58,14 @@ public class JAXBParser {
 		JAXBContext context = JAXBContext.newInstance(clazz);
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		return (T) unmarshaller.unmarshal(inputStream);
+	}
+	
+	public static List<JAXBBean> unmarshal(InputStream inputStream) throws JAXBException {
+		List<JAXBBean> beans = Lists.newArrayList();
+		for (String xmlPart : new XMLInputStreamSplitter(inputStream)) {
+			beans.add(unmarshal(JAXBBean.class, new ByteArrayInputStream(xmlPart.getBytes())));
+		}
+		
+		return beans;
 	}
 }
