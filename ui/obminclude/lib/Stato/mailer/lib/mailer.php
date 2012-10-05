@@ -42,7 +42,9 @@ class SMailer
     protected $body;
     protected $parts;
     protected $attachments;
-    
+
+    protected $headers;
+
     protected static $template_root;
     protected static $transport;
     
@@ -103,6 +105,10 @@ class SMailer
         $mail = $this->prepare($method_name, $args);
         return $mail->send($this->get_transport());
     }
+
+    public function add_header($name, $value, $encode = true) {
+      $this->headers[] = array($name, $value, $encode);
+    }
     
     protected function create($method_name, $args)
     {
@@ -138,6 +144,9 @@ class SMailer
             $a = array_merge(self::$attachment_defaults, $a);
             $mail->add_attachment($a['content'], $a['filename'], $a['content_type'], $a['encoding']);
         }
+	foreach ($this->headers as $h) {
+	    $mail->set_header($h[0], $h[1], $h[2]);
+	}
         
         $this->reset();
         
@@ -204,5 +213,6 @@ class SMailer
         $this->body = '';
         $this->parts = array();
         $this->attachments = array();
+	$this->headers = array();
     }
 }
