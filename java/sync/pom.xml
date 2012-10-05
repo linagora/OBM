@@ -430,6 +430,18 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${easymock.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-easymock</artifactId>
+				<version>1.4.12</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>1.4.12</version>
+				<scope>test</scope>
+			</dependency>
             		<dependency>
                 		<groupId>org.easytesting</groupId>
                 		<artifactId>fest-assert-core</artifactId>
