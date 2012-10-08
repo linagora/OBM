@@ -31,13 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.protocol.bean.SyncResponse
-import scala.collection.JavaConversions._
+import scala.collection.JavaConversions.collectionAsScalaIterable
+
 import org.obm.push.bean.FolderType
 import org.obm.push.bean.SyncKey
+import org.obm.push.helper.SessionHelper
+import org.obm.push.protocol.bean.SyncResponse
+
+import com.excilys.ebi.gatling.core.session.Session
 
 class InitialSyncContext(folderType: FolderType) extends SyncContext(folderType) {
 	
@@ -47,24 +48,18 @@ class InitialSyncContext(folderType: FolderType) extends SyncContext(folderType)
 	
 }
 
-case class SyncContext(folderType: FolderType) {
+class SyncContext(folderType: FolderType) extends CollectionContext {
 	
-	val sessionKeyLastSync = "lastSync"
-		
 	def nextSyncKey(session: => Session): SyncKey = {
-		if (session.isAttributeDefined(sessionKeyLastSync)) {
-			val lastSync = session.getTypedAttribute[SyncResponse](sessionKeyLastSync)
-			if (lastSync != null) {
-				return nextSyncKeyInResponse(session, lastSync)
-			}
-			throw new IllegalStateException("Cannot find the next SyncKey in previous Sync response")
-		} else {
-			throw new IllegalStateException("No last Sync in session")
+		val lastSync = SessionHelper.findLastSync(session)
+		if (lastSync.isDefined) {
+			return nextSyncKeyInResponse(session, lastSync.get)
 		}
+		throw new IllegalStateException("No last Sync in session")
 	}
 	
 	private[this] def nextSyncKeyInResponse(session: Session, syncResponse: SyncResponse): SyncKey = {
-		val collectionId = this.findCollectionId(session)
+		val collectionId = this.findCollectionId(session, folderType)
 		for (collection <- syncResponse.getCollectionResponses()
 			if collection.getSyncCollection().getCollectionId() == collectionId) {
 				return collection.getAllocateNewSyncKey()
@@ -73,11 +68,5 @@ case class SyncContext(folderType: FolderType) {
 				"Cannot find collection:{%d} in response:{%s}".format(collectionId, syncResponse))
 	}
 	
-	private[this] var collectionId: Option[Int] = None
-	def findCollectionId(session: => Session): Int = {
-		if (collectionId.isEmpty) {
-			collectionId = Option.apply(new FolderSyncContext().collectionId(session, folderType))
-		}
-		collectionId.get
-	}
+	def findCollectionId(session: Session) = super.findCollectionId(session, folderType)
 }

@@ -47,6 +47,7 @@ import com.google.common.collect.ImmutableList
 import org.obm.push.bean.MSAttendee
 import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.AttendeeStatus
+import com.google.common.base.Strings
 
 @RunWith(classOf[JUnitRunner])
 class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
@@ -65,6 +66,12 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 	
 	before {
 		wbxmlTools = new WBXMLTools()
+	}
+	
+	test("Context make integer clientId as string") {
+		val invitation = new InvitationContext(email("user"))
+		assert(!Strings.isNullOrEmpty(invitation.clientId))
+		assert(invitation.clientId.toInt > 0)
 	}
 	
 	test("SendInvitation command name is Sync") {

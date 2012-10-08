@@ -29,42 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.helper
 
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
-import org.obm.push.bean.SyncKey
+import org.obm.push.protocol.bean.SyncResponse
 import scala.collection.JavaConversions._
-import org.obm.push.bean.FolderType
-import org.obm.push.helper.SessionKeys
-import org.obm.push.helper.SessionHelper
+import org.obm.push.bean.PIMDataType._
+import org.obm.push.bean.ms.MSEmail
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest
+import scala.collection.mutable.MutableList
+import org.obm.push.bean.SyncCollectionChange
+import org.obm.push.bean.MSEvent
 
-class InitialFolderSyncContext extends FolderSyncContext {
+object SyncHelper {
 	
-	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
-		
-	override def nextSyncKey(session: => Session) = initialSyncKey
-	
-}
-
-case class FolderSyncContext {
-		
-	def nextSyncKey(session: => Session): SyncKey = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session)
-		if (lastFolderSync.isDefined) {
-			return lastFolderSync.get.getNewSyncKey()
-		}
-		throw new IllegalStateException("Cannot find the next SyncKey in previous FolderSync response")
+	def findChangesWithMeetingRequest(syncResponse: SyncResponse) = {
+		for (change <- findChangesWithEmailData(syncResponse);
+			 meetingRequest = change.getData().asInstanceOf[MSEmail].getMeetingRequest();
+				if meetingRequest != null) yield change
 	}
 	
-	def collectionId(session: => Session, folderType: => FolderType): Int = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session).get
-		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
-			if collection.getFolderType() == folderType) {
-				return collection.getCollectionId().toInt
-		}
-		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
+	def findChangesWithEmailData(syncResponse: SyncResponse) = {
+		for (change <- findChanges(syncResponse);
+				if changeHasEmailData(change)) yield change
 	}
+	
+	def findEventChanges(syncResponse: SyncResponse, serverId: String) = {
+		for (change <- findChangesWithServerId(syncResponse, serverId);
+				if changeHasCalendarData(change))
+					yield change.getData().asInstanceOf[MSEvent]
+	}
+	
+	def findChangesWithServerId(syncResponse: SyncResponse, serverId: String) = {
+		for (change <- findChanges(syncResponse);
+				if change.getServerId().equals(serverId))
+					yield change
+	}
+	
+	def findChanges(syncResponse: SyncResponse) = {
+		for (collection <- syncResponse.getCollectionResponses();
+			 change <- collection.getSyncCollection().getChanges())
+				yield change
+	}
+	
+	def changeHasCalendarData(change: SyncCollectionChange) = 
+		change.getType() == CALENDAR && change.getData() != null
+	
+	def changeHasEmailData(change: SyncCollectionChange) = 
+		change.getType() == EMAIL && change.getData() != null
 }

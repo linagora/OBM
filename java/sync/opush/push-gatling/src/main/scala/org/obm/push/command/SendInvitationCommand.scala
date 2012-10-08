@@ -67,7 +67,7 @@ class SendInvitationCommand(httpContext: HttpContext, invitation: InvitationCont
 					.commands(ImmutableList.of(
 						SyncRequestCollectionCommand.builder()
 							.name("Add")
-							.clientId("123")
+							.clientId(invitation.clientId)
 							.applicationData(buildInvitationData())
 							.build()))
 					.build())

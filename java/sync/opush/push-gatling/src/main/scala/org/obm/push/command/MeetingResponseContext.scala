@@ -31,40 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
-import org.obm.push.bean.SyncKey
-import scala.collection.JavaConversions._
-import org.obm.push.bean.FolderType
-import org.obm.push.helper.SessionKeys
+import org.obm.push.bean.AttendeeStatus
 import org.obm.push.helper.SessionHelper
+import org.obm.push.helper.SyncHelper
 
-class InitialFolderSyncContext extends FolderSyncContext {
-	
-	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
-		
-	override def nextSyncKey(session: => Session) = initialSyncKey
-	
-}
+import com.excilys.ebi.gatling.core.session.Session
 
-case class FolderSyncContext {
-		
-	def nextSyncKey(session: => Session): SyncKey = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session)
-		if (lastFolderSync.isDefined) {
-			return lastFolderSync.get.getNewSyncKey()
+case class MeetingResponseContext(attendeeStatus: AttendeeStatus = AttendeeStatus.ACCEPT)
+			extends CollectionContext {
+
+	def findServerIds(session: => Session): List[String] = {
+		val lastSync = SessionHelper.findLastSync(session)
+		if (lastSync.isDefined) {
+			val serverIds = 
+				for (change <- SyncHelper.findChangesWithMeetingRequest(lastSync.get))
+					yield change.getServerId()
+			return serverIds.toList
 		}
-		throw new IllegalStateException("Cannot find the next SyncKey in previous FolderSync response")
+		List()
 	}
-	
-	def collectionId(session: => Session, folderType: => FolderType): Int = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session).get
-		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
-			if collection.getFolderType() == folderType) {
-				return collection.getCollectionId().toInt
-		}
-		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
-	}
+
 }

@@ -43,6 +43,7 @@ import com.google.common.base.Charsets
 import org.obm.push.protocol.bean.FolderSyncRequest
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
+import org.obm.push.helper.SessionKeys
 
 class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(httpContext) {
@@ -58,7 +59,7 @@ class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncC
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toFolderSyncResponse(response))
-			    .saveAs(folderSyncContext.sessionKeyLastFolderSync))
+			    .saveAs(SessionKeys.LAST_FOLDER_SYNC.toString))
 	}
 
 	def buildFolderSyncRequest(session: Session): Array[Byte] = {

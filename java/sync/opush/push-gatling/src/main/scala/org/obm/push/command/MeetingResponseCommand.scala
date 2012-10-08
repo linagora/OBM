@@ -32,49 +32,56 @@
 package org.obm.push.command
 
 import scala.collection.JavaConversions.seqAsJavaList
+
+import org.obm.push.bean.MeetingResponse
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.context.http.HttpContext
+import org.obm.push.encoder.GatlingEncoders.meetingProtocol
 import org.obm.push.helper.SessionKeys
-import org.obm.push.protocol.bean.SyncRequest
-import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncResponse
+import org.obm.push.protocol.bean.MeetingHandlerRequest
+import org.obm.push.protocol.bean.MeetingHandlerResponse
 import org.obm.push.wbxml.WBXMLTools
+
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.decoder.GatlingDecoders.syncDecoder
-import org.obm.push.encoder.GatlingEncoders.syncEncoder
 
-abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
+class MeetingResponseCommand(httpContext: HttpContext, response: MeetingResponseContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(httpContext) {
 
-	val syncNamespace = "AirSync"
+	val namespace = "MeetingResponse"
 	
-	override val commandTitle = "Sync command"
-	override val commandName = "Sync"
-
+	override val commandTitle = "MeetingResponse command"
+	override val commandName = "MeetingResponse"
+	  
 	override def buildCommand() = {
 		super.buildCommand()
-			.byteArrayBody((session: Session) => buildSyncRequest(session))
+			.byteArrayBody((session: Session) => buildMeetingResponse(session))
 			.check(bodyExtractor
 			    .find
-			    .transform((response: Array[Byte]) => toSyncResponse(response))
-			    .saveAs(SessionKeys.LAST_SYNC.toString))
+			    .transform((response: Array[Byte]) => toMeetingResponseReply(response))
+			    .saveAs(SessionKeys.MEETING_RESPONSE.toString))
 	}
 
-	def buildSyncRequest(session: Session): Array[Byte] = {
-		val request = SyncRequest.builder()
-			.collections(buildSyncRequestCollections(session))
-			.build()
-		
-		val requestDoc = syncEncoder.encodeSync(request)
-		wbTools.toWbxml(syncNamespace, requestDoc)
+	def buildMeetingResponse(session: Session): Array[Byte] = {
+		val request = MeetingHandlerRequest.builder()
+				.meetingResponses(buildResponseForPendingRequest(session))
+				.build()
+		val requestDoc = meetingProtocol.encodeRequest(request)
+		wbTools.toWbxml(namespace, requestDoc)
 	}
 	
-	def buildSyncRequestCollections(session: Session): List[SyncRequestCollection]
+	def buildResponseForPendingRequest(session: Session) = {
+		for (serverId <- response.findServerIds(session))
+			yield MeetingResponse.builder()
+					.reqId(serverId)
+					.collectionId(response.collectionIdFromServerId(serverId))
+					.userResponse(response.attendeeStatus)
+					.build()
+	}
 	
-	def toSyncResponse(response: Array[Byte]): SyncResponse = {
+	def toMeetingResponseReply(response: Array[Byte]): MeetingHandlerResponse = {
 		val responseDoc = wbTools.toXml(response)
-		syncDecoder.decodeSyncResponse(responseDoc)
+		meetingProtocol.decodeResponse(responseDoc)
 	}
 }
