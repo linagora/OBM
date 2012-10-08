@@ -33,7 +33,7 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SolrRequest {
+public abstract class SolrRequest {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	protected final CommonsHttpSolrServer server;
 	
@@ -41,8 +41,7 @@ public class SolrRequest {
 		this.server = server;
 	}
 
-	public void run() throws Exception {
-	}
+	public abstract void run() throws Exception;
 
 	/**
 	 * Gets called after processing of this {@link SolrRequest} is done.<br />
