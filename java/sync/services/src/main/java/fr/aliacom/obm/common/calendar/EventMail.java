@@ -52,8 +52,13 @@ import org.obm.sync.calendar.Attendee;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
+import fr.aliacom.obm.common.ObmSyncVersion;
+
 public class EventMail {
 
+	public static final String X_OBM_NOTIFICATION_EMAIL = "X-OBM-NOTIFICATION-EMAIL";
+	public static final String X_OBM_NOTIFICATION_EMAIL_VALUE_IF_NO_VERSION = "0";
+	
 	private final Address from;
 	private final List<Attendee> recipients;
 	private final String subject;
@@ -82,12 +87,22 @@ public class EventMail {
 		message.setFrom(from);
 		message.setRecipients(RecipientType.TO, getRecipients());
 		message.setSubject(subject);
+		message.addHeader(X_OBM_NOTIFICATION_EMAIL, getObmSyncVersion());
 		if(icsContent != null){
 			message.setContent(buildParts());
 		} else {
 			message.setContent(buildAlternativePart());
 		}
 		return message;
+	}
+
+	private String getObmSyncVersion() {
+		try {
+			return ObmSyncVersion.current().toString();
+		}
+		catch (Exception e) {
+			return X_OBM_NOTIFICATION_EMAIL_VALUE_IF_NO_VERSION;
+		}
 	}
 	
 	private Address[] getRecipients() throws UnsupportedEncodingException {

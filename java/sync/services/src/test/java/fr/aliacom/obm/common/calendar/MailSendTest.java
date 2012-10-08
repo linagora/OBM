@@ -33,13 +33,17 @@ package fr.aliacom.obm.common.calendar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,23 +59,47 @@ import org.obm.filter.SlowFilterRunner;
 @RunWith(SlowFilterRunner.class)
 public class MailSendTest {
 
+	private static final String ICS_METHOD = "REQUEST";
+	private static final String ICS = "ics";
+	private static final String BODY_HTML = "html";
+	private static final String BODY_TEXT = "text";
+	private static final String SUBJECT = "subject";
+
 	@Test
 	public void testBasicEventEmail() throws MessagingException, IOException {
-		InternetAddress from = new InternetAddress("sender@test");
-		Attendee attendee1 = new Attendee();
-		attendee1.setEmail("attendee1@test");
-		ImmutableList<Attendee> attendees = ImmutableList.of(attendee1);
-		String subject = "subject";
-		String bodyTxt = "text";
-		String bodyHtml = "html";
-		String icsContent = "ics";
-		EventMail eventMail = new EventMail(from, attendees, subject, bodyTxt, bodyHtml, icsContent, "REQUEST");
-		MimeMessage mail = eventMail.buildMimeMail(Session.getDefaultInstance(new Properties()));
-		ByteArrayOutputStream mailByteStream = new ByteArrayOutputStream();
-		mail.writeTo(mailByteStream);
-		String content = new String(mailByteStream.toByteArray(), CharsetNames.CS_UTF8);
-		Assert.assertThat(content, new StringContains("Subject: subject"));
-		Assert.assertThat(content, new StringContains("To: " + attendee1.getEmail()));
+		Attendee attendee1 = newAttendee("attendee1");
+		EventMail eventMail = newEventMail(ImmutableList.of(attendee1));		
+		String content = writeEventMail(eventMail);
+		
+		Assertions.assertThat(content).contains("Subject: " + SUBJECT).contains("To: " + attendee1.getEmail());
 	}
 	
+	@Test
+	public void testCustomObmHeaderIsPresent() throws Exception {
+		EventMail eventMail = newEventMail(ImmutableList.of(newAttendee("attendee1")));
+		String content = writeEventMail(eventMail);
+		
+		Assertions.assertThat(content).contains(EventMail.X_OBM_NOTIFICATION_EMAIL);
+	}
+	
+	private String writeEventMail(EventMail eventMail) throws IOException, MessagingException {
+		MimeMessage mail = eventMail.buildMimeMail(Session.getDefaultInstance(new Properties()));
+		ByteArrayOutputStream mailByteStream = new ByteArrayOutputStream();
+		
+		mail.writeTo(mailByteStream);
+		
+		return new String(mailByteStream.toByteArray(), CharsetNames.CS_UTF8);
+	}
+	
+	private EventMail newEventMail(List<Attendee> attendees) throws AddressException {
+		return new EventMail(new InternetAddress("sender@test"), attendees, SUBJECT, BODY_TEXT, BODY_HTML, ICS, ICS_METHOD);
+	}
+	
+	private Attendee newAttendee(String name) {
+		Attendee attendee = new Attendee();
+		
+		attendee.setEmail(name + "@test");
+		
+		return attendee;
+	}
 }
