@@ -29,63 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.command
 
-import java.util.Map;
+import com.excilys.ebi.gatling.core.session.Session
+import org.obm.push.context.http.HttpContext
+import org.obm.push.protocol.bean.FolderSyncResponse
+import org.obm.push.bean.FolderType
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-
-public enum FolderType {
-
-	USER_FOLDER_GENERIC("1"),
-	DEFAULT_INBOX_FOLDER("2"),
-	DEFAULT_DRAFTS_FOLDER("3"),
-	DEFAULT_DELETED_ITEMS_FOLDER("4"),
-	DEFAULT_SENT_EMAIL_FOLDER("5"),
-	DEFAULT_OUTBOX_FOLDER("6"),
-	DEFAULT_TASKS_FOLDER("7"),
-	DEFAULT_CALENDAR_FOLDER("8"),
-	DEFAULT_CONTACTS_FOLDER("9"),
-	DEFAULT_NOTES_FOLDER("10"),
-	DEFAULT_JOURNAL_FOLDER("11"),
-	USER_CREATED_EMAIL_FOLDER("12"),
-	USER_CREATED_CALENDAR_FOLDER("13"),
-	USER_CREATED_CONTACTS_FOLDER("14"),
-	USER_CREATED_TASKS_FOLDER("15"),
-	USER_CREATED_JOURNAL_FOLDER("16"),
-	USER_CREATED_NOTES_FOLDER("17"),
-	UNKNOWN_FOLDER_TYPE("18");
+class SendInvitationContext(
+		val organizerEmail: String,
+		val attendeesEmails: Set[String] = Set(),
+		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER)
+			extends SyncContext(folderType) {
 	
-	private final String specificationValue;
-	
-	private FolderType(String specificationValue) {
-		this.specificationValue = specificationValue;
-	}
-
-	public String asSpecificationValue() {
-		return specificationValue;
-	}
-
-	public static FolderType fromSpecificationValue(String specificationValue){
-		if (specValueToEnum.containsKey(specificationValue)) {
-			return specValueToEnum.get(specificationValue);
-		}
-		return null;
-	}
-	
-	private static Map<String, FolderType> specValueToEnum;
-	
-	static {
-		Builder<String, FolderType> builder = ImmutableMap.builder();
-		for (FolderType folderType : values()) {
-			builder.put(folderType.specificationValue, folderType);
-		}
-		specValueToEnum = builder.build();
-	}
-	
-	public boolean isCalendarFolder() {
-		return  this == FolderType.DEFAULT_CALENDAR_FOLDER ||
-				this == FolderType.USER_CREATED_CALENDAR_FOLDER;
-	}
+	require(folderType.isCalendarFolder())
 }

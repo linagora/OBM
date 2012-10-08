@@ -70,7 +70,7 @@ public class CalendarEncoder extends Encoder {
 	private final TimeZoneConverter timeZoneConverter;
 	
 	@Inject
-	/* package */ CalendarEncoder(TimeZoneEncoder timeZoneEncoder, TimeZoneConverter timeZoneConverter) {
+	protected CalendarEncoder(TimeZoneEncoder timeZoneEncoder, TimeZoneConverter timeZoneConverter) {
 		super();
 		this.timeZoneEncoder = timeZoneEncoder;
 		this.timeZoneConverter = timeZoneConverter;
