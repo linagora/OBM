@@ -31,9 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,18 +44,13 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.fest.assertions.api.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.internal.matchers.StringContains;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 
 import com.ctc.wstx.io.CharsetNames;
 import com.google.common.collect.ImmutableList;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MailSendTest {
@@ -71,7 +67,7 @@ public class MailSendTest {
 		EventMail eventMail = newEventMail(ImmutableList.of(attendee1));		
 		String content = writeEventMail(eventMail);
 		
-		Assertions.assertThat(content).contains("Subject: " + SUBJECT).contains("To: " + attendee1.getEmail());
+		assertThat(content).contains("Subject: " + SUBJECT).contains("To: " + attendee1.getEmail());
 	}
 	
 	@Test
@@ -79,7 +75,7 @@ public class MailSendTest {
 		EventMail eventMail = newEventMail(ImmutableList.of(newAttendee("attendee1")));
 		String content = writeEventMail(eventMail);
 		
-		Assertions.assertThat(content).contains(EventMail.X_OBM_NOTIFICATION_EMAIL);
+		assertThat(content).contains(EventMail.X_OBM_NOTIFICATION_EMAIL);
 	}
 	
 	private String writeEventMail(EventMail eventMail) throws IOException, MessagingException {
