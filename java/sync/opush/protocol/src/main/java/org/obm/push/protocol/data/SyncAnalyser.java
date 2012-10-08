@@ -55,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -164,6 +165,7 @@ public class SyncAnalyser {
  			collection.setCollectionPath(collectionPath);
  			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
  			collection.setDataType(dataType);
+			collection.setDataClass(Objects.firstNonNull(collection.getDataClass(), dataType.asXmlValue()));
 		} catch (CollectionNotFoundException e) {
 			collection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
  		}
