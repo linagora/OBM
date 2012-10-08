@@ -42,6 +42,7 @@ import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
 import com.excilys.ebi.gatling.http.Predef.regex
 import com.google.common.base.Charsets
 import org.obm.push.protocol.bean.FolderSyncRequest
+import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 
 class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(httpContext) {
@@ -55,9 +56,9 @@ class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncC
 	override def buildCommand() = {
 		super.buildCommand()
 			.byteArrayBody((session: Session) => buildFolderSyncRequest(session))
-			.check(regex(".*")
+			.check(bodyExtractor
 			    .find
-			    .transform((response: String) => toFolderSyncResponse(response))
+			    .transform((response: Array[Byte]) => toFolderSyncResponse(response))
 			    .saveAs(folderSyncContext.sessionKeyLastFolderSync))
 	}
 
@@ -68,8 +69,8 @@ class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncC
 		wbTools.toWbxml(folderSyncNamespace, requestDoc)
 	}
 	
-	def toFolderSyncResponse(response: String): FolderSyncResponse = {
-		val responseDoc = wbTools.toXml(response.getBytes(Charsets.UTF_8))
+	def toFolderSyncResponse(response: Array[Byte]): FolderSyncResponse = {
+		val responseDoc = wbTools.toXml(response)
 		folderSyncProtocol.decodeResponse(responseDoc)
 	}
 }

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
+import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.SyncRequest
 import org.obm.push.protocol.bean.SyncRequestCollection
@@ -42,8 +43,6 @@ import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
-import com.excilys.ebi.gatling.http.Predef.regex
 import com.google.common.base.Charsets
 import com.google.common.collect.ImmutableList
 
@@ -60,9 +59,9 @@ class SyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: W
 	override def buildCommand() = {
 		super.buildCommand()
 			.byteArrayBody((session: Session) => buildSyncRequest(session))
-			.check(regex(".*")
+			.check(bodyExtractor
 			    .find
-			    .transform((response: String) => toSyncResponse(response))
+			    .transform((response: Array[Byte]) => toSyncResponse(response))
 			    .saveAs(syncContext.sessionKeyLastSync))
 	}
 
@@ -79,8 +78,8 @@ class SyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: W
 		wbTools.toWbxml(syncNamespace, requestDoc)
 	}
 	
-	def toSyncResponse(response: String): SyncResponse = {
-		val responseDoc = wbTools.toXml(response.getBytes(Charsets.UTF_8))
+	def toSyncResponse(response: Array[Byte]): SyncResponse = {
+		val responseDoc = wbTools.toXml(response)
 		syncDecoder.decodeSyncResponse(responseDoc)
 	}
 }
