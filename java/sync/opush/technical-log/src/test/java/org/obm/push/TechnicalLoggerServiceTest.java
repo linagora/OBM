@@ -29,34 +29,35 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration.module;
+package org.obm.push;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import org.joda.time.DateTime;
+import org.junit.Test;
+import org.obm.push.bean.jaxb.Transaction;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-
-public class LoggerModule extends AbstractModule {
-
-	public static final String AUTH = "AUTHENTICATION";
-	public static final String TRIMMED_REQUEST = "REQUEST.TRIMMED";
-	public static final String FULL_REQUEST = "REQUEST.FULL";
-	public static final String MAIL_DATA = "MAIL.DATA";
-	public static final String OBM_SYNC = "OBM-SYNC";
-	public static final String CONFIGURATION = "CONFIGURATION";
-	public static final String TECHNICAL_LOG = "technical_log";
+public class TechnicalLoggerServiceTest {
 	
-	@Override
-	protected void configure() {
+	@Test
+	public void testTrace() {
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+
+		replay(logger);
 		
-		bind(Logger.class).annotatedWith(Names.named(AUTH)).toInstance(LoggerFactory.getLogger(AUTH));
-		bind(Logger.class).annotatedWith(Names.named(TRIMMED_REQUEST)).toInstance(LoggerFactory.getLogger(TRIMMED_REQUEST));
-		bind(Logger.class).annotatedWith(Names.named(FULL_REQUEST)).toInstance(LoggerFactory.getLogger(FULL_REQUEST));
-		bind(Logger.class).annotatedWith(Names.named(MAIL_DATA)).toInstance(LoggerFactory.getLogger(MAIL_DATA));
-		bind(Logger.class).annotatedWith(Names.named(OBM_SYNC)).toInstance(LoggerFactory.getLogger(OBM_SYNC));
-		bind(Logger.class).annotatedWith(Names.named(CONFIGURATION)).toInstance(LoggerFactory.getLogger(CONFIGURATION));
-		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger);
+		technicalLoggerService.trace(Transaction.builder()
+				.id(Thread.currentThread().getId())
+				.transactionStartTime(DateTime.now())
+				.build());
+		
+		verify(logger);
 	}
-	
 }
