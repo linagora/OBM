@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.jaxb;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -43,86 +43,101 @@ import org.joda.time.DateTimeUtils;
 
 import com.google.common.base.Objects;
 
-@XmlRootElement(name = JAXBConstants.TRANSACTION_ROOT)
+@XmlRootElement(name = JAXBConstants.RESOURCE_ROOT)
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { JAXBConstants.ID, 
-			JAXBConstants.TRANSACTION_START_TIME, 
-			JAXBConstants.TRANSACTION_END_TIME },
-		factoryMethod = JAXBConstants.TRANSACTION_EMPTY_METHOD_NAME)
-public class Transaction extends JAXBBean {
+@XmlType(propOrder = { JAXBConstants.RESOURCE_ID, 
+			JAXBConstants.RESOURCE_TYPE, 
+			JAXBConstants.RESOURCE_START_TIME, 
+			JAXBConstants.RESOURCE_END_TIME },
+		factoryMethod = JAXBConstants.RESOURCE_EMPTY_METHOD_NAME)
+public class Resource extends JAXBBean {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
-	public static Transaction createEmptyTransaction() {
+	public static Resource createEmptyResource() {
 		return builder().build();
 	}
 	
 	public static class Builder {
-		private long id;
-		private DateTime transactionStartTime;
-		private DateTime transactionEndTime;
+		private long resourceId;
+		private ResourceType resourceType;
+		private DateTime resourceStartTime;
+		private DateTime resourceEndTime;
 		
 		private Builder() {}
 		
-		public Builder id(long id) {
-			this.id = id;
+		public Builder resourceId(long resourceId) {
+			this.resourceId = resourceId;
 			return this;
 		}
 		
-		public Builder transactionStartTime(DateTime transactionStartTime) {
-			this.transactionStartTime = transactionStartTime;
+		public Builder resourceType(ResourceType resourceType) {
+			this.resourceType = resourceType;
 			return this;
 		}
 		
-		public Builder transactionEndTime(DateTime transactionEndTime) {
-			this.transactionEndTime = transactionEndTime;
+		public Builder resourceStartTime(DateTime resourceStartTime) {
+			this.resourceStartTime = resourceStartTime;
 			return this;
 		}
 		
-		public Transaction build() {
-			return new Transaction(id, transactionStartTime, transactionEndTime);
+		public Builder resourceEndTime(DateTime resourceEndTime) {
+			this.resourceEndTime = resourceEndTime;
+			return this;
+		}
+		
+		public Resource build() {
+			return new Resource(resourceId, resourceType, resourceStartTime, resourceEndTime);
 		}
 	}
-
+	
 	@XmlAttribute
-	private final long id;
+	private final long resourceId;
 	@XmlElement
-	private final DateTime transactionStartTime;
+	private final ResourceType resourceType;
 	@XmlElement
-	private final DateTime transactionEndTime;
+	private final DateTime resourceStartTime;
+	@XmlElement
+	private final DateTime resourceEndTime;
 	
-	private Transaction(long id, DateTime transactionStartTime, DateTime transactionEndTime) {
-		this.id = id;
-		this.transactionStartTime = transactionStartTime;
-		this.transactionEndTime = transactionEndTime;
+	private Resource(long resourceId, ResourceType resourceType, DateTime resourceStartTime, DateTime resourceEndTime) {
+		this.resourceId = resourceId;
+		this.resourceType = resourceType;
+		this.resourceStartTime = resourceStartTime;
+		this.resourceEndTime = resourceEndTime;
 	}
 	
-	public long getId() {
-		return id;
+	public long getResourceId() {
+		return resourceId;
 	}
 	
-	public DateTime getTransactionStartTime() {
-		return transactionStartTime;
+	public ResourceType getResourceType() {
+		return resourceType;
 	}
 	
-	public DateTime getTransactionEndTime() {
-		return transactionEndTime;
+	public DateTime getResourceStartTime() {
+		return resourceStartTime;
+	}
+	
+	public DateTime getResourceEndTime() {
+		return resourceEndTime;
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(id, transactionStartTime, transactionEndTime);
+		return Objects.hashCode(resourceId, resourceType, resourceStartTime, resourceEndTime);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof Transaction) {
-			Transaction that = (Transaction) object;
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.transactionStartTime, that.transactionStartTime)
-				&& Objects.equal(this.transactionEndTime, that.transactionEndTime);
+		if (object instanceof Resource) {
+			Resource that = (Resource) object;
+			return Objects.equal(this.resourceId, that.resourceId)
+				&& Objects.equal(this.resourceType, that.resourceType)
+				&& Objects.equal(this.resourceStartTime, that.resourceStartTime)
+				&& Objects.equal(this.resourceEndTime, that.resourceEndTime);
 		}
 		return false;
 	}
@@ -130,9 +145,10 @@ public class Transaction extends JAXBBean {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("transactionStartTime", DateTimeUtils.getInstantMillis(transactionStartTime))
-			.add("transactionEndTime", DateTimeUtils.getInstantMillis(transactionEndTime))
+			.add("resourceId", resourceId)
+			.add("resourceType", resourceType)
+			.add("resourceStartTime", DateTimeUtils.getInstantMillis(resourceStartTime))
+			.add("resourceEndTime", DateTimeUtils.getInstantMillis(resourceEndTime))
 			.toString();
 	}
 }

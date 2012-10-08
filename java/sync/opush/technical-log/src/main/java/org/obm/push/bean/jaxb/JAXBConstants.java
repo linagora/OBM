@@ -29,19 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.jaxb;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
-
-@XmlSeeAlso( { Transaction.class, Request.class, Resource.class })
-public abstract class JAXBBean {
+public class JAXBConstants {
 	
-	@Override
-	public abstract int hashCode();
+	public final static String REQUEST_ROOT = "request";
+	public final static String REQUEST_EMPTY_METHOD_NAME = "createEmptyRequest";
+	public final static String DEVICE_ID = "deviceId";
+	public final static String DEVICE_TYPE = "deviceType";
+	public final static String COMMAND = "command";
+	public final static String TRANSACTION_ID = "transactionId";
+	public final static String REQUEST_START_TIME = "requestStartTime";
+	public final static String REQUEST_END_TIME = "requestEndTime";
+	public final static String RESOURCES = "resources";
 	
-	@Override
-	public abstract boolean equals(Object object);
-
-	@Override
-	public abstract String toString();
+	public final static String RESOURCE_ROOT = "resource";
+	public final static String RESOURCE_EMPTY_METHOD_NAME = "createEmptyResource";
+	public final static String RESOURCE_ID = "resourceId";
+	public final static String RESOURCE_TYPE = "resourceType";
+	public final static String RESOURCE_START_TIME = "resourceStartTime";
+	public final static String RESOURCE_END_TIME = "resourceEndTime";
+	
+	public final static String TRANSACTION_ROOT = "transaction";
+	public final static String TRANSACTION_EMPTY_METHOD_NAME = "createEmptyTransaction";
+	public final static String ID = "id";
+	public final static String TRANSACTION_START_TIME = "transactionStartTime";
+	public final static String TRANSACTION_END_TIME = "transactionEndTime";
 }

@@ -29,19 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.jaxb;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
-import org.joda.time.DateTime;
-
-public class DateTimeAdapter extends XmlAdapter<String, DateTime> {
+@XmlSeeAlso( { Transaction.class, Request.class, Resource.class })
+public abstract class JAXBBean {
 	
-    public DateTime unmarshal(String v) throws Exception {
-        return new DateTime(v);
-    }
- 
-    public String marshal(DateTime v) throws Exception {
-        return v.toString();
-    }
+	@Override
+	public abstract int hashCode();
+	
+	@Override
+	public abstract boolean equals(Object object);
+
+	@Override
+	public abstract String toString();
 }

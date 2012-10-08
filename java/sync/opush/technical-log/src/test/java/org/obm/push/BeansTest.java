@@ -35,9 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.Request;
-import org.obm.push.bean.Resource;
-import org.obm.push.bean.Transaction;
+import org.obm.push.bean.jaxb.Request;
+import org.obm.push.bean.jaxb.Resource;
+import org.obm.push.bean.jaxb.Transaction;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;

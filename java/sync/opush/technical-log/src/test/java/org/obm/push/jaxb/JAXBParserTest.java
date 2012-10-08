@@ -41,11 +41,11 @@ import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.obm.push.bean.JAXBBean;
-import org.obm.push.bean.Request;
-import org.obm.push.bean.Resource;
-import org.obm.push.bean.ResourceType;
-import org.obm.push.bean.Transaction;
+import org.obm.push.bean.jaxb.JAXBBean;
+import org.obm.push.bean.jaxb.Request;
+import org.obm.push.bean.jaxb.Resource;
+import org.obm.push.bean.jaxb.ResourceType;
+import org.obm.push.bean.jaxb.Transaction;
 
 import com.google.common.collect.Lists;
 

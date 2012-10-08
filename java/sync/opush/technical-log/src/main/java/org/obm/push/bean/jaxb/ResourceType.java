@@ -29,14 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.push.bean.jaxb;
 
-@XmlJavaTypeAdapters({
-	@XmlJavaTypeAdapter(type=DateTime.class, value=DateTimeAdapter.class)
-})
-package org.obm.push.bean;
+public enum ResourceType {
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
-
-import org.joda.time.DateTime;
-
+	JDBC_CONNECTION, IMAP_CONNECTION, HTTP_CLIENT;
+}
