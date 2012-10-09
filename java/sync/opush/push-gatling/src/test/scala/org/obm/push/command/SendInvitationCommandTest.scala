@@ -68,19 +68,19 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 	}
 	
 	test("SendInvitation command name is Sync") {
-		val invitation = new SendInvitationContext(email("user"))
+		val invitation = new InvitationContext(email("user"))
 		val command = new SendInvitationCommand(context, invitation, wbxmlTools)
 		assert(command.commandName === "Sync")
 	}
 	
 	test("SendInvitation contains organizer") {
-		val invitation = new SendInvitationContext(email("user"))
+		val invitation = new InvitationContext(email("user"))
 		val event = new SendInvitationCommand(context, invitation, wbxmlTools).buildEventInvitation
 		assert(event.getOrganizerEmail() == email("user"))
 	}
 	
 	test("SendInvitation contains attendees") {
-		val invitation = new SendInvitationContext(email("user"), attendeesEmails = Set(email("inv1"), email("inv2")))
+		val invitation = new InvitationContext(email("user"), attendeesEmails = Set(email("inv1"), email("inv2")))
 		val event = new SendInvitationCommand(context, invitation, wbxmlTools).buildEventInvitation
 		assert(event.getAttendeeEmails().containsAll(ImmutableList.of(email("inv1"), email("inv2"))))
 		assert(event.getAttendees().containsAll(ImmutableList.of(

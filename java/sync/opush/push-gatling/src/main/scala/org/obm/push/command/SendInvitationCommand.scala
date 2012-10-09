@@ -72,7 +72,7 @@ import org.obm.push.bean.MSAttendee
 import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.AttendeeStatus
 
-class SendInvitationCommand(httpContext: HttpContext, invitation: SendInvitationContext,
+class SendInvitationCommand(httpContext: HttpContext, invitation: InvitationContext,
 		wbTools: WBXMLTools) extends AbstractSyncCommand(httpContext, invitation, wbTools) {
 
 	override def buildSyncRequestCollections(session: Session) = {

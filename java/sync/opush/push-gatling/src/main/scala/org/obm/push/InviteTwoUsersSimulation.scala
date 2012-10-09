@@ -38,7 +38,7 @@ import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.command.InitialSyncContext
 import org.obm.push.command.SendInvitationCommand
-import org.obm.push.command.SendInvitationContext
+import org.obm.push.command.InvitationContext
 import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
@@ -83,7 +83,7 @@ class InviteTwoUsersSimulation extends Simulation {
 
 	def buildScenarioForOrganizer(userNumber: Int) = {
 		val userContext = userHttpContext(login(userNumber))
-		val invitation = new SendInvitationContext(
+		val invitation = new InvitationContext(
 				organizerEmail = email(userNumber),
 				attendeesEmails = Set(email(userNumber+1), email(userNumber+2)),
 				folderType = usedCalendarCollection)
@@ -107,7 +107,7 @@ class InviteTwoUsersSimulation extends Simulation {
 		new SyncCollectionCommand(userContext, syncContext, wbTools).buildCommand
 	}
 	
-	def buildSendInvitationCommand(userContext: HttpContext, invitation: SendInvitationContext) = {
+	def buildSendInvitationCommand(userContext: HttpContext, invitation: InvitationContext) = {
 		new SendInvitationCommand(userContext, invitation, wbTools).buildCommand
 	}
 

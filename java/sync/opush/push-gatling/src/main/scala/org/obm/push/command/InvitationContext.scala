@@ -36,7 +36,7 @@ import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.FolderSyncResponse
 import org.obm.push.bean.FolderType
 
-class SendInvitationContext(
+class InvitationContext(
 		val organizerEmail: String,
 		val attendeesEmails: Set[String] = Set(),
 		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER)
