@@ -616,6 +616,8 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
 	return $retour;
 }
 
+
+
 /**
 * increment sequence number for all events having ext_id $event_ext_id
 * => this propagates changes in exceptions
@@ -1195,11 +1197,15 @@ function run_query_calendar_insert_entity_event_alert($entity_id, $event_id) {
   return $obm_q; 
 }
 
-function run_query_calendar_update_entity_event($entity, $entity_id, $event_id, $state) {
+function run_query_calendar_update_entity_event($entity, $entity_id, $event_id, $state, $reset_comment = false) {
   global $cdg_sql, $obm;
+
+  $sql_comment = '';
+  if( $reset_comment ) $sql_comment = " , eventlink_comment = '' ";
 
   $entity_id = sql_parse_id($entity_id);
   $query = "UPDATE EventLink SET eventlink_state = '$state'
+    $sql_comment
     WHERE eventlink_event_id = $event_id 
     AND eventlink_entity_id = ".of_entity_subquery($entity, $entity_id);
 
@@ -1209,14 +1215,46 @@ function run_query_calendar_update_entity_event($entity, $entity_id, $event_id, 
   return $obm_q; 
 }
 
-function run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $state) {
+function run_query_calendar_update_entity_recurrent_event($entity, $entity_id, $ext_id, $state , $reset_comment = false) {
   global $cdg_sql, $obm;
+
+  $sql_comment = '';
+  if( $reset_comment ) $sql_comment = " , eventlink_comment = '' ";
+
   $entity_id = sql_parse_id($entity_id);
   $query = "UPDATE EventLink SET eventlink_state = '$state'
+    $sql_comment
     WHERE eventlink_event_id IN (SELECT event_id FROM Event WHERE event_ext_id='$ext_id')
     AND eventlink_entity_id = ".of_entity_subquery($entity, $entity_id);
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_entity_recurrent_event()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+function run_query_reset_comment_entity_event($entity, $entity_id, $event_id) {
+  global $cdg_sql, $obm;
+  $entity_id = sql_parse_id($entity_id);
+  $query = "UPDATE EventLink SET eventlink_comment = ''
+    WHERE eventlink_event_id = $event_id 
+    AND eventlink_entity_id = ".of_entity_subquery($entity, $entity_id);
+
+  display_debug_msg($query, $cdg_sql, 'run_query_reset_comment_entity_event()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+function run_query_reset_comment_recurrent_event($entity, $entity_id, $ext_id) {
+  global $cdg_sql, $obm;
+
+  $entity_id = sql_parse_id($entity_id);
+  $query = "UPDATE EventLink SET eventlink_comment = ''
+    WHERE eventlink_event_id IN (SELECT event_id FROM Event WHERE event_ext_id='$ext_id')
+    AND eventlink_entity_id = ".of_entity_subquery($entity, $entity_id);
+
+  display_debug_msg($query, $cdg_sql, 'run_query_reset_comment_recurrent_event()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -2501,25 +2539,25 @@ function run_query_calendar_reset_event_links($users, $contacts, $resources, $ev
     $users = array_unique($users);
     foreach ($users as $user_id) {
       if ($user_id != $obm['uid'] ) {
-	if ( !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
-		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'NEEDS-ACTION');
-	} else {
-		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'ACCEPTED');
-	}
+      	if ( !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
+      		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'NEEDS-ACTION', true);
+      	} else {
+      		run_query_calendar_update_entity_recurrent_event('user', $user_id, $event_ext_id, 'ACCEPTED', true);
+      	}
       }
     }
   }
   if (is_array($contacts)) {
     $contacts = array_unique($contacts);
     foreach ($contacts as $contact_id) {
-      run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $event_ext_id, 'NEEDS-ACTION');
+      run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $event_ext_id, 'NEEDS-ACTION', true);
     }
   }
   if (is_array($resources)) {
     $resources = array_unique($resources);
     foreach ($resources as $res_id) {
       if (!OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
-        run_query_calendar_update_entity_recurrent_event('resource', $res_id, $event_ext_id, 'NEEDS-ACTION');
+        run_query_calendar_update_entity_recurrent_event('resource', $res_id, $event_ext_id, 'NEEDS-ACTION', true);
       }
     }
   }
@@ -2532,9 +2570,9 @@ function run_query_calendar_reset_occurrence_links($users, $contacts, $resources
 		foreach ($users as $user_id) {
 			if ($user_id != $obm['uid'] ) {
 				if ( !OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id) ) {
-					run_query_calendar_update_entity_event('user', $user_id, $id, 'NEEDS-ACTION');
+					run_query_calendar_update_entity_event('user', $user_id, $id, 'NEEDS-ACTION', true);
 				} else {
-					run_query_calendar_update_entity_event('user', $user_id, $id, 'ACCEPTED');
+					run_query_calendar_update_entity_event('user', $user_id, $id, 'ACCEPTED', true);
 				}
 			}
 		}
@@ -2542,14 +2580,14 @@ function run_query_calendar_reset_occurrence_links($users, $contacts, $resources
 	if (is_array($contacts)) {
 		$contacts = array_unique($contacts);
 		foreach ($contacts as $contact_id) {
-			run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $id, 'NEEDS-ACTION');
+			run_query_calendar_update_entity_recurrent_event('contact', $contact_id, $id, 'NEEDS-ACTION', true);
 		}
 	}
 	if (is_array($resources)) {
 		$resources = array_unique($resources);
 		foreach ($resources as $res_id) {
 			if (!OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
-				run_query_calendar_update_entity_event('resource', $res_id, $id, 'NEEDS-ACTION');
+				run_query_calendar_update_entity_event('resource', $res_id, $id, 'NEEDS-ACTION', true);
 			}
 		}
 	}

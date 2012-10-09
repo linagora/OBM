@@ -789,8 +789,10 @@ if ($action == 'search') {
     if (check_calendar_participation_decision($params)) {
     	$event_q = run_query_calendar_detail($params['calendar_id']);
       if(($event_q->f('event_repeatkind')=='none') || $params['all'] == 1) {
+        $retour = run_query_reset_comment_entity_event($params['entity_kind'], $params['entity_id'], $params['calendar_id']);
       	$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
       } else {
+        $retour = run_query_reset_comment_recurrent_event($params['entity_kind'], $params['entity_id'], $params['calendar_id']);
       	$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event'], true);
       }
       if ($retour) {
