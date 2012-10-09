@@ -39,7 +39,7 @@ import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.command.InitialSyncContext
 import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.SendInvitationContext
-import org.obm.push.command.SyncCommand
+import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
@@ -104,7 +104,7 @@ class InviteTwoUsersSimulation extends Simulation {
 	}
 	
 	def buildSyncCommand(userContext: HttpContext, syncContext: SyncContext) = {
-		new SyncCommand(userContext, syncContext, wbTools).buildCommand
+		new SyncCollectionCommand(userContext, syncContext, wbTools).buildCommand
 	}
 	
 	def buildSendInvitationCommand(userContext: HttpContext, invitation: SendInvitationContext) = {

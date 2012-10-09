@@ -73,39 +73,21 @@ import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.AttendeeStatus
 
 class SendInvitationCommand(httpContext: HttpContext, invitation: SendInvitationContext,
-		wbTools: WBXMLTools) extends AbstractActiveSyncCommand(httpContext) {
+		wbTools: WBXMLTools) extends AbstractSyncCommand(httpContext, invitation, wbTools) {
 
-	val calendarEncoder = new CalendarEncoder(null, null) {}
-	val syncEncoder = new SyncEncoder(){}
-	val syncNamespace = "AirSync"
-		
-	override val commandTitle = "SendInvitation command"
-	override val commandName = "Sync"
-	  
-	override def buildCommand() = {
-		super.buildCommand()
-			.byteArrayBody((session: Session) => buildAddInvitationRequest(session))
-	}
-
-	def buildAddInvitationRequest(session: Session): Array[Byte] = {
-		val request = SyncRequest.builder()
-			.collections(ImmutableList.of(
-				SyncRequestCollection.builder()
-					.id(invitation.findCollectionId(session))
-					.syncKey(invitation.nextSyncKey(session))
-					.commands(SyncRequestCollectionCommands.builder()
-						.commands(ImmutableList.of(
-							SyncRequestCollectionCommand.builder()
-								.name("Add")
-								.clientId("123")
-								.applicationData(buildInvitationData())
-								.build()))
-						.build())
-					.build()))
-			.build()
-		
-		val requestDoc = syncEncoder.encodeSync(request)
-		wbTools.toWbxml(syncNamespace, requestDoc)
+	override def buildSyncRequestCollections(session: Session) = {
+		List(SyncRequestCollection.builder()
+				.id(invitation.findCollectionId(session))
+				.syncKey(invitation.nextSyncKey(session))
+				.commands(SyncRequestCollectionCommands.builder()
+					.commands(ImmutableList.of(
+						SyncRequestCollectionCommand.builder()
+							.name("Add")
+							.clientId("123")
+							.applicationData(buildInvitationData())
+							.build()))
+					.build())
+				.build())
 	}
 	
 	def buildInvitationData() = {

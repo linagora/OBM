@@ -52,7 +52,7 @@ import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.command.InitialSyncContext
-import org.obm.push.command.SyncCommand
+import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.bean.FolderType
 
@@ -90,7 +90,7 @@ class InitialSyncOnCalendarSimulation extends Simulation {
 	
 	def buildSyncOnCalendarCommand(userContext: HttpContext) = {
 		val initialSyncContext = new InitialSyncContext(FolderType.DEFAULT_CALENDAR_FOLDER)
-		new SyncCommand(userContext, initialSyncContext, wbTools).buildCommand
+		new SyncCollectionCommand(userContext, initialSyncContext, wbTools).buildCommand
 	}
 	
 	def buildInitialFolderSyncCommand(userContext: HttpContext) = {

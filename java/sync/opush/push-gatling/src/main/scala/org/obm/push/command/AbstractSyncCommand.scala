@@ -31,11 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
+import scala.collection.JavaConversions.seqAsJavaList
+
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.SyncRequest
 import org.obm.push.protocol.bean.SyncRequestCollection
 import org.obm.push.protocol.bean.SyncResponse
+import org.obm.push.protocol.data.CalendarEncoder
 import org.obm.push.protocol.data.SyncDecoder
 import org.obm.push.protocol.data.SyncEncoder
 import org.obm.push.wbxml.WBXMLTools
@@ -43,19 +46,19 @@ import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.google.common.base.Charsets
-import com.google.common.collect.ImmutableList
 
-class SyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
+abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(httpContext) {
 
 	val syncEncoder = new SyncEncoder() {}
 	val syncDecoder = new SyncDecoder(null) {}
+	val calendarEncoder = new CalendarEncoder(null, null) {}
+
 	val syncNamespace = "AirSync"
 	
 	override val commandTitle = "Sync command"
 	override val commandName = "Sync"
-	  
+
 	override def buildCommand() = {
 		super.buildCommand()
 			.byteArrayBody((session: Session) => buildSyncRequest(session))
@@ -67,16 +70,14 @@ class SyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: W
 
 	def buildSyncRequest(session: Session): Array[Byte] = {
 		val request = SyncRequest.builder()
-			.collections(ImmutableList.of(
-				SyncRequestCollection.builder()
-					.id(syncContext.findCollectionId(session))
-					.syncKey(syncContext.nextSyncKey(session))
-					.build()))
+			.collections(buildSyncRequestCollections(session))
 			.build()
 		
 		val requestDoc = syncEncoder.encodeSync(request)
 		wbTools.toWbxml(syncNamespace, requestDoc)
 	}
+	
+	def buildSyncRequestCollections(session: Session): List[SyncRequestCollection]
 	
 	def toSyncResponse(response: Array[Byte]): SyncResponse = {
 		val responseDoc = wbTools.toXml(response)
