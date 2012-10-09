@@ -372,8 +372,13 @@ public class ItemOperationsProtocolTest {
 		return MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
-			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), MSEmailBodyType.MIME, 0, Charsets.UTF_8, false))
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))
+					.bodyType(MSEmailBodyType.MIME)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
 			.build();
 	}
 

@@ -44,13 +44,59 @@ import com.google.common.base.Objects;
 
 public class MSEmailBody implements Serializable {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+
+		private SerializableInputStream mimeData;
+		private MSEmailBodyType bodyType;
+		private int estimatedDataSize;
+		private Charset charset;
+		private boolean truncated;
+		
+		private Builder() {
+			super();
+		}
+
+		public Builder mimeData(SerializableInputStream mimeData) {
+			this.mimeData = mimeData;
+			return this;
+		}
+
+		public Builder bodyType(MSEmailBodyType bodyType) {
+			this.bodyType = bodyType;
+			return this;
+		}
+
+		public Builder estimatedDataSize(int estimatedDataSize) {
+			this.estimatedDataSize = estimatedDataSize;
+			return this;
+		}
+
+		public Builder charset(Charset charset) {
+			this.charset = charset;
+			return this;
+		}
+
+		public Builder truncated(boolean truncated) {
+			this.truncated = truncated;
+			return this;
+		}
+		
+		public MSEmailBody build() {
+			return new MSEmailBody(mimeData, bodyType, estimatedDataSize, charset, truncated);
+		}
+	}
+	
 	private SerializableInputStream mimeData;
 	private MSEmailBodyType bodyType;
 	private int estimatedDataSize;
 	private Charset charset;
 	private boolean truncated;
 	
-	public MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, 
+	private MSEmailBody(SerializableInputStream mimeData, MSEmailBodyType bodyType, 
 			int estimatedDataSize, Charset charset, boolean truncated) {
 		
 		this.mimeData = mimeData;

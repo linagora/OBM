@@ -502,8 +502,14 @@ public class SyncHandlerTest {
 		return MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
-			.body(new MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false)).build();
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))
+					.bodyType(emailBodyType)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
+			.build();
 	}
 
 	@Test

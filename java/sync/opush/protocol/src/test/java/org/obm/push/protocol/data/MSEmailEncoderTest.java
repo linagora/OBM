@@ -92,11 +92,13 @@ public class MSEmailEncoderTest {
 		return MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
-			.body(new MSEmailBody(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())), 
-						emailBodyType, 
-						10, 
-						Charsets.UTF_8, 
-						true))
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))
+					.bodyType(emailBodyType)
+					.estimatedDataSize(10)
+					.charset(Charsets.UTF_8)
+					.truncated(true)
+					.build())
 			.build();
 	}
 }

@@ -63,12 +63,13 @@ public class MSEmailHeaderSerializingTest {
 	public void setUp() {
 		sdf = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
 		serializingTest = new SerializingTest();
-		simpleBody = new MSEmailBody(new SerializableInputStream(
-				new ByteArrayInputStream("text".getBytes())), 
-				MSEmailBodyType.PlainText, 
-				0, 
-				Charsets.UTF_8,
-				false);
+		simpleBody = MSEmailBody.builder()
+				.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))
+				.bodyType(MSEmailBodyType.PlainText)
+				.estimatedDataSize(0)
+				.charset(Charsets.UTF_8)
+				.truncated(false)
+				.build();
 	}
 	
 	@Test

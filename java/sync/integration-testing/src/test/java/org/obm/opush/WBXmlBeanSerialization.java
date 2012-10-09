@@ -78,12 +78,13 @@ public class WBXmlBeanSerialization {
 		return MSEmail.builder()
 			.uid(1)
 			.header(msEmailHeader)
-			.body(new MSEmailBody(new SerializableInputStream(
-				new ByteArrayInputStream("text".getBytes())), 
-				MSEmailBodyType.PlainText, 
-				0, 
-				Charsets.UTF_8,
-				false))
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))
+					.bodyType(MSEmailBodyType.PlainText)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
 			.build();
 	}
 	

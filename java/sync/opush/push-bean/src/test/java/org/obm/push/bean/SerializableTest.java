@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -103,8 +104,13 @@ public class SerializableTest {
 		 org.obm.push.bean.ms.MSEmail msEmail = org.obm.push.bean.ms.MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
-			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
-					new ByteArrayInputStream("message".getBytes())), MSEmailBodyType.PlainText, 0, Charsets.UTF_8, false))
+			.body(org.obm.push.bean.ms.MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream("message".getBytes())))
+					.bodyType(MSEmailBodyType.PlainText)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
 			.meetingRequest(
 					new MSMeetingRequest.MsMeetingRequestBuilder()
 						.startTime(date("2012-02-03T11:22:33"))

@@ -134,12 +134,13 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 
 	private MSEmailBody convertBody(EmailView emailView) {
-		SerializableInputStream mimeData = new SerializableInputStream(emailView.getBodyMimePartData());
-		int estimatedDataSize = emailView.getEstimatedDataSize();
-		boolean truncated = emailView.isTruncated();
-		
-		return new MSEmailBody(mimeData, convertContentType(emailView), 
-				estimatedDataSize, chooseSupportedCharset(emailView.getCharset()), truncated);
+		return MSEmailBody.builder()
+				.mimeData(new SerializableInputStream(emailView.getBodyMimePartData()))
+				.estimatedDataSize(emailView.getEstimatedDataSize())
+				.truncated(emailView.isTruncated())
+				.charset(chooseSupportedCharset(emailView.getCharset()))
+				.bodyType(convertContentType(emailView))
+				.build();
 	}
 
 	private Charset chooseSupportedCharset(String charset) {
