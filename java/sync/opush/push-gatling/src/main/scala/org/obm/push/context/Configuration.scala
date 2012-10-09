@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.context
 
-trait ContextConfiguration {
+trait Configuration {
   
   val targetServerUrl: String
   

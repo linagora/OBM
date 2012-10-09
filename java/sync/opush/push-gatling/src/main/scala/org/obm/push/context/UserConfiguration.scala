@@ -31,54 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.context
 
-import com.google.common.base.Strings
+class UserConfiguration(default: Configuration) {
 
-object Arguments extends Enumeration {
-  
-	val TARGET_SERVER_URL_ARG = Value("targetServerUrl")
-	  
-	val USER_DOMAIN = Value("userDomain")
-	val USER_LOGIN = Value("userLogin")
-	val USER_PASSWORD = Value("userPassword")
-	val USER_POLICY_KEY = Value("userPolicyKey")
-	val USER_DEVICE_ID = Value("userDeviceId")
-	val USER_DEVICE_TYPE = Value("userDeviceType")
-}
-
-object GatlingContextConfiguration {
-
-	def build(): ContextConfiguration = build(
-			System.getProperty(Arguments.TARGET_SERVER_URL_ARG.toString),
-			System.getProperty(Arguments.USER_DOMAIN.toString),
-			System.getProperty(Arguments.USER_LOGIN.toString),
-			System.getProperty(Arguments.USER_PASSWORD.toString),
-			System.getProperty(Arguments.USER_POLICY_KEY.toString),
-			System.getProperty(Arguments.USER_DEVICE_ID.toString),
-			System.getProperty(Arguments.USER_DEVICE_TYPE.toString))
+	def cloneForUser(
+			serverUrl: String = default.targetServerUrl,
+			login: String = default.userLogin,
+			domain: String = default.userDomain,
+			pwd: String = default.userPassword,
+			policyKey: String = default.userPolicyKey,
+			deviceId: String = default.userDeviceId,
+			deviceType: String = default.userDeviceType)
 	
-	def build(
-			serverUrl: String, domain: String, login: String,
-			password: String, policyKey: String, deviceId: String, deviceType: String) = {
-	  
-			require(!Strings.isNullOrEmpty(serverUrl))
-			require(!Strings.isNullOrEmpty(domain))
-			require(!Strings.isNullOrEmpty(login))
-			require(!Strings.isNullOrEmpty(password))
-			require(!Strings.isNullOrEmpty(deviceId))
-			require(!Strings.isNullOrEmpty(deviceType))
-			require(!Strings.isNullOrEmpty(policyKey))
-			
-			new ContextConfiguration() {
-			
-				override val targetServerUrl = serverUrl
-				 
-				override val userDomain = domain
-				override val userLogin = login
-				override val userPassword = password
-				override val userPolicyKey = policyKey
-				override val userDeviceId = deviceId
-				override val userDeviceType = deviceType
-				
-		  	}
-	}
+	= GatlingConfiguration.build(serverUrl, domain, login, pwd, policyKey, deviceId, deviceType);
+
 }

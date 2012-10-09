@@ -41,9 +41,9 @@ import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.SendInvitationContext
 import org.obm.push.command.SyncCommand
 import org.obm.push.command.SyncContext
-import org.obm.push.context.ContextConfiguration
-import org.obm.push.context.GatlingContextConfiguration
-import org.obm.push.context.UserContextConfiguration
+import org.obm.push.context.Configuration
+import org.obm.push.context.GatlingConfiguration
+import org.obm.push.context.UserConfiguration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.wbxml.WBXMLTools
@@ -60,14 +60,14 @@ import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
 class InviteTwoUsersSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
-	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
+	val configuration: Configuration = GatlingConfiguration.build
 
 	val usedCalendarCollection = FolderType.DEFAULT_CALENDAR_FOLDER
 	
 	def apply = {
 		
 		val httpConf = httpConfig
-			.baseURL(contextConfiguration.targetServerUrl)
+			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
 		
@@ -113,9 +113,9 @@ class InviteTwoUsersSimulation extends Simulation {
 
 	def userHttpContext(userLogin: String) = {
 		new ActiveSyncHttpContext(
-			new UserContextConfiguration(contextConfiguration).cloneForUser(login = userLogin, pwd = "1234"))
+			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
 	}
 	
-	def email(userNumber: Int) = "%s@%s".format(login(userNumber), contextConfiguration.userDomain)
+	def email(userNumber: Int) = "%s@%s".format(login(userNumber), configuration.userDomain)
 	def login(userNumber: Int) = "u%d".format(userNumber)
 }

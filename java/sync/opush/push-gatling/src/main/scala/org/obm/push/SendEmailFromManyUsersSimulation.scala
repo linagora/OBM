@@ -35,8 +35,8 @@ import scala.collection.mutable.MutableList
 import org.apache.james.mime4j.dom.address.Mailbox
 import org.obm.push.command.SendEmailCommand
 import org.obm.push.command.SendEmailContext
-import org.obm.push.context.ContextConfiguration
-import org.obm.push.context.GatlingContextConfiguration
+import org.obm.push.context.Configuration
+import org.obm.push.context.GatlingConfiguration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.wbxml.WBXMLTools
@@ -46,18 +46,18 @@ import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBui
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
-import org.obm.push.context.UserContextConfiguration
+import org.obm.push.context.UserConfiguration
 
 class SendEmailFromManyUsersSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
   
-	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
+	val configuration: Configuration = GatlingConfiguration.build
 
 	def apply = {
 		
 		val httpConf = httpConfig
-			.baseURL(contextConfiguration.targetServerUrl)
+			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
 		
@@ -72,10 +72,10 @@ class SendEmailFromManyUsersSimulation extends Simulation {
 
 	def buildScenarioForUser(userNumber: Int) = {
 		val userLogin = login(userNumber)
-		val from = new Mailbox(userLogin, contextConfiguration.userDomain)
-		val to = new Mailbox(login(userNumber+1), contextConfiguration.userDomain)
-		val cc = new Mailbox(login(userNumber+2), contextConfiguration.userDomain)
-		val bcc = new Mailbox(login(userNumber+3), contextConfiguration.userDomain)
+		val from = new Mailbox(userLogin, configuration.userDomain)
+		val to = new Mailbox(login(userNumber+1), configuration.userDomain)
+		val cc = new Mailbox(login(userNumber+2), configuration.userDomain)
+		val bcc = new Mailbox(login(userNumber+3), configuration.userDomain)
 		
 		val sendEmailContext = new SendEmailContext(from, to, cc, bcc)
 		scenario("Send a simple email from:{%s} to:{%s} cc:{%s} bcc:{%s}".format(from, to, cc, bcc))
@@ -84,7 +84,7 @@ class SendEmailFromManyUsersSimulation extends Simulation {
 	
 	def userContext(userLogin: String) = {
 		new ActiveSyncHttpContext(
-			new UserContextConfiguration(contextConfiguration).cloneForUser(login = userLogin, pwd = "1234"))
+			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
 	}
 	
 	def login(userNumber: Int) = "u%d".format(userNumber)

@@ -32,7 +32,7 @@
 package org.obm.push.context.http
 
 import org.junit.runner.RunWith
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
@@ -41,7 +41,7 @@ class ActiveSyncHttpContextTest extends FunSuite {
 	   
 	test("ActiveSyncHttpContext returns expected Authorization header") {
 
-		val context = new ContextConfiguration {
+		val context = new Configuration {
 			  val targetServerUrl = "192.168.0.1"
 			  val userDomain = "domain.org"
 			  val userLogin = "login"
@@ -57,7 +57,7 @@ class ActiveSyncHttpContextTest extends FunSuite {
 	   
 	test("ActiveSyncHttpContext returns expected WBXML Content-Type header") {
 
-		val context = new ContextConfiguration {
+		val context = new Configuration {
 			  val targetServerUrl = "192.168.0.1"
 			  val userDomain = "domain.org"
 			  val userLogin = "login"
@@ -73,7 +73,7 @@ class ActiveSyncHttpContextTest extends FunSuite {
 	   
 	test("ActiveSyncHttpContext returns ActiveSync version 12.1 header") {
 
-		val context = new ContextConfiguration {
+		val context = new Configuration {
 			  val targetServerUrl = "192.168.0.1"
 			  val userDomain = "domain.org"
 			  val userLogin = "login"
@@ -89,7 +89,7 @@ class ActiveSyncHttpContextTest extends FunSuite {
 	   
 	test("ActiveSyncHttpContext returns given ActiveSync policy key header") {
 
-		val context = new ContextConfiguration {
+		val context = new Configuration {
 			  val targetServerUrl = "192.168.0.1"
 			  val userDomain = "domain.org"
 			  val userLogin = "login"

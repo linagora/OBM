@@ -32,7 +32,7 @@
 package org.obm.push.command
 
 import org.junit.runner.RunWith
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
@@ -50,7 +50,7 @@ class FolderSyncCommandTest extends FunSuite with BeforeAndAfter {
 	}
 	
 	test("FolderSync command name is FolderSync") {
-		val context = new ActiveSyncHttpContext(new ContextConfiguration {
+		val context = new ActiveSyncHttpContext(new Configuration {
 			  val targetServerUrl = "192.168.0.1"
 			  val userDomain = "domain.org"
 			  val userLogin = "login"

@@ -32,12 +32,12 @@
 package org.obm.push.context.http
 
 import org.apache.commons.codec.binary.Base64
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 
 import com.google.common.base.Charsets
 import com.google.common.base.Strings
 
-class ActiveSyncHttpContext(context: ContextConfiguration) extends HttpContext {
+class ActiveSyncHttpContext(context: Configuration) extends HttpContext {
   
 	val headerContentTypeWbXml = new HttpHeader(HttpHeaders.CONTENT_TYPE, "application/vnd.ms-sync.wbxml")
 	val headerActiveSyncVersion = new HttpHeader(HttpHeaders.AS_VERSION, "12.1")

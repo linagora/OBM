@@ -35,8 +35,8 @@ import scala.collection.mutable.MutableList
 import org.apache.james.mime4j.dom.address.Mailbox
 import org.obm.push.command.SendEmailCommand
 import org.obm.push.command.SendEmailContext
-import org.obm.push.context.ContextConfiguration
-import org.obm.push.context.GatlingContextConfiguration
+import org.obm.push.context.Configuration
+import org.obm.push.context.GatlingConfiguration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.wbxml.WBXMLTools
@@ -46,7 +46,7 @@ import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBui
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
-import org.obm.push.context.UserContextConfiguration
+import org.obm.push.context.UserConfiguration
 import com.excilys.ebi.gatling.core.action.builder.ActionBuilder
 import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.command.InitialFolderSyncContext
@@ -60,12 +60,12 @@ class InitialSyncOnCalendarSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
   
-	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
+	val configuration: Configuration = GatlingConfiguration.build
 
 	def apply = {
 		
 		val httpConf = httpConfig
-			.baseURL(contextConfiguration.targetServerUrl)
+			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
 		
@@ -100,7 +100,7 @@ class InitialSyncOnCalendarSimulation extends Simulation {
 	
 	def userHttpContext(userLogin: String) = {
 		new ActiveSyncHttpContext(
-			new UserContextConfiguration(contextConfiguration).cloneForUser(login = userLogin, pwd = "1234"))
+			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
 	}
 	
 	def login(userNumber: Int) = "u%d".format(userNumber)

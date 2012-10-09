@@ -40,85 +40,85 @@ class GatlingContextConfigurationTest extends FunSuite {
  
 	test("GatlingContextConfiguration needs a non-null targetServerUrl") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build(null, "domain.org", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build(null, "domain.org", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty targetServerUrl") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("", "domain.org", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("", "domain.org", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null domain") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", null, "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", null, "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty domain") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null login") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", null, "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", null, "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty login") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null password") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", null, "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", null, "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty password") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null deviceId") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", null, "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", null, "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty deviceId") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null deviceType") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", null)
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", null)
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty deviceType") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", "")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", "")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null policyKey") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", null, "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", null, "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty policyKey") {
 		intercept[IllegalArgumentException] {
-			GatlingContextConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "", "id", "type")
 		}
 	}
 }

@@ -35,11 +35,11 @@ import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 import org.obm.push.context.http.HttpContext
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.apache.james.mime4j.dom.address.Mailbox
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 import org.obm.push.context.http.HttpContext
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.wbxml.WBXMLTools
@@ -51,7 +51,7 @@ import org.obm.push.bean.AttendeeStatus
 @RunWith(classOf[JUnitRunner])
 class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 
-	val context = new ActiveSyncHttpContext(new ContextConfiguration {
+	val context = new ActiveSyncHttpContext(new Configuration {
 		  val targetServerUrl = "192.168.0.1"
 		  val userDomain = "domain.org"
 		  val userLogin = "login"

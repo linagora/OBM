@@ -32,7 +32,7 @@
 package org.obm.push.command
 
 import org.junit.runner.RunWith
-import org.obm.push.context.ContextConfiguration
+import org.obm.push.context.Configuration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

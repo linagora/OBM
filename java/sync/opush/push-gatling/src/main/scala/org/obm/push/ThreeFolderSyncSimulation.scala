@@ -34,8 +34,8 @@ package org.obm.push
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.FolderSyncContext
 import org.obm.push.command.InitialFolderSyncContext
-import org.obm.push.context.ContextConfiguration
-import org.obm.push.context.GatlingContextConfiguration
+import org.obm.push.context.Configuration
+import org.obm.push.context.GatlingConfiguration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.FolderSyncProtocol
@@ -50,8 +50,8 @@ class ThreeFolderSyncSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
   
-	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
-	val httpContext: HttpContext = new ActiveSyncHttpContext(contextConfiguration)
+	val configuration: Configuration = GatlingConfiguration.build
+	val httpContext: HttpContext = new ActiveSyncHttpContext(configuration)
 	
 	val initialFolderSyncContext = new InitialFolderSyncContext()
 	val folderSyncContext = new FolderSyncContext()
@@ -64,7 +64,7 @@ class ThreeFolderSyncSimulation extends Simulation {
 			.exec(new FolderSyncCommand(httpContext, folderSyncContext, wbTools).buildCommand)
 					
 		val httpConf = httpConfig
-			.baseURL(contextConfiguration.targetServerUrl)
+			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
 		List(folderSyncScenario.configure.users(1).ramp(10).protocolConfig(httpConf))

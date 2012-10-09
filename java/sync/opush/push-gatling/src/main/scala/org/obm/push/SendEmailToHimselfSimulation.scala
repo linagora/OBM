@@ -33,8 +33,8 @@ package org.obm.push
 
 import org.obm.push.command.SendEmailContext
 import org.obm.push.command.SendEmailCommand
-import org.obm.push.context.ContextConfiguration
-import org.obm.push.context.GatlingContextConfiguration
+import org.obm.push.context.Configuration
+import org.obm.push.context.GatlingConfiguration
 import org.obm.push.context.http.ActiveSyncHttpContext
 import org.obm.push.context.http.HttpContext
 import org.obm.push.wbxml.WBXMLTools
@@ -53,18 +53,18 @@ class SendEmailToHimselfSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
   
-	val contextConfiguration: ContextConfiguration = GatlingContextConfiguration.build
-	val httpContext: HttpContext = new ActiveSyncHttpContext(contextConfiguration)
+	val configuration: Configuration = GatlingConfiguration.build
+	val httpContext: HttpContext = new ActiveSyncHttpContext(configuration)
 
 	def apply = {
-		val toMailbox = new Mailbox(contextConfiguration.userLogin, contextConfiguration.userDomain)
+		val toMailbox = new Mailbox(configuration.userLogin, configuration.userDomain)
 		val sendEmailContext = new SendEmailContext(to = toMailbox)
 		val folderSyncScenario = scenario("Send a simple email to himself")
 			.exec(new SendEmailCommand(httpContext, sendEmailContext).buildCommand)
 					
 		
 		val httpConf = httpConfig
-			.baseURL(contextConfiguration.targetServerUrl)
+			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
 		List(folderSyncScenario.configure.users(1).ramp(10).protocolConfig(httpConf))
