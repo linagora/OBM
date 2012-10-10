@@ -29,18 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
+import java.net.ServerSocket;
 
-import com.google.inject.BindingAnnotation;
+public class FreePortFinder {
 
-@Retention(RetentionPolicy.RUNTIME) 
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER}) 
-@BindingAnnotation
-public @interface PortNumber {
+	public static final int findFreePort() {
+		for (int i = 8000; i < 8100; i++) {
+			ServerSocket socket;
+			try {
+				socket = new ServerSocket(i);
+				socket.close();
+				return i;
+			} catch (IOException portInUse) {
+			}
+		}
+		throw new RuntimeException("Can't find a free port");
+	}
 
+	
 }
