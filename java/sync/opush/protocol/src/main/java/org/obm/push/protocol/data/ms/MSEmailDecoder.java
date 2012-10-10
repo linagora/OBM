@@ -43,6 +43,8 @@ import javax.mail.internet.InternetAddress;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.MSImportance;
+import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.MSEmailBody.Builder;
@@ -83,6 +85,9 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 						.date(date(uniqueStringFieldValue(data, ASEmail.DATE_RECEIVED)))
 						.build())
 				.body(msEmailBody(data))
+				.importance(MSImportance.fromSpecificationValue(uniqueStringFieldValue(data, ASEmail.IMPORTANCE)))
+				.messageClass(MSMessageClass.fromSpecificationValue(uniqueStringFieldValue(data, ASEmail.MESSAGE_CLASS)))
+				.read(uniqueBooleanFieldValue(data, ASEmail.READ, false))
 				.build();
 		} catch (AddressException e) {
 			throw new ConversionException("An address field is not valid", e);

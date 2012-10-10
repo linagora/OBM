@@ -31,19 +31,40 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-public enum MSImportance {
-	LOW, NORMAL, HIGH;
-	
-	public String asIntString() {
-		switch (this) {
-		case HIGH:
-			return "2";
-		case LOW:
-			return "0";
-		case NORMAL:
-		default:
-			return "1";
-		}
-	}
+import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
+public enum MSImportance {
+	LOW("0"),
+	NORMAL("1"),
+	HIGH("2");
+	
+	private final String asSpecificationValue;
+
+	private MSImportance(String asSpecificationValue) {
+		this.asSpecificationValue = asSpecificationValue;
+	}
+	
+	public String asSpecificationValue() {
+		return asSpecificationValue;
+	}
+    
+    public static MSImportance fromSpecificationValue(String specificationValue) {
+    	if (specValueToEnum.containsKey(specificationValue)) {
+    		return specValueToEnum.get(specificationValue);
+    	}
+		return null;
+    }
+
+    private static Map<String, MSImportance> specValueToEnum;
+    
+    static {
+    	Builder<String, MSImportance> builder = ImmutableMap.builder();
+    	for (MSImportance enumeration : MSImportance.values()) {
+    		builder.put(enumeration.asSpecificationValue(), enumeration);
+    	}
+    	specValueToEnum = builder.build();
+    }
 }

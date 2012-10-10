@@ -48,6 +48,9 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSImportance;
+import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -229,5 +232,138 @@ public class MSEmailDecoderTest {
 		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
 		
 		assertThat(body.getBodyType()).isNull();
+	}
+	
+	@Test
+	public void parseMessageClassNote() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<MessageClass>IPM.Note</MessageClass>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getMessageClass()).isEqualTo(MSMessageClass.NOTE);
+	}
+	
+	@Test
+	public void parseMessageClassNoteSMIME() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<MessageClass>IPM.Note.SMIME</MessageClass>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getMessageClass()).isEqualTo(MSMessageClass.NOTE_SMIME);
+	}
+
+	@Test
+	public void parseImportanceHigh() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Importance>2</Importance>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getImportance()).isEqualTo(MSImportance.HIGH);
+	}
+
+	@Test
+	public void parseImportanceLow() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Importance>0</Importance>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getImportance()).isEqualTo(MSImportance.LOW);
+	}
+
+	@Test
+	public void parseImportanceNormal() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Importance>1</Importance>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getImportance()).isEqualTo(MSImportance.NORMAL);
+	}
+
+	@Test
+	public void parseImportanceDefaultIsNormal() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getImportance()).isEqualTo(MSImportance.NORMAL);
+	}
+	
+	@Test
+	public void parseReadFalse() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Read>0</Read>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.isRead()).isFalse();
+	}
+
+	@Test
+	public void parseReadTrue() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Read>1</Read>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+
+		assertThat(email.isRead()).isTrue();
+	}
+
+	@Test
+	public void parseReadDefaultIsFalse() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+
+		assertThat(email.isRead()).isFalse();
 	}
 }

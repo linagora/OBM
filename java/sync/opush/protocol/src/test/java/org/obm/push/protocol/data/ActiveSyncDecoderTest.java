@@ -148,6 +148,24 @@ public class ActiveSyncDecoderTest {
 	}
 
 	@Test
+	public void testBooleanDefaultFalse() throws Exception {
+		Element request = DOMUtils.parse("<root></root>").getDocumentElement();
+
+		boolean value = new ActiveSyncDecoder().uniqueBooleanFieldValue(request, field("FieldName"), false);
+
+		assertThat(value).isFalse();
+	}
+
+	@Test
+	public void testBooleanDefaultTrue() throws Exception {
+		Element request = DOMUtils.parse("<root></root>").getDocumentElement();
+
+		boolean value = new ActiveSyncDecoder().uniqueBooleanFieldValue(request, field("FieldName"), true);
+
+		assertThat(value).isTrue();
+	}
+
+	@Test
 	public void testStringWhenNotPresent() throws Exception {
 		Element request = DOMUtils.parse("<root></root>").getDocumentElement();
 

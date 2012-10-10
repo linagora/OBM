@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Objects;
+
 public class ActiveSyncDecoder {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncDecoder.class);
@@ -69,6 +71,10 @@ public class ActiveSyncDecoder {
 			throw new ASRequestBooleanFieldException("Failed to parse field : " + booleanField.getName());
 		}
 		return elementText.equalsIgnoreCase(AS_BOOLEAN_TRUE);
+	}
+
+	public boolean uniqueBooleanFieldValue(Element root, ActiveSyncFields booleanField, boolean defaultValue) {
+		return Objects.firstNonNull(uniqueBooleanFieldValue(root, booleanField), defaultValue);
 	}
 
 	public Integer uniqueIntegerFieldValue(Element root, ActiveSyncFields integerField) {

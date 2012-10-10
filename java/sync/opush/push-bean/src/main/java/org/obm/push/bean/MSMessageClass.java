@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 public enum MSMessageClass {
 	
 	NOTE("IPM.Note"),
@@ -53,4 +58,21 @@ public enum MSMessageClass {
 	public String specificationValue() {
 		return value;
 	}
+
+	public static MSMessageClass fromSpecificationValue(String specificationValue) {
+    	if (specValueToEnum.containsKey(specificationValue)) {
+    		return specValueToEnum.get(specificationValue);
+    	}
+		return null;
+    }
+
+    private static Map<String, MSMessageClass> specValueToEnum;
+    
+    static {
+    	Builder<String, MSMessageClass> builder = ImmutableMap.builder();
+    	for (MSMessageClass enumeration : MSMessageClass.values()) {
+    		builder.put(enumeration.specificationValue(), enumeration);
+    	}
+    	specValueToEnum = builder.build();
+    }
 }
