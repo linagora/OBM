@@ -48,7 +48,7 @@ import org.obm.push.bean.jaxb.Request;
 import org.obm.push.bean.jaxb.Resource;
 import org.obm.push.bean.jaxb.ResourceType;
 import org.obm.push.bean.jaxb.Transaction;
-import org.obm.push.jaxb.store.ehcache.RequestMap;
+import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.obm.push.jaxb.store.ehcache.RequestNotFoundException;
 import org.slf4j.Logger;
 
@@ -85,20 +85,20 @@ public class TechnicalLoggerServiceTest {
 				.requestStartTime(DateTime.now())
 				.build();
 		
-		RequestMap requestMap = createStrictMock(RequestMap.class);
-		expect(requestMap.put(transactionId, request))
+		RequestStore requestStore = createStrictMock(RequestStore.class);
+		expect(requestStore.put(transactionId, request))
 			.andReturn(null).once();
 		
 		Logger logger = createStrictMock(Logger.class);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
-		replay(requestMap, logger);
+		replay(requestStore, logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestStore);
 		technicalLoggerService.traceStartedRequest(request);
 		
-		verify(requestMap, logger);
+		verify(requestStore, logger);
 	}
 	
 	@Test
@@ -114,20 +114,20 @@ public class TechnicalLoggerServiceTest {
 				.build();
 		
 		Element previous = new Element(transactionId, request);
-		RequestMap requestMap = createStrictMock(RequestMap.class);
-		expect(requestMap.put(transactionId, request))
+		RequestStore requestStore = createStrictMock(RequestStore.class);
+		expect(requestStore.put(transactionId, request))
 			.andReturn(previous).once();
 		
 		Logger logger = createStrictMock(Logger.class);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
-		replay(requestMap, logger);
+		replay(requestStore, logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestStore);
 		technicalLoggerService.traceStartedRequest(request);
 		
-		verify(requestMap, logger);
+		verify(requestStore, logger);
 	}
 	
 	@Test
@@ -142,20 +142,20 @@ public class TechnicalLoggerServiceTest {
 				.requestEndTime(DateTime.now())
 				.build();
 		
-		RequestMap requestMap = createStrictMock(RequestMap.class);
-		requestMap.delete(transactionId);
+		RequestStore requestStore = createStrictMock(RequestStore.class);
+		requestStore.delete(transactionId);
 		expectLastCall();
 		
 		Logger logger = createStrictMock(Logger.class);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
-		replay(requestMap, logger);
+		replay(requestStore, logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestStore);
 		technicalLoggerService.traceEndedRequest(request);
 		
-		verify(requestMap, logger);
+		verify(requestStore, logger);
 	}
 	
 	@Test
@@ -176,20 +176,20 @@ public class TechnicalLoggerServiceTest {
 				.requestStartTime(DateTime.now())
 				.build();
 		
-		RequestMap requestMap = createStrictMock(RequestMap.class);
-		expect(requestMap.getRequest(transactionId))
+		RequestStore requestStore = createStrictMock(RequestStore.class);
+		expect(requestStore.getRequest(transactionId))
 			.andReturn(request).once();
 		
 		Logger logger = createStrictMock(Logger.class);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
-		replay(requestMap, logger);
+		replay(requestStore, logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestStore);
 		technicalLoggerService.traceResource(resource);
 		
-		verify(requestMap, logger);
+		verify(requestStore, logger);
 		assertThat(request.getResources()).containsOnly(resource);
 	}
 	
@@ -201,19 +201,19 @@ public class TechnicalLoggerServiceTest {
 				.resourceStartTime(DateTime.now())
 				.build();
 		
-		RequestMap requestMap = createStrictMock(RequestMap.class);
-		expect(requestMap.getRequest(Thread.currentThread().getId()))
+		RequestStore requestStore = createStrictMock(RequestStore.class);
+		expect(requestStore.getRequest(Thread.currentThread().getId()))
 			.andThrow(new RequestNotFoundException()).once();
 		
 		Logger logger = createStrictMock(Logger.class);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
-		replay(requestMap, logger);
+		replay(requestStore, logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestStore);
 		technicalLoggerService.traceResource(resource);
 		
-		verify(requestMap, logger);
+		verify(requestStore, logger);
 	}
 }

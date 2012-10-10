@@ -31,67 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxb.store.ehcache;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 
-import java.util.List;
+import org.obm.push.bean.jaxb.Request;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class)
-public class ObjectStoreManagerTest {
-
-	private ObjectStoreManager opushCacheManager;
-
-	@Before
-	public void init() {
-		this.opushCacheManager = new ObjectStoreManager();
+public class RequestStore {
+	
+	private final static String STORE_NAME = "request";
+	protected final ObjectStoreManager objectStoreManager;
+	protected final Cache store;
+	
+	@Inject  
+	@VisibleForTesting RequestStore(ObjectStoreManager objectStoreManager) {
+		this.objectStoreManager = objectStoreManager;
+		this.store = this.objectStoreManager.getStore(STORE_NAME);
 	}
 
-	@After
-	public void shutdown() {
-		opushCacheManager.shutdown();
-	}
-
-	@Test
-	public void loadStores() {
-		List<String> stores = opushCacheManager.listStores();
-		assertThat(stores).isNotNull();
-		assertThat(stores).hasSize(1);
+	public Request getRequest(long threadId) throws RequestNotFoundException {
+		Element element = store.get(threadId);
+		if (element == null) {
+			throw new RequestNotFoundException();
+		}
+		return (Request) element.getObjectValue();
 	}
 	
-	@Test @Slow
-	public void createNewThreeCaches() {
-		opushCacheManager.getStore("test 1");
-		opushCacheManager.getStore("test 2");
-		opushCacheManager.getStore("test 3");
-		
-		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
-		assertThat(opushCacheManager.getStore("test 3")).isNotNull();
-		assertThat(opushCacheManager.getStore("test 2")).isNotNull();
-		
-		assertThat(opushCacheManager.listStores()).hasSize(4);
+	public Element put(long threadId, Request request) {
+		Element previousElement = store.get(threadId);
+		store.put(new Element(threadId, request));
+		return previousElement;
 	}
 	
-	@Test
-	public void createAndRemoveCache() {
-		opushCacheManager.getStore("test 1");
-		opushCacheManager.removeStore("test 1");
-		
-		assertThat(opushCacheManager.listStores()).hasSize(1);
+	public void delete(long threadId) {
+		store.remove(threadId);
 	}
-
-	@Test
-	public void createTwoIdenticalCache() {
-		opushCacheManager.getStore("test 1");
-		opushCacheManager.getStore("test 1");
-		
-		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
-		assertThat(opushCacheManager.listStores()).hasSize(2);
-	}
-
 }

@@ -42,7 +42,7 @@ import org.obm.push.bean.jaxb.JAXBBean;
 import org.obm.push.bean.jaxb.Request;
 import org.obm.push.bean.jaxb.Resource;
 import org.obm.push.jaxb.JAXBParser;
-import org.obm.push.jaxb.store.ehcache.RequestMap;
+import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.obm.push.jaxb.store.ehcache.RequestNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +56,12 @@ public class TechnicalLoggerService {
 	private static final Logger logger = LoggerFactory.getLogger(TechnicalLoggerService.class);
 
 	private Logger technicalLogger;
-	private RequestMap requestMap;
+	private RequestStore requestStore;
 	
 	@Inject
-	@VisibleForTesting TechnicalLoggerService(@Named(LoggerModule.TECHNICAL_LOG)Logger technicalLogger, RequestMap requestMap) {
+	@VisibleForTesting TechnicalLoggerService(@Named(LoggerModule.TECHNICAL_LOG)Logger technicalLogger, RequestStore requestStore) {
 		this.technicalLogger = technicalLogger;
-		this.requestMap = requestMap;
+		this.requestStore = requestStore;
 	}
 	
 	public void trace(JAXBBean jaxbBean) {
@@ -76,7 +76,7 @@ public class TechnicalLoggerService {
 	
 	public void traceStartedRequest(Request request) {
 		trace(request);
-		Element previous = requestMap.put(Thread.currentThread().getId(), request);
+		Element previous = requestStore.put(Thread.currentThread().getId(), request);
 		if (previous != null) {
 			logger.error("Request {} already mapped", request.getRequestId());
 		}
@@ -84,12 +84,12 @@ public class TechnicalLoggerService {
 	
 	public void traceEndedRequest(Request request) {
 		trace(request);
-		requestMap.delete(Thread.currentThread().getId());
+		requestStore.delete(Thread.currentThread().getId());
 	}
 	
 	public void traceResource(Resource resource) {
 		try {
-			Request request = requestMap.getRequest(Thread.currentThread().getId());
+			Request request = requestStore.getRequest(Thread.currentThread().getId());
 			request.add(resource);
 			trace(request);
 		} catch (RequestNotFoundException e) {
