@@ -33,7 +33,10 @@
 package org.obm.push.protocol.data.ms;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import javax.mail.internet.AddressException;
@@ -103,5 +106,30 @@ public class MSEmailDecoderTest {
 	public void parseAddressWithoutEmail() throws AddressException {
 		decoder.addresses("\"display name\"");
 	}
+	
+	@Test(expected=ParseException.class)
+	public void parseDateNeedsPunctuation() throws ParseException {
+		decoder.date("20021126T160000Z");
+	}
+	
+	@Test(expected=ParseException.class)
+	public void parseDateNeedsTime() throws ParseException {
+		decoder.date("2002-11-26");
+	}
+	
+	@Test
+	public void parseDateReturnNullAsItsOptionalWhenNull() throws ParseException {
+		assertThat(decoder.date(null)).isNull();
+	}
 
+	@Test
+	public void parseDateReturnNullAsItsOptionalWhenEmpty() throws ParseException {
+		assertThat(decoder.date("")).isNull();
+	}
+	
+	@Test
+	public void parseDate() throws ParseException {
+		Date parsed = decoder.date("2000-12-25T08:35:00.000Z");
+		assertThat(parsed).isEqualTo(date("2000-12-25T08:35:00+00"));
+	}
 }

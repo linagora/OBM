@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data.ms;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -53,9 +57,12 @@ import com.google.inject.Inject;
 
 public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 
+	private final SimpleDateFormat utcDateFormat;
+	
 	@Inject
 	protected MSEmailDecoder() {
-		super();
+		utcDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
+		utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	
 	@Override
@@ -66,11 +73,22 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 						.from(addresses(uniqueStringFieldValue(data, ASEmail.FROM)))
 						.to(addresses(uniqueStringFieldValue(data, ASEmail.TO)))
 						.cc(addresses(uniqueStringFieldValue(data, ASEmail.CC)))
+						.replyTo(addresses(uniqueStringFieldValue(data, ASEmail.REPLY_TO)))
+						.date(date(uniqueStringFieldValue(data, ASEmail.DATE_RECEIVED)))
 						.build())
 				.build();
 		} catch (AddressException e) {
 			throw new ConversionException("An address field is not valid", e);
+		} catch (ParseException e) {
+			throw new ConversionException("A date field is not valid", e);
 		}
+	}
+
+	@VisibleForTesting Date date(String dateAsString) throws ParseException {
+		if (!Strings.isNullOrEmpty(dateAsString)) {
+			return utcDateFormat.parse(dateAsString);
+		} 
+		return null;
 	}
 
 	@VisibleForTesting List<MSAddress> addresses(String addressesAsString) throws AddressException {
