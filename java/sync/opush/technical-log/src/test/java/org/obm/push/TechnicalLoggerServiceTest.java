@@ -33,17 +33,28 @@ package org.obm.push;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+import net.sf.ehcache.Element;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.jaxb.Request;
+import org.obm.push.bean.jaxb.Resource;
+import org.obm.push.bean.jaxb.ResourceType;
 import org.obm.push.bean.jaxb.Transaction;
+import org.obm.push.jaxb.store.ehcache.RequestMap;
+import org.obm.push.jaxb.store.ehcache.RequestNotFoundException;
 import org.slf4j.Logger;
 
+@RunWith(SlowFilterRunner.class)
 public class TechnicalLoggerServiceTest {
-	
+
 	@Test
 	public void testTrace() {
 		Logger logger = createStrictMock(Logger.class);
@@ -52,12 +63,157 @@ public class TechnicalLoggerServiceTest {
 
 		replay(logger);
 		
-		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, null);
 		technicalLoggerService.trace(Transaction.builder()
 				.id(Thread.currentThread().getId())
 				.transactionStartTime(DateTime.now())
 				.build());
 		
 		verify(logger);
+	}
+	
+	@Test
+	public void testTraceStartedRequest() {
+		long transactionId = Thread.currentThread().getId();
+		Request request = Request.builder()
+				.deviceId("devId")
+				.deviceType("devType")
+				.command("Sync")
+				.requestId(1)
+				.transactionId(transactionId)
+				.requestStartTime(DateTime.now())
+				.build();
+		
+		RequestMap requestMap = createStrictMock(RequestMap.class);
+		expect(requestMap.put(transactionId, request))
+			.andReturn(null).once();
+		
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+		
+		replay(requestMap, logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		technicalLoggerService.traceStartedRequest(request);
+		
+		verify(requestMap, logger);
+	}
+	
+	@Test
+	public void testTraceStartedRequestWithPrevious() {
+		long transactionId = Thread.currentThread().getId();
+		Request request = Request.builder()
+				.deviceId("devId")
+				.deviceType("devType")
+				.command("Sync")
+				.requestId(1)
+				.transactionId(transactionId)
+				.requestStartTime(DateTime.now())
+				.build();
+		
+		Element previous = new Element(transactionId, request);
+		RequestMap requestMap = createStrictMock(RequestMap.class);
+		expect(requestMap.put(transactionId, request))
+			.andReturn(previous).once();
+		
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+		
+		replay(requestMap, logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		technicalLoggerService.traceStartedRequest(request);
+		
+		verify(requestMap, logger);
+	}
+	
+	@Test
+	public void testTraceEndedRequest() {
+		long transactionId = Thread.currentThread().getId();
+		Request request = Request.builder()
+				.deviceId("devId")
+				.deviceType("devType")
+				.command("Sync")
+				.requestId(1)
+				.transactionId(transactionId)
+				.requestEndTime(DateTime.now())
+				.build();
+		
+		RequestMap requestMap = createStrictMock(RequestMap.class);
+		requestMap.delete(transactionId);
+		expectLastCall();
+		
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+		
+		replay(requestMap, logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		technicalLoggerService.traceEndedRequest(request);
+		
+		verify(requestMap, logger);
+	}
+	
+	@Test
+	public void testTraceResource() throws Exception {
+		Resource resource = Resource.builder()
+				.resourceId(Long.valueOf(1))
+				.resourceType(ResourceType.HTTP_CLIENT)
+				.resourceStartTime(DateTime.now())
+				.build();
+		
+		long transactionId = Thread.currentThread().getId();
+		Request request = Request.builder()
+				.deviceId("devId")
+				.deviceType("devType")
+				.command("Sync")
+				.requestId(1)
+				.transactionId(transactionId)
+				.requestStartTime(DateTime.now())
+				.build();
+		
+		RequestMap requestMap = createStrictMock(RequestMap.class);
+		expect(requestMap.getRequest(transactionId))
+			.andReturn(request).once();
+		
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+		
+		replay(requestMap, logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		technicalLoggerService.traceResource(resource);
+		
+		verify(requestMap, logger);
+		assertThat(request.getResources()).containsOnly(resource);
+	}
+	
+	@Test
+	public void testTraceResourceWithoutRequest() throws Exception {
+		Resource resource = Resource.builder()
+				.resourceId(Long.valueOf(1))
+				.resourceType(ResourceType.HTTP_CLIENT)
+				.resourceStartTime(DateTime.now())
+				.build();
+		
+		RequestMap requestMap = createStrictMock(RequestMap.class);
+		expect(requestMap.getRequest(Thread.currentThread().getId()))
+			.andThrow(new RequestNotFoundException()).once();
+		
+		Logger logger = createStrictMock(Logger.class);
+		logger.trace(anyObject(String.class));
+		expectLastCall().once();
+		
+		replay(requestMap, logger);
+		
+		TechnicalLoggerService technicalLoggerService = new TechnicalLoggerService(logger, requestMap);
+		technicalLoggerService.traceResource(resource);
+		
+		verify(requestMap, logger);
 	}
 }
