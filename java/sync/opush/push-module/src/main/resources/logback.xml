@@ -21,7 +21,7 @@
 	<appender name="TECHNICAL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>/var/log/opush/technical.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>technical.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>/var/log/opush/technical.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 		<encoder>
@@ -73,7 +73,7 @@
 
 	<include file="/etc/opush/logback.xml" />
 
-	<logger name="technical_log">
+	<logger name="technical_log" additivity="false">
 		<appender-ref ref="TECHNICAL_LOG" />
 	</logger>
 	
