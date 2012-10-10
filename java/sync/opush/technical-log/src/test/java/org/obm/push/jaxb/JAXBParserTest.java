@@ -78,6 +78,7 @@ public class JAXBParserTest {
 				.deviceId("devId")
 				.deviceType("devType")
 				.command("Ping")
+				.requestId(12)
 				.transactionId(1)
 				.requestStartTime(now)
 				.add(Resource.builder()
@@ -93,7 +94,7 @@ public class JAXBParserTest {
 				.build();
 		
 		String expectedLog = 
-			"<request deviceId=\"devId\" deviceType=\"devType\" command=\"Ping\">" +
+			"<request deviceId=\"devId\" deviceType=\"devType\" command=\"Ping\" requestId=\"12\">" +
 				"<transactionId>1</transactionId>" +
 				"<requestStartTime>" + now + "</requestStartTime>" +
 				"<resources resourceId=\"1\">" +

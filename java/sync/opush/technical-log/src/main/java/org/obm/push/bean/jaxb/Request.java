@@ -50,7 +50,8 @@ import com.google.common.collect.Lists;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { JAXBConstants.DEVICE_ID, 
 			JAXBConstants.DEVICE_TYPE, 
-			JAXBConstants.COMMAND, 
+			JAXBConstants.COMMAND,
+			JAXBConstants.REQUEST_ID,
 			JAXBConstants.TRANSACTION_ID, 
 			JAXBConstants.REQUEST_START_TIME, 
 			JAXBConstants.REQUEST_END_TIME, 
@@ -70,6 +71,7 @@ public class Request extends JAXBBean {
 		private String deviceId;
 		private String deviceType;
 		private String command;
+		private int requestId;
 		private long transactionId;
 		private DateTime requestStartTime;
 		private DateTime requestEndTime;
@@ -91,6 +93,11 @@ public class Request extends JAXBBean {
 		
 		public Builder command(String command) {
 			this.command = command;
+			return this;
+		}
+		
+		public Builder requestId(int requestId) {
+			this.requestId = requestId;
 			return this;
 		}
 		
@@ -120,7 +127,14 @@ public class Request extends JAXBBean {
 		}
 		
 		public Request build() {
-			return new Request(deviceId, deviceType, command, transactionId, requestStartTime, requestEndTime, resources);
+			return new Request(deviceId, 
+					deviceType, 
+					command, 
+					requestId, 
+					transactionId, 
+					requestStartTime, 
+					requestEndTime, 
+					resources);
 		}
 	}
 
@@ -130,6 +144,8 @@ public class Request extends JAXBBean {
 	private final String deviceType;
 	@XmlAttribute
 	private final String command;
+	@XmlAttribute
+	private final int requestId;
 	@XmlElement
 	private final long transactionId;
 	@XmlElement
@@ -139,10 +155,19 @@ public class Request extends JAXBBean {
 	@XmlElement
 	private final List<Resource> resources;
 	
-	private Request(String deviceId, String deviceType, String command, long transactionId, DateTime requestStartTime, DateTime requestEndTime, List<Resource> resources) {
+	private Request(String deviceId, 
+			String deviceType, 
+			String command, 
+			int requestId, 
+			long transactionId, 
+			DateTime requestStartTime, 
+			DateTime requestEndTime, 
+			List<Resource> resources) {
+		
 		this.deviceId = deviceId;
 		this.deviceType = deviceType;
 		this.command = command;
+		this.requestId = requestId;
 		this.transactionId = transactionId;
 		this.requestStartTime = requestStartTime;
 		this.requestEndTime = requestEndTime;
@@ -161,6 +186,10 @@ public class Request extends JAXBBean {
 		return command;
 	}
 	
+	public int getRequestId() {
+		return requestId;
+	}
+	
 	public long getTransactionId() {
 		return transactionId;
 	}
@@ -177,9 +206,20 @@ public class Request extends JAXBBean {
 		return resources;
 	}
 	
+	public void add(Resource resource) {
+		resources.add(resource);
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(deviceId, deviceType, command, transactionId, requestStartTime, requestEndTime, resources);
+		return Objects.hashCode(deviceId, 
+				deviceType, 
+				command, 
+				requestId, 
+				transactionId, 
+				requestStartTime, 
+				requestEndTime, 
+				resources);
 	}
 	
 	@Override
@@ -189,6 +229,7 @@ public class Request extends JAXBBean {
 			return Objects.equal(this.deviceId, that.deviceId)
 				&& Objects.equal(this.deviceType, that.deviceType)
 				&& Objects.equal(this.command, that.command)
+				&& Objects.equal(this.requestId, that.requestId)
 				&& Objects.equal(this.transactionId, that.transactionId)
 				&& Objects.equal(this.requestStartTime, that.requestStartTime)
 				&& Objects.equal(this.requestEndTime, that.requestEndTime)
@@ -203,6 +244,7 @@ public class Request extends JAXBBean {
 			.add("deviceId", deviceId)
 			.add("deviceType", deviceType)
 			.add("command", command)
+			.add("requestId", requestId)
 			.add("transactionId", transactionId)
 			.add("requestStartTime", DateTimeUtils.getInstantMillis(requestStartTime))
 			.add("requestEndTime", DateTimeUtils.getInstantMillis(requestEndTime))

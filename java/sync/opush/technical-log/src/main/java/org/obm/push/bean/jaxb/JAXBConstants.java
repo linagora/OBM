@@ -38,6 +38,7 @@ public class JAXBConstants {
 	public final static String DEVICE_ID = "deviceId";
 	public final static String DEVICE_TYPE = "deviceType";
 	public final static String COMMAND = "command";
+	public final static String REQUEST_ID = "requestId";
 	public final static String TRANSACTION_ID = "transactionId";
 	public final static String REQUEST_START_TIME = "requestStartTime";
 	public final static String REQUEST_END_TIME = "requestEndTime";

@@ -89,7 +89,10 @@ public class Resource extends JAXBBean {
 		}
 		
 		public Resource build() {
-			return new Resource(resourceId, resourceType, resourceStartTime, resourceEndTime);
+			return new Resource(resourceId, 
+					resourceType, 
+					resourceStartTime, 
+					resourceEndTime);
 		}
 	}
 	
@@ -102,7 +105,11 @@ public class Resource extends JAXBBean {
 	@XmlElement
 	private final DateTime resourceEndTime;
 	
-	private Resource(long resourceId, ResourceType resourceType, DateTime resourceStartTime, DateTime resourceEndTime) {
+	private Resource(long resourceId, 
+			ResourceType resourceType, 
+			DateTime resourceStartTime, 
+			DateTime resourceEndTime) {
+		
 		this.resourceId = resourceId;
 		this.resourceType = resourceType;
 		this.resourceStartTime = resourceStartTime;
@@ -127,7 +134,10 @@ public class Resource extends JAXBBean {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(resourceId, resourceType, resourceStartTime, resourceEndTime);
+		return Objects.hashCode(resourceId, 
+				resourceType, 
+				resourceStartTime, 
+				resourceEndTime);
 	}
 	
 	@Override
