@@ -39,6 +39,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.EasyMockSugar
 import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.protocol.bean.FolderSyncResponse
+import org.obm.push.bean.SyncKey
 
 @RunWith(classOf[JUnitRunner])
 class FolderSyncContextTest extends FunSuite with EasyMockSugar {
@@ -54,7 +55,7 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 			  val userPolicyKey = "1234567890"
 		})
 		val context = new InitialFolderSyncContext(httpContext)
-		assert(context.nextSyncKey(null) === "0")
+		assert(context.nextSyncKey(null) === new SyncKey("0"))
 	}
 	
 	test("nextSyncKey throw exception if no response in session") {
@@ -116,13 +117,13 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 		val lastResponse = strictMock(manifest[FolderSyncResponse])
 		val session = strictMock(manifest[Session])
 		expecting {
-			call(lastResponse.getNewSyncKey()).andReturn("1234-5678")
+			call(lastResponse.getNewSyncKey()).andReturn(new SyncKey("1234-5678"))
 			call(session.isAttributeDefined("lastFolderSync")).andReturn(true)
 			call(session.getTypedAttribute("lastFolderSync")).andReturn(lastResponse)
 		}
 		
 		whenExecuting(lastResponse, session) {
-			assert(new FolderSyncContext(httpContext).nextSyncKey(session) === "1234-5678")
+			assert(new FolderSyncContext(httpContext).nextSyncKey(session) === new SyncKey("1234-5678"))
 		}
 	}
 }

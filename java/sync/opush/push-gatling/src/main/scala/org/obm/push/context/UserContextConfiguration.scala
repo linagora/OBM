@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.context
 
-import com.google.common.base.Strings
-
 class UserContextConfiguration(default: ContextConfiguration) {
 
 	def cloneForUser(

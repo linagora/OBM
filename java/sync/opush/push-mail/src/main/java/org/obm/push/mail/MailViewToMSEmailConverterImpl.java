@@ -47,6 +47,7 @@ import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.bean.Flag;
@@ -86,9 +87,8 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	}
 	
 	@Override
-	public MSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException {
-		MSEmail.Builder msEmailBuilder = MSEmail.builder();
-		msEmailBuilder.uid(emailView.getUid());
+	public UidMSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException {
+		MSEmail.MSEmailBuilder msEmailBuilder = MSEmail.builder();
 		
 		fillFlags(msEmailBuilder, emailView);
 		msEmailBuilder.header(convertHeader(emailView));
@@ -99,7 +99,10 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		msEmailBuilder.meetingRequest(fillMSEventUid(msMeetingRequest, userDataRequest));
 		msEmailBuilder.messageClass(convertInvitationType(emailView));
 		msEmailBuilder.subject(convertSubject(emailView));
-		return msEmailBuilder.build();
+		return UidMSEmail.uidBuilder()
+				.email(msEmailBuilder.build())
+				.uid(emailView.getUid())
+				.build();
 	}
 
 	private MSMeetingRequest fillMSEventUid(MSMeetingRequest msMeetingRequest, UserDataRequest userDataRequest) throws DaoException {
@@ -123,7 +126,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		return emailView.getSubject();
 	}
 
-	private void fillFlags(MSEmail.Builder msEmailBuilder, EmailView emailView) {
+	private void fillFlags(MSEmail.MSEmailBuilder msEmailBuilder, EmailView emailView) {
 		msEmailBuilder.answered(emailView.hasFlag(Flag.ANSWERED));
 		msEmailBuilder.read(emailView.hasFlag(Flag.SEEN));
 		msEmailBuilder.starred(emailView.hasFlag(Flag.FLAGGED));

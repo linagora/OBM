@@ -115,7 +115,7 @@ public class LinagoraMailboxService implements MailboxService {
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 	}
-	
+
 	@Override
 	public Map<Long, FlagsList> fetchFlags(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
 		try {

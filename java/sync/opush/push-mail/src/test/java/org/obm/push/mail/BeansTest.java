@@ -62,7 +62,7 @@ public class BeansTest {
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		
-		equalsVerifierUtilsTest.createEqualsVerifier(EmailViewAttachment.class)
+		EqualsVerifierUtils.createEqualsVerifier(EmailViewAttachment.class)
 			.withPrefabValues(BodyParams.class, 
 					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
 					BodyParams.builder().add(new BodyParam("blond", "beer")).build())

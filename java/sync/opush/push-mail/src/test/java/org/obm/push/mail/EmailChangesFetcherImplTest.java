@@ -55,6 +55,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.MSEmailMetadata;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.utils.SerializableInputStream;
 
@@ -111,18 +112,25 @@ public class EmailChangesFetcherImplTest {
 				.additions(ImmutableSet.of(
 						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build()))
 				.build();
-		
-		MSEmail emailChangesData = MSEmail.builder()
+
+		UidMSEmail emailChangesData = UidMSEmail.uidBuilder()
 				.uid(33)
-				.read(false)
-				.header(MSEmailHeader.builder()
-						.subject("a subject")
-						.from(new MSAddress("from@domain.org"))
-						.to(new MSAddress("to@domain.org"))
-						.date(date("2004-12-13T21:39:45Z"))
-						.build())
-				.body(new MSEmailBody(new SerializableInputStream(new ByteArrayInputStream("mail data".getBytes())),
-						MSEmailBodyType.PlainText, 1000, Charsets.UTF_8, false))
+				.email(MSEmail.builder()
+					.read(false)
+					.header(MSEmailHeader.builder()
+							.subject("a subject")
+							.from(new MSAddress("from@domain.org"))
+							.to(new MSAddress("to@domain.org"))
+							.date(date("2008-02-03T20:37:05Z"))
+							.build())
+					.body(MSEmailBody.builder()
+							.bodyType(MSEmailBodyType.PlainText)
+							.charset(Charsets.UTF_8)
+							.estimatedDataSize(1000)
+							.mimeData(new SerializableInputStream(new ByteArrayInputStream("mail data".getBytes())))
+							.truncated(false)
+							.build())
+					.build())
 				.build();
 		
 		expect(msEmailFetcher.fetch(udr, collectionId, collectionPath, ImmutableList.of(33l), bodyPreferences))
@@ -151,30 +159,45 @@ public class EmailChangesFetcherImplTest {
 						Email.builder().uid(156).read(false).date(date("2004-10-10T21:39:45Z")).build()))
 				.build();
 		
-		MSEmail email1ChangeData = MSEmail.builder()
-				.uid(33)
-				.read(false)
-				.header(MSEmailHeader.builder()
-						.subject("a subject")
-						.from(new MSAddress("from@domain.org"))
-						.to(new MSAddress("to@domain.org"))
-						.date(date("2004-12-13T21:39:45Z"))
-						.build())
-				.body(new MSEmailBody(new SerializableInputStream(new ByteArrayInputStream("mail data".getBytes())),
-						MSEmailBodyType.PlainText, 1000, Charsets.UTF_8, false))
-				.build();
 
-		MSEmail email2ChangeData = MSEmail.builder()
+		UidMSEmail email1ChangeData = UidMSEmail.uidBuilder()
+				.uid(33)
+				.email(MSEmail.builder()
+					.read(false)
+					.header(MSEmailHeader.builder()
+							.subject("a subject")
+							.from(new MSAddress("from@domain.org"))
+							.to(new MSAddress("to@domain.org"))
+							.date(date("2008-02-03T20:37:05Z"))
+							.build())
+					.body(MSEmailBody.builder()
+							.bodyType(MSEmailBodyType.PlainText)
+							.charset(Charsets.UTF_8)
+							.estimatedDataSize(1000)
+							.mimeData(new SerializableInputStream(new ByteArrayInputStream("mail data".getBytes())))
+							.truncated(false)
+							.build())
+					.build())
+				.build();
+		
+		UidMSEmail email2ChangeData = UidMSEmail.uidBuilder()
 				.uid(156)
-				.read(false)
-				.header(MSEmailHeader.builder()
-						.subject("a subject")
-						.from(new MSAddress("from@domain.org"))
-						.to(new MSAddress("to@domain.org"))
-						.date(date("2004-10-10T21:39:45Z"))
-						.build())
-				.body(new MSEmailBody(new SerializableInputStream(new ByteArrayInputStream("mail data".getBytes())),
-						MSEmailBodyType.PlainText, 1000, Charsets.UTF_8, false))
+				.email(MSEmail.builder()
+					.read(false)
+					.header(MSEmailHeader.builder()
+							.subject("a subject2")
+							.from(new MSAddress("from2@domain.org"))
+							.to(new MSAddress("to2@domain.org"))
+							.date(date("2008-02-03T20:37:05Z"))
+							.build())
+					.body(MSEmailBody.builder()
+							.bodyType(MSEmailBodyType.PlainText)
+							.charset(Charsets.UTF_8)
+							.estimatedDataSize(1000)
+							.mimeData(new SerializableInputStream(new ByteArrayInputStream("mail data2".getBytes())))
+							.truncated(false)
+							.build())
+					.build())
 				.build();
 		
 		expect(msEmailFetcher.fetch(udr, collectionId, collectionPath, ImmutableList.of(33l, 156l), bodyPreferences))
@@ -305,17 +328,24 @@ public class EmailChangesFetcherImplTest {
 						Email.builder().uid(15).read(false).date(date("2008-02-03T20:37:05Z")).build()))
 				.build();
 		
-		MSEmail emailAddedData = MSEmail.builder()
+		UidMSEmail emailAddedData = UidMSEmail.uidBuilder()
 				.uid(15)
-				.read(false)
-				.header(MSEmailHeader.builder()
-						.subject("a subject2")
-						.from(new MSAddress("from2@domain.org"))
-						.to(new MSAddress("to2@domain.org"))
-						.date(date("2008-02-03T20:37:05Z"))
-						.build())
-				.body(new MSEmailBody(new SerializableInputStream(new ByteArrayInputStream("mail data2".getBytes())),
-						MSEmailBodyType.HTML, 1000, Charsets.UTF_8, false))
+				.email(MSEmail.builder()
+					.read(false)
+					.header(MSEmailHeader.builder()
+							.subject("a subject2")
+							.from(new MSAddress("from2@domain.org"))
+							.to(new MSAddress("to2@domain.org"))
+							.date(date("2008-02-03T20:37:05Z"))
+							.build())
+					.body(MSEmailBody.builder()
+							.bodyType(MSEmailBodyType.HTML)
+							.charset(Charsets.UTF_8)
+							.estimatedDataSize(1000)
+							.mimeData(new SerializableInputStream(new ByteArrayInputStream("mail data2".getBytes())))
+							.truncated(false)
+							.build())
+					.build())
 				.build();
 		expect(msEmailFetcher.fetch(udr, collectionId, collectionPath, ImmutableList.of(15l), bodyPreferences))
 			.andReturn(ImmutableList.of(emailAddedData));

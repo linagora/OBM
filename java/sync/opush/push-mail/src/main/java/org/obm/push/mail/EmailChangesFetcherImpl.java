@@ -42,8 +42,8 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.change.item.MSEmailChanges;
-import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailMetadata;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Email;
@@ -99,7 +99,7 @@ public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 			List<BodyPreference> bodyPreferences, Set<Email> additions)
 					throws EmailViewPartsFetcherException, DaoException {
 		
-		final Map<Long, MSEmail> uidToMSEmailMap = fetchMSEmails(udr, collectionId, collectionPath, bodyPreferences, additions); 
+		final Map<Long, UidMSEmail> uidToMSEmailMap = fetchMSEmails(udr, collectionId, collectionPath, bodyPreferences, additions); 
 		return FluentIterable
 				.from(additions)
 				.transform(new Function<Email, ItemChange>() {
@@ -138,16 +138,16 @@ public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 	}
 	
 
-	private Map<Long, MSEmail> fetchMSEmails(UserDataRequest udr,
+	private Map<Long, UidMSEmail> fetchMSEmails(UserDataRequest udr,
 			final int collectionId, String collectionPath,
 			List<BodyPreference> bodyPreferences, Set<Email> changes)
 					throws EmailViewPartsFetcherException, DaoException {
 		
 		if (changes.isEmpty()) {
-			return ImmutableMap.<Long, MSEmail>of();
+			return ImmutableMap.<Long, UidMSEmail>of();
 		}
 		List<Long> uids = IndexUtils.listIndexes(changes);
-		List<MSEmail> msEmails = msEmailFetcher.fetch(udr, collectionId, collectionPath, uids, bodyPreferences);
+		List<UidMSEmail> msEmails = msEmailFetcher.fetch(udr, collectionId, collectionPath, uids, bodyPreferences);
 		return IndexUtils.mapByIndexes(msEmails);
 	}
 	

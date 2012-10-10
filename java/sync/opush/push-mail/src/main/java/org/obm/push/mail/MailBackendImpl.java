@@ -75,6 +75,7 @@ import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmailMetadata;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
@@ -350,10 +351,10 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<org.obm.push.bean.ms.MSEmail> emails = 
+			final List<UidMSEmail> emails = 
 					msEmailFetcher.fetch(udr, collectionId, collectionPath, uids, bodyPreferences);
 			
-			for (final org.obm.push.bean.ms.MSEmail email: emails) {
+			for (final UidMSEmail email: emails) {
 				ItemChange ic = new ItemChange();
 				ic.setServerId(mappingService.getServerIdFor(collectionId, String.valueOf(email.getUid())));
 				ic.setData(email);

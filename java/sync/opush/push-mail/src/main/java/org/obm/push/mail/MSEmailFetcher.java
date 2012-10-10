@@ -36,6 +36,7 @@ import java.util.List;
 
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.conversation.EmailView;
@@ -61,10 +62,10 @@ public class MSEmailFetcher {
 		this.msEmailConverter = msEmailConverter;
 	}
 
-	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath,
+	public List<UidMSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath,
 			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
 		
-		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
+		List<UidMSEmail> msEmails  = Lists.newLinkedList();
 		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
 				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionPath, collectionId);
 		

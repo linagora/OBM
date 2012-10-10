@@ -76,7 +76,6 @@ public class WBXmlBeanSerialization {
 
 	private MSEmail msEmailWithHeader(MSEmailHeader msEmailHeader) {
 		return MSEmail.builder()
-			.uid(1)
 			.header(msEmailHeader)
 			.body(MSEmailBody.builder()
 					.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))

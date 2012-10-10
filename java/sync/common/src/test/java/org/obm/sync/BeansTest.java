@@ -83,7 +83,7 @@ public class BeansTest {
 	
 	@Test
 	public void testWhereNullableFields() {
-		equalsVerifierUtilsTest
+		EqualsVerifierUtils
 			.createEqualsVerifier(RecurrenceDays.class)
 			.suppress(Warning.NULL_FIELDS)
 			.verify();

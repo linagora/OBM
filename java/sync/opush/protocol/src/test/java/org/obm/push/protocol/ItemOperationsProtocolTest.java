@@ -370,7 +370,6 @@ public class ItemOperationsProtocolTest {
 	
 	private MSEmail msEmail(String message) {
 		return MSEmail.builder()
-			.uid(1l)
 			.header(MSEmailHeader.builder().build())
 			.body(MSEmailBody.builder()
 					.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))

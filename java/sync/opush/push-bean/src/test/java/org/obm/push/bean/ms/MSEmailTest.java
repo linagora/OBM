@@ -53,23 +53,8 @@ import com.google.common.base.Charsets;
 public class MSEmailTest {
 
 	@Test(expected=IllegalStateException.class)
-	public void testMSEmailBuilderRequireUid() {
-		MSEmail.builder()
-				.header(MSEmailHeader.builder().build())
-				.body(MSEmailBody.builder()
-						.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))
-						.bodyType(MSEmailBodyType.PlainText)
-						.estimatedDataSize(0)
-						.charset(Charsets.UTF_8)
-						.truncated(false)
-						.build())
-				.build();
-	}
-	
-	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireBody() {
 		MSEmail.builder()
-		.uid(1)
 		.header(MSEmailHeader.builder().build())
 		.build();
 	}
@@ -77,7 +62,6 @@ public class MSEmailTest {
 	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireHeader() {
 		MSEmail.builder()
-				.uid(1)
 				.body(MSEmailBody.builder()
 						.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))
 						.bodyType(MSEmailBodyType.PlainText)
@@ -90,7 +74,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderDefaultImportanceValue() {
-		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.build();
@@ -100,7 +84,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderDefaultMessageClassValue() {
-		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest())
@@ -111,7 +95,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderMessageClassCanceled() {
-		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), MSMessageClass.SCHEDULE_MEETING_CANCELED)
@@ -122,7 +106,7 @@ public class MSEmailTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMSEmailBuilderPreconditionOnMessageClass() {
-		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
 
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), null)
@@ -158,11 +142,10 @@ public class MSEmailTest {
 		Assertions.assertThat(msEmail.getSubject()).isEqualTo("a subject");
 	}
 
-	private MSEmail.Builder requirementsInitializedBuilder() {
+	private MSEmail.MSEmailBuilder requirementsInitializedBuilder() {
 		String message = "text";
 		MSEmailBodyType emailBodyType = MSEmailBodyType.PlainText;
 		return MSEmail.builder()
-				.uid(1l)
 				.header(MSEmailHeader.builder().build())
 					.body(MSEmailBody.builder()
 							.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))

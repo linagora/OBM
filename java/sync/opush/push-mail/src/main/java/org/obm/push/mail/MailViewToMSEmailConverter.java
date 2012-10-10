@@ -32,11 +32,11 @@
 package org.obm.push.mail;
 
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.conversation.EmailView;
 
 public interface MailViewToMSEmailConverter {
 
-	MSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException;
+	UidMSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException;
 }

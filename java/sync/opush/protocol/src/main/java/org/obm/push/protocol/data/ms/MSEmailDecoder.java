@@ -47,6 +47,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.ActiveSyncDecoder;
 import org.obm.push.protocol.data.IDataDecoder;
+import org.obm.push.protocol.data.MSEmailEncoder;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -68,7 +69,7 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 	@Override
 	public MSEmail decode(Element data) throws ConversionException {
 		try {
-			return new MSEmail.MSEmailBuilder()
+			return MSEmail.builder()
 				.header(MSEmailHeader.builder()
 						.from(addresses(uniqueStringFieldValue(data, ASEmail.FROM)))
 						.to(addresses(uniqueStringFieldValue(data, ASEmail.TO)))

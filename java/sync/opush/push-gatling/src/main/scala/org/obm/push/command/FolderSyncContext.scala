@@ -34,10 +34,12 @@ package org.obm.push.command
 import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.FolderSyncResponse
+import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
+import org.obm.push.bean.SyncKey
 
 class InitialFolderSyncContext(httpContext: HttpContext) extends FolderSyncContext(httpContext) {
 	
-	val initialSyncKey = "0"
+	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
 		
 	override def nextSyncKey(session: => Session) = initialSyncKey
 	
@@ -47,7 +49,7 @@ case class FolderSyncContext(httpContext: HttpContext) {
 	
 	val sessionKeyLastFolderSync = "lastFolderSync"
 		
-	def nextSyncKey(session: => Session): String = {
+	def nextSyncKey(session: => Session): SyncKey = {
 		if (session.isAttributeDefined(sessionKeyLastFolderSync)) {
 			val lastFolderSync = session.getTypedAttribute[FolderSyncResponse](sessionKeyLastFolderSync)
 			if (lastFolderSync != null) {

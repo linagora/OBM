@@ -60,6 +60,7 @@ import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.mail.bean.Address;
@@ -175,7 +176,7 @@ public class MailViewToMSEmailConverterImplTest {
 	public void testUid() throws IOException, ParserException, DaoException {
 		emailViewFixture.uid = 54;
 		
-		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
+		UidMSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getUid()).isEqualTo(54);
 	}
@@ -559,7 +560,7 @@ public class MailViewToMSEmailConverterImplTest {
 		assertThat(method).isEqualTo(expectedMethod);
 	}
 	
-	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException, DaoException {
+	private UidMSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException, DaoException {
 		EventService eventService = createMock(EventService.class);
 		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
 		

@@ -40,6 +40,7 @@ import org.obm.push.mail.mime.BodyParams;
 import org.obm.push.mail.mime.ContentType;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -73,16 +74,18 @@ public class BeansTest {
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		
-		equalsVerifierUtilsTest.createEqualsVerifier(ContentType.class)
-			.withPrefabValues(BodyParams.class, 
-				BodyParams.builder().add(new BodyParam("white", "wine")).build(),
-				BodyParams.builder().add(new BodyParam("blond", "beer")).build())
+		EqualsVerifierBuilder.builder()
+			.equalsVerifiers(ImmutableList.<Class<?>>of(ContentType.class))
+			.prefabValue(BodyParams.class, 
+					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
+					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
 			.verify();
-		
-		equalsVerifierUtilsTest.createEqualsVerifier(BodyParams.class)
-			.withPrefabValues(ImmutableMap.class, 
-				ImmutableMap.of("key", "value"),
-				ImmutableMap.of("first", "second"))
+
+		EqualsVerifierBuilder.builder()
+			.equalsVerifiers(ImmutableList.<Class<?>>of(BodyParams.class))
+			.prefabValue(ImmutableMap.class, 
+					ImmutableMap.of("key", "value"),
+					ImmutableMap.of("first", "second"))
 			.verify();
 	}
 	

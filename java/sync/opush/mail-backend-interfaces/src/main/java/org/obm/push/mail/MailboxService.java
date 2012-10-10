@@ -64,7 +64,7 @@ public interface MailboxService {
 	
 	void updateReadFlag(UserDataRequest udr, String collectionPath, MessageSet messages, boolean read) throws MailException, ImapMessageNotFoundException;
 
-	String parseMailBoxName(UserDataRequest udr, String collectionPath) throws MailException;
+	String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException;
 
 	void delete(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException;
 

@@ -78,7 +78,6 @@ public class MSEmailHeaderSerializingTest {
 		
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-				.uid(1)
 				.body(simpleBody)
 					.header(MSEmailHeader.builder()
 					.from(new MSAddress("from@obm.lng.org"))
@@ -105,7 +104,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeFrom() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.body(simpleBody)
 			.header(MSEmailHeader.builder()
 				.from(new MSAddress("from@obm.lng.org")).build())
@@ -120,7 +118,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeEmptyFrom() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();
@@ -134,7 +131,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeNullSubject() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();
@@ -148,7 +144,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeEmptySubject() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject("")
@@ -163,7 +158,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeSubject() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject("a subject")
@@ -178,7 +172,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeOnlySpaceSubject() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.subject(" ")
@@ -193,7 +186,6 @@ public class MSEmailHeaderSerializingTest {
 	public void testSerializeEmptyField() {
 		Element parentElement = createRootDocument();
 		MSEmail msEmail = MSEmail.builder()
-			.uid(1)
 			.header(MSEmailHeader.builder().build())
 			.body(simpleBody)
 			.build();

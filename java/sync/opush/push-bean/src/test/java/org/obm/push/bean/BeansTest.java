@@ -45,10 +45,12 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmailMetadata;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
 import com.google.common.collect.ImmutableList;
 
@@ -123,7 +125,23 @@ public class BeansTest {
 					.add(org.obm.push.bean.ms.MSEmailBody.class)
 					.build();
 		
-		equalsVerifierUtilsTest.testClassWithCharsetField(list);
+		EqualsVerifierBuilder.builder()
+					.equalsVerifiers(list)
+					.hasCharsetField()
+					.verify();
+	}
+	
+	@Test
+	public void testClassAsSubBeans() {
+		ImmutableList<Class<?>> list = ImmutableList.<Class<?>>builder()
+					.add(UidMSEmail.class)
+					.build();
+		
+		EqualsVerifierBuilder.builder()
+					.equalsVerifiers(list)
+					.hasCharsetField()
+					.withSuperClass(true)
+					.verify();
 	}
 	
 }

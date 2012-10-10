@@ -500,7 +500,6 @@ public class SyncHandlerTest {
 	
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
 		return MSEmail.builder()
-			.uid(1l)
 			.header(MSEmailHeader.builder().build())
 			.body(MSEmailBody.builder()
 					.mimeData(new SerializableInputStream(new ByteArrayInputStream(message.getBytes())))

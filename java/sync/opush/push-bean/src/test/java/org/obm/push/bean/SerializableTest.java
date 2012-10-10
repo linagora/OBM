@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.MSEmailBody;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -102,7 +103,6 @@ public class SerializableTest {
 	@Test
 	public void testNewMSEmail() {
 		 org.obm.push.bean.ms.MSEmail msEmail = org.obm.push.bean.ms.MSEmail.builder()
-			.uid(1l)
 			.header(MSEmailHeader.builder().build())
 			.body(org.obm.push.bean.ms.MSEmailBody.builder()
 					.mimeData(new SerializableInputStream(new ByteArrayInputStream("message".getBytes())))
@@ -130,6 +130,42 @@ public class SerializableTest {
 						.build())
 			.build();
 		 SerializableTester.reserializeAndAssert(msEmail);
+	}
+
+	@Test
+	public void testUidMSEmail() {
+		 org.obm.push.bean.ms.MSEmail msEmail = org.obm.push.bean.ms.MSEmail.builder()
+			.header(MSEmailHeader.builder().build())
+			.body(org.obm.push.bean.ms.MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream("message".getBytes())))
+					.bodyType(MSEmailBodyType.PlainText)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
+			.meetingRequest(
+					new MSMeetingRequest.MsMeetingRequestBuilder()
+						.startTime(date("2012-02-03T11:22:33"))
+						.endTime(date("2012-02-03T12:22:33"))
+						.dtStamp(date("2012-02-02T11:22:33"))
+						.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
+						.msEventExtId(new MSEventExtId("ext-id-123-536"))
+						.recurrences(Arrays.asList(
+								MSMeetingRequestRecurrence.builder()
+								.type(MSMeetingRequestRecurrenceType.DAILY)
+								.interval(1)
+								.build()))
+						.recurrenceId(date("2012-02-02T11:22:33"))
+						.categories(Arrays.asList(
+								new MSMeetingRequestCategory("category")
+								))
+						.build())
+			.build();
+		 
+		 SerializableTester.reserializeAndAssert(UidMSEmail.uidBuilder()
+				 .uid(1)
+				 .email(msEmail)
+				 .build());
 	}
 
 	

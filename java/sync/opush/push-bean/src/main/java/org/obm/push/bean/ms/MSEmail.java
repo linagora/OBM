@@ -44,23 +44,20 @@ import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
-import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
+public class MSEmail implements IApplicationData, Serializable {
 
-	public static Builder builder() {
-		return new Builder();
+	public static MSEmailBuilder builder() {
+		return new MSEmailBuilder();
 	}
 	
-	public static class Builder {
+	public static class MSEmailBuilder {
 
-		private Long uid;
-		
 		private String subject;
 		private MSEmailHeader header;
 		private MSEmailBody body;
@@ -73,73 +70,67 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 		private boolean starred;
 		private boolean answered;
 		
-		private Builder() {
+		private MSEmailBuilder() {
 			attachments = Sets.newHashSet();
 		}
 		
-		public Builder uid(long uid) {
-			this.uid = uid;
-			return this;
-		}
-
-		public Builder header(MSEmailHeader header) {
+		public MSEmailBuilder header(MSEmailHeader header) {
 			this.header = header;
 			return this;
 		}
 		
-		public Builder subject(String subject) {
+		public MSEmailBuilder subject(String subject) {
 			this.subject = subject;
 			return this;
 		}
 
-		public Builder body(MSEmailBody body) {
+		public MSEmailBuilder body(MSEmailBody body) {
 			this.body = body;
 			return this;
 		}
 		
-		public Builder attachements(Set<MSAttachement> attachements) {
+		public MSEmailBuilder attachements(Set<MSAttachement> attachements) {
 			this.attachments = attachements;
 			return this;
 		}
 		
-		public Builder meetingRequest(MSMeetingRequest meetingRequest) {
+		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest) {
 			return meetingRequest(meetingRequest, MSMessageClass.SCHEDULE_MEETING_REQUEST);
 		}
 		
-		public Builder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
+		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
 			Preconditions.checkArgument(messageClass != null);
 			this.meetingRequest = meetingRequest;
 			this.messageClass = messageClass;
 			return this;
 		}
 		
-		public Builder messageClass(MSMessageClass messageClass) {
+		public MSEmailBuilder messageClass(MSMessageClass messageClass) {
 			this.messageClass = messageClass;
 			return this;
 		}
 		
-		public Builder importance(MSImportance importance) {
+		public MSEmailBuilder importance(MSImportance importance) {
 			this.importance = importance;
 			return this;
 		}
 		
-		public Builder read(boolean read) {
+		public MSEmailBuilder read(boolean read) {
 			this.read = read;
 			return this;
 		}
 		
-		public Builder starred(boolean starred) {
+		public MSEmailBuilder starred(boolean starred) {
 			this.starred = starred;
 			return this;
 		}
 		
-		public Builder answered(boolean answered) {
+		public MSEmailBuilder answered(boolean answered) {
 			this.answered = answered;
 			return this;
 		}
 		
 		public MSEmail build() {
-			Preconditions.checkState(uid != null, "The uid is required");
 			Preconditions.checkState(header != null, "The header is required");
 			Preconditions.checkState(body != null, "The body is required");
 			Preconditions.checkState(attachments != null, "The attachments cannot be null");
@@ -151,7 +142,7 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 				importance = MSImportance.NORMAL;
 			}
 			String emailSubject = Strings.emptyToNull(subject);
-			return new MSEmail(uid, emailSubject, header, body, attachments, meetingRequest, messageClass,
+			return new MSEmail(emailSubject, header, body, attachments, meetingRequest, messageClass,
 					importance, read, starred, answered);
 		}
 
@@ -161,8 +152,6 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 	public PIMDataType getType() {
 		return PIMDataType.EMAIL;
 	}
-
-	private final long uid;
 
 	private final String subject;
 	private final MSEmailHeader header;
@@ -176,10 +165,9 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 	private final boolean starred;
 	private final boolean answered;
 
-	private MSEmail(long uid, String subject, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachments,
+	protected MSEmail(String subject, MSEmailHeader header, MSEmailBody body, Set<MSAttachement> attachments,
 			MSMeetingRequest meetingRequest, MSMessageClass messageClass, MSImportance importance,
 			boolean read, boolean starred, boolean answered) {
-		this.uid = uid;
 		this.subject = subject;
 		this.header = header;
 		this.body = body;
@@ -192,11 +180,6 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 		this.answered = answered;
 	}
 	
-	@Override
-	public Long getIndex() {
-		return getUid();
-	}
-
 	public MSAddress getDisplayTo() {
 		return header.getDisplayTo();
 	}
@@ -229,10 +212,6 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 		return header;
 	}
 	
-	public long getUid() {
-		return uid;
-	}
-
 	public MSEmailBody getBody() {
 		return body;
 	}
@@ -266,29 +245,33 @@ public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hashCode(answered, attachments, header, body, 
 				importance, meetingRequest, messageClass,
-				read, starred, uid);
+				read, starred);
 	}
 	
 	@Override
-	public final boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj instanceof MSEmail) {
 			MSEmail other = (MSEmail) obj;
-			return Objects.equal(this.answered, other.answered)
-				&& Objects.equal(this.answered, other.answered)
-				&& Objects.equal(this.attachments, other.attachments)
-				&& Objects.equal(this.header, other.header)
-				&& Objects.equal(this.body, other.body)
-				&& Objects.equal(this.importance, other.importance)
-				&& Objects.equal(this.meetingRequest, other.meetingRequest)
-				&& Objects.equal(this.messageClass, other.messageClass)
-				&& Objects.equal(this.read, other.read)
-				&& Objects.equal(this.starred, other.starred)
-				&& Objects.equal(this.uid, other.uid);
+			if (other.canEquals(this)) {
+				return Objects.equal(this.answered, other.answered)
+					&& Objects.equal(this.attachments, other.attachments)
+					&& Objects.equal(this.header, other.header)
+					&& Objects.equal(this.body, other.body)
+					&& Objects.equal(this.importance, other.importance)
+					&& Objects.equal(this.meetingRequest, other.meetingRequest)
+					&& Objects.equal(this.messageClass, other.messageClass)
+					&& Objects.equal(this.read, other.read)
+					&& Objects.equal(this.starred, other.starred);
+			}
 		}
 		return false;
+	}
+
+	protected boolean canEquals(Object obj) {
+		return obj instanceof MSEmail;
 	}
 
 }
