@@ -38,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 
 public class SerializableInputStream extends NoArgFilterInputStream implements Serializable {
@@ -48,6 +49,10 @@ public class SerializableInputStream extends NoArgFilterInputStream implements S
 	
 	public SerializableInputStream(InputStream inputStream) {
 		super(inputStream);
+	}
+	
+	public SerializableInputStream(String data) {
+		this(new ByteArrayInputStream(data.getBytes(Charsets.UTF_8)));
 	}
 	
 	 private void writeObject(final ObjectOutputStream out)

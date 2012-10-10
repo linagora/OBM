@@ -41,13 +41,18 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.ms.MSEmailBody.Builder;
 import org.obm.push.exception.ConversionException;
+import org.obm.push.protocol.data.ASAirs;
 import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.ActiveSyncDecoder;
 import org.obm.push.protocol.data.IDataDecoder;
 import org.obm.push.protocol.data.MSEmailEncoder;
+import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -77,12 +82,35 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 						.replyTo(addresses(uniqueStringFieldValue(data, ASEmail.REPLY_TO)))
 						.date(date(uniqueStringFieldValue(data, ASEmail.DATE_RECEIVED)))
 						.build())
+				.body(msEmailBody(data))
 				.build();
 		} catch (AddressException e) {
 			throw new ConversionException("An address field is not valid", e);
 		} catch (ParseException e) {
 			throw new ConversionException("A date field is not valid", e);
 		}
+	}
+
+	@VisibleForTesting MSEmailBody msEmailBody(Element data) {
+		Builder bodyBuilder = MSEmailBody.builder()
+				.bodyType(MSEmailBodyType.getValueOf(uniqueIntegerFieldValue(data, ASAirs.TYPE)));
+		
+		Integer estimatedDataSize = uniqueIntegerFieldValue(data, ASAirs.ESTIMATED_DATA_SIZE);
+		if (estimatedDataSize != null) {
+			bodyBuilder.estimatedDataSize(estimatedDataSize);
+		}
+		
+		Boolean truncated = uniqueBooleanFieldValue(data, ASAirs.TRUNCATED);
+		if (truncated != null) {
+			bodyBuilder.truncated(truncated);
+		}
+		
+		String mimeData = uniqueStringFieldValue(data, ASAirs.DATA);
+		if (mimeData != null) {
+			bodyBuilder.mimeData(new SerializableInputStream(mimeData));
+		}
+		
+		return bodyBuilder.build();
 	}
 
 	@VisibleForTesting Date date(String dateAsString) throws ParseException {

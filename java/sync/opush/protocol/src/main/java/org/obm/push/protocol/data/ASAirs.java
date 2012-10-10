@@ -32,7 +32,7 @@
 package org.obm.push.protocol.data;
 
 
-public enum ASAirs {
+public enum ASAirs implements ActiveSyncFields {
 
 	BODY("Body"),
 	TYPE("Type"),
@@ -52,6 +52,7 @@ public enum ASAirs {
 		this.name = name;
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}

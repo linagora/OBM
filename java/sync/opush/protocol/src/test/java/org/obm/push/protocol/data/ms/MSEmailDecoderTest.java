@@ -35,6 +35,7 @@ package org.obm.push.protocol.data.ms;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
+import java.io.ByteArrayInputStream;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +47,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
+
+import com.google.common.base.Charsets;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEmailDecoderTest {
@@ -131,5 +138,96 @@ public class MSEmailDecoderTest {
 	public void parseDate() throws ParseException {
 		Date parsed = decoder.date("2000-12-25T08:35:00.000Z");
 		assertThat(parsed).isEqualTo(date("2000-12-25T08:35:00+00"));
+	}
+	
+	@Test
+	public void parseBody() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<Type>2</Type>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>1</Truncated>" +
+				"<Data>Email data</Data>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.getBodyType()).isEqualTo(MSEmailBodyType.HTML);
+		assertThat(body.getEstimatedDataSize()).isEqualTo(930);
+		assertThat(body.isTruncated()).isTrue();
+		assertThat(body.getMimeData()).hasContentEqualTo(new ByteArrayInputStream("Email data".getBytes(Charsets.UTF_8)));
+	}
+
+	@Test
+	public void parseBodyTruncatedTrue() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<Type>2</Type>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>1</Truncated>" +
+				"<Data>Email data</Data>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.isTruncated()).isTrue();
+	}
+
+	@Test
+	public void parseBodyTruncatedFalse() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<Type>2</Type>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>0</Truncated>" +
+				"<Data>Email data</Data>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.isTruncated()).isFalse();
+	}
+
+	@Test
+	public void parseBodyTypeMime() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<Type>4</Type>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>0</Truncated>" +
+				"<Data>Email data</Data>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.getBodyType()).isEqualTo(MSEmailBodyType.MIME);
+	}
+	
+	@Test
+	public void parseBodyHasOptionalData() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<Type>2</Type>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>1</Truncated>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.getMimeData()).isNull();
+	}
+	
+	@Test
+	public void parseBodyHasOptionalType() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Body>" +
+				"<EstimatedDataSize>930</EstimatedDataSize>" +
+				"<Truncated>1</Truncated>" +
+				"<Data>Email data</Data>" +
+			"</Body>");
+
+		MSEmailBody body = decoder.msEmailBody(doc.getDocumentElement());
+		
+		assertThat(body.getBodyType()).isNull();
 	}
 }
