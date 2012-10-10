@@ -32,10 +32,11 @@
 package org.obm.push.protocol.data;
 
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.exception.ConversionException;
 import org.w3c.dom.Element;
 
 public interface IDataDecoder {
 
-	IApplicationData decode(Element syncData);
+	IApplicationData decode(Element syncData) throws ConversionException;
 
 }

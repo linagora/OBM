@@ -32,7 +32,7 @@
 package org.obm.push.protocol.data;
 
 
-public enum ASEmail {
+public enum ASEmail implements ActiveSyncFields {
 
 	TO("To"),
 	REPLY_TO("ReplyTo"),
@@ -79,6 +79,7 @@ public enum ASEmail {
 		this.name = name;
 	}
 	
+	@Override
 	public String getName() {
 		return name;
 	}
