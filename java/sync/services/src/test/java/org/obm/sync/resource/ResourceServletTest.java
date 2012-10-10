@@ -119,6 +119,7 @@ public class ResourceServletTest {
 
 		EasyMock.expect(request.getPathInfo()).andReturn(uid);
 
+		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(EasyMock.eq(HttpServletResponse.SC_OK));
 		EasyMock.expectLastCall();
 
@@ -161,6 +162,7 @@ public class ResourceServletTest {
 				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
 				.andThrow(new ResourceNotFoundException("Resource with id doesn't exist"));
 
+		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(EasyMock.eq(HttpServletResponse.SC_NOT_FOUND));
 		response.flushBuffer();
 		EasyMock.expectLastCall();

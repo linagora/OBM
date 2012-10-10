@@ -80,6 +80,7 @@ public class ResourceServlet extends HttpServlet {
 		}
 		
 		try {
+			response.setContentType("text/calendar;charset=UTF-8");
 			String resourceICS = getResourceICS(resourceEmail);
 			response.getWriter().write(resourceICS);
 			response.setStatus(HttpServletResponse.SC_OK);
