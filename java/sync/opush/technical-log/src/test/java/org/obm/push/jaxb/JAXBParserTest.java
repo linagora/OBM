@@ -55,14 +55,16 @@ public class JAXBParserTest {
 	public void testMarshalResource() throws JAXBException {
 		DateTime now = DateTime.now();
 		Resource resource = Resource.builder()
-				.resourceId(1)
+				.resourceId(Long.valueOf(1))
 				.resourceType(ResourceType.HTTP_CLIENT)
+				.transactionId(Long.valueOf(2))
 				.resourceStartTime(now)
 				.build();
 		
 		String expectedLog = 
 			"<resource resourceId=\"1\">" +
 				"<resourceType>HTTP_CLIENT</resourceType>" +
+				"<transactionId>2</transactionId>" +
 				"<resourceStartTime>" + now + "</resourceStartTime>" +
 			"</resource>";
 		
@@ -79,15 +81,17 @@ public class JAXBParserTest {
 				.deviceType("devType")
 				.command("Ping")
 				.requestId(12)
-				.transactionId(1)
+				.transactionId(Long.valueOf(1))
 				.requestStartTime(now)
 				.add(Resource.builder()
-						.resourceId(1)
+						.resourceId(Long.valueOf(1))
 						.resourceType(ResourceType.HTTP_CLIENT)
+						.transactionId(Long.valueOf(1))
 						.resourceStartTime(now)
 						.build())
 				.add(Resource.builder()
-						.resourceId(2)
+						.resourceId(Long.valueOf(2))
+						.transactionId(Long.valueOf(1))
 						.resourceType(ResourceType.IMAP_CONNECTION)
 						.resourceStartTime(now)
 						.build())
@@ -99,10 +103,12 @@ public class JAXBParserTest {
 				"<requestStartTime>" + now + "</requestStartTime>" +
 				"<resources resourceId=\"1\">" +
 					"<resourceType>HTTP_CLIENT</resourceType>" +
+					"<transactionId>1</transactionId>" +
 					"<resourceStartTime>" + now + "</resourceStartTime>" +
 				"</resources>" +
 				"<resources resourceId=\"2\">" +
 					"<resourceType>IMAP_CONNECTION</resourceType>" +
+					"<transactionId>1</transactionId>" +
 					"<resourceStartTime>" + now + "</resourceStartTime>" +
 				"</resources>" +
 			"</request>";
@@ -115,7 +121,7 @@ public class JAXBParserTest {
 	@Test
 	public void testMarshalTransaction() throws JAXBException {
 		DateTime now = DateTime.now();
-		int transactionId = 12;
+		Long transactionId = Long.valueOf(12);
 		Transaction transaction = Transaction.builder()
 				.id(transactionId)
 				.transactionStartTime(now)
@@ -135,23 +141,27 @@ public class JAXBParserTest {
 	public void testMarshalMultipleBeans() throws JAXBException {
 		DateTime now = DateTime.now();
 		Resource resource = Resource.builder()
-				.resourceId(1)
+				.resourceId(Long.valueOf(1))
 				.resourceType(ResourceType.HTTP_CLIENT)
+				.transactionId(Long.valueOf(12))
 				.resourceStartTime(now)
 				.build();
 		Resource resource2 = Resource.builder()
-				.resourceId(2)
+				.resourceId(Long.valueOf(2))
 				.resourceType(ResourceType.IMAP_CONNECTION)
+				.transactionId(Long.valueOf(12))
 				.resourceStartTime(now)
 				.build();
 		
 		String expectedLog = 
 			"<resource resourceId=\"1\">" +
 				"<resourceType>HTTP_CLIENT</resourceType>" +
+				"<transactionId>12</transactionId>" +
 				"<resourceStartTime>" + now + "</resourceStartTime>" +
 			"</resource>" +
 			"<resource resourceId=\"2\">" +
 				"<resourceType>IMAP_CONNECTION</resourceType>" +
+				"<transactionId>12</transactionId>" +
 				"<resourceStartTime>" + now + "</resourceStartTime>" +
 			"</resource>";
 		
@@ -179,7 +189,7 @@ public class JAXBParserTest {
 			"</resource>";
 			
 		Resource expectedResource = Resource.builder()
-				.resourceId(1)
+				.resourceId(Long.valueOf(1))
 				.resourceType(ResourceType.HTTP_CLIENT)
 				.resourceStartTime(now)
 				.build();
@@ -211,15 +221,15 @@ public class JAXBParserTest {
 				.deviceId("devId")
 				.deviceType("devType")
 				.command("Ping")
-				.transactionId(1)
+				.transactionId(Long.valueOf(1))
 				.requestStartTime(now)
 				.add(Resource.builder()
-						.resourceId(1)
+						.resourceId(Long.valueOf(1))
 						.resourceType(ResourceType.HTTP_CLIENT)
 						.resourceStartTime(now)
 						.build())
 				.add(Resource.builder()
-						.resourceId(2)
+						.resourceId(Long.valueOf(2))
 						.resourceType(ResourceType.IMAP_CONNECTION)
 						.resourceStartTime(now)
 						.build())
@@ -234,7 +244,7 @@ public class JAXBParserTest {
 	@Test
 	public void testUnmarshalTransaction() throws JAXBException {
 		DateTime now = DateTime.now();
-		int transactionId = 12;
+		Long transactionId = Long.valueOf(12);
 		String log = 
 			"<transaction id=\"" + transactionId + "\">" +
 				"<transactionStartTime>" + now + "</transactionStartTime>" +
@@ -269,7 +279,7 @@ public class JAXBParserTest {
 			
 		List<Resource> expectedResources = Lists.newArrayList();
 		expectedResources.add(Resource.builder()
-				.resourceId(resourceId)
+				.resourceId(Long.valueOf(resourceId))
 				.resourceType(ResourceType.HTTP_CLIENT)
 				.resourceStartTime(now)
 				.build());
@@ -283,9 +293,9 @@ public class JAXBParserTest {
 	@Test
 	public void testUnmarshalStreamComplexeMultipleBeans() throws Exception {
 		DateTime now = DateTime.now();
-		int transactionId = 12;
-		int resourceId = 1;
-		int resourceId2 = 2;
+		Long transactionId = Long.valueOf(12);
+		Long resourceId = Long.valueOf(1);
+		Long resourceId2 = Long.valueOf(2);
 		String log = 
 			"<transaction id=\"" + transactionId + "\">" +
 				"<transactionStartTime>" + now + "</transactionStartTime>" +
@@ -313,7 +323,7 @@ public class JAXBParserTest {
 				.transactionStartTime(now)
 				.build());
 		expectedResources.add(Resource.builder()
-				.resourceId(resourceId)
+				.resourceId(Long.valueOf(resourceId))
 				.resourceType(ResourceType.HTTP_CLIENT)
 				.resourceStartTime(now)
 				.build());

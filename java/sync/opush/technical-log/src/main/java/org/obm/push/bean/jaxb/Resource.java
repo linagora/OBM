@@ -47,6 +47,7 @@ import com.google.common.base.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { JAXBConstants.RESOURCE_ID, 
 			JAXBConstants.RESOURCE_TYPE, 
+			JAXBConstants.TRANSACTION_ID,
 			JAXBConstants.RESOURCE_START_TIME, 
 			JAXBConstants.RESOURCE_END_TIME },
 		factoryMethod = JAXBConstants.RESOURCE_EMPTY_METHOD_NAME)
@@ -61,20 +62,26 @@ public class Resource extends JAXBBean {
 	}
 	
 	public static class Builder {
-		private long resourceId;
+		private Long resourceId;
 		private ResourceType resourceType;
+		private Long transactionId;
 		private DateTime resourceStartTime;
 		private DateTime resourceEndTime;
 		
 		private Builder() {}
 		
-		public Builder resourceId(long resourceId) {
+		public Builder resourceId(Long resourceId) {
 			this.resourceId = resourceId;
 			return this;
 		}
 		
 		public Builder resourceType(ResourceType resourceType) {
 			this.resourceType = resourceType;
+			return this;
+		}
+		
+		public Builder transactionId(Long transactionId) {
+			this.transactionId = transactionId;
 			return this;
 		}
 		
@@ -91,37 +98,46 @@ public class Resource extends JAXBBean {
 		public Resource build() {
 			return new Resource(resourceId, 
 					resourceType, 
+					transactionId,
 					resourceStartTime, 
 					resourceEndTime);
 		}
 	}
 	
 	@XmlAttribute
-	private final long resourceId;
+	private final Long resourceId;
 	@XmlElement
 	private final ResourceType resourceType;
+	@XmlElement
+	private final Long transactionId;
 	@XmlElement
 	private final DateTime resourceStartTime;
 	@XmlElement
 	private final DateTime resourceEndTime;
 	
-	private Resource(long resourceId, 
+	private Resource(Long resourceId, 
 			ResourceType resourceType, 
+			Long transactionId, 
 			DateTime resourceStartTime, 
 			DateTime resourceEndTime) {
 		
 		this.resourceId = resourceId;
 		this.resourceType = resourceType;
+		this.transactionId = transactionId;
 		this.resourceStartTime = resourceStartTime;
 		this.resourceEndTime = resourceEndTime;
 	}
 	
-	public long getResourceId() {
+	public Long getResourceId() {
 		return resourceId;
 	}
 	
 	public ResourceType getResourceType() {
 		return resourceType;
+	}
+	
+	public Long getTransactionId() {
+		return transactionId;
 	}
 	
 	public DateTime getResourceStartTime() {
@@ -136,6 +152,7 @@ public class Resource extends JAXBBean {
 	public final int hashCode(){
 		return Objects.hashCode(resourceId, 
 				resourceType, 
+				transactionId,
 				resourceStartTime, 
 				resourceEndTime);
 	}
@@ -146,6 +163,7 @@ public class Resource extends JAXBBean {
 			Resource that = (Resource) object;
 			return Objects.equal(this.resourceId, that.resourceId)
 				&& Objects.equal(this.resourceType, that.resourceType)
+				&& Objects.equal(this.transactionId, that.transactionId)
 				&& Objects.equal(this.resourceStartTime, that.resourceStartTime)
 				&& Objects.equal(this.resourceEndTime, that.resourceEndTime);
 		}
@@ -157,6 +175,7 @@ public class Resource extends JAXBBean {
 		return Objects.toStringHelper(this)
 			.add("resourceId", resourceId)
 			.add("resourceType", resourceType)
+			.add("transactionId", transactionId)
 			.add("resourceStartTime", DateTimeUtils.getInstantMillis(resourceStartTime))
 			.add("resourceEndTime", DateTimeUtils.getInstantMillis(resourceEndTime))
 			.toString();

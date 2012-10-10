@@ -60,13 +60,13 @@ public class Transaction extends JAXBBean {
 	}
 	
 	public static class Builder {
-		private long id;
+		private Long id;
 		private DateTime transactionStartTime;
 		private DateTime transactionEndTime;
 		
 		private Builder() {}
 		
-		public Builder id(long id) {
+		public Builder id(Long id) {
 			this.id = id;
 			return this;
 		}
@@ -87,19 +87,19 @@ public class Transaction extends JAXBBean {
 	}
 
 	@XmlAttribute
-	private final long id;
+	private final Long id;
 	@XmlElement
 	private final DateTime transactionStartTime;
 	@XmlElement
 	private final DateTime transactionEndTime;
 	
-	private Transaction(long id, DateTime transactionStartTime, DateTime transactionEndTime) {
+	private Transaction(Long id, DateTime transactionStartTime, DateTime transactionEndTime) {
 		this.id = id;
 		this.transactionStartTime = transactionStartTime;
 		this.transactionEndTime = transactionEndTime;
 	}
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	

@@ -71,8 +71,8 @@ public class Request extends JAXBBean {
 		private String deviceId;
 		private String deviceType;
 		private String command;
-		private int requestId;
-		private long transactionId;
+		private Integer requestId;
+		private Long transactionId;
 		private DateTime requestStartTime;
 		private DateTime requestEndTime;
 		private List<Resource> resources;
@@ -96,12 +96,12 @@ public class Request extends JAXBBean {
 			return this;
 		}
 		
-		public Builder requestId(int requestId) {
+		public Builder requestId(Integer requestId) {
 			this.requestId = requestId;
 			return this;
 		}
 		
-		public Builder transactionId(long transactionId) {
+		public Builder transactionId(Long transactionId) {
 			this.transactionId = transactionId;
 			return this;
 		}
@@ -145,9 +145,9 @@ public class Request extends JAXBBean {
 	@XmlAttribute
 	private final String command;
 	@XmlAttribute
-	private final int requestId;
+	private final Integer requestId;
 	@XmlElement
-	private final long transactionId;
+	private final Long transactionId;
 	@XmlElement
 	private final DateTime requestStartTime;
 	@XmlElement
@@ -158,8 +158,8 @@ public class Request extends JAXBBean {
 	private Request(String deviceId, 
 			String deviceType, 
 			String command, 
-			int requestId, 
-			long transactionId, 
+			Integer requestId, 
+			Long transactionId, 
 			DateTime requestStartTime, 
 			DateTime requestEndTime, 
 			List<Resource> resources) {
@@ -186,11 +186,11 @@ public class Request extends JAXBBean {
 		return command;
 	}
 	
-	public int getRequestId() {
+	public Integer getRequestId() {
 		return requestId;
 	}
 	
-	public long getTransactionId() {
+	public Long getTransactionId() {
 		return transactionId;
 	}
 	
