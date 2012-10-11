@@ -50,7 +50,7 @@ import org.obm.icalendar.ical4jwrapper.ICalendarRecur;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
-import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.Builder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
@@ -102,7 +102,7 @@ public class ICalendarConverter {
 	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar) {
 		Preconditions.checkNotNull(icalendar, "ICalendar is null");
 		
-		MsMeetingRequestBuilder builder = new MSMeetingRequest.MsMeetingRequestBuilder();
+		Builder builder = MSMeetingRequest.builder();
 		if (icalendar.hasEvent()) {
 			ICalendarEvent iCalendarEvent = icalendar.getICalendarEvent();
 			
@@ -134,7 +134,7 @@ public class ICalendarConverter {
 	}
 	
 	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, 
-			MsMeetingRequestBuilder msMeetingRequestBuilder) {
+			Builder msMeetingRequestBuilder) {
 		
 		Date startDate = iCalendarEvent.startDate();
 		Date endDate = endTime(iCalendarEvent);
@@ -235,7 +235,7 @@ public class ICalendarConverter {
 	}
 	
 	private void fillMsMeetingRequestFromRRule(ICalendarRecur iCalendarRule, ICalendarEvent iCalendarEvent,
-			TimeZone iCalendarTimeZone, MsMeetingRequestBuilder msMeetingRequestBuilder) {
+			TimeZone iCalendarTimeZone, Builder msMeetingRequestBuilder) {
 		
 		List<MSMeetingRequestRecurrence> meetingRequestRecurrences = Lists.newArrayList();
 		

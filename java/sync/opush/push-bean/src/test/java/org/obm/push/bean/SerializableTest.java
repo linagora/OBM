@@ -112,7 +112,7 @@ public class SerializableTest {
 					.truncated(false)
 					.build())
 			.meetingRequest(
-					new MSMeetingRequest.MsMeetingRequestBuilder()
+					MSMeetingRequest.builder()
 						.startTime(date("2012-02-03T11:22:33"))
 						.endTime(date("2012-02-03T12:22:33"))
 						.dtStamp(date("2012-02-02T11:22:33"))
@@ -144,7 +144,7 @@ public class SerializableTest {
 					.truncated(false)
 					.build())
 			.meetingRequest(
-					new MSMeetingRequest.MsMeetingRequestBuilder()
+					MSMeetingRequest.builder()
 						.startTime(date("2012-02-03T11:22:33"))
 						.endTime(date("2012-02-03T12:22:33"))
 						.dtStamp(date("2012-02-02T11:22:33"))

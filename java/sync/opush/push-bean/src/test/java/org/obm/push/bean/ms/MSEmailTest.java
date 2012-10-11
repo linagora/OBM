@@ -157,7 +157,7 @@ public class MSEmailTest {
 	}
 
 	private MSMeetingRequest anyMeetingRequest() {
-		return new MSMeetingRequest.MsMeetingRequestBuilder()
+		return MSMeetingRequest.builder()
 			.msEventExtId(new MSEventExtId("anyExtId"))
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.startTime(new DateTime("2012-07-10T07:00:00").toDate())

@@ -46,7 +46,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
-import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.Builder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
@@ -457,8 +457,8 @@ public class MSMeetingRequestSerializingTest {
 		return protocolDateFormat.format(date);
 	}
 
-	private MsMeetingRequestBuilder initializedRequiredFieldsMeetingRequestBuilder() {
-		return new MSMeetingRequest.MsMeetingRequestBuilder()
+	private Builder initializedRequiredFieldsMeetingRequestBuilder() {
+		return MSMeetingRequest.builder()
 				.dtStamp(DateUtils.date("1970-01-01T10:00:00"))
 				.startTime(DateUtils.date("1970-01-01T12:00:00"))
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))

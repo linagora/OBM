@@ -45,10 +45,8 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
-import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
-import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence.Builder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.utils.IntEncoder;
@@ -343,14 +341,14 @@ public class MSMeetingRecurrenceSerializingTest {
 		Assertions.assertThat(tagValue(encodedDocument, ASEmail.OCCURRENCES)).isEqualTo("1234");
 	}
 
-	private Builder initializedRequiredFieldsRecurrenceBuilder() {
+	private MSMeetingRequestRecurrence.Builder initializedRequiredFieldsRecurrenceBuilder() {
 		return MSMeetingRequestRecurrence.builder()
 				.type(MSMeetingRequestRecurrenceType.DAILY)
 				.interval(1);
 	}
 
-	private MsMeetingRequestBuilder meetingRequestBuilderWithRequiredFields() {
-		return new MSMeetingRequest.MsMeetingRequestBuilder()
+	private MSMeetingRequest.Builder meetingRequestBuilderWithRequiredFields() {
+		return MSMeetingRequest.builder()
 				.dtStamp(DateUtils.date("1970-01-01T10:00:00"))
 				.startTime(DateUtils.date("1970-01-01T12:00:00"))
 				.endTime(DateUtils.date("1970-01-01T15:00:00"))

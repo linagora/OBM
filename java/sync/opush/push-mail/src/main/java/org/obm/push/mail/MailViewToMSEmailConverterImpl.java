@@ -109,7 +109,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		if (msMeetingRequest != null) {
 			EventExtId eventExtId = new EventExtId(msMeetingRequest.getMSEventExtId().serializeToString());
 			MSEventUid msEventUid = eventService.getMSEventUidFor(eventExtId, userDataRequest.getDevice());
-			return new MSMeetingRequest.MsMeetingRequestBuilder()
+			return MSMeetingRequest.builder()
 				.copy(msMeetingRequest)
 				.msEventUid(msEventUid).build();
 		} else {

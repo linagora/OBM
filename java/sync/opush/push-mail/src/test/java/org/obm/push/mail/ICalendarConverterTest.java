@@ -75,7 +75,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -95,7 +95,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -115,7 +115,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -135,7 +135,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -161,7 +161,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T07:57:33Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -182,7 +182,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T02:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T09:44:07Z").toDate())
 					.endTime(new DateTime("2012-04-25T02:00:00").toDate())
@@ -251,7 +251,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T13:04:28Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -276,7 +276,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T13:32:54Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:30:00").toDate())
@@ -302,7 +302,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:04:23Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
@@ -333,7 +333,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:18:17Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
@@ -365,7 +365,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:25:04Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
@@ -393,7 +393,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:28:46Z").toDate())
 					.endTime(new DateTime("2012-04-24T07:15:00").toDate())
@@ -419,7 +419,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-05-12T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:51:05Z").toDate())
 					.endTime(new DateTime("2012-05-12T07:15:00").toDate())
@@ -448,7 +448,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T07:57:07Z").toDate())
 					.endTime(new DateTime("2012-07-10T07:15:00").toDate())
@@ -476,7 +476,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T08:08:09Z").toDate())
 					.endTime(new DateTime("2012-07-10T07:15:00").toDate())
@@ -503,7 +503,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2013-10-01T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T08:19:39Z").toDate())
 					.endTime(new DateTime("2013-10-01T07:15:00").toDate())
@@ -536,7 +536,7 @@ public class ICalendarConverterTest {
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
 		Assertions.assertThat(msMeetingRequest).isEqualTo(
-				new MSMeetingRequest.MsMeetingRequestBuilder()
+				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-06-15T02:00:00").toDate())
 					.dtStamp(new DateTime("2012-06-04T12:59:20Z").toDate())
 					.allDayEvent(true)

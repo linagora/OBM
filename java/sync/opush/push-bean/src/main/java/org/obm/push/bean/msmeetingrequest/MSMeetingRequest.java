@@ -47,7 +47,11 @@ import com.google.common.base.Strings;
 
 public class MSMeetingRequest implements Serializable {
 
-	public static class MsMeetingRequestBuilder {
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
 		private boolean allDayEvent;
 		private Date startTime;
 		private Date dtStamp;
@@ -66,93 +70,97 @@ public class MSMeetingRequest implements Serializable {
 		private List<MSMeetingRequestCategory> categories;
 		private MSEventUid msEventUid;
 		
-		public MsMeetingRequestBuilder allDayEvent(boolean allDayEvent) {
+		private Builder() {
+			super();
+		}
+		
+		public Builder allDayEvent(boolean allDayEvent) {
 			this.allDayEvent = allDayEvent;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder startTime(Date startTime) {
+		public Builder startTime(Date startTime) {
 			this.startTime = startTime;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder dtStamp(Date dtStamp) {
+		public Builder dtStamp(Date dtStamp) {
 			this.dtStamp = dtStamp;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder endTime(Date endTime) {
+		public Builder endTime(Date endTime) {
 			this.endTime = endTime;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder instanceType(MSMeetingRequestInstanceType instanceType) {
+		public Builder instanceType(MSMeetingRequestInstanceType instanceType) {
 			this.instanceType = instanceType;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder location(String location) {
+		public Builder location(String location) {
 			this.location = location;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder organizer(String organizer) {
+		public Builder organizer(String organizer) {
 			this.organizer = organizer;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder recurrenceId(Date recurrenceId) {
+		public Builder recurrenceId(Date recurrenceId) {
 			this.recurrenceId = recurrenceId;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder reminder(Long reminder) {
+		public Builder reminder(Long reminder) {
 			this.reminder = reminder;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder reponseRequested(boolean responseRequested) {
+		public Builder reponseRequested(boolean responseRequested) {
 			this.responseRequested = responseRequested;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder recurrences(List<MSMeetingRequestRecurrence> recurrences) {
+		public Builder recurrences(List<MSMeetingRequestRecurrence> recurrences) {
 			this.recurrences = recurrences;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder sensitivity(MSMeetingRequestSensitivity sensitivity) {
+		public Builder sensitivity(MSMeetingRequestSensitivity sensitivity) {
 			this.sensitivity = sensitivity;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder intDBusyStatus(MSMeetingRequestIntDBusyStatus intDBusyStatus) {
+		public Builder intDBusyStatus(MSMeetingRequestIntDBusyStatus intDBusyStatus) {
 			this.intDBusyStatus = intDBusyStatus;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder timeZone(TimeZone timeZone) {
+		public Builder timeZone(TimeZone timeZone) {
 			this.timeZone = timeZone;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder msEventExtId(MSEventExtId msEventExtId) {
+		public Builder msEventExtId(MSEventExtId msEventExtId) {
 			this.msEventExtId = msEventExtId;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder categories(List<MSMeetingRequestCategory> categories) {
+		public Builder categories(List<MSMeetingRequestCategory> categories) {
 			this.categories = categories;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder msEventUid(MSEventUid msEventUid) {
+		public Builder msEventUid(MSEventUid msEventUid) {
 			this.msEventUid = msEventUid;
 			return this;
 		}
 		
-		public MsMeetingRequestBuilder copy(MSMeetingRequest msMeetingRequest) {
-			return new MsMeetingRequestBuilder()
+		public Builder copy(MSMeetingRequest msMeetingRequest) {
+			return new Builder()
 				.allDayEvent(msMeetingRequest.allDayEvent)
 				.categories(msMeetingRequest.getCategories())
 				.dtStamp(msMeetingRequest.getDtStamp())
