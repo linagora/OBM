@@ -205,8 +205,6 @@ public class MSMeetingRequest implements Serializable {
 				intDBusyStatus = MSMeetingRequestIntDBusyStatus.FREE;
 			}
 
-			Preconditions.checkNotNull(msEventExtId, "The field msEventExtId is required");
-			
 			return new MSMeetingRequest(allDayEvent, startTime, dtStamp, endTime, instanceType, location, 
 					organizer, recurrenceId, reminder, responseRequested, recurrences, sensitivity, 
 					intDBusyStatus, timeZone, msEventExtId, categories, msEventUid);
