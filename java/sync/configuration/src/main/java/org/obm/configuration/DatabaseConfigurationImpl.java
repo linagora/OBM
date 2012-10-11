@@ -61,8 +61,8 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     }
 
     @Override
-    public DatabaseSystem getDatabaseSystem() {
-        return DatabaseSystem.valueOf(getStringValue(DB_TYPE_KEY).trim());
+    public DatabaseFlavour getDatabaseSystem() {
+        return DatabaseFlavour.valueOf(getStringValue(DB_TYPE_KEY).trim());
     }
 
     @Override

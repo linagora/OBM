@@ -33,7 +33,7 @@
 package org.obm.dbcp;
 
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseSystem;
+import org.obm.configuration.DatabaseFlavour;
 
 public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfiguration {
 
@@ -44,8 +44,8 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 	}
 
 	@Override
-	public DatabaseSystem getDatabaseSystem() {
-		return DatabaseSystem.PGSQL;
+	public DatabaseFlavour getDatabaseSystem() {
+		return DatabaseFlavour.PGSQL;
 	}
 
 	@Override

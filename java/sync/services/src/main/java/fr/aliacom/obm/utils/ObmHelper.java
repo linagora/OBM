@@ -38,7 +38,7 @@ import java.sql.Statement;
 import java.util.Date;
 
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseSystem;
+import org.obm.configuration.DatabaseFlavour;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
 
@@ -51,7 +51,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ObmHelper {
 
-	private DatabaseSystem type = DatabaseSystem.PGSQL;
+	private DatabaseFlavour type = DatabaseFlavour.PGSQL;
 
 	private final DatabaseConnectionProvider dbcp;
 
@@ -81,7 +81,7 @@ public class ObmHelper {
 		ResultSet rs = null;
 		try {
 			st = con.createStatement();
-			if (type == DatabaseSystem.PGSQL) {
+			if (type == DatabaseFlavour.PGSQL) {
 				rs = st.executeQuery("SELECT lastval()");
 			} else {
 				rs = st.executeQuery("SELECT last_insert_id()");
@@ -178,7 +178,7 @@ public class ObmHelper {
 		}
 	}
 
-	public DatabaseSystem getType() {
+	public DatabaseFlavour getType() {
 		return type;
 	}
 }

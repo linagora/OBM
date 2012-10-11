@@ -29,10 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.dbcp.jdbc;
 
-public enum DatabaseSystem {
+import java.util.Map;
 
-	MYSQL, PGSQL;
+import org.obm.configuration.DatabaseConfiguration;
 
+public interface DatabaseDriverConfiguration {
+
+	String getLastInsertIdQuery();
+
+	String getDataSourceClassName();
+
+	String getUniqueName();
+
+	Map<String, String> getDriverProperties(DatabaseConfiguration configuration);
+
+	boolean readOnlySupported();
+
+	String getGMTTimezoneQuery();
 }

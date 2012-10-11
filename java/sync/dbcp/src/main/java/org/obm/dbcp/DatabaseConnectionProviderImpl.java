@@ -42,11 +42,18 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.DatabaseConfiguration;
+<<<<<<< HEAD
 import org.obm.configuration.DatabaseSystem;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.IJDBCDriver;
 import org.obm.dbcp.jdbc.MySqlJDBCDriver;
 import org.obm.dbcp.jdbc.PgSqlJDBCDriver;
+=======
+import org.obm.configuration.DatabaseFlavour;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
+import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
+>>>>>>> OBMFULL-4164 CR-2045 Some formatting, Indent correction, and verbose member and variables naming
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,9 +74,9 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	
 	private final DatabaseConfiguration databaseConfiguration;
 
-	private final IJDBCDriver driver;
+	private final DatabaseDriverConfiguration driverConfiguration;
 
-	private final PoolingDataSource poolds;
+	private final PoolingDataSource poolingDataSource;
 
 	private static final String VALIDATION_QUERY = "SELECT 666";
 
@@ -81,38 +88,39 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		this.transactionAttributeBinder = transactionAttributeBinder;
 		this.databaseConfiguration = databaseConfiguration;
 
-        configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
+		configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
 		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
 		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
 		configurationLogger.info("Databse login : {}", databaseConfiguration.getDatabaseLogin());
-        logger.info("Starting OBM connection pool...");
-        
-        driver = buildJDBCConnectionFactory(databaseConfiguration.getDatabaseSystem());
+		logger.info("Starting OBM connection pool...");
 
-        poolds = new PoolingDataSource();
-        poolds.setClassName(driver.getDataSourceClassName());
-        poolds.setUniqueName(driver.getUniqueName());
-        poolds.setMaxPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
-        poolds.setAllowLocalTransactions(true);
-        poolds.getDriverProperties().putAll(
-                driver.getDriverProperties(databaseConfiguration));
-        poolds.setTestQuery(VALIDATION_QUERY);
+		driverConfiguration = buildDriverConfigurationForDatabaseFlavour(databaseConfiguration
+				.getDatabaseSystem());
 
-        poolds.init();
+		poolingDataSource = new PoolingDataSource();
+		poolingDataSource.setClassName(driverConfiguration.getDataSourceClassName());
+		poolingDataSource.setUniqueName(driverConfiguration.getUniqueName());
+		poolingDataSource.setMaxPoolSize(databaseConfiguration
+				.getDatabaseMaxConnectionPoolSize());
+		poolingDataSource.setAllowLocalTransactions(true);
+		poolingDataSource.getDriverProperties().putAll(
+				driverConfiguration.getDriverProperties(databaseConfiguration));
+		poolingDataSource.setTestQuery(VALIDATION_QUERY);
+
+		poolingDataSource.init();
 	}
 
-	private IJDBCDriver buildJDBCConnectionFactory(DatabaseSystem dbType) {
-		IJDBCDriver cf = null;
-		if (dbType.equals(DatabaseSystem.PGSQL)) {
-			cf = new PgSqlJDBCDriver();
+	private DatabaseDriverConfiguration buildDriverConfigurationForDatabaseFlavour(DatabaseFlavour databaseFlavour) {
+		DatabaseDriverConfiguration driverConfiguration = null;
+		if (databaseFlavour.equals(DatabaseFlavour.PGSQL)) {
+			driverConfiguration = new PostgresDriverConfiguration();
+		} else if (databaseFlavour.equals(DatabaseFlavour.MYSQL)) {
+			driverConfiguration = new MySQLDriverConfiguration();
+		} else {
+			throw new IllegalArgumentException(
+					"No connection factory found for database flavour: [" + databaseFlavour + "]");
 		}
-		else if (dbType.equals(DatabaseSystem.MYSQL)) {
-			cf = new MySqlJDBCDriver();
-		}
-		else {
-		    throw new IllegalArgumentException("No connection factory found for dbtype " + dbType);
-		}
-		return cf;
+		return driverConfiguration;
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {
@@ -121,7 +129,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		ResultSet rs = null;
 		try {
 			st = con.createStatement();
-			rs = st.executeQuery(driver.getLastInsertIdQuery());
+			rs = st.executeQuery(driverConfiguration.getLastInsertIdQuery());
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
@@ -133,22 +141,22 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		Connection connection = poolds.getConnection();
+		Connection connection = poolingDataSource.getConnection();
 		setConnectionReadOnlyIfNecessary(connection);
 		setTimeZoneToUTC(connection);
 		return connection;
 	}
 
 	private void setTimeZoneToUTC(Connection connection) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(driver.getGMTTimezoneQuery());
+		PreparedStatement ps = connection.prepareStatement(driverConfiguration.getGMTTimezoneQuery());
 		ps.executeUpdate();
 	}
 
 	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
-		if(driver.readOnlySupported()){
+		if (driverConfiguration.readOnlySupported()) {
 			try {
 				boolean isReadOnlyTransaction = isReadOnlyTransaction();
-				if(connection.isReadOnly() != isReadOnlyTransaction){
+				if (connection.isReadOnly() != isReadOnlyTransaction) {
 					connection.setReadOnly(isReadOnlyTransaction);
 				}
 			} catch (TransactionException e) {
@@ -164,12 +172,12 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	public void cleanup() {
-	    poolds.close();
+		poolingDataSource.close();
 	}
 
 	@Override
 	public Object getJdbcObject(String type, String value) throws SQLException {
-		if (databaseConfiguration.getDatabaseSystem() == DatabaseSystem.PGSQL) {
+		if (databaseConfiguration.getDatabaseSystem() == DatabaseFlavour.PGSQL) {
 			try {
 				Object o = Class.forName("org.postgresql.util.PGobject")
 						.newInstance();

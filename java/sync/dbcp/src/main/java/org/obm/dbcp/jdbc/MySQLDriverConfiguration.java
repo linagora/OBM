@@ -38,46 +38,62 @@ import org.obm.configuration.DatabaseConfiguration;
 
 import com.google.common.collect.ImmutableMap;
 
+public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 
-public class PgSqlJDBCDriver implements IJDBCDriver {
+	private String getJDBCUrl(String host, String dbName) {
+		String jdbcUrl = "jdbc:mysql://" + host + "/" + dbName + "?" + getMySQLOptions();
+		return jdbcUrl;
+	}
 
+	private String getMySQLOptions() {
+		StringBuilder b = new StringBuilder();
+		b.append("zeroDateTimeBehavior=convertToNull");
+		b.append("&relaxAutocommit=true");
+		b.append("&jdbcCompliantTruncation=false");
+		b.append("&interactiveClient=true");
+		b.append("&useGmtMillisForDatetime=true");
+		b.append("&useUnicode=true");
+		b.append("&characterEncoding=utf8");
+		b.append("&characterSetResults=utf8");
+		b.append("&connectionCollation=utf8_general_ci");
+		return b.toString();
+	}
 
 	@Override
 	public String getLastInsertIdQuery() {
-		return "SELECT lastval()";
+		return "SELECT last_insert_id()";
 	}
 
 	@Override
 	public String getDataSourceClassName() {
-		return "org.postgresql.xa.PGXADataSource";
+		return "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
 	}
 
 	@Override
 	public String getUniqueName() {
-		return "pgsql";
+		return "mysql";
 	}
 
 	@Override
-	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
+	public Map<String, String> getDriverProperties(DatabaseConfiguration configuration) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		builder.put("user", conf.getDatabaseLogin());
-		builder.put("password", conf.getDatabasePassword());
-		builder.put("databaseName", conf.getDatabaseName());
-		builder.put("serverName", conf.getDatabaseHost());
-		builder.put("ssl", conf.isPostgresSSLEnabled().toString());
-		if (conf.isPostgresSSLNonValidating()) {
-		    builder.put("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
-		}
+		builder.put("user", configuration.getDatabaseLogin());
+		builder.put("password", configuration.getDatabasePassword());
+		builder.put("databaseName", configuration.getDatabaseName());
+		builder.put("url", getJDBCUrl(configuration.getDatabaseHost(), configuration.getDatabaseName()));
 		return builder.build();
 	}
 
+	/**
+	 * read-only is disabled due to an exception thrown when the transactionManager try to open a new mysql transaction
+	 */
 	@Override
 	public boolean readOnlySupported() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public String getGMTTimezoneQuery() {
-		return "SET LOCAL TIME ZONE 'GMT'";
+		return "SET time_zone='+00:00'";
 	}
 }

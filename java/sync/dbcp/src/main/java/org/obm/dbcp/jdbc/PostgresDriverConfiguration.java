@@ -29,24 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.dbcp.jdbc;
 
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
 
+import com.google.common.collect.ImmutableMap;
 
-public interface IJDBCDriver {
+public class PostgresDriverConfiguration implements DatabaseDriverConfiguration {
 
-	String getLastInsertIdQuery();
+	@Override
+	public String getLastInsertIdQuery() {
+		return "SELECT lastval()";
+	}
 
-	String getDataSourceClassName();
-	
-	String getUniqueName();
+	@Override
+	public String getDataSourceClassName() {
+		return "org.postgresql.xa.PGXADataSource";
+	}
 
-	Map<String,String> getDriverProperties(DatabaseConfiguration configuration);
+	@Override
+	public String getUniqueName() {
+		return "pgsql";
+	}
 
-	boolean readOnlySupported();
+	@Override
+	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		builder.put("user", conf.getDatabaseLogin());
+		builder.put("password", conf.getDatabasePassword());
+		builder.put("databaseName", conf.getDatabaseName());
+		builder.put("serverName", conf.getDatabaseHost());
+		builder.put("ssl", conf.isPostgresSSLEnabled().toString());
+		if (conf.isPostgresSSLNonValidating()) {
+			builder.put("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
+		}
+		return builder.build();
+	}
 
-	String getGMTTimezoneQuery();
+	@Override
+	public boolean readOnlySupported() {
+		return true;
+	}
+
+	@Override
+	public String getGMTTimezoneQuery() {
+		return "SET LOCAL TIME ZONE 'GMT'";
+	}
 }

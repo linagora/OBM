@@ -36,7 +36,7 @@ public interface DatabaseConfiguration {
 
     Integer getDatabaseMaxConnectionPoolSize();
 
-    DatabaseSystem getDatabaseSystem();
+    DatabaseFlavour getDatabaseSystem();
 
     String getDatabaseName();
 
