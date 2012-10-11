@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Objects;
+import com.google.common.primitives.Ints;
 
 public class ActiveSyncDecoder {
 
@@ -78,12 +79,24 @@ public class ActiveSyncDecoder {
 	}
 
 	public Integer uniqueIntegerFieldValue(Element root, ActiveSyncFields integerField) {
-		String element = DOMUtils.getElementText(root, integerField.getName());
-		logger.debug(integerField.getName() + " value : " + element);
+		Long value = uniqueNumberFieldValue(root, integerField);
+		if (value != null) {
+			return Ints.checkedCast(value);
+		}
+		return null;
+	}
+
+	public Long uniqueLongFieldValue(Element root, ActiveSyncFields longField) {
+		return uniqueNumberFieldValue(root, longField);
+	}
+
+	private Long uniqueNumberFieldValue(Element root, ActiveSyncFields numberField) {
+		String element = DOMUtils.getElementText(root, numberField.getName());
+		logger.debug(numberField.getName() + " value : " + element);
 		
 		if (element != null) {
 			try {
-				return Integer.parseInt(element);
+				return Long.parseLong(element);
 			} catch (NumberFormatException e) {
 				throw new ASRequestIntegerFieldException(e);
 			}

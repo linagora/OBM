@@ -36,8 +36,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.data.ASEmail;
@@ -48,6 +51,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
@@ -75,10 +79,25 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 					.endTime(date(uniqueStringFieldValue(data, ASEmail.END_TIME)))
 					.timeZone(timeZone(uniqueStringFieldValue(data, ASEmail.TIME_ZONE)))
 					.instanceType(instanceType(uniqueIntegerFieldValue(data, ASEmail.INSTANCE_TYPE)))
+					.intDBusyStatus(busyStatus(uniqueIntegerFieldValue(data, ASEmail.INT_DB_BUSY_STATUS)))
+					.organizer(uniqueStringFieldValue(data, ASEmail.ORGANIZER))
+					.location(uniqueStringFieldValue(data, ASEmail.LOCATION))
+					.reminder(uniqueLongFieldValue(data, ASEmail.REMINDER))
+					.reponseRequested(uniqueBooleanFieldValue(data, ASEmail.RESPONSE_REQUESTED, false))
+					.msEventUid(new MSEventUid(uniqueStringFieldValue(data, ASEmail.GLOBAL_OBJ_ID)))
+					.sensitivity(sensitivity(uniqueIntegerFieldValue(data, ASEmail.SENSITIVITY)))
 					.build();
 		} catch (ParseException e) {
 			throw new ConversionException("A date field is not valid", e);
 		}
+	}
+
+	private MSMeetingRequestSensitivity sensitivity(Integer value) {
+		return Objects.firstNonNull(MSMeetingRequestSensitivity.getValueOf(value), MSMeetingRequestSensitivity.NORMAL);
+	}
+
+	private MSMeetingRequestIntDBusyStatus busyStatus(Integer busyStatus) {
+		return MSMeetingRequestIntDBusyStatus.getValueOf(busyStatus);
 	}
 
 	private MSMeetingRequestInstanceType instanceType(Integer instanceType) throws ConversionException {

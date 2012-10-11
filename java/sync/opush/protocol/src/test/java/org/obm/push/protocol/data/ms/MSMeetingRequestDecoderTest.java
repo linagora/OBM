@@ -46,6 +46,8 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
@@ -391,6 +393,430 @@ public class MSMeetingRequestDecoderTest {
 		decoder.decode(doc.getDocumentElement());
 	}
 
+	@Test
+	public void parseBusyStatusBusy() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<IntDBusyStatus>0</IntDBusyStatus>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getIntDBusyStatus()).isEqualTo(MSMeetingRequestIntDBusyStatus.BUSY);
+	}
+
+	@Test
+	public void parseBusyStatusFree() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<IntDBusyStatus>1</IntDBusyStatus>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getIntDBusyStatus()).isEqualTo(MSMeetingRequestIntDBusyStatus.FREE);
+	}
+
+	@Test
+	public void parseBusyStatusDefaultIsFree() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getIntDBusyStatus()).isEqualTo(MSMeetingRequestIntDBusyStatus.FREE);
+	}
+
+	@Test
+	public void parseOrganizer() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Organizer>organizer@domain.org</Organizer>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getOrganizer()).isEqualTo("organizer@domain.org");
+	}
+
+	@Test
+	public void parseOrganizerIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getOrganizer()).isNull();
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void parseOrganizerNeedsValidEmail() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Organizer>I am the organizer</Organizer>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		decoder.decode(doc.getDocumentElement());
+	}
+
+	@Test
+	public void parseLocation() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Location>In Ardèche men!</Location>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getLocation()).isEqualTo("In Ardèche men!");
+	}
+
+	@Test
+	public void parseLocationIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getLocation()).isNull();
+	}
+
+	@Test
+	public void parseReminderZero() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Reminder>0</Reminder>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getReminder()).isEqualTo(0);
+	}
+
+	@Test
+	public void parseReminderThousand() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Reminder>1000</Reminder>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getReminder()).isEqualTo(1000);
+	}
+
+	@Test
+	public void parseReminderIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getReminder()).isNull();
+	}
+
+	@Test
+	public void parseResponseRequestedFalse() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<ResponseRequested>0</ResponseRequested>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.isResponseRequested()).isFalse();
+	}
+
+	@Test
+	public void parseResponseRequestedTrue() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<ResponseRequested>1</ResponseRequested>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.isResponseRequested()).isTrue();
+	}
+
+	@Test
+	public void parseResponseRequestedDefaultIsFalse() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.isResponseRequested()).isFalse();
+	}
+
+	@Test
+	public void parseGlobalObjId() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<GlobalObjId>a1b2</GlobalObjId>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getMsEventUid().serializeToString()).isEqualTo("a1b2");
+	}
+
+	@Test
+	public void parseSensitivityPersonnal() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Sensitivity>1</Sensitivity>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getSensitivity()).isEqualTo(MSMeetingRequestSensitivity.PERSONAL);
+	}
+
+	@Test
+	public void parseSensitivityPrivate() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<Sensitivity>2</Sensitivity>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getSensitivity()).isEqualTo(MSMeetingRequestSensitivity.PRIVATE);
+	}
+
+	@Test
+	public void parseSensitivityDefaultIsNormal() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getSensitivity()).isEqualTo(MSMeetingRequestSensitivity.NORMAL);
+	}
+
+	
 	private ASTimeZone expectTimeZone() {
 		return expectTimeZone(TimeZone.getTimeZone("UTC"), 
 				"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
