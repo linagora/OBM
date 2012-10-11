@@ -7,7 +7,7 @@ import java.util.Map;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -39,7 +39,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 
 	private Collection<Event> filterNonRecurrentEvent(Event event) {
 		Attendee att = event.findAttendeeFromEmail(declinedAttendee.getEmail());
-		if (att.getState() != ParticipationState.DECLINED) {
+		if (att.getParticipation() != Participation.DECLINED) {
 			return ImmutableList.of(event);
 		} else {
 			return ImmutableList.of();
@@ -52,7 +52,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 
 		Attendee att = event.findAttendeeFromEmail(this.declinedAttendee.getEmail());
 		boolean isParentEventDeclined = att == null
-				|| att.getState() == ParticipationState.DECLINED;
+				|| att.getParticipation() == Participation.DECLINED;
 		if (isParentEventDeclined) {
 			return event.getEventsExceptions();
 		} else {

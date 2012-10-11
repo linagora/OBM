@@ -33,7 +33,7 @@ package fr.aliacom.obm.common.calendar;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -45,6 +45,6 @@ public interface EventNotificationService {
 
 	void notifyDeletedEvent(Event event, AccessToken token);
 
-	void notifyUpdatedParticipationStateAttendees(Event event, ObmUser calendarOwner, ParticipationState state, AccessToken token);
+	void notifyUpdatedParticipationAttendees(Event event, ObmUser calendarOwner, Participation state, AccessToken token);
 
 }

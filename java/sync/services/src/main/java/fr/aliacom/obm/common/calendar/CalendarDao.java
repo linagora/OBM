@@ -50,7 +50,7 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -126,7 +126,7 @@ public interface CalendarDao {
 			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
-	boolean changeParticipationState(AccessToken token, ObmUser calendarOwner, EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState) throws SQLException, ParseException ;
+	boolean changeParticipation(AccessToken token, ObmUser calendarOwner, EventExtId extId, RecurrenceId recurrenceId, Participation participation) throws SQLException, ParseException ;
 
 	Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendars)
 			throws FindException;
@@ -134,7 +134,7 @@ public interface CalendarDao {
 	Collection<ResourceInfo> getResourceMetadata(ObmUser user, Collection<String> resources)
 			throws FindException;
 
-	boolean changeParticipationState(AccessToken token, ObmUser calendar,
-			EventExtId extId, ParticipationState participationState)
+	boolean changeParticipation(AccessToken token, ObmUser calendar,
+			EventExtId extId, Participation participation)
 			throws SQLException;
 }

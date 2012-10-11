@@ -56,7 +56,7 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -215,7 +215,7 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 	private MSAttendee convertAttendee(Attendee at) {
 		MSAttendee msa = new MSAttendee();
 
-		msa.setAttendeeStatus(status(at.getState()));
+		msa.setAttendeeStatus(status(at.getParticipation()));
 		msa.setEmail(at.getEmail());
 		msa.setName(at.getDisplayName());
 		msa.setAttendeeType(participationRole(at.getParticipationRole()));
@@ -223,9 +223,9 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 		return msa;
 	}
 
-	@VisibleForTesting AttendeeStatus status(ParticipationState state) {
-		Preconditions.checkNotNull(state);
-		switch (state) {
+	@VisibleForTesting AttendeeStatus status(Participation participation) {
+		Preconditions.checkNotNull(participation);
+		switch (participation.getState()) {
 		case DECLINED:
 			return AttendeeStatus.DECLINE;
 		case NEEDSACTION:

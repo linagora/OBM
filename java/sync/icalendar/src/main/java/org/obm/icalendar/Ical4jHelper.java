@@ -53,7 +53,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -120,6 +119,7 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
@@ -130,7 +130,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -140,8 +140,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -467,15 +467,15 @@ public class Ical4jHelper {
 				if (att.getEmail().equals(email)) {
 
 					if (Status.VTODO_NEEDS_ACTION.equals(status)) {
-						att.setState(ParticipationState.NEEDSACTION);
+						att.setParticipation(Participation.NEEDSACTION);
 					} else if (Status.VTODO_IN_PROCESS.equals(status)) {
-						att.setState(ParticipationState.INPROGRESS);
+						att.setParticipation(Participation.INPROGRESS);
 					} else if (Status.VTODO_COMPLETED.equals(status)) {
-						att.setState(ParticipationState.COMPLETED);
+						att.setParticipation(Participation.COMPLETED);
 					} else if (Status.VTODO_CANCELLED.equals(status)) {
-						att.setState(ParticipationState.DECLINED);
+						att.setParticipation(Participation.DECLINED);
 					} else {
-						att.setState(null);
+						att.setParticipation(null);
 					}
 				}
 			}
@@ -823,13 +823,13 @@ public class Ical4jHelper {
 	private void appendStatusToICS(PropertyList prop, Event event, Ical4jUser iCal4jUser) {
 		for (Attendee att : event.getAttendees()) {
 			if (att.getEmail().equals(iCal4jUser.getEmail())) {
-				if (ParticipationState.NEEDSACTION.equals(att.getState())) {
+				if (Participation.NEEDSACTION.equals(att.getParticipation())) {
 					prop.add(Status.VTODO_NEEDS_ACTION);
-				} else if (ParticipationState.INPROGRESS.equals(att.getState())) {
+				} else if (Participation.INPROGRESS.equals(att.getParticipation())) {
 					prop.add(Status.VTODO_IN_PROCESS);
-				} else if (ParticipationState.COMPLETED.equals(att.getState())) {
+				} else if (Participation.COMPLETED.equals(att.getParticipation())) {
 					prop.add(Status.VTODO_COMPLETED);
-				} else if (ParticipationState.DECLINED.equals(att.getState())) {
+				} else if (Participation.DECLINED.equals(att.getParticipation())) {
 					prop.add(Status.VTODO_CANCELLED);
 				} else {
 					prop.add(new Status(""));
@@ -891,7 +891,7 @@ public class Ical4jHelper {
 	}
 
 	private void appendReplyCommentToICS(PropertyList prop, Attendee attendee) {
-		ParticipationState status = attendee.getState();
+		Participation status = attendee.getParticipation();
 		org.obm.sync.calendar.Comment comment = status.getComment();
 
 		if (status.hasDefinedComment()) {
@@ -1313,14 +1313,14 @@ public class Ical4jHelper {
 					.getParameter(Parameter.PARTSTAT);
 			if (partStat != null) {
 				if (partStat.equals(PartStat.IN_PROCESS)) {
-					att.setState(ParticipationState.INPROGRESS);
+					att.setParticipation(Participation.INPROGRESS);
 				} else {
-					att.setState(ParticipationState.getValueOf(partStat
-							.getValue()));
+					att.setParticipation(new Participation(State.getValueOf(partStat
+							.getValue())));
 				}
 			} else {
 				//rfc5545 : 3.2.12, if PART-STAT is missing, default is NEEDS-ACTION
-				att.setState(ParticipationState.NEEDSACTION);
+				att.setParticipation(Participation.NEEDSACTION);
 			}
 			if (att.getEmail() != null && 
 					!attendeeAlreadyExist(emails, att)) {
@@ -1355,7 +1355,7 @@ public class Ical4jHelper {
 						organizer.setDisplayName(cn.getValue());
 					}
 					organizer.setParticipationRole(ParticipationRole.REQ);
-					organizer.setState(ParticipationState.ACCEPTED);
+					organizer.setParticipation(Participation.ACCEPTED);
 					organizer.setOrganizer(true);
 					emails.put(organizer.getEmail(), organizer);
 				}
@@ -1519,19 +1519,19 @@ public class Ical4jHelper {
 
 	/* package */ PartStat getPartStat(Attendee attendee) {
 		PartStat partStat = PartStat.NEEDS_ACTION;
-		if (ParticipationState.ACCEPTED.equals(attendee.getState())) {
+		if (Participation.ACCEPTED.equals(attendee.getParticipation())) {
 			partStat = PartStat.ACCEPTED;
-		} else if (ParticipationState.COMPLETED.equals(attendee.getState())) {
+		} else if (Participation.COMPLETED.equals(attendee.getParticipation())) {
 			partStat = PartStat.COMPLETED;
-		} else if (ParticipationState.DECLINED.equals(attendee.getState())) {
+		} else if (Participation.DECLINED.equals(attendee.getParticipation())) {
 			partStat = PartStat.DECLINED;
-		} else if (ParticipationState.DELEGATED.equals(attendee.getState())) {
+		} else if (Participation.DELEGATED.equals(attendee.getParticipation())) {
 			partStat = PartStat.DELEGATED;
-		} else if (ParticipationState.INPROGRESS.equals(attendee.getState())) {
+		} else if (Participation.INPROGRESS.equals(attendee.getParticipation())) {
 			partStat = PartStat.IN_PROCESS;
-		} else if (ParticipationState.NEEDSACTION.equals(attendee.getState())) {
+		} else if (Participation.NEEDSACTION.equals(attendee.getParticipation())) {
 			partStat = PartStat.NEEDS_ACTION;
-		} else if (ParticipationState.TENTATIVE.equals(attendee.getState())) {
+		} else if (Participation.TENTATIVE.equals(attendee.getParticipation())) {
 			partStat = PartStat.TENTATIVE;
 		}
 		return partStat;
@@ -1609,10 +1609,10 @@ public class Ical4jHelper {
 					.getParameter(Parameter.PARTSTAT);
 			if (partStat != null) {
 				if (partStat.equals(PartStat.IN_PROCESS)) {
-					att.setState(ParticipationState.INPROGRESS);
+					att.setParticipation(Participation.INPROGRESS);
 				} else {
-					att.setState(ParticipationState.getValueOf(partStat
-							.getValue()));
+					att.setParticipation(new Participation(State.getValueOf(partStat
+							.getValue())));
 				}
 			}
 			fb.addAttendee(att);

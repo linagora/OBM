@@ -72,14 +72,16 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -364,7 +366,7 @@ public class CalendarBindingImplTest {
 		String icsData = "icsData";
 		EventExtId eventExtId = new EventExtId("extid");
 		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		fakeUserAttendee.setState(ParticipationState.NEEDSACTION);
+		fakeUserAttendee.setParticipation(Participation.NEEDSACTION);
 		
 		AccessToken accessToken = mockAccessToken();
 		
@@ -397,7 +399,7 @@ public class CalendarBindingImplTest {
 			throw e;
 		}
 		
-		Assert.assertEquals(ParticipationState.ACCEPTED, fakeUserAttendee.getState());
+		Assert.assertEquals(Participation.ACCEPTED, fakeUserAttendee.getParticipation());
 	}
 	
 	@Test
@@ -413,7 +415,7 @@ public class CalendarBindingImplTest {
 		String otherUserEmail = "user2@domain1";
 		Attendee userAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
 		Attendee otherAttendee = ToolBox.getFakeAttendee(otherUserEmail);
-		userAttendee.setState(ParticipationState.NEEDSACTION);
+		userAttendee.setParticipation(Participation.NEEDSACTION);
 
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 
@@ -437,8 +439,8 @@ public class CalendarBindingImplTest {
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
 		eventChangeHandler.delete(oldEventNoOtherAttendees, false, accessToken);
-		eventChangeHandler.updateParticipationState(oldEventWithOtherAttendees, defaultUser, 
-				ParticipationState.DECLINED, false, accessToken);
+		eventChangeHandler.updateParticipation(oldEventWithOtherAttendees, defaultUser,
+				Participation.DECLINED, false, accessToken);
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
@@ -455,8 +457,8 @@ public class CalendarBindingImplTest {
 				andReturn(oldEventNoOtherAttendees);
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, oldEventWithOtherAttendeesExtId)).
 			andReturn(oldEventWithOtherAttendees).atLeastOnce();
-		expect(calendarDao.changeParticipationState(accessToken, defaultUser, 
-				oldEventWithOtherAttendees.getExtId(), ParticipationState.DECLINED)).andReturn(true);		
+		expect(calendarDao.changeParticipation(accessToken, defaultUser,
+				oldEventWithOtherAttendees.getExtId(), Participation.DECLINED)).andReturn(true);		
 
 		HelperService rightsHelper = mockRightsHelper(calendar, accessToken);
 
@@ -480,7 +482,7 @@ public class CalendarBindingImplTest {
 		String icsData = "icsData";
 		EventExtId eventExtId = new EventExtId("extid");
 		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		fakeUserAttendee.setState(ParticipationState.NEEDSACTION);
+		fakeUserAttendee.setParticipation(Participation.NEEDSACTION);
 		
 		AccessToken accessToken = mockAccessToken();
 		
@@ -514,7 +516,7 @@ public class CalendarBindingImplTest {
 			throw e;
 		}
 		
-		Assert.assertEquals(ParticipationState.NEEDSACTION, fakeUserAttendee.getState());
+		Assert.assertEquals(Participation.NEEDSACTION, fakeUserAttendee.getParticipation());
 	}
 
 	@Test
@@ -594,7 +596,7 @@ public class CalendarBindingImplTest {
 		boolean notification = false;
 		
 		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		attendee.setState(ParticipationState.NEEDSACTION);
+		attendee.setParticipation(Participation.NEEDSACTION);
 		
 		Event beforeEvent = new Event();
 		beforeEvent.setType(EventType.VEVENT);
@@ -633,7 +635,7 @@ public class CalendarBindingImplTest {
 		
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 		
-		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0).getState());
+		Assert.assertEquals(Participation.ACCEPTED, newEvent.getAttendees().get(0).getParticipation());
 		Assert.assertEquals(1, beforeEvent.getAttendees().size());
 		Assert.assertEquals(true, beforeEvent.getAttendees().iterator().next().isCanWriteOnCalendar());
 		
@@ -651,7 +653,7 @@ public class CalendarBindingImplTest {
 		boolean notification = false;
 
 		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		attendee.setState(ParticipationState.ACCEPTED);
+		attendee.setParticipation(Participation.ACCEPTED);
 
 		Event beforeEvent = new Event();
 		beforeEvent.setType(EventType.VEVENT);
@@ -695,8 +697,8 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		Assert.assertEquals(ParticipationState.NEEDSACTION, newEvent.getAttendees().get(0)
-				.getState());
+		Assert.assertEquals(Participation.NEEDSACTION, newEvent.getAttendees().get(0)
+				.getParticipation());
 	}
 
 	@Test
@@ -712,10 +714,10 @@ public class CalendarBindingImplTest {
 		boolean notification = false;
 
 		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		attendee.setState(ParticipationState.NEEDSACTION);
+		attendee.setParticipation(Participation.NEEDSACTION);
 
 		Attendee exceptionAttendee = ToolBox.getFakeAttendee(exceptionAttendeeEmail);
-		exceptionAttendee.setState(ParticipationState.ACCEPTED);
+		exceptionAttendee.setParticipation(Participation.ACCEPTED);
 
 		Date recurrenceId = new Date();
 
@@ -795,13 +797,13 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		Assert.assertEquals(ParticipationState.NEEDSACTION,
-				Iterables.getOnlyElement(newEvent.getAttendees()).getState());
+		Assert.assertEquals(Participation.NEEDSACTION,
+				Iterables.getOnlyElement(newEvent.getAttendees()).getParticipation());
 		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
 				.getEventExceptions());
 		Attendee afterExceptionAttendee = afterException
 				.findAttendeeFromEmail(exceptionAttendeeEmail);
-		Assert.assertEquals(ParticipationState.ACCEPTED, afterExceptionAttendee.getState());
+		Assert.assertEquals(Participation.ACCEPTED, afterExceptionAttendee.getParticipation());
 		Assert.assertEquals(true, afterExceptionAttendee.isCanWriteOnCalendar());
 	}
 
@@ -818,10 +820,10 @@ public class CalendarBindingImplTest {
 		boolean notification = false;
 
 		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		attendee.setState(ParticipationState.NEEDSACTION);
+		attendee.setParticipation(Participation.NEEDSACTION);
 
 		Attendee exceptionAttendee = ToolBox.getFakeAttendee(exceptionAttendeeEmail);
-		exceptionAttendee.setState(ParticipationState.NEEDSACTION);
+		exceptionAttendee.setParticipation(Participation.NEEDSACTION);
 
 		Date recurrenceId = new Date();
 
@@ -901,13 +903,13 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		Assert.assertEquals(ParticipationState.NEEDSACTION,
-				Iterables.getOnlyElement(newEvent.getAttendees()).getState());
+		Assert.assertEquals(Participation.NEEDSACTION,
+				Iterables.getOnlyElement(newEvent.getAttendees()).getParticipation());
 		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
 				.getEventExceptions());
 		Attendee afterExceptionAttendee = afterException
 				.findAttendeeFromEmail(exceptionAttendeeEmail);
-		Assert.assertEquals(ParticipationState.NEEDSACTION, afterExceptionAttendee.getState());
+		Assert.assertEquals(Participation.NEEDSACTION, afterExceptionAttendee.getParticipation());
 		Assert.assertEquals(false, afterExceptionAttendee.isCanWriteOnCalendar());
 	}
 	
@@ -924,9 +926,9 @@ public class CalendarBindingImplTest {
 		recurrence.setKind(RecurrenceKind.lookup("daily"));
 
 		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		attendee.setState(ParticipationState.ACCEPTED);
+		attendee.setParticipation(Participation.ACCEPTED);
 		Attendee attendee2 = ToolBox.getFakeAttendee(attendeeEmail);
-		attendee2.setState(ParticipationState.ACCEPTED);
+		attendee2.setParticipation(Participation.ACCEPTED);
 		
 		Event beforeEvent = new Event();
 		beforeEvent.setType(EventType.VEVENT);
@@ -979,10 +981,10 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		Assert.assertEquals(ParticipationState.ACCEPTED, newEvent.getAttendees().get(0)
-				.getState());		
-		Assert.assertEquals(ParticipationState.NEEDSACTION, newEvent.getRecurrence().getEventExceptions().get(0).getAttendees().get(1)
-				.getState());
+		Assert.assertEquals(Participation.ACCEPTED, newEvent.getAttendees().get(0)
+				.getParticipation());		
+		Assert.assertEquals(Participation.NEEDSACTION, newEvent.getRecurrence().getEventExceptions().get(0).getAttendees().get(1)
+				.getParticipation());
 	}
 	
 	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException, EventNotFoundException {
@@ -998,15 +1000,15 @@ public class CalendarBindingImplTest {
 
 		Attendee userAttendee = new Attendee();
 		userAttendee.setEmail(userEmail);
-		userAttendee.setState(ParticipationState.ACCEPTED);
+		userAttendee.setParticipation(Participation.ACCEPTED);
 
 		Attendee guestAttendee1 = new Attendee();
 		guestAttendee1.setEmail(guestAttendee1Email);
-		guestAttendee1.setState(ParticipationState.ACCEPTED);
+		guestAttendee1.setParticipation(Participation.ACCEPTED);
 
 		Attendee guestAttendee2 = new Attendee();
 		guestAttendee2.setEmail(guestAttendee2Email);
-		guestAttendee2.setState(ParticipationState.NEEDSACTION);
+		guestAttendee2.setParticipation(Participation.NEEDSACTION);
 
 		boolean updateAttendees = true;
 		boolean notification = true;
@@ -1048,9 +1050,9 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(mocks);
 
-		Assert.assertEquals(ParticipationState.ACCEPTED, userAttendee.getState());
-		Assert.assertEquals(ParticipationState.ACCEPTED, guestAttendee1.getState());
-		Assert.assertEquals(ParticipationState.NEEDSACTION, guestAttendee2.getState());
+		Assert.assertEquals(Participation.ACCEPTED, userAttendee.getParticipation());
+		Assert.assertEquals(Participation.ACCEPTED, guestAttendee1.getParticipation());
+		Assert.assertEquals(Participation.NEEDSACTION, guestAttendee2.getParticipation());
 	}
 
 	@Test
@@ -1179,7 +1181,7 @@ public class CalendarBindingImplTest {
 		boolean notification = false;
 		
 		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmail());
-		calOwner.setState(ParticipationState.DECLINED);
+		calOwner.setParticipation(Participation.DECLINED);
 		
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
@@ -1210,7 +1212,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(null).once();
 		expect(calendarDao.createEvent(accessToken, calendar, event, false)).andReturn(eventCreated).once();
 		expect(calendarDao.removeEvent(accessToken, eventCreated, eventCreated.getType(), eventCreated.getSequence())).andReturn(eventCreated).once();
-		eventChangeHandler.updateParticipationState(eventCreated, defaultUser, calOwner.getState(), notification, accessToken);
+		eventChangeHandler.updateParticipation(eventCreated, defaultUser, calOwner.getParticipation(), notification, accessToken);
 		EasyMock.expectLastCall().once();
 		
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -1312,7 +1314,7 @@ public class CalendarBindingImplTest {
 		updatedEvent.setRecurrenceId(new Date(1327680000000L)); // Fri, 27 Jan 2012 16:00:00 GMT <=> 20120127T160000Z
 
 		Attendee attendee = ToolBox.getFakeAttendee("user2@domain1");
-		attendee.setState(ParticipationState.ACCEPTED);
+		attendee.setParticipation(Participation.ACCEPTED);
 		
 		updatedEvent.addAttendee(attendee);
 		return updatedEvent;
@@ -1448,18 +1450,21 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, noRightsHelper, null, null);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, after);
-		calendarService.applyParticipationStateModifications(before, after);
+		calendarService.applyParticipationModifications(before, after);
 
 		List<Attendee> attendeesToTest = after.getAttendees();
 		assertThat(attendeesToTest).hasSize(3);
+
+		Participation needsaction = 
+				new Participation(new Comment(""), State.NEEDSACTION);
 		for(Attendee attendee: attendeesToTest) {
-			assertThat(attendee.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+			assertThat(attendee.getParticipation()).isEqualTo(needsaction);
 			assertThat(attendee.isCanWriteOnCalendar()).isEqualTo(false);
 		}
 	}
 
 	@Test
-	public void testChangeParticipationStateHasRightOnOneAttendee() {
+	public void testChangeParticipationHasRightOnOneAttendee() {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 		Event before = new Event();
@@ -1486,7 +1491,7 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, rightsHelper, null, null);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, after);
-		calendarService.applyParticipationStateModifications(before, after);
+		calendarService.applyParticipationModifications(before, after);
 
 		List<Attendee> attendeesToTest = after.getAttendees();
 		assertThat(attendeesToTest).hasSize(3);
@@ -1495,15 +1500,15 @@ public class CalendarBindingImplTest {
 		Attendee mccarthy = attendeesToTest.get(2);
 
 		assertThat(beria.isCanWriteOnCalendar()).isEqualTo(true);
-		Assert.assertEquals(beria.getState(), ParticipationState.ACCEPTED);
+		Assert.assertEquals(beria.getParticipation(), Participation.ACCEPTED);
 		assertThat(hoover.isCanWriteOnCalendar()).isEqualTo(false);
-		Assert.assertEquals(hoover.getState(), ParticipationState.NEEDSACTION);
+		Assert.assertEquals(hoover.getParticipation(), Participation.NEEDSACTION);
 		assertThat(mccarthy.isCanWriteOnCalendar()).isEqualTo(false);
-		Assert.assertEquals(mccarthy.getState(), ParticipationState.NEEDSACTION);
+		Assert.assertEquals(mccarthy.getParticipation(), Participation.NEEDSACTION);
 	}
 
 	@Test
-	public void testChangeParticipationStateRecurrentEventWithException() {
+	public void testChangeParticipationRecurrentEventWithException() {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 
@@ -1534,7 +1539,7 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, rightsHelper, null, null);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, afterRecurrentEvent);
-		calendarService.applyParticipationStateModifications(beforeRecurrentEvent, afterRecurrentEvent);
+		calendarService.applyParticipationModifications(beforeRecurrentEvent, afterRecurrentEvent);
 
 		EventRecurrence eventRecurrence = afterRecurrentEvent.getRecurrence();
 		Event exception = Iterables.getOnlyElement(eventRecurrence.getEventExceptions());
@@ -1546,11 +1551,11 @@ public class CalendarBindingImplTest {
 		Attendee mccarthy = attendeesToTest.get(2);
 
 		assertThat(beria.isCanWriteOnCalendar()).isEqualTo(true);
-		Assert.assertEquals(beria.getState(), ParticipationState.ACCEPTED);
+		Assert.assertEquals(beria.getParticipation(), Participation.ACCEPTED);
 		assertThat(hoover.isCanWriteOnCalendar()).isEqualTo(false);
-		Assert.assertEquals(hoover.getState(), ParticipationState.NEEDSACTION);
+		Assert.assertEquals(hoover.getParticipation(), Participation.NEEDSACTION);
 		assertThat(mccarthy.isCanWriteOnCalendar()).isEqualTo(false);
-		Assert.assertEquals(mccarthy.getState(), ParticipationState.NEEDSACTION);
+		Assert.assertEquals(mccarthy.getParticipation(), Participation.NEEDSACTION);
 	}
 
 	@Test
@@ -1560,11 +1565,11 @@ public class CalendarBindingImplTest {
 		String calendar = user.getEmail();
 
 		Attendee userAttendee = ToolBox.getFakeAttendee(user.getEmail());
-		userAttendee.setState(ParticipationState.ACCEPTED);
+		userAttendee.setParticipation(Participation.ACCEPTED);
 		Attendee angletonAttendee = ToolBox.getFakeAttendee("james.jesus.angleton");
-		angletonAttendee.setState(ParticipationState.ACCEPTED);
+		angletonAttendee.setParticipation(Participation.ACCEPTED);
 		Attendee dullesAttendee = ToolBox.getFakeAttendee("allen.dulles");
-		dullesAttendee.setState(ParticipationState.ACCEPTED);
+		dullesAttendee.setParticipation(Participation.ACCEPTED);
 
 		int previousSequence = 0;
 		Date eventDate = after();
@@ -1625,7 +1630,7 @@ public class CalendarBindingImplTest {
 		daoEvent.setInternalEvent(false);
 
 		Attendee attendee = new Attendee();
-		attendee.setState(ParticipationState.ACCEPTED);
+		attendee.setParticipation(Participation.ACCEPTED);
 		attendee.setEmail(user.getEmail());
 		daoEvent.addAttendee(attendee);
 		daoEvent.setOwner(calendar);
@@ -1649,7 +1654,7 @@ public class CalendarBindingImplTest {
 				daoEvent).once();
 
 		EventChangeHandler eventChangeHandler = EasyMock.createMock(EventChangeHandler.class);
-		eventChangeHandler.updateParticipationState(daoEvent, user, ParticipationState.DECLINED, true, token);
+		eventChangeHandler.updateParticipation(daoEvent, user, Participation.DECLINED, true, token);
 
 		EasyMock.replay(token, userService, rightsHelper, calendarDao,eventChangeHandler);
 
@@ -1658,7 +1663,7 @@ public class CalendarBindingImplTest {
 		Event removedEvent = calendarService.removeEventByExtId(token, calendar, daoEvent.getExtId(), 0, true);
 
 		Attendee calendarOwnerAsAttendee = removedEvent.findAttendeeFromEmail(attendee.getEmail());
-		assertThat(calendarOwnerAsAttendee.getState()).isEqualTo(ParticipationState.DECLINED);
+		assertThat(calendarOwnerAsAttendee.getParticipation()).isEqualTo(Participation.DECLINED);
 	}
 
 	@Test
@@ -1813,195 +1818,195 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testInheritsParticipationStateForSpecificAttendee() {
-		Attendee expectedAttendee = Attendee.builder()
-			.email("attendee@test.lng")
-			.participationState(ParticipationState.NEEDSACTION)
-			.build();
-		Event event = createEvent(Arrays.asList(expectedAttendee));
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		public void testInheritsParticipationForSpecificAttendee() {
+			Attendee expectedAttendee = Attendee.builder()
+				.email("attendee@test.lng")
+				.participation(Participation.NEEDSACTION)
+				.build();
+			Event event = createEvent(Arrays.asList(expectedAttendee));
 
-		Attendee attendee = Attendee.builder()
-			.email("attendee@test.lng")
-			.participationState(ParticipationState.ACCEPTED)
-			.build();
-		calendarService.inheritsParticipationStateForSpecificAttendee(event, attendee);
-		assertThat(attendee).isEqualTo(expectedAttendee);
-	}
+			CalendarBindingImpl calendarService =
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+			Attendee attendee = Attendee.builder()
+				.email("attendee@test.lng")
+				.participation(Participation.ACCEPTED)
+				.build();
+			calendarService.inheritsParticipationForSpecificAttendee(event, attendee);
+			assertThat(attendee).isEqualTo(expectedAttendee);
+		}
 	
 	@Test
-	public void testInheritsParticipationStateFromExistingEventEmptyAttendees() {
-		Event before = new Event();
-		Event after = new Event();
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
-		assertThat(after.getAttendees()).isEmpty();
-	}
+		public void testInheritsParticipationFromExistingEventEmptyAttendees() {
+			Event before = new Event();
+			Event after = new Event();
+
+			CalendarBindingImpl calendarService =
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+			calendarService.inheritsParticipationFromExistingEvent(before, after);
+			assertThat(after.getAttendees()).isEmpty();
+		}
 
 	@Test
-	public void testInheritsParticipationStateFromExistingEventOneHandEmptyAttendees() {
-		Event before = new Event();
-		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
-		Event after = createEvent(expectedAttendees);
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
-		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
-	}
+		public void testInheritsParticipationFromExistingEventOneHandEmptyAttendees() {
+			Event before = new Event();
+
+			List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.ACCEPTED);
+			Event after = createEvent(expectedAttendees);
+
+			CalendarBindingImpl calendarService =
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+			calendarService.inheritsParticipationFromExistingEvent(before, after);
+			assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
+		}
 
 	@Test
-	public void testInheritsParticipationStateFromExistingEventThOtherHandEmptyAttendees() {
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		public void testInheritsParticipationFromExistingEventThOtherHandEmptyAttendees() {
+			List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.ACCEPTED);
+			Event before = createEvent(expectedAttendees);
+
+			Event after = new Event();
+
+			CalendarBindingImpl calendarService =
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+			calendarService.inheritsParticipationFromExistingEvent(before, after);
+			assertThat(after.getAttendees()).isEmpty();
+		}
+
+	@Test
+		public void testInheritsParticipationFromExistingEvent() {
+			List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
+			Event before = createEvent(expectedAttendees);
+
+			Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
+
+			CalendarBindingImpl calendarService =
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+
+			calendarService.inheritsParticipationFromExistingEvent(before, after);
+			assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
+		}
+
+	@Test
+	public void testInheritsParticipationOnEmptyExceptions() {
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
 		Event before = createEvent(expectedAttendees);
 		
-		Event after = new Event();
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
-		assertThat(after.getAttendees()).isEmpty();
-	}
-
-	@Test
-	public void testInheritsParticipationStateFromExistingEvent() {
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
-		Event before = createEvent(expectedAttendees);
-		
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
-		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
-	}
-
-	@Test
-	public void testInheritsParticipationStateOnEmptyExceptions() {
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
-		Event before = createEvent(expectedAttendees);
-		
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		calendarService.inheritsParticipationStateOnExceptions(before, after);
+		calendarService.inheritsParticipationOnExceptions(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
 	}
 
 	@Test
-	public void testInheritsParticipationStateOnExceptions() {
-		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
-		Event beforeException = createEvent(expectedAttendeesException);
-		
-		Event before = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		before.addEventException(beforeException);
-		
-		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		after.addEventException(afterException);
-		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		calendarService.inheritsParticipationStateOnExceptions(before, after);
-		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
-	}
+		public void testInheritsParticipationOnExceptions() {
+			List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.DECLINED);
+			Event beforeException = createEvent(expectedAttendeesException);
+			
+			Event before = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
+			before.addEventException(beforeException);
+			
+			Event afterException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
+			Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
+			after.addEventException(afterException);
+			
+			CalendarBindingImpl calendarService = 
+					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+			
+			calendarService.inheritsParticipationOnExceptions(before, after);
+			assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+		}
 
 	@Test
-	public void testRecursiveInheritsParticipationStateFromExistingEvent() {
-		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+	public void testRecursiveInheritsParticipationFromExistingEvent() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.DECLINED);
 		Event beforeException = createEvent(expectedAttendeesException);
 		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
 		Event before = createEvent(expectedAttendees);
 		before.addEventException(beforeException);
 		
-		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event afterException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		after.addEventException(afterException);
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
 	@Test
-	public void testRecursiveInheritsParticipationStateFromExistingEventEmptyExceptions() {
-		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+	public void testRecursiveInheritsParticipationFromExistingEventEmptyExceptions() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.DECLINED);
 		Event beforeException = createEvent(expectedAttendeesException);
 		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
 		Event before = createEvent(expectedAttendees);
 		before.addEventException(beforeException);
 		String expectedExtId = "123";
 		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
 		beforeException.setExtId(expectedEventExtId);
 		
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
 	}
 
 	@Test
-	public void testRecursiveInheritsParticipationStateFromExistingEventComparator() {
-		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+	public void testRecursiveInheritsParticipationFromExistingEventComparator() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.DECLINED);
 		Event beforeException = createEvent(expectedAttendeesException);
 		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
 		Event before = createEvent(expectedAttendees);
 		before.addEventException(beforeException);
 		String expectedExtId = "123";
 		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
 		beforeException.setExtId(expectedEventExtId);
 		
-		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event afterException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		afterException.setExtId(new EventExtId(expectedExtId));
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		after.addEventException(afterException);
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
 	@Test
-	public void testRecursiveInheritsParticipationStateFromExistingEventMultipleExceptions() {
-		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(ParticipationState.DECLINED);
+	public void testRecursiveInheritsParticipationFromExistingEventMultipleExceptions() {
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.DECLINED);
 		Event beforeException = createEvent(expectedAttendeesException);
 		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION);
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.NEEDSACTION);
 		Event before = createEvent(expectedAttendees);
 		before.addEventException(beforeException);
 		String expectedExtId = "123";
 		EventExtId expectedEventExtId = new EventExtId(expectedExtId);
 		beforeException.setExtId(expectedEventExtId);
 		
-		Event firstException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event firstException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		firstException.setExtId(new EventExtId("012"));
-		Event afterException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event afterException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		afterException.setExtId(new EventExtId(expectedExtId));
-		Event thirdException = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event thirdException = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		thirdException.setExtId(new EventExtId("234"));
-		Event after = createEvent(createOrganiserAndContactAttendees(ParticipationState.ACCEPTED));
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.ACCEPTED));
 		after.addEventException(thirdException);
 		after.addEventException(firstException);
 		after.addEventException(afterException);
@@ -2009,19 +2014,19 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
 	@Test
-	public void testRecursiveInheritsParticipationStateFromExistingEventNotFoundExceptions() {
-		Event beforeException = createEvent(createOrganiserAndContactAttendees(ParticipationState.DECLINED));
+	public void testRecursiveInheritsParticipationFromExistingEventNotFoundExceptions() {
+		Event beforeException = createEvent(createOrganiserAndContactAttendees(Participation.DECLINED));
 		
-		Event before = createEvent(createOrganiserAndContactAttendees(ParticipationState.NEEDSACTION));
+		Event before = createEvent(createOrganiserAndContactAttendees(Participation.NEEDSACTION));
 		before.addEventException(beforeException);
 		beforeException.setExtId(new EventExtId("123"));
 		
-		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		List<Attendee> expectedAttendees = createOrganiserAndContactAttendees(Participation.ACCEPTED);
 		Event firstException = createEvent(expectedAttendees);
 		firstException.setExtId(new EventExtId("012"));
 		Event afterException = createEvent(expectedAttendees);
@@ -2036,7 +2041,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.inheritsParticipationStateFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendees);
 	}
 	
@@ -2062,7 +2067,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testBuildTreeMap() {
-		List<Attendee> attendees = createOrganiserAndContactAttendees(ParticipationState.ACCEPTED);
+		List<Attendee> attendees = createOrganiserAndContactAttendees(Participation.ACCEPTED);
 		Event firstException = createEvent(attendees);
 		firstException.setExtId(new EventExtId("012"));
 		Event secondException = createEvent(attendees);
@@ -2130,35 +2135,35 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithoutDelegations() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.NEEDSACTION).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.applyParticipationStateModifications(before, event);
+		calendarService.applyParticipationModifications(before, event);
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION);
 	}
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithDelegations() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.NEEDSACTION).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
 		att1.setCanWriteOnCalendar(true);
-		calendarService.applyParticipationStateModifications(before, event);
+		calendarService.applyParticipationModifications(before, event);
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED);
 	}
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithDelegationsWithExceptions() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
-		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.NEEDSACTION).build();
+		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.NEEDSACTION).build();
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
@@ -2166,42 +2171,42 @@ public class CalendarBindingImplTest {
 		att1.setCanWriteOnCalendar(true);
 		att1ForExc.setCanWriteOnCalendar(true);
 		event.addEventException(exception);
-		calendarService.applyParticipationStateModifications(before, event);
+		calendarService.applyParticipationModifications(before, event);
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
-		assertThat(att1ForExc.getState()).isEqualTo(ParticipationState.ACCEPTED);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED);
+		assertThat(att1ForExc.getParticipation()).isEqualTo(Participation.ACCEPTED);
 	}
 	
 	@Test
 	public void testInitDefaultParticipationState() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.ACCEPTED).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
-		calendarService.initDefaultParticipationState(event);
+		calendarService.initDefaultParticipation(event);
 		
-		assertThat(organizer.getState()).isEqualTo(ParticipationState.NEEDSACTION);
-		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(organizer.getParticipation()).isEqualTo(Participation.NEEDSACTION);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION);
 	}
 	
 	@Test
 	public void testInitDefaultParticipationStateWithExceptions() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
-		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.ACCEPTED).build();
+		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.ACCEPTED).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
 		event.addEventException(exception);
-		calendarService.initDefaultParticipationState(event);
+		calendarService.initDefaultParticipation(event);
 		
-		assertThat(organizer.getState()).isEqualTo(ParticipationState.NEEDSACTION);
-		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
-		assertThat(organizerForExc.getState()).isEqualTo(ParticipationState.NEEDSACTION);
-		assertThat(att1ForExc.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(organizer.getParticipation()).isEqualTo(Participation.NEEDSACTION);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION);
+		assertThat(organizerForExc.getParticipation()).isEqualTo(Participation.NEEDSACTION);
+		assertThat(att1ForExc.getParticipation()).isEqualTo(Participation.NEEDSACTION);
 	}
 
 	private Event createEvent(List<Attendee> expectedAttendees) {
@@ -2211,15 +2216,15 @@ public class CalendarBindingImplTest {
 		return event;
 	}
 
-	private List<Attendee> createOrganiserAndContactAttendees(ParticipationState contactState) {
+	private List<Attendee> createOrganiserAndContactAttendees(Participation contactState) {
 		return Arrays.asList(
 				Attendee.builder()
 				.asOrganizer()
-				.participationState(ParticipationState.ACCEPTED)
+				.participation(Participation.ACCEPTED)
 				.email("organiser@test.lng").build(),
 				Attendee.builder()
 				.asContact()
-				.participationState(contactState)
+				.participation(contactState)
 				.email("attendee@test.lng").build());
 	}
 

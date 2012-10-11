@@ -67,7 +67,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -115,12 +115,12 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		event.addAttendees(Arrays.asList(
 				Attendee.builder().email("jaures@sfio.fr")
 					.displayName("Jean Jaures")
-					.participationState(ParticipationState.ACCEPTED)
+					.participation(Participation.ACCEPTED)
 					.participationRole(ParticipationRole.REQ)
 					.asOrganizer().build(),
 				Attendee.builder().email("blum@sfio.fr")
 					.displayName("Léon Blum")
-					.participationState(ParticipationState.NEEDSACTION)
+					.participation(Participation.NEEDSACTION)
 					.participationRole(ParticipationRole.OPT)
 					.asAttendee().build()));
 		return event;
@@ -316,7 +316,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		Event secondOccurence = new Event();
 		secondOccurence.addAttendee(Attendee.builder().email("jaures@sfio.fr")
 				.displayName("Jean Jaures")
-				.participationState(ParticipationState.DECLINED)
+				.participation(Participation.DECLINED)
 				.participationRole(ParticipationRole.REQ).build());
 		secondOccurence.setDuration(event.getDuration());
 		secondOccurence.setRecurrenceId(date("2004-12-20T21:39:45Z"));

@@ -879,7 +879,7 @@ public class EventTest {
 			attendee.setOrganizer(isOrganizer(i));
 			attendee.setPercent(1);
 			attendee.setParticipationRole(ParticipationRole.REQ);
-			attendee.setState(ParticipationState.NEEDSACTION);
+			attendee.setParticipation(Participation.NEEDSACTION);
 		}
 		return attendees;
 	}
@@ -1372,22 +1372,22 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setState(ParticipationState.DECLINED);
+		att1.setParticipation(Participation.DECLINED);
 		att1.setCanWriteOnCalendar(false);
-		event.updateParticipationState();
-		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		event.updateParticipation();
+
+		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION);
 	}
 	
 	public void testAcceptedAttendeeWithoutDelegationEndsUpInNeedsAction() {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setState(ParticipationState.ACCEPTED);
+		att1.setParticipation(Participation.ACCEPTED);
 		att1.setCanWriteOnCalendar(false);
-		event.updateParticipationState();
+		event.updateParticipation();
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION);
 	}
 	
 	@Test
@@ -1395,11 +1395,11 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setState(ParticipationState.DECLINED);
+		att1.setParticipation(Participation.DECLINED);
 		att1.setCanWriteOnCalendar(true);
-		event.updateParticipationState();
+		event.updateParticipation();
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED);
 	}
 	
 	@Test
@@ -1407,11 +1407,11 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setState(ParticipationState.NEEDSACTION);
+		att1.setParticipation(Participation.NEEDSACTION);
 		att1.setCanWriteOnCalendar(true);
-		event.updateParticipationState();
+		event.updateParticipation();
 		
-		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED);
 	}
 
 	@Test

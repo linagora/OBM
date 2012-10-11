@@ -38,7 +38,7 @@ public class EventParticipationState {
 	private String uid;
 	private String title;
 	private Date date;
-	private ParticipationState state;
+	private Participation participation;
 	private Integer alert;
 
 	public String getTitle() {
@@ -57,12 +57,12 @@ public class EventParticipationState {
 		this.uid = uid;
 	}
 
-	public ParticipationState getState() {
-		return state;
+	public Participation getParticipation() {
+		return participation;
 	}
 
-	public void setState(ParticipationState state) {
-		this.state = state;
+	public void setParticipation(Participation participation) {
+		this.participation = participation;
 	}
 
 	public Integer getAlert() {

@@ -36,28 +36,10 @@ import java.sql.SQLException;
 
 import org.obm.configuration.DatabaseFlavour;
 
-public enum ParticipationState {
+public enum State {
 
 	// grr, '-' in java enums not allowed
 	NEEDSACTION, ACCEPTED, DECLINED, TENTATIVE, DELEGATED, COMPLETED, INPROGRESS;
-
-	private Comment comment;
-
-	private ParticipationState() {
-		comment = new Comment();
-	}
-
-	public Comment getComment() {
-		return comment;
-	}
-
-	public void setComment(Comment comment) {
-		this.comment = comment;
-	}
-
-	public boolean hasDefinedComment() {
-		return comment.getComment() != null;
-	}
 
 	public Object getJdbcObject(DatabaseFlavour type) throws SQLException {
 		if (type == DatabaseFlavour.PGSQL) {
@@ -79,14 +61,14 @@ public enum ParticipationState {
 		return toString();
 	}
 
-	public static final ParticipationState getValueOf(String s) {
+	public static final State getValueOf(String s) {
 		if ("NEEDS-ACTION".equals(s)) {
 			return NEEDSACTION;
 		} else if ("IN-PROGRESS".equals(s)) {
 			return INPROGRESS;
 		} else {
 			try {
-				return ParticipationState.valueOf(s);
+				return State.valueOf(s);
 			} catch (IllegalArgumentException iae) {
 				return ACCEPTED;
 			}

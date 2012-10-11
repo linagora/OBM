@@ -70,6 +70,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -83,7 +84,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
@@ -730,10 +731,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return firstEmail;
 	}
 
-	private ParticipationState getAttendeeState(ResultSet rs)
+	private Participation getAttendeeState(ResultSet rs)
 			throws SQLException {
-		ParticipationState status = ParticipationState.getValueOf(rs.getString("eventlink_state"));
-		status.setComment(new Comment(rs.getString("eventlink_comment")));
+		Comment comment = new Comment(rs.getString("eventlink_comment"));
+		State state = State.getValueOf(rs.getString("eventlink_state"));
+		Participation status = new Participation(comment, state);
 		return status;
 	}
 	
@@ -786,7 +788,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 								.getTime()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getEnd()
 								.getTime()));
-						ps.setObject(idx++, ParticipationState.DECLINED
+						ps.setObject(idx++, State.DECLINED
 								.getJdbcObject(obmHelper.getType()));
 						ps.setObject(idx++, EventOpacity.OPAQUE
 								.getJdbcObject(obmHelper.getType()));
@@ -997,10 +999,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
 				int recurentParentId = evrs.getInt(4);
-				ParticipationState state = ParticipationState.getValueOf(evrs
+				State state = State.getValueOf(evrs
 						.getString(2));
 				Integer eventId = evrs.getInt(1);
-				if (state == ParticipationState.DECLINED) {
+				if (state == State.DECLINED) {
 					if (recurentParentId == 0) {
 						declined.add(new DeletedEvent(
 							new EventObmId(eventId), 
@@ -2046,7 +2048,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 				ps.setInt(1, eventObmId);
 				ps.setInt(2, userEntity);
-				ps.setObject(3, getJdbcObjectParticipationState(at));
+				ps.setObject(3, getJdbcObjectParticipation(at));
 				ps.setObject(4, getJdbcObjectParticipationRole(at));
 				ps.setInt(5, at.getPercent());
 				ps.setInt(6, editor.getObmId());
@@ -2080,9 +2082,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private Object getJdbcObjectParticipationState(final Attendee at) throws SQLException {
-		final ParticipationState pStat = RFC2445.getParticipationStateOrDefault(at.getState());
-		return pStat.getJdbcObject(obmHelper.getType());
+	private Object getJdbcObjectParticipation(final Attendee at) throws SQLException {
+		final Participation participation = RFC2445.getParticipationOrDefault(at.getParticipation());
+		return participation.getState().getJdbcObject(obmHelper.getType());
 	}
 
 	private Object getJdbcObjectParticipationRole(final Attendee at) throws SQLException {
@@ -2145,7 +2147,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 				int idx = 1;
 				ps.setObject(idx++,
-						at.getState().getJdbcObject(obmHelper.getType()));
+						at.getParticipation().getState().getJdbcObject(obmHelper.getType()));
 				ps.setObject(idx++,
 						at.getParticipationRole().getJdbcObject(obmHelper.getType()));
 				ps.setInt(idx++, token.getObmId());
@@ -2519,7 +2521,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
-				EventParticipationState psEvent = participationStateEventFromCursor(evrs);
+				EventParticipationState psEvent = participationEventFromCursor(evrs);
 				Calendar cal = getGMTCalendar();
 				EventRecurrence er = eventRecurrenceFromCursor(cal, evrs);
 
@@ -2545,13 +2547,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	}
 
-	private EventParticipationState participationStateEventFromCursor(
+	private EventParticipationState participationEventFromCursor(
 			ResultSet evrs) throws SQLException {
 		EventParticipationState e = new EventParticipationState();
 		int id = evrs.getInt("event_id");
 		e.setUid("" + id);
 		e.setTitle(evrs.getString("event_title"));
-		e.setState(getAttendeeState(evrs));
+		e.setParticipation(getAttendeeState(evrs));
 		e.setAlert(evrs.getInt("eventalert_duration"));
 		return e;
 	}
@@ -2587,7 +2589,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			evps.setObject(idx++, calendarUser.getUid());
 			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
-			evps.setObject(idx++, ParticipationState.DECLINED
+			State declined = Participation.DECLINED.getState();
+			evps.setObject(idx++, declined
 					.getJdbcObject(obmHelper.getType()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
@@ -2738,20 +2741,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public boolean changeParticipationState(AccessToken token, ObmUser calendar,
-			EventExtId extId, ParticipationState participationState) throws SQLException {
+	public boolean changeParticipation(AccessToken token, ObmUser calendar,
+			EventExtId extId, Participation participation) throws SQLException {
 
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return changeParticipationState(con, token, extId, calendar, participationState);
+			return changeParticipation(con, token, extId, calendar, participation);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
 	}
 	
-	private boolean changeParticipationState(Connection con, AccessToken token, EventExtId extId, ObmUser calendarOwner,
-			ParticipationState participationState) throws SQLException {
+	private boolean changeParticipation(Connection con, AccessToken token, EventExtId extId, ObmUser calendarOwner,
+			Participation participation) throws SQLException {
 		
 		PreparedStatement ps = null;
 				
@@ -2768,9 +2771,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);		
 
 			int idx = 1;
-			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
+			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
-			ps.setString(idx++, participationState.getComment().serializeToString());
+			ps.setString(idx++, participation.getComment().serializeToString());
 			ps.setString(idx++, extId.getExtId());
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
@@ -2787,20 +2790,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public boolean changeParticipationState(AccessToken token, ObmUser calendar,
-			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState) throws SQLException, ParseException {
+	public boolean changeParticipation(AccessToken token, ObmUser calendar,
+			EventExtId extId, RecurrenceId recurrenceId, Participation participation) throws SQLException, ParseException {
 
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return changeParticipationState(con, token, extId, recurrenceId, calendar, participationState);
+			return changeParticipation(con, token, extId, recurrenceId, calendar, participation);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
 	}
 	
-	private boolean changeParticipationState(Connection con, AccessToken token, EventExtId extId, RecurrenceId recurrenceId, ObmUser calendarOwner,
-			ParticipationState participationState) throws SQLException, ParseException {
+	private boolean changeParticipation(Connection con, AccessToken token, EventExtId extId, RecurrenceId recurrenceId, ObmUser calendarOwner,
+			Participation participation) throws SQLException, ParseException {
 		
 		PreparedStatement ps = null;
 				
@@ -2823,9 +2826,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);		
 
 			int idx = 1;
-			ps.setObject(idx++, participationState.getJdbcObject(obmHelper.getType()));
+			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
-			ps.setString(idx++, participationState.getComment().serializeToString());
+			ps.setString(idx++, participation.getComment().serializeToString());
 			ps.setString(idx++, extId.getExtId());
 			Date recId = new DateTime(recurrenceId.getRecurrenceId());
 			ps.setTimestamp(idx++, new Timestamp(recId.getTime()));

@@ -43,7 +43,7 @@ import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 public class EventNotificationServiceTestTools {
 
@@ -83,16 +83,16 @@ public class EventNotificationServiceTestTools {
 		return cal.getTime();
 	}
 	
-	static Attendee createRequiredAttendee(String email, ParticipationState state) {
+	static Attendee createRequiredAttendee(String email, Participation state) {
 		Attendee attendee = new Attendee();
 		attendee.setEmail(email);
 		attendee.setParticipationRole(ParticipationRole.REQ);
-		attendee.setState(state);
+		attendee.setParticipation(state);
 		attendee.setCanWriteOnCalendar(false);
 		return attendee;
 	}
 
-	static List<Attendee> createRequiredAttendees(String prefix, String suffix, ParticipationState state, int start, int number) {
+	static List<Attendee> createRequiredAttendees(String prefix, String suffix, Participation state, int start, int number) {
 		ArrayList<Attendee> result = new ArrayList<Attendee>();
 		for (int i = 0; i < number; ++i) {
 			result.add(createRequiredAttendee(prefix + (start + i)+ suffix,state));

@@ -49,7 +49,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.base.Objects;
@@ -296,11 +296,11 @@ public class TaskConverter {
 	}
 
 	private Attendee convertAttendee(UserDataRequest udr, Event oldEvent) {
-		ParticipationState oldState = ParticipationState.NEEDSACTION;
+		Participation oldState = Participation.NEEDSACTION;
 		if (oldEvent != null) {
 			for (Attendee oldAtt : oldEvent.getAttendees()) {
 				if (oldAtt.getEmail().equals(udr.getCredentials().getUser().getEmail())) {
-					oldState = oldAtt.getState();
+					oldState = oldAtt.getParticipation();
 					break;
 				}
 			}
@@ -308,25 +308,25 @@ public class TaskConverter {
 		Attendee ret = new Attendee();
 		ret.setEmail(udr.getCredentials().getUser().getEmail());
 		ret.setParticipationRole(ParticipationRole.REQ);
-		ret.setState(status(oldState, AttendeeStatus.ACCEPT));
+		ret.setParticipation(status(oldState, AttendeeStatus.ACCEPT));
 		return ret;
 	}
 
-	private ParticipationState status(ParticipationState oldParticipationState,
+	private Participation status(Participation oldParticipation,
 			AttendeeStatus attendeeStatus) {
 		if (attendeeStatus == null) {
-			return oldParticipationState;
+			return oldParticipation;
 		}
 		switch (attendeeStatus) {
 		case DECLINE:
-			return ParticipationState.DECLINED;
+			return Participation.DECLINED;
 		case NOT_RESPONDED:
 		case RESPONSE_UNKNOWN:
 		case TENTATIVE:
-			return ParticipationState.NEEDSACTION;
+			return Participation.NEEDSACTION;
 		default:
 		case ACCEPT:
-			return ParticipationState.ACCEPTED;
+			return Participation.ACCEPTED;
 		}
 	}
 }

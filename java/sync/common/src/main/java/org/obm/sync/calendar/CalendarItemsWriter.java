@@ -155,15 +155,15 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 	private void appendAttendeeForParticipationChange(Element attendees, Attendee attendee) {
 		Element at = DOMUtils.createElement(attendees, "attendee");
 		at.setAttribute("email", attendee.getEmail());
-		ParticipationState status = attendee.getState();
-		at.setAttribute("state", (status != null ? status.toString() : ParticipationState.NEEDSACTION.toString()));
-		appendCommentFromParticipationFor(at, status);
+		Participation participation = attendee.getParticipation();
+		at.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION.toString()));
+		appendCommentFromParticipationFor(at, participation);
 	}
 
 	private void appendCommentFromParticipationFor(Element at,
-			ParticipationState status) {
-		if(status.hasDefinedComment()) {
-			Comment comment = status.getComment();
+			Participation participation) {
+		if(participation.hasDefinedComment()) {
+			Comment comment = participation.getComment();
 			at.setAttribute("comment", comment.serializeToString());
 		}
 	}
@@ -214,8 +214,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		attendeeElement.setAttribute("displayName", attendee.getDisplayName());
 		attendeeElement.setAttribute("isOrganizer", String.valueOf(attendee.isOrganizer()));
 		attendeeElement.setAttribute("email", attendee.getEmail());
-		attendeeElement.setAttribute("state", (attendee.getState() != null ? attendee.getState()
-				.toString() : ParticipationState.NEEDSACTION.toString()));
+		Participation participation = attendee.getParticipation();
+		attendeeElement.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION.toString()));
 		attendeeElement.setAttribute("required", attendee.getParticipationRole() != null ? attendee.getParticipationRole()
 						.toString() : ParticipationRole.OPT.toString());
 
@@ -332,8 +332,8 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		if (eps.getDate() != null) {
 			createIfNotNull(e, "date", DateHelper.asString(eps.getDate()));
 		}
-		createIfNotNull(e, "state", (eps.getState() != null ? eps.getState()
-				.toString() : ParticipationState.NEEDSACTION.toString()));
+		createIfNotNull(e, "state", (eps.getParticipation() != null ? eps.getParticipation()
+				.toString() : Participation.NEEDSACTION.toString()));
 		if (eps.getAlert() != null) {
 			createIfNotNull(e, "alert", "" + eps.getAlert());
 		}

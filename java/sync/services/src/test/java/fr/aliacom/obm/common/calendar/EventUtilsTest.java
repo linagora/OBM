@@ -45,7 +45,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import org.obm.filter.SlowFilterRunner;
 
@@ -79,7 +79,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
+		at.setParticipation(Participation.NEEDSACTION);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(true);
@@ -97,7 +97,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
+		at.setParticipation(Participation.NEEDSACTION);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(false);
@@ -115,7 +115,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
+		at.setParticipation(Participation.NEEDSACTION);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
@@ -124,7 +124,7 @@ public class EventUtilsTest {
 		at = new Attendee();
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
-		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED);
 		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(false);
@@ -141,7 +141,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setState(ParticipationState.NEEDSACTION);
+		at.setParticipation(Participation.NEEDSACTION);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
@@ -150,7 +150,7 @@ public class EventUtilsTest {
 		at = new Attendee();
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
-		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED);
 		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(true);

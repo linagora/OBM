@@ -38,7 +38,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -62,8 +62,8 @@ public class EventConverterImpl implements EventConverter {
 	}
 
 	@Override
-	public ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
-		return msEventToObmEventConverter.getParticipationState(oldParticipationState, attendeeStatus);
+	public Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus) {
+		return msEventToObmEventConverter.getParticipation(oldParticipation, attendeeStatus);
 	}
 
 	@Override

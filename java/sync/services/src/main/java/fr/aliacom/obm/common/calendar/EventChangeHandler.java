@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 
 import com.google.inject.Inject;
@@ -105,12 +105,12 @@ public class EventChangeHandler {
 		}
 	}
 
-	public void updateParticipationState(Event event, ObmUser calendarOwner, 
-			ParticipationState state, boolean notification, AccessToken token) {
+	public void updateParticipation(Event event, ObmUser calendarOwner,
+			Participation participation, boolean notification, AccessToken token) {
 		
 		jmsService.writeIcsInvitationReply(token, event);
 		if (notification) {
-			eventNotificationService.notifyUpdatedParticipationStateAttendees(event, calendarOwner, state, token);
+			eventNotificationService.notifyUpdatedParticipationAttendees(event, calendarOwner, participation, token);
 		}
 	}
 	

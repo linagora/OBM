@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.ImmutableMap;
@@ -17,25 +17,25 @@ import com.google.common.collect.Lists;
 
 public class DeclinedAttendeeFilterTest {
 
-	private Attendee kimPhilby(ParticipationState state) {
+	private Attendee kimPhilby(Participation participation) {
 		Attendee philby = new Attendee();
 		philby.setEmail("kim.philby@mi6.gov.uk");
-		philby.setState(state);
+		philby.setParticipation(participation);
 		return philby;
 	}
 
-	private Attendee guyBurgess(ParticipationState state) {
+	private Attendee guyBurgess(Participation participation) {
 		Attendee burgess = new Attendee();
 		burgess.setEmail("guy.burgess@mi6.gov.uk");
-		burgess.setState(state);
+		burgess.setParticipation(participation);
 		return burgess;
 	}
 
 	@Test
 	public void testNonRecurrentEvent() {
-		Attendee acceptingPhilby = kimPhilby(ParticipationState.ACCEPTED);
-		Attendee decliningPhilby = kimPhilby(ParticipationState.DECLINED);
-		Attendee burgess = guyBurgess(ParticipationState.ACCEPTED);
+		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED);
+		Attendee decliningPhilby = kimPhilby(Participation.DECLINED);
+		Attendee burgess = guyBurgess(Participation.ACCEPTED);
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();
@@ -60,8 +60,8 @@ public class DeclinedAttendeeFilterTest {
 
 	@Test
 	public void testNoDeclinedEvent() {
-		Attendee acceptingPhilby = kimPhilby(ParticipationState.ACCEPTED);
-		Attendee burgess = guyBurgess(ParticipationState.ACCEPTED);
+		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED);
+		Attendee burgess = guyBurgess(Participation.ACCEPTED);
 
 		EventObmId evWithPhilby1Id = new EventObmId(1);
 		Event evWithPhilby1 = new Event();
@@ -86,9 +86,9 @@ public class DeclinedAttendeeFilterTest {
 	public void testRecurrentEvent() {
 		Date currentDate = new Date();
 
-		Attendee acceptingPhilby = kimPhilby(ParticipationState.ACCEPTED);
-		Attendee decliningPhilby = kimPhilby(ParticipationState.DECLINED);
-		Attendee burgess = guyBurgess(ParticipationState.ACCEPTED);
+		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED);
+		Attendee decliningPhilby = kimPhilby(Participation.DECLINED);
+		Attendee burgess = guyBurgess(Participation.ACCEPTED);
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();
@@ -140,9 +140,9 @@ public class DeclinedAttendeeFilterTest {
 	public void testDeclinedRecurrentEvent() {
 		Date currentDate = new Date();
 
-		Attendee acceptingPhilby = kimPhilby(ParticipationState.ACCEPTED);
-		Attendee decliningPhilby = kimPhilby(ParticipationState.DECLINED);
-		Attendee burgess = guyBurgess(ParticipationState.ACCEPTED);
+		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED);
+		Attendee decliningPhilby = kimPhilby(Participation.DECLINED);
+		Attendee burgess = guyBurgess(Participation.ACCEPTED);
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();

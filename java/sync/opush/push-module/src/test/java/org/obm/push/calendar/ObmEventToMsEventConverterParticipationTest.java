@@ -39,12 +39,12 @@ import org.junit.runner.RunWith;
 
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
-public class ObmEventToMsEventConverterParticipationStateTest {
+public class ObmEventToMsEventConverterParticipationTest {
 
 	private ObmEventToMSEventConverterImpl converter;
 
@@ -54,49 +54,49 @@ public class ObmEventToMsEventConverterParticipationStateTest {
 	}
 
 	@Test(expected=NullPointerException.class)
-	public void testNullParticipationState() {
+	public void testNullParticipation() {
 		converter.status(null);
 	}
 	
 	@Test
-	public void testAcceptedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.ACCEPTED);
+	public void testAcceptedParticipation() {
+		AttendeeStatus status = converter.status(Participation.ACCEPTED);
 		assertThat(status).isEqualTo(AttendeeStatus.ACCEPT);
 	}
 
 	@Test
-	public void testCompletedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.COMPLETED);
+	public void testCompletedParticipation() {
+		AttendeeStatus status = converter.status(Participation.COMPLETED);
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
-	public void testDeclinedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DECLINED);
+	public void testDeclinedParticipation() {
+		AttendeeStatus status = converter.status(Participation.DECLINED);
 		assertThat(status).isEqualTo(AttendeeStatus.DECLINE);
 	}
 
 	@Test
-	public void testDelegatedParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.DELEGATED);
+	public void testDelegatedParticipation() {
+		AttendeeStatus status = converter.status(Participation.DELEGATED);
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
-	public void testInProgressParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.INPROGRESS);
+	public void testInProgressParticipation() {
+		AttendeeStatus status = converter.status(Participation.INPROGRESS);
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
-	public void testNeedActionParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.NEEDSACTION);
+	public void testNeedActionParticipation() {
+		AttendeeStatus status = converter.status(Participation.NEEDSACTION);
 		assertThat(status).isEqualTo(AttendeeStatus.NOT_RESPONDED);
 	}
 
 	@Test
-	public void testTentativeParticipationState() {
-		AttendeeStatus status = converter.status(ParticipationState.TENTATIVE);
+	public void testTentativeParticipation() {
+		AttendeeStatus status = converter.status(Participation.TENTATIVE);
 		assertThat(status).isEqualTo(AttendeeStatus.TENTATIVE);
 	}
 

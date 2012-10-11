@@ -47,7 +47,7 @@ import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
 import org.slf4j.Logger;
@@ -122,10 +122,10 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 
 			Collection<Attendee> attendees = filterOwner(event,
 					ensureAttendeeUnicity(event.getAttendees()));
-			Map<ParticipationState, Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
+			Map<Participation, Set<Attendee>> attendeeGroups = computeParticipationGroups(attendees);
 			Set<Attendee> notify = Sets.union(
-					attendeeGroups.get(ParticipationState.NEEDSACTION),
-					attendeeGroups.get(ParticipationState.ACCEPTED));
+					attendeeGroups.get(Participation.NEEDSACTION),
+					attendeeGroups.get(Participation.ACCEPTED));
 			if (!notify.isEmpty()) {
 				UserSettings settings = settingsService.getSettings(user);
 				eventChangeMailer.notifyRemovedUsers(user, notify, event,
@@ -139,10 +139,10 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 
 	@Override
-	public void notifyUpdatedParticipationStateAttendees(Event event,
-			ObmUser calendarOwner, ParticipationState state, AccessToken token) {
+	public void notifyUpdatedParticipationAttendees(Event event,
+			ObmUser calendarOwner, Participation participation, AccessToken token) {
 		
-		if (isHandledParticipationState(state)) {
+		if (isHandledParticipation(participation)) {
 			
 			ObmUser user = userService.getUserFromAccessToken(token);
 			Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
@@ -150,10 +150,10 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
-				if (updateParticipationStateNeedsNotification(calendarOwner, organizer)) {
+				if (updateParticipationNeedsNotification(calendarOwner, organizer)) {
 					UserSettings settings = settingsService.getSettings(calendarOwner);
-					eventChangeMailer.notifyUpdateParticipationState(event, 
-							organizer, calendarOwner, state, settings.locale(), 
+					eventChangeMailer.notifyUpdateParticipation(event, 
+							organizer, calendarOwner, participation, settings.locale(), 
 							settings.timezone(), ics, token);
 				}
 			} else {
@@ -191,7 +191,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 
 		Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
 		if (!keptAttendees.isEmpty() && notifyImportantChanges) {
-			Map<ParticipationState, Set<Attendee>> atts = computeParticipationStateGroups(keptAttendees);
+			Map<Participation, Set<Attendee>> atts = computeParticipationGroups(keptAttendees);
 			notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs, token);
 			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs, token);
 		}
@@ -202,7 +202,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		}
 	}
 	
-	private boolean updateParticipationStateNeedsNotification(
+	private boolean updateParticipationNeedsNotification(
 			final ObmUser calendarOwner, final Attendee organizer) {
 
 		return organizerHasEmailAddress(organizer) && organizerMayAttend(organizer) &&
@@ -220,18 +220,18 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 
 	private boolean organizerMayAttend(final Attendee organizer) {
-		return !ParticipationState.DECLINED.equals(organizer.getState());
+		return !Participation.DECLINED.equals(organizer.getParticipation());
 	}
 
 	private boolean organizerHasEmailAddress(final Attendee organizer) {
 		return !StringUtils.isEmpty(organizer.getEmail());
 	}
 	
-	private boolean isHandledParticipationState(final ParticipationState state) {
+	private boolean isHandledParticipation(final Participation state) {
 		if (state == null) {
 			return false;
 		}
-		switch (state) {
+		switch (state.getState()) {
 		case ACCEPTED:
 		case DECLINED:
 			return true;
@@ -278,13 +278,13 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		Locale locale = settings.locale();
 		TimeZone timezone = settings.timezone();
 		
-		Map<ParticipationState, Set<Attendee>> attendeeGroups = computeParticipationStateGroups(attendees);
-		Set<Attendee> accepted = attendeeGroups.get(ParticipationState.ACCEPTED);
+		Map<Participation, Set<Attendee>> attendeeGroups = computeParticipationGroups(attendees);
+		Set<Attendee> accepted = attendeeGroups.get(Participation.ACCEPTED);
 		if(accepted != null && !accepted.isEmpty()){
 			eventChangeMailer.notifyAcceptedNewUsers(user, accepted, event, locale, timezone, token);
 		}
 		
-		Set<Attendee> notAccepted = attendeeGroups.get(ParticipationState.NEEDSACTION);
+		Set<Attendee> notAccepted = attendeeGroups.get(Participation.NEEDSACTION);
 		if (notAccepted != null && !notAccepted.isEmpty()) {
 			eventChangeMailer.notifyNeedActionNewUsers(user, notAccepted, event, locale, timezone, ics, token);
 		}
@@ -308,19 +308,19 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 	
 	private void notifyNeedActionUpdateUsers(ObmUser user, Event previous, Event current,
-			Locale locale, Map<ParticipationState, Set<Attendee>> atts,
+			Locale locale, Map<Participation, Set<Attendee>> atts,
 					TimeZone timezone, String ics, AccessToken token) { 
 		
 		logger.info("Listing all event attendees for event with name=[" + current.getTitle() + "]");
-		for (Entry<ParticipationState, Set<Attendee>> attendeesByState : atts.entrySet()) {
-			logger.info("Attendees in state=[" + attendeesByState.getKey().name() + "]");
+		for (Entry<Participation, Set<Attendee>> attendeesByState : atts.entrySet()) {
+			logger.info("Attendees in state=[" + attendeesByState.getKey().getState().name() + "]");
 			for (Attendee attendee : attendeesByState.getValue())
 			{
-				logger.info("<" + attendee.getEmail() + "> is in [" + attendee.getState().name() + "]");
+				logger.info("<" + attendee.getEmail() + "> is in [" + attendee.getParticipation().getState().name() + "]");
 			}
 		}
 		
-		final Set<Attendee> notAccepted = atts.get(ParticipationState.NEEDSACTION);
+		final Set<Attendee> notAccepted = atts.get(Participation.NEEDSACTION);
 
 		if (notAccepted != null && !notAccepted.isEmpty()) {
 			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone, ics, token);
@@ -336,9 +336,9 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 	
 	private void notifyAcceptedUpdateUsers(ObmUser user, Event previous, Event current, Locale locale, 
-			Map<ParticipationState, ? extends Set<Attendee>> atts, TimeZone timezone, String ics, AccessToken token) {
+			Map<Participation, ? extends Set<Attendee>> atts, TimeZone timezone, String ics, AccessToken token) {
 		
-		Set<Attendee> attendeesAccepted = atts.get(ParticipationState.ACCEPTED);
+		Set<Attendee> attendeesAccepted = atts.get(Participation.ACCEPTED);
 		if (attendeesAccepted != null) {
 			Collection<Attendee> attendeesCanWriteOnCalendar = filterCanWriteOnCalendar(attendeesAccepted);
 			if (attendeesCanWriteOnCalendar != null && !attendeesCanWriteOnCalendar.isEmpty()) {
@@ -384,7 +384,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		});
 	}
 	
-	private Map<ParticipationState, Set<Attendee>> computeParticipationStateGroups(Collection<Attendee> attendees) {
+	private Map<Participation, Set<Attendee>> computeParticipationGroups(Collection<Attendee> attendees) {
 		Set<Attendee> acceptedAttendees = Sets.newLinkedHashSet();
 		Set<Attendee> needActionAttendees = Sets.newLinkedHashSet();
 		Set<Attendee> declinedAttendees = Sets.newLinkedHashSet();
@@ -396,7 +396,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		Set<Attendee> inprogressAttendees = Sets.newLinkedHashSet();
 		
 		for(Attendee att : attendees){
-			switch (att.getState()) {
+			switch (att.getParticipation().getState()) {
 			case ACCEPTED:
 				acceptedAttendees.add(att);
 				break;
@@ -420,14 +420,14 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 				break;
 			}
 		}
-		Builder<ParticipationState, Set<Attendee>> ret = ImmutableMap.builder();
-		ret.put(ParticipationState.ACCEPTED, acceptedAttendees);
-		ret.put(ParticipationState.NEEDSACTION, needActionAttendees);
-		ret.put(ParticipationState.DECLINED, declinedAttendees);
-		ret.put(ParticipationState.TENTATIVE, tentativeAttendees);
-		ret.put(ParticipationState.DELEGATED, delegatedAttendees);
-		ret.put(ParticipationState.COMPLETED, completedAttendees);
-		ret.put(ParticipationState.INPROGRESS, inprogressAttendees);
+		Builder<Participation, Set<Attendee>> ret = ImmutableMap.builder();
+		ret.put(Participation.ACCEPTED, acceptedAttendees);
+		ret.put(Participation.NEEDSACTION, needActionAttendees);
+		ret.put(Participation.DECLINED, declinedAttendees);
+		ret.put(Participation.TENTATIVE, tentativeAttendees);
+		ret.put(Participation.DELEGATED, delegatedAttendees);
+		ret.put(Participation.COMPLETED, completedAttendees);
+		ret.put(Participation.INPROGRESS, inprogressAttendees);
 		return ret.build();
 	}
 

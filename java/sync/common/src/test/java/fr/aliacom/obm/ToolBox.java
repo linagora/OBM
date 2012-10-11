@@ -43,7 +43,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.Lists;
@@ -101,11 +101,11 @@ public class ToolBox {
 
 	public static List<Attendee> getFakeListOfAttendees() {
 		Attendee beriaAttendee = ToolBox.getFakeAttendee("beria");
-		beriaAttendee.setState(ParticipationState.NEEDSACTION);
+		beriaAttendee.setParticipation(Participation.NEEDSACTION);
 		Attendee hooverAttendee = ToolBox.getFakeAttendee("hoover");
-		hooverAttendee.setState(ParticipationState.NEEDSACTION);
+		hooverAttendee.setParticipation(Participation.NEEDSACTION);
 		Attendee mccarthyAttendee = ToolBox.getFakeAttendee("mccarthy");
-		mccarthyAttendee.setState(ParticipationState.NEEDSACTION);
+		mccarthyAttendee.setParticipation(Participation.NEEDSACTION);
 		return Lists.newArrayList(beriaAttendee, hooverAttendee, mccarthyAttendee);
 	}
 

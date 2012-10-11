@@ -69,7 +69,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -115,7 +115,7 @@ public class EventConverterTest {
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).doesNotContain(organizer);
-		checkAttendeeParticipationState(attendees);
+		checkAttendeeParticipation(attendees);
 	}
 	
 	@Test
@@ -137,7 +137,7 @@ public class EventConverterTest {
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).doesNotContain(organizer);
-		checkAttendeeParticipationState(attendees);
+		checkAttendeeParticipation(attendees);
 	}
 
 	@Ignore("FIXME for OBMFULL-2728")
@@ -198,14 +198,14 @@ public class EventConverterTest {
 		Assert.assertNotNull(organizer);
 		Assert.assertEquals(email, organizer.getEmail());
 		Assert.assertNull(organizer.getDisplayName());
-		Assert.assertEquals(ParticipationState.ACCEPTED, organizer.getState());
+		Assert.assertEquals(Participation.ACCEPTED, organizer.getParticipation());
 		Assert.assertEquals(ParticipationRole.REQ, organizer.getParticipationRole());
 		Assert.assertTrue(organizer.isOrganizer());
 	}
 
-	private void checkAttendeeParticipationState(List<Attendee> attendeesListWithoutOrganizer) {
+	private void checkAttendeeParticipation(List<Attendee> attendeesListWithoutOrganizer) {
 		for (Attendee attendee: attendeesListWithoutOrganizer) {
-			Assert.assertEquals(ParticipationState.NEEDSACTION, attendee.getState());
+			Assert.assertEquals(Participation.NEEDSACTION, attendee.getParticipation());
 			Assert.assertFalse(attendee.isOrganizer());
 		}
 	}

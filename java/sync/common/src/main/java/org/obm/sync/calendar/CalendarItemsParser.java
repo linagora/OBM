@@ -36,10 +36,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.EventChanges;
-import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +184,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			Attendee at = new Attendee();
 			at.setDisplayName(attendee[0]);
 			at.setEmail(attendee[1]);
-			at.setState(ParticipationState.getValueOf(attendee[2]));
+			at.setParticipation(new Participation(State.getValueOf(attendee[2])));
 			at.setParticipationRole(ParticipationRole.valueOf(attendee[3]));
 			if (attendee[4] != null && !attendee[4].equals("")) {
 				at.setPercent(Integer.parseInt(attendee[4]));
@@ -328,7 +328,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		EventParticipationState eps = new EventParticipationState();
 		eps.setUid(e.getAttribute("id"));
 		eps.setTitle(s(e, "title"));
-		eps.setState(ParticipationState.getValueOf(s(e, "state")));
+		eps.setParticipation(new Participation(State.getValueOf(s(e, "state"))));
 		eps.setAlert(getAlert(e));
 		eps.setDate(d(e, "date"));
 		return eps;

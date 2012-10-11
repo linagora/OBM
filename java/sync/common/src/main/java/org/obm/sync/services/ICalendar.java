@@ -52,7 +52,7 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -300,7 +300,7 @@ public interface ICalendar {
 	 * change user of given calendar participation state
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, ParticipationState participationState, int sequence,
+			EventExtId extId, Participation participation, int sequence,
 			boolean notification) throws ServerFault;
 
 	/**
@@ -309,7 +309,7 @@ public interface ICalendar {
 	 * @throws ParseException if recurrenceId is not in the right format.
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState, int sequence,
+			EventExtId extId, RecurrenceId recurrenceId, Participation participation, int sequence,
 			boolean notification) throws ServerFault, EventNotFoundException, ParseException;
 	
 	/**

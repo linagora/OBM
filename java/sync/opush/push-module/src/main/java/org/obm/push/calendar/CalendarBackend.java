@@ -75,7 +75,7 @@ import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
@@ -298,7 +298,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private boolean checkIfEventCanBeAdded(Event event, String userEmail) {
 		for (final Attendee attendee : event.getAttendees()) {
 			if (userEmail.equals(attendee.getEmail()) && 
-					ParticipationState.DECLINED.equals(attendee.getState())) {
+					Participation.DECLINED.equals(attendee.getParticipation())) {
 				return false;
 			}
 		}
@@ -541,7 +541,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			AccessToken at) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		logger.info("update user status[ {} in calendar ]", status);
-		ParticipationState participationStatus = eventConverter.getParticipationState(null, status);
+		Participation participationStatus = eventConverter.getParticipation(null, status);
 		try {
 			String calendar = udr.getUser().getLoginAtDomain();
 			calCli.changeParticipationState(at, calendar, event.getExtId(), participationStatus, msEvent.getObmSequence(), true);

@@ -90,7 +90,7 @@ import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
@@ -618,7 +618,7 @@ public class CalendarBackendTest {
 			.andReturn(true);
 		
 		expectEventConvertion(event, false);
-		expect(eventConverter.getParticipationState(null, AttendeeStatus.ACCEPT))
+		expect(eventConverter.getParticipation(null, AttendeeStatus.ACCEPT))
 			.andReturn(null).once();
 		
 		String serverId = "123";
@@ -735,7 +735,7 @@ public class CalendarBackendTest {
 		EventExtId eventExtId = new EventExtId("event-ext-id-bla-bla");
 		Attendee attendee = new Attendee();
 		attendee.setEmail(user.getLoginAtDomain());
-		attendee.setState(ParticipationState.DECLINED);
+		attendee.setParticipation(Participation.DECLINED);
 		Event event = new Event();
 		event.setExtId(eventExtId);
 		event.setUid(eventObmId);

@@ -39,6 +39,7 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -49,6 +50,7 @@ import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.Comment;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -57,7 +59,7 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -65,7 +67,6 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.services.ImportICalendarException;
-import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -522,13 +523,13 @@ public class EventHandler extends SecureSyncHandler {
 		if (recursive) {
 			success = binding.changeParticipationState(at, getCalendar(at, request),
 					getExtId(request, "extId"), 
-					getParticipationState(request),
+					getParticipation(request),
 					i(request, "sequence", 0),
 					getNotificationOption(request));
 		} else {
 			success = binding.changeParticipationState(at, getCalendar(at, request),
 					getExtId(request, "extId"), getRecurrenceId(request),
-					getParticipationState(request),
+					getParticipation(request),
 					i(request, "sequence", 0),
 					getNotificationOption(request));
 		}
@@ -573,10 +574,10 @@ public class EventHandler extends SecureSyncHandler {
 		return true;
 	}
 
-	private ParticipationState getParticipationState(Request request) {
-		ParticipationState status = ParticipationState.getValueOf(request.getParameter("state"));
+	private Participation getParticipation(Request request) {
 		String comment = request.getParameter("comment");
-		status.setComment(new Comment(comment));
+		Participation status = new Participation(new Comment(comment), 
+				State.getValueOf(request.getParameter("state")));
 		return status;
 	}
 

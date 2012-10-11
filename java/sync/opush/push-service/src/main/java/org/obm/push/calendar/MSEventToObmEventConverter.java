@@ -36,7 +36,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 
 public interface MSEventToObmEventConverter {
 	
@@ -44,5 +44,5 @@ public interface MSEventToObmEventConverter {
 
 	boolean isInternalEvent(Event event, boolean defaultValue);
 	
-	ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus);
+	Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus);
 }

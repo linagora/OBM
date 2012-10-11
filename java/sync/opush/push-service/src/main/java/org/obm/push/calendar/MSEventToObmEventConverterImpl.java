@@ -61,7 +61,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -270,14 +270,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return description;
 	}
 
-	private ParticipationState getAttendeeState(Event eventFromBD, MSAttendee msAttendee) {
+	private Participation getAttendeeState(Event eventFromBD, MSAttendee msAttendee) {
 		if (eventFromBD != null) {
 			Attendee attendee = eventFromBD.findAttendeeFromEmail(msAttendee.getEmail());
 			if (attendee != null) {
-				return attendee.getState();
+				return attendee.getParticipation();
 			}
 		}
-		return ParticipationState.NEEDSACTION;
+		return Participation.NEEDSACTION;
 	}
 
 	private boolean isOrganizer(MSEvent event, MSAttendee at) {
@@ -293,7 +293,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		Attendee att = new Attendee();
 		att.setEmail(email);
 		att.setDisplayName(displayName);
-		att.setState(ParticipationState.ACCEPTED);
+		att.setParticipation(Participation.ACCEPTED);
 		att.setParticipationRole(ParticipationRole.REQ);
 		att.setOrganizer(true);
 		return att;
@@ -604,10 +604,10 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		ret.setParticipationRole( 
 				getParticipationRole(msAttendee.getAttendeeType()) );
 		
-		ParticipationState status = getParticipationState( 
+		Participation status = getParticipation(
 				getAttendeeState(eventFromDB, msAttendee) , msAttendee.getAttendeeStatus() );
 		
-		ret.setState(status);
+		ret.setParticipation(status);
 		
 		ret.setOrganizer( isOrganizer(msEvent, msAttendee) );
 		return ret;
@@ -746,22 +746,22 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 	
 	@Override
-	public ParticipationState getParticipationState(ParticipationState oldParticipationState, AttendeeStatus attendeeStatus) {
+	public Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus) {
 		if (attendeeStatus == null) {
-			return oldParticipationState;
+			return oldParticipation;
 		}
 		
 		switch (attendeeStatus) {
 		case DECLINE:
-			return ParticipationState.DECLINED;
+			return Participation.DECLINED;
 		case NOT_RESPONDED:
 		case RESPONSE_UNKNOWN:
-			return ParticipationState.NEEDSACTION;
+			return Participation.NEEDSACTION;
 		case TENTATIVE:
-			return ParticipationState.TENTATIVE;
+			return Participation.TENTATIVE;
 		default:
 		case ACCEPT:
-			return ParticipationState.ACCEPTED;
+			return Participation.ACCEPTED;
 		}
 	}
 

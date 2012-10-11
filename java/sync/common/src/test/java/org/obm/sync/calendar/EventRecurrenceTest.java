@@ -136,7 +136,7 @@ public class EventRecurrenceTest {
 		Event e2 = createEventException(2, 3);
 		
 		Attendee firstAttendee = e1.getAttendees().get(0);
-		firstAttendee.setState(ParticipationState.DECLINED);	
+		firstAttendee.setParticipation(Participation.DECLINED);	
 		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
 		
 		String attendeeWithDeclinedEventEmail = "email0@email.com";
@@ -154,7 +154,7 @@ public class EventRecurrenceTest {
 		Event e2 = createEventException(2, 3);
 
 		Attendee firstAttendee = e1.getAttendees().get(0);
-		firstAttendee.setState(ParticipationState.DECLINED);
+		firstAttendee.setParticipation(Participation.DECLINED);
 		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
 
 		EventRecurrence rec2 = getOneDailyEventRecurence();
@@ -386,7 +386,7 @@ public class EventRecurrenceTest {
 			attendee.setOrganizer(isOrganizer(i));
 			attendee.setPercent(1);
 			attendee.setParticipationRole(ParticipationRole.REQ);
-			attendee.setState(ParticipationState.NEEDSACTION);
+			attendee.setParticipation(Participation.NEEDSACTION);
 			attendees.add(attendee);
 		}
 		return attendees;

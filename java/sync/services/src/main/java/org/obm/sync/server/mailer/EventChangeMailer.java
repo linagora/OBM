@@ -51,7 +51,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.server.template.ITemplateLoader;
@@ -232,17 +232,17 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	public void notifyUpdateParticipationState(final Event event, final Attendee organizer, final ObmUser attendeeUpdated, 
-			final ParticipationState newState, final Locale locale, final TimeZone timezone, String ics, AccessToken token) {
+	public void notifyUpdateParticipation(final Event event, final Attendee organizer, final ObmUser attendeeUpdated,
+			final Participation newParticipation, final Locale locale, final TimeZone timezone, String ics, AccessToken token) {
 	
 		try {
 			final EventMail mail = 
 				new EventMail(
 						extractSenderAddress(attendeeUpdated),
 						event.getAttendees(), 
-						updateParticipationStateTitle(event.getTitle(), locale), 
-						updateParticipationStateBodyTxt(event, attendeeUpdated, newState, locale, timezone),
-						updateParticipationStateBodyHtml(event, attendeeUpdated, newState, locale, timezone),
+						updateParticipationTitle(event.getTitle(), locale),
+						updateParticipationBodyTxt(event, attendeeUpdated, newParticipation, locale, timezone),
+						updateParticipationBodyHtml(event, attendeeUpdated, newParticipation, locale, timezone),
 						ics, "REPLY"
 						);
 			sendNotificationMessageToOrganizer(organizer, mail, token);
@@ -337,11 +337,11 @@ public class EventChangeMailer extends AbstractMailer {
 		mailService.sendMessage(address, mimeMail, token);
 	}
 	
-	private String participationState(ParticipationState state, Locale locale){
-		if(ParticipationState.ACCEPTED.equals(state)){
-			return getMessages(locale).participationStateAccepted();
+	private String participation(Participation participation, Locale locale){
+		if(Participation.ACCEPTED.equals(participation)){
+			return getMessages(locale).accepted();
 		} else {
-			return getMessages(locale).participationStateDeclined();
+			return getMessages(locale).declined();
 		}
 	}
 
@@ -353,8 +353,8 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 	
-	private String updateParticipationStateTitle(String title, Locale locale) {
-		return getMessages(locale).updateParticipationStateTitle(title);
+	private String updateParticipationTitle(String title, Locale locale) {
+		return getMessages(locale).updateParticipationTitle(title);
 	}
 	
 	private String notifyNewUserBodyTxt(Event event, Locale locale, TimeZone timezone) throws IOException, TemplateException {
@@ -389,14 +389,14 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	private String updateParticipationStateBodyTxt(Event event,
-			final ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangePlain.tpl", event, attendeeUpdated, newState, locale, timezone);
+	private String updateParticipationBodyTxt(Event event,
+			final ObmUser attendeeUpdated, Participation newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
+		return applyUpdateParticipationOnTemplate("ParticipationChangePlain.tpl", event, attendeeUpdated, newState, locale, timezone);
 	}
 	
-	private String updateParticipationStateBodyHtml(Event event,
-			final ObmUser attendeeUpdated, ParticipationState newState, Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		return applyUpdateParticipationStateOnTemplate("ParticipationStateChangeHtml.tpl", event, attendeeUpdated, newState, locale, timezone);
+	private String updateParticipationBodyHtml(Event event,
+			final ObmUser attendeeUpdated, Participation newParticipation, Locale locale, TimeZone timezone) throws IOException, TemplateException {
+		return applyUpdateParticipationOnTemplate("ParticipationChangeHtml.tpl", event, attendeeUpdated, newParticipation, locale, timezone);
 	}
 	
 
@@ -465,9 +465,9 @@ public class EventChangeMailer extends AbstractMailer {
 		return applyTemplate(datamodel, template);
 	}
 	
-	private String applyUpdateParticipationStateOnTemplate(String templateName,
-			Event event, final ObmUser attendeeUpdated, ParticipationState newState,  Locale locale, TimeZone timezone) throws IOException, TemplateException {
-		Builder<Object, Object> builder = buildUpdateParticipationStateDatamodel(event, attendeeUpdated, newState, locale);
+	private String applyUpdateParticipationOnTemplate(String templateName,
+			Event event, final ObmUser attendeeUpdated, Participation newState,  Locale locale, TimeZone timezone) throws IOException, TemplateException {
+		Builder<Object, Object> builder = buildUpdateParticipationDatamodel(event, attendeeUpdated, newState, locale);
 		ImmutableMap<Object, Object> datamodel = defineTechnicalData(builder, event).build();
 		Template template = templateLoader.getTemplate(templateName, locale, timezone);
 		return applyTemplate(datamodel, template);
@@ -664,7 +664,7 @@ public class EventChangeMailer extends AbstractMailer {
 		for (Attendee attendee : attendeesList) {
 			if (attendee.getDisplayName() != null) {
 				attendees.append(attendee.getDisplayName() + " - "
-						+ buildParticipationStateOfAttendee(attendee, locale)
+						+ buildParticipationOfAttendee(attendee, locale)
 						+ "<br/>");
 			}
 		}
@@ -672,19 +672,19 @@ public class EventChangeMailer extends AbstractMailer {
 		return attendees.toString();
 	}
 	
-	private String buildParticipationStateOfAttendee(Attendee attendee, Locale locale) {
-		ParticipationState state = attendee.getState();
+	private String buildParticipationOfAttendee(Attendee attendee, Locale locale) {
+		Participation participation = attendee.getParticipation();
 		String stateString = "";
-		if (state != null) {
-			switch (state) {
+		if (participation != null) {
+			switch (participation.getState()) {
 			case NEEDSACTION:
-				stateString = getMessages(locale).participationStateNeedsAction();
+				stateString = getMessages(locale).needsAction();
 				break;
 			case ACCEPTED:
-				stateString = getMessages(locale).participationStateAccepted();
+				stateString = getMessages(locale).accepted();
 				break;
 			case DECLINED:
-				stateString = getMessages(locale).participationStateDeclined();
+				stateString = getMessages(locale).declined();
 				break;
 			case COMPLETED:
 			case DELEGATED:
@@ -703,12 +703,12 @@ public class EventChangeMailer extends AbstractMailer {
 		return datamodel;
 	}
 	
-	@VisibleForTesting Builder<Object, Object> buildUpdateParticipationStateDatamodel(
-			Event event, final ObmUser attendeeUpdated, ParticipationState status, Locale locale) {
+	@VisibleForTesting Builder<Object, Object> buildUpdateParticipationDatamodel(
+			Event event, final ObmUser attendeeUpdated, Participation participation, Locale locale) {
 		Builder<Object, Object> datamodel = ImmutableMap.builder()
 			.put("user", attendeeUpdated.getDisplayName())
-			.put("participationState", participationState(status, locale))
-			.put("comment", Strings.nullToEmpty(status.getComment().serializeToString()))
+			.put("participation", participation(participation, locale))
+			.put("comment", Strings.nullToEmpty(participation.getComment().serializeToString()))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
 			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
 		return datamodel;

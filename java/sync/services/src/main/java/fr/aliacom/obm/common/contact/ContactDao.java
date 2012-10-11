@@ -86,7 +86,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.exception.ContactNotFoundException;
@@ -420,7 +420,7 @@ public class ContactDao {
 		Attendee at = new Attendee();
 		at.setEmail(token.getUserEmail());
 		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED);
 		e.addAttendee(at);
 
 		logger.info("inserting birthday with date " + cal.getTime());

@@ -103,7 +103,7 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -915,7 +915,7 @@ public class Ical4jHelperTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
-		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		Role role = getIcal4jHelper().getRole(at);
@@ -936,7 +936,7 @@ public class Ical4jHelperTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
-		at.setState(ParticipationState.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		PartStat ps = getIcal4jHelper().getPartStat(at);
@@ -1062,26 +1062,26 @@ public class Ical4jHelperTest {
 		final Attendee at1 = new Attendee();
 		at1.setDisplayName("OBM ORGANIZER");
 		at1.setEmail("obm@obm.org");
-		at1.setState(ParticipationState.ACCEPTED);
+		at1.setParticipation(Participation.ACCEPTED);
 		at1.setParticipationRole(ParticipationRole.CHAIR);
 		at1.setOrganizer(true);
 		
 		final Attendee at2 = new Attendee();
 		at2.setDisplayName("OBM USER 2");
 		at2.setEmail("obm2@obm.org");
-		at2.setState(ParticipationState.ACCEPTED);
+		at2.setParticipation(Participation.ACCEPTED);
 		at2.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at3 = new Attendee();
 		at3.setDisplayName("OBM USER 3");
 		at3.setEmail("obm3@obm.org");
-		at3.setState(ParticipationState.ACCEPTED);
+		at3.setParticipation(Participation.ACCEPTED);
 		at3.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at4 = new Attendee();
 		at4.setDisplayName("OBM USER 4");
 		at4.setEmail("obm4@obm.org");
-		at4.setState(ParticipationState.DECLINED);
+		at4.setParticipation(Participation.DECLINED);
 		at4.setParticipationRole(ParticipationRole.REQ);
 		
 		event.addAttendee(at1);
@@ -1189,7 +1189,7 @@ public class Ical4jHelperTest {
 		Event event = buildEvent();
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
-		ParticipationState status = attendeeReply.getState();
+		Participation status = attendeeReply.getParticipation();
 		status.setComment(new Comment("I declined your invitation."));
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 		AccessToken token = new AccessToken(0, "OBM");
@@ -1204,7 +1204,7 @@ public class Ical4jHelperTest {
 		Event event = buildEvent();
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
-		ParticipationState status = attendeeReply.getState();
+		Participation status = attendeeReply.getParticipation();
 		status.setComment(new Comment(null));
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 		AccessToken token = new AccessToken(0, "OBM");
@@ -1289,7 +1289,7 @@ public class Ical4jHelperTest {
 		Event event = Iterables.getOnlyElement(events);
 		Assertions.assertThat(event.getAttendees()).hasSize(2);
 		Attendee userc = event.getAttendees().get(1);
-		Assertions.assertThat(userc.getState()).isNotNull().isEqualTo(ParticipationState.NEEDSACTION);
+		Assertions.assertThat(userc.getParticipation()).isNotNull().isEqualTo(Participation.NEEDSACTION);
 	}
 
 	@Test

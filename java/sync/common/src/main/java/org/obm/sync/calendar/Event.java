@@ -646,20 +646,20 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		recurrence.addException(recurrenceId);
 	}
 	
-	public void updateParticipationState() {
-		changeAttendeesParticipationState();
-        List<Event> eventsExceptions = getEventsExceptions();
-        for (Event event: eventsExceptions) {
-        	event.changeAttendeesParticipationState();
-        }
+	public void updateParticipation() {
+		changeAttendeesParticipation();
+		List<Event> eventsExceptions = getEventsExceptions();
+		for (Event event: eventsExceptions) {
+			event.changeAttendeesParticipation();
+		}
 	}
 	
-	private void changeAttendeesParticipationState() {
+	private void changeAttendeesParticipation() {
 		for (Attendee att: getAttendees()) {
 			if (att.isCanWriteOnCalendar()) {
-				att.setState(ParticipationState.ACCEPTED);
+				att.setParticipation(Participation.ACCEPTED);
 			} else {
-				att.setState(ParticipationState.NEEDSACTION);
+				att.setParticipation(Participation.NEEDSACTION);
 			}
 		}
 	}

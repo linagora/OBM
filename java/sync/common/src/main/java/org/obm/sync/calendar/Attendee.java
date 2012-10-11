@@ -50,8 +50,8 @@ public class Attendee implements Serializable {
 			attendee = new Attendee();
 		}
 		
-		public Builder participationState(ParticipationState state) {
-			attendee.state = state;
+		public Builder participation(Participation participation) {
+			attendee.participation = participation;
 			return this;
 		}
 		
@@ -95,7 +95,7 @@ public class Attendee implements Serializable {
 		}
 	}
 	
-	private ParticipationState state;
+	private Participation participation;
 	private String email;
 	private ParticipationRole participationRole;
 	private String displayName;
@@ -109,7 +109,7 @@ public class Attendee implements Serializable {
 	}
 
 	public Attendee(Attendee attendee) {
-		this.state = attendee.state;
+		this.participation = attendee.participation;
 		this.email = attendee.email;
 		this.displayName = attendee.displayName;
 		this.percent = attendee.percent;
@@ -119,12 +119,12 @@ public class Attendee implements Serializable {
 		this.participationRole = attendee.participationRole;
 	}
 
-	public ParticipationState getState() {
-		return state;
+	public Participation getParticipation() {
+		return participation;
 	}
 
-	public void setState(ParticipationState state) {
-		this.state = state;
+	public void setParticipation(Participation participation) {
+		this.participation = participation;
 	}
 
 	public String getEmail() {
@@ -217,7 +217,7 @@ public class Attendee implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(getClass()).
 				add("email", getEmail()).
-				add("state", getState()).
+				add("participation", getParticipation()).
 				add("canWriteOnCalendar", isCanWriteOnCalendar()).toString();
 	}
 

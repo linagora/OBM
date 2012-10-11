@@ -56,7 +56,7 @@ import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -456,12 +456,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, ParticipationState participationState, 
+			EventExtId extId, Participation participation,
 			int sequence, boolean notification) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("extId", extId.serializeToString());
-		params.put("state", participationState.toString()); 
+		params.put("state", participation.toString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/changeParticipationState", params);
@@ -471,7 +471,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	
 	@Override
 	public boolean changeParticipationState(AccessToken token, String calendar,
-			EventExtId extId, RecurrenceId recurrenceId, ParticipationState participationState, 
+			EventExtId extId, RecurrenceId recurrenceId, Participation participation, 
 			int sequence, boolean notification) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
@@ -479,7 +479,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		if (recurrenceId != null) {
 			params.put("recurrenceId", recurrenceId.serializeToString());
 		}
-		params.put("state", participationState.toString()); 
+		params.put("state", participation.toString());
 		params.put("sequence", String.valueOf(sequence));
 		params.put("notification", String.valueOf(notification));
 		Document doc = execute(token, type + "/changeParticipationState", params);

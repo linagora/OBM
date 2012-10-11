@@ -8,10 +8,11 @@ import java.util.Map;
 
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Comment;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
@@ -202,7 +203,7 @@ public class AttendeeLoader {
 		att.setObmUser(isInternalAttendee(rs));
 		att.setDisplayName(getAttendeeDisplayName(rs));
 		att.setEmail(getAttendeeEmail(rs, domainName));
-		att.setState(getAttendeeState(rs));
+		att.setParticipation(getAttendeeState(rs));
 		att.setParticipationRole(getAttendeeRequired(rs));
 		att.setPercent(getAttendeePercent(rs));
 		att.setOrganizer(getAttendeeOrganizer(rs));
@@ -241,9 +242,9 @@ public class AttendeeLoader {
 		return ParticipationRole.valueOf(rs.getString("eventlink_required"));
 	}
 
-	private ParticipationState getAttendeeState(ResultSet rs) throws SQLException {
-		ParticipationState status = ParticipationState.getValueOf(rs.getString("eventlink_state"));
-		status.setComment(new Comment(rs.getString("eventlink_comment")));
+	private Participation getAttendeeState(ResultSet rs) throws SQLException {
+		Participation status = new Participation(new Comment(rs.getString("eventlink_comment")), 
+				State.getValueOf(rs.getString("eventlink_state")));
 		return status;
 	}
 

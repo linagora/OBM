@@ -75,7 +75,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -379,7 +379,7 @@ public class EventChangeMailerTest {
 	}
 	
 	@Test
-	public void testAcceptedParticipationStateChangeEvent() throws UnsupportedEncodingException, IOException, MessagingException {
+	public void testAcceptedParticipationChangeEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
 				"Raphael ROUGERON <rrougeron@linagora.com>"
 			);
@@ -388,8 +388,8 @@ public class EventChangeMailerTest {
 		event.setSequence(4);
 		List<Attendee> attendees = event.getAttendees();
 		Attendee updatedAttendee = attendees.get(2);
-		updatedAttendee.setState(ParticipationState.ACCEPTED);
-		ParticipationState updatedAttendeeStatus = updatedAttendee.getState();
+		updatedAttendee.setParticipation(Participation.ACCEPTED);
+		Participation updatedAttendeeStatus = updatedAttendee.getParticipation();
 		updatedAttendeeStatus.setComment(new Comment("This is a random comment"));
 		event.addAttendee(createAttendee("Raphael ROUGERON", "rrougeron@linagora.com"));
 		Attendee organizer = attendees.get(4);
@@ -398,8 +398,8 @@ public class EventChangeMailerTest {
 		String ics = ical4jHelper.buildIcsInvitationReply(event,
 				ServicesToolBox.getIcal4jUserFrom("mbaechler@linagora.com"), accessToken);
 
-		ParticipationState accepted = ParticipationState.ACCEPTED;
-		eventChangeMailer.notifyUpdateParticipationState(
+		Participation accepted = Participation.ACCEPTED;
+		eventChangeMailer.notifyUpdateParticipation(
 				event,
 				event.findOrganizer(),
 				ServicesToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
@@ -658,7 +658,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att : before.getAttendees()) {
-			att.setState(ParticipationState.NEEDSACTION);
+			att.setParticipation(Participation.NEEDSACTION);
 		}
 		after.setSequence(4);
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
@@ -715,7 +715,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2012-02-15T13:00:00"));
 		after.setDuration(7200);
 		for (Attendee att : before.getAttendees()) {
-			att.setState(ParticipationState.NEEDSACTION);
+			att.setParticipation(Participation.NEEDSACTION);
 		}
 		after.setSequence(4);
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
@@ -774,7 +774,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
-			att.setState(ParticipationState.ACCEPTED);
+			att.setParticipation(Participation.ACCEPTED);
 		}
 		
 		eventChangeMailer.notifyAcceptedUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", accessToken);
@@ -820,7 +820,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
-			att.setState(ParticipationState.ACCEPTED);
+			att.setParticipation(Participation.ACCEPTED);
 		}
 		eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, accessToken);
 		
@@ -853,24 +853,24 @@ public class EventChangeMailerTest {
 	}
 	
 	@Test
-	public void testBuildUpdateParticipationStateDatamodel() {
-		Event event = new Event();
-		event.setStartDate(new Date());
-		ObmUser obmUser = new ObmUser();
-		ParticipationState status = ParticipationState.ACCEPTED;
-		status.setComment(new Comment(null));
+		public void testBuildUpdateParticipationDatamodel() {
+			Event event = new Event();
+			event.setStartDate(new Date());
+			ObmUser obmUser = new ObmUser();
+			Participation status = Participation.ACCEPTED;
+			status.setComment(new Comment(null));
 
-		ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
-		EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
-		EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
-				ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
+			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
+			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
+					ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
 
-		EasyMock.replay(constantService);
+			EasyMock.replay(constantService);
 
-		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
+			EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
 
-		eventChangeMailer.buildUpdateParticipationStateDatamodel(event, obmUser, status, Locale.FRENCH);
-	}
+			eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, Locale.FRENCH);
+		}
 	
 	@Test
 	public void testNonRecurrentToRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {

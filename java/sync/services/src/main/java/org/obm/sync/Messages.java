@@ -78,20 +78,20 @@ public class Messages {
 		return getString("UpdatedRecurrentEventTitle", owner, title);
 	}
 
-	public String updateParticipationStateTitle(String title) {
-		return getString("UpdateParticipationStateTitle", title);
+	public String updateParticipationTitle(String title) {
+		return getString("UpdateParticipationTitle", title);
 	}
 
-	public String participationStateAccepted() {
-		return getString("ParticipationStateAccepted");
+	public String accepted() {
+		return getString("Accepted");
 	}
 	
-	public String participationStateDeclined() {
-		return getString("ParticipationStateDeclined");
+	public String declined() {
+		return getString("Declined");
 	}
 
-	public String participationStateNeedsAction() {
-		return getString("ParticipationStateNeedsAction");
+	public String needsAction() {
+		return getString("NeedsAction");
 	}
 	
 	public String connectorVersionErrorTitle() {

@@ -1,13 +1,13 @@
-This email was automatically sent by OBM
+Message automatique envoyé par OBM
 ------------------------------------------------------------------
-ATTENDEE STATE UPDATED
+PARTICIPATION : MISE A JOUR
 ------------------------------------------------------------------
 
-${user} has ${participationState} the event ${subject} scheduled on ${startDate}.
+${user} a ${participation} l'événement ${subject} prévu le ${startDate}.
 
-:: Comment :
+:: Commentaire :
 ${comment}
 
 
-:: More information about this appointment :
+:: Pour plus de détails :
 ${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}
