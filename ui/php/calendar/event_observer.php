@@ -317,7 +317,17 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   * @return boolean whether or not the changes should bring a sequence bump 
   */
   public function shouldIncrementSequence($old, $exceptionsMatter = true) {
-	  $isDifferentEnough = $this->location != $old->location
+	$isDifferentEnough = $this->isDifferent($old);
+
+    if ($exceptionsMatter) {
+  		$isDifferentEnough = $isDifferentEnough || $this->hasDifferentExceptions($old);
+    }
+
+    return $isDifferentEnough;
+  }
+  
+  public function isDifferent($old) {
+  	return $this->location != $old->location
 		|| $this->allday  != $old->allday
 		|| $this->date_begin->compare($old->date_begin) != 0
 		|| $this->duration != $old->duration
@@ -330,15 +340,12 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
 						) 
 	  )
 		|| ($this->repeat_kind != 'none' && $this->repeatfrequency != $old->repeatfrequency);
-
-    if ($exceptionsMatter) {
-  		$isDifferentEnough = $isDifferentEnough
-      || (count(array_udiff($this->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
-  	  || (count(array_udiff($old->date_exception, $this->date_exception, array('Of_Date', 'cmp'))));
-    }
-
-    return $isDifferentEnough;
   }
+  
+  public function hasDifferentExceptions($old) {
+  	return (count(array_udiff($this->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
+  	  || (count(array_udiff($old->date_exception, $this->date_exception, array('Of_Date', 'cmp'))));
+  } 
 }
 
 /**

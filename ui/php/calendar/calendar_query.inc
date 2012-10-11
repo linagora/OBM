@@ -2102,7 +2102,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_add_event_links($new_entities['user'], $new_entities['contact'], $new_entities['resource'], $event_id);
   
   if ($updatedEvent->shouldIncrementSequence($oldEvent)) {
-  	if ($updatedEvent->shouldIncrementSequence($oldEvent, false)) {
+  	if ($updatedEvent->isDifferent($oldEvent)) {
 	  	if($oldEvent->repeat_kind == 'none' || $params['all'] == 1) {
 	  		run_query_calendar_reset_occurrence_links($same_entities['user'], $same_entities['contact'], $same_entities['resource'], $calendar['calendar_id']);
 	  	} else {
