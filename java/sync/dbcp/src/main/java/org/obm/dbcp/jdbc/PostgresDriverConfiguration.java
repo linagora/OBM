@@ -62,7 +62,7 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 		builder.put("password", conf.getDatabasePassword());
 		builder.put("databaseName", conf.getDatabaseName());
 		builder.put("serverName", conf.getDatabaseHost());
-		builder.put("ssl", conf.isPostgresSSLEnabled().toString());
+		builder.put("ssl", String.valueOf(conf.isPostgresSSLEnabled()));
 		if (conf.isPostgresSSLNonValidating()) {
 			builder.put("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
 		}

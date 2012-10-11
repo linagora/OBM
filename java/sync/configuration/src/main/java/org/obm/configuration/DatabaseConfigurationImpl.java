@@ -66,11 +66,6 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     }
 
     @Override
-    public Boolean isPostgresSSLEnabled() {
-        return getBooleanValue(DB_PG_SSL);
-    }
-
-    @Override
     public String getDatabaseName() {
         return getStringValue(DB_NAME_KEY);
     }
@@ -96,7 +91,12 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     }
 
     @Override
-    public Boolean isPostgresSSLNonValidating() {
-        return getBooleanValue(DB_PG_SSL_NON_VALIDATING);
+    public boolean isPostgresSSLEnabled() {
+        return getBooleanValue(DB_PG_SSL, false);
+    }
+
+    @Override
+    public boolean isPostgresSSLNonValidating() {
+        return getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
     }
 }
