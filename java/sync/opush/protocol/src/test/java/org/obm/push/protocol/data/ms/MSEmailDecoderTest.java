@@ -33,6 +33,7 @@
 package org.obm.push.protocol.data.ms;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.easymock.EasyMock.*;
 import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayInputStream;
@@ -52,19 +53,23 @@ import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEmailDecoderTest {
 
+	private MSMeetingRequestDecoder meetingRequestDecoder;
 	private MSEmailDecoder decoder;
 
 	@Before
 	public void setup(){
-		decoder = new MSEmailDecoder();
+		meetingRequestDecoder = createMock(MSMeetingRequestDecoder.class);
+		decoder = new MSEmailDecoder(meetingRequestDecoder);
 	}
 
 	@Test
@@ -365,5 +370,57 @@ public class MSEmailDecoderTest {
 		MSEmail email= decoder.decode(doc.getDocumentElement());
 
 		assertThat(email.isRead()).isFalse();
+	}
+
+	@Test
+	public void parseMeetingRequestIsCall() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				// MeetingRequest added below
+			"</ApplicationData>");
+
+		Element meetingRequestElement = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<AllDayEvent>0</AllDayEvent>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+			"</MeetingRequest>").getDocumentElement();
+				
+		doc.adoptNode(meetingRequestElement);
+		doc.getDocumentElement().appendChild(meetingRequestElement);
+		
+		expect(meetingRequestDecoder.decode(meetingRequestElement))
+			.andReturn(createMock(MSMeetingRequest.class));
+		
+		replay(meetingRequestDecoder);
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		verify(meetingRequestDecoder);
+		
+		assertThat(email.getMeetingRequest()).isNotNull();
+	}
+
+	@Test
+	public void parseMeetingRequestIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		assertThat(email.getMeetingRequest()).isNull();
 	}
 }

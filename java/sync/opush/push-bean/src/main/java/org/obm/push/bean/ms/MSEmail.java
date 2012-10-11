@@ -99,9 +99,11 @@ public class MSEmail implements IApplicationData, Serializable {
 		}
 		
 		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
-			Preconditions.checkArgument(messageClass != null);
+			if (meetingRequest != null) {
+				Preconditions.checkArgument(messageClass != null);
+				this.messageClass = messageClass;
+			}
 			this.meetingRequest = meetingRequest;
-			this.messageClass = messageClass;
 			return this;
 		}
 		

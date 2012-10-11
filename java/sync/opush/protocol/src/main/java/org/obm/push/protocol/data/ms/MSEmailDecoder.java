@@ -48,12 +48,14 @@ import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.MSEmailBody.Builder;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.data.ASAirs;
 import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.ActiveSyncDecoder;
 import org.obm.push.protocol.data.IDataDecoder;
 import org.obm.push.protocol.data.MSEmailEncoder;
+import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
 
@@ -66,9 +68,11 @@ import com.google.inject.Inject;
 public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 
 	private final SimpleDateFormat utcDateFormat;
+	private final MSMeetingRequestDecoder meetingRequestDecoder;
 	
 	@Inject
-	protected MSEmailDecoder() {
+	protected MSEmailDecoder(MSMeetingRequestDecoder meetingRequestDecoder) {
+		this.meetingRequestDecoder = meetingRequestDecoder;
 		utcDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
 		utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
@@ -88,12 +92,20 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 				.importance(MSImportance.fromSpecificationValue(uniqueStringFieldValue(data, ASEmail.IMPORTANCE)))
 				.messageClass(MSMessageClass.fromSpecificationValue(uniqueStringFieldValue(data, ASEmail.MESSAGE_CLASS)))
 				.read(uniqueBooleanFieldValue(data, ASEmail.READ, false))
+				.meetingRequest(meetingRequest(DOMUtils.getUniqueElement(data, ASEmail.MEETING_REQUEST.getName())))
 				.build();
 		} catch (AddressException e) {
 			throw new ConversionException("An address field is not valid", e);
 		} catch (ParseException e) {
 			throw new ConversionException("A date field is not valid", e);
 		}
+	}
+
+	private MSMeetingRequest meetingRequest(Element meetingRequest) throws ConversionException {
+		if (meetingRequest != null) {
+			return meetingRequestDecoder.decode(meetingRequest);
+		}
+		return null;
 	}
 
 	@VisibleForTesting MSEmailBody msEmailBody(Element data) {
