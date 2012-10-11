@@ -32,7 +32,11 @@
 
 package org.obm.push.protocol.data.ms;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.aryEq;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
@@ -47,6 +51,9 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.bean.ASTimeZone;
@@ -56,6 +63,7 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class MSMeetingRequestDecoderTest {
@@ -792,9 +800,49 @@ public class MSMeetingRequestDecoderTest {
 		
 		assertThat(meeting.getSensitivity()).isEqualTo(MSMeetingRequestSensitivity.PRIVATE);
 	}
+	
+	@Test(expected=ParseException.class)
+	public void parseRecurrenceDateNeedsNoPunctuation() throws Exception {
+		decoder.recurrenceDate("2002-11-26T16:00:00.000Z");
+	}
+	
+	@Test(expected=ParseException.class)
+	public void parseRecurrenceDateNeedsTime() throws Exception {
+		decoder.date("20021126");
+	}
+	
+	@Test
+	public void parseRecurrenceDate() throws Exception {
+		Date parsed = decoder.recurrenceDate("20001225T083500Z");
+		assertThat(parsed).isEqualTo(date("2000-12-25T08:35:00+00"));
+	}
+	
+	@Test
+	public void parseRecurrenceId() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<MeetingRequest>" +
+				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
+				"<EndTime>2014-12-01T10:00:00.000Z</EndTime>" +
+				"<DTStamp>2012-07-19T20:08:30.000Z</DTStamp>" +
+				"<InstanceType>0</InstanceType>" +
+				"<TimeZone>" +
+					"xP///1IAbwBtAGEAbgBjAGUAIABTAHQAYQBuAGQAYQByAGQAIABUAGkAbQ" +
+					"BlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAA" +
+					"AFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZwBoAHQAIABUAGkAbQBlAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==" +
+				"</TimeZone>" +
+				"<RecurrenceId>20120720T200830Z</RecurrenceId>" +
+			"</MeetingRequest>");
+
+		expectTimeZone();
+		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
+		verifyTimeZone();
+		
+		assertThat(meeting.getRecurrenceId()).isEqualTo(date("2012-07-20T20:08:30+00"));
+	}
 
 	@Test
-	public void parseSensitivityDefaultIsNormal() throws Exception {
+	public void parseRecurrenceIdIsNotRequired() throws Exception {
 		Document doc = DOMUtils.parse(
 			"<MeetingRequest>" +
 				"<StartTime>2014-12-01T09:00:00.000Z</StartTime>" +
@@ -813,9 +861,265 @@ public class MSMeetingRequestDecoderTest {
 		MSMeetingRequest meeting = decoder.decode(doc.getDocumentElement());
 		verifyTimeZone();
 		
-		assertThat(meeting.getSensitivity()).isEqualTo(MSMeetingRequestSensitivity.NORMAL);
+		assertThat(meeting.getRecurrenceId()).isNull();
 	}
 
+	@Test
+	public void parseRecurrenceInterval() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getInterval()).isEqualTo(2);
+	}
+
+	@Test(expected=ConversionException.class)
+	public void parseRecurrenceIntervalIsRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		decoder.recurrences(doc.getDocumentElement());
+	}
+
+	@Test
+	public void parseRecurrenceTypeDaily() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getType()).isEqualTo(MSMeetingRequestRecurrenceType.DAILY);
+	}
+
+	@Test
+	public void parseRecurrenceTypeMonthly() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>2</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getType()).isEqualTo(MSMeetingRequestRecurrenceType.MONTHLY);
+	}
+
+	@Test(expected=ConversionException.class)
+	public void parseRecurrenceTypeIsRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		decoder.recurrences(doc.getDocumentElement());
+	}
+
+	@Test
+	public void parseRecurrenceDayOfMonth() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_DayOfMonth>30</Recurrence_DayOfMonth>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getDayOfMonth()).isEqualTo(30);
+	}
+
+	@Test
+	public void parseRecurrenceDayOfMonthIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getDayOfMonth()).isNull();
+	}
+
+	@Test
+	public void parseRecurrenceDayOfWeek() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_DayOfWeek>34</Recurrence_DayOfWeek>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getDayOfWeek()).containsOnly(
+				MSMeetingRequestRecurrenceDayOfWeek.MONDAY,
+				MSMeetingRequestRecurrenceDayOfWeek.FRIDAY);
+	}
+
+	@Test
+	public void parseRecurrenceDayOfWeekIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getDayOfWeek()).isEmpty();
+	}
+
+	@Test
+	public void parseRecurrenceWeekOfMonth() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_WeekOfMonth>2</Recurrence_WeekOfMonth>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getWeekOfMonth()).isEqualTo(2);
+	}
+
+	@Test
+	public void parseRecurrenceWeekOfMonthIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getWeekOfMonth()).isNull();
+	}
+
+	@Test
+	public void parseRecurrenceMonthOfYear() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_MonthOfYear>5</Recurrence_MonthOfYear>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getMonthOfYear()).isEqualTo(5);
+	}
+
+	@Test
+	public void parseRecurrenceMonthOfYearIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getMonthOfYear()).isNull();
+	}
+
+	@Test
+	public void parseRecurrenceOccurrences() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_Occurrences>15</Recurrence_Occurrences>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getOccurrences()).isEqualTo(15);
+	}
+
+	@Test
+	public void parseRecurrenceOccurrencesIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getOccurrences()).isNull();
+	}
+
+	@Test
+	public void parseRecurrenceUntil() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+					"<Recurrence_Until>20120719T200830Z</Recurrence_Until>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getUntil()).isEqualTo(date("2012-07-19T20:08:30+00"));
+	}
+
+	@Test
+	public void parseRecurrenceUntilIsNotRequired() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<Recurrences>" +
+				"<Recurrence>" +
+					"<Recurrence_Type>0</Recurrence_Type>" +
+					"<Recurrence_Interval>2</Recurrence_Interval>" +
+				"</Recurrence>" +
+			"</Recurrences>");
+
+		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(decoder.recurrences(doc.getDocumentElement()));
+		
+		assertThat(recurrence.getUntil()).isNull();
+	}
 	
 	private ASTimeZone expectTimeZone() {
 		return expectTimeZone(TimeZone.getTimeZone("UTC"), 

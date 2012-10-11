@@ -47,8 +47,10 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class DOMUtilsTest {
@@ -187,5 +189,25 @@ public class DOMUtilsTest {
 		DOMUtils.getElementInteger(intNode);
 	}
 	
+	@Test
+	public void testGetElementsByNameZero() throws Exception {
+		Element parent = DOMUtils.parse("<root></root>").getDocumentElement();
+		Iterable<Node> found = DOMUtils.getElementsByName(parent, "Seeking");
+		assertThat(Iterables.size(found)).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetElementsByNameOne() throws Exception {
+		Element parent = DOMUtils.parse("<root><Seeking>data</Seeking></root>").getDocumentElement();
+		Iterable<Node> found = DOMUtils.getElementsByName(parent, "Seeking");
+		assertThat(Iterables.size(found)).isEqualTo(1);
+	}
+
+	@Test
+	public void testGetElementsByNameTwo() throws Exception {
+		Element parent = DOMUtils.parse("<root><Seeking>data</Seeking><Seeking>data</Seeking></root>").getDocumentElement();
+		Iterable<Node> found = DOMUtils.getElementsByName(parent, "Seeking");
+		assertThat(Iterables.size(found)).isEqualTo(2);
+	}
 }
 

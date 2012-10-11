@@ -34,12 +34,16 @@ package org.obm.push.protocol.data.ms;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
+import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.protocol.bean.ASTimeZone;
@@ -47,12 +51,16 @@ import org.obm.push.protocol.data.ASEmail;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.ActiveSyncDecoder;
 import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
+import org.obm.push.protocol.data.MSEmailEncoder;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
@@ -61,6 +69,7 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 	private final ASTimeZoneConverter asTimeZoneConverter;
 	
 	private final SimpleDateFormat utcDateFormat;
+	private final SimpleDateFormat utcRecurrenceDateFormat;
 	
 	@Inject
 	protected MSMeetingRequestDecoder(Base64ASTimeZoneDecoder base64asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
@@ -68,6 +77,8 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 		this.asTimeZoneConverter = asTimeZoneConverter;
 		utcDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_PATTERN);
 		utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		utcRecurrenceDateFormat = new SimpleDateFormat(MSEmailEncoder.UTC_DATE_NO_PUNCTUATION_PATTERN);
+		utcRecurrenceDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	
 	public MSMeetingRequest decode(Element data) throws ConversionException {
@@ -86,10 +97,52 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 					.reponseRequested(uniqueBooleanFieldValue(data, ASEmail.RESPONSE_REQUESTED, false))
 					.msEventUid(new MSEventUid(uniqueStringFieldValue(data, ASEmail.GLOBAL_OBJ_ID)))
 					.sensitivity(sensitivity(uniqueIntegerFieldValue(data, ASEmail.SENSITIVITY)))
+					.recurrenceId(recurrenceDate(uniqueStringFieldValue(data, ASEmail.RECURRENCE_ID)))
+					.recurrences(recurrences(DOMUtils.getUniqueElement(data, ASEmail.RECURRENCES.getName())))
 					.build();
 		} catch (ParseException e) {
 			throw new ConversionException("A date field is not valid", e);
 		}
+	}
+
+	@VisibleForTesting List<MSMeetingRequestRecurrence> recurrences(Element recurrencesElement)
+			throws ParseException, ConversionException {
+		
+		List<MSMeetingRequestRecurrence> recurrences = Lists.newArrayList();
+		if (recurrencesElement != null) {
+			for (Node recurrence : DOMUtils.getElementsByName(recurrencesElement, ASEmail.RECURRENCE.getName())) {
+				Element recurrenceEl = (Element) recurrence;
+				recurrences.add(MSMeetingRequestRecurrence.builder()
+					.dayOfMonth(uniqueIntegerFieldValue(recurrenceEl, ASEmail.DAY_OF_MONTH))
+					.dayOfWeek(dayOfWeek(uniqueIntegerFieldValue(recurrenceEl, ASEmail.DAY_OF_WEEK)))
+					.weekOfMonth(uniqueIntegerFieldValue(recurrenceEl, ASEmail.WEEK_OF_MONTH))
+					.monthOfYear(uniqueIntegerFieldValue(recurrenceEl, ASEmail.MONTH_OF_YEAR))
+					.interval(interval(uniqueIntegerFieldValue(recurrenceEl, ASEmail.INTERVAL)))
+					.occurrences(uniqueIntegerFieldValue(recurrenceEl, ASEmail.OCCURRENCES))
+					.type(recurrenceType(uniqueIntegerFieldValue(recurrenceEl, ASEmail.TYPE)))
+					.until(recurrenceDate(uniqueStringFieldValue(recurrenceEl, ASEmail.UNTIL)))
+					.build());
+			}
+		}
+		return recurrences;
+	}
+
+	private Integer interval(Integer interval) throws ConversionException {
+		if (interval != null) {
+			return interval;
+		}
+		throw new ConversionException("Interval is required");
+	}
+
+	private MSMeetingRequestRecurrenceType recurrenceType(Integer recurrenceType) throws ConversionException {
+		if (recurrenceType != null) {
+			return MSMeetingRequestRecurrenceType.getValueOf(recurrenceType);
+		}
+		throw new ConversionException("RecurrenceType is required");
+	}
+
+	private List<MSMeetingRequestRecurrenceDayOfWeek> dayOfWeek(Integer integer) {
+		return MSMeetingRequestRecurrenceDayOfWeek.getValuesOf(integer);
 	}
 
 	private MSMeetingRequestSensitivity sensitivity(Integer value) {
@@ -105,6 +158,13 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 			return MSMeetingRequestInstanceType.getValueOf(instanceType);
 		}
 		throw new ConversionException("instanceType is required, found : " + instanceType);
+	}
+
+	@VisibleForTesting Date recurrenceDate(String dateAsString) throws ParseException {
+		if (!Strings.isNullOrEmpty(dateAsString)) {
+			return utcRecurrenceDateFormat.parse(dateAsString);
+		}
+		return null;
 	}
 
 	@VisibleForTesting Date date(String dateAsString) throws ParseException, ConversionException {

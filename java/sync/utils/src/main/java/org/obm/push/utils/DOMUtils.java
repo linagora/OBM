@@ -40,6 +40,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -274,6 +275,35 @@ public final class DOMUtils {
 	public static Element getUniqueElement(Element root, String elementName) {
 		NodeList list = root.getElementsByTagName(elementName);
 		return (Element) list.item(0);
+	}
+
+	public static Iterable<Node> getElementsByName(Element parent, String name) {
+		final NodeList elements = parent.getElementsByTagName(name);
+		return new Iterable<Node>() {
+			
+			@Override
+			public Iterator<Node> iterator() {
+				return new Iterator<Node>() {
+					
+					int index = 0;
+					
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException("cannot remove element");
+					}
+					
+					@Override
+					public Node next() {
+						return elements.item(index++);
+					}
+					
+					@Override
+					public boolean hasNext() {
+						return index < elements.getLength();
+					}
+				};
+			}
+		};
 	}
 
 	public static Element findElementWithUniqueAttribute(Element root,

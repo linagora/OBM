@@ -31,10 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.msmeetingrequest;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Lists;
 
 public enum MSMeetingRequestRecurrenceDayOfWeek {
 	
@@ -73,5 +77,30 @@ public enum MSMeetingRequestRecurrenceDayOfWeek {
 			return null;
 		}
 		return values.get(xmlValue);
+	}
+
+	public static final List<MSMeetingRequestRecurrenceDayOfWeek> getValuesOf(Integer value) {
+		List<MSMeetingRequestRecurrenceDayOfWeek> days = Lists.newArrayList();
+		if (value != null) {
+			for (MSMeetingRequestRecurrenceDayOfWeek day : sortedDays()) {
+				if (day.xmlValue <= value) {
+					days.add(day);
+					value -= day.xmlValue;
+				}
+			}
+		}
+		return days;
+	}
+
+	private static MSMeetingRequestRecurrenceDayOfWeek[] sortedDays() {
+		MSMeetingRequestRecurrenceDayOfWeek[] target = values();
+		Arrays.sort(target, new Comparator<MSMeetingRequestRecurrenceDayOfWeek>() {
+
+			@Override
+			public int compare(MSMeetingRequestRecurrenceDayOfWeek first, MSMeetingRequestRecurrenceDayOfWeek second) {
+				return second.xmlValue - first.xmlValue;
+			}
+		});
+		return target;
 	}
 }
