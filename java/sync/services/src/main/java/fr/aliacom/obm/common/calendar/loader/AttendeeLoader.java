@@ -100,6 +100,25 @@ public class AttendeeLoader {
 				"0 AS is_internal_attendee"
 		});
 
+	private static final String RESOURCE_ATTENDEE_FIELDS = Joiner
+		.on(", ")
+		.join(new String[] {
+				"eventlink_event_id",
+				"eventlink_state",
+				"eventlink_comment",
+				"eventlink_required",
+				"eventlink_percent",
+				"eventlink_is_organizer",
+				"resource_email AS attendee_email",
+				"NULL AS attendee_firstname",
+				"NULL AS attendee_lastname",
+				"resource_name AS attendee_commonname",
+				"resourceentity_resource_id AS attendee_entity_id",
+				"1 AS is_internal_attendee"
+		});
+	// An attendee can be either an OBM user, a contact or a resource
+	private final static int ENTITY_TYPE_COUNT = 3;
+
 	private Connection conn;
 	private Map<EventObmId, Event> eventsById;
 	private String domainName;
@@ -127,8 +146,8 @@ public class AttendeeLoader {
 	}
 
 	private String buildQuery(EventObmIdSQLCollectionHelper idsHelper) {
-		return String.format("%s UNION %s", buildInternalAttendeesQuery(idsHelper),
-				buildExternalAttendeesQuery(idsHelper));
+		return String.format("%s UNION %s UNION %s", buildInternalAttendeesQuery(idsHelper),
+				buildExternalAttendeesQuery(idsHelper), buildResourceAttendeesQuery(idsHelper));
 	}
 
 	private String buildInternalAttendeesQuery(EventObmIdSQLCollectionHelper idsHelper) {
@@ -150,11 +169,21 @@ public class AttendeeLoader {
 		return query;
 	}
 
+	private String buildResourceAttendeesQuery(EventObmIdSQLCollectionHelper idsHelper) {
+		String query = String.format("SELECT %s "
+			+ "FROM EventLink att "
+			+ "INNER JOIN ResourceEntity ON att.eventlink_entity_id=resourceentity_entity_id "
+			+ "INNER JOIN Resource ON resourceentity_resource_id=resource_id "
+			+ "WHERE eventlink_event_id IN (%s) ", RESOURCE_ATTENDEE_FIELDS, idsHelper.asPlaceHolders());
+		return query;
+	}
+	
 	private void setParameters(PreparedStatement stat, EventObmIdSQLCollectionHelper idsHelper)
 			throws SQLException {
 		int pos = 1;
-		pos = idsHelper.insertValues(stat, pos);
-		pos = idsHelper.insertValues(stat, pos);
+		for (int i = 0 ; i < ENTITY_TYPE_COUNT ; i++) {
+			pos = idsHelper.insertValues(stat, pos);
+		}
 	}
 	
 	private Multimap<EventObmId, Attendee> buildAttendees(ResultSet rs) throws SQLException {
