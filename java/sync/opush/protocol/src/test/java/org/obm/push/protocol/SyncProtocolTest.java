@@ -86,10 +86,10 @@ import org.obm.push.protocol.data.ContactDecoder;
 import org.obm.push.protocol.data.ContactEncoder;
 import org.obm.push.protocol.data.DecoderFactory;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.data.MSEmailMetadataDecoder;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.protocol.data.SyncEncoder;
+import org.obm.push.protocol.data.ms.MSEmailDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DOMUtils;
@@ -1720,10 +1720,10 @@ public class SyncProtocolTest {
 						}
 					},
 					null,
-					new Provider<MSEmailMetadataDecoder>() {
+					new Provider<MSEmailDecoder>() {
 						@Override
-						public MSEmailMetadataDecoder get() {
-							return new MSEmailMetadataDecoder(null, null);
+						public MSEmailDecoder get() {
+							return new MSEmailDecoder(null){};
 						}
 					});
 		}

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception;
 
-public class ConversionException extends Exception {
+public class ConversionException extends RuntimeException {
 
 	public ConversionException() {
 		super();

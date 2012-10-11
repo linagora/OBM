@@ -33,6 +33,7 @@ package org.obm.push.protocol.data;
 
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.protocol.data.ms.MSEmailDecoder;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
@@ -45,13 +46,13 @@ public class DecoderFactory {
 	private final Provider<CalendarDecoder> calendarProvider;
 	private final Provider<ContactDecoder> contactProvider;
 	private final Provider<TaskDecoder> taskProvider;
-	private final Provider<MSEmailMetadataDecoder> emailProvider;
+	private final Provider<MSEmailDecoder> emailProvider;
 
 	@Inject
 	protected DecoderFactory(Provider<CalendarDecoder> calendarProvider,
 			Provider<ContactDecoder> contactProvider,
 			Provider<TaskDecoder> taskProvider,
-			Provider<MSEmailMetadataDecoder> emailProvider) {
+			Provider<MSEmailDecoder> emailProvider) {
 		super();
 		this.calendarProvider = calendarProvider;
 		this.contactProvider = contactProvider;
