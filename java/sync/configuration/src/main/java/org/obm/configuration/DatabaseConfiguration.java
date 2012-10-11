@@ -46,8 +46,8 @@ public interface DatabaseConfiguration {
 
     String getDatabasePassword();
 
-    Boolean isPostgresSSLEnabled();
+    boolean isPostgresSSLEnabled();
 
-    Boolean isPostgresSSLNonValidating();
+    boolean isPostgresSSLNonValidating();
 
 }
