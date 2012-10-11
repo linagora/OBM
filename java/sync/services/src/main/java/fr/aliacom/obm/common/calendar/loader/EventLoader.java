@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.common.calendar.EventUtils;
 import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
@@ -219,9 +220,16 @@ public class EventLoader {
 			rs = stat.executeQuery();
 			Map<EventObmId, Event> eventsById = buildEvents(rs);
 			loadObjectGraph(eventsById);
+			computeIsInternal(eventsById);
 			return eventsById;
 		} finally {
 			DBUtils.cleanup(stat, rs);
+		}
+	}
+
+	private void computeIsInternal(Map<EventObmId, Event> eventsById) {
+		for (Event event : eventsById.values()) {
+			event.setInternalEvent(EventUtils.isInternalEvent(event));
 		}
 	}
 

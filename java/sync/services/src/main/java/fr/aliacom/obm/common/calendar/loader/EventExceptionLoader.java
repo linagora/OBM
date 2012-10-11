@@ -15,6 +15,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import fr.aliacom.obm.common.calendar.EventUtils;
 import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
@@ -179,6 +180,7 @@ public class EventExceptionLoader {
 			addEventExceptionToEvent(parentEventId, eventException);
 		}
 		loadObjectGraph(eventExceptionsByEventId);
+		computeIsInternal(eventExceptionsByEventId);
 		return eventExceptionsByEventId;
 	}
 
@@ -188,6 +190,12 @@ public class EventExceptionLoader {
 		this.loadAttendees(eventExceptionsByEventId);
 		if (this.withAlertsFor != null) {
 			this.loadAlerts(eventExceptionsByEventId);
+		}
+	}
+
+	private void computeIsInternal(Map<EventObmId, Event> eventsById) {
+		for (Event event : eventsById.values()) {
+			event.setInternalEvent(EventUtils.isInternalEvent(event));
 		}
 	}
 
