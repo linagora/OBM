@@ -29,53 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.decoder
 
-import scala.collection.JavaConversions.seqAsJavaList
+import java.util.Locale
+import java.util.TimeZone
 
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.SyncRequest
-import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncResponse
-import org.obm.push.wbxml.WBXMLTools
+import org.obm.push.protocol.bean.ASTimeZone
+import org.obm.push.protocol.data.ASTimeZoneConverter
+import org.obm.push.protocol.data.TimeZoneConverter
 
-import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.decoder.GatlingDecoders.syncDecoder
-import org.obm.push.encoder.GatlingEncoders.syncEncoder
-
-abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
-
-	val syncNamespace = "AirSync"
+object GatlingTimeZoneConverter extends ASTimeZoneConverter with TimeZoneConverter {
 	
-	override val commandTitle = "Sync command"
-	override val commandName = "Sync"
-
-	override def buildCommand() = {
-		super.buildCommand()
-			.byteArrayBody((session: Session) => buildSyncRequest(session))
-			.check(bodyExtractor
-			    .find
-			    .transform((response: Array[Byte]) => toSyncResponse(response))
-			    .saveAs(syncContext.sessionKeyLastSync))
+	override def convert(asTimeZone: ASTimeZone): TimeZone = {
+		TimeZone.getTimeZone("Europe/Paris");
 	}
 
-	def buildSyncRequest(session: Session): Array[Byte] = {
-		val request = SyncRequest.builder()
-			.collections(buildSyncRequestCollections(session))
-			.build()
-		
-		val requestDoc = syncEncoder.encodeSync(request)
-		wbTools.toWbxml(syncNamespace, requestDoc)
-	}
-	
-	def buildSyncRequestCollections(session: Session): List[SyncRequestCollection]
-	
-	def toSyncResponse(response: Array[Byte]): SyncResponse = {
-		val responseDoc = wbTools.toXml(response)
-		syncDecoder.decodeSyncResponse(responseDoc)
+	override def convert(timezone: TimeZone, locale: Locale): ASTimeZone = {
+		GatlingTimeZoneDecoder.buildParisTimeZone()
 	}
 }

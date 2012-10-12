@@ -31,46 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.context.http.HttpContext
-import org.obm.push.utils.Mime4jUtils
-import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
-import com.excilys.ebi.gatling.http.Predef.regex
-import com.google.common.io.ByteStreams
-import org.apache.james.mime4j.dom.address.Mailbox
-import org.apache.james.mime4j.dom.Message
-import org.obm.push.protocol.SyncProtocol
-import org.obm.push.wbxml.WBXMLTools
-import org.obm.push.bean.Sync
-import com.google.common.base.Charsets
-import org.obm.push.protocol.data.SyncEncoder
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.protocol.bean.SyncRequest
-import org.obm.push.protocol.bean.SyncRequestCollection
-import com.google.common.collect.Lists
-import com.google.common.collect.ImmutableList
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand
-import org.obm.push.utils.DOMUtils
-import org.obm.push.bean.MSEvent
-import com.google.common.collect.Iterables
-import com.google.common.collect.Sets
-import com.google.common.collect.ImmutableSet
-import scala.collection.JavaConversions._
 import java.util.Date
-import org.obm.push.bean.CalendarMeetingStatus
-import org.obm.DateUtils.date
-import org.obm.push.protocol.data.CalendarEncoder
-import org.obm.push.bean.Device
-import org.obm.push.bean.MSEventUid
 import java.util.UUID
+
+import scala.collection.JavaConversions.setAsJavaSet
+
+import org.obm.DateUtils.date
+import org.obm.push.bean.AttendeeStatus
+import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.CalendarBusyStatus
+import org.obm.push.bean.CalendarMeetingStatus
 import org.obm.push.bean.CalendarSensitivity
 import org.obm.push.bean.MSAttendee
-import org.obm.push.bean.AttendeeType
-import org.obm.push.bean.AttendeeStatus
+import org.obm.push.bean.MSEvent
+import org.obm.push.bean.MSEventUid
+import org.obm.push.context.http.HttpContext
+import org.obm.push.encoder.GatlingEncoders.calendarEncoder
+import org.obm.push.protocol.bean.SyncRequestCollection
+import org.obm.push.protocol.bean.SyncRequestCollectionCommand
+import org.obm.push.protocol.bean.SyncRequestCollectionCommands
+import org.obm.push.utils.DOMUtils
+import org.obm.push.wbxml.WBXMLTools
+
+import com.excilys.ebi.gatling.core.Predef.Session
+import com.google.common.collect.ImmutableList
 
 class SendInvitationCommand(httpContext: HttpContext, invitation: InvitationContext,
 		wbTools: WBXMLTools) extends AbstractSyncCommand(httpContext, invitation, wbTools) {

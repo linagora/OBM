@@ -29,47 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.encoder
 
-import org.obm.push.context.http.HttpContext
+import org.obm.push.protocol.data.SyncEncoder
+import org.obm.push.protocol.data.CalendarEncoder
+import org.obm.push.decoder.GatlingTimeZoneConverter
 import org.obm.push.protocol.FolderSyncProtocol
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.wbxml.WBXMLTools
-import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.excilys.ebi.gatling.http.Predef.regex
-import com.google.common.base.Charsets
-import org.obm.push.protocol.bean.FolderSyncRequest
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
+import org.obm.push.protocol.MeetingProtocol
 
-class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
+object GatlingEncoders {
 
-	val folderSyncNamespace = "FolderHierarchy"
+	lazy val timeZoneEncoder = GatlingTimeZoneEncoder 
+
+	lazy val syncEncoder = new SyncEncoder() {}
+	lazy val folderSyncProtocol = new FolderSyncProtocol
+	lazy val meetingProtocol = new MeetingProtocol
 	
-	override val commandTitle = "FolderSync command"
-	override val commandName = "FolderSync"
-	  
-	override def buildCommand() = {
-		super.buildCommand()
-			.byteArrayBody((session: Session) => buildFolderSyncRequest(session))
-			.check(bodyExtractor
-			    .find
-			    .transform((response: Array[Byte]) => toFolderSyncResponse(response))
-			    .saveAs(folderSyncContext.sessionKeyLastFolderSync))
-	}
-
-	def buildFolderSyncRequest(session: Session): Array[Byte] = {
-		val nextFolderSyncSyncKey = folderSyncContext.nextSyncKey(session)
-		val request = FolderSyncRequest.builder().syncKey(nextFolderSyncSyncKey).build()
-		val requestDoc = folderSyncProtocol.encodeRequest(request)
-		wbTools.toWbxml(folderSyncNamespace, requestDoc)
-	}
+	lazy val calendarEncoder = new CalendarEncoder(timeZoneEncoder, GatlingTimeZoneConverter) {}
 	
-	def toFolderSyncResponse(response: Array[Byte]): FolderSyncResponse = {
-		val responseDoc = wbTools.toXml(response)
-		folderSyncProtocol.decodeResponse(responseDoc)
-	}
 }

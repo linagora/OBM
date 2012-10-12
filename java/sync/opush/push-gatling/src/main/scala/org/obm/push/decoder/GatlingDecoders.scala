@@ -29,53 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.decoder
 
-import scala.collection.JavaConversions.seqAsJavaList
+import org.obm.push.protocol.data.CalendarDecoder
+import org.obm.push.protocol.data.ms.MSEmailDecoder
+import org.obm.push.protocol.data.ms.MSMeetingRequestDecoder
+import org.obm.push.protocol.data.DecoderFactory
+import com.google.inject.Provider
+import org.obm.push.protocol.data.ContactDecoder
+import org.obm.push.protocol.data.TaskDecoder
+import org.obm.push.protocol.data.SyncDecoder
 
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.SyncRequest
-import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncResponse
-import org.obm.push.wbxml.WBXMLTools
+object GatlingDecoders {
 
-import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.decoder.GatlingDecoders.syncDecoder
-import org.obm.push.encoder.GatlingEncoders.syncEncoder
-
-abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
-
-	val syncNamespace = "AirSync"
+	lazy val timeZoneDecoder = GatlingTimeZoneDecoder
+	lazy val timeZoneConverter = GatlingTimeZoneConverter
 	
-	override val commandTitle = "Sync command"
-	override val commandName = "Sync"
+	lazy val meetingRequestDecoder = new MSMeetingRequestDecoder(timeZoneDecoder, timeZoneConverter) {}
+	lazy val syncDecoder = new SyncDecoder(decoderFactory) {}
 
-	override def buildCommand() = {
-		super.buildCommand()
-			.byteArrayBody((session: Session) => buildSyncRequest(session))
-			.check(bodyExtractor
-			    .find
-			    .transform((response: Array[Byte]) => toSyncResponse(response))
-			    .saveAs(syncContext.sessionKeyLastSync))
-	}
-
-	def buildSyncRequest(session: Session): Array[Byte] = {
-		val request = SyncRequest.builder()
-			.collections(buildSyncRequestCollections(session))
-			.build()
-		
-		val requestDoc = syncEncoder.encodeSync(request)
-		wbTools.toWbxml(syncNamespace, requestDoc)
-	}
+	lazy val calendarDecoder = new CalendarDecoder(timeZoneDecoder, timeZoneConverter) {}
+	lazy val emailDecoder = new MSEmailDecoder(meetingRequestDecoder) {}
+	lazy val contactsDecoder: ContactDecoder = null
+	lazy val taskDecoder: TaskDecoder = null
 	
-	def buildSyncRequestCollections(session: Session): List[SyncRequestCollection]
+	lazy val decoderFactory = new DecoderFactory(
+			new Provider[CalendarDecoder]() {
+				override def get = calendarDecoder
+			},
+			new Provider[ContactDecoder]() {
+				override def get = contactsDecoder
+			},
+			new Provider[TaskDecoder]() {
+				override def get = taskDecoder
+			},
+			new Provider[MSEmailDecoder]() {
+				override def get = emailDecoder
+			}
+	) {}
 	
-	def toSyncResponse(response: Array[Byte]): SyncResponse = {
-		val responseDoc = wbTools.toXml(response)
-		syncDecoder.decodeSyncResponse(responseDoc)
-	}
 }

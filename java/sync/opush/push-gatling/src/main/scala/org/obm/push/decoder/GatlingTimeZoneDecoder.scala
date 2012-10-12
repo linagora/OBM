@@ -29,53 +29,54 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.decoder
 
-import scala.collection.JavaConversions.seqAsJavaList
+import org.obm.push.protocol.data.Base64ASTimeZoneDecoder
+import org.obm.push.protocol.bean.ASTimeZone
+import org.obm.push.protocol.bean.ASSystemTime
+import org.obm.push.utils.`type`.UnsignedShort
 
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.SyncRequest
-import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncResponse
-import org.obm.push.wbxml.WBXMLTools
-
-import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.decoder.GatlingDecoders.syncDecoder
-import org.obm.push.encoder.GatlingEncoders.syncEncoder
-
-abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
-
-	val syncNamespace = "AirSync"
+object GatlingTimeZoneDecoder extends Base64ASTimeZoneDecoder {
 	
-	override val commandTitle = "Sync command"
-	override val commandName = "Sync"
-
-	override def buildCommand() = {
-		super.buildCommand()
-			.byteArrayBody((session: Session) => buildSyncRequest(session))
-			.check(bodyExtractor
-			    .find
-			    .transform((response: Array[Byte]) => toSyncResponse(response))
-			    .saveAs(syncContext.sessionKeyLastSync))
-	}
-
-	def buildSyncRequest(session: Session): Array[Byte] = {
-		val request = SyncRequest.builder()
-			.collections(buildSyncRequestCollections(session))
+	override def decode(base64TimeZone: Array[Byte]): ASTimeZone  = {
+		buildParisTimeZone()
+	};
+	
+	def buildParisTimeZone(): ASTimeZone = {
+		ASTimeZone.builder()
+			.bias(1)
+			.standardName("Central European Summer Time")
+			.standardDate(asSummerTime())
+			.standardBias(3)
+			.dayLightName("Central European Time")
+			.dayLightDate(asWinterTime())
+			.dayLightBias(2)
 			.build()
-		
-		val requestDoc = syncEncoder.encodeSync(request)
-		wbTools.toWbxml(syncNamespace, requestDoc)
 	}
 	
-	def buildSyncRequestCollections(session: Session): List[SyncRequestCollection]
+	private[this] def asSummerTime(): ASSystemTime = {
+		ASSystemTime.builder()
+			.year(UnsignedShort.checkedCast(2012))
+			.month(UnsignedShort.checkedCast(10))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.weekOfMonth(UnsignedShort.checkedCast(5))
+			.hour(UnsignedShort.checkedCast(3))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0))
+			.build();
+	}
 	
-	def toSyncResponse(response: Array[Byte]): SyncResponse = {
-		val responseDoc = wbTools.toXml(response)
-		syncDecoder.decodeSyncResponse(responseDoc)
+	private[this] def asWinterTime(): ASSystemTime = {
+		ASSystemTime.builder()
+			.year(UnsignedShort.checkedCast(2012))
+			.month(UnsignedShort.checkedCast(03))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.weekOfMonth(UnsignedShort.checkedCast(5))
+			.hour(UnsignedShort.checkedCast(2))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0))
+			.build();
 	}
 }
