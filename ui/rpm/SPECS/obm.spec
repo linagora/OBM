@@ -363,10 +363,6 @@ chmod 0664 \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/resources/*/*/*.inc \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}include/*/of_session.inc
 
-#Roundcube permissions
-chown -R root:apache $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/temp/ $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/logs/
-chmod -R 770 $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/temp/ $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/logs/
-
 ln -s %{_datadir}/%{name}/resources $RPM_BUILD_ROOT%{_datadir}/%{name}/php/images
 
 cd $RPM_BUILD_ROOT%{_sysconfdir}
@@ -495,11 +491,13 @@ fi
 %{_datadir}/%{name}/app
 %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/locale
-%{_datadir}/%{name}/webmail
 %{_sysconfdir}/%{name}/hooks
 %{_sysconfdir}/%{name}/themes
 %{_sysconfdir}/%{name}/modules
 %{_sysconfdir}/cron.d/obm-core
+
+%attr(770,-,apache) %dir %{_datadir}/%{name}/php/webmail/temp
+%attr(770,-,apache) %dir %{_datadir}/%{name}/php/webmail/logs
 
 %files		-n perl-OBM
 %defattr(-,root,root,-)

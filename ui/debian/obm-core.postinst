@@ -45,9 +45,8 @@ if is_initial_configuration "$@"; then
   /bin/chown -R root.www-data /var/lib/obm
   /bin/chmod -R 770 /var/lib/obm
   
-  #Permissions for roundcube
-  /bin/chown -R root.www-data /usr/share/obm/www/webmail/temp/ /usr/share/obm/www/webmail/logs/
-  /bin/chmod -R 770 /usr/share/obm/www/webmail/temp/ /usr/share/obm/www/webmail/logs/
+  /bin/chown -R root.www-data /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
+  /bin/chmod -R 770 /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
   
   #configuration	de obm_conf.inc
   #sed -i -e 's#^\$cbackup_root.*#\$cbackup_root = "/var/lib/obm/backup";#' /etc/obm/obm_conf.inc
