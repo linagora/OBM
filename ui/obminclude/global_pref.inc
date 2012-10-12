@@ -500,9 +500,9 @@ if ($cgp_show['module']['organizationalchart']) {
 }
 
 if ($cgp_show['module']['webmail'] && $u['mail_perms'] == 1) {
-  $modules['webmail'] = array('Name'=> $l_module_webmail,
+  $modules['webmail'] = array('Name'=> $l_module_webmail_pref,
                                     'Ico' => "$ico_webmail",
-                                    'Url' => "$path/webmail",
+                                    'Url' => "$path/webmail/?_task=settings",
 			            'Right'=> $cright_read);
 }
 

@@ -278,6 +278,7 @@ $l_insert = "Inserisci";
 $l_recursive = "Ricorsivo";
 $l_category1 = "Categoria";
 $l_section_webmail = "Webmail";
+$l_module_webmail_pref = "Webmail preferenze";
 $l_this_week = "Questa settimana";
 $l_err_fill = "Il campo deve essere riempito";
 $l_of_right_err_empty = "Il riferimento dell'oggetto da visualizzare è assente!";

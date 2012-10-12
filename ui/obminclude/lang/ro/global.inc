@@ -354,6 +354,7 @@ $l_module_mailforward = "Redirecționare mail";
 $l_module_vacation = "Mesaj de răspuns";
 $l_module_mailbox = "Căsuțe poștale";
 $l_module_webmail = "Webmail";
+$l_module_webmail_pref = "Webmail Preferences";
 $l_header_admin = "Admin";
 $l_header_import = "Importați";
 $l_header_new_f = "Nouă";

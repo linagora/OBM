@@ -383,6 +383,7 @@ $l_module_mailforward = "Mail Forward";
 $l_module_vacation = "Mail Vacation";
 $l_module_mailbox = "Mailbox";
 $l_module_webmail = "Webmail";
+$l_module_webmail_pref = "Webmail Preferences";
 $l_module_device = "Mobile devices";
 $l_module_admin_device = "Mobile devices management";
 $l_module_log    = "Logs";

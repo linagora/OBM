@@ -248,6 +248,7 @@ $l_firstname = "Vorname";
 $l_recursive = "rekursiv";
 $l_category1 = "Kategorie";
 $l_section_webmail = "Webmail";
+$l_module_webmail_pref = "Webmail Preferences";
 $l_err_fill = "Das Feld muss ausgefÃ¼llt werden.";
 $l_of_right_err_empty = "Die Objekt-Referenz fehlt!";
 $l_code = "Code";

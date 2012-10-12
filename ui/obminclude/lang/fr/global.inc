@@ -420,6 +420,7 @@ $l_module_mailforward = "Redirection messagerie";
 $l_module_vacation = "Répondeur messagerie";
 $l_module_mailbox = "Boîte aux lettres";
 $l_module_webmail = "Webmail";
+$l_module_webmail_pref = "Preferences de Webmail";
 $l_module_device = "Périphériques mobiles";
 $l_module_admin_device = "Gestion des périphériques mobiles";
 

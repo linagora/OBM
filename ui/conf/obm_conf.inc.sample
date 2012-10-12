@@ -262,8 +262,7 @@ $profiles['admin'] = array (
 // --- sections --- Default is true
 //$cgp_show['section'] = ''; // Needed if module order to change
 //$cgp_show['section']['com']['url'] = "$path/calendar/calendar_index.php";
-//$cgp_show['section']['webmail']['url'] = 'http://webmail';
-//$cgp_show['section']['webmail']['url'] = $path."/horde3";
+//$cgp_show['section']['webmail']['url'] = $path.'/webmail';
 //$cgp_show['section']['webmail']['target'] = '_blank';
 
 $cgp_show['section']['com'] = false;
