@@ -1,0 +1,28 @@
+CHANGELOG Roundcube plugin multiple_smtp_server
+===============================================
+
+RELEASE 0.2
+-----------
+- Extend comparison of IMAP hosts (now host, scheme and port)
+- Show message with used SMTP server now also always with port
+- Change IMAP host schemes to all possible types (ssl, tls and imaps)
+- Check for right task with defined task member
+- Fix: Use strcmp() for string comparison
+- Fix: Rename variable with the same name
+
+
+RELEASE 0.1.2
+-------------
+- Set rcmail instance as member variable
+- Load configuration in init method
+
+
+RELEASE 0.1.1
+-------------
+- Remove .gitignore from repository
+- Move config files in config directory
+
+
+RELEASE 0.1
+-----------
+- First public release working with Roundcube 0.5.3

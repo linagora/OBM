@@ -1,0 +1,30 @@
+<?php
+
+// Configuration file for Roundcube plugin for multiple SMTP server
+
+/**
+ * SMTP server for default host array
+ */
+$rcmail_config['multiple_smtp_server'] = array (
+    'Host 1' => 'ssl://smtp.host1.com:465',
+    'Host 2' => 'ssl://mailhost.host2.com:465',
+    'Host 3' => 'tls://smtp.host3.com:587'
+);
+
+/**
+ * SMTP server for blank default host value
+ */
+/*
+$rcmail_config['multiple_smtp_server'] = array (
+    'ssl://mail.host1.com:993' => 'ssl://smtp.host1.com:465',
+    'ssl://mailbox.host2.com:993' => 'ssl://mailhost.host2.com:465',
+    'ssl://imap.host3.com:993' => 'tls://smtp.host3.com:587'
+);
+*/
+
+/**
+ * Show message after send which SMTP server was used
+ */
+$rcmail_config['multiple_smtp_server_message'] = false;
+
+?>

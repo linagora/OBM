@@ -1,0 +1,93 @@
+Roundcube plugin for multiple SMTP server
+=========================================
+
+Introduction
+------------
+This plugin allows you to set multiple SMTP server for Roundcube.
+
+There are three ways to set IMAP mail hosts on $rcmail_config['default_host']
+in Roundcube :
+* Set one host as string
+* Give a list of hosts to display a pulldown menu
+* Leave blank to show a textbox at login
+
+For the first way you don't need this plugin because you can set the SMTP server
+counterpart on $rcmail_config['smtp_server'] as string directly.
+
+For the second and third way this plugin is made for. For a defined list of IMAP
+mail hosts you can now specify the counterparts of SMTP server as an array. If
+you allow your users to write their hosts into a textbox you can also specify an
+array of SMTP servers to find the relevant counterparts.
+
+
+Download
+--------
+This plugin can be downloaded from
+https://github.com/unstko/Roundcube-plugins
+
+You can also check it out from its repository:
+$ git clone git://github.com/unstko/Roundcube-plugins.git
+
+
+Installation
+------------
+Put the multiple_smtp_server folder into the plugin folder and enable the
+plugin by adding multiple_smtp_server into the $rcmail_config['plugins'] array.
+
+Copy config/config.inc.php.dist to config/config.inc.php and modify it.
+
+
+Configuration
+-------------
+If you have a list of IMAP hosts in the following way:
+
+$rcmail_config['default_host'] = array (
+    'ssl://mail.host1.com' => 'Host 1',
+    'ssl://mailbox.host2.com' => 'Host 2',
+    'ssl://imap.host3.com' => 'Host 3'
+);
+
+Specify an array $rcmail_config['multiple_smtp_server'] in the config.inc.php
+with the counterparts in the following way:
+
+$rcmail_config['multiple_smtp_server'] = array (
+    'Host 1' => 'ssl://smtp.host1.com:465',
+    'Host 2' => 'ssl://mailhost.host2.com:465',
+    'Host 3' => 'tls://smtp.host3.com:587'
+);
+
+The plugin will then make the comparision based on the host names.
+
+If you leave the $rcmail_config['default_host'] blank you can specify the array
+$rcmail_config['multiple_smtp_server'] in the config.inc.php as followed:
+
+$rcmail_config['multiple_smtp_server'] = array (
+    'ssl://mail.host1.com:993' => 'ssl://smtp.host1.com:465',
+    'ssl://mailbox.host2.com:993' => 'ssl://mailhost.host2.com:465',
+    'ssl://imap.host3.com:993' => 'tls://smtp.host3.com:587'
+);
+
+The plugin will then take the user specified host and tries to find it in this
+array. So you can also set counterparts for known hosts.
+
+If the plugin doesn't find the right counterpart it doesn't change the default
+SMTP settings you made in:
+* $rcmail_config['smtp_server']
+* $rcmail_config['smtp_port']
+* $rcmail_config['smtp_user']
+* $rcmail_config['smtp_pass']
+
+When changing the SMTP server to a new value the plugin also sets the username
+and password to the current values of the user. This is because normaly the
+username and password of an IMAP host also fits to the matching SMTP server.
+
+
+License
+-------
+This plugin is distributed under the MIT License.
+Please see multiple_smtp_server.php for the complete license.
+
+
+Contribution
+------------
+Visit https://github.com/unstko/Roundcube-plugins if you want to contribute.
