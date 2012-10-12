@@ -903,11 +903,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throws FindException {
 		Calendar cal = getGMTCalendar();
 		String domainName = resourceInfo.getDomainName();
+		Attendee resourceAtt = new Attendee();
+		resourceAtt.setEmail(resourceInfo.getMail());
 		Connection conn = null;
 		try {
 			conn = obmHelper.getConnection();
 			EventLoader loader = EventLoader.builder().connection(conn).domainName(domainName).calendar(cal).
-				occurringBetween(syncRange).usingResources(resourceInfo.getId()).withExceptions(true).build();
+				occurringBetween(syncRange).usingResources(resourceInfo.getId()).withExceptions(true).
+				withoutDeclinedAttendee(resourceAtt).build();
 			Map<EventObmId, Event> events = loader.load();
 			return events.values();
 		}
