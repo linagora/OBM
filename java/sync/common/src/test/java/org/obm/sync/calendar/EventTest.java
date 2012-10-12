@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import static org.obm.DateUtils.date;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,14 +46,12 @@ import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ToolBox;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class EventTest {
@@ -1440,4 +1438,41 @@ public class EventTest {
 		assertThat(event.getTitle()).isNull();
 	}
 	
+    @Test
+	public void testChangeAttendeesParticipation() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = publicEvent.getAttendees();
+
+		for (Attendee attendee : attendees){
+			attendee.setParticipation(Participation.ACCEPTED);
+		}
+		publicEvent.updateParticipation();
+
+		List<Attendee> updatedAttendees = publicEvent.getAttendees();
+		for (Attendee upAtt : updatedAttendees){
+			assertThat(upAtt.getParticipation()).isEqualTo(Participation.NEEDSACTION);
+		}
+	}
+
+	@Test
+	public void resetAttendeeCommentWhenEventIsUpdated() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		List<Attendee> attendees = publicEvent.getAttendees();
+
+		Comment attComent = new Comment("No Way! Get off my calendar!");
+
+		for (Attendee attendee : attendees){
+			attendee.setParticipation(Participation.DECLINED);
+			attendee.getParticipation().setComment(attComent);
+		}
+
+		publicEvent.updateParticipation();
+
+		Comment emptyComment = new Comment("");
+
+		List<Attendee> updatedAttendees = publicEvent.getAttendees();
+		for (Attendee upAtt : updatedAttendees){
+			assertThat(upAtt.getParticipation().getComment()).isEqualTo(emptyComment);
+		}
+	}
 }

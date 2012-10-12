@@ -2773,7 +2773,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
-			ps.setString(idx++, participation.getComment().serializeToString());
+			ps.setString(idx++, "");
 			ps.setString(idx++, extId.getExtId());
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
@@ -2828,7 +2828,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			int idx = 1;
 			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
 			ps.setInt(idx++, loggedUserId);
-			ps.setString(idx++, participation.getComment().serializeToString());
+			ps.setString(idx++, "");
 			ps.setString(idx++, extId.getExtId());
 			Date recId = new DateTime(recurrenceId.getRecurrenceId());
 			ps.setTimestamp(idx++, new Timestamp(recId.getTime()));
