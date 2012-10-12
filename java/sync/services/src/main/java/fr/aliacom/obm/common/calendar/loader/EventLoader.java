@@ -16,7 +16,6 @@ import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.SyncRange;
 
 import com.google.common.base.Joiner;
@@ -26,6 +25,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.calendar.EventUtils;
+import fr.aliacom.obm.common.calendar.loader.filter.DeclinedAttendeeFilter;
+import fr.aliacom.obm.common.calendar.loader.filter.EventFilter;
 import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
@@ -140,9 +141,14 @@ public class EventLoader {
 			Preconditions
 					.checkState((updatedAfter == null || updatedOrOccuringAfter == null),
 							"The updatedAfter and updatedOrOccurringAfter arguments are mutually exclusive");
+
+			List<EventFilter> filters = Lists.newArrayList();
+			if (this.withoutDeclinedAttendee != null) {
+				filters.add(new DeclinedAttendeeFilter(this.withoutDeclinedAttendee));
+			}
 			return new EventLoader(conn, domainName, cal, ids, updatedAfter,
 					updatedOrOccuringAfter, occurringBetween, usingResources, withExceptions,
-					withAlertsFor, withoutDeclinedAttendee);
+					withAlertsFor, filters);
 		}
 	}
 
@@ -200,12 +206,12 @@ public class EventLoader {
 	private Set<Integer> usingResources;
 	private boolean withExceptions;
 	private EventObmId withAlertsFor;
-	private Attendee withoutDeclinedAttendee;
+	private List<EventFilter> eventFilters;
 
 	private EventLoader(Connection conn, String domainName, Calendar cal, Set<EventObmId> ids,
 			Date updatedAfter, Date updatedOrOccuringAfter, SyncRange occurringBetween,
 			Set<Integer> usingResources, boolean withExceptions, EventObmId withAlertsFor,
-			Attendee withoutDeclinedAttendee) {
+			List<EventFilter> eventFilters) {
 		this.conn = conn;
 		this.domainName = domainName;
 		this.cal = cal;
@@ -216,7 +222,7 @@ public class EventLoader {
 		this.usingResources = usingResources;
 		this.withExceptions = withExceptions;
 		this.withAlertsFor = withAlertsFor;
-		this.withoutDeclinedAttendee = withoutDeclinedAttendee;
+		this.eventFilters = eventFilters;
 	}
 
 	public Map<EventObmId, Event> load() throws SQLException {
@@ -233,12 +239,20 @@ public class EventLoader {
 			rs = stat.executeQuery();
 			Map<EventObmId, Event> eventsById = buildEvents(rs);
 			loadObjectGraph(eventsById);
-			Map<EventObmId, Event> filteredEventsById = filterEventsOnDeclinedAttendees(eventsById);
+			Map<EventObmId, Event> filteredEventsById = filterEvents(eventsById);
 			computeIsInternal(filteredEventsById);
 			return filteredEventsById;
 		} finally {
 			DBUtils.cleanup(stat, rs);
 		}
+	}
+
+	private Map<EventObmId, Event> filterEvents(Map<EventObmId, Event> events) {
+		Map<EventObmId, Event> filteredEvents = events;
+		for (EventFilter filter : eventFilters) {
+			filteredEvents = filter.filter(filteredEvents);
+		}
+		return filteredEvents;
 	}
 
 	private void computeIsInternal(Map<EventObmId, Event> eventsById) {
@@ -293,37 +307,6 @@ public class EventLoader {
 		AlertLoader alertLoader = AlertLoader.builder().connection(conn).eventsById(eventsById)
 				.build();
 		alertLoader.load();
-	}
-
-	private Map<EventObmId, Event> filterEventsOnDeclinedAttendees(Map<EventObmId, Event> unfilteredEventsById) {
-		if (this.withoutDeclinedAttendee == null) {
-			return unfilteredEventsById;
-		}
-
-		Map<EventObmId, Event> filteredEventsById = Maps.newHashMap();
-		for (Event event : unfilteredEventsById.values()) {
-			if (!event.isRecurrent()) {
-				Attendee att = event.findAttendeeFromEmail(withoutDeclinedAttendee.getEmail());
-				if (att.getState() != ParticipationState.DECLINED) {
-					filteredEventsById.put(event.getObmId(), event);
-				}
-			}
-			else {
-				event.getRecurrence().replaceUnattendedEventExceptionByException(this.withoutDeclinedAttendee.getEmail());
-
-				Attendee att = event.findAttendeeFromEmail(this.withoutDeclinedAttendee.getEmail());
-				boolean isParentEventDeclined = att == null || att.getState() == ParticipationState.DECLINED;
-				if (isParentEventDeclined) {
-					for (Event ex : event.getEventsExceptions()) {
-						filteredEventsById.put(ex.getObmId(), ex);
-					}
-				}
-				else {
-					filteredEventsById.put(event.getObmId(), event);
-				}
-			}
-		}
-		return filteredEventsById;
 	}
 
 	private Map<EventObmId, Event> buildEvents(ResultSet rs) throws SQLException {
