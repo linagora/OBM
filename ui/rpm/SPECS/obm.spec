@@ -349,7 +349,7 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm/documents/8
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm/documents/9
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-cp -apR contrib cron obminclude php resources tests scripts locale views app lib webmail \
+cp -apR contrib cron obminclude php resources tests scripts locale views app lib \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}
 cp conf/obm_conf.inc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 # Fix permissions
