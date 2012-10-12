@@ -5,7 +5,6 @@
 %global _source_payload w9.gzdio
 
 %global jetty_home /usr/share/jetty6
-
 Name: obm-sync
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
@@ -96,7 +95,6 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-
 %prep
 %setup -q -n obm-java-%{version}
 
@@ -104,57 +102,52 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 LANG=en_US.UTF-8 mvn clean install
 
 %install
-rm -rf $RPM_BUILD_ROOT
+
+# obm-sync
+
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}
-# install obm-sync
+mkdir -p $RPM_BUILD_ROOT%{_datadir}
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-sync
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-sync
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-sync/jms
-# copie du web-inf de obm-sync
-WEB_INF=`find services/target -name WEB-INF `
+WEB_INF=`find services/target -name WEB-INF`
 cp -r ${WEB_INF} $RPM_BUILD_ROOT%{_datadir}/obm-sync
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/slf4j-api-*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/logback*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/jta-1.1.jar
-# postinst pour obm-sync
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-sync
 
-# install opush
-mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/opush
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/opush
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/opush
-cp opush/config-sample/sync_perms.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
-cp opush/config-sample/ldap_conf.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
-cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT/%{_sysconfdir}/opush/
-# copie du web-inf
-cd opush
-WEB_INF=`find push/target -name WEB-INF `
-cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush
-cd -
+# opush
 
-# install obm-locator
+mkdir -p $RPM_BUILD_ROOT%{jetty_home}/webapps/opush
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/opush
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/opush
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/opush
+cp opush/config-sample/sync_perms.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
+cp opush/config-sample/ldap_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
+cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
+cp -r opush/push/target/opush/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush/
+
+# obm-locator
+
 mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-locator
-# copie du web-inf
-WEB_INF=`find obm-locator/target -name WEB-INF `
-cp -r ${WEB_INF} $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
+cp -r obm-locator/target/obm-locator/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator/
 
-# common libs
+# obm-jetty-common-libs
 mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
 cp -p webapp-common-dependencies/target/jetty/*.jar \
   $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
 
+# obm-tomcat-common-libs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/tomcat/lib
 cp -p webapp-common-dependencies/target/tomcat/*.jar \
   $RPM_BUILD_ROOT%{_datadir}/tomcat/lib/
-
 
 
 %files -n obm-sync
