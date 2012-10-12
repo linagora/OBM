@@ -99,7 +99,7 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 %setup -q -n obm-java-%{version}
 
 %build
-LANG=en_US.UTF-8 mvn clean install
+[ -z "%{obm_no_compile}" ] || [ %{obm_no_compile} != "1" ] && LANG=en_US.UTF-8 mvn install
 
 %install
 
