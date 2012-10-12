@@ -43,6 +43,16 @@ NameVirtualHost *:443
     LimitRequestBody 20971520
 
     Alias /stats /var/www/munin
+    
+    Alias /webmail /usr/share/obm/www/webmail/
+    
+#obm#<Directory /usr/share/obm/www/webmail/>
+#obm#  DirectoryIndex index.php
+#obm#  Options +FollowSymLinks
+#obm#  AllowOverride All
+#obm#  Order allow,deny
+#obm#  Allow from all
+#obm#</Directory>
 
 #obm#<Location /obm-sync>
 #obm#  Order allow,deny
