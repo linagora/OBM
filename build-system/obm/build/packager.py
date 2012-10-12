@@ -23,7 +23,7 @@ class Packager(object):
     """
 
     def __init__(self, package, package_type, build_dir, changelog_updater,
-            version, release, perl_module_compat=None, perl_vendorlib=None):
+            version, release, perl_module_compat=None, perl_vendorlib=None, nocompile=False):
         self.package = package
         self.package_type = package_type
         self.changelog_updater = changelog_updater
@@ -33,6 +33,7 @@ class Packager(object):
         self.perl_vendorlib = perl_vendorlib
         self.build_dir = build_dir
         self._target_dir = os.path.join(self.build_dir, package.name)
+        self.nocompile = nocompile
 
     def prepare_build(self):
         """
@@ -140,7 +141,8 @@ class Packager(object):
         logging.info("Building package %s" % self.package.name)
         command = None
         if self.package_type == "deb":
-            command = 'debuild --no-tgz-check -us -uc -sa'
+            command = 'debuild -e OBM_NO_COMPILE --no-tgz-check -us -uc -sa'
+            os.putenv('OBM_NO_COMPILE', "%d" % self.nocompile)
         elif self.package_type == "rpm":
             distname, version, id = platform.linux_distribution()
             # If we're not building on RedHat/CentOS, we need to make sure we're
@@ -152,6 +154,7 @@ class Packager(object):
                 "--define '_rpmdir %s' --define '_srcrpmdir %s' " \
                 "--define 'obm_version %s' --define 'obm_release %s' " % \
                 (topdir, target_dir, target_dir, self.version, self.release)
+            command += "--define 'obm_no_compile %d' " % self.nocompile
             if redefine_platform_params:
                 # Override the Perl module destination directory
                 if self.perl_vendorlib is None or self.perl_module_compat is None:

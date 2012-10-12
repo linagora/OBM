@@ -39,6 +39,9 @@ def build_argument_parser(args):
     parser.add_argument('--perl-version', help='perl flavor (only for RPMs)',
             default='5.8', dest='perl_version', choices=['5.8', '5.10'])
 
+    parser.add_argument('-n', '--nocompile', help='Do not attempt to compile anything',
+            default=False, action='store_true', dest='nocompile');
+
     package_types = ['deb', 'rpm']
     parser.add_argument('-p', '--package-type', metavar='PACKAGETYPE',
             help="package type, may be one of: %s" % ", ".join(package_types),
@@ -114,7 +117,7 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
 
     packagers = [ob.Packager(p, args.package_type, packages_dir,
         changelog_updater, version, release, perl_module_compat,
-        perl_vendorlib) for p in packages]
+        perl_vendorlib, args.nocompile) for p in packages]
     return packagers
 
 def assert_package_option_is_correct(usage, package_names, available_packages):
