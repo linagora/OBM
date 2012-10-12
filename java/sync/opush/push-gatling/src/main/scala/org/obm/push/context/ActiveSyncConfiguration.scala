@@ -29,31 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.context.http
+package org.obm.push.context
 
-import org.apache.commons.codec.binary.Base64
-import org.obm.push.context.Configuration
+import org.obm.push.context.http.HttpHeaders
+import org.obm.push.context.http.HttpQueryParams
 
-import com.google.common.base.Charsets
-import com.google.common.base.Strings
-
-class ActiveSyncHttpContext(context: Configuration) extends HttpContext {
+object ActiveSyncConfiguration {
   
-	val headerContentTypeWbXml = new HttpHeader(HttpHeaders.CONTENT_TYPE, "application/vnd.ms-sync.wbxml")
-	val headerActiveSyncVersion = new HttpHeader(HttpHeaders.AS_VERSION, "12.1")
-	val headerActiveSyncPolicyKey = new HttpHeader(HttpHeaders.AS_POLICY_KEY, context.userPolicyKey)
-	val headerAuthorization = {
-		val authValue = "%s\\%s:%s".format(context.userDomain, context.userLogin, context.userPassword)
-		val authBase64Bytes = Base64.encodeBase64(authValue.getBytes(Charsets.UTF_8))
-		val headerValue = "Basic %s".format(new String(authBase64Bytes, Charsets.UTF_8))
-		new HttpHeader(HttpHeaders.AUTHORIZATION, headerValue) 
-	}
-	
-	
-	val paramDeviceId = new HttpQueryParam(HttpQueryParams.DEVICE_ID, context.userDeviceId)
-	val paramDeviceType = new HttpQueryParam(HttpQueryParams.DEVICE_TYPE, context.userDeviceType)
-	val paramUser = new HttpQueryParam(HttpQueryParams.USER, context.userDomain + "\\" + context.userLogin)
-	
-	
 	val postUrl = "/Microsoft-Server-ActiveSync"
+	val wbXmlContentType = "application/vnd.ms-sync.wbxml"
+	val activeSyncVersion = "12.1"
+	
 }

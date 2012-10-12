@@ -32,29 +32,24 @@
 package org.obm.push
 
 import scala.collection.mutable.MutableList
-import org.apache.james.mime4j.dom.address.Mailbox
-import org.obm.push.command.SendEmailCommand
-import org.obm.push.command.SendEmailContext
+import org.obm.push.bean.FolderType
+import org.obm.push.command.FolderSyncCommand
+import org.obm.push.command.InitialFolderSyncContext
+import org.obm.push.command.InitialSyncContext
+import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.context.http.HttpContext
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
 import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
+import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
 import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
-import org.obm.push.context.UserConfiguration
-import com.excilys.ebi.gatling.core.action.builder.ActionBuilder
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.command.InitialFolderSyncContext
-import org.obm.push.context.http.HttpContext
-import org.obm.push.command.InitialSyncContext
-import org.obm.push.command.SyncCollectionCommand
-import org.obm.push.command.FolderSyncCommand
-import org.obm.push.bean.FolderType
+import org.obm.push.context.feeder.UserFeeder
 
 class InitialSyncOnCalendarSimulation extends Simulation {
 
@@ -79,29 +74,22 @@ class InitialSyncOnCalendarSimulation extends Simulation {
 	}
 
 	def buildScenarioForUser(userNumber: Int) = {
-		val userContext = userHttpContext(login(userNumber))
-		val initialFolderSyncCommand = buildInitialFolderSyncCommand(userContext)
-		val syncOnCalendarCommand = buildSyncOnCalendarCommand(userContext)
-			
+		val user = new User(userNumber, configuration)
+		val userKey = new UserKey("user")
+		val feeder = new UserFeeder(Seq(user).iterator, userKey)
+		
 		scenario("Initial Sync on user's calendar")
-			.exec(initialFolderSyncCommand)
-			.exec(syncOnCalendarCommand)
+			.exec(s => s.setAttributes(feeder.next))
+			.exec(buildInitialFolderSyncCommand(userKey))
+			.exec(buildSyncOnCalendarCommand(userKey))
 	}
 	
-	def buildSyncOnCalendarCommand(userContext: HttpContext) = {
-		val initialSyncContext = new InitialSyncContext(FolderType.DEFAULT_CALENDAR_FOLDER)
-		new SyncCollectionCommand(userContext, initialSyncContext, wbTools).buildCommand
+	def buildSyncOnCalendarCommand(userKey: UserKey) = {
+		val initialSyncContext = new InitialSyncContext(userKey, FolderType.DEFAULT_CALENDAR_FOLDER)
+		new SyncCollectionCommand(initialSyncContext, wbTools).buildCommand
 	}
 	
-	def buildInitialFolderSyncCommand(userContext: HttpContext) = {
-		val initialFolderSyncContext = new InitialFolderSyncContext()
-		new FolderSyncCommand(userContext, initialFolderSyncContext, wbTools).buildCommand
+	def buildInitialFolderSyncCommand(userKey: UserKey) = {
+		new FolderSyncCommand(new InitialFolderSyncContext(userKey), wbTools).buildCommand
 	}
-	
-	def userHttpContext(userLogin: String) = {
-		new ActiveSyncHttpContext(
-			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
-	}
-	
-	def login(userNumber: Int) = "u%d".format(userNumber)
 }

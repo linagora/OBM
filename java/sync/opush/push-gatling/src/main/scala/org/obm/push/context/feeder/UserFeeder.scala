@@ -29,19 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.context
+package org.obm.push.context.feeder
 
-class UserConfiguration(default: Configuration) {
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
 
-	def cloneForUser(
-			serverUrl: String = default.targetServerUrl,
-			login: String = default.userLogin,
-			domain: String = default.userDomain,
-			pwd: String = default.userPassword,
-			policyKey: String = default.userPolicyKey,
-			deviceId: String = default.userDeviceId,
-			deviceType: String = default.userDeviceType)
+class UserFeeder(users: Iterator[User], userKeys: UserKey*) extends Iterator[Map[String, Any]] {
 	
-	= GatlingConfiguration.build(serverUrl, domain, login, pwd, policyKey, deviceId, deviceType);
-
+	val cyclicUsers = Stream.continually(users).flatten.iterator;
+	
+	def hasNext = true
+	def next = {
+		var sessionMap = Map[String, Any]()
+		for (userKey <- userKeys; user = cyclicUsers.next) {
+			sessionMap += userKey.key -> user
+			sessionMap += userKey.elUserPolicyKey -> user.policyKey
+		}
+		sessionMap
+	}
+	
 }

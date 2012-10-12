@@ -31,19 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.protocol.bean.SyncResponse
-import scala.collection.JavaConversions._
 import org.obm.push.bean.FolderType
+import org.obm.push.context.UserKey
 
-trait CollectionContext {
+import com.excilys.ebi.gatling.core.session.Session
+
+class CollectionContext(userKey: UserKey) {
 	
 	private[this] var collectionId: Option[Int] = None
 	def findCollectionId(session: Session, folderType: FolderType): Int = {
 		if (collectionId.isEmpty) {
-			collectionId = Option.apply(new FolderSyncContext().collectionId(session, folderType))
+			collectionId = Option.apply(userKey.sessionHelper.collectionId(session, folderType))
 		}
 		collectionId.get
 	}

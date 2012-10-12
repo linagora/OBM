@@ -31,23 +31,33 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.context.http.HttpContext
+import org.obm.push.context.ActiveSyncConfiguration
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
+import org.obm.push.context.http.HttpHeaders
 import org.obm.push.context.http.HttpQueryParams
-
 import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
+import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.http.Predef.http
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
+import org.obm.push.helper.GatlingHelper
 
-abstract class AbstractActiveSyncCommand(httpContext: HttpContext) extends ActiveSyncCommand {
+abstract class AbstractActiveSyncCommand(userKey: UserKey)
+		extends ActiveSyncCommand {
 
 	override def buildCommand(): PostHttpRequestBuilder = {
 		http(commandTitle)
-			.post(httpContext.postUrl)
-			.headers(httpContext.commonHeaders)
-			.queryParam(httpContext.paramUser.name, httpContext.paramUser.value)
-			.queryParam(httpContext.paramDeviceId.name, httpContext.paramDeviceId.value)
-			.queryParam(httpContext.paramDeviceType.name, httpContext.paramDeviceType.value)
-			.queryParam(HttpQueryParams.COMMAND.toString(), commandName)
+			.post(ActiveSyncConfiguration.postUrl)
+			.header(HttpHeaders.CONTENT_TYPE.toString, ActiveSyncConfiguration.wbXmlContentType)
+			.header(HttpHeaders.AS_VERSION.toString, ActiveSyncConfiguration.activeSyncVersion)
+			.header(HttpHeaders.AS_POLICY_KEY.toString, GatlingHelper.el(userKey.elUserPolicyKey))
+			.basicAuth(s => user(s).userProtocol, s => user(s).password)
+			.queryParam(s => HttpQueryParams.USER.toString, s => user(s).userProtocol)
+			.queryParam(s => HttpQueryParams.DEVICE_ID.toString, s => user(s).deviceId.getDeviceId())
+			.queryParam(s => HttpQueryParams.DEVICE_TYPE.toString, s => user(s).deviceType)
+			.queryParam(s => HttpQueryParams.COMMAND.toString, commandName)
 	}
+	
+	def user(session: Session) = session.getTypedAttribute[User](userKey.key)
 	
 }

@@ -32,13 +32,14 @@
 package org.obm.push.context
 
 import com.google.common.base.Strings
+import org.obm.push.bean.DeviceId
 
 object Arguments extends Enumeration {
   
 	val TARGET_SERVER_URL_ARG = Value("targetServerUrl")
 	  
 	val USER_DOMAIN = Value("userDomain")
-	val USER_LOGIN = Value("userLogin")
+	val USER_LOGIN_PREFIX = Value("userLoginPrefix")
 	val USER_PASSWORD = Value("userPassword")
 	val USER_POLICY_KEY = Value("userPolicyKey")
 	val USER_DEVICE_ID = Value("userDeviceId")
@@ -50,19 +51,19 @@ object GatlingConfiguration {
 	def build(): Configuration = build(
 			System.getProperty(Arguments.TARGET_SERVER_URL_ARG.toString),
 			System.getProperty(Arguments.USER_DOMAIN.toString),
-			System.getProperty(Arguments.USER_LOGIN.toString),
+			System.getProperty(Arguments.USER_LOGIN_PREFIX.toString),
 			System.getProperty(Arguments.USER_PASSWORD.toString),
 			System.getProperty(Arguments.USER_POLICY_KEY.toString),
 			System.getProperty(Arguments.USER_DEVICE_ID.toString),
 			System.getProperty(Arguments.USER_DEVICE_TYPE.toString))
 	
 	def build(
-			serverUrl: String, domain: String, login: String,
+			serverUrl: String, domain: String, loginPrefix: String,
 			password: String, policyKey: String, deviceId: String, deviceType: String) = {
 	  
 			require(!Strings.isNullOrEmpty(serverUrl))
 			require(!Strings.isNullOrEmpty(domain))
-			require(!Strings.isNullOrEmpty(login))
+			require(!Strings.isNullOrEmpty(loginPrefix))
 			require(!Strings.isNullOrEmpty(password))
 			require(!Strings.isNullOrEmpty(deviceId))
 			require(!Strings.isNullOrEmpty(deviceType))
@@ -72,12 +73,12 @@ object GatlingConfiguration {
 			
 				override val targetServerUrl = serverUrl
 				 
-				override val userDomain = domain
-				override val userLogin = login
-				override val userPassword = password
-				override val userPolicyKey = policyKey
-				override val userDeviceId = deviceId
-				override val userDeviceType = deviceType
+				override val defaultUserDomain = domain
+				override val defaultUserLoginPrefix = loginPrefix
+				override val defaultUserPassword = password
+				override val defaultUserPolicyKey = policyKey
+				override val defaultUserDeviceId = new DeviceId(deviceId)
+				override val defaultUserDeviceType = deviceType
 				
 		  	}
 	}

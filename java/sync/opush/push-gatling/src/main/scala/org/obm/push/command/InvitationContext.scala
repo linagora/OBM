@@ -31,27 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.FolderType
-import scala.util.Random
-import org.obm.push.bean.AttendeeStatus
 import scala.collection.mutable.Map
+import scala.util.Random
+
+import org.obm.push.bean.AttendeeStatus
+import org.obm.push.bean.FolderType
+import org.obm.push.context.UserKey
 
 class InvitationContext(
-		val organizerEmail: String,
-		val attendeesEmails: Set[String] = Set(),
+		organizer: UserKey,
+		val attendees: Set[UserKey] = Set(),
 		val clientId: String = new Random().nextInt(Int.MaxValue).toString(),
 		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER)
-			extends SyncContext(folderType) {
+			extends SyncContext(organizer, folderType) {
 	
 	require(folderType.isCalendarFolder())
+	
 }
 
 class PendingInvitationContext(val invitation: InvitationContext, val serverId: String) {
 	
 	val attendeeReplies = Map[String, AttendeeStatus]()
 	
-	def hasReplyOfEveryAttendees: Boolean = attendeeReplies.size == invitation.attendeesEmails.size
+	def hasReplyOfEveryAttendees: Boolean = attendeeReplies.size == invitation.attendees.size
 }

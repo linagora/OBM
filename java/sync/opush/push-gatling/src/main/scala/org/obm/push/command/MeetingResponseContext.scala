@@ -32,16 +32,18 @@
 package org.obm.push.command
 
 import org.obm.push.bean.AttendeeStatus
-import org.obm.push.helper.SessionHelper
+import org.obm.push.context.UserKey
 import org.obm.push.helper.SyncHelper
 
 import com.excilys.ebi.gatling.core.session.Session
 
-case class MeetingResponseContext(attendeeStatus: AttendeeStatus = AttendeeStatus.ACCEPT)
-			extends CollectionContext {
+case class MeetingResponseContext(
+		userKey: UserKey,
+		attendeeStatus: AttendeeStatus = AttendeeStatus.ACCEPT)
+			extends CollectionContext(userKey) {
 
-	def findServerIds(session: => Session): List[String] = {
-		val lastSync = SessionHelper.findLastSync(session)
+	def findServerIds(s: => Session): List[String] = {
+		val lastSync = userKey.sessionHelper.findLastSync(s)
 		if (lastSync.isDefined) {
 			val serverIds = 
 				for (change <- SyncHelper.findChangesWithMeetingRequest(lastSync.get))

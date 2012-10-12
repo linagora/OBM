@@ -32,11 +32,12 @@
 package org.obm.push.command
 
 import org.junit.runner.RunWith
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.ActiveSyncHttpContext
+import org.obm.push.context.UserKey
+import org.obm.push.protocol.bean.FolderSyncResponse
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.EasyMockSugar
+
 import com.excilys.ebi.gatling.core.session.Session
 import org.obm.push.protocol.bean.FolderSyncResponse
 import org.obm.push.bean.SyncKey
@@ -44,34 +45,22 @@ import org.obm.push.bean.SyncKey
 @RunWith(classOf[JUnitRunner])
 class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 	
+	val userKey = new UserKey("user")
+	
 	test("Initial FoldeSync context returns 0 for next synckey") {
-		val context = new InitialFolderSyncContext()
+		val context = new InitialFolderSyncContext(userKey)
 		assert(context.nextSyncKey(null) === new SyncKey("0"))
 	}
 	
 	test("nextSyncKey throw exception if no response in session") {
 		val session = strictMock(manifest[Session])
 		expecting {
-			call(session.isAttributeDefined("lastFolderSync")).andReturn(false)
+			call(session.getAttributeAsOption("lastFolderSync:user")).andReturn(Option.empty)
 		}
 		
 		whenExecuting(session) {
 			intercept[IllegalStateException] {
-				new FolderSyncContext().nextSyncKey(session)
-			}
-		}
-	}
-	
-	test("nextSyncKey throw exception if response in session is null") {
-		val session = strictMock(manifest[Session])
-		expecting {
-			call(session.isAttributeDefined("lastFolderSync")).andReturn(true)
-			call(session.getTypedAttribute("lastFolderSync")).andReturn(null)
-		}
-		
-		whenExecuting(session) {
-			intercept[IllegalStateException] {
-				new FolderSyncContext().nextSyncKey(session)
+				new FolderSyncContext(userKey).nextSyncKey(session)
 			}
 		}
 	}
@@ -81,12 +70,12 @@ class FolderSyncContextTest extends FunSuite with EasyMockSugar {
 		val session = strictMock(manifest[Session])
 		expecting {
 			call(lastResponse.getNewSyncKey()).andReturn(new SyncKey("1234-5678"))
-			call(session.isAttributeDefined("lastFolderSync")).andReturn(true)
-			call(session.getTypedAttribute("lastFolderSync")).andReturn(lastResponse)
+			call(session.getAttributeAsOption[FolderSyncResponse]("lastFolderSync:user"))
+				.andReturn(Option.apply(lastResponse))
 		}
 		
 		whenExecuting(lastResponse, session) {
-			assert(new FolderSyncContext().nextSyncKey(session) === new SyncKey("1234-5678"))
+			assert(new FolderSyncContext(userKey).nextSyncKey(session) === new SyncKey("1234-5678"))
 		}
 	}
 }

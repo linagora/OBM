@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push
 
-import scala.collection.mutable.MutableList
-
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.FolderType
 import org.obm.push.command.FolderSyncCommand
@@ -46,23 +44,17 @@ import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
-import org.obm.push.context.UserConfiguration
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.context.http.HttpContext
-import org.obm.push.helper.SessionHelper.attendeeRepliesAreNotReceived
-import org.obm.push.helper.SessionHelper.invitationIsNotReceived
-import org.obm.push.helper.SessionHelper.setupPendingInvitation
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
+import org.obm.push.context.feeder.UserFeeder
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Simulation
-import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
-import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
-import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
+import com.excilys.ebi.gatling.core.session.Session
 
 class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 
@@ -79,78 +71,66 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 			.disableFollowRedirect
 			.disableCaching
 		
-		var scenarios = MutableList[ConfiguredScenarioBuilder]()
-		val userNumber = 1
-		val organizerScenario = buildScenarioForOrganizer(userNumber)
-		val inviteeOneScenario = buildScenarioForInvitee(userNumber+1, AttendeeStatus.ACCEPT)
-		val inviteeTwoScenario = buildScenarioForInvitee(userNumber+2, AttendeeStatus.DECLINE)
-		scenarios += organizerScenario.configure.users(1).protocolConfig(httpConf)
-		scenarios += inviteeOneScenario.configure.users(1).protocolConfig(httpConf)
-		scenarios += inviteeTwoScenario.configure.users(1).protocolConfig(httpConf)
+		val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
 		
-		scenarios
+		List(buildScenario(users).configure.users(2).protocolConfig(httpConf))
 	}
 
-	def buildScenarioForOrganizer(userNumber: Int) = {
-		val userContext = userHttpContext(login(userNumber))
+	def buildScenario(users: Iterator[User]) = {
+		
+		val organizer = new UserKey("organizer")
+		val attendee1 = new UserKey("attendee1")
+		val attendee2 = new UserKey("attendee2")
+
+		val feeder = new UserFeeder(users, organizer, attendee1, attendee2)
+		
 		val invitation = new InvitationContext(
-				organizerEmail = email(userNumber),
-				attendeesEmails = Set(email(userNumber+1), email(userNumber+2)),
+				organizer = organizer,
+				attendees = Set(attendee1, attendee2),
 				folderType = usedCalendarCollection)
-
-		scenario("Send an invitation from:{%s} attendees:{%s}".format(invitation.organizerEmail, invitation.attendeesEmails))
-			.exec(buildInitialFolderSyncCommand(userContext)).pause(2)
-			.exec(buildInitialSyncCommand(userContext, usedCalendarCollection)).pause(2)
-			.exec(buildSendInvitationCommand(userContext, invitation))
-			.exec((s: Session) => setupPendingInvitation(s, invitation))
-			.asLongAs((s: Session) => attendeeRepliesAreNotReceived(s), "Sync until reply are received received") (
-				exec(buildSyncCommand(userContext, usedCalendarCollection)).pause(3)
-			)
-	}
-	
-	def buildScenarioForInvitee(userNumber: Int, attendeeStatus: AttendeeStatus) = {
-		val userContext = userHttpContext(login(userNumber))
 		
-		scenario("Wait for invitation, then reply")
-			.exec(buildInitialFolderSyncCommand(userContext)).pause(2)
-			.exec(buildInitialSyncCommand(userContext, usedMailCollection)).pause(3)
-			.asLongAs((s: Session) => invitationIsNotReceived(s), "Sync until invitation is received") (
-				exec(buildSyncCommand(userContext, usedMailCollection)).pause(3)
-			)
-			.exec(buildMeetingResponseCommand(userContext, attendeeStatus))
+		scenario("Send an invitation at two attendees")
+			.exec(s => s.setAttributes(feeder.next()))
+			.exec(buildInitialFolderSyncCommand(organizer))
+			.exec(buildInitialFolderSyncCommand(attendee1))
+			.exec(buildInitialFolderSyncCommand(attendee2))
+			.exec(buildInitialSyncCommand(organizer, usedCalendarCollection))
+			.exec(buildSendInvitationCommand(invitation))
+			.exec((s: Session) => organizer.sessionHelper.setupPendingInvitation(s, invitation))
+			.pause(10)
+			.exec(buildInitialSyncCommand(attendee1, usedMailCollection))
+			.exec(buildInitialSyncCommand(attendee2, usedMailCollection))
+			.exec(buildSyncCommand(attendee1, usedMailCollection))
+			.exec(buildSyncCommand(attendee2, usedMailCollection))
+			.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
+			.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
+			.pause(10)
+			.exec(buildSyncCommand(organizer, usedCalendarCollection))
 	}
 	
-	def buildInitialFolderSyncCommand(userContext: HttpContext) = {
-		val initialFolderSyncContext = new InitialFolderSyncContext()
-		new FolderSyncCommand(userContext, initialFolderSyncContext, wbTools).buildCommand
+	def buildInitialFolderSyncCommand(userKey: UserKey) = {
+		new FolderSyncCommand(new InitialFolderSyncContext(userKey), wbTools).buildCommand
 	}
 	
-	def buildInitialSyncCommand(userContext: HttpContext, folderType: FolderType) = {
-		buildSyncCommand(userContext, new InitialSyncContext(folderType))
+	def buildInitialSyncCommand(userKey: UserKey, folderType: FolderType) = {
+		buildSyncCommand(new InitialSyncContext(userKey, folderType))
 	}
 	
-	def buildSyncCommand(userContext: HttpContext, folderType: FolderType): PostHttpRequestBuilder = {
-		buildSyncCommand(userContext, new SyncContext(folderType))
+	def buildSyncCommand(userKey: UserKey, folderType: FolderType): PostHttpRequestBuilder = {
+		buildSyncCommand(new SyncContext(userKey, folderType))
 	}
 	
-	def buildSyncCommand(userContext: HttpContext, syncContext: SyncContext) = {
-		new SyncCollectionCommand(userContext, syncContext, wbTools).buildCommand
+	def buildSyncCommand(syncContext: SyncContext) = {
+		new SyncCollectionCommand(syncContext, wbTools).buildCommand
 	}
 	
-	def buildSendInvitationCommand(userContext: HttpContext, invitation: InvitationContext) = {
-		new SendInvitationCommand(userContext, invitation, wbTools).buildCommand
+	def buildSendInvitationCommand(invitation: InvitationContext) = {
+		new SendInvitationCommand(invitation, wbTools).buildCommand
 	}
 	
-	def buildMeetingResponseCommand(userContext: HttpContext, attendeeStatus: AttendeeStatus) = {
-		val meetingResponse = new MeetingResponseContext(attendeeStatus)
-		new MeetingResponseCommand(userContext, meetingResponse, wbTools).buildCommand
+	def buildMeetingResponseCommand(userKey: UserKey, attendeeStatus: AttendeeStatus) = {
+		val meetingResponse = new MeetingResponseContext(userKey, attendeeStatus)
+		new MeetingResponseCommand(meetingResponse, wbTools).buildCommand
 	}
 	
-	def userHttpContext(userLogin: String) = {
-		new ActiveSyncHttpContext(
-			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
-	}
-	
-	def email(userNumber: Int) = "%s@%s".format(login(userNumber), configuration.userDomain)
-	def login(userNumber: Int) = "u%d".format(userNumber)
 }

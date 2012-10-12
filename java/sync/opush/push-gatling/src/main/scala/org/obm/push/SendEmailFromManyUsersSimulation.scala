@@ -37,16 +37,17 @@ import org.obm.push.command.SendEmailCommand
 import org.obm.push.command.SendEmailContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.context.http.HttpContext
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
 import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
+import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
 import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
-import org.obm.push.context.UserConfiguration
+import org.obm.push.context.feeder.UserFeeder
 
 class SendEmailFromManyUsersSimulation extends Simulation {
 
@@ -71,21 +72,17 @@ class SendEmailFromManyUsersSimulation extends Simulation {
 	}
 
 	def buildScenarioForUser(userNumber: Int) = {
-		val userLogin = login(userNumber)
-		val from = new Mailbox(userLogin, configuration.userDomain)
-		val to = new Mailbox(login(userNumber+1), configuration.userDomain)
-		val cc = new Mailbox(login(userNumber+2), configuration.userDomain)
-		val bcc = new Mailbox(login(userNumber+3), configuration.userDomain)
+		val from = new User(1, configuration)
+		val to = new User(2, configuration).mailbox
+		val cc = new User(3, configuration).mailbox
+		val bcc = new User(4, configuration).mailbox
+
+		val fromKey = new UserKey("fromUser")
+		val feeder = new UserFeeder(Seq(from).iterator, fromKey)
 		
-		val sendEmailContext = new SendEmailContext(from, to, cc, bcc)
-		scenario("Send a simple email from:{%s} to:{%s} cc:{%s} bcc:{%s}".format(from, to, cc, bcc))
-			.exec(new SendEmailCommand(userContext(userLogin), sendEmailContext).buildCommand)
+		val sendEmailContext = new SendEmailContext(fromKey, from.mailbox, to, cc, bcc)
+		scenario("Send a simple email from:{%s} to:{%s} cc:{%s} bcc:{%s}".format(from.mailbox, to, cc, bcc))
+			.exec(s => s.setAttributes(feeder.next))
+			.exec(new SendEmailCommand(sendEmailContext).buildCommand)
 	}
-	
-	def userContext(userLogin: String) = {
-		new ActiveSyncHttpContext(
-			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
-	}
-	
-	def login(userNumber: Int) = "u%d".format(userNumber)
 }

@@ -36,32 +36,37 @@ import org.obm.push.command.FolderSyncContext
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.FolderSyncProtocol
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
 import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
+import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
+import org.obm.push.context.feeder.UserFeeder
 
 class ThreeFolderSyncSimulation extends Simulation {
 
 	val wbTools: WBXMLTools = new WBXMLTools
   
 	val configuration: Configuration = GatlingConfiguration.build
-	val httpContext: HttpContext = new ActiveSyncHttpContext(configuration)
 	
-	val initialFolderSyncContext = new InitialFolderSyncContext()
-	val folderSyncContext = new FolderSyncContext()
-
 	def apply = {
 		
+		val user = new User(1, configuration)
+		val userKey = new UserKey("user")
+		val feeder = new UserFeeder(Seq(user).iterator, userKey)
+		
+		val initialFolderSyncContext = new InitialFolderSyncContext(userKey)
+		val folderSyncContext = new FolderSyncContext(userKey)
+		
 		val folderSyncScenario = scenario("Three consecutive FolderSync request")
-			.exec(new FolderSyncCommand(httpContext, initialFolderSyncContext, wbTools).buildCommand)
-			.exec(new FolderSyncCommand(httpContext, folderSyncContext, wbTools).buildCommand)
-			.exec(new FolderSyncCommand(httpContext, folderSyncContext, wbTools).buildCommand)
+			.exec(s => s.setAttributes(feeder.next))
+			.exec(new FolderSyncCommand(initialFolderSyncContext, wbTools).buildCommand)
+			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
+			.exec(new FolderSyncCommand(folderSyncContext, wbTools).buildCommand)
 					
 		val httpConf = httpConfig
 			.baseURL(configuration.targetServerUrl)

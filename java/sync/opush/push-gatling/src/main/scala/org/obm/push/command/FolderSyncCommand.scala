@@ -31,22 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.FolderSyncProtocol
+import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
+import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
+import org.obm.push.protocol.bean.FolderSyncRequest
 import org.obm.push.protocol.bean.FolderSyncResponse
 import org.obm.push.wbxml.WBXMLTools
+
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.excilys.ebi.gatling.http.Predef.regex
-import com.google.common.base.Charsets
-import org.obm.push.protocol.bean.FolderSyncRequest
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
-import org.obm.push.helper.SessionKeys
 
-class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
+class FolderSyncCommand(folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
+	extends AbstractActiveSyncCommand(folderSyncContext.userKey) {
 
 	val folderSyncNamespace = "FolderHierarchy"
 	
@@ -59,7 +55,7 @@ class FolderSyncCommand(httpContext: HttpContext, folderSyncContext: FolderSyncC
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toFolderSyncResponse(response))
-			    .saveAs(SessionKeys.LAST_FOLDER_SYNC.toString))
+			    .saveAs(folderSyncContext.userKey.lastFolderSyncSessionKey))
 	}
 
 	def buildFolderSyncRequest(session: Session): Array[Byte] = {

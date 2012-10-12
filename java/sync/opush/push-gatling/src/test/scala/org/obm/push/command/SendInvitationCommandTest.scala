@@ -31,36 +31,35 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.scalatest.FunSuite
-import org.scalatest.BeforeAndAfter
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.HttpContext
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.apache.james.mime4j.dom.address.Mailbox
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.HttpContext
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.wbxml.WBXMLTools
-import com.google.common.collect.ImmutableList
-import org.obm.push.bean.MSAttendee
-import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.AttendeeStatus
+import org.obm.push.bean.AttendeeType
+import org.obm.push.bean.MSAttendee
+import org.obm.push.context.Configuration
+import org.obm.push.context.User
+import org.obm.push.wbxml.WBXMLTools
+import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
 import com.google.common.base.Strings
+import com.google.common.collect.ImmutableList
+import org.obm.push.context.UserKey
+import org.obm.push.bean.DeviceId
 
 @RunWith(classOf[JUnitRunner])
 class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 
-	val context = new ActiveSyncHttpContext(new Configuration {
+	val config = new Configuration {
 		  val targetServerUrl = "192.168.0.1"
-		  val userDomain = "domain.org"
-		  val userLogin = "login"
-		  val userPassword = "pass"
-		  val userDeviceId = "deviceId"
-		  val userDeviceType = "deviceType"
-		  val userPolicyKey = "1234567890"
-	})
+		  val defaultUserDomain = "domain.org"
+		  val defaultUserLoginPrefix = "login"
+		  val defaultUserPassword = "pass"
+		  val defaultUserDeviceId = new DeviceId("deviceId")
+		  val defaultUserDeviceType = "deviceType"
+		  val defaultUserPolicyKey = "1234567890"
+	}
+	val user = new User(1, config)
+	val userKey = new UserKey("user")
 	
 	var wbxmlTools: WBXMLTools =_
 	
@@ -69,32 +68,36 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 	}
 	
 	test("Context make integer clientId as string") {
-		val invitation = new InvitationContext(email("user"))
-		assert(!Strings.isNullOrEmpty(invitation.clientId))
-		assert(invitation.clientId.toInt > 0)
+		val clientId = new InvitationContext(userKey).clientId
+		assert(!Strings.isNullOrEmpty(clientId))
+		assert(clientId.toInt > 0)
 	}
 	
 	test("SendInvitation command name is Sync") {
-		val invitation = new InvitationContext(email("user"))
-		val command = new SendInvitationCommand(context, invitation, wbxmlTools)
+		val invitation = new InvitationContext(userKey)
+		val command = new SendInvitationCommand(invitation, wbxmlTools)
 		assert(command.commandName === "Sync")
 	}
 	
 	test("SendInvitation contains organizer") {
-		val invitation = new InvitationContext(email("user"))
-		val event = new SendInvitationCommand(context, invitation, wbxmlTools).buildEventInvitation
-		assert(event.getOrganizerEmail() == email("user"))
+		val invitation = new InvitationContext(organizer = userKey)
+		val event = new SendInvitationCommand(invitation, wbxmlTools)
+				.buildEventInvitation(user, Set())
+		assert(event.getOrganizerEmail() == email("login1"))
 	}
 	
 	test("SendInvitation contains attendees") {
-		val invitation = new InvitationContext(email("user"), attendeesEmails = Set(email("inv1"), email("inv2")))
-		val event = new SendInvitationCommand(context, invitation, wbxmlTools).buildEventInvitation
-		assert(event.getAttendeeEmails().containsAll(ImmutableList.of(email("inv1"), email("inv2"))))
+		val invitation = new InvitationContext(
+				organizer = userKey,
+				attendees = Set(new UserKey("user2"), new UserKey("user3")))
+		val event = new SendInvitationCommand(invitation, wbxmlTools)
+				.buildEventInvitation(user, Set(new User(2, config), new User(3, config)))
+		assert(event.getAttendeeEmails().containsAll(ImmutableList.of(email("login2"), email("login3"))))
 		assert(event.getAttendees().containsAll(ImmutableList.of(
-				MSAttendee.builder().withEmail(email("inv1"))
+				MSAttendee.builder().withEmail(email("login2"))
 									.withType(AttendeeType.REQUIRED)
 									.withStatus(AttendeeStatus.NOT_RESPONDED).build(),
-				MSAttendee.builder().withEmail(email("inv2"))
+				MSAttendee.builder().withEmail(email("login3"))
 									.withType(AttendeeType.REQUIRED)
 									.withStatus(AttendeeStatus.NOT_RESPONDED).build())))
 	}

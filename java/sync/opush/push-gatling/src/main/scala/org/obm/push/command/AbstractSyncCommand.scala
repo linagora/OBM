@@ -32,21 +32,21 @@
 package org.obm.push.command
 
 import scala.collection.JavaConversions.seqAsJavaList
+
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
-import org.obm.push.helper.SessionKeys
+import org.obm.push.decoder.GatlingDecoders.syncDecoder
+import org.obm.push.encoder.GatlingEncoders.syncEncoder
 import org.obm.push.protocol.bean.SyncRequest
 import org.obm.push.protocol.bean.SyncRequestCollection
 import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.wbxml.WBXMLTools
+
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.decoder.GatlingDecoders.syncDecoder
-import org.obm.push.encoder.GatlingEncoders.syncEncoder
 
-abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
+abstract class AbstractSyncCommand(syncContext: SyncContext, wbTools: WBXMLTools)
+	extends AbstractActiveSyncCommand(syncContext.userKey) {
 
 	val syncNamespace = "AirSync"
 	
@@ -59,7 +59,7 @@ abstract class AbstractSyncCommand(httpContext: HttpContext, syncContext: SyncCo
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toSyncResponse(response))
-			    .saveAs(SessionKeys.LAST_SYNC.toString))
+			    .saveAs(syncContext.userKey.lastSyncSessionKey))
 	}
 
 	def buildSyncRequest(session: Session): Array[Byte] = {

@@ -29,45 +29,55 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.context
 
-import scala.collection.JavaConversions.collectionAsScalaIterable
-
-import org.obm.push.bean.FolderType
-import org.obm.push.bean.SyncKey
+import java.math.BigDecimal
+import org.obm.push.bean.Device
 import org.obm.push.helper.SessionHelper
-import org.obm.push.context.UserKey
-import org.obm.push.protocol.bean.SyncResponse
-
 import com.excilys.ebi.gatling.core.session.Session
+import org.apache.james.mime4j.dom.address.Mailbox
 
-class InitialSyncContext(userKey: UserKey, folderType: FolderType) extends SyncContext(userKey, folderType) {
+class User(userNumber: Int, configuration: Configuration) {
 	
-	val initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY
-		
-	override def nextSyncKey(session: => Session) = initialSyncKey
+	val domain = configuration.defaultUserDomain
+	val login = "%s%d".format(configuration.defaultUserLoginPrefix, userNumber)
+	val password = configuration.defaultUserPassword
+	val email = {"%s@%s".format(login, domain)}
+	val policyKey = configuration.defaultUserPolicyKey
+	val deviceId = configuration.defaultUserDeviceId
+	val deviceType = configuration.defaultUserDeviceType
 	
+	val userProtocol = "%s\\%s".format(domain, login)
+	lazy val mailbox = new Mailbox(login, domain)
+	lazy val device = new Device.Factory().create(
+			null, 
+			deviceType,
+			"Mozilla/5.0 (X11; Linux x86_64; rv:10.0.7) Gecko/20100101 Firefox/10.0.7 Iceweasel/10.0.7",
+			deviceId,
+			new BigDecimal(ActiveSyncConfiguration.activeSyncVersion))
 }
 
-class SyncContext(val userKey: UserKey, val folderType: FolderType) extends CollectionContext(userKey) {
+class UserKey (val key: String) {
 	
-	def nextSyncKey(session: => Session): SyncKey = {
-		val lastSync = userKey.sessionHelper.findLastSync(session)
-		if (lastSync.isDefined) {
-			return nextSyncKeyInResponse(session, lastSync.get)
-		}
-		throw new IllegalStateException("No last Sync in session")
-	}
+	val elUserPolicyKey = key + ":PolicyKey"
 	
-	private[this] def nextSyncKeyInResponse(session: Session, syncResponse: SyncResponse): SyncKey = {
-		val collectionId = this.findCollectionId(session, folderType)
-		for (collection <- syncResponse.getCollectionResponses()
-			if collection.getSyncCollection().getCollectionId() == collectionId) {
-				return collection.getAllocateNewSyncKey()
-		}
-		throw new NoSuchElementException(
-				"Cannot find collection:{%d} in response:{%s}".format(collectionId, syncResponse))
-	}
+	def getUser(session: Session) = session.getTypedAttribute[User](key)
 	
-	def findCollectionId(session: Session) = super.findCollectionId(session, folderType)
+	lazy val sessionHelper = new SessionHelper(this) 
+	lazy val lastFolderSyncSessionKey = buildSessionKey(UserSessionKeys.LAST_FOLDER_SYNC)
+	lazy val lastSyncSessionKey = buildSessionKey(UserSessionKeys.LAST_SYNC)
+	lazy val lastMeetingResponseSessionKey = buildSessionKey(UserSessionKeys.MEETING_RESPONSE)
+	lazy val lastPendingInvitationSessionKey = buildSessionKey(UserSessionKeys.PENDING_INVITATION)
+	
+	private[this] def buildSessionKey(sessionKey: UserSessionKeys.Keys) = "%s:%s".format(sessionKey, key)
+}
+
+object UserSessionKeys extends Enumeration {
+	type Keys = Value
+	
+	val LAST_FOLDER_SYNC = Value("lastFolderSync")
+	val LAST_SYNC = Value("lastSync")
+	val MEETING_RESPONSE = Value("meetingResponse")
+	val PENDING_INVITATION = Value("pendingInvitation")
+	
 }

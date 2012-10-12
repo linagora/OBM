@@ -34,15 +34,8 @@ package org.obm.push.context.http
 object HttpHeaders extends Enumeration {
 	type HttpHeaders = Value
  
-	val AUTHORIZATION = Value("Authorization")
 	val CONTENT_TYPE = Value("Content-Type")
 	val AS_VERSION = Value("MS-ASProtocolVersion")
 	val AS_POLICY_KEY = Value("X-MS-PolicyKey")
   
-}
-
-case class HttpHeader(header: HttpHeaders.HttpHeaders, value: String) {
-	
-	val name = header.toString
-	
 }

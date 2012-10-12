@@ -31,19 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.context.http.HttpContext
+import org.apache.james.mime4j.dom.Message
 import org.obm.push.utils.Mime4jUtils
 
 import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
-import com.excilys.ebi.gatling.http.Predef.regex
 import com.google.common.io.ByteStreams
-import org.apache.james.mime4j.dom.address.Mailbox
-import org.apache.james.mime4j.dom.Message
 
-class SendEmailCommand(httpContext: HttpContext, sendContext :SendEmailContext) extends AbstractActiveSyncCommand(httpContext) {
+class SendEmailCommand(sendContext: SendEmailContext)
+		extends AbstractActiveSyncCommand(sendContext.userKey) {
 
 	val mime4jUtils = new Mime4jUtils()
 	val saveInSent = if (sendContext.saveInSent) "T" else "F" 

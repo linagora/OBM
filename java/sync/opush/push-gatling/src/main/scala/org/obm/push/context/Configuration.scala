@@ -31,15 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.context
 
+import org.obm.push.bean.DeviceId
+
 trait Configuration {
   
-  val targetServerUrl: String
+	val targetServerUrl: String
   
-  val userDomain: String
-  val userLogin: String
-  val userPassword: String
-  val userPolicyKey: String
-  val userDeviceId: String
-  val userDeviceType: String
-  
+	val defaultUserDomain: String
+	val defaultUserLoginPrefix: String
+	val defaultUserPassword: String
+	val defaultUserPolicyKey: String
+	val defaultUserDeviceId: DeviceId
+	val defaultUserDeviceType: String
+	
 }

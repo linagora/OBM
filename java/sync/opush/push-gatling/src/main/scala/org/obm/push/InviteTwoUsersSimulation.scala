@@ -32,30 +32,27 @@
 package org.obm.push
 
 import scala.collection.mutable.MutableList
-
 import org.obm.push.bean.FolderType
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.command.InitialSyncContext
-import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.InvitationContext
+import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.SyncCollectionCommand
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
-import org.obm.push.context.UserConfiguration
-import org.obm.push.context.http.ActiveSyncHttpContext
-import org.obm.push.context.http.HttpContext
+import org.obm.push.context.User
+import org.obm.push.context.UserKey
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Simulation
-import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
+import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
 import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
-import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
+import org.obm.push.context.feeder.UserFeeder
 
 class InviteTwoUsersSimulation extends Simulation {
 
@@ -82,40 +79,40 @@ class InviteTwoUsersSimulation extends Simulation {
 	}
 
 	def buildScenarioForOrganizer(userNumber: Int) = {
-		val userContext = userHttpContext(login(userNumber))
+		val users = Seq(user(userNumber), user(userNumber +1), user(userNumber +2)).iterator
+		val organizer = new UserKey("organizer")
+		val invitee1 = new UserKey("invitee1")
+		val invitee2 = new UserKey("invitee2")
+		
+		val feeder = new UserFeeder(users, organizer, invitee1, invitee2)
+		
 		val invitation = new InvitationContext(
-				organizerEmail = email(userNumber),
-				attendeesEmails = Set(email(userNumber+1), email(userNumber+2)),
+				organizer = organizer,
+				attendees = Set(invitee1, invitee2),
 				folderType = usedCalendarCollection)
 
-		scenario("Send an invitation from:{%s} attendees:{%s}".format(invitation.organizerEmail, invitation.attendeesEmails))
-			.exec(buildInitialFolderSyncCommand(userContext)).pause(2)
-			.exec(buildInitialSyncCommand(userContext, usedCalendarCollection)).pause(2)
-			.exec(buildSendInvitationCommand(userContext, invitation))
+		scenario("Send an invitation to two users")
+			.exec(s => s.setAttributes(feeder.next))
+			.exec(buildInitialFolderSyncCommand(organizer)).pause(2)
+			.exec(buildInitialSyncCommand(organizer, usedCalendarCollection)).pause(2)
+			.exec(buildSendInvitationCommand(invitation))
 	}
 	
-	def buildInitialFolderSyncCommand(userContext: HttpContext) = {
-		val initialFolderSyncContext = new InitialFolderSyncContext()
-		new FolderSyncCommand(userContext, initialFolderSyncContext, wbTools).buildCommand
+	def buildInitialFolderSyncCommand(userKey: UserKey) = {
+		new FolderSyncCommand(new InitialFolderSyncContext(userKey), wbTools).buildCommand
 	}
 	
-	def buildInitialSyncCommand(userContext: HttpContext, folderType: FolderType) = {
-		buildSyncCommand(userContext, new InitialSyncContext(folderType))
+	def buildInitialSyncCommand(userKey: UserKey, folderType: FolderType) = {
+		buildSyncCommand(new InitialSyncContext(userKey, folderType))
 	}
 	
-	def buildSyncCommand(userContext: HttpContext, syncContext: SyncContext) = {
-		new SyncCollectionCommand(userContext, syncContext, wbTools).buildCommand
+	def buildSyncCommand(syncContext: SyncContext) = {
+		new SyncCollectionCommand(syncContext, wbTools).buildCommand
 	}
 	
-	def buildSendInvitationCommand(userContext: HttpContext, invitation: InvitationContext) = {
-		new SendInvitationCommand(userContext, invitation, wbTools).buildCommand
-	}
-
-	def userHttpContext(userLogin: String) = {
-		new ActiveSyncHttpContext(
-			new UserConfiguration(configuration).cloneForUser(login = userLogin, pwd = "1234"))
+	def buildSendInvitationCommand(invitation: InvitationContext) = {
+		new SendInvitationCommand(invitation, wbTools).buildCommand
 	}
 	
-	def email(userNumber: Int) = "%s@%s".format(login(userNumber), configuration.userDomain)
-	def login(userNumber: Int) = "u%d".format(userNumber)
+	def user(userNumber: Int) = new User(userNumber, configuration)
 }

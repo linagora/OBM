@@ -31,22 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
-import org.obm.push.protocol.bean.SyncRequest
 import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncResponse
-import org.obm.push.protocol.data.SyncDecoder
-import org.obm.push.protocol.data.SyncEncoder
 import org.obm.push.wbxml.WBXMLTools
 
 import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import com.google.common.collect.ImmutableList
 
-class SyncCollectionCommand(httpContext: HttpContext, syncContext: SyncContext, wbTools: WBXMLTools)
-	extends AbstractSyncCommand(httpContext, syncContext, wbTools) {
+class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
+	extends AbstractSyncCommand(syncContext, wbTools) {
 
 	def buildSyncRequestCollections(session: Session) = {
 		List(SyncRequestCollection.builder()

@@ -34,47 +34,34 @@ package org.obm.push.command
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.HttpContext
-import org.obm.push.context.http.ActiveSyncHttpContext
 import org.apache.james.mime4j.dom.address.Mailbox
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.HttpContext
-import org.obm.push.context.http.ActiveSyncHttpContext
+import org.obm.push.context.UserKey
 
 @RunWith(classOf[JUnitRunner])
 class SendEmailCommandTest extends FunSuite {
 
-	val context = new ActiveSyncHttpContext(new Configuration {
-		  val targetServerUrl = "192.168.0.1"
-		  val userDomain = "domain.org"
-		  val userLogin = "login"
-		  val userPassword = "pass"
-		  val userDeviceId = "deviceId"
-		  val userDeviceType = "deviceType"
-		  val userPolicyKey = "1234567890"
-	})
+	val userKey = new UserKey("user")
 	
 	test("SendEmail command name is SendMail") {
-		val sendEmailContext = new SendEmailContext(mailbox("to")) 
-		val command = new SendEmailCommand(context, sendEmailContext)
+		val sendEmailContext = new SendEmailContext(userKey, mailbox("to")) 
+		val command = new SendEmailCommand(sendEmailContext)
 		assert(command.commandName === "SendMail")
 	}
 
 	test("SendEmail save in sent is T when true") {
-		val sendEmailContext = new SendEmailContext(mailbox("to"), saveInSent = true) 
-		assert(new SendEmailCommand(context, sendEmailContext).saveInSent === "T")
+		val sendEmailContext = new SendEmailContext(userKey, mailbox("to"), saveInSent = true) 
+		assert(new SendEmailCommand(sendEmailContext).saveInSent === "T")
 	}
 	
 	test("SendEmail save in sent is F when false") {
-		val sendEmailContext = new SendEmailContext(mailbox("to"), saveInSent = false) 
-		assert(new SendEmailCommand(context, sendEmailContext).saveInSent === "F")
+		val sendEmailContext = new SendEmailContext(userKey, mailbox("to"), saveInSent = false) 
+		assert(new SendEmailCommand(sendEmailContext).saveInSent === "F")
 	}
 	
 	test("SendEmail message contains recipients") {
-		val sendEmailContext = new SendEmailContext(
+		val sendEmailContext = new SendEmailContext(userKey, 
 				mailbox("from"), mailbox("to"), mailbox("cc"), mailbox("bcc"))
-		val message = new SendEmailCommand(context, sendEmailContext).buildMail
+		val message = new SendEmailCommand(sendEmailContext).buildMail
 		assert(message.getTo().contains(mailbox("to")))
 		assert(message.getFrom().contains(mailbox("from")))
 		assert(message.getCc().contains(mailbox("cc")))

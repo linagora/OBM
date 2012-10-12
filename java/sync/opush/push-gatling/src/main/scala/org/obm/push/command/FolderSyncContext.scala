@@ -31,17 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
+import org.obm.push.context.UserKey
 import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.context.http.HttpContext
 import org.obm.push.protocol.bean.FolderSyncResponse
 import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
 import org.obm.push.bean.SyncKey
 import scala.collection.JavaConversions._
 import org.obm.push.bean.FolderType
-import org.obm.push.helper.SessionKeys
 import org.obm.push.helper.SessionHelper
 
-class InitialFolderSyncContext extends FolderSyncContext {
+class InitialFolderSyncContext(userKey: UserKey) extends FolderSyncContext(userKey) {
 	
 	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
 		
@@ -49,22 +48,14 @@ class InitialFolderSyncContext extends FolderSyncContext {
 	
 }
 
-case class FolderSyncContext {
+class FolderSyncContext(val userKey: UserKey) {
 		
 	def nextSyncKey(session: => Session): SyncKey = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session)
+		val lastFolderSync = userKey.sessionHelper.findLastFolderSync(session)
 		if (lastFolderSync.isDefined) {
 			return lastFolderSync.get.getNewSyncKey()
 		}
 		throw new IllegalStateException("Cannot find the next SyncKey in previous FolderSync response")
 	}
 	
-	def collectionId(session: => Session, folderType: => FolderType): Int = {
-		val lastFolderSync = SessionHelper.findLastFolderSync(session).get
-		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
-			if collection.getFolderType() == folderType) {
-				return collection.getCollectionId().toInt
-		}
-		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
-	}
 }

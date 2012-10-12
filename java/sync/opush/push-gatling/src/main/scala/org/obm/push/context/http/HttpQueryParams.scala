@@ -31,33 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.context.http
 
-import org.obm.push.bean.Device
-import java.math.BigDecimal
-import org.obm.push.bean.DeviceId
-
-trait HttpContext {
-
-	val headerAuthorization: HttpHeader
-	val headerContentTypeWbXml: HttpHeader
-	val headerActiveSyncVersion: HttpHeader
-	val headerActiveSyncPolicyKey: HttpHeader
+object HttpQueryParams extends Enumeration {
+	type HttpQueryParams = Value
+  
+	val USER = Value("User")
+	val DEVICE_ID = Value("DeviceId")
+	val DEVICE_TYPE = Value("DeviceType")
+	val COMMAND = Value("Cmd")
 	
-	lazy val commonHeaders = Map(
-			headerContentTypeWbXml.name -> headerContentTypeWbXml.value,
-			headerActiveSyncVersion.name -> headerActiveSyncVersion.value,
-			headerActiveSyncPolicyKey.name -> headerActiveSyncPolicyKey.value,
-			headerAuthorization.name -> headerAuthorization.value)
-	
-	val paramUser: HttpQueryParam
-	val paramDeviceId: HttpQueryParam
-	val paramDeviceType: HttpQueryParam
-	
-	val postUrl: String
-	
-	lazy val device = new Device.Factory().create(
-			null, 
-			paramDeviceType.value,
-			"Mozilla/5.0 (X11; Linux x86_64; rv:10.0.7) Gecko/20100101 Firefox/10.0.7 Iceweasel/10.0.7",
-			new DeviceId(paramDeviceId.value),
-			new BigDecimal("12.1"))
 }

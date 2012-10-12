@@ -29,20 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.context.http
+package org.obm.push.helper
 
-object HttpQueryParams extends Enumeration {
-	type HttpQueryParams = Value
-  
-	val USER = Value("User")
-	val DEVICE_ID = Value("DeviceId")
-	val DEVICE_TYPE = Value("DeviceType")
-	val COMMAND = Value("Cmd")
-	
-}
+object GatlingHelper {
 
-case class HttpQueryParam(param: HttpQueryParams.HttpQueryParams, value: String) {
-  
-	val name = param.toString
+	def el(key: String) = "${%s}".format(key)
 	
 }

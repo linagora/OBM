@@ -32,13 +32,11 @@
 package org.obm.push.command
 
 import org.junit.runner.RunWith
-import org.obm.push.context.Configuration
-import org.obm.push.context.http.ActiveSyncHttpContext
+import org.obm.push.context.UserKey
+import org.obm.push.wbxml.WBXMLTools
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.obm.push.wbxml.WBXMLTools
-import org.obm.push.context.http.HttpContext
 
 @RunWith(classOf[JUnitRunner])
 class FolderSyncCommandTest extends FunSuite with BeforeAndAfter {
@@ -50,16 +48,8 @@ class FolderSyncCommandTest extends FunSuite with BeforeAndAfter {
 	}
 	
 	test("FolderSync command name is FolderSync") {
-		val context = new ActiveSyncHttpContext(new Configuration {
-			  val targetServerUrl = "192.168.0.1"
-			  val userDomain = "domain.org"
-			  val userLogin = "login"
-			  val userPassword = "pass"
-			  val userDeviceId = "deviceId"
-			  val userDeviceType = "deviceType"
-			  val userPolicyKey = "1234567890"
-		})
-		val command = new FolderSyncCommand(context, new FolderSyncContext(), wbxmlTools)
+		val userKey = new UserKey("user")
+		val command = new FolderSyncCommand(new FolderSyncContext(userKey), wbxmlTools)
 		assert(command.commandName === "FolderSync")
 	}
 	

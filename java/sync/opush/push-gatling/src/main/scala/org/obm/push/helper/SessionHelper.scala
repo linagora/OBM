@@ -31,39 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.helper
 
+import scala.collection.JavaConversions._
+
+import org.obm.push.bean.AttendeeStatus.ACCEPT
+import org.obm.push.bean.AttendeeStatus.DECLINE
+import org.obm.push.bean.FolderType
+import org.obm.push.bean.MSAttendee
 import org.obm.push.command.InvitationContext
 import org.obm.push.command.PendingInvitationContext
-import org.obm.push.protocol.bean.SyncResponse
-import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.bean.MSEvent
-import org.obm.push.bean.AttendeeStatus
-import org.obm.push.bean.AttendeeStatus.{ACCEPT, DECLINE}
-import scala.collection.JavaConversions._
+import org.obm.push.context.UserKey
 import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.MSAttendee
+import org.obm.push.protocol.bean.SyncResponse
 
-object SessionKeys extends Enumeration {
-	type Keys = Value
-	
-	val LAST_FOLDER_SYNC = Value("lastFolderSync")
-	val LAST_SYNC = Value("lastSync")
-	val MEETING_RESPONSE = Value("meetingResponse")
-	val PENDING_INVITATION = Value("pendingInvitation")
-	
-}
+import com.excilys.ebi.gatling.core.session.Session
 
-object SessionHelper {
+class SessionHelper(userKey: UserKey) {
 	
 	def findLastSync(session: Session): Option[SyncResponse] = {
-		session.getAttributeAsOption[SyncResponse](SessionKeys.LAST_SYNC.toString)
+		session.getAttributeAsOption[SyncResponse](userKey.lastSyncSessionKey)
 	}
 	
 	def findLastFolderSync(session: Session): Option[FolderSyncResponse] = {
-		session.getAttributeAsOption[FolderSyncResponse](SessionKeys.LAST_FOLDER_SYNC.toString)
+		session.getAttributeAsOption[FolderSyncResponse](userKey.lastFolderSyncSessionKey)
 	}
 	
 	def findPendingInvitation(session: Session): Option[PendingInvitationContext] = {
-		session.getAttributeAsOption[PendingInvitationContext](SessionKeys.PENDING_INVITATION.toString)
+		session.getAttributeAsOption[PendingInvitationContext](userKey.lastPendingInvitationSessionKey)
+	}
+	
+	def collectionId(session: Session, folderType: FolderType): Int = {
+		val lastFolderSync = findLastFolderSync(session).get
+		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
+			if collection.getFolderType() == folderType) {
+				return collection.getCollectionId().toInt
+		}
+		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
 	}
 	
 	def attendeeRepliesAreNotReceived(session: Session) = !attendeeRepliesAreReceived(session)
@@ -72,9 +74,10 @@ object SessionHelper {
 		if (pendingInvitationOpt.isDefined) {
 			val lastSync = findLastSync(session).get
 			val pendingInvitation = pendingInvitationOpt.get
+			val organizerEmail = userKey.getUser(session).email
 			for (event <- SyncHelper.findEventChanges(lastSync, pendingInvitation.serverId);
 				attendee <- event.getAttendees();
-				if (attendeeHasReplied(pendingInvitation, attendee))) {
+				if (attendeeHasReplied(organizerEmail, attendee))) {
 				
 				pendingInvitation.attendeeReplies += (attendee.getEmail() -> attendee.getAttendeeStatus())
 			}
@@ -83,9 +86,9 @@ object SessionHelper {
 		throw new IllegalStateException("Check attendee replies but no pending invitation")
 	}
 	
-	def attendeeHasReplied(pendingInvitation: PendingInvitationContext, attendee: MSAttendee): Boolean = {
+	def attendeeHasReplied(organizerEmail: String, attendee: MSAttendee): Boolean = {
 		if ((attendee.getAttendeeStatus() == ACCEPT) || (attendee.getAttendeeStatus() == DECLINE)) {
-			if (!pendingInvitation.invitation.organizerEmail.equals(attendee.getEmail())) {
+			if (!organizerEmail.equals(attendee.getEmail())) {
 				return true
 			}
 		}
@@ -116,7 +119,7 @@ object SessionHelper {
 	}
 	
 	def updatePendingInvitation(session: Session, pendingInvitation: PendingInvitationContext): Session = {
-		session.setAttribute(SessionKeys.PENDING_INVITATION.toString, pendingInvitation)
+		session.setAttribute(userKey.lastPendingInvitationSessionKey, pendingInvitation)
 	}
 	
 }

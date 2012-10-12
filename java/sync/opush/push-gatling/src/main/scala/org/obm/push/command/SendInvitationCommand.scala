@@ -34,8 +34,6 @@ package org.obm.push.command
 import java.util.Date
 import java.util.UUID
 
-import scala.collection.JavaConversions.setAsJavaSet
-
 import org.obm.DateUtils.date
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.AttendeeType
@@ -45,7 +43,7 @@ import org.obm.push.bean.CalendarSensitivity
 import org.obm.push.bean.MSAttendee
 import org.obm.push.bean.MSEvent
 import org.obm.push.bean.MSEventUid
-import org.obm.push.context.http.HttpContext
+import org.obm.push.context.User
 import org.obm.push.encoder.GatlingEncoders.calendarEncoder
 import org.obm.push.protocol.bean.SyncRequestCollection
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand
@@ -56,8 +54,8 @@ import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.google.common.collect.ImmutableList
 
-class SendInvitationCommand(httpContext: HttpContext, invitation: InvitationContext,
-		wbTools: WBXMLTools) extends AbstractSyncCommand(httpContext, invitation, wbTools) {
+class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
+		extends AbstractSyncCommand(invitation, wbTools) {
 
 	override def buildSyncRequestCollections(session: Session) = {
 		List(SyncRequestCollection.builder()
@@ -68,37 +66,38 @@ class SendInvitationCommand(httpContext: HttpContext, invitation: InvitationCont
 						SyncRequestCollectionCommand.builder()
 							.name("Add")
 							.clientId(invitation.clientId)
-							.applicationData(buildInvitationData())
+							.applicationData(buildInvitationData(session))
 							.build()))
 					.build())
 				.build())
 	}
 	
-	def buildInvitationData() = {
+	def buildInvitationData(session: Session) = {
+		val organizer = invitation.userKey.getUser(session)
+		val attendees = for (attendee <- invitation.attendees) yield attendee.getUser(session)
+		
 		val parent = DOMUtils.createDoc(null, "ApplicationData").getDocumentElement()
-		val device = httpContext.device
-		calendarEncoder.encode(device, parent, buildEventInvitation(), true)
+		calendarEncoder.encode(organizer.device, parent, buildEventInvitation(organizer, attendees), true)
 		parent
 	}
 	
-	def buildEventInvitation() = {
+	def buildEventInvitation(organizer: User, attendees: Iterable[User]) = {
 		val event = new MSEvent()
 		event.setDtStamp(new Date())
 		event.setUid(new MSEventUid(UUID.randomUUID().toString()))
-		event.setSubject("Invitation from %s".format(invitation.organizerEmail))
+		event.setSubject("Invitation from %s".format(organizer.email))
 		event.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 		event.setBusyStatus(CalendarBusyStatus.BUSY)
 		event.setSensitivity(CalendarSensitivity.NORMAL)
 		
-		for (attendee <- invitation.attendeesEmails) {
+		event.setOrganizerEmail(organizer.email)
+		for (attendee <- attendees) {
 			event.addAttendee(MSAttendee.builder()
-					.withEmail(attendee)
+					.withEmail(attendee.email)
 					.withType(AttendeeType.REQUIRED)
 					.withStatus(AttendeeStatus.NOT_RESPONDED)
 					.build())
 		}
-		event.setOrganizerEmail(invitation.organizerEmail)
-		event.setAttendeeEmails(invitation.attendeesEmails)
 		
 		event.setAllDayEvent(false)
 		event.setStartTime(date("2014-12-01T09:00:00"))

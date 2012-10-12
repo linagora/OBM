@@ -35,9 +35,7 @@ import scala.collection.JavaConversions.seqAsJavaList
 
 import org.obm.push.bean.MeetingResponse
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
-import org.obm.push.context.http.HttpContext
 import org.obm.push.encoder.GatlingEncoders.meetingProtocol
-import org.obm.push.helper.SessionKeys
 import org.obm.push.protocol.bean.MeetingHandlerRequest
 import org.obm.push.protocol.bean.MeetingHandlerResponse
 import org.obm.push.wbxml.WBXMLTools
@@ -46,8 +44,8 @@ import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
 
-class MeetingResponseCommand(httpContext: HttpContext, response: MeetingResponseContext, wbTools: WBXMLTools)
-	extends AbstractActiveSyncCommand(httpContext) {
+class MeetingResponseCommand(response: MeetingResponseContext, wbTools: WBXMLTools)
+	extends AbstractActiveSyncCommand(response.userKey) {
 
 	val namespace = "MeetingResponse"
 	
@@ -60,7 +58,7 @@ class MeetingResponseCommand(httpContext: HttpContext, response: MeetingResponse
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toMeetingResponseReply(response))
-			    .saveAs(SessionKeys.MEETING_RESPONSE.toString))
+			    .saveAs(response.userKey.lastMeetingResponseSessionKey))
 	}
 
 	def buildMeetingResponse(session: Session): Array[Byte] = {
