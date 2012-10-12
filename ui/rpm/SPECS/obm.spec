@@ -349,7 +349,7 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm/documents/8
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm/documents/9
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-cp -apR contrib cron obminclude php resources tests scripts locale views app lib \
+cp -apR contrib cron obminclude php resources tests scripts locale views app lib webmail \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}
 cp conf/obm_conf.inc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 # Fix permissions
@@ -362,6 +362,10 @@ chmod 0664 \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/resources/*/*/*/*.css \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/resources/*/*/*.inc \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}include/*/of_session.inc
+
+#Roundcube permissions
+chown -R root:apache $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/temp/ $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/logs/
+chmod -R 770 $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/temp/ $RPM_BUILD_ROOT%{_datadir}/%{name}/webmail/logs/
 
 ln -s %{_datadir}/%{name}/resources $RPM_BUILD_ROOT%{_datadir}/%{name}/php/images
 
@@ -491,6 +495,7 @@ fi
 %{_datadir}/%{name}/app
 %{_datadir}/%{name}/lib
 %{_datadir}/%{name}/locale
+%{_datadir}/%{name}/webmail
 %{_sysconfdir}/%{name}/hooks
 %{_sysconfdir}/%{name}/themes
 %{_sysconfdir}/%{name}/modules
