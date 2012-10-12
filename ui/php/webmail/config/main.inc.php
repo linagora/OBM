@@ -19,7 +19,7 @@
 // This queries the OBM database to retrieve the available domains and associated mail servers.
 // This then exposes the rcmail_x variables with the proper information.
 
-$path = '.';
+$path = '..';
 $module = "webmail";
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') {
