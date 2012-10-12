@@ -10,7 +10,7 @@ class ChangelogUpdater(object):
           which we started building the packages
         - *sha1*: the SHA1 of the build
         - *version*: the OBM version (ex: 2.4.0)
-        - *release*: the OBM release (ex: rc10) 
+        - *release*: the OBM release (ex: rc10)
         - *mode*: one of `'replace'`, `'append'` or `'no_update'`. The first
           overwrites the changelog with the instancied template, the second
           inserts the contents of the instancied template at the top of the

@@ -23,24 +23,21 @@ def read_packages(config, checkout_dir):
     packages = []
     for package_name in set(package_names.split(",")):
         stripped_package_name = package_name.strip()
-
         package_section_name = "package:%s" % stripped_package_name
-
         package_path = None
-
         end_of_path = None
         if config.has_option(package_section_name, 'path'):
             end_of_path = config.get(package_section_name, 'path')
         else:
             end_of_path = stripped_package_name
+
         package_path = os.path.join(checkout_dir, end_of_path)
 
         sub_packages = []
-        if config.has_option(package_section_name, 'sub-packages'): 
+        if config.has_option(package_section_name, 'sub-packages'):
             sub_package_names = config.get(package_section_name, 'sub-packages')
             for sub_package_name in set(sub_package_names.split(",")):
                 stripped_sub_package_name = sub_package_name.strip()
-                
                 sub_package_section_name = "sub-package:%s" %\
                         stripped_sub_package_name
                 if config.has_option(sub_package_section_name, 'source_path'):

@@ -142,7 +142,7 @@ class Packager(object):
         if self.package_type == "deb":
             command = 'debuild --no-tgz-check -us -uc -sa'
         elif self.package_type == "rpm":
-            distname, version, id = platform.linux_distribution() 
+            distname, version, id = platform.linux_distribution()
             # If we're not building on RedHat/CentOS, we need to make sure we're
             # not going to take system directories from the current platform
             redefine_platform_params = distname != 'redhat'

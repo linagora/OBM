@@ -44,7 +44,7 @@ def update_changelogs(config, obm_version, obm_release, packages, date, obm_dir)
             changelog = ob.get_changelog(package.name, package_type,
                     package.path)
             if os.path.exists(changelog):
-                logging.info("Updating changelog %s" % changelog) 
+                logging.info("Updating changelog %s" % changelog)
                 changelog_updater.update(package.name, changelog)
 
 def main():

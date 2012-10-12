@@ -66,7 +66,7 @@ def get_version_release(args, config, date, sha1):
     if args.package_type == 'rpm' and not obm_release:
         obm_release = 1
     short_sha1 = sha1[:7]
-    if args.on_commit: 
+    if args.on_commit:
         formatter = string.Formatter()
         params = dict(obm_release=obm_release,
                 year=date.strftime("%Y"),
@@ -130,7 +130,7 @@ def assert_package_option_is_correct(usage, package_names, available_packages):
     available_package_names = set([p.name for p in available_packages])
     available_package_names.add('all')
     package_diff =  package_names - available_package_names
-    if package_diff: 
+    if package_diff:
         label = "choice" if len(package_diff)==1 else "choices"
         formatted_package_diff = "'%s'" % "', '".join(package_diff)
         formatted_available_packages = "'%s'" % "', '".join(
