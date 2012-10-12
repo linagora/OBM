@@ -11,8 +11,6 @@
 # Author: Sylvain Garcia <sylvain.garcia@aliasource.fr>
 #
 
-# Do NOT "set -e"
-
 DESC="obmSatellite service"
 NAME=init-obmsatellite
 DAEMON=/usr/share/obm-satellite/obmSatellite.pl

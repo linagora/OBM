@@ -12,8 +12,6 @@
 #         Anthony Prades <anthony.prades@aliasource.fr>
 #
 
-# Do NOT "set -e"
-
 DESC="obmSaslauthd service"
 NAME=init-obmsaslauthd
 DAEMON=/usr/share/obm-saslauthd/obmSaslauthd.pl
