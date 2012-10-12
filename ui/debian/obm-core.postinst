@@ -21,6 +21,12 @@ is_initial_configuration() {
 	return 1 
 } 
 
+/bin/chown -R root.www-data /var/lib/obm
+/bin/chmod -R 770 /var/lib/obm
+
+/bin/chown -R root.www-data /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
+/bin/chmod -R 770 /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
+
 #Installation des fichier de conf
 if is_initial_configuration "$@"; then
 
@@ -40,13 +46,6 @@ if is_initial_configuration "$@"; then
   else
     cat /usr/share/doc/obm-core/themes/login.html.sample > /etc/obm/themes/login.html.sample
   fi
-  
-  #mise en place des permissions sur /var/lib/obm
-  /bin/chown -R root.www-data /var/lib/obm
-  /bin/chmod -R 770 /var/lib/obm
-  
-  /bin/chown -R root.www-data /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
-  /bin/chmod -R 770 /usr/share/obm/www/php/webmail/temp/ /usr/share/obm/www/php/webmail/logs/
   
   #configuration	de obm_conf.inc
   #sed -i -e 's#^\$cbackup_root.*#\$cbackup_root = "/var/lib/obm/backup";#' /etc/obm/obm_conf.inc
