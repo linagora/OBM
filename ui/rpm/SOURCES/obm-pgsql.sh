@@ -32,8 +32,10 @@ obmconf=/etc/obm/obm-rpm.conf
 REP_BIN_PGSQL="/usr/bin"
 REP_SCRIPTS_OBM="/usr/share/obm/scripts/creation"
 SCRIPT_INSTALL="$REP_SCRIPTS_OBM/install_obmdb.sh"
+SCRIPT_RC_INSTALL="$REP_SCRIPTS_OBM/install_roundcubedb_2.4.sh"
 SCRIPT_UPDATE="$REP_SCRIPTS_OBM/update-$FROM_VER-$TO_VER.sh"
 LIB_ADMIN_PG="/usr/bin/pgadmin.lib"
+RC_DBNAME="roundcubemail"
 
 echo "=============== OBM DataBase initialisation ================"
 echo
@@ -134,6 +136,18 @@ else
 	$SCRIPT_INSTALL
 	popd 1>/dev/null
 	
+fi
+
+echo "Vérification de la base de données ${RC_DBNAME}"
+CHECKBD=`su - postgres -c "$REP_BIN_PGSQL/psql -c \"\l\"" |grep ${RC_DBNAME} |awk '{print $1}'`
+
+if [ "x$CHECKBD" == "x${RC_DBNAME}" ]; then
+	echo "${RC_DBNAME} database already exist, skipping."
+else
+	echo "Installing ${RC_DBNAME} database."
+	pushd $REP_SCRIPTS_OBM 1>/dev/null
+	$SCRIPT_RC_INSTALL
+	popd 1>/dev/null
 fi
 
 unset PGPASSWORD

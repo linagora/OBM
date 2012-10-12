@@ -19,6 +19,7 @@ set_db_to_gmt() {
 create_obm_schema() {
         cd /usr/share/obm-storage/update-install/scripts/creation
         bash ./install_obmdb.sh filldata
+        bash ./install_roundcubedb_2.4.sh
         cd -
 }
 
