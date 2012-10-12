@@ -38,17 +38,23 @@ binary-install-tomcat-webapp/% ::
 
 binary-install/obm-autoconf:: binary-install-tomcat-webapp/obm-autoconf
 
+install/obm-sync: WEB_INF = $(shell find $(CURDIR)/services/target -name WEB-INF)
+install/obm-sync: INSTALL_DIR := $(CURDIR)/debian/obm-sync/usr/share/obm-sync/
 install/obm-sync::
-	(/bin/bash $(CURDIR)/debian/obm-sync-build.sh $(CURDIR))
+	cp -r $(WEB_INF) $(INSTALL_DIR)
+	rm -f $(INSTALL_DIR)/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+	rm -f $(INSTALL_DIR)/WEB-INF/lib/slf4j-api-*.jar
+	rm -f $(INSTALL_DIR)/WEB-INF/lib/logback*.jar
+	rm -f $(INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar
 
 install/obm-locator::
-	(/bin/bash $(CURDIR)/debian/obm-locator-build.sh $(CURDIR))
+	cp -r $(CURDIR)/obm-locator/target/obm-locator $(CURDIR)/debian/obm-locator/var/lib/jetty/webapps/
 
 install/opush::
-	(/bin/bash $(CURDIR)/debian/opush-build.sh $(CURDIR))
+	cp -r $(CURDIR)/opush/push/target/opush $(CURDIR)/debian/opush/var/lib/jetty/webapps/
 
 install/obm-tomcat-common-libs::
-	(/bin/bash $(CURDIR)/debian/obm-webapp-common-libs-build.sh $(CURDIR) "tomcat")
+	cp $(CURDIR)/webapp-common-dependencies/target/tomcat/*.jar $(CURDIR)/debian/obm-tomcat-common-libs/usr/share/tomcat/lib/
 
 install/obm-jetty-common-libs::
-	(/bin/bash $(CURDIR)/debian/obm-webapp-common-libs-build.sh $(CURDIR) "jetty")
+	cp $(CURDIR)/webapp-common-dependencies/target/jetty/*.jar $(CURDIR)/debian/obm-jetty-common-libs/usr/share/jetty/lib/
