@@ -33,10 +33,13 @@ package org.obm.push.protocol;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.MeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.utils.DOMUtils;
@@ -94,5 +97,102 @@ public class MeetingProtocolTest {
 		Document encodeResponse = meetingProtocol.encodeResponse(meetingResponse);
 		
 		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
+	
+	@Test
+	public void testEncodeValues() throws Exception {
+		MeetingHandlerRequest request = MeetingHandlerRequest.builder().add(MeetingResponse.builder()
+					.collectionId(1)
+					.longId("2")
+					.reqId("3")
+					.userResponse(AttendeeStatus.ACCEPT)
+					.build()).build();
+		Document encodedRequest = meetingProtocol.encodeRequest(request);
+		
+		Document expectedRequest = DOMUtils.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Request>" +
+				"<UserResponse>1</UserResponse>" +
+				"<CollectionId>1</CollectionId>" +
+				"<ReqId>3</ReqId>" +
+				"<LongId>2</LongId>" +
+				"</Request>" +
+				"</MeetingResponse>");
+		
+		XMLAssert.assertXMLEqual(encodedRequest, expectedRequest);
+	}
+	
+	@Test
+	public void testEncodeLongIdIsNotRequired() throws Exception {
+		MeetingHandlerRequest request = MeetingHandlerRequest.builder().add(MeetingResponse.builder()
+					.collectionId(1)
+					.reqId("3")
+					.userResponse(AttendeeStatus.ACCEPT)
+					.build()).build();
+		Document encodedRequest = meetingProtocol.encodeRequest(request);
+		
+		Document expectedRequest = DOMUtils.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Request>" +
+				"<UserResponse>1</UserResponse>" +
+				"<CollectionId>1</CollectionId>" +
+				"<ReqId>3</ReqId>" +
+				"</Request>" +
+				"</MeetingResponse>");
+		
+		XMLAssert.assertXMLEqual(encodedRequest, expectedRequest);
+	}
+	
+	@Test
+	public void testEncodeCollectionIdIsNotRequired() throws Exception {
+		MeetingHandlerRequest request = MeetingHandlerRequest.builder().add(MeetingResponse.builder()
+					.longId("2")
+					.reqId("3")
+					.userResponse(AttendeeStatus.ACCEPT)
+					.build()).build();
+		Document encodedRequest = meetingProtocol.encodeRequest(request);
+		
+		Document expectedRequest = DOMUtils.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Request>" +
+				"<UserResponse>1</UserResponse>" +
+				"<ReqId>3</ReqId>" +
+				"<LongId>2</LongId>" +
+				"</Request>" +
+				"</MeetingResponse>");
+		
+		XMLAssert.assertXMLEqual(encodedRequest, expectedRequest);
+	}
+
+	@Test
+	public void testEncodeAttendeeStatusIsTentativeByDefault() throws Exception {
+		MeetingHandlerRequest request = MeetingHandlerRequest.builder().add(MeetingResponse.builder()
+					.collectionId(1)
+					.longId("2")
+					.reqId("3")
+					.build()).build();
+		Document encodedRequest = meetingProtocol.encodeRequest(request);
+		
+		Document expectedRequest = DOMUtils.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+				"<MeetingResponse>" +
+				"<Request>" +
+				"<UserResponse>2</UserResponse>" +
+				"<CollectionId>1</CollectionId>" +
+				"<ReqId>3</ReqId>" +
+				"<LongId>2</LongId>" +
+				"</Request>" +
+				"</MeetingResponse>");
+		
+		XMLAssert.assertXMLEqual(encodedRequest, expectedRequest);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testEncodeReqIdIsRequired() {
+		MeetingHandlerRequest request = MeetingHandlerRequest.builder().add(MeetingResponse.builder()
+					.collectionId(1)
+					.longId("2")
+					.userResponse(AttendeeStatus.ACCEPT)
+					.build()).build();
+		meetingProtocol.encodeRequest(request);
 	}
 }

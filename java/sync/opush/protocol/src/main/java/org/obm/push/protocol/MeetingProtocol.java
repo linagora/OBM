@@ -44,6 +44,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 public class MeetingProtocol implements ActiveSyncProtocol<MeetingHandlerRequest, MeetingHandlerResponse> {
 
 	@Override
@@ -149,6 +152,7 @@ public class MeetingProtocol implements ActiveSyncProtocol<MeetingHandlerRequest
 		Element root = reply.getDocumentElement();
 		
 		for (MeetingResponse meetingResponse : meetingRequest.getMeetingResponses()) {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(meetingResponse.getReqId()));
 			Element request = DOMUtils.createElement(root, "Request");
 			
 			DOMUtils.createElementAndText(request, "UserResponse", serializeAttendeeStatus(meetingResponse.getUserResponse()));
@@ -156,7 +160,9 @@ public class MeetingProtocol implements ActiveSyncProtocol<MeetingHandlerRequest
 				DOMUtils.createElementAndText(request, "CollectionId", meetingResponse.getCollectionId());
 			}
 			DOMUtils.createElementAndText(request, "ReqId", meetingResponse.getReqId());
-			DOMUtils.createElementAndText(request, "LongId", meetingResponse.getLongId());
+			if (meetingResponse.getLongId() != null) {
+				DOMUtils.createElementAndText(request, "LongId", meetingResponse.getLongId());
+			}
 		}
 		return reply;
 	}
