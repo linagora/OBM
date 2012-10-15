@@ -41,6 +41,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.ResourceType;
+import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -95,6 +98,7 @@ public class StoreClient {
 	/**
 	 * Logs into the IMAP store
 	 */
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
 	public void login(Boolean activateTLS) throws IMAPException {
 		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
 		SocketAddress sa = new InetSocketAddress(hostname, port);
@@ -107,6 +111,7 @@ public class StoreClient {
 	 * 
 	 * @throws IMAPException
 	 */
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
 	public void logout() {
 		if (logger.isDebugEnabled()) {
 			logger.debug("logout attempt for " + login);

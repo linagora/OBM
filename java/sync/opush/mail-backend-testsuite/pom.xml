@@ -89,17 +89,22 @@
 			<artifactId>push-mail</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-exec</artifactId>
 			<version>1.1</version>
 			<scope>compile</scope>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-mail</artifactId>
 			<version>${obm.version}</version>
 			<type>test-jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 </project>
