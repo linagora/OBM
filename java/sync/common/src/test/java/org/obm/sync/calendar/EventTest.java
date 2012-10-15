@@ -1459,20 +1459,19 @@ public class EventTest {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = publicEvent.getAttendees();
 
-		Comment attComent = new Comment("No Way! Get off my calendar!");
-
 		for (Attendee attendee : attendees){
-			attendee.setParticipation(Participation.DECLINED);
-			attendee.getParticipation().setComment(attComent);
+			attendee.setParticipation(
+					Participation.builder()
+						.state(State.DECLINED)
+						.comment("a random comment")
+						.build());
 		}
 
 		publicEvent.updateParticipation();
 
-		Comment emptyComment = new Comment("");
-
 		List<Attendee> updatedAttendees = publicEvent.getAttendees();
-		for (Attendee upAtt : updatedAttendees){
-			assertThat(upAtt.getParticipation().getComment()).isEqualTo(emptyComment);
+		for (Attendee updatedAttendee : updatedAttendees){
+			assertThat(updatedAttendee.getParticipation().getComment()).isEqualTo(Comment.EMPTY);
 		}
 	}
 }

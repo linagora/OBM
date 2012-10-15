@@ -7,12 +7,11 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.Comment;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.State;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
@@ -243,9 +242,10 @@ public class AttendeeLoader {
 	}
 
 	private Participation getAttendeeState(ResultSet rs) throws SQLException {
-		Participation status = new Participation(new Comment(rs.getString("eventlink_comment")), 
-				State.getValueOf(rs.getString("eventlink_state")));
-		return status;
+		return Participation.builder()
+							.state(State.getValueOf(rs.getString("eventlink_state")))
+							.comment(rs.getString("eventlink_comment"))
+							.build();
 	}
 
 	private int getAttendeePercent(ResultSet rs) throws SQLException {

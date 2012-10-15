@@ -68,9 +68,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
-import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -83,13 +81,14 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
@@ -733,10 +732,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Participation getAttendeeState(ResultSet rs)
 			throws SQLException {
-		Comment comment = new Comment(rs.getString("eventlink_comment"));
-		State state = State.getValueOf(rs.getString("eventlink_state"));
-		Participation status = new Participation(comment, state);
-		return status;
+		return Participation.builder()
+							.state(State.getValueOf(rs.getString("eventlink_state")))
+							.comment(rs.getString("eventlink_comment"))
+							.build();
 	}
 	
 	@Override

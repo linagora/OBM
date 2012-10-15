@@ -32,8 +32,39 @@ package org.obm.sync.calendar;
 import java.io.Serializable;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class Participation implements Serializable{
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private State state;
+		private Comment comment;
+
+		private Builder() {
+			super();
+		}
+
+		public Builder comment(String comment) {
+			this.comment = new Comment(comment);
+			return this;
+		}
+
+		public Builder state(State state) {
+			this.state = state;
+			return this;
+		}
+
+		public Participation build() {
+			Preconditions.checkState(state != null);
+			return new Participation(state,
+					Objects.firstNonNull(comment, new Comment()));
+		}
+	}
+
 	public static final Participation DECLINED = new Participation(State.DECLINED);
 	public static final Participation NEEDSACTION = new Participation(State.NEEDSACTION);
 	public static final Participation ACCEPTED = new Participation(State.ACCEPTED);
@@ -45,14 +76,13 @@ public class Participation implements Serializable{
 	private Comment comment;
 	private State state;
 
-	public Participation(Comment comment, State state) {
-		this.comment = comment;
+	private Participation(State state, Comment comment) {
 		this.state = state;
+		this.comment = comment;
 	}
 
-	public Participation(State state) {
-		this.comment = new Comment();
-		this.state = state;
+	private Participation(State state) {
+		this(state, new Comment());
 	}
 
 	public Comment getComment() {

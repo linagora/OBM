@@ -47,7 +47,6 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.items.AbstractItemsWriter;
@@ -239,8 +238,10 @@ private CalendarItemsWriter writer;
 		john.setParticipation(Participation.ACCEPTED);
 		Attendee jane = new Attendee();
 		jane.setEmail("jane@doe");
-		jane.setParticipation(Participation.NEEDSACTION);
-		jane.getParticipation().setComment(new Comment("this is a new comment"));
+		jane.setParticipation(Participation.builder()
+								.state(State.NEEDSACTION)
+								.comment("this is a new comment")
+								.build());
 
 		List<Attendee> attendees = Lists.newArrayList(john, jane);
 		return attendees;

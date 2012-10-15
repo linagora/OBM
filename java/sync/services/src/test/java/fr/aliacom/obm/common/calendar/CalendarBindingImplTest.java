@@ -72,9 +72,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
-import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -84,6 +82,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
@@ -1455,8 +1454,10 @@ public class CalendarBindingImplTest {
 		List<Attendee> attendeesToTest = after.getAttendees();
 		assertThat(attendeesToTest).hasSize(3);
 
-		Participation needsaction = 
-				new Participation(new Comment(""), State.NEEDSACTION);
+		Participation needsaction = Participation.builder()
+												.state(State.NEEDSACTION)
+												.comment("")
+												.build();
 		for(Attendee attendee: attendeesToTest) {
 			assertThat(attendee.getParticipation()).isEqualTo(needsaction);
 			assertThat(attendee.isCanWriteOnCalendar()).isEqualTo(false);

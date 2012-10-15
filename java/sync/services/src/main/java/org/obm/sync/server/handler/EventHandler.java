@@ -49,8 +49,6 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
-import org.obm.sync.calendar.Comment;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -62,6 +60,7 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
+import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.Request;
@@ -575,10 +574,10 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private Participation getParticipation(Request request) {
-		String comment = request.getParameter("comment");
-		Participation status = new Participation(new Comment(comment), 
-				State.getValueOf(request.getParameter("state")));
-		return status;
+		return Participation.builder()
+							.state(State.getValueOf(request.getParameter("state")))
+							.comment(request.getParameter("comment"))
+							.build();
 	}
 
 }
