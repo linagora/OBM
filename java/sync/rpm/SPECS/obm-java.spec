@@ -220,6 +220,8 @@ fi
 
 
 %changelog
+* Mon Oct 15 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.4.2.0-0.alpha2
+- New upstream release.
 * Wed Sep 26 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.4.2.0-0.alpha1
 - New upstream release.
 * Fri Sep 14 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.4.1.1-0.rc2
