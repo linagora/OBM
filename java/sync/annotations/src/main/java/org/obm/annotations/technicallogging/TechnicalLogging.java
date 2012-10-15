@@ -29,9 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean.jaxb;
+package org.obm.annotations.technicallogging;
 
-public enum ResourceType {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-	JDBC_CONNECTION, IMAP_CONNECTION, HTTP_CLIENT;
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TechnicalLogging {
+
+    boolean onStartOfMethod() default false;
+    
+    boolean onEndOfMethod() default false;
+    
+    KindToBeLogged kindToBeLogged() default KindToBeLogged.TRANSACTION;
+    
+    ResourceType resourceType() default ResourceType.JDBC_CONNECTION;
 }
