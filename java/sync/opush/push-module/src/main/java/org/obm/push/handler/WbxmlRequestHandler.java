@@ -34,6 +34,8 @@ package org.obm.push.handler;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -87,6 +89,7 @@ public abstract class WbxmlRequestHandler implements IRequestHandler {
 	}
 
 	@Override
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.REQUEST, onStartOfMethod=true, onEndOfMethod=true)
 	public void process(IContinuation continuation, UserDataRequest udr,
 			ActiveSyncRequest request, Responder responder) throws IOException {
 
