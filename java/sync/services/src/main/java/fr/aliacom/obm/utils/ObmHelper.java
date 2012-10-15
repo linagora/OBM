@@ -52,6 +52,10 @@ import com.google.inject.Singleton;
 public class ObmHelper {
 
 	private DatabaseFlavour type = DatabaseFlavour.PGSQL;
+	public static final String VCOMPONENT = "vcomponent";
+	public static final String VROLE = "vrole";
+	public static final String VPARTSTAT = "vpartstat";
+	public static final String VOPACITY = "vopacity";
 
 	private final DatabaseConnectionProvider dbcp;
 
@@ -180,5 +184,9 @@ public class ObmHelper {
 
 	public DatabaseFlavour getType() {
 		return type;
+	}
+
+	public DatabaseConnectionProvider getDBCP() {
+		return dbcp;
 	}
 }

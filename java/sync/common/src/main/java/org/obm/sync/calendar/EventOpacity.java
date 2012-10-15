@@ -31,34 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-
-import org.obm.configuration.DatabaseFlavour;
-
 public enum EventOpacity {
 
 	OPAQUE, TRANSPARENT;
-
-	public Object getJdbcObject(DatabaseFlavour type) throws SQLException {
-		if (type == DatabaseFlavour.PGSQL) {
-			try {
-				Object o = Class.forName("org.postgresql.util.PGobject")
-						.newInstance();
-				Method setType = o.getClass()
-						.getMethod("setType", String.class);
-				Method setValue = o.getClass().getMethod("setValue",
-						String.class);
-
-				setType.invoke(o, "vopacity");
-				setValue.invoke(o, toString());
-				return o;
-			} catch (Throwable e) {
-				throw new SQLException(e.getMessage(), e);
-			}
-		}
-		return toString();
-	}
 
 	public static EventOpacity getValueOf(String opacity) {
 		if (TRANSPARENT.toString().equalsIgnoreCase(opacity)) {

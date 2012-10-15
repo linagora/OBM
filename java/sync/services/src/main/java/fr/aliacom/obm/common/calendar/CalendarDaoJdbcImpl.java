@@ -465,7 +465,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		int idx = i;
 		ps.setString(idx++, ev.getExtId().getExtId());
 		ps.setString(idx++, ev.getTimezoneName());
-		ps.setObject(idx++, ev.getOpacity().getJdbcObject(obmHelper.getType()));
+		ps.setObject(idx++, obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VOPACITY, ev.getOpacity().toString()));
 		ps.setString(idx++, ev.getTitle());
 		ps.setString(idx++, ev.getLocation());
 		Integer cat = catIdFromString(ps.getConnection(), ev.getCategory(),
@@ -499,13 +500,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		ps.setString(idx++, ev.getDescription());
 		ps.setInt(idx++, at.getDomain().getId());
 		ps.setString(idx++, at.getOrigin());
-		ps.setObject(idx++, ev.getType().getJdbcObject(obmHelper.getType()));
+		ps.setObject(idx++, obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VCOMPONENT, ev.getType().toString()));
 		ps.setInt(idx++, ev.getSequence());
 		return idx;
 	}
 	
     private List<DeletedEvent> findDeletedEvents(ObmUser calendarUser, Date d,
-                    EventType et, List<DeletedEvent> declined) {
+                    EventType eventType, List<DeletedEvent> declined) {
 
             List<DeletedEvent> result = new LinkedList<DeletedEvent>();
             result.addAll(declined);
@@ -522,7 +524,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
                     con = obmHelper.getConnection();
                     ps = con.prepareStatement(q);
                     ps.setInt(1, calendarUser.getUid());
-                    ps.setObject(2, et.getJdbcObject(obmHelper.getType()));
+                    ps.setObject(2, obmHelper.getDBCP()
+                    		.getJdbcObject(ObmHelper.VCOMPONENT, eventType.toString()));
                     if (d != null) {
                             ps.setTimestamp(3, new Timestamp(d.getTime()));
                     }
@@ -780,17 +783,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 						int idx = 1;
 						ps.setInt(idx++, u.getUid());
-						ps.setObject(idx++, EventType.VEVENT.getJdbcObject(obmHelper.getType()));
+						ps.setObject(idx++, obmHelper.getDBCP()
+								.getJdbcObject(ObmHelper.VCOMPONENT, EventType.VEVENT.toString()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getStart()
 								.getTime()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getStart()
 								.getTime()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getEnd()
 								.getTime()));
-						ps.setObject(idx++, State.DECLINED
-								.getJdbcObject(obmHelper.getType()));
-						ps.setObject(idx++, EventOpacity.OPAQUE
-								.getJdbcObject(obmHelper.getType()));
+						ps.setObject(idx++, obmHelper.getDBCP()
+								.getJdbcObject(ObmHelper.VPARTSTAT, State.DECLINED.toString()));
+						ps.setObject(idx++, obmHelper.getDBCP()
+								.getJdbcObject(ObmHelper.VOPACITY, EventOpacity.OPAQUE.toString()));
 						rs = ps.executeQuery();
 						FreeBusy freebusy = new FreeBusy();
 						freebusy.setStart(fbr.getStart());
@@ -977,7 +981,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(fetchIds.toString());
 			int idx = 1;
-			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
 			evps.setObject(idx++, calendarUser.getUid());
 			if (lastSync != null) {
 				evps.setTimestamp(idx++, new Timestamp(lastSync.getTime()));
@@ -1742,10 +1747,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		ps = con.prepareStatement(upQ);
 		ps.setInt(1, at.getObmId());
-		ps.setObject(2, ev.getType().getJdbcObject(obmHelper.getType()));
+		ps.setObject(2, obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VCOMPONENT, ev.getType().toString()));
 		ps.setString(3, ev.getTimezoneName() != null ? ev.getTimezoneName()
 				: "Europe/Paris");
-		ps.setObject(4, ev.getOpacity().getJdbcObject(obmHelper.getType()));
+		ps.setObject(4, obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VOPACITY, ev.getOpacity().toString()));
 		ps.setString(5, ev.getTitle());
 		ps.setString(6, ev.getLocation());
 		Integer cat = catIdFromString(con, ev.getCategory(), at.getDomain().getId());
@@ -1957,7 +1964,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				insertStatement.setInt(1, databaseId.getObmId());
 				insertStatement.setInt(2, attendeeId);
 				insertStatement.setString(3, token.getOrigin());
-				insertStatement.setObject(4, eventType.getJdbcObject(obmHelper.getType()));
+				insertStatement.setObject(4, obmHelper.getDBCP()
+						.getJdbcObject(ObmHelper.VCOMPONENT, eventType.toString()));
 				insertStatement.setString(5, event.getExtId().getExtId());
 				insertStatement.addBatch();
 			}
@@ -2083,12 +2091,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private Object getJdbcObjectParticipation(final Attendee at) throws SQLException {
 		final Participation participation = RFC2445.getParticipationOrDefault(at.getParticipation());
-		return participation.getState().getJdbcObject(obmHelper.getType());
+		return obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VPARTSTAT, participation.getState().toString());
 	}
 
 	private Object getJdbcObjectParticipationRole(final Attendee at) throws SQLException {
 		final ParticipationRole pRole = RFC2445.getParticipationRoleOrDefault(at.getParticipationRole());
-		return pRole.getJdbcObject(obmHelper.getType());
+		return obmHelper.getDBCP()
+				.getJdbcObject(ObmHelper.VROLE, pRole.toString());
 	}
 	
 	private Set<Attendee> removeDuplicateAttendee(List<Attendee> attendees) {
@@ -2145,10 +2155,10 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 
 				int idx = 1;
-				ps.setObject(idx++,
-						at.getParticipation().getState().getJdbcObject(obmHelper.getType()));
-				ps.setObject(idx++,
-						at.getParticipationRole().getJdbcObject(obmHelper.getType()));
+				ps.setObject(idx++, obmHelper.getDBCP()
+						.getJdbcObject(ObmHelper.VPARTSTAT, at.getParticipation().getState().toString()));
+				ps.setObject(idx++, obmHelper.getDBCP()
+						.getJdbcObject(ObmHelper.VROLE, at.getParticipationRole().toString()));
 				ps.setInt(idx++, token.getObmId());
 				ps.setInt(idx++, at.getPercent());
 				ps.setBoolean(idx++, at.isOrganizer());
@@ -2399,7 +2409,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(sql);
 			int idx = 1;
-			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
 			evps.setObject(idx++, obmUser.getUid());
 			evps.setTimestamp(idx++, new Timestamp(endDate.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(startDate.getTime()));
@@ -2462,7 +2473,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps = con.prepareStatement(sb.toString());
 			int idx = 1;
 			evps.setObject(idx++, calendarUser.getUid());
-			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
 			evrs = evps.executeQuery();
 
 			while (evrs.next()) {
@@ -2512,7 +2524,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(ev);
 			int idx = 1;
-			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
 			evps.setObject(idx++, calendarUser.getUid());
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
@@ -2587,10 +2600,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps = con.prepareStatement(sb.toString());
 			int idx = 1;
 			evps.setObject(idx++, calendarUser.getUid());
-			evps.setObject(idx++, typeFilter.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
 			State declined = Participation.DECLINED.getState();
-			evps.setObject(idx++, declined
-					.getJdbcObject(obmHelper.getType()));
+			evps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VPARTSTAT, declined.toString()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
 			if (end != null) {
@@ -2770,7 +2784,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);		
 
 			int idx = 1;
-			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
+			ps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VPARTSTAT, participation.getState().toString()));
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, "");
 			ps.setString(idx++, extId.getExtId());
@@ -2825,7 +2840,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);		
 
 			int idx = 1;
-			ps.setObject(idx++, participation.getState().getJdbcObject(obmHelper.getType()));
+			ps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VPARTSTAT, participation.getState().toString()));
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, "");
 			ps.setString(idx++, extId.getExtId());
