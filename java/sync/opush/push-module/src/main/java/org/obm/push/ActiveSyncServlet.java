@@ -40,6 +40,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IBackend;
@@ -130,6 +132,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	
 	@Override
 	@Transactional
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.TRANSACTION, onStartOfMethod=true, onEndOfMethod=true)
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
