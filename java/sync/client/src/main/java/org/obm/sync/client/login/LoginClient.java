@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.login;
 
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.ResourceType;
+import org.obm.annotations.technicallogging.TechnicalLogging;
+import org.obm.configuration.module.LoggerModule;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
@@ -38,8 +43,6 @@ import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +60,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	private final String origin;
 
 	@Inject
-	private LoginClient(@Named("origin")String origin,
+	protected LoginClient(@Named("origin")String origin,
 			SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		super(syncClientException, obmSyncLogger);
 		this.origin = origin;
@@ -65,6 +68,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
 		Multimap<String, String> params = ArrayListMultimap.create();
 		params.put("login", loginAtDomain);
@@ -118,6 +122,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	@Override
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	public void logout(AccessToken at) {
 		try {
 			Multimap<String, String> params = ArrayListMultimap.create();

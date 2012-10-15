@@ -27,6 +27,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
                         <groupId>junit</groupId>
                         <artifactId>junit</artifactId>
                 </dependency>
