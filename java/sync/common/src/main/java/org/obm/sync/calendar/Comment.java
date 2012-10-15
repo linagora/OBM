@@ -36,6 +36,7 @@ import java.io.Serializable;
 import com.google.common.base.Objects;
 
 public class Comment implements Serializable {
+	public static final Comment EMPTY = new Comment("");
 
 	private final String comment;
 

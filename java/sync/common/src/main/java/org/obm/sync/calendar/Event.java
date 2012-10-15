@@ -661,7 +661,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 			} else {
 				att.setParticipation(Participation.NEEDSACTION);
 			}
-			att.getParticipation().setComment(new Comment(""));
+			att.getParticipation().setComment(Comment.EMPTY);
 		}
 	}
 	

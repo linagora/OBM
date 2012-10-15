@@ -119,7 +119,6 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
@@ -129,8 +128,8 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -1315,8 +1314,7 @@ public class Ical4jHelper {
 				if (partStat.equals(PartStat.IN_PROCESS)) {
 					att.setParticipation(Participation.INPROGRESS);
 				} else {
-					att.setParticipation(new Participation(State.getValueOf(partStat
-							.getValue())));
+					att.setParticipation(Participation.getValueOf(partStat.getValue()));
 				}
 			} else {
 				//rfc5545 : 3.2.12, if PART-STAT is missing, default is NEEDS-ACTION
@@ -1611,8 +1609,7 @@ public class Ical4jHelper {
 				if (partStat.equals(PartStat.IN_PROCESS)) {
 					att.setParticipation(Participation.INPROGRESS);
 				} else {
-					att.setParticipation(new Participation(State.getValueOf(partStat
-							.getValue())));
+					att.setParticipation(Participation.getValueOf(partStat.getValue()));
 				}
 			}
 			fb.addAttendee(att);

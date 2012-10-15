@@ -184,7 +184,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			Attendee at = new Attendee();
 			at.setDisplayName(attendee[0]);
 			at.setEmail(attendee[1]);
-			at.setParticipation(new Participation(State.getValueOf(attendee[2])));
+			at.setParticipation(Participation.getValueOf(attendee[2]));
 			at.setParticipationRole(ParticipationRole.valueOf(attendee[3]));
 			if (attendee[4] != null && !attendee[4].equals("")) {
 				at.setPercent(Integer.parseInt(attendee[4]));
@@ -328,7 +328,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		EventParticipationState eps = new EventParticipationState();
 		eps.setUid(e.getAttribute("id"));
 		eps.setTitle(s(e, "title"));
-		eps.setParticipation(new Participation(State.getValueOf(s(e, "state"))));
+		eps.setParticipation(Participation.getValueOf(s(e, "state")));
 		eps.setAlert(getAlert(e));
 		eps.setDate(d(e, "date"));
 		return eps;

@@ -75,6 +75,10 @@ public class Participation implements Serializable{
 		return comment.getComment() != null;
 	}
 
+	public static final Participation getValueOf(String value) {
+		return new Participation(State.getValueOf(value));
+	}
+
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof Participation) {
