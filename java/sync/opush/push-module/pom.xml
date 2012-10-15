@@ -203,6 +203,11 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>qos-filter</artifactId>
 			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>technical-log</artifactId>
+			<version>${obm.version}</version>
 		</dependency>	
 	</dependencies>
 

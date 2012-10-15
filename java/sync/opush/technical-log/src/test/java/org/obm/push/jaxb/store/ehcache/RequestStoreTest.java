@@ -36,6 +36,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.util.List;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
@@ -113,7 +116,8 @@ public class RequestStoreTest {
 		
 		verify(objectStoreManager);
 		assertThat(element).isEqualTo(expectedElement);
-		assertThat(cache.getKeys()).containsOnly(transactionId);
+		List<Long> keys = cache.getKeys();
+		assertThat(keys).containsOnly(transactionId);
 	}
 	
 	@Test
@@ -137,7 +141,8 @@ public class RequestStoreTest {
 		
 		verify(objectStoreManager);
 		assertThat(element).isNull();
-		assertThat(cache.getKeys()).containsOnly(transactionId);
+		List<Long> keys = cache.getKeys();
+		assertThat(keys).containsOnly(transactionId);
 	}
 	
 	@Test
@@ -162,7 +167,8 @@ public class RequestStoreTest {
 		requestStore.delete(transactionId);
 		
 		verify(objectStoreManager);
-		assertThat(cache.getKeys()).isEmpty();
+		List<Long> keys = cache.getKeys();
+		assertThat(keys).isEmpty();
 	}
 	
 	@Test
@@ -176,7 +182,8 @@ public class RequestStoreTest {
 		requestStore.delete(2);
 		
 		verify(objectStoreManager);
-		assertThat(cache.getKeys()).isEmpty();
+		List<Long> keys = cache.getKeys();
+		assertThat(keys).isEmpty();
 	}
 	
 	private ObjectStoreManager mockObjectStoreManager(Cache cache) {

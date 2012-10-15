@@ -112,6 +112,7 @@ public class OpushImplModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new TransactionalModule());
+		install(new TechnicalLoggingModule());
 		install(new DaoModule());
 		install(qosModule());
 		install(new OpushServletModule());

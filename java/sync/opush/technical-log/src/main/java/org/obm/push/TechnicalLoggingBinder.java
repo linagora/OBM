@@ -112,7 +112,7 @@ public class TechnicalLoggingBinder implements ITechnicalLoggingBinder {
 	private void logStartRequest(DateTime startTime, UserDataRequest userDataRequest, IContinuation continuation) {
 		if (startTime != null) {
 			technicalLoggerService.traceStartedRequest(Request.builder()
-					.deviceId(userDataRequest.getDevId())
+					.deviceId(userDataRequest.getDevId().getDeviceId())
 					.deviceType(userDataRequest.getDevType())
 					.command(userDataRequest.getCommand())
 					.requestId(continuation.getReqId())
@@ -125,7 +125,7 @@ public class TechnicalLoggingBinder implements ITechnicalLoggingBinder {
 	private void logEndRequest(DateTime endTime, UserDataRequest userDataRequest, IContinuation continuation) {
 		if (endTime != null) {
 			technicalLoggerService.traceEndedRequest(Request.builder()
-					.deviceId(userDataRequest.getDevId())
+					.deviceId(userDataRequest.getDevId().getDeviceId())
 					.deviceType(userDataRequest.getDevType())
 					.command(userDataRequest.getCommand())
 					.requestId(continuation.getReqId())

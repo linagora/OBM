@@ -50,6 +50,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -143,7 +144,7 @@ public class TechnicalLoggingBinderTest {
 			
 		DateTime startTime = DateTime.now();
 		Request startRequest = Request.builder()
-				.deviceId(userDataRequest.getDevId())
+				.deviceId(userDataRequest.getDevId().getDeviceId())
 				.deviceType(userDataRequest.getDevType())
 				.command(userDataRequest.getCommand())
 				.requestId(requestId)
@@ -156,7 +157,7 @@ public class TechnicalLoggingBinderTest {
 		
 		DateTime endTime = DateTime.now().plusDays(requestId);
 		Request endRequest = Request.builder()
-				.deviceId(userDataRequest.getDevId())
+				.deviceId(userDataRequest.getDevId().getDeviceId())
 				.deviceType(userDataRequest.getDevType())
 				.command(userDataRequest.getCommand())
 				.requestId(requestId)
@@ -177,12 +178,12 @@ public class TechnicalLoggingBinderTest {
 	private UserDataRequest getFakeUserDataRequest() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"),
-				"Sync", getFakeDevice(), new BigDecimal("12.5"));
+				"Sync", getFakeDevice());
 		return udr;
 	}
 
 	private Device getFakeDevice() {
-		return new Device(1, "devType", "devId", new Properties());
+		return new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
 	}
 	
 	@Test
