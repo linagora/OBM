@@ -38,6 +38,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.ResourceType;
+import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
@@ -134,6 +137,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	@Override
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
 	public Connection getConnection() throws SQLException {
 		Connection connection = poolingDataSource.getConnection();
 		setConnectionReadOnlyIfNecessary(connection);

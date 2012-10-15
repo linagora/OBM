@@ -41,6 +41,9 @@ import java.util.Date;
 
 import javax.transaction.UserTransaction;
 
+import org.obm.annotations.technicallogging.KindToBeLogged;
+import org.obm.annotations.technicallogging.ResourceType;
+import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +129,7 @@ public class JDBCUtils {
 		return null;
 	}
 
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
 	@VisibleForTesting static Throwable closeConnectionThenGetFailure(Connection con) {
 		if (con != null) {
 			try {
