@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.obm.annotations.technicallogging.ResourceType;
 
 import com.google.common.base.Objects;
 
