@@ -402,11 +402,11 @@ $cgp_show['section']['gw']['url'] = "$path/calendar/calendar_index.php";
 $cgp_show['section']['prod']['url'] = "$path/time/time_index.php";
 $cgp_show['section']['com']['url'] = "$path/company/company_index.php";
 $cgp_show['section']['compta']['url'] = "$path/invoice/invoice_index.php";
-$cgp_show['section']['webmail']['url'] = "$path/webmail";
-$cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
 $cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
 $cgp_show['section']['admin']['url'] = "$path/admin/admin_index.php?mode=html";
 $cgp_show['section']['dic']['url'] = "$path/admin_ref/admin_ref_index.php?mode=html";
+$cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
+$cgp_show['section']['webmail']['url'] = "$path/webmail/webmail_index.php";
 
 // modules
 $cgp_show['module']['company'] = 'com';
@@ -455,7 +455,9 @@ $cgp_show['module']['admin_code'] = 'dic';
 $cgp_show['module']['admin_ref'] = 'dic';
 $cgp_show['module']['settings'] = 'my';
 $cgp_show['module']['password'] = 'my';
-$cgp_show['module']['webmail'] = 'my';
+
+$cgp_show['module']['webmail_pref'] = 'my';
+
 if ($cgp_use['service']['mail_nomad']) {
   $cgp_show['module']['mailforward'] = 'my';
 }

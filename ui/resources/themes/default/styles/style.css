@@ -302,7 +302,7 @@ form {
   background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   box-shadow: 0px 0px 10px #AAA;
   position: absolute;
-  top: 33px;
+  top: 33.5px;
   height:auto;
   line-height: 12px;
   left: 0;
@@ -425,7 +425,7 @@ form {
 }
 
 #section li.current a {
-  color: #368397;
+  color: #777;
 }
 
 #section a {

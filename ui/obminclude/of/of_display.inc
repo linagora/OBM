@@ -1046,12 +1046,7 @@ function display_outframe(&$display) {
   if (function_exists('display_outframe_theme')) {
     return display_outframe_theme($display);
   }  
-  echo $display['head'] . $display['header'] . "
-    <div id=\"mainContent\" >  
-    $display[detail]
-    </div>
-    $display[end]
-";
+  echo $display['head'] . $display['header'] .$display['detail'];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

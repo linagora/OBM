@@ -40,39 +40,39 @@ $params = get_global_params('webmail');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 include("webmail_display.inc");
-get_webmail_action();
-
-
-//$perm->check_permissions($module, $action);
-$action = 'index';
 page_close();
-
-if ($action == 'index' || $action == '') {
-///////////////////////////////////////////////////////////////////////////////
-    $display['detail'] = dis_webmail_content();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display['head'] = display_head('Webmail', false);
-$display['header'] = display_menu($module);
-$display['end'] = display_end();
+
+$spreadlove= "<h2 class=\"spreadLove\"><div>"
+  .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
+  ."</div><div class=\"supportUs\">"
+  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
+  ."</div></h2>";
+
+$display['header'] = display_menu($module).$spreadlove;
+
+$get_params = params_for_iframe();
+
+$display['detail'] = '<iframe src="index.php'.$get_params.'" style="border:none;width:100%;height:94%;" id="webmail_iframe"></iframe>';
 display_outframe($display);
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-// User Action 
-///////////////////////////////////////////////////////////////////////////////
-function get_webmail_action() {
-
-// Index
-  $GLOBALS['actions']['webmail']['index'] = array (
-    'Url'      => "$GLOBALS[path]/resource/resource_index.php?action=index",
-    'Right'    => $GLOBALS['cright_read'],
-    'Condition'=> array ('None') 
-                                    );
+function params_for_iframe(){
+	$get_params = '';
+	if (!empty($_GET)) {
+		foreach ($_GET as $key => $value) {
+			if ($get_params == '') {
+				$get_params .= '?'.$key.'='.$value;
+			} else {
+				$get_params .= '&'.$key.'='.$value;
+			}
+		}
+	}
+	return $get_params;
 }
 
 ?>

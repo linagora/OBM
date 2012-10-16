@@ -270,7 +270,7 @@ $rcmail_config['login_autocomplete'] = 0;
 $rcmail_config['login_lc'] = 0;
 
 // Includes should be interpreted as PHP files
-$rcmail_config['skin_include_php'] = false;
+$rcmail_config['skin_include_php'] = true;
 
 // display software version on login screen
 $rcmail_config['display_version'] = false;

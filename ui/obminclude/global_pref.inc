@@ -499,10 +499,17 @@ if ($cgp_show['module']['organizationalchart']) {
 			            'Right'=> $cright_read);
 }
 
-if ($cgp_show['module']['webmail'] && $u['mail_perms'] == 1) {
-  $modules['webmail'] = array('Name'=> $l_module_webmail_pref,
+if ($cgp_show['module']['webmail']) {
+  $modules['webmail'] = array('Name'=> $l_module_webmail,
                                     'Ico' => "$ico_webmail",
-                                    'Url' => "$path/webmail/?_task=settings",
+                                    'Url' => "$path/webmail/webmail_index.php",
+                  'Right'=> $cright_read);
+}
+
+if ($cgp_show['module']['webmail_pref']) {
+  $modules['webmail_pref'] = array('Name'=> $l_module_webmail_pref,
+                                    'Ico' => "$ico_webmail",
+                                    'Url' => "$path/webmail/webmail_index.php?_task=settings",
 			            'Right'=> $cright_read);
 }
 
