@@ -58,7 +58,7 @@ public class DatabaseConnectionProviderImplTest {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		transactionAttributeBinder = EasyMock.createMock(ITransactionAttributeBinder.class);
 		databaseConfiguration = new DatabaseConfigurationFixturePostgreSQL();
-		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, databaseConfiguration);
+		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, databaseConfiguration, logger);
 	}
 
 	@Test(expected=SQLException.class)

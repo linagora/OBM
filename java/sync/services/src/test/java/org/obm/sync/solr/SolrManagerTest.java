@@ -29,7 +29,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,7 +51,7 @@ import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.dbcp.ConfigurationServiceFixturePostgreSQL;
+import org.obm.configuration.ConfigurationService;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Email;
@@ -78,6 +82,7 @@ public class SolrManagerTest {
 	private SolrRequest pingRequest;
 	private Command<Integer> pingCommand;
 	private QueueManager queueManager;
+	private ConfigurationService configurationService;
 	private CommandConverter converter = new CommandConverter() {
 		@Override
 		public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
@@ -90,11 +95,16 @@ public class SolrManagerTest {
 		queueManager = new QueueManager();
 		queueManager.start();
 		
+		configurationService = createMock(ConfigurationService.class);
+		server = createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
+		
+		expect(configurationService.solrCheckingInterval()).andReturn(10);
+		replay(configurationService);
+		
 		pingCommand = new PingCommand();
-		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager, converter);
+		manager = new SolrManager(configurationService, queueManager, converter);
 		lock = new ReentrantLock();
 		condition = lock.newCondition();
-		server = createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
 		pingRequest = new PingSolrRequest(server, lock, condition);
 	}
 	

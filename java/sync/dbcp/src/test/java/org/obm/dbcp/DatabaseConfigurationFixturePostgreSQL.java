@@ -69,12 +69,12 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 	}
 
     @Override
-    public Boolean isPostgresSSLEnabled() {
+    public boolean isPostgresSSLEnabled() {
         return true;
     }
 
     @Override
-    public Boolean isPostgresSSLNonValidating() {
+    public boolean isPostgresSSLNonValidating() {
         return true;
     }
 }

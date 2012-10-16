@@ -29,14 +29,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
 import junit.framework.Assert;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.dbcp.ConfigurationServiceFixturePostgreSQL;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
@@ -58,6 +63,7 @@ public class SolrHelperFactoryTest {
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
 	private QueueManager queueManager;
+	private ConfigurationService configurationService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -67,17 +73,22 @@ public class SolrHelperFactoryTest {
 		contact = new Contact();
 		accessToken = ToolBox.mockAccessToken();
 		locatorClient = createMock(LocatorService.class);
+		configurationService = createMock(ConfigurationService.class);
 		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer", CommonsHttpSolrServer.class, ObmDomain.class, Contact.class).createMock();
 		contactIndexer = createMockBuilder(ContactIndexer.class).createMock();
-		manager = new SolrManager(new ConfigurationServiceFixturePostgreSQL(), queueManager, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
+		
+		expect(configurationService.solrCheckingInterval()).andReturn(10);
+		expect(locatorClient.getServiceLocation(isA(String.class), isA(String.class))).andReturn(null).anyTimes();
+		expect(contactIndexerFactory.createIndexer(isA(CommonsHttpSolrServer.class), isA(ObmDomain.class), eq(contact))).andReturn(contactIndexer).once();
+
+		replay(accessToken, locatorClient, contactIndexerFactory, configurationService);
+		
+		manager = new SolrManager(configurationService, queueManager, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
 		factory = new SolrHelper.Factory(manager, locatorClient);
 
 		contact.setUid(1);
 
-		expect(locatorClient.getServiceLocation(isA(String.class), isA(String.class))).andReturn(null).anyTimes();
-		expect(contactIndexerFactory.createIndexer(isA(CommonsHttpSolrServer.class), isA(ObmDomain.class), eq(contact))).andReturn(contactIndexer).once();
-
-		replay(accessToken, locatorClient, contactIndexerFactory);
+		
 	}
 
 	@After

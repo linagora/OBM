@@ -42,18 +42,11 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.DatabaseConfiguration;
-<<<<<<< HEAD
-import org.obm.configuration.DatabaseSystem;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.jdbc.IJDBCDriver;
-import org.obm.dbcp.jdbc.MySqlJDBCDriver;
-import org.obm.dbcp.jdbc.PgSqlJDBCDriver;
-=======
 import org.obm.configuration.DatabaseFlavour;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
->>>>>>> OBMFULL-4164 CR-2045 Some formatting, Indent correction, and verbose member and variables naming
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
