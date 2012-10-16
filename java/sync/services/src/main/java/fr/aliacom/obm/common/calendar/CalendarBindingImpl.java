@@ -1391,12 +1391,13 @@ public class CalendarBindingImpl implements ICalendar {
 		return changed;
 	}
 
-	private boolean applyParticipationChange(AccessToken token, EventExtId extId,
+	@VisibleForTesting boolean applyParticipationChange(AccessToken token, EventExtId extId,
 			Participation participation, int sequence,
 			ObmUser calendarOwner, Event currentEvent) throws SQLException {
 		
 		if (currentEvent.getSequence() == sequence) {
 			boolean changed = false;
+			participation.resetComment();
 			changed = calendarDao.changeParticipation(token, calendarOwner, extId, participation);
 			logger.info(LogUtils.prefix(token) + 
 						"Calendar : event[extId:{}] change participation state for user {} " 
@@ -1410,13 +1411,14 @@ public class CalendarBindingImpl implements ICalendar {
 			return false;
 		}
 	}
-	
-	private boolean applyParticipationChange(AccessToken token, EventExtId extId,
+
+	@VisibleForTesting boolean applyParticipationChange(AccessToken token, EventExtId extId,
 			RecurrenceId recurrenceId, Participation participation, int sequence,
 			ObmUser calendarOwner, Event currentEvent) throws SQLException, ParseException {
 		
 		if (currentEvent.getSequence() == sequence) {
 			boolean changed = false;
+			participation.resetComment();
 			changed = calendarDao.changeParticipation(token, calendarOwner, extId, recurrenceId, participation);
 				logger.info(LogUtils.prefix(token) + 
 						"Calendar : event[extId:{} and recurrenceId:{}] change participation state for user {} " 

@@ -45,6 +45,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -72,6 +73,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -81,6 +83,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.Participation.State;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
@@ -469,6 +472,63 @@ public class CalendarBindingImplTest {
 		calendarService.purge(accessToken, calendar);
 
 		EasyMock.verify(mocks);
+	}
+
+	@Test
+	public void testCommentResettedOnChangeParticipationState() throws SQLException {
+		Participation participation = Participation.builder()
+				.state(State.ACCEPTED)
+				.comment("a comment")
+				.build();
+		Event currentEvent = new Event();
+		currentEvent.setSequence(0);
+		ObmUser calendarOwner = ToolBox.getDefaultObmUser();
+		AccessToken accessToken = new AccessToken(0, "origin");
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		EventExtId extId = new EventExtId("0000");
+		expect(calendarDao.changeParticipation(accessToken, calendarOwner,
+				extId, participation)).andReturn(true);
+
+		replay(calendarDao);
+
+		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, null, null, null);
+
+		boolean changed =
+				calendarBindingImpl.applyParticipationChange(accessToken, extId, participation, 0, calendarOwner, currentEvent);
+		verify(calendarDao);
+
+		assertThat(changed).isTrue();
+		assertThat(participation.getComment()).isEqualTo(Comment.EMPTY);
+	}
+
+	@Test
+	public void testCommentResettedOnChangeParticipationStateWithRecurrenceId() throws SQLException, ParseException {
+		Participation participation = Participation.builder()
+				.state(State.ACCEPTED)
+				.comment("a comment")
+				.build();
+		Event currentEvent = new Event();
+		currentEvent.setSequence(0);
+		ObmUser calendarOwner = ToolBox.getDefaultObmUser();
+		AccessToken accessToken = new AccessToken(0, "origin");
+
+		CalendarDao calendarDao = createMock(CalendarDao.class);
+		EventExtId extId = new EventExtId("0000");
+		RecurrenceId recurrenceId = new RecurrenceId("recId");
+		expect(calendarDao.changeParticipation(accessToken, calendarOwner,
+				extId, recurrenceId , participation)).andReturn(true);
+
+		replay(calendarDao);
+
+		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, null, null, null);
+
+		boolean changed =
+				calendarBindingImpl.applyParticipationChange(accessToken, extId, recurrenceId, participation, 0, calendarOwner, currentEvent);
+		verify(calendarDao);
+
+		assertThat(changed).isTrue();
+		assertThat(participation.getComment()).isEqualTo(Comment.EMPTY);
 	}
 
 	@Test

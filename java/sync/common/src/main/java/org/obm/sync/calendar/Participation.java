@@ -145,6 +145,10 @@ public class Participation implements Serializable{
 		return new Participation(State.getValueOf(value));
 	}
 
+	public void resetComment() {
+		comment = Comment.EMPTY;
+	}
+
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof Participation) {
