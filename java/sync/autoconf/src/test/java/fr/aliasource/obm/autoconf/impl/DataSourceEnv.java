@@ -32,6 +32,7 @@
 package fr.aliasource.obm.autoconf.impl;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 
