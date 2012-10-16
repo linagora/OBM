@@ -298,7 +298,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private boolean checkIfEventCanBeAdded(Event event, String userEmail) {
 		for (final Attendee attendee : event.getAttendees()) {
 			if (userEmail.equals(attendee.getEmail()) && 
-					Participation.DECLINED.equals(attendee.getParticipation())) {
+					Participation.DECLINED_PART.equals(attendee.getParticipation())) {
 				return false;
 			}
 		}

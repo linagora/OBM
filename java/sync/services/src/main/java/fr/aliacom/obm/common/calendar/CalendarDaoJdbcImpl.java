@@ -82,13 +82,13 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
-import org.obm.sync.calendar.State;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
@@ -1003,8 +1003,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evrs = evps.executeQuery();
 			while (evrs.next()) {
 				int recurentParentId = evrs.getInt(4);
-				State state = State.getValueOf(evrs
-						.getString(2));
+				State state = State.getValueOf(evrs.getString(2));
 				Integer eventId = evrs.getInt(1);
 				if (state == State.DECLINED) {
 					if (recurentParentId == 0) {
@@ -2602,7 +2601,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps.setObject(idx++, calendarUser.getUid());
 			evps.setObject(idx++, obmHelper.getDBCP()
 					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
-			State declined = Participation.DECLINED.getState();
+			State declined = Participation.DECLINED_PART.getState();
 			evps.setObject(idx++, obmHelper.getDBCP()
 					.getJdbcObject(ObmHelper.VPARTSTAT, declined.toString()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));

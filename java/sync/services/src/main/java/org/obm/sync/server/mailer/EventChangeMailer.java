@@ -338,7 +338,7 @@ public class EventChangeMailer extends AbstractMailer {
 	}
 	
 	private String participation(Participation participation, Locale locale){
-		if(Participation.ACCEPTED.equals(participation)){
+		if(Participation.ACCEPTED_PART.equals(participation)){
 			return getMessages(locale).accepted();
 		} else {
 			return getMessages(locale).declined();

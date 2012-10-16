@@ -50,7 +50,7 @@ public class RFC2445 {
 	}
 
 	public static Participation getParticipationOrDefault(Participation participation) {
-		return Objects.firstNonNull(participation, Participation.NEEDSACTION);
+		return Objects.firstNonNull(participation, Participation.NEEDSACTION_PART);
 	}
 
 	public static ParticipationRole getParticipationRoleOrDefault(ParticipationRole pRole) {

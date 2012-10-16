@@ -198,14 +198,14 @@ public class EventConverterTest {
 		Assert.assertNotNull(organizer);
 		Assert.assertEquals(email, organizer.getEmail());
 		Assert.assertNull(organizer.getDisplayName());
-		Assert.assertEquals(Participation.ACCEPTED, organizer.getParticipation());
+		Assert.assertEquals(Participation.ACCEPTED_PART, organizer.getParticipation());
 		Assert.assertEquals(ParticipationRole.REQ, organizer.getParticipationRole());
 		Assert.assertTrue(organizer.isOrganizer());
 	}
 
 	private void checkAttendeeParticipation(List<Attendee> attendeesListWithoutOrganizer) {
 		for (Attendee attendee: attendeesListWithoutOrganizer) {
-			Assert.assertEquals(Participation.NEEDSACTION, attendee.getParticipation());
+			Assert.assertEquals(Participation.NEEDSACTION_PART, attendee.getParticipation());
 			Assert.assertFalse(attendee.isOrganizer());
 		}
 	}

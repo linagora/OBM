@@ -65,16 +65,52 @@ public class Participation implements Serializable{
 		}
 	}
 
-	public static final Participation DECLINED = new Participation(State.DECLINED);
-	public static final Participation NEEDSACTION = new Participation(State.NEEDSACTION);
-	public static final Participation ACCEPTED = new Participation(State.ACCEPTED);
-	public static final Participation TENTATIVE = new Participation(State.TENTATIVE);
-	public static final Participation DELEGATED = new Participation(State.DELEGATED);
-	public static final Participation COMPLETED = new Participation(State.COMPLETED);
-	public static final Participation INPROGRESS = new Participation(State.INPROGRESS);
+	public static final Participation DECLINED_PART = new Participation(State.DECLINED);
+	public static final Participation NEEDSACTION_PART = new Participation(State.NEEDSACTION);
+	public static final Participation ACCEPTED_PART = new Participation(State.ACCEPTED);
+	public static final Participation TENTATIVE_PART = new Participation(State.TENTATIVE);
+	public static final Participation DELEGATED_PART = new Participation(State.DELEGATED);
+	public static final Participation COMPLETED_PART = new Participation(State.COMPLETED);
+	public static final Participation INPROGRESS_PART = new Participation(State.INPROGRESS);
 
 	private Comment comment;
 	private State state;
+
+	public enum State {
+
+		NEEDSACTION("NEEDS-ACTION"),
+		ACCEPTED("ACCEPTED"),
+		DECLINED("DECLINED"),
+		TENTATIVE("TENTATIVE"),
+		DELEGATED("DELEGATED"),
+		COMPLETED("COMPLETED"),
+		INPROGRESS("IN-PROGRESS");
+
+		private String state;
+
+		private State(String state) {
+			this.state = state;
+		}
+
+		public static final State getValueOf(String s) {
+			if ("NEEDS-ACTION".equals(s)) {
+				return NEEDSACTION;
+			} else if ("IN-PROGRESS".equals(s)) {
+				return INPROGRESS;
+			} else {
+				try {
+					return State.valueOf(s);
+				} catch (IllegalArgumentException iae) {
+					throw new IllegalArgumentException("Unknown value for the participation state.");
+				}
+			}
+		}
+
+		@Override
+		public String toString() {
+			return state;
+		}
+	}
 
 	private Participation(State state, Comment comment) {
 		this.state = state;

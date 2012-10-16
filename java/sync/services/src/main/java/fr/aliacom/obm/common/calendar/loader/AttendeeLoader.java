@@ -10,8 +10,8 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.State;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 

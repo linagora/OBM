@@ -156,7 +156,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		Element at = DOMUtils.createElement(attendees, "attendee");
 		at.setAttribute("email", attendee.getEmail());
 		Participation participation = attendee.getParticipation();
-		at.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION.toString()));
+		at.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION_PART.toString()));
 		appendCommentFromParticipationFor(at, participation);
 	}
 
@@ -215,7 +215,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		attendeeElement.setAttribute("isOrganizer", String.valueOf(attendee.isOrganizer()));
 		attendeeElement.setAttribute("email", attendee.getEmail());
 		Participation participation = attendee.getParticipation();
-		attendeeElement.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION.toString()));
+		attendeeElement.setAttribute("state", (participation != null ? participation.toString() : Participation.NEEDSACTION_PART.toString()));
 		attendeeElement.setAttribute("required", attendee.getParticipationRole() != null ? attendee.getParticipationRole()
 						.toString() : ParticipationRole.OPT.toString());
 
@@ -333,7 +333,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 			createIfNotNull(e, "date", DateHelper.asString(eps.getDate()));
 		}
 		createIfNotNull(e, "state", (eps.getParticipation() != null ? eps.getParticipation()
-				.toString() : Participation.NEEDSACTION.toString()));
+				.toString() : Participation.NEEDSACTION_PART.toString()));
 		if (eps.getAlert() != null) {
 			createIfNotNull(e, "alert", "" + eps.getAlert());
 		}

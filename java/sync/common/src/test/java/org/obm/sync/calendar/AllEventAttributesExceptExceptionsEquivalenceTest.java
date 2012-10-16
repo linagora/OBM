@@ -95,14 +95,14 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION);
+		at.setParticipation(Participation.NEEDSACTION_PART);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		la.add(at);
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.OPT);
 		la.add(at);
 		ev.setAttendees(la);
@@ -172,7 +172,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Attendee at = new Attendee();
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		
@@ -218,7 +218,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Attendee at = new Attendee();
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		boolean result = comparator.equivalent(e1, e2);
@@ -563,7 +563,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Attendee at = new Attendee();
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		
@@ -592,7 +592,7 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Attendee at = new Attendee();
 		at.setDisplayName("User Un");
 		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.OPT);
 		e2.getAttendees().add(at);
 		boolean result = comparator.equivalent(e1, e2);

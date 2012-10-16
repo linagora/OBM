@@ -915,7 +915,7 @@ public class Ical4jHelperTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		Role role = getIcal4jHelper().getRole(at);
@@ -936,7 +936,7 @@ public class Ical4jHelperTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("adrien");
 		at.setEmail("adrien@zz.com");
-		at.setParticipation(Participation.ACCEPTED);
+		at.setParticipation(Participation.ACCEPTED_PART);
 		at.setParticipationRole(ParticipationRole.CHAIR);
 
 		PartStat ps = getIcal4jHelper().getPartStat(at);
@@ -1062,26 +1062,26 @@ public class Ical4jHelperTest {
 		final Attendee at1 = new Attendee();
 		at1.setDisplayName("OBM ORGANIZER");
 		at1.setEmail("obm@obm.org");
-		at1.setParticipation(Participation.ACCEPTED);
+		at1.setParticipation(Participation.ACCEPTED_PART);
 		at1.setParticipationRole(ParticipationRole.CHAIR);
 		at1.setOrganizer(true);
 		
 		final Attendee at2 = new Attendee();
 		at2.setDisplayName("OBM USER 2");
 		at2.setEmail("obm2@obm.org");
-		at2.setParticipation(Participation.ACCEPTED);
+		at2.setParticipation(Participation.ACCEPTED_PART);
 		at2.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at3 = new Attendee();
 		at3.setDisplayName("OBM USER 3");
 		at3.setEmail("obm3@obm.org");
-		at3.setParticipation(Participation.ACCEPTED);
+		at3.setParticipation(Participation.ACCEPTED_PART);
 		at3.setParticipationRole(ParticipationRole.REQ);
 		
 		final Attendee at4 = new Attendee();
 		at4.setDisplayName("OBM USER 4");
 		at4.setEmail("obm4@obm.org");
-		at4.setParticipation(Participation.DECLINED);
+		at4.setParticipation(Participation.DECLINED_PART);
 		at4.setParticipationRole(ParticipationRole.REQ);
 		
 		event.addAttendee(at1);
@@ -1289,7 +1289,7 @@ public class Ical4jHelperTest {
 		Event event = Iterables.getOnlyElement(events);
 		Assertions.assertThat(event.getAttendees()).hasSize(2);
 		Attendee userc = event.getAttendees().get(1);
-		Assertions.assertThat(userc.getParticipation()).isNotNull().isEqualTo(Participation.NEEDSACTION);
+		Assertions.assertThat(userc.getParticipation()).isNotNull().isEqualTo(Participation.NEEDSACTION_PART);
 	}
 
 	@Test

@@ -122,7 +122,7 @@ public abstract class AbstractEventNotificationServiceTest {
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
 		
@@ -142,7 +142,7 @@ public abstract class AbstractEventNotificationServiceTest {
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@domain.net";
-		Attendee owner = createRequiredAttendee(ownerEmail, Participation.ACCEPTED);
+		Attendee owner = createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART);
 		event.setOwnerEmail(ownerEmail);
 		event.addAttendee(owner);
 		
@@ -164,7 +164,7 @@ public abstract class AbstractEventNotificationServiceTest {
 		Event event = new Event();
 		event.setStartDate(before());
 		event.setOwnerEmail("user@test");
-		event.addAttendee(createRequiredAttendee("attendee1@test", Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART));
 		EventChangeMailer mailer = EasyMock.createMock(EventChangeMailer.class);
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 		UserService userService = EasyMock.createMock(UserService.class);
@@ -177,13 +177,13 @@ public abstract class AbstractEventNotificationServiceTest {
 	}
 	
 	public void testAcceptedAttendee() {
-		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", Participation.ACCEPTED);
+		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendee(attendeeAccepted);
 
 		ObmUser obmUSer = getDefaultObmUser();
@@ -204,13 +204,13 @@ public abstract class AbstractEventNotificationServiceTest {
 	protected abstract EventChangeMailer expectationObmUserIsNotOwner(ObmUser synchronizer, Attendee owner);
 	
 	public void testNeedActionAttendee() {
-		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION);
+		Attendee attendeeNeedAction = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendee(attendeeNeedAction);
 
 		ObmUser defaultObmUser = getDefaultObmUser();
@@ -230,13 +230,13 @@ public abstract class AbstractEventNotificationServiceTest {
 	protected abstract EventChangeMailer expectationNeedActionAttendees(Attendee attendeeNeedAction, String icsData, Event event, ObmUser obmUser);
 	
 	public void testDeclinedAttendee() {
-		Attendee attendeeDeclined = createRequiredAttendee("attendee1@test", Participation.DECLINED);
+		Attendee attendeeDeclined = createRequiredAttendee("attendee1@test", Participation.DECLINED_PART);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendee(attendeeDeclined);
 
 		ObmUser defaultObmUser = getDefaultObmUser();
@@ -256,15 +256,15 @@ public abstract class AbstractEventNotificationServiceTest {
 	protected abstract EventChangeMailer expectationDeclinedAttendees(Attendee attendeeDeclined, Event event, ObmUser obmUser);
 
 	public void testTwoAttendee() {
-		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", Participation.ACCEPTED);
+		Attendee attendeeAccepted = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
 		
-		Attendee attendeeNotAccepted = createRequiredAttendee("attendee2@test", Participation.NEEDSACTION);
+		Attendee attendeeNotAccepted = createRequiredAttendee("attendee2@test", Participation.NEEDSACTION_PART);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendee(attendeeAccepted);
 		event.addAttendee(attendeeNotAccepted);
 		
@@ -285,13 +285,13 @@ public abstract class AbstractEventNotificationServiceTest {
 			ObmUser obmUser);
 
 	public void testSameAttendeeTwice() {
-		Attendee attendeeOne = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION);
+		Attendee attendeeOne = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendee(attendeeOne);
 		event.addAttendee(attendeeOne);
 		
@@ -312,14 +312,14 @@ public abstract class AbstractEventNotificationServiceTest {
 
 	
 	public void testManyAttendees() {
-		List<Attendee> accpetedAttendees = createRequiredAttendees("attendee", "@test", Participation.ACCEPTED,0,  5);
-		List<Attendee> needActionAttendees = createRequiredAttendees("attendee", "@test", Participation.NEEDSACTION, 5, 5);
+		List<Attendee> accpetedAttendees = createRequiredAttendees("attendee", "@test", Participation.ACCEPTED_PART,0,  5);
+		List<Attendee> needActionAttendees = createRequiredAttendees("attendee", "@test", Participation.NEEDSACTION_PART, 5, 5);
 		
 		Event event = new Event();
 		event.setStartDate(after());
 		String ownerEmail = "user@test";
 		event.setOwnerEmail(ownerEmail);
-		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED));
+		event.addAttendee(createRequiredAttendee(ownerEmail, Participation.ACCEPTED_PART));
 		event.addAttendees(needActionAttendees);
 		event.addAttendees(accpetedAttendees);
 		

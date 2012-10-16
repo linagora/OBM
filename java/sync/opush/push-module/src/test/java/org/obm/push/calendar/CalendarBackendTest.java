@@ -735,7 +735,7 @@ public class CalendarBackendTest {
 		EventExtId eventExtId = new EventExtId("event-ext-id-bla-bla");
 		Attendee attendee = new Attendee();
 		attendee.setEmail(user.getLoginAtDomain());
-		attendee.setParticipation(Participation.DECLINED);
+		attendee.setParticipation(Participation.DECLINED_PART);
 		Event event = new Event();
 		event.setExtId(eventExtId);
 		event.setUid(eventObmId);

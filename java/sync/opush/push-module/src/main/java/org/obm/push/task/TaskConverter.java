@@ -296,7 +296,7 @@ public class TaskConverter {
 	}
 
 	private Attendee convertAttendee(UserDataRequest udr, Event oldEvent) {
-		Participation oldState = Participation.NEEDSACTION;
+		Participation oldState = Participation.NEEDSACTION_PART;
 		if (oldEvent != null) {
 			for (Attendee oldAtt : oldEvent.getAttendees()) {
 				if (oldAtt.getEmail().equals(udr.getCredentials().getUser().getEmail())) {
@@ -319,14 +319,14 @@ public class TaskConverter {
 		}
 		switch (attendeeStatus) {
 		case DECLINE:
-			return Participation.DECLINED;
+			return Participation.DECLINED_PART;
 		case NOT_RESPONDED:
 		case RESPONSE_UNKNOWN:
 		case TENTATIVE:
-			return Participation.NEEDSACTION;
+			return Participation.NEEDSACTION_PART;
 		default:
 		case ACCEPT:
-			return Participation.ACCEPTED;
+			return Participation.ACCEPTED_PART;
 		}
 	}
 }

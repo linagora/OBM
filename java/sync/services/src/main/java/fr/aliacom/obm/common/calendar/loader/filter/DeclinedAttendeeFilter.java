@@ -39,7 +39,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 
 	private Collection<Event> filterNonRecurrentEvent(Event event) {
 		Attendee att = event.findAttendeeFromEmail(declinedAttendee.getEmail());
-		if (att.getParticipation() != Participation.DECLINED) {
+		if (att.getParticipation() != Participation.DECLINED_PART) {
 			return ImmutableList.of(event);
 		} else {
 			return ImmutableList.of();
@@ -52,7 +52,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 
 		Attendee att = event.findAttendeeFromEmail(this.declinedAttendee.getEmail());
 		boolean isParentEventDeclined = att == null
-				|| att.getParticipation() == Participation.DECLINED;
+				|| att.getParticipation() == Participation.DECLINED_PART;
 		if (isParentEventDeclined) {
 			return event.getEventsExceptions();
 		} else {

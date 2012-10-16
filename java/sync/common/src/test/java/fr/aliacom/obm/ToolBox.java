@@ -101,11 +101,11 @@ public class ToolBox {
 
 	public static List<Attendee> getFakeListOfAttendees() {
 		Attendee beriaAttendee = ToolBox.getFakeAttendee("beria");
-		beriaAttendee.setParticipation(Participation.NEEDSACTION);
+		beriaAttendee.setParticipation(Participation.NEEDSACTION_PART);
 		Attendee hooverAttendee = ToolBox.getFakeAttendee("hoover");
-		hooverAttendee.setParticipation(Participation.NEEDSACTION);
+		hooverAttendee.setParticipation(Participation.NEEDSACTION_PART);
 		Attendee mccarthyAttendee = ToolBox.getFakeAttendee("mccarthy");
-		mccarthyAttendee.setParticipation(Participation.NEEDSACTION);
+		mccarthyAttendee.setParticipation(Participation.NEEDSACTION_PART);
 		return Lists.newArrayList(beriaAttendee, hooverAttendee, mccarthyAttendee);
 	}
 
