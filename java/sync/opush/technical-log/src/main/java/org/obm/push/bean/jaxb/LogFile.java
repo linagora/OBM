@@ -29,40 +29,70 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.bean.jaxb;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.jaxb.LogFile;
-import org.obm.push.bean.jaxb.Request;
-import org.obm.push.bean.jaxb.Resource;
-import org.obm.push.bean.jaxb.Transaction;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Objects;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+@XmlRootElement(name = JAXBConstants.LOG_FILE_ROOT)
+@XmlType(factoryMethod = JAXBConstants.LOG_FILE_EMPTY_METHOD_NAME)
+public class LogFile {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Resource.class)
-					.add(Request.class)
-					.add(Transaction.class)
-					.add(LogFile.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public static LogFile createEmptyLogFile() {
+		return builder().build();
 	}
 	
+	public static class Builder {
+		private String fileName;
+		
+		private Builder() {}
+		
+		public Builder fileName(String fileName) {
+			this.fileName = fileName;
+			return this;
+		}
+		
+		public LogFile build() {
+			return new LogFile(fileName); 
+		}
+	}
+
+	@XmlElement
+	private final String fileName;
+	
+	private LogFile(String fileName) {
+		this.fileName = fileName;
+	}
+	
+	public String getFileName() {
+		return fileName;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(fileName);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof LogFile) {
+			LogFile that = (LogFile) object;
+			return Objects.equal(this.fileName, that.fileName);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("fileName", fileName)
+			.toString();
+	}
 }

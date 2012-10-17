@@ -29,40 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.jaxrs;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.jaxb.LogFile;
-import org.obm.push.bean.jaxb.Request;
-import org.obm.push.bean.jaxb.Resource;
-import org.obm.push.bean.jaxb.Transaction;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import java.io.File;
+import java.io.FilenameFilter;
 
-import com.google.common.collect.ImmutableList;
+import org.obm.configuration.LogConfiguration;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class TechnicalLogFilenameFilter implements FilenameFilter {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	private final LogConfiguration logConfiguration;
+
+	protected TechnicalLogFilenameFilter(LogConfiguration logConfiguration) {
+		this.logConfiguration = logConfiguration;
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Resource.class)
-					.add(Request.class)
-					.add(Transaction.class)
-					.add(LogFile.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	@Override
+	public boolean accept(File dir, String name) {
+		return name.toLowerCase().startsWith(logConfiguration.getTechnicalLogPrefix()); 
 	}
-	
 }

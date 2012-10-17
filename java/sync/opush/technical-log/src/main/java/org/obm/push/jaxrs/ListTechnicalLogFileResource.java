@@ -29,40 +29,44 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.jaxrs;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
+import java.io.File;
+import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.obm.configuration.LogConfiguration;
 import org.obm.push.bean.jaxb.LogFile;
-import org.obm.push.bean.jaxb.Request;
-import org.obm.push.bean.jaxb.Resource;
-import org.obm.push.bean.jaxb.Transaction;
-import org.obm.sync.bean.EqualsVerifierUtils;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.sun.jersey.api.JResponse;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+@Path("/ListTechnicalLog")
+public class ListTechnicalLogFileResource {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	private final LogConfiguration logConfiguration;
+	
+	@Inject
+	@VisibleForTesting ListTechnicalLogFileResource(LogConfiguration logConfiguration) {
+		this.logConfiguration = logConfiguration;
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Resource.class)
-					.add(Request.class)
-					.add(Transaction.class)
-					.add(LogFile.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	public JResponse<List<LogFile>> getLogsList() {
+		List<LogFile> logsList = Lists.newArrayList();
+		File directory = new File(logConfiguration.getLogDirectory());
+		if (directory.isDirectory()) {
+			for (String fileName : directory.list(new TechnicalLogFilenameFilter(logConfiguration))) {
+				logsList.add(LogFile.builder().fileName(fileName).build());
+			}
+		}
+		return JResponse.ok(logsList).build();
 	}
-	
 }

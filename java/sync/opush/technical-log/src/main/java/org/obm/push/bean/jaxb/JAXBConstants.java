@@ -56,4 +56,8 @@ public class JAXBConstants {
 	public final static String ID = "id";
 	public final static String TRANSACTION_START_TIME = "transactionStartTime";
 	public final static String TRANSACTION_END_TIME = "transactionEndTime";
+	
+	public final static String LOG_FILE_ROOT = "logFile";
+	public final static String LOG_FILE_EMPTY_METHOD_NAME = "createEmptyLogFile";
+	public final static String FILE_NAME = "fileName";
 }
