@@ -13,7 +13,7 @@
  */
 
 body {
-	font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+	font-family:  Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	color: #333;
 	background: url(images/pattern.png) repeat #d1d5d8;
@@ -1010,12 +1010,13 @@ table.records-table {
 
 .records-table tr.selected td {
 	color: #fff !important;
-	background: #019bc6;
-	background: -moz-linear-gradient(top, #019bc6 0%, #017cb4 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#019bc6), color-stop(100%,#017cb4));
-	background: -o-linear-gradient(top, #019bc6 0%, #017cb4 100%);
-	background: -ms-linear-gradient(top, #019bc6 0%, #017cb4 100%);
-	background: linear-gradient(top, #019bc6 0%, #017cb4 100%);
+	font-weight: bold;
+	background-color: #368397;
+	background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+	background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
 }
 
 .records-table tr.selected td a,
@@ -1025,7 +1026,7 @@ table.records-table {
 
 .records-table tr.unfocused td {
 	color: #fff !important;
-	background: #4db0d2 !important;
+	background-color: #3F99AF !important;
 }
 
 .records-table tr.unfocused td a,
@@ -1207,21 +1208,17 @@ ul.proplist li {
 
 #login-form .box-inner {
 	width: 430px;
-	background: url(images/linen_login.jpg) top left no-repeat #5c5c5c;
+	background-color: #fafafa;
+	background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+	background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+	background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+	background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+	background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+	box-shadow: 2px 2px 5px #777;
 	margin: 0 50px;
 	padding: 10px 24px 24px 24px;
-	border: 1px solid #333;
+	border: 1px solid #DDD;
 	border-radius: 5px;
-	box-shadow: inset 0 0 1px #ccc;
-	-o-box-shadow: inset 0 0 1px #ccc;
-	-webkit-box-shadow: inset 0 0 1px #ccc;
-	-moz-box-shadow: inset 0 0 1px #ccc;
-}
-
-#login-form .box-bottom {
-	background: url(images/login_shadow.png) top center no-repeat;
-	margin-top: -3px;
-	padding-top: 10px;
 }
 
 #login-form td.input {
@@ -1232,31 +1229,33 @@ ul.proplist li {
 #login-form input[type="text"],
 #login-form input[type="password"] {
 	width: 100%;
-	border-color: #666;
+	border-color: #BBB;
 }
 
 #login-form input.button {
-	color: #444;
-	text-shadow: 0px 1px 1px #fff;
-	border-color: #f9f9f9;
-	background: #f9f9f9;
-	background: -moz-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f9f9f9), color-stop(100%,#e2e2e2));
-	background: -o-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-	background: -ms-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-	background: linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-	box-shadow: inset 0 1px 0 0 #fff;
-	-moz-box-shadow: inset 0 1px 0 0 #fff;
-	-webkit-box-shadow: inset 0 1px 0 0 #fff;
-	-o-box-shadow: inset 0 1px 0 0 #fff;
+	color: #fff;
+	padding: 3px 20px;
+	border-width: 1px;
+	border-color: #47ADC6 #368397 #296472;
+	border-style: solid;
+	background-color: #368397;
+	background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+	background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+	cursor: pointer;
 }
 
 #login-form input.button:hover,
 #login-form input.button:focus {
-	box-shadow: 0 0 5px 2px rgba(71,135,177, 0.9), inset 0 1px 0 0 #fff;
-	-moz-box-shadow: 0 0 5px 2px rgba(71,135,177, 0.9), inset 0 1px 0 0 #fff;
-	-webkit-box-shadow: 0 0 5px 2px rgba(71,135,177, 0.9), inset 0 1px 0 0 #fff;
-	-o-box-shadow: 0 0 5px 2px rgba(71,135,177, 0.9), inset 0 1px 0 0 #fff;
+	background-color: #3F99AF;
+	background: linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+	background: -moz-linear-gradient(center top , #368397 0%, #3F99AF 100%)#368397;
+	background: -webkit-linear-gradient(top, #368397 0%,#3F99AF 100%);
+	background: -o-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+	background: -ms-linear-gradient(center top , #368397 0%, #3F99AF 100%) #368397;
+	cursor: pointer;
 }
 
 #login-form input.button:active {
@@ -1275,10 +1274,10 @@ ul.proplist li {
 #login-form td.title {
 	width: 20%;
 	white-space: nowrap;
-	color: #cecece;
-	text-shadow: 0px 1px 1px black;
+	color: #777;
 	text-align: right;
-	padding-right: 1em;
+	padding-right: 0.8em;
+	font-size: 14px;
 }
 
 #login-form p.formbuttons {
@@ -1288,6 +1287,7 @@ ul.proplist li {
 
 #login-form #logo {
 	margin-bottom: 20px;
+	color:#999;
 }
 
 #login-form #message {
@@ -1302,9 +1302,8 @@ ul.proplist li {
 }
 
 #bottomline {
-	font-size: 90%;
+	font-size: 80%;
 	text-align: center;
-	margin-top: 2em;
 }
 
 
@@ -1358,12 +1357,12 @@ ul.proplist li {
 	color: #555;
 	min-width: 50px;
 	max-width: 75px;
-	height: 13px;
+	height: 15px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	padding: 28px 2px 0 2px;
-	text-shadow: 0px 1px 1px #eee;
+	padding: 28px 3px 0 3px;
+	text-shadow: 1px 1px 5px #FFF;
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
