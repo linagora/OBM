@@ -29,35 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.configuration;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.obm.configuration.LogConfiguration;
-import org.obm.servlet.filter.qos.QoSFilter;
+public interface LogConfiguration {
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
-
-public class OpushServletModule extends ServletModule{
-
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
-
-	@Override
-	    protected void configureServlets() {
-	        super.configureServlets();
-
-	        serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-	        serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
-
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
-	        
-	        bind(LogConfiguration.class).to(LogConfigurationImpl.class);
-	    }
+	String getLogDirectory();
+	
+	String getTechnicalLogPrefix();
+	
+	String getLogFileExtension();
+	
+	String getMainLogFileName();
 }

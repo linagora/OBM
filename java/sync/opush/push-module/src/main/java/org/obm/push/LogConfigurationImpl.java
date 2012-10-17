@@ -31,33 +31,35 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
 import org.obm.configuration.LogConfiguration;
-import org.obm.servlet.filter.qos.QoSFilter;
 
 import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
 
-public class OpushServletModule extends ServletModule{
-
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
+@Singleton
+public class LogConfigurationImpl implements LogConfiguration {
+	
+	private final String LOGS_DIRECTORY = "/var/log/opush/";
+	private final String TECHNICAL_LOG_PREFIX = "technical";
+	private final String LOG_FILE_EXTENSION = ".log";
+	private final String MAIN_LOG_FILE_NAME = LOGS_DIRECTORY + TECHNICAL_LOG_PREFIX + LOG_FILE_EXTENSION;
+	
+	@Override
+	public String getLogDirectory() {
+		return LOGS_DIRECTORY;
+	}
 
 	@Override
-	    protected void configureServlets() {
-	        super.configureServlets();
+	public String getTechnicalLogPrefix() {
+		return TECHNICAL_LOG_PREFIX;
+	}
 
-	        serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-	        serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
+	@Override
+	public String getLogFileExtension() {
+		return LOG_FILE_EXTENSION;
+	}
 
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
-	        
-	        bind(LogConfiguration.class).to(LogConfigurationImpl.class);
-	    }
+	@Override
+	public String getMainLogFileName() {
+		return MAIN_LOG_FILE_NAME;
+	}
 }
