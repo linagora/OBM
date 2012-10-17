@@ -47,7 +47,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.sun.jersey.api.JResponse;
 
-@Path("/ListTechnicalLog")
+@Path("ListFiles")
 public class ListTechnicalLogFileResource {
 	
 	private final LogConfiguration logConfiguration;

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
-@Path("/TechnicalLog")
+@Path("File")
 public class TechnicalLogFileResource {
 
 	private final static Logger logger = LoggerFactory.getLogger(TechnicalLogFileResource.class);

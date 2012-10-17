@@ -33,10 +33,14 @@ package org.obm.push;
 
 import org.eclipse.jetty.continuation.ContinuationFilter;
 import org.obm.configuration.LogConfiguration;
+import org.obm.push.jaxrs.ListTechnicalLogFileResource;
+import org.obm.push.jaxrs.TechnicalLogFileResource;
 import org.obm.servlet.filter.qos.QoSFilter;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class OpushServletModule extends ServletModule{
 
@@ -59,5 +63,9 @@ public class OpushServletModule extends ServletModule{
 	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
 	        
 	        bind(LogConfiguration.class).to(LogConfigurationImpl.class);
+	        bind(TechnicalLogFileResource.class);
+	        bind(ListTechnicalLogFileResource.class);
+			serve("/TechnicalLog/*").with(GuiceContainer.class, 
+					ImmutableMap.of("com.sun.jersey.config.feature.Trace", "true"));
 	    }
 }
