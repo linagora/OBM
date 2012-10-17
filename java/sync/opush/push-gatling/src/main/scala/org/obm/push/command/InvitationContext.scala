@@ -38,10 +38,14 @@ import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.FolderType
 import org.obm.push.context.UserKey
 
+object InvitationContext {
+	val random: Random = new Random()
+	def generateClientId: String = random.nextInt(Int.MaxValue).toString()
+}
+
 class InvitationContext(
 		organizer: UserKey,
 		val attendees: Set[UserKey] = Set(),
-		val clientId: String = new Random().nextInt(Int.MaxValue).toString(),
 		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER)
 			extends SyncContext(organizer, folderType) {
 	

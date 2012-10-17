@@ -65,7 +65,7 @@ class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 					.commands(ImmutableList.of(
 						SyncRequestCollectionCommand.builder()
 							.name("Add")
-							.clientId(invitation.clientId)
+							.clientId(invitation.userKey.sessionHelper.findLastInvitationClientId(session))
 							.applicationData(buildInvitationData(session))
 							.build()))
 					.build())

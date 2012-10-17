@@ -38,12 +38,8 @@ import com.excilys.ebi.gatling.core.session.Session
 
 class CollectionContext(userKey: UserKey) {
 	
-	private[this] var collectionId: Option[Int] = None
 	def findCollectionId(session: Session, folderType: FolderType): Int = {
-		if (collectionId.isEmpty) {
-			collectionId = Option.apply(userKey.sessionHelper.collectionId(session, folderType))
-		}
-		collectionId.get
+		userKey.sessionHelper.collectionId(session, folderType)
 	}
 	
 	def collectionIdFromServerId(serverId: String) = serverId.split(":").apply(0).toInt

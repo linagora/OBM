@@ -67,6 +67,7 @@ class UserKey (val key: String) {
 	lazy val lastFolderSyncSessionKey = buildSessionKey(UserSessionKeys.LAST_FOLDER_SYNC)
 	lazy val lastSyncSessionKey = buildSessionKey(UserSessionKeys.LAST_SYNC)
 	lazy val lastMeetingResponseSessionKey = buildSessionKey(UserSessionKeys.MEETING_RESPONSE)
+	lazy val lastInvitationClientIdSessionKey = buildSessionKey(UserSessionKeys.INVITATION_CLIENT_ID)
 	lazy val lastPendingInvitationSessionKey = buildSessionKey(UserSessionKeys.PENDING_INVITATION)
 	
 	private[this] def buildSessionKey(sessionKey: UserSessionKeys.Keys) = "%s:%s".format(sessionKey, key)
@@ -78,6 +79,7 @@ object UserSessionKeys extends Enumeration {
 	val LAST_FOLDER_SYNC = Value("lastFolderSync")
 	val LAST_SYNC = Value("lastSync")
 	val MEETING_RESPONSE = Value("meetingResponse")
+	val INVITATION_CLIENT_ID = Value("invitationClientId")
 	val PENDING_INVITATION = Value("pendingInvitation")
 	
 }

@@ -55,9 +55,13 @@ class SessionHelper(userKey: UserKey) {
 		session.getAttributeAsOption[FolderSyncResponse](userKey.lastFolderSyncSessionKey)
 	}
 	
+	def findLastInvitationClientId(session: Session) = 
+		session.getTypedAttribute[String](userKey.lastInvitationClientIdSessionKey)
+	
 	def findPendingInvitation(session: Session): Option[PendingInvitationContext] = {
 		session.getAttributeAsOption[PendingInvitationContext](userKey.lastPendingInvitationSessionKey)
 	}
+	
 	
 	def collectionId(session: Session, folderType: FolderType): Int = {
 		val lastFolderSync = findLastFolderSync(session).get
@@ -105,12 +109,17 @@ class SessionHelper(userKey: UserKey) {
 		false
 	}
 	
+	def setupNextInvitationClientId(session: Session): Session = {
+		session.setAttribute(userKey.lastInvitationClientIdSessionKey, InvitationContext.generateClientId)
+	}
+	
 	def setupPendingInvitation(session: Session, invitation: InvitationContext): Session = {
+		val clientId = findLastInvitationClientId(session)
 		var outgoingSession = session
 		val lastSync = findLastSync(session)
 		if (lastSync.isDefined) {
 			for (change <- SyncHelper.findChanges(lastSync.get)
-				if invitation.clientId.equals(change.getClientId())) {
+				if clientId.equals(change.getClientId())) {
 				
 				outgoingSession = updatePendingInvitation(session, new PendingInvitationContext(invitation, change.getServerId()))
 			}
