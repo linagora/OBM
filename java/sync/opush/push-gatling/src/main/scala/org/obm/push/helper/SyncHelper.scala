@@ -43,32 +43,27 @@ import org.obm.push.bean.MSEvent
 object SyncHelper {
 	
 	def findChangesWithMeetingRequest(syncResponse: SyncResponse) = {
-		for (change <- findChangesWithEmailData(syncResponse);
-			 meetingRequest = change.getData().asInstanceOf[MSEmail].getMeetingRequest();
-				if meetingRequest != null) yield change
+		findChangesWithEmailData(syncResponse)
+			.filter(_.getData().asInstanceOf[MSEmail].getMeetingRequest() != null)
 	}
 	
 	def findChangesWithEmailData(syncResponse: SyncResponse) = {
-		for (change <- findChanges(syncResponse);
-				if changeHasEmailData(change)) yield change
+		findChanges(syncResponse).filter(changeHasEmailData(_))
 	}
 	
 	def findEventChanges(syncResponse: SyncResponse, serverId: String) = {
-		for (change <- findChangesWithServerId(syncResponse, serverId);
-				if changeHasCalendarData(change))
-					yield change.getData().asInstanceOf[MSEvent]
+		findChangesWithServerId(syncResponse, serverId)
+			.filter(changeHasCalendarData(_))
+			.map(_.getData().asInstanceOf[MSEvent])
 	}
 	
 	def findChangesWithServerId(syncResponse: SyncResponse, serverId: String) = {
-		for (change <- findChanges(syncResponse);
-				if change.getServerId().equals(serverId))
-					yield change
+		findChanges(syncResponse).filter(_.getServerId().equals(serverId))
 	}
 	
 	def findChanges(syncResponse: SyncResponse) = {
-		for (collection <- syncResponse.getCollectionResponses();
-			 change <- collection.getSyncCollection().getChanges())
-				yield change
+		syncResponse.getCollectionResponses()
+			.flatMap(_.getSyncCollection().getChanges())
 	}
 	
 	def changeHasCalendarData(change: SyncCollectionChange) = 

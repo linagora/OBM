@@ -64,30 +64,23 @@ class SessionHelper(userKey: UserKey) {
 	
 	
 	def collectionId(session: Session, folderType: FolderType): Int = {
-		val lastFolderSync = findLastFolderSync(session).get
-		for (collection <- lastFolderSync.getCollectionsAddedAndUpdated()
-			if collection.getFolderType() == folderType) {
-				return collection.getCollectionId().toInt
-		}
-		throw new NoSuchElementException("Cannot find collectionId for folderType:{%s}".format(folderType))
+		findLastFolderSync(session).get
+			.getCollectionsAddedAndUpdated()
+			.filter(_.getFolderType() == folderType)
+			.head.getCollectionId().toInt
 	}
 	
 	def attendeeRepliesAreNotReceived(session: Session) = !attendeeRepliesAreReceived(session)
 	def attendeeRepliesAreReceived(session: Session): Boolean = {
-		val pendingInvitationOpt = findPendingInvitation(session)
-		if (pendingInvitationOpt.isDefined) {
-			val lastSync = findLastSync(session).get
-			val pendingInvitation = pendingInvitationOpt.get
-			val organizerEmail = userKey.getUser(session).email
-			for (event <- SyncHelper.findEventChanges(lastSync, pendingInvitation.serverId);
-				attendee <- event.getAttendees();
-				if (attendeeHasReplied(organizerEmail, attendee))) {
-				
-				pendingInvitation.attendeeReplies += (attendee.getEmail() -> attendee.getAttendeeStatus())
-			}
-			return pendingInvitation.hasReplyOfEveryAttendees
-		}
-		throw new IllegalStateException("Check attendee replies but no pending invitation")
+		val organizerEmail = userKey.getUser(session).email
+		val invitation = findPendingInvitation(session).get
+		invitation.attendeeReplies = SyncHelper
+			.findEventChanges(findLastSync(session).get, invitation.serverId)
+			.flatMap(_.getAttendees())
+			.filter(attendeeHasReplied(organizerEmail, _))
+			.map(a => (a.getEmail() -> a.getAttendeeStatus())).toMap
+			
+		invitation.hasReplyOfEveryAttendees
 	}
 	
 	def attendeeHasReplied(organizerEmail: String, attendee: MSAttendee): Boolean = {
@@ -101,12 +94,7 @@ class SessionHelper(userKey: UserKey) {
 	
 	def invitationIsNotReceived(session: Session) = !invitationIsReceived(session)
 	def invitationIsReceived(session: Session): Boolean = {
-		val lastSync = findLastSync(session)
-		if (lastSync.isDefined) {
-			val isReceived = !SyncHelper.findChangesWithMeetingRequest(lastSync.get).isEmpty
-			return isReceived
-		}
-		false
+		!SyncHelper.findChangesWithMeetingRequest(findLastSync(session).get).isEmpty
 	}
 	
 	def setupNextInvitationClientId(session: Session): Session = {
@@ -115,16 +103,9 @@ class SessionHelper(userKey: UserKey) {
 	
 	def setupPendingInvitation(session: Session, invitation: InvitationContext): Session = {
 		val clientId = findLastInvitationClientId(session)
-		var outgoingSession = session
-		val lastSync = findLastSync(session)
-		if (lastSync.isDefined) {
-			for (change <- SyncHelper.findChanges(lastSync.get)
-				if clientId.equals(change.getClientId())) {
-				
-				outgoingSession = updatePendingInvitation(session, new PendingInvitationContext(invitation, change.getServerId()))
-			}
-		}
-		outgoingSession
+		val change = SyncHelper.findChanges(findLastSync(session).get)
+								.filter(change => clientId.equals(change.getClientId())).head
+		updatePendingInvitation(session, new PendingInvitationContext(invitation, change.getServerId()))
 	}
 	
 	def updatePendingInvitation(session: Session, pendingInvitation: PendingInvitationContext): Session = {

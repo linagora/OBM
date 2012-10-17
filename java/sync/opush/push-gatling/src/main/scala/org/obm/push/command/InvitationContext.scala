@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import scala.collection.mutable.Map
 import scala.util.Random
 
 import org.obm.push.bean.AttendeeStatus
@@ -55,7 +54,7 @@ class InvitationContext(
 
 class PendingInvitationContext(val invitation: InvitationContext, val serverId: String) {
 	
-	val attendeeReplies = Map[String, AttendeeStatus]()
+	var attendeeReplies = Map[String, AttendeeStatus]()
 	
 	def hasReplyOfEveryAttendees: Boolean = attendeeReplies.size == invitation.attendees.size
 }
