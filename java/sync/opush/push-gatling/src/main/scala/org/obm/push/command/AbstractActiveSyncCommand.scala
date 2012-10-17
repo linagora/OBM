@@ -36,7 +36,6 @@ import org.obm.push.context.User
 import org.obm.push.context.UserKey
 import org.obm.push.context.http.HttpHeaders
 import org.obm.push.context.http.HttpQueryParams
-import com.excilys.ebi.gatling.core.Predef.stringToSessionFunction
 import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.http.Predef.http
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
@@ -55,7 +54,7 @@ abstract class AbstractActiveSyncCommand(userKey: UserKey)
 			.queryParam(s => HttpQueryParams.USER.toString, s => user(s).userProtocol)
 			.queryParam(s => HttpQueryParams.DEVICE_ID.toString, s => user(s).deviceId.getDeviceId())
 			.queryParam(s => HttpQueryParams.DEVICE_TYPE.toString, s => user(s).deviceType)
-			.queryParam(s => HttpQueryParams.COMMAND.toString, commandName)
+			.queryParam(s => HttpQueryParams.COMMAND.toString, s => commandName)
 	}
 	
 	def user(session: Session) = session.getTypedAttribute[User](userKey.key)
