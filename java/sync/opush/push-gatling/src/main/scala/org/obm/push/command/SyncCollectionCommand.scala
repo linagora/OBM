@@ -31,10 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
+import scala.collection.JavaConversions.collectionAsScalaIterable
+import org.obm.push.bean.SyncStatus
+import org.obm.push.checks.Check
 import org.obm.push.protocol.bean.SyncRequestCollection
+import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Session
+import com.excilys.ebi.gatling.core.check.Failure
+import com.excilys.ebi.gatling.core.check.MatchStrategy
+import com.excilys.ebi.gatling.core.check.Success
+import com.google.common.base.Strings
+import org.obm.push.helper.SyncHelper
+import org.obm.push.bean.SyncKey
 
 class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractSyncCommand(syncContext, wbTools) {
@@ -45,4 +54,63 @@ class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 				.syncKey(syncContext.nextSyncKey(session))
 				.build())
 	}
+	
+}
+
+object SyncCollectionCommand {
+	
+	val onlyOneCollection = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			if (value.get.getCollectionResponses().size() <= 1) Success(value) 
+			else Failure("Only one collection expected in resposne")
+		}
+	}
+	
+	val validSyncKey = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			val hasCollectionWithInvalidSyncKey = value.get
+					.getCollectionResponses()
+					.find(c => !isValidSyncKey(c.getAllocateNewSyncKey()))
+					.isDefined
+			if (!hasCollectionWithInvalidSyncKey) Success(value)
+			else Failure("Invalid SyncKey in response")
+		}
+	}
+	def isValidSyncKey(syncKey: SyncKey) : Boolean = {
+		if (syncKey != null) {
+			val syncKeyString = syncKey.getSyncKey()
+			if (!Strings.isNullOrEmpty(syncKeyString) && syncKeyString != "0") {
+				return true
+			}
+		}
+		return false
+	} 
+	
+	val statusOk = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			if (value.get.getStatus() == SyncStatus.OK) Success(value)
+			else Failure("Status isn't ok : " + value.get.getStatus())
+		}
+	}
+	
+	val atLeastOneAdd = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			val hasCollectionWithoutAdd = value.get
+					.getCollectionResponses()
+					.find(_.getItemChanges().isEmpty())
+					.isDefined
+			if (!hasCollectionWithoutAdd) Success(value) 
+			else Failure("No add or update in response")
+		}
+	}
+	
+	val atLeastOneMeetingRequest = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			val meetingRequests = SyncHelper.findChangesWithMeetingRequest(value.get)
+			if (!meetingRequests.isEmpty) Success(value) 
+			else Failure("No meeting request in response")
+		}
+	}
+	
+	val validSync = Check.manyToOne[SyncResponse](Seq(onlyOneCollection, validSyncKey, statusOk))
 }

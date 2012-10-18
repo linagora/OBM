@@ -59,6 +59,7 @@ abstract class AbstractSyncCommand(syncContext: SyncContext, wbTools: WBXMLTools
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toSyncResponse(response))
+			    .matchWith(syncContext.matcher)
 			    .saveAs(syncContext.userKey.lastSyncSessionKey))
 	}
 

@@ -42,7 +42,7 @@ object Check {
 		}
 	}
 	
-	def manyToOne[T](strategies: Iterable[MatchStrategy[T]]) = new MatchStrategy[T] {
+	def manyToOne[T](strategies: Iterable[MatchStrategy[T]]): MatchStrategy[T] = new MatchStrategy[T] {
 		def apply(value: Option[T], session: Session) = {
 			val firstFailure = strategies
 					.map(_.apply(value, session))

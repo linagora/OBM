@@ -41,6 +41,7 @@ import org.obm.push.command.MeetingResponseCommand
 import org.obm.push.command.MeetingResponseContext
 import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.SyncCollectionCommand
+import org.obm.push.command.SyncCollectionCommand._
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
@@ -49,6 +50,7 @@ import org.obm.push.context.UserKey
 import org.obm.push.context.feeder.UserFeeder
 import org.obm.push.wbxml.WBXMLTools
 
+import com.excilys.ebi.gatling.core.check._
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
@@ -57,6 +59,9 @@ import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
+import org.obm.push.protocol.bean.FolderSyncResponse
+import org.obm.push.protocol.bean.SyncResponse
+import org.obm.push.checks.Check
 
 class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 
@@ -104,8 +109,8 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 				.pause(10)
 				.exec(buildInitialSyncCommand(attendee1, usedMailCollection))
 				.exec(buildInitialSyncCommand(attendee2, usedMailCollection))
-				.exec(buildSyncCommand(attendee1, usedMailCollection))
-				.exec(buildSyncCommand(attendee2, usedMailCollection))
+				.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneMeetingRequest))
+				.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneMeetingRequest))
 				.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
 				.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
 				.pause(10)
@@ -119,11 +124,12 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	}
 	
 	def buildInitialSyncCommand(userKey: UserKey, folderType: FolderType) = {
-		buildSyncCommand(new InitialSyncContext(userKey, folderType))
+		buildSyncCommand(new InitialSyncContext(userKey, folderType, validSync))
 	}
 	
-	def buildSyncCommand(userKey: UserKey, folderType: FolderType): PostHttpRequestBuilder = {
-		buildSyncCommand(new SyncContext(userKey, folderType))
+	def buildSyncCommand(userKey: UserKey, folderType: FolderType, matchers: MatchStrategy[SyncResponse]*): PostHttpRequestBuilder = {
+		val matcher = Check.manyToOne(validSync :: matchers.toList)
+		buildSyncCommand(new SyncContext(userKey, folderType, matcher))
 	}
 	
 	def buildSyncCommand(syncContext: SyncContext) = {
