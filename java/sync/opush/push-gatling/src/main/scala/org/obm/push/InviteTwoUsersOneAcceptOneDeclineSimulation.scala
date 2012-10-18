@@ -114,7 +114,8 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 				.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
 				.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
 				.pause(10)
-				.exec(buildSyncCommand(organizer, usedCalendarCollection))
+				.exec(buildSyncCommand(organizer, usedCalendarCollection, Check.matcher((s, response) 
+						=> (organizer.sessionHelper.attendeeRepliesAreReceived(s, response.get), "Each users havn't replied"))))
 			)
 	}
 	

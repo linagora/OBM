@@ -52,4 +52,12 @@ object Check {
 		}
 	}
 	
+	def matcher[T](matcher: (Session, Option[T]) => (Boolean, String)) = new MatchStrategy[T] {
+		def apply(value: Option[T], session: Session) = {
+			val (success, message) = matcher.apply(session, value)
+			if (success) Success(value)
+			else Failure(message)
+		}
+	}
+		
 }

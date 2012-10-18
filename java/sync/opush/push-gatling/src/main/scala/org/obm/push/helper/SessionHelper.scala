@@ -70,12 +70,12 @@ class SessionHelper(userKey: UserKey) {
 			.head.getCollectionId().toInt
 	}
 	
-	def attendeeRepliesAreNotReceived(session: Session) = !attendeeRepliesAreReceived(session)
-	def attendeeRepliesAreReceived(session: Session): Boolean = {
-		val organizerEmail = userKey.getUser(session).email
-		val invitation = findPendingInvitation(session).get
+	def attendeeRepliesAreNotReceived(s: Session, response: SyncResponse) = !attendeeRepliesAreReceived(s, response)
+	def attendeeRepliesAreReceived(s: Session, response: SyncResponse): Boolean = {
+		val organizerEmail = userKey.getUser(s).email
+		val invitation = findPendingInvitation(s).get
 		invitation.attendeeReplies = SyncHelper
-			.findEventChanges(findLastSync(session).get, invitation.serverId)
+			.findEventChanges(response, invitation.serverId)
 			.flatMap(_.getAttendees())
 			.filter(attendeeHasReplied(organizerEmail, _))
 			.map(a => (a.getEmail() -> a.getAttendeeStatus())).toMap
