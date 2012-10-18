@@ -1434,6 +1434,28 @@ function run_query_user_public_owner_group($uid) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Groups of User in DB query execution
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_of_user_from_database($uid) {
+  global $obm, $cdg_sql;
+
+  $uid = sql_parse_id($uid, true);
+  $query = "SELECT *
+    FROM UGroup
+    JOIN UserObm ON userobm_id $uid AND group_domain_id = userobm_domain_id
+    INNER JOIN UserObmGroup ON userobmgroup_group_id = group_id AND userobmgroup_userobm_id = userobm_id
+    WHERE
+      (group_privacy=0 OR group_usercreate=$obm[uid])
+    ORDER by group_privacy, group_name";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_user_public_owner_group()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $obm_q;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserObmGroup global update
@@ -1453,74 +1475,74 @@ function run_query_user_update_user_group($user) {
 
   $u_id = $user['user_id'];
 
-  // $groups tracks the user membership, to optimize internal mapping update
-  $groups = array();
+  $user_groups = array();
+  $groups_in_db = array();
+  $groups_to_add = array();
+  $groups_to_remove = array();
 
-  // Get the displayed group list (public and owner)
-  $g_q = run_query_user_public_owner_group($u_id);
+  $q_groups_in_db = run_query_group_of_user_from_database($u_id);
 
-  // Construct the group list for deletion clause (public or owner groups)
-  if ($g_q->num_rows() > 0) {
-    $w_g = 'AND (';
-    $or = '';
-    while ($g_q->next_record()) {
-      $g_id = $g_q->f('group_id');
-      $groups[$g_id] = 0;
-      $w_g .= " $or userobmgroup_group_id='$g_id'";
-      $or = 'OR';
+  if ($q_groups_in_db->num_rows() > 0) {
+    while ($q_groups_in_db->next_record()) {
+      $group_id = $q_groups_in_db->f('group_id');
+      $groups_in_db[] = $group_id;
     }
-    $w_g .= ')';
   }
 
-  // Get current membership and track it in groups
-  $m_q = run_query_user_user_group($u_id);
-  while ($m_q->next_record()) {
-    $g_id = $m_q->f('group_id');
-    $groups[$g_id] = 1;
-  }
-
-  // Delete the current user membership (from public and owner groups)
-  $query = "DELETE FROM UserObmGroup
-    WHERE userobmgroup_userobm_id ".sql_parse_id($u_id, true)."
-      $w_g";
-  display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  // Renew the selected user membership
   $cpt = 0;
-  $cpt_ins = 0;
   while ($cpt < $user['group_nb']) {
     $cpt++;
-    $g_id = $user["group_$cpt"];
-
-    $query = "INSERT INTO UserObmGroup (
-        userobmgroup_group_id,
-        userobmgroup_userobm_id)
-      VALUES (
-        ".sql_parse_id($g_id).",
-        ".sql_parse_id($u_id).")";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
-    $retour = $obm_q->query($query);
-    if (! $retour) {
-      return -1;
-    }
-    $cpt_ins++;
-
-    // If this group membership is new (just set), update internal mapping
-    if ($groups[$g_id] != 1) {
-      of_usergroup_update_group_hierarchy($g_id);
-    }
-    unset ($groups[$g_id]);
+    $group_id = $user["group_$cpt"];
+    $user_groups[] = $group_id;
   }
 
-  // Finish the internal usergroup mapping update
-  // for groups membership that are not renewed (=remaining groups = 1)
-  foreach ($groups as $g_id => $value) {
-    if ($value != 0) {
-      of_usergroup_update_group_hierarchy($g_id);
+  $prepared_array = array_intersect($groups_in_db, $user_groups);
+  $groups_to_add = array_diff($user_groups, $prepared_array);
+
+  $groups_to_remove = array_diff($groups_in_db, $user_groups);
+
+  $operations_done=0;
+
+  if( count($groups_to_remove) > 0 ){
+    $sql_groups_to_remove = '';
+    foreach ($groups_to_remove as $g_id) {
+      $operations_done++;
+      $parsed_g_id = sql_parse_id($g_id);
+      $sql_groups_to_remove .= ( $sql_groups_to_remove == '' ) ? $parsed_g_id : ', '.$parsed_g_id;
     }
+
+    $query = "DELETE FROM UserObmGroup
+              WHERE userobmgroup_userobm_id ".sql_parse_id($u_id, true)."
+              AND userobmgroup_group_id IN ( $sql_groups_to_remove )";
+    display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+    if (!$retour) {
+      return -1;
+    }
+  }
+
+  if( count($groups_to_add) > 0){
+    $sql_groups_to_add = '';
+    $parsed_u_id = sql_parse_id($u_id);
+    foreach ($groups_to_add as $g_id) {
+      $operations_done++;
+      $parsed_g_id = sql_parse_id($g_id);
+      $sql_groups_to_add .= ( $sql_groups_to_add == '' ) ? "( $parsed_g_id, $parsed_u_id )" : ", ( $parsed_g_id, $parsed_u_id )" ;
+    }
+    $query ="INSERT INTO UserObmGroup ( userobmgroup_group_id, userobmgroup_userobm_id )
+       VALUES $sql_groups_to_add ";
+    display_debug_msg($query, $cdg_sql, 'run_query_user_update_user_group()');
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+    if (!$retour) {
+      return -1;
+    }
+  }
+
+  $need_update_hierarchy = array_merge($groups_to_add, $groups_to_remove);
+  foreach ($need_update_hierarchy as $g_id) {
+    of_usergroup_update_group_hierarchy($g_id);
   }
 
   // Register the user to its group GID
@@ -1528,8 +1550,7 @@ function run_query_user_update_user_group($user) {
   $gid = $u['gid'];
   $domain_id = $u['domain_id'];
   run_query_user_init_group($domain_id, $u_id, $gid);
-
-  return $cpt_ins;
+  return $operations_done;
 }
 
 
