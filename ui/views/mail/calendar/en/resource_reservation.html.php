@@ -60,7 +60,7 @@ applicable to the OBM software.
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $targetComment; ?>.
+        Comments: <?php echo $targetComment; ?>
       </td>
     </tr>
     <tr>

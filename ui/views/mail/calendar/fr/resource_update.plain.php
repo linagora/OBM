@@ -33,20 +33,26 @@ applicable to the OBM software.
 ?>
 Message automatique envoyé par OBM
 ------------------------------------------------------------------
-MODIFICATION D'UNE RESERVATION DE RESSOURCE !
+MISE A JOUR DE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
-a été modifié et se déroulera du <?php echo $start; ?> au <?php echo $end; ?>, (lieu : <?php echo $location; ?>)
+La réservation de la ressource : <?php  echo $resourceLabel; ?>, dont vous êtes responsable, 
+et qui avait été réservée du <?php echo $old_start; ?> au <?php echo $old_end; ?>, 
+(lieu : <?php echo $old_location; ?>), a été mise à jour:
 
-Commentaire : <?php echo $targetComment; ?>.
+du              : <?php echo $start; ?>
 
-:: Pour plus de détails : 
+au              : <?php echo $end; ?>
+
+sujet           : <?php echo $title; ?>
+
+lieu            : <?php echo $location; ?>
+
+organisateur    : <?php echo $organizer; ?>
+
+créé par        : <?php echo $creator; ?>
+
+Commentaire     : <?php echo $targetComment; ?>
+
+:: Pour accepter/refuser la mise à jour : 
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
-
-
-:: Pour accepter les modifications :
-<?php echo $this->host; ?>/calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED
-
-:: Pour refuser les modifications : 
-<?php echo $this->host; ?>/calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED

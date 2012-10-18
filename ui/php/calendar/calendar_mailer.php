@@ -203,7 +203,9 @@ class CalendarMailer extends OBM_Mailer {
     $this->recipients = $this->getRecipients($resourceOwners);
     $this->subject = __('Resource %resource% reservation updated: %title%', array('%resource%' => $resource->label, '%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
-                              $this->extractEventDetails($oldEvent, $this->from, 'old_'));
+                              $this->extractEventDetails($oldEvent, $this->from, 'old_'),
+			      array('resourceLabel' => $resource->label)
+			      );
   }
 
   protected function resourceStateUpdate($event, $res) {

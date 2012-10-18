@@ -36,9 +36,23 @@ This email was automatically sent by OBM
 RESOURCE RESERVATION UPDATED !
 ------------------------------------------------------------------
 
-The resource reservation <?php echo $target; ?>, initially scheduled from <?php echo $old_start; ?> to <?php echo $old_end; ?>, (location : <?php echo $old_location; ?>),
-was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?>, (location : <?php echo $location; ?>).
-Comment : <?php echo $targetComment; ?>.
+The reservation of the resource : <?php  echo $resourceLabel; ?>, you are manager for, 
+and that was reserved from <?php echo $old_start; ?> to <?php echo $old_end; ?>, 
+(location : <?php echo $old_location; ?>), has been updated:
 
-:: To accept or refuse this update : 
+from            : <?php echo $start; ?>
+
+to              : <?php echo $end; ?>
+
+subject         : <?php echo $title; ?>
+
+location        : <?php echo $location; ?>
+
+organizer       : <?php echo $organizer; ?>
+
+created by      : <?php echo $creator; ?>
+
+Comments        : <?php echo $targetComment; ?>
+
+:: To accept/refuse this update : 
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

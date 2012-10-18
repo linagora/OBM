@@ -38,21 +38,21 @@ NEW RESOURCE RESERVATION !
 
 A new resource reservation was scheduled
 
-Ressource name: <?php  echo $resourceLabel; ?>
+Ressource name : <?php  echo $resourceLabel; ?>
 
-from     : <?php echo $start; ?>
+from           : <?php echo $start; ?>
 
-to           : <?php echo $end; ?>
+to             : <?php echo $end; ?>
 
-subject      : <?php echo $title; ?>
+subject        : <?php echo $title; ?>
 
-location     : <?php echo $location; ?>
+location       : <?php echo $location; ?>
 
-organizer    : <?php echo $organizer; ?>
+organizer      : <?php echo $organizer; ?>
 
-created by   : <?php echo $creator; ?>
+created by     : <?php echo $creator; ?>
 
-Comment : <?php echo $targetComment; ?>.
+Comments: <?php echo $targetComment; ?>
 
 :: To accept or refuse this reservation :
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

@@ -41,6 +41,9 @@ applicable to the OBM software.
         <td colspan="2">La réservation suivante a été annulée:</td>
     </tr>
     <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Ressource</td><td style="font-weight:bold;"><?php echo $resourceLabel; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
     </tr>
     <tr>
@@ -60,7 +63,7 @@ applicable to the OBM software.
     </tr>
     <tr>
       <td colspan="2">
-        Commentaire : <?php echo $targetComment; ?>.
+        Commentaire : <?php echo $targetComment; ?>
       </td>
     </tr>
 </table>

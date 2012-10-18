@@ -31,27 +31,42 @@ applicable to the OBM software.
 
 
 ?>
-<table style="width:100%; border:3px solid #000;">
+<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
-        <th style="text-align:left; background-color: blue; color:#fff; font-size:16px" colspan="2">
+        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
           Resource reservation updated
         </th>
     </tr>
     <tr>
-        <td colspan="2">
-
-The resource reservation <?php echo $target; ?>, initially scheduled from <?php echo $old_start; ?> to <?php echo $old_end; ?>, (location : <?php echo $old_location; ?>),
-was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?>, (location : <?php echo $location; ?>).
-</td>
+      <td colspan="2">The resource reservation for : <?php  echo $resourceLabel; ?>, from <?php echo $old_start; ?> to <?php echo $old_end; ?>, (location : <?php echo $old_location; ?>), has been modified:</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em; width:20%;">Subject</td><td><?php echo $title; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">From</td><td><?php echo $start; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">To</td><td><?php echo $end; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Location</td><td><?php echo $location; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td><?php echo $creator; ?></td>
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $targetComment; ?>.
+        Comments: <?php echo $targetComment; ?>
       </td>
     </tr>
     <tr>
-        <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">To accept or refuse this update</a>
+        <td style="text-align:right;padding-right:1em;" colspan="2">
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accept/refuse this update</a>
         </td>
     </tr>
 </table>
+

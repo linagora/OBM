@@ -38,11 +38,13 @@ RESERVATION DE RESSOURCE ANNULEE !
 
 La réservation suivante a été annulée
 
+ressource       : <?php echo $resourceLabel; ?>
+
+sujet           : <?php echo $title; ?>
+
 du              : <?php echo $start; ?>
 
 au              : <?php echo $end; ?>
-
-sujet           : <?php echo $title; ?>
 
 lieu            : <?php echo $location; ?>
 
@@ -50,4 +52,4 @@ organisateur    : <?php echo $organizer; ?>
 
 créé par        : <?php echo $creator; ?>
 
-Commentaire     : <?php echo $targetComment; ?>.
+Commentaire     : <?php echo $targetComment; ?>

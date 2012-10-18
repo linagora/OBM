@@ -34,15 +34,14 @@ applicable to the OBM software.
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Invitation à un évènement : mise à jour
+          Mise à jour d'une réservation de ressource
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous <strong><?php echo $title; ?></strong>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
-a été modifié :</td>
+      <td colspan="2">La réservation de ressource, concernant: <?php  echo $resourceLabel; ?>, du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>), a été modifiée:</td>
     </tr>
     <tr>
-        <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td><?php echo $title; ?></td>
+        <td style="text-align:right;padding-right:1em; width:20%;">Sujet</td><td><?php echo $title; ?></td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Du</td><td><?php echo $start; ?></td>
@@ -61,14 +60,13 @@ a été modifié :</td>
     </tr>
     <tr>
       <td colspan="2">
-        Commentaire : <?php echo $targetComment; ?>.
+        Commentaire: <?php echo $targetComment; ?>
       </td>
     </tr>
     <tr>
-        <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED">Accepter</a>
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED">Refuser</a>
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Consulter l'agenda</a>
+        <td style="text-align:right;padding-right:1em;" colspan="2">
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accepter/refuser cette mise à jour</a>
         </td>
     </tr>
 </table>
+

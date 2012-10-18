@@ -34,15 +34,36 @@ applicable to the OBM software.
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Resource reservation cancelled
+          Resource reservation cancelled 
         </th>
     </tr>
     <tr>
-        <td colspan="2">The resource reservation <?php echo $target; ?> initially scheduled from <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>), was cancelled.</td>
+        <td colspan="2">The following resource reservation has been cancelled:</td>
+    </tr>
+    <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Resource</td><td style="font-weight:bold;"><?php echo $resourceLabel; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Title</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;"><?php echo $start; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;"><?php echo $end; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
     </tr>
     <tr>
       <td colspan="2">
-        Comment : <?php echo $targetComment; ?>.
+        Comments: <?php echo $targetComment; ?>
       </td>
     </tr>
 </table>
