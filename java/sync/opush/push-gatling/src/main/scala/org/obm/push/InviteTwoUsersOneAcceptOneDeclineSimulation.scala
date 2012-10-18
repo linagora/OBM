@@ -48,13 +48,15 @@ import org.obm.push.context.User
 import org.obm.push.context.UserKey
 import org.obm.push.context.feeder.UserFeeder
 import org.obm.push.wbxml.WBXMLTools
+
 import com.excilys.ebi.gatling.core.Predef.Simulation
+import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
+import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
-import com.excilys.ebi.gatling.core.session.Session
 
 class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 
@@ -73,7 +75,7 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 		
 		val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
 		
-		List(buildScenario(users).configure.users(2).protocolConfig(httpConf))
+		List(buildScenario(users).configure.users(1).protocolConfig(httpConf))
 	}
 
 	def buildScenario(users: Iterator[User]) = {
@@ -90,27 +92,30 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 				folderType = usedCalendarCollection)
 		
 		scenario("Send an invitation at two attendees")
-			.exec(s => s.setAttributes(feeder.next()))
-			.exec(buildInitialFolderSyncCommand(organizer))
-			.exec(buildInitialFolderSyncCommand(attendee1))
-			.exec(buildInitialFolderSyncCommand(attendee2))
-			.exec(buildInitialSyncCommand(organizer, usedCalendarCollection))
-			.exec(s => organizer.sessionHelper.setupNextInvitationClientId(s))
-			.exec(buildSendInvitationCommand(invitation))
-			.exec(s => organizer.sessionHelper.setupPendingInvitation(s, invitation))
-			.pause(10)
-			.exec(buildInitialSyncCommand(attendee1, usedMailCollection))
-			.exec(buildInitialSyncCommand(attendee2, usedMailCollection))
-			.exec(buildSyncCommand(attendee1, usedMailCollection))
-			.exec(buildSyncCommand(attendee2, usedMailCollection))
-			.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
-			.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
-			.pause(10)
-			.exec(buildSyncCommand(organizer, usedCalendarCollection))
+			.exitBlockOnFail(
+				exec(s => s.setAttributes(feeder.next()))
+				.exec(buildInitialFolderSyncCommand(organizer))
+				.exec(buildInitialFolderSyncCommand(attendee1))
+				.exec(buildInitialFolderSyncCommand(attendee2))
+				.exec(buildInitialSyncCommand(organizer, usedCalendarCollection))
+				.exec(s => organizer.sessionHelper.setupNextInvitationClientId(s))
+				.exec(buildSendInvitationCommand(invitation))
+				.exec(s => organizer.sessionHelper.setupPendingInvitation(s, invitation))
+				.pause(10)
+				.exec(buildInitialSyncCommand(attendee1, usedMailCollection))
+				.exec(buildInitialSyncCommand(attendee2, usedMailCollection))
+				.exec(buildSyncCommand(attendee1, usedMailCollection))
+				.exec(buildSyncCommand(attendee2, usedMailCollection))
+				.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
+				.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
+				.pause(10)
+				.exec(buildSyncCommand(organizer, usedCalendarCollection))
+			)
 	}
 	
 	def buildInitialFolderSyncCommand(userKey: UserKey) = {
-		new FolderSyncCommand(new InitialFolderSyncContext(userKey), wbTools).buildCommand
+		val context = new InitialFolderSyncContext(userKey, FolderSyncCommand.validInitialFolderSync)
+		new FolderSyncCommand(context, wbTools).buildCommand
 	}
 	
 	def buildInitialSyncCommand(userKey: UserKey, folderType: FolderType) = {

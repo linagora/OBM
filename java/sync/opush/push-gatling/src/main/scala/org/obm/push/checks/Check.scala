@@ -29,41 +29,27 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.checks
 
-import org.obm.push.context.UserKey
-import org.obm.push.protocol.bean.FolderSyncResponse
-import com.excilys.ebi.gatling.core.check.MatchStrategy
 import com.excilys.ebi.gatling.core.session.Session
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.bean.SyncKey.INITIAL_FOLDER_SYNC_KEY
-import org.obm.push.bean.SyncKey
-import scala.collection.JavaConversions._
-import org.obm.push.bean.FolderType
-import org.obm.push.helper.SessionHelper
-import org.obm.push.checks.Check
+import com.excilys.ebi.gatling.core.check._
 
-class InitialFolderSyncContext(
-		userKey: UserKey,
-		matcher: MatchStrategy[FolderSyncResponse] = Check.success)
-			extends FolderSyncContext(userKey, matcher) {
+object Check {
 	
-	val initialSyncKey = INITIAL_FOLDER_SYNC_KEY
-		
-	override def nextSyncKey(session: => Session) = initialSyncKey
-	
-}
-
-class FolderSyncContext(
-		val userKey: UserKey,
-		val matcher: MatchStrategy[FolderSyncResponse] = Check.success) {
-	
-	def nextSyncKey(session: => Session): SyncKey = {
-		val lastFolderSync = userKey.sessionHelper.findLastFolderSync(session)
-		if (lastFolderSync.isDefined) {
-			return lastFolderSync.get.getNewSyncKey()
+	def success[T] = new MatchStrategy[T] {
+		def apply(value: Option[T], session: Session) = {
+			Success(value)
 		}
-		throw new IllegalStateException("Cannot find the next SyncKey in previous FolderSync response")
+	}
+	
+	def manyToOne[T](strategies: Iterable[MatchStrategy[T]]) = new MatchStrategy[T] {
+		def apply(value: Option[T], session: Session) = {
+			val firstFailure = strategies
+					.map(_.apply(value, session))
+					.find(_.isInstanceOf[Failure])
+			if (firstFailure.isEmpty) Success(value)
+			else firstFailure.get
+		}
 	}
 	
 }

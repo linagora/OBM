@@ -68,7 +68,7 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 	}
 	
 	test("Context make integer clientId as string") {
-		val clientId = new InvitationContext(userKey).clientId
+		val clientId = InvitationContext.generateClientId
 		assert(!Strings.isNullOrEmpty(clientId))
 		assert(clientId.toInt > 0)
 	}

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
+import org.obm.push.bean.FolderSyncStatus
+import org.obm.push.checks.Check
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
 import org.obm.push.protocol.bean.FolderSyncRequest
@@ -39,7 +41,8 @@ import org.obm.push.wbxml.WBXMLTools
 
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
-import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
+import com.excilys.ebi.gatling.core.check._
+import com.google.common.base.Strings
 
 class FolderSyncCommand(folderSyncContext: FolderSyncContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(folderSyncContext.userKey) {
@@ -55,6 +58,7 @@ class FolderSyncCommand(folderSyncContext: FolderSyncContext, wbTools: WBXMLTool
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toFolderSyncResponse(response))
+			    .matchWith(folderSyncContext.matcher)
 			    .saveAs(folderSyncContext.userKey.lastFolderSyncSessionKey))
 	}
 
@@ -69,4 +73,32 @@ class FolderSyncCommand(folderSyncContext: FolderSyncContext, wbTools: WBXMLTool
 		val responseDoc = wbTools.toXml(response)
 		folderSyncProtocol.decodeResponse(responseDoc)
 	}
+}
+
+object FolderSyncCommand {
+	
+	val validSyncKey = new MatchStrategy[FolderSyncResponse] {
+		def apply(value: Option[FolderSyncResponse], session: Session) = {
+			val nextSyncKey = value.get.getNewSyncKey
+			if (nextSyncKey != null &&
+					!Strings.isNullOrEmpty(nextSyncKey.getSyncKey()) && nextSyncKey.getSyncKey() != "0") Success(value)
+			else Failure("Invalid SyncKey in response")
+		}
+	}
+	
+	val statusOk = new MatchStrategy[FolderSyncResponse] {
+		def apply(value: Option[FolderSyncResponse], session: Session) = {
+			if (value.get.getStatus() == FolderSyncStatus.OK) Success(value)
+			else Failure("Status isn't ok : " + value.get.getStatus())
+		}
+	}
+	
+	val atLeastOneAdd = new MatchStrategy[FolderSyncResponse] {
+		def apply(value: Option[FolderSyncResponse], session: Session) = {
+			if (value.get.getCollectionsAddedAndUpdated().size() > 0) Success(value) 
+			else Failure("No add or update in response")
+		}
+	}
+	
+	val validInitialFolderSync = Check.manyToOne[FolderSyncResponse](Seq(validSyncKey, statusOk, atLeastOneAdd))
 }
