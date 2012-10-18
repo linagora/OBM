@@ -31,37 +31,32 @@ applicable to the OBM software.
 
 
 ?>
-<table style="width:100%; border:3px solid #000;">
+<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
-        <th style="text-align:left; background-color: blue; color:#fff; font-size:16px" colspan="2">
-          New resource reservation
+        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
+          Resource reservation
         </th>
     </tr>
     <tr>
-      <td colspan="2">
-A new resource reservation was scheduled
-</td>
+      <td colspan="2">The resource : <?php  echo $resourceLabel; ?>, has been reserved.</td>
     </tr>
     <tr>
-        <td style="text-align:right; width:20%">Resource Name</td><td><?php echo $resourceLabel; ?></td>
+        <td style="text-align:right;padding-right:1em; width:20%;">Subject</td><td><?php echo $title; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right; width:20%">Subject</td><td><?php echo $title; ?></td>
+        <td style="text-align:right;padding-right:1em;">From</td><td><?php echo $start; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;">From</td><td><?php echo $start; ?></td>
+        <td style="text-align:right;padding-right:1em;">To</td><td><?php echo $end; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;">To</td><td><?php echo $end; ?></td>
+        <td style="text-align:right;padding-right:1em;">Location</td><td><?php echo $location; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;">Location</td><td><?php echo $location; ?></td>
+        <td style="text-align:right;padding-right:1em;">Organizer</td><td><?php echo $organizer; ?></td>
     </tr>
     <tr>
-        <td style="text-align:right;">Organizer</td><td><?php echo $organizer; ?></td>
-    </tr>
-    <tr>
-        <td style="text-align:right;">Created by</td><td><?php echo $creator; ?></td>
+        <td style="text-align:right;padding-right:1em;">Created by</td><td><?php echo $creator; ?></td>
     </tr>
     <tr>
       <td colspan="2">
@@ -69,8 +64,8 @@ A new resource reservation was scheduled
       </td>
     </tr>
     <tr>
-        <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">To accept or refuse this reservation</a>
+        <td style="text-align:right;padding-right:1em;" colspan="2">
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accept/Refuse the reservation</a>
         </td>
     </tr>
 </table>
