@@ -31,18 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import scala.collection.JavaConversions.seqAsJavaList
-
+import scala.collection.JavaConversions._
 import org.obm.push.bean.MeetingResponse
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.encoder.GatlingEncoders.meetingProtocol
 import org.obm.push.protocol.bean.MeetingHandlerRequest
 import org.obm.push.protocol.bean.MeetingHandlerResponse
 import org.obm.push.wbxml.WBXMLTools
-
+import com.excilys.ebi.gatling.core.check._
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
+import org.obm.push.bean.MeetingResponseStatus
+import org.obm.push.checks.Check
+import com.google.common.base.Strings
 
 class MeetingResponseCommand(response: MeetingResponseContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(response.userKey) {
@@ -58,6 +60,7 @@ class MeetingResponseCommand(response: MeetingResponseContext, wbTools: WBXMLToo
 			.check(bodyExtractor
 			    .find
 			    .transform((response: Array[Byte]) => toMeetingResponseReply(response))
+			    .matchWith(response.matcher)
 			    .saveAs(response.userKey.lastMeetingResponseSessionKey))
 	}
 
@@ -82,4 +85,27 @@ class MeetingResponseCommand(response: MeetingResponseContext, wbTools: WBXMLToo
 		val responseDoc = wbTools.toXml(response)
 		meetingProtocol.decodeResponse(responseDoc)
 	}
+}
+
+object MeetingResponseCommand {
+	
+	val statusOk = new MatchStrategy[MeetingHandlerResponse] {
+		def apply(value: Option[MeetingHandlerResponse], session: Session) = {
+			val everyOkStatus = value.get
+					.getItemChanges()
+					.find(_.getStatus() != MeetingResponseStatus.SUCCESS)
+					.isEmpty
+			if (everyOkStatus) Success(value)
+			else Failure("Status isn't ok for a meeting response")
+		}
+	}
+	
+	val atLeastOneResponse = new MatchStrategy[MeetingHandlerResponse] {
+		def apply(value: Option[MeetingHandlerResponse], session: Session) = {
+			if (!value.get.getItemChanges().isEmpty) Success(value) 
+			else Failure("No meeting response in reply")
+		}
+	}
+	
+	val validResponses = Check.manyToOne[MeetingHandlerResponse](Seq(statusOk, atLeastOneResponse))
 }

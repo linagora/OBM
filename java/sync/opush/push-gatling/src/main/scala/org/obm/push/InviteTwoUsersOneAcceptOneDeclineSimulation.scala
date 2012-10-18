@@ -141,7 +141,7 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	}
 	
 	def buildMeetingResponseCommand(userKey: UserKey, attendeeStatus: AttendeeStatus) = {
-		val meetingResponse = new MeetingResponseContext(userKey, attendeeStatus)
+		val meetingResponse = new MeetingResponseContext(userKey, attendeeStatus, MeetingResponseCommand.validResponses)
 		new MeetingResponseCommand(meetingResponse, wbTools).buildCommand
 	}
 	

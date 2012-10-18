@@ -31,15 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.bean.AttendeeStatus
+import org.obm.push.checks.Check
 import org.obm.push.context.UserKey
 import org.obm.push.helper.SyncHelper
+import org.obm.push.bean.AttendeeStatus
+import org.obm.push.protocol.bean.MeetingHandlerResponse
 
+import com.excilys.ebi.gatling.core.check._
 import com.excilys.ebi.gatling.core.session.Session
 
 case class MeetingResponseContext(
 		userKey: UserKey,
-		attendeeStatus: AttendeeStatus = AttendeeStatus.ACCEPT)
+		attendeeStatus: AttendeeStatus = AttendeeStatus.ACCEPT,
+		matcher: MatchStrategy[MeetingHandlerResponse] = Check.success)
 			extends CollectionContext(userKey) {
 
 	def findServerIds(s: => Session): List[String] = {
