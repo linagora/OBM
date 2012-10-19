@@ -33,7 +33,7 @@ package org.obm.push.command
 
 import java.util.Date
 import java.util.UUID
-
+import org.obm.DateUtils.date
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.CalendarBusyStatus
@@ -44,37 +44,16 @@ import org.obm.push.bean.MSEvent
 import org.obm.push.bean.MSEventUid
 import org.obm.push.context.User
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Session
+import org.obm.push.helper.SyncHelper
 
-class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
+class DeleteInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 		extends AbstractInvitationCommand(invitation, wbTools) {
 
-	override val collectionCommandName = "Add"
-	override def clientId(s: Session) = invitation.userKey.sessionHelper.findLastInvitationClientId(s)
-	override def serverId(s: Session) = null
+	override val collectionCommandName = "Delete"
+	override def clientId(s: Session) = null
+	override def serverId(s: Session) = invitation.userKey.sessionHelper.findPendingInvitation(s).get.serverId
 		
-	override def buildEventInvitation(session: Session = null, organizer: User, attendees: Iterable[User]) = {
-		val event = new MSEvent()
-		event.setDtStamp(new Date())
-		event.setUid(new MSEventUid(UUID.randomUUID().toString()))
-		event.setSubject("Invitation from %s".format(organizer.email))
-		event.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
-		event.setBusyStatus(CalendarBusyStatus.BUSY)
-		event.setSensitivity(CalendarSensitivity.NORMAL)
-		
-		event.setOrganizerEmail(organizer.email)
-		for (attendee <- attendees) {
-			event.addAttendee(MSAttendee.builder()
-					.withEmail(attendee.email)
-					.withType(AttendeeType.REQUIRED)
-					.withStatus(AttendeeStatus.NOT_RESPONDED)
-					.build())
-		}
-		
-		event.setAllDayEvent(false)
-		event.setStartTime(invitation.startTime)
-		event.setEndTime(invitation.endTime)
-		event
-	}
+	override def buildInvitationData(session: Session) = null
+	override def buildEventInvitation(session: Session, organizer: User, attendees: Iterable[User]) = null
 }

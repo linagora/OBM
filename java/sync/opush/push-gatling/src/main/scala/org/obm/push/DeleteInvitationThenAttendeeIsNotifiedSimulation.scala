@@ -31,43 +31,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push
 
-import org.obm.DateUtils.date
-import org.obm.push.bean.AttendeeStatus
-import org.obm.push.checks.Check
+import org.obm.push.command.DeleteInvitationCommand
 import org.obm.push.command.InvitationCommand
 import org.obm.push.command.InvitationContext
-import org.obm.push.command.ModifyInvitationCommand
-import org.obm.push.command.SyncCollectionCommand.atLeastOneMeetingRequest
-import org.obm.push.command.SyncCollectionCommand.atLeastOneDeleteResponse
+import org.obm.push.command.SyncCollectionCommand.{atLeastOneAddResponse, noChange}
 import org.obm.push.context.User
 
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 
-class ModifyInvitationOneAttendeeAcceptOneDeclineSimulation extends InviteTwoUsersOneAcceptOneDeclineSimulation {
+class DeleteInvitationThenAtendeeIsNotifiedSimulation extends ModifyInvitationOneAttendeeAcceptOneDeclineSimulation {
 
 	override def buildScenario(users: Iterator[User]) = {
 		super.buildScenario(users).exitHereIfFailed.exitBlockOnFail(
-			exec(buildModifyInvitationCommand(invitation))
-			.exec(s => organizer.sessionHelper.updatePendingInvitation(s))
+			exec(buildDeleteInvitationCommand(invitation))
 			.pause(configuration.asynchronousChangeTime)
-			.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneMeetingRequest)) // Change notification reception
-			.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneMeetingRequest)) // Change notification reception
-			.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.DECLINE))
-			.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.ACCEPT))
-			.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneDeleteResponse)) // notification deletion
-			.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneDeleteResponse)) // notification deletion
-			.pause(configuration.asynchronousChangeTime)
-			.exec(buildSyncCommand(organizer, usedCalendarCollection, Check.matcher((s, response) 
-					=> (organizer.sessionHelper.attendeeRepliesAreReceived(s, response.get), "Each users havn't replied"))))
+			.exec(buildSyncCommand(attendee1, usedMailCollection, noChange))
+			.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneAddResponse)) // Event canceled notification
 		)
 	}
 	
-	def buildModifyInvitationCommand(invitation: InvitationContext) = {
-		val modifiedInvitation = invitation.modify(
-				startTime = date("2014-01-14T09:00:00"),
-				endTime = date("2014-01-14T11:00:00"),
-				matcher = InvitationCommand.validModifiedInvitation)
-		new ModifyInvitationCommand(modifiedInvitation, wbTools).buildCommand
+	def buildDeleteInvitationCommand(invitation: InvitationContext) = {
+		invitation.matcher = InvitationCommand.validDeleteInvitation
+		new DeleteInvitationCommand(invitation, wbTools).buildCommand
 	}
 }

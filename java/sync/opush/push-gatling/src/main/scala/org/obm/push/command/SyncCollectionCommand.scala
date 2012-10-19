@@ -93,14 +93,26 @@ object SyncCollectionCommand {
 		}
 	}
 	
-	val atLeastOneAdd = new MatchStrategy[SyncResponse] {
+	val noChange = new MatchStrategy[SyncResponse] {
 		def apply(value: Option[SyncResponse], session: Session) = {
-			val hasCollectionWithoutAdd = value.get
+			val hasNoChange = SyncHelper.findChanges(value.get).isEmpty
+			if (hasNoChange) Success(value) 
+			else Failure("Non expected change found in response")
+		}
+	}
+	
+	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("add")
+	val atLeastOneModifyResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("change")
+	val atLeastOneDeleteResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("delete")
+	def atLeastOneTypedResponse(modType: String): MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			val hasAddChange = value.get
 					.getCollectionResponses()
-					.find(_.getItemChanges().isEmpty())
+					.flatMap(_.getSyncCollection().getChanges())
+					.find(_.getModType().equalsIgnoreCase(modType))
 					.isDefined
-			if (!hasCollectionWithoutAdd) Success(value) 
-			else Failure("No add or update in response")
+			if (hasAddChange) Success(value) 
+			else Failure("No %s in response".format(modType))
 		}
 	}
 	
