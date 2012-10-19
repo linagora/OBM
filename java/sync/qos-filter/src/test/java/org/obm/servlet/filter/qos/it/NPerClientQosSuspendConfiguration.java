@@ -29,29 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.servlet.filter.qos;
+package org.obm.servlet.filter.qos.it;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.servlet.filter.qos.handlers.RequestInfo;
-import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import static org.easymock.EasyMock.createStrictControl;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+import org.easymock.IMocksControl;
+import org.obm.servlet.filter.qos.QoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
+import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
+import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+
+public abstract class NPerClientQosSuspendConfiguration extends AbstractModule {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	protected abstract int getN();
+	
+	@Override
+	protected void configure() {
+		IMocksControl control = createStrictControl();
+		bind(IMocksControl.class).toInstance(control);
+		bind(new TypeLiteral<BusinessKeyProvider<String>>(){}).toInstance(control.createMock(BusinessKeyProvider.class));
+		bind(QoSRequestHandler.class).to(new TypeLiteral<NPerClientQoSRequestSuspendHandler<String>>(){});
+		bind(Integer.class).annotatedWith(Names.named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM)).toInstance(getN());
+		install(new QoSFilterTestModule());
 	}
-	
-	@Test
-	public void test() {
-		equalsVerifierUtilsTest.test(RequestInfo.class, ContinuationId.class);
-	}
-	
 }

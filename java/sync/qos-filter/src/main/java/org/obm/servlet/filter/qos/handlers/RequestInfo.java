@@ -30,9 +30,14 @@
 package org.obm.servlet.filter.qos.handlers;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 /**
  * Holds information about a request.<br />
@@ -45,9 +50,10 @@ import com.google.common.base.Preconditions;
 public class RequestInfo<K extends Serializable> implements Serializable {
 	
 	public static <K extends Serializable> RequestInfo<K> create(K key) {
-		return new RequestInfo<K>(key);
+		return new RequestInfo<K>(key, 0, ImmutableList.<ContinuationId>of());
 	}
 	
+	private List<ContinuationId> continuationIds;
 	private long timestamp;
 	private int numberOfRunningRequests;
 	private final K key;
@@ -56,21 +62,18 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 	 * Builds a new {@link RequestInfo}.<br />
 	 * Use the factory method {@link #create()} to instantiate.
 	 */
-	private RequestInfo(K key, int numberOfRunningRequests) {
+	private RequestInfo(K key, int numberOfRequests, List<ContinuationId> continuationIds) {
 		this.key = key;
 		this.timestamp = System.currentTimeMillis();
-		this.numberOfRunningRequests = numberOfRunningRequests;
-	}
-	
-	private RequestInfo(K key) {
-		this(key, 0);
+		this.numberOfRunningRequests = numberOfRequests;
+		this.continuationIds = continuationIds;
 	}
 
 	/**
 	 * @return a copy of this {@link RequestInfo} adding one to the pending requests number  
 	 */
 	public RequestInfo<K> oneMoreRequest() {
-		return new RequestInfo<K>(key, numberOfRunningRequests + 1);
+		return new RequestInfo<K>(key, numberOfRunningRequests + 1, continuationIds);
 	}
 
 	/**
@@ -78,9 +81,24 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 	 */
 	public RequestInfo<K> removeOneRequest() {
 		Preconditions.checkState(numberOfRunningRequests > 0);
-		return new RequestInfo<K>(key, numberOfRunningRequests - 1);
+		return new RequestInfo<K>(key, numberOfRunningRequests - 1, continuationIds);
 	}
 
+	public RequestInfo<K> appendContinuationId(ContinuationId continuationId) {
+		return new RequestInfo<K>(key, numberOfRunningRequests, 
+				ImmutableList.copyOf(Iterables.concat(continuationIds, ImmutableList.of(continuationId))));
+	}
+	
+	public RequestInfo<K> popContinuation() {
+		Preconditions.checkState(continuationIds.size() > 0);
+		return new RequestInfo<K>(key, numberOfRunningRequests, 
+				ImmutableList.copyOf(Iterables.skip(continuationIds, 1)));
+	}
+
+	public ContinuationId nextContinuation() {
+		return Iterables.getFirst(continuationIds, null);
+	}
+	
 	public long getTimestamp() {
 		return timestamp;
 	}
@@ -92,10 +110,14 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 	public K getKey() {
 		return key;
 	}
-	
+
+	public List<ContinuationId> getContinuationIds() {
+		return continuationIds;
+	}
+
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(numberOfRunningRequests, key);
+		return Objects.hashCode(continuationIds, numberOfRunningRequests, key);
 	}
 	
 	@Override
@@ -103,7 +125,8 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 		if (object instanceof RequestInfo) {
 			@SuppressWarnings("unchecked")
 			RequestInfo<K> that = (RequestInfo<K>) object;
-			return Objects.equal(this.numberOfRunningRequests, that.numberOfRunningRequests)
+			return Objects.equal(this.continuationIds, that.continuationIds)
+				&& Objects.equal(this.numberOfRunningRequests, that.numberOfRunningRequests)
 				&& Objects.equal(this.key, that.key);
 		}
 		return false;

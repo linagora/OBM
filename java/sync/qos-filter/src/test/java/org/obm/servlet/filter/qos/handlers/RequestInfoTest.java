@@ -32,7 +32,11 @@ package org.obm.servlet.filter.qos.handlers;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 
+@RunWith(SlowFilterRunner.class)
 public class RequestInfoTest
 {
 	@Test
@@ -68,9 +72,67 @@ public class RequestInfoTest
 		assertThat(info.getNumberOfRunningRequests()).isEqualTo(0);
 	}
 	
+	@Test
+	public void testAppendOneContinuation() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		ContinuationId continuationId = new ContinuationId(1l);
+		RequestInfo<Integer> actual = info.appendContinuationId(continuationId);
+		assertThat(actual.getContinuationIds()).containsOnly(continuationId);
+		assertThat(info.getContinuationIds()).isEmpty();
+	}
+	
+	@Test
+	public void testAppendTwoContinuation() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		RequestInfo<Integer> actual = info
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l));
+		assertThat(actual.getContinuationIds()).containsOnly(new ContinuationId(1l), new ContinuationId(2l));
+		assertThat(info.getContinuationIds()).isEmpty();
+	}
+	
+	@Test
+	public void testPopOneRequest() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		RequestInfo<Integer> actual = info
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l))
+				.popContinuation();
+		assertThat(actual.getContinuationIds()).containsOnly(new ContinuationId(2l));
+	}
+	
+	@Test
+	public void testNextContinuation() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		ContinuationId actual = info
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l))
+				.nextContinuation();
+		assertThat(actual).isEqualTo(new ContinuationId(1l));
+	}
+	
+	@Test
+	public void testNextContinuationIsSameAsPop() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		RequestInfo<Integer> twoContinuations = info
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l));
+		assertThat(twoContinuations.nextContinuation()).isEqualTo(new ContinuationId(1l));
+		assertThat(twoContinuations.popContinuation().getContinuationIds()).containsOnly(new ContinuationId(2l));
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testTooManyRequests() {
+		RequestInfo<Integer> info = RequestInfo.create(2);
+		info.appendContinuationId(new ContinuationId(1l))
+			.popContinuation()
+			.popContinuation();
+	}
+	
 	@Test(expected=IllegalStateException.class)
 	public void testNegativeRequest() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
 		info.removeOneRequest();
 	}
+	
 }

@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.util.server;
 
+import org.eclipse.jetty.continuation.ContinuationFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -72,6 +73,7 @@ public class QoSFilterTestModule extends ServletModule {
 
 		install(new org.obm.servlet.filter.qos.QoSFilterModule());
 		
+		filter("/*").through(new ContinuationFilter());
 		filter("/*").through(QoSFilter.class);
 		serve("/*").with(BlockingServlet.class);
 	}
