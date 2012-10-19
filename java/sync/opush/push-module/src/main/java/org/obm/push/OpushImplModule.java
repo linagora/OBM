@@ -64,6 +64,7 @@ import org.obm.push.protocol.data.TimeZoneConverter;
 import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.protocol.data.TimeZoneEncoderImpl;
+import org.obm.push.qos.OpushQoSKeyProvider;
 import org.obm.push.service.DeviceService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
@@ -82,22 +83,35 @@ import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
 import org.obm.push.task.TaskBackend;
+import org.obm.servlet.filter.qos.QoSFilterModule;
+import org.obm.servlet.filter.qos.QoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
+import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
 import org.obm.sync.ObmSyncHttpClientModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 
 public class OpushImplModule extends AbstractModule {
 
+	/**
+	 * Opush must accepts only one requests per client to prevent lock timeout on same resources
+	 */
+	private static final int MAX_REQUESTS_PER_CLIENT = 1;
 	private static final String APPLICATION_NAME = "opush";
 	private static final String APPLICATION_ORIGIN = "o-push";
+	
 
 	@Override
 	protected void configure() {
 		install(new TransactionalModule());
 		install(new DaoModule());
+		install(qosModule());
 		install(new OpushServletModule());
 		install(new ObmSyncHttpClientModule());
 		install(new ProtocolModule());
@@ -134,5 +148,17 @@ public class OpushImplModule extends AbstractModule {
 		pimBackends.addBinding().to(TaskBackend.class);
 		pimBackends.addBinding().to(CalendarBackend.class);
 		pimBackends.addBinding().to(ContactsBackend.class);
+	}
+	
+	private Module qosModule() {
+		return new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(new TypeLiteral<BusinessKeyProvider<Integer>>(){}).to(OpushQoSKeyProvider.class);
+				bind(Integer.class).annotatedWith(Names.named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM)).toInstance(MAX_REQUESTS_PER_CLIENT);
+				bind(QoSRequestHandler.class).to(new TypeLiteral<NPerClientQoSRequestSuspendHandler<Integer>>(){});
+				install(new QoSFilterModule());
+			}
+		};
 	}
 }

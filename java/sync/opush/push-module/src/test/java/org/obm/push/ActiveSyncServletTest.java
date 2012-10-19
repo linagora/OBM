@@ -78,11 +78,14 @@ public class ActiveSyncServletTest {
 	private int requestId;
 	private String command;
 	private Credentials credentials;
+	private ActiveSyncRequest activeSyncRequest;
 	
 	@Before
 	public void setUp() {
 		mocksControl = new MocksControl(MockType.DEFAULT);
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
+		
+		activeSyncRequest = mocksControl.createMock(ActiveSyncRequest.class);
 		
 		deviceId = "devId";
 		deviceType = "devType";
@@ -101,13 +104,14 @@ public class ActiveSyncServletTest {
 		request = mocksControl.createMock(HttpServletRequest.class);
 		expect(request.getQueryString()).andReturn("Cmd=").anyTimes();
 		expect(request.getMethod()).andReturn("method").anyTimes();
-		expect(request.getParameter("DeviceId")).andReturn(deviceId).anyTimes();
-		expect(request.getParameter("DeviceType")).andReturn(deviceType).anyTimes();
-		expect(request.getHeader("User-Agent")).andReturn(userAgent).anyTimes();
+		expect(activeSyncRequest.getDeviceId()).andReturn(deviceId).anyTimes();
+		expect(activeSyncRequest.getDeviceType()).andReturn(deviceType).anyTimes();
+		expect(activeSyncRequest.getUserAgent()).andReturn(userAgent).anyTimes();
+		expect(activeSyncRequest.getMsPolicyKey()).andReturn(null).anyTimes();
 		expect(request.getParameter("Cmd")).andReturn(command).anyTimes();
-		expect(request.getHeader("X-Ms-PolicyKey")).andReturn(null).anyTimes();
 		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
+		expect(request.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST)).andReturn(activeSyncRequest);
 		
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));
@@ -139,7 +143,6 @@ public class ActiveSyncServletTest {
 		LoggerService loggerService = mocksControl.createMock(LoggerService.class);
 		loggerService.closeSession();
 		expectLastCall();
-		loggerService.defineCommand(command);
 		return loggerService;
 	}
 	
@@ -163,7 +166,7 @@ public class ActiveSyncServletTest {
 
 	private Handlers createHandlers(UserDataRequest userDataRequest) throws IOException {
 		IRequestHandler requestHandler = mocksControl.createMock(IRequestHandler.class);
-		requestHandler.process(anyObject(IContinuation.class), eq(userDataRequest), anyObject(ActiveSyncRequest.class), (Responder) eq(null));
+		requestHandler.process(anyObject(IContinuation.class), eq(userDataRequest), eq(activeSyncRequest), (Responder) eq(null));
 		expectLastCall();
 		
 		Handlers handlers = mocksControl.createMock(Handlers.class);

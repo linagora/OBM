@@ -32,7 +32,6 @@
 package org.obm.push;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -54,8 +53,6 @@ import org.obm.push.handler.IRequestHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.protocol.request.Base64QueryString;
-import org.obm.push.protocol.request.SimpleQueryString;
 import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
@@ -150,7 +147,6 @@ public class ActiveSyncServlet extends HttpServlet {
 			}
 			
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
-			loggerService.defineCommand(asrequest.getCommand());
 
 			checkAuthorizedDevice(asrequest, credentials);
 
@@ -250,18 +246,11 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {
-		String qs = r.getQueryString();
-		if (qs.contains("Cmd=")) {
-			return new SimpleQueryString(r);
-		} else {
-			InputStream is = null;
-			try {
-				is = r.getInputStream();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-			return new Base64QueryString(r, is);
+		ActiveSyncRequest activeSyncRequest = (ActiveSyncRequest) r.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST);
+		if (activeSyncRequest == null) {
+			throw new IllegalStateException("Unable to retrieve ActiveSync request from Servlet attributes, make sure to install " + ActiveSyncRequestFilter.class);
 		}
+		return activeSyncRequest;
 	}
 
 	private void noHandlerError(ActiveSyncRequest request, UserDataRequest udr) {

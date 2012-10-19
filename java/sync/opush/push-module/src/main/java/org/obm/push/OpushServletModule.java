@@ -32,23 +32,29 @@
 package org.obm.push;
 
 import org.eclipse.jetty.continuation.ContinuationFilter;
+import org.obm.servlet.filter.qos.QoSFilter;
 
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
 public class OpushServletModule extends ServletModule{
 
-	 @Override
+	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
+	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
+
+	@Override
 	    protected void configureServlets() {
 	        super.configureServlets();
 
-	        serve("/ActiveSyncServlet/*").with(ActiveSyncServlet.class);
-	        serve("/Autodiscover/*").with(AutodiscoverServlet.class);
+	        serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
+	        serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
 
 	        
 	        bind(ContinuationFilter.class).in(Singleton.class);
 	        filter("/*").through(ContinuationFilter.class);
 	        filter("/*").through(PushContinuationFilter.class);
 	        filter("/*").through(AuthenticationFilter.class);
+	        filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
+	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
 	    }
 }

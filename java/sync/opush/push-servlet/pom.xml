@@ -18,7 +18,7 @@
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-module</artifactId>
 			<version>${obm.version}</version>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-mail</artifactId>
