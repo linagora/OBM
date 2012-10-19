@@ -138,6 +138,7 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	}
 	
 	def buildSendInvitationCommand(invitation: InvitationContext) = {
+		invitation.matcher = SendInvitationCommand.validSentInvitation
 		new SendInvitationCommand(invitation, wbTools).buildCommand
 	}
 	

@@ -34,6 +34,8 @@ package org.obm.push.command
 import java.util.Date
 import java.util.UUID
 
+import scala.collection.JavaConversions._
+
 import org.obm.DateUtils.date
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.AttendeeType
@@ -43,15 +45,18 @@ import org.obm.push.bean.CalendarSensitivity
 import org.obm.push.bean.MSAttendee
 import org.obm.push.bean.MSEvent
 import org.obm.push.bean.MSEventUid
+import org.obm.push.checks.Check
 import org.obm.push.context.User
 import org.obm.push.encoder.GatlingEncoders.calendarEncoder
 import org.obm.push.protocol.bean.SyncRequestCollection
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands
+import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.utils.DOMUtils
 import org.obm.push.wbxml.WBXMLTools
 
 import com.excilys.ebi.gatling.core.Predef.Session
+import com.excilys.ebi.gatling.core.check._
 import com.google.common.collect.ImmutableList
 
 class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
@@ -100,8 +105,25 @@ class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 		}
 		
 		event.setAllDayEvent(false)
-		event.setStartTime(date("2014-12-01T09:00:00"))
-		event.setEndTime(date("2014-12-01T10:00:00"))
+		event.setStartTime(date("2014-01-12T09:00:00"))
+		event.setEndTime(date("2014-01-12T10:00:00"))
 		event
 	}
+}
+
+object SendInvitationCommand {
+
+	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
+		def apply(value: Option[SyncResponse], session: Session) = {
+			val hasAddChange = value.get
+					.getCollectionResponses()
+					.flatMap(_.getSyncCollection().getChanges())
+					.find(_.getModType().equalsIgnoreCase("add"))
+					.isDefined
+			if (hasAddChange) Success(value) 
+			else Failure("No add in response")
+		}
+	}
+	
+	val validSentInvitation = Check.manyToOne(Seq(SyncCollectionCommand.validSync, atLeastOneAddResponse))
 }

@@ -32,10 +32,12 @@
 package org.obm.push.command
 
 import scala.util.Random
-
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.FolderType
 import org.obm.push.context.UserKey
+import org.obm.push.checks.Check
+import com.excilys.ebi.gatling.core.check.MatchStrategy
+import org.obm.push.protocol.bean.SyncResponse
 
 object InvitationContext {
 	val random: Random = new Random()
@@ -45,8 +47,9 @@ object InvitationContext {
 class InvitationContext(
 		organizer: UserKey,
 		val attendees: Set[UserKey] = Set(),
-		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER)
-			extends SyncContext(organizer, folderType) {
+		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER,
+		matcher: MatchStrategy[SyncResponse] = Check.success)
+			extends SyncContext(organizer, folderType, matcher) {
 	
 	require(folderType.isCalendarFolder())
 	

@@ -56,7 +56,7 @@ class InitialSyncContext(
 class SyncContext(
 		val userKey: UserKey,
 		val folderType: FolderType,
-		val matcher: MatchStrategy[SyncResponse] = Check.success)
+		var matcher: MatchStrategy[SyncResponse] = Check.success)
 			extends CollectionContext(userKey) {
 	
 	def nextSyncKey(session: => Session): SyncKey = {
