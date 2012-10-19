@@ -82,7 +82,7 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 	test("SendInvitation contains organizer") {
 		val invitation = new InvitationContext(organizer = userKey)
 		val event = new SendInvitationCommand(invitation, wbxmlTools)
-				.buildEventInvitation(user, Set())
+				.buildEventInvitation(null, user, Set())
 		assert(event.getOrganizerEmail() == email("login1"))
 	}
 	
@@ -91,7 +91,7 @@ class SendInvitationCommandTest extends FunSuite with BeforeAndAfter {
 				organizer = userKey,
 				attendees = Set(new UserKey("user2"), new UserKey("user3")))
 		val event = new SendInvitationCommand(invitation, wbxmlTools)
-				.buildEventInvitation(user, Set(new User(2, config), new User(3, config)))
+				.buildEventInvitation(null, user, Set(new User(2, config), new User(3, config)))
 		assert(event.getAttendeeEmails().containsAll(ImmutableList.of(email("login2"), email("login3"))))
 		assert(event.getAttendees().containsAll(ImmutableList.of(
 				MSAttendee.builder().withEmail(email("login2"))

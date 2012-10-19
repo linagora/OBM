@@ -33,35 +33,36 @@ package org.obm.push
 
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.FolderType
+import org.obm.push.checks.Check
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.command.InitialSyncContext
+import org.obm.push.command.InvitationCommand
 import org.obm.push.command.InvitationContext
 import org.obm.push.command.MeetingResponseCommand
 import org.obm.push.command.MeetingResponseContext
 import org.obm.push.command.SendInvitationCommand
 import org.obm.push.command.SyncCollectionCommand
-import org.obm.push.command.SyncCollectionCommand._
+import org.obm.push.command.SyncCollectionCommand.atLeastOneMeetingRequest
+import org.obm.push.command.SyncCollectionCommand.validSync
 import org.obm.push.command.SyncContext
 import org.obm.push.context.Configuration
 import org.obm.push.context.GatlingConfiguration
 import org.obm.push.context.User
 import org.obm.push.context.UserKey
 import org.obm.push.context.feeder.UserFeeder
+import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.wbxml.WBXMLTools
 
-import com.excilys.ebi.gatling.core.check._
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
 import com.excilys.ebi.gatling.core.session.Session
+import com.excilys.ebi.gatling.core.check.MatchStrategy
 import com.excilys.ebi.gatling.http.Predef.httpConfig
 import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
 import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
-import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.protocol.bean.SyncResponse
-import org.obm.push.checks.Check
 
 class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 
@@ -138,7 +139,7 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	}
 	
 	def buildSendInvitationCommand(invitation: InvitationContext) = {
-		invitation.matcher = SendInvitationCommand.validSentInvitation
+		invitation.matcher = InvitationCommand.validSentInvitation
 		new SendInvitationCommand(invitation, wbTools).buildCommand
 	}
 	
