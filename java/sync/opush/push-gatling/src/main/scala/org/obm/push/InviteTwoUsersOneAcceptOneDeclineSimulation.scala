@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push
 
+import org.obm.DateUtils.date
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.FolderType
 import org.obm.push.checks.Check
@@ -72,6 +73,16 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	val usedMailCollection = FolderType.DEFAULT_INBOX_FOLDER 
 	val usedCalendarCollection = FolderType.DEFAULT_CALENDAR_FOLDER
 	
+	val organizer = new UserKey("organizer")
+	val attendee1 = new UserKey("attendee1")
+	val attendee2 = new UserKey("attendee2")
+	val invitation = new InvitationContext(
+		organizer = organizer,
+		attendees = Set(attendee1, attendee2),
+		startTime = date("2014-01-12T09:00:00"),
+		endTime = date("2014-01-12T10:00:00"),
+		folderType = usedCalendarCollection)
+	
 	def apply = {
 		
 		val httpConf = httpConfig
@@ -81,21 +92,12 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 		
 		val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
 		
-		List(buildScenario(users).configure.users(1).protocolConfig(httpConf))
+		List(buildScenario(users).configure.users(33).protocolConfig(httpConf))
 	}
 
 	def buildScenario(users: Iterator[User]) = {
-		
-		val organizer = new UserKey("organizer")
-		val attendee1 = new UserKey("attendee1")
-		val attendee2 = new UserKey("attendee2")
 
 		val feeder = new UserFeeder(users, organizer, attendee1, attendee2)
-		
-		val invitation = new InvitationContext(
-				organizer = organizer,
-				attendees = Set(attendee1, attendee2),
-				folderType = usedCalendarCollection)
 		
 		scenario("Send an invitation at two attendees")
 			.exitBlockOnFail(

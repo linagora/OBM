@@ -31,43 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import scala.util.Random
-import org.obm.push.bean.AttendeeStatus
-import org.obm.push.bean.FolderType
-import org.obm.push.context.UserKey
-import org.obm.push.checks.Check
-import com.excilys.ebi.gatling.core.check.MatchStrategy
-import org.obm.push.protocol.bean.SyncResponse
-import java.util.Date
+import org.obm.push.bean.MSEvent
+import org.obm.push.context.User
+import org.obm.push.helper.SyncHelper
+import org.obm.push.wbxml.WBXMLTools
 
-object InvitationContext {
-	val random: Random = new Random()
-	def generateClientId: String = random.nextInt(Int.MaxValue).toString()
-}
+import com.excilys.ebi.gatling.core.Predef.Session
 
-class InvitationContext(
-		organizer: UserKey,
-		val attendees: Set[UserKey] = Set(),
-		val startTime: Date = null,
-		val endTime: Date = null,
-		folderType: FolderType = FolderType.DEFAULT_CALENDAR_FOLDER,
-		matcher: MatchStrategy[SyncResponse] = Check.success)
-			extends SyncContext(organizer, folderType, matcher) {
-	
-	require(folderType.isCalendarFolder())
-	
-	def modify(
-			attendees: Set[UserKey] = this.attendees,
-			startTime: Date = this.startTime,
-			endTime: Date = this.endTime,
-			matcher: MatchStrategy[SyncResponse] = this.matcher) = {
-		new InvitationContext(organizer, attendees, startTime, endTime, folderType, matcher)
+class ModifyInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
+		extends AbstractInvitationCommand(invitation, wbTools) {
+
+	override val collectionCommandName = "Change"
+	override def clientId(s: Session) = null
+	override def serverId(s: Session) = invitation.userKey.sessionHelper.findPendingInvitation(s).get.serverId
+		
+	override def buildEventInvitation(session: Session, organizer: User, attendees: Iterable[User]) = {
+		val syncResponse = invitation.userKey.sessionHelper.findLastSync(session).get
+		val eventServerId = invitation.userKey.sessionHelper.findPendingInvitation(session).get.serverId
+		val event = SyncHelper.findChangesWithServerId(syncResponse, eventServerId).head.getData().asInstanceOf[MSEvent]
+		event.setStartTime(invitation.startTime)
+		event.setEndTime(invitation.endTime)
+		event
 	}
-}
-
-class PendingInvitationContext(val invitation: InvitationContext, val serverId: String) {
-	
-	var attendeeReplies = Map[String, AttendeeStatus]()
-	
-	def hasReplyOfEveryAttendees: Boolean = attendeeReplies.size == invitation.attendees.size
 }

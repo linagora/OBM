@@ -72,15 +72,17 @@ class SessionHelper(userKey: UserKey) {
 	
 	def attendeeRepliesAreNotReceived(s: Session, response: SyncResponse) = !attendeeRepliesAreReceived(s, response)
 	def attendeeRepliesAreReceived(s: Session, response: SyncResponse): Boolean = {
-		val organizerEmail = userKey.getUser(s).email
 		val invitation = findPendingInvitation(s).get
+		setAttendeeRepliesFromResponse(response, invitation, userKey.getUser(s).email)
+		invitation.hasReplyOfEveryAttendees
+	}
+	
+	def setAttendeeRepliesFromResponse(response: SyncResponse, invitation: PendingInvitationContext, organizerEmail: String) = {
 		invitation.attendeeReplies = SyncHelper
 			.findEventChanges(response, invitation.serverId)
 			.flatMap(_.getAttendees())
 			.filter(attendeeHasReplied(organizerEmail, _))
 			.map(a => (a.getEmail() -> a.getAttendeeStatus())).toMap
-			
-		invitation.hasReplyOfEveryAttendees
 	}
 	
 	def attendeeHasReplied(organizerEmail: String, attendee: MSAttendee): Boolean = {
@@ -105,10 +107,16 @@ class SessionHelper(userKey: UserKey) {
 		val clientId = findLastInvitationClientId(session)
 		val change = SyncHelper.findChanges(findLastSync(session).get)
 								.filter(change => clientId.equals(change.getClientId())).head
-		updatePendingInvitation(session, new PendingInvitationContext(invitation, change.getServerId()))
+		setPendingInvitation(session, new PendingInvitationContext(invitation, change.getServerId()))
 	}
 	
-	def updatePendingInvitation(session: Session, pendingInvitation: PendingInvitationContext): Session = {
+	def updatePendingInvitation(session: Session): Session = {
+		val invitation = findPendingInvitation(session).get
+		setAttendeeRepliesFromResponse(findLastSync(session).get, invitation, userKey.getUser(session).email)
+		setPendingInvitation(session, invitation)
+	}
+	
+	def setPendingInvitation(session: Session, pendingInvitation: PendingInvitationContext): Session = {
 		session.setAttribute(userKey.lastPendingInvitationSessionKey, pendingInvitation)
 	}
 	

@@ -90,17 +90,22 @@ abstract class AbstractInvitationCommand(invitation: InvitationContext, wbTools:
 
 object InvitationCommand {
 
-	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
+	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("add")
+	val atLeastOneModifyResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("change")
+	val atLeastOneDeleteResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("delete")
+	
+	def atLeastOneTypedResponse(modType: String): MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
 		def apply(value: Option[SyncResponse], session: Session) = {
 			val hasAddChange = value.get
 					.getCollectionResponses()
 					.flatMap(_.getSyncCollection().getChanges())
-					.find(_.getModType().equalsIgnoreCase("add"))
+					.find(_.getModType().equalsIgnoreCase(modType))
 					.isDefined
 			if (hasAddChange) Success(value) 
-			else Failure("No add in response")
+			else Failure("No %s in response".format(modType))
 		}
 	}
 	
 	val validSentInvitation = Check.manyToOne(Seq(SyncCollectionCommand.validSync, atLeastOneAddResponse))
+	val validModifiedInvitation = Check.manyToOne(Seq(SyncCollectionCommand.validSync, atLeastOneModifyResponse))
 }

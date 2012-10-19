@@ -34,7 +34,6 @@ package org.obm.push.command
 import java.util.Date
 import java.util.UUID
 
-import org.obm.DateUtils.date
 import org.obm.push.bean.AttendeeStatus
 import org.obm.push.bean.AttendeeType
 import org.obm.push.bean.CalendarBusyStatus
@@ -74,8 +73,8 @@ class SendInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 		}
 		
 		event.setAllDayEvent(false)
-		event.setStartTime(date("2014-01-12T09:00:00"))
-		event.setEndTime(date("2014-01-12T10:00:00"))
+		event.setStartTime(invitation.startTime)
+		event.setEndTime(invitation.endTime)
 		event
 	}
 }

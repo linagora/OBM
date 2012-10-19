@@ -32,6 +32,7 @@
 package org.obm.push
 
 import scala.collection.mutable.MutableList
+import org.obm.DateUtils.date
 import org.obm.push.bean.FolderType
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.InitialFolderSyncContext
@@ -89,6 +90,8 @@ class InviteTwoUsersSimulation extends Simulation {
 		val invitation = new InvitationContext(
 				organizer = organizer,
 				attendees = Set(invitee1, invitee2),
+				startTime = date("2014-01-12T09:00:00"),
+				endTime = date("2014-01-12T10:00:00"),
 				folderType = usedCalendarCollection)
 
 		scenario("Send an invitation to two users")
