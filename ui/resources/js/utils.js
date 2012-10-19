@@ -332,3 +332,11 @@ Obm.Error = {
   }
 
 }
+
+Obm.utils = Obm.utils || {};
+Obm.utils.decodeSpecialChars = function(str) {
+  var tmpTa = document.createElement("textarea"); 
+  tmpTa.innerHTML = str;
+  return tmpTa.value; 
+};
+

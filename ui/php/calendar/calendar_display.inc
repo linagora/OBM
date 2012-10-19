@@ -2018,7 +2018,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
  * @access public
  * @return event HTML and javascript code
  */
-function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
+function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity) {
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_private;
   global $l_user, $l_contact, $l_resource, $l_private;
@@ -2027,7 +2027,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   if($occurrence->entity_state == "DECLINED"){
     return null;
   }
-
+  $event_data = array();
+  $options=new stdClass();
   $event = $occurrence->event;
   $owner = $event->owner;
   $owner_name = phpStringToJsString($event->owner_name);
@@ -2040,8 +2041,8 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $category = $title;
     $attendees = $title;
   } else {
-    $title = phpStringToJsString($event->title);
-    $description = phpStringToJsString($event->description);
+    $title = $event->title;
+    $description = $event->description;
     $properties = $event->properties;
     if ($properties != '') {
       $charset = mb_internal_encoding();
@@ -2070,7 +2071,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       foreach($entities as $at) {
         $ent[] = phpStringToJsString($at);
       }
-      $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
+      $attendees[] = array("label"=>$label_entity, "entities"=>$ent);
     }
   }
 
@@ -2088,36 +2089,40 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $updatable = false;
   if ( $entity_id == $event->owner && ( $owner == $obm['uid'] || in_array($owner,$writable_entity['ids']) ) ) {
     $updatable =  true;
-    $ed[] = 'updatable:true';
+    $event_data["updatable"] = true;
   }
   
   if ($output_target == 'print' || $action == 'portlet') {
     $updatable =  false;
-    $ed[] = 'updatable:false';
+    $event_data["updatable"] = false;
   }
 
-  $ed[] = "id:'$id'";
-  $ed[] = "opacity:'$event->opacity'";
-  $ed[] = "entity:'$entity'";
-  $ed[] = "entity_id:$entity_id"; 
-  $ed[] = "duration:$duration";
-  $ed[] = "item:'$item_list'";
-  $ed[] = "time:".$date->getTimestamp();
-  $ed[] = "title:'$title'";
-  $ed[] = "all_day:".$all_day;
-  $ed[] = "klass:'$entityClass'"; 
-  $ed[] = "description:'$description'";
-  $ed[] = "owner_name:'$owner_name'";
-  $ed[] = "location:'$location'";
-  $ed[] = "category:'$category'";
-  $ed[] = "colors: {event: {body:'$eventColor[body]', header:'$eventColor[header]'}}";
-  //$ed[] = "colors: {event: {body:'".$event->color."'}}";
-  $ed[] = "status:'$entity_state'";
-  $ed[] = "organizer_name:'$organizer_name'";
-  if (is_array($attendees))
-    $ed[] = "attendees:[".implode(',',$attendees)."]";
-  else
-    $ed[] = "attendees:'$attendees'";
+  $event_data["id"] = "$id";
+  $event_data["opacity"] = "$event->opacity";
+  $event_data["entity"] = "$entity";
+  $event_data["entity_id"] = $entity_id; 
+  $event_data["duration"] = $duration;
+  settype($event_data["duration"],"float");
+  $event_data["item"] = "$item_list";
+  $event_data["time"] = $date->getTimestamp();
+  settype($event_data["time"],"float");
+  $event_data["title"] = htmlspecialchars($title);
+  $event_data["all_day"] = $all_day;
+  $event_data["klass"] = $entityClass; 
+  $event_data["description"] = htmlspecialchars($description);
+  $event_data["owner_name"] = $owner_name;
+  $event_data["location"] = htmlspecialchars($location);
+  $event_data["category"] = $category;
+  $event_data["colors"] = array(
+    "event"=>array(
+	"body"=>$eventColor[body], 
+	"header"=> $eventColor[header]
+      )
+    );
+
+  $event_data["status"] = $entity_state;
+  $event_data["organizer_name"] = $organizer_name;
+  $event_data["attendees"] = $attendees;
 
   switch($unit) {
     case 'day' :
@@ -2125,11 +2130,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       $index = $occurrence->index->getTimestamp();
       $left = $occurrence->left;
       $right = $occurrence->right;
-      $ed[] = "index:'$index'";
-      $ed[] = "left:'$left'";
-      $ed[] = "right:'$right'";
+      $event_data["index"] =$index;
+      $event_data["left"] = $left;
+      $event_data["right"] = $right;
       if ($updatable) {
-        $options[] = 'draggable:true';
+        $options->draggable = true;
       }
       break;
     case 'hour' :
@@ -2139,26 +2144,26 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       }
       $day = ($all_day) || ($cend->compareDateIso($date)!=0);
       if ($updatable) {
-        $options[] = 'draggable:true';
-        $options[] = 'resizable:true';
+        $options->draggable = true;
+        $options->resizable = true;
       }
       break;
   }
 
   if ($event->isPrivate()) {
-    $ed[] = 'private:true';
+    $event_data["private"] = true;
   } else {
-    $ed[] = 'private:false';
+    $event_data["private"] = false;
   }
   if ($event->isMeeting()) {
-    $ed[] = 'meeting:true';
+    $event_data["meeting"] = true;
   } else {
-    $ed[] = 'meeting:false';
+    $event_data["meeting"] = false;
   }
   if ($event->isPeriodic()) {
-    $ed[] = 'periodic:true';
+    $event_data["periodic"] = true;
   } else {
-    $ed[] = 'periodic:false';
+    $event_data["periodic"] = false;
   }
   if ($all_day) {
     $head .= $title;
@@ -2166,12 +2171,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $head .= $date->get(Of_Date::TIME_SHORT);
   }
   
-  $opt = '{'.implode(',',$options).'}';
-  $event_data =  '{'.implode(',',$ed).'}';
+  $opt = json_encode($options);
   if ($day) {
-    $display_events = "obm.calendarManager.newDayEvent($event_data,$opt);";
+    $display_events = "obm.calendarManager.newDayEvent(".json_encode($event_data).",$opt);";
   } else {
-    $display_events = "obm.calendarManager.newEvent($event_data,$opt);";
+    $display_events = "obm.calendarManager.newEvent(".json_encode($event_data).",$opt);";
   }
 
   return $display_events;
@@ -2246,6 +2250,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
                 $category = '';
               }
               $location = htmlspecialchars($event->location);
+	      $title = htmlspecialchars($event->title);
               if($event->all_day) {
                 $ad = ": $l_all_day";
               } else {
@@ -2262,9 +2267,9 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
                   $style = '';
                 }                
                 if ($location != '') {
-                  $today_events[] = "<li style=\"$style\">".htmlspecialchars($event->title)." ($location) $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".$title." ($location) $ad</li>";
                 } else {
-                  $today_events[] = "<li style=\"$style\">".htmlspecialchars($event->title)." $ad</li>";
+                  $today_events[] = "<li style=\"$style\">".$title." $ad</li>";
                 } 
               }
             }            

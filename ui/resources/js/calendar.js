@@ -278,6 +278,7 @@ Obm.CalendarManager = new Class({
    * Add an all day event
    */
   newDayEvent: function(eventData,options) {
+    eventData = this.decodeJSONfields(eventData);
     obmEvent = new Obm.CalendarAllDayEvent(eventData,options);
     this.register(obmEvent);
     return obmEvent;
@@ -288,11 +289,28 @@ Obm.CalendarManager = new Class({
    * Add an in-day event
    */
   newEvent: function(eventData,options) {
+    eventData = this.decodeJSONfields(eventData);
     var obmEvent = new Obm.CalendarInDayEvent(eventData,options);
     this.register(obmEvent);
     return obmEvent;
   },
 
+  /**
+   * Because we generate JSON from the server, and include it into the page,
+   * we have to encode html special chars such as the <script> tags
+   * This method takes care of decoding the appropriate fields
+   */
+  decodeJSONfields: function(eventData) {
+    eventData.title = Obm.utils.decodeSpecialChars(eventData.title);
+    if ( eventData.location ) {
+      eventData.location = Obm.utils.decodeSpecialChars(eventData.location);
+    }
+    if ( eventData.description ) {
+      eventData.description = Obm.utils.decodeSpecialChars(eventData.description);
+    }
+    return eventData;
+  },
+  
 
   /*
    * Create in-day dummy event (for event creation)
@@ -1625,12 +1643,7 @@ Obm.CalendarInDayEvent = new Class({
       this.locationContainer.set('text',location);
     }
     
-    // Workaround : HTML entities aren't converted to actual symbols in a JS-inserted "title" attribute
-    var tmpTa = document.createElement("textarea"); 
-    tmpTa.innerHTML = this.event.title.replace("&quot;", '"');
-    var decodedTitle = tmpTa.value; 
-
-    this.element.setProperty('title', decodedTitle + ' ' + location);
+    this.element.setProperty('title', title + ' ' + location);
     this.timeContainer.set('text',time);
     this.titleContainer.set('text',title);
   },
@@ -1869,17 +1882,12 @@ Obm.CalendarAllDayEvent = new Class({
    */
   setTitle: function() {
     var title = this.event.title;
-    var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' ' + title; 
+    var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' ' + title;
     if (this.event.all_day) {
       time = title;
     }
     
-    // Workaround : HTML entities aren't converted to actual symbols in a JS-inserted "title" attribute
-    var tmpTa = document.createElement("textarea"); 
-    tmpTa.innerHTML = this.event.title.replace("&quot;", '"');
-    var decodedTitle = tmpTa.value;
-
-    this.element.setProperty('title', decodedTitle);
+    this.element.setProperty('title', title);
     this.titleContainer.set('text',time);
   },
 
@@ -2371,11 +2379,11 @@ Obm.CalendarQuickForm = new Class({
     } else {
       this.form.setStyle('display','none');
       if (evt.isExternal()) {
-        $('extEventTitle').set('html', evt.event.title);
+        $('extEventTitle').set('text', evt.event.title);
         this.title.setStyle('display','none');
         $('extEventTitle').setStyle('display', '');
       } else {
-        this.title.set('html',evt.event.title);
+        this.title.set('text',evt.event.title);
         this.title.setStyle('display','');
         $('extEventTitle').setStyle('display', 'none');
       }
