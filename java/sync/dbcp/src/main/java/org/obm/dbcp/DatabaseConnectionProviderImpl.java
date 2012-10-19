@@ -99,6 +99,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		poolingDataSource.getDriverProperties().putAll(
 				driverConfiguration.getDriverProperties(databaseConfiguration));
 		poolingDataSource.setTestQuery(VALIDATION_QUERY);
+		poolingDataSource.setShareTransactionConnections(true);
 
 		poolingDataSource.init();
 	}
