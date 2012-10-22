@@ -36,6 +36,8 @@ import org.obm.push.bean.DeviceId
 trait Configuration {
   
 	val targetServerUrl: String
+	val asynchronousChangeTime = 5
+	val parallelsScenariosCount = 1
   
 	val defaultUserDomain: String
 	val defaultUserLoginPrefix: String

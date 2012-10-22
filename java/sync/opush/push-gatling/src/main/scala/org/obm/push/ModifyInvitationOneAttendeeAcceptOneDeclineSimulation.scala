@@ -50,14 +50,14 @@ class ModifyInvitationOneAttendeeAcceptOneDeclineSimulation extends InviteTwoUse
 		super.buildScenario(users).exitHereIfFailed.exitBlockOnFail(
 			exec(buildModifyInvitationCommand(invitation))
 			.exec(s => organizer.sessionHelper.updatePendingInvitation(s))
-			.pause(10)
+			.pause(configuration.asynchronousChangeTime)
 			.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneMeetingRequest)) // Change notification reception
 			.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneMeetingRequest)) // Change notification reception
 			.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.DECLINE))
 			.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.ACCEPT))
 			.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneDeleteResponse)) // notification deletion
 			.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneDeleteResponse)) // notification deletion
-			.pause(10)
+			.pause(configuration.asynchronousChangeTime)
 			.exec(buildSyncCommand(organizer, usedCalendarCollection, Check.matcher((s, response) 
 					=> (organizer.sessionHelper.attendeeRepliesAreReceived(s, response.get), "Each users havn't replied"))))
 		)

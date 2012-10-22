@@ -37,6 +37,8 @@ import org.obm.push.bean.DeviceId
 object Arguments extends Enumeration {
   
 	val TARGET_SERVER_URL_ARG = Value("targetServerUrl")
+	val PARALLELS_SCENARIOS_COUNT = Value("parallelsScenariosCount")
+	val ASYNCHRONOUS_CHANGE_TIME = Value("asynchronousChangeTime")
 	  
 	val USER_DOMAIN = Value("userDomain")
 	val USER_LOGIN_PREFIX = Value("userLoginPrefix")
@@ -50,6 +52,8 @@ object GatlingConfiguration {
 
 	def build(): Configuration = build(
 			System.getProperty(Arguments.TARGET_SERVER_URL_ARG.toString),
+			System.getProperty(Arguments.PARALLELS_SCENARIOS_COUNT.toString),
+			System.getProperty(Arguments.ASYNCHRONOUS_CHANGE_TIME.toString),
 			System.getProperty(Arguments.USER_DOMAIN.toString),
 			System.getProperty(Arguments.USER_LOGIN_PREFIX.toString),
 			System.getProperty(Arguments.USER_PASSWORD.toString),
@@ -58,10 +62,13 @@ object GatlingConfiguration {
 			System.getProperty(Arguments.USER_DEVICE_TYPE.toString))
 	
 	def build(
-			serverUrl: String, domain: String, loginPrefix: String,
+			serverUrl: String, parallelsScenarios: String, asynchronousChange: String,
+			domain: String, loginPrefix: String,
 			password: String, policyKey: String, deviceId: String, deviceType: String) = {
 	  
 			require(!Strings.isNullOrEmpty(serverUrl))
+			require(!Strings.isNullOrEmpty(parallelsScenarios))
+			require(!Strings.isNullOrEmpty(asynchronousChange))
 			require(!Strings.isNullOrEmpty(domain))
 			require(!Strings.isNullOrEmpty(loginPrefix))
 			require(!Strings.isNullOrEmpty(password))
@@ -72,6 +79,8 @@ object GatlingConfiguration {
 			new Configuration() {
 			
 				override val targetServerUrl = serverUrl
+				override val parallelsScenariosCount = parallelsScenarios.toInt
+				override val asynchronousChangeTime = asynchronousChange.toInt
 				 
 				override val defaultUserDomain = domain
 				override val defaultUserLoginPrefix = loginPrefix

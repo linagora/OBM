@@ -85,14 +85,17 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 	
 	def apply = {
 		
-		val httpConf = httpConfig
-			.baseURL(configuration.targetServerUrl)
-			.disableFollowRedirect
-			.disableCaching
-		
 		val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
 		
-		List(buildScenario(users).configure.users(33).protocolConfig(httpConf))
+		val httpConf = httpConfig
+				.baseURL(configuration.targetServerUrl)
+				.disableFollowRedirect
+				.disableCaching
+				
+		List(buildScenario(users)
+				.configure
+				.users(configuration.parallelsScenariosCount)
+				.protocolConfig(httpConf))
 	}
 
 	def buildScenario(users: Iterator[User]) = {
@@ -109,14 +112,14 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 				.exec(s => organizer.sessionHelper.setupNextInvitationClientId(s))
 				.exec(buildSendInvitationCommand(invitation))
 				.exec(s => organizer.sessionHelper.setupPendingInvitation(s, invitation))
-				.pause(10)
+				.pause(configuration.asynchronousChangeTime)
 				.exec(buildInitialSyncCommand(attendee1, usedMailCollection))
 				.exec(buildInitialSyncCommand(attendee2, usedMailCollection))
 				.exec(buildSyncCommand(attendee1, usedMailCollection, atLeastOneMeetingRequest))
 				.exec(buildSyncCommand(attendee2, usedMailCollection, atLeastOneMeetingRequest))
 				.exec(buildMeetingResponseCommand(attendee1, AttendeeStatus.ACCEPT))
 				.exec(buildMeetingResponseCommand(attendee2, AttendeeStatus.DECLINE))
-				.pause(10)
+				.pause(configuration.asynchronousChangeTime)
 				.exec(buildSyncCommand(organizer, usedCalendarCollection, Check.matcher((s, response) 
 						=> (organizer.sessionHelper.attendeeRepliesAreReceived(s, response.get), "Each users havn't replied"))))
 			)

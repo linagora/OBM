@@ -40,85 +40,121 @@ class GatlingContextConfigurationTest extends FunSuite {
  
 	test("GatlingContextConfiguration needs a non-null targetServerUrl") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build(null, "domain.org", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build(null, "2", "5", "domain.org", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty targetServerUrl") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("", "domain.org", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("", "2", "5", "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	
+	test("GatlingContextConfiguration needs a non-null parallels scenarios count") {
+		intercept[IllegalArgumentException] {
+			GatlingConfiguration.build("192.168.0.1", null, "5", "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	   
+	test("GatlingContextConfiguration needs a non-empty parallels scenarios count") {
+		intercept[IllegalArgumentException] {
+			GatlingConfiguration.build("192.168.0.1", "", "5", "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	   
+	test("GatlingContextConfiguration needs a parsable number for parallels scenarios count") {
+		intercept[NumberFormatException] {
+			GatlingConfiguration.build("192.168.0.1", "a2", "5", "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	
+	test("GatlingContextConfiguration needs a non-null asynchronous change time") {
+		intercept[IllegalArgumentException] {
+			GatlingConfiguration.build("192.168.0.1", "2", null, "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	   
+	test("GatlingContextConfiguration needs a non-empty asynchronous change time") {
+		intercept[IllegalArgumentException] {
+			GatlingConfiguration.build("192.168.0.1", "2", "", "domain.org", "login", "pass", "policyKey", "id", "type")
+		}
+	}
+	   
+	test("GatlingContextConfiguration needs a parsable number for  asynchronous change time") {
+		intercept[NumberFormatException] {
+			GatlingConfiguration.build("192.168.0.1", "2", "a5", "domain.org", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null domain") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", null, "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", null, "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty domain") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "", "login", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "", "login", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null login") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", null, "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", null, "pass", "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty login") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "", "pass", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "", "pass", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null password") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", null, "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", null, "policyKey", "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty password") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "", "policyKey", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "", "policyKey", "id", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null deviceId") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", null, "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", "policyKey", null, "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty deviceId") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", "policyKey", "", "type")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null deviceType") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", null)
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", "policyKey", "id", null)
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty deviceType") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "policyKey", "id", "")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", "policyKey", "id", "")
 		}
 	}
 	
 	test("GatlingContextConfiguration needs a non-null policyKey") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", null, "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", null, "id", "type")
 		}
 	}
 	   
 	test("GatlingContextConfiguration needs a non-empty policyKey") {
 		intercept[IllegalArgumentException] {
-			GatlingConfiguration.build("192.168.0.1", "domain.org", "login", "pass", "", "id", "type")
+			GatlingConfiguration.build("192.168.0.1", "2", "5", "domain.org", "login", "pass", "", "id", "type")
 		}
 	}
 }
