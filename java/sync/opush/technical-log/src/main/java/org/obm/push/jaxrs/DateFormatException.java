@@ -31,53 +31,5 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxrs;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.List;
-
-import org.obm.configuration.LogConfiguration;
-import org.obm.push.bean.jaxb.LogFile;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-
-public class TechnicalLogFileUtility {
-	
-	public final static String LOG_APPENDER_NAME = "technical_log";
-	
-	public static InputStream getTechnicalLogFile(String logFileName) throws FileNotFoundException {
-		return new FileInputStream(logFileName);
-	}
-	
-	public static List<LogFile> retrieveLogsListOrEmpty(LogConfiguration logConfiguration) {
-		try {
-			return getLogsList(logConfiguration);
-		} catch (FolderNotFoundException e) {
-			return Lists.newArrayList();
-		}
-	}
-	
-	@VisibleForTesting static List<LogFile> getLogsList(LogConfiguration logConfiguration) throws FolderNotFoundException {
-		List<LogFile> logsList = Lists.newArrayList();
-		File directory = new File(logConfiguration.getLogDirectory());
-		if (!directory.isDirectory()) {
-			throw new FolderNotFoundException();
-		}
-		
-		for (String fileName : directory.list(new TechnicalLogFilenameFilter(logConfiguration))) {
-			logsList.add(LogFile.builder().fileName(fileName).build());
-		}
-		return logsList;
-	}
-	
-	public static String getFullPathLogFileName(LogConfiguration logConfiguration, String fileName) {
-		return logConfiguration.getLogDirectory() + File.separator + fileName;
-	}
-	
-	public static boolean isTraceEnabled() {
-		return LoggerFactory.getLogger(LOG_APPENDER_NAME).isTraceEnabled();
-	}
+public class DateFormatException extends Exception {
 }

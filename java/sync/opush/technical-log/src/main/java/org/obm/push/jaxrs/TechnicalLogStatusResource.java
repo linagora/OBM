@@ -36,14 +36,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.obm.configuration.LogConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.sun.jersey.api.view.Viewable;
 
@@ -52,11 +50,11 @@ public class TechnicalLogStatusResource {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TechnicalLogFileResource.class);
 	
-	private final LogConfiguration logConfiguration;
+	private final TechnicalLogFileUtils technicalLogFileUtility;
 	
 	@Inject
-	@VisibleForTesting TechnicalLogStatusResource(LogConfiguration logConfiguration) {
-		this.logConfiguration = logConfiguration;
+	@VisibleForTesting TechnicalLogStatusResource(TechnicalLogFileUtils technicalLogFileUtility) {
+		this.technicalLogFileUtility = technicalLogFileUtility;
 	}
 	
 	@GET
@@ -67,9 +65,6 @@ public class TechnicalLogStatusResource {
 				(ch.qos.logback.classic.Logger) LoggerFactory.getLogger("technical_log");
 		
 		technicalLogLogger.setLevel((activate) ? Level.TRACE : Level.OFF);
-		
-		return new Viewable("/TechnicalLogPage", 
-				ImmutableMap.of("logFiles", TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration),
-						"appenderActive", TechnicalLogFileUtility.isTraceEnabled()));	
+		return technicalLogFileUtility.technicalLogPageIndex();
 	}
 }

@@ -40,4 +40,6 @@ public interface LogConfiguration {
 	String getLogFileExtension();
 	
 	String getMainLogFileName();
+	
+	String fileExtensionSeparator();
 }

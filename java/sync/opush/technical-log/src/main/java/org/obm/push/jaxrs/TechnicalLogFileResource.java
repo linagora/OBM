@@ -31,16 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxrs;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.obm.configuration.LogConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,18 +51,19 @@ public class TechnicalLogFileResource {
 
 	private final static Logger logger = LoggerFactory.getLogger(TechnicalLogFileResource.class);
 	
-	private final LogConfiguration logConfiguration;
+	private final TechnicalLogFileUtils technicalLogFileUtility;
 	
 	@Inject
-	@VisibleForTesting TechnicalLogFileResource(LogConfiguration logConfiguration) {
-		this.logConfiguration = logConfiguration;
+	@VisibleForTesting TechnicalLogFileResource(TechnicalLogFileUtils technicalLogFileUtility) {
+		this.technicalLogFileUtility = technicalLogFileUtility;
 	}
 	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public InputStream getCurrentLog() {
+	public InputStream getLogFile(@QueryParam("selected") String dateAsString) {
 		try {
-			return new FileInputStream(logConfiguration.getMainLogFileName());
+			return technicalLogFileUtility.getTechnicalLogFile(
+					technicalLogFileUtility.getFullPathLogFileName(dateAsString));
 		}
 		catch (FileNotFoundException e) {
 			logger.error("Technical log file not found.", e);

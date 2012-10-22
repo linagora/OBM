@@ -40,8 +40,9 @@ public class LogConfigurationImpl implements LogConfiguration {
 	
 	private final String LOGS_DIRECTORY = "/var/log/opush/";
 	private final String TECHNICAL_LOG_PREFIX = "technical";
-	private final String LOG_FILE_EXTENSION = ".log";
-	private final String MAIN_LOG_FILE_NAME = LOGS_DIRECTORY + TECHNICAL_LOG_PREFIX + LOG_FILE_EXTENSION;
+	private final String LOG_FILE_EXTENSION = "log";
+	private final String DOT = ".";
+	private final String MAIN_LOG_FILE_NAME = LOGS_DIRECTORY + TECHNICAL_LOG_PREFIX + DOT + LOG_FILE_EXTENSION;
 	
 	@Override
 	public String getLogDirectory() {
@@ -61,5 +62,10 @@ public class LogConfigurationImpl implements LogConfiguration {
 	@Override
 	public String getMainLogFileName() {
 		return MAIN_LOG_FILE_NAME;
+	}
+
+	@Override
+	public String fileExtensionSeparator() {
+		return DOT;
 	}
 }

@@ -35,6 +35,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.joda.time.DateTime;
+
 import com.google.common.base.Objects;
 
 @XmlRootElement(name = JAXBConstants.LOG_FILE_ROOT)
@@ -50,41 +52,41 @@ public class LogFile {
 	}
 	
 	public static class Builder {
-		private String fileName;
+		private DateTime date;
 		
 		private Builder() {}
 		
-		public Builder fileName(String fileName) {
-			this.fileName = fileName;
+		public Builder date(DateTime date) {
+			this.date = date;
 			return this;
 		}
 		
 		public LogFile build() {
-			return new LogFile(fileName); 
+			return new LogFile(date); 
 		}
 	}
 
 	@XmlElement
-	private final String fileName;
+	private final DateTime date;
 	
-	private LogFile(String fileName) {
-		this.fileName = fileName;
+	private LogFile(DateTime date) {
+		this.date = date;
 	}
 	
-	public String getFileName() {
-		return fileName;
+	public DateTime getDate() {
+		return date;
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(fileName);
+		return Objects.hashCode(date);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof LogFile) {
 			LogFile that = (LogFile) object;
-			return Objects.equal(this.fileName, that.fileName);
+			return Objects.equal(this.date, that.date);
 		}
 		return false;
 	}
@@ -92,7 +94,7 @@ public class LogFile {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("fileName", fileName)
+			.add("date", date != null ? date.getMillis() : null)
 			.toString();
 	}
 }

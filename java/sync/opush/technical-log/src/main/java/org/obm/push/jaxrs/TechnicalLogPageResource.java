@@ -35,28 +35,23 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.obm.configuration.LogConfiguration;
-
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.sun.jersey.api.view.Viewable;
 
 @Path("index")
 public class TechnicalLogPageResource {
 	
-	private final LogConfiguration logConfiguration;
+	private final TechnicalLogFileUtils technicalLogFileUtility;
 	
 	@Inject
-	@VisibleForTesting TechnicalLogPageResource(LogConfiguration logConfiguration) {
-		this.logConfiguration = logConfiguration;
+	@VisibleForTesting TechnicalLogPageResource(TechnicalLogFileUtils technicalLogFileUtility) {
+		this.technicalLogFileUtility = technicalLogFileUtility;
 	}
 	
 	@GET
 	@Produces("text/html")
 	public Viewable index() {
-		return new Viewable("/TechnicalLogPage", 
-				ImmutableMap.of("logFiles", TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration),
-						"appenderActive", TechnicalLogFileUtility.isTraceEnabled()));	
+		return technicalLogFileUtility.technicalLogPageIndex();
 	}
 }
