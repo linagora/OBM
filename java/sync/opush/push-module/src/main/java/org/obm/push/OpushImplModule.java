@@ -116,6 +116,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new DaoModule());
 		install(qosModule());
 		install(new OpushServletModule());
+		install(new TechnicalLogServletModule());
 		install(new ObmSyncHttpClientModule());
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);

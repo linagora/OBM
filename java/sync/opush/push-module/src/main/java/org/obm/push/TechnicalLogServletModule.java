@@ -31,30 +31,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.obm.servlet.filter.qos.QoSFilter;
+import org.obm.configuration.LogConfiguration;
+import org.obm.push.jaxrs.ListTechnicalLogFileResource;
+import org.obm.push.jaxrs.TechnicalLogFileResource;
+import org.obm.push.jaxrs.TechnicalLogPageResource;
+import org.obm.push.jaxrs.TechnicalLogStatusResource;
 
-import com.google.inject.Singleton;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.servlet.ServletModule;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class OpushServletModule extends ServletModule{
+public class TechnicalLogServletModule extends ServletModule{
 
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
-
-	@Override
+	 @Override
 	    protected void configureServlets() {
 	        super.configureServlets();
 
-	        serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-	        serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
-
-	        
-	        bind(ContinuationFilter.class).in(Singleton.class);
-	        filter("/*").through(ContinuationFilter.class);
-	        filter("/*").through(PushContinuationFilter.class);
-	        filter("/*").through(AuthenticationFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
+	        bind(LogConfiguration.class).to(LogConfigurationImpl.class);
+	        bind(TechnicalLogPageResource.class);
+	        bind(TechnicalLogStatusResource.class);
+	        bind(TechnicalLogFileResource.class);
+	        bind(ListTechnicalLogFileResource.class);
+			serve("/TechnicalLog/*").with(GuiceContainer.class, 
+					ImmutableMap.of("com.sun.jersey.config.feature.Trace", "true"));
 	    }
 }
