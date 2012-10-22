@@ -31,35 +31,5 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxrs;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import org.obm.configuration.LogConfiguration;
-import org.obm.push.bean.jaxb.LogFile;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.sun.jersey.api.JResponse;
-
-@Path("ListFiles")
-public class ListTechnicalLogFileResource {
-	
-	private final LogConfiguration logConfiguration;
-	
-	@Inject
-	@VisibleForTesting ListTechnicalLogFileResource(LogConfiguration logConfiguration) {
-		this.logConfiguration = logConfiguration;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	public JResponse<List<LogFile>> getLogsList() {
-		return JResponse
-				.ok(TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration))
-				.build();
-	}
+public class FolderNotFoundException extends Exception {
 }

@@ -31,35 +31,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxrs;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.obm.configuration.LogConfiguration;
-import org.obm.push.bean.jaxb.LogFile;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.sun.jersey.api.JResponse;
+import com.sun.jersey.api.view.Viewable;
 
-@Path("ListFiles")
-public class ListTechnicalLogFileResource {
+@Path("index")
+public class TechnicalLogPageResource {
 	
 	private final LogConfiguration logConfiguration;
 	
 	@Inject
-	@VisibleForTesting ListTechnicalLogFileResource(LogConfiguration logConfiguration) {
+	@VisibleForTesting TechnicalLogPageResource(LogConfiguration logConfiguration) {
 		this.logConfiguration = logConfiguration;
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	public JResponse<List<LogFile>> getLogsList() {
-		return JResponse
-				.ok(TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration))
-				.build();
+	@Produces("text/html")
+	public Viewable index() {
+		return new Viewable("/TechnicalLogPage", 
+				ImmutableMap.of("logFiles", TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration),
+						"appenderActive", TechnicalLogFileUtility.isTraceEnabled()));	
 	}
 }

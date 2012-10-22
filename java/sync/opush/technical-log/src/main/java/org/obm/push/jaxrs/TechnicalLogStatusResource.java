@@ -31,35 +31,45 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.jaxrs;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.QueryParam;
 
 import org.obm.configuration.LogConfiguration;
-import org.obm.push.bean.jaxb.LogFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.sun.jersey.api.JResponse;
+import com.sun.jersey.api.view.Viewable;
 
-@Path("ListFiles")
-public class ListTechnicalLogFileResource {
+@Path("status")
+public class TechnicalLogStatusResource {
+	
+	private final static Logger logger = LoggerFactory.getLogger(TechnicalLogFileResource.class);
 	
 	private final LogConfiguration logConfiguration;
 	
 	@Inject
-	@VisibleForTesting ListTechnicalLogFileResource(LogConfiguration logConfiguration) {
+	@VisibleForTesting TechnicalLogStatusResource(LogConfiguration logConfiguration) {
 		this.logConfiguration = logConfiguration;
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	public JResponse<List<LogFile>> getLogsList() {
-		return JResponse
-				.ok(TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration))
-				.build();
+	@Produces("text/html")
+	public Viewable activateLog(@QueryParam("status") boolean activate) {
+		logger.debug("status {}", activate);
+		ch.qos.logback.classic.Logger technicalLogLogger = 
+				(ch.qos.logback.classic.Logger) LoggerFactory.getLogger("technical_log");
+		
+		technicalLogLogger.setLevel((activate) ? Level.TRACE : Level.OFF);
+		
+		return new Viewable("/TechnicalLogPage", 
+				ImmutableMap.of("logFiles", TechnicalLogFileUtility.retrieveLogsListOrEmpty(logConfiguration),
+						"appenderActive", TechnicalLogFileUtility.isTraceEnabled()));	
 	}
 }
