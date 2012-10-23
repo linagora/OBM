@@ -83,6 +83,21 @@ class SMimeEntity
     
     protected function encode_header($text)
     {
-        return mb_encode_mimeheader($text, $this->charset, 'Q', $this->eol);
+    	$mbEncoded = mb_encode_mimeheader($text, $this->charset, 'Q', $this->eol);
+        
+    	// If no encoding is required, return the string as-is
+    	// This is required as some non-business headers cannot be encoded (Content-Encoding, X*, etc.)
+    	if (strcmp($mbEncoded, $text) == 0) {
+    		return $text;
+    	}
+    	
+    	$iconvEncoded = iconv_mime_encode("Dummy", $text, array("scheme" => "Q", "input-charset" => $this->charset, "output-charset" => $this->charset, "line-break-chars" => $this->eol));
+        
+        // In case there's any trouble with iconv, fallback to the previous variant using mb_encode
+        if (!$iconvEncoded) {
+        	return $mbEncoded;
+        } else {
+        	return preg_replace("/Dummy:\s*/", "", $iconvEncoded); // To remove the header name "Dummy"
+        }
     }
 }
