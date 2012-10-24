@@ -39,7 +39,7 @@ applicable to the OBM software.
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-
+require_once("$obminclude/lib/captcha/recaptchalib.php");
 //-----------------------------------------------------------------------------
 // Open the session system
 //-----------------------------------------------------------------------------
@@ -413,6 +413,17 @@ class Auth {
   
   function auth_refreshlogin() { ; }
 
+  function auth_validate_captcha() {
+    global $conf_recaptcha_privatekey;
+    if (recaptcha_activation() != true){
+      return true;
+    }
+    $resp = recaptcha_check_answer ($conf_recaptcha_privatekey,
+                                    $_SERVER["REMOTE_ADDR"],
+                                    $_POST["recaptcha_challenge_field"],
+                                    $_POST["recaptcha_response_field"]);
+    return $resp->is_valid;
+  }
 }
 
 
