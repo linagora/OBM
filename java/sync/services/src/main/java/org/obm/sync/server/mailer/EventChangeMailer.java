@@ -708,7 +708,7 @@ public class EventChangeMailer extends AbstractMailer {
 		Builder<Object, Object> datamodel = ImmutableMap.builder()
 			.put("user", attendeeUpdated.getDisplayName())
 			.put("participation", participation(participation, locale))
-			.put("comment", Strings.nullToEmpty(participation.getComment().serializeToString()))
+			.put("comment", Strings.nullToEmpty(participation.getSerializedCommentToString()))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
 			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
 		return datamodel;

@@ -1205,7 +1205,7 @@ public class Ical4jHelperTest {
 
 		final Attendee attendeeReply = event.getAttendees().get(2);
 		Participation status = attendeeReply.getParticipation();
-		status.setComment(new Comment(null));
+		status.setComment(null);
 		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
 		AccessToken token = new AccessToken(0, "OBM");
 

@@ -891,9 +891,9 @@ public class Ical4jHelper {
 
 	private void appendReplyCommentToICS(PropertyList prop, Attendee attendee) {
 		Participation status = attendee.getParticipation();
-		org.obm.sync.calendar.Comment comment = status.getComment();
 
 		if (status.hasDefinedComment()) {
+			org.obm.sync.calendar.Comment comment = status.getComment();
 			prop.add(new Comment(comment.serializeToString()));
 		}
 	}

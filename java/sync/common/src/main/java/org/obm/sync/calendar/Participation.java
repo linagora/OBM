@@ -60,8 +60,7 @@ public class Participation implements Serializable{
 
 		public Participation build() {
 			Preconditions.checkState(state != null);
-			return new Participation(state,
-					Objects.firstNonNull(comment, new Comment()));
+			return new Participation(state, comment);
 		}
 	}
 
@@ -118,7 +117,7 @@ public class Participation implements Serializable{
 	}
 
 	private Participation(State state) {
-		this(state, new Comment());
+		this(state, null);
 	}
 
 	public Comment getComment() {
@@ -138,7 +137,15 @@ public class Participation implements Serializable{
 	}
 
 	public boolean hasDefinedComment() {
-		return comment.getComment() != null;
+		return comment != null;
+	}
+
+	public String getSerializedCommentToString() {
+		if (this.hasDefinedComment()) {
+			return comment.serializeToString();
+		} else {
+			return null;
+		}
 	}
 
 	public static final Participation getValueOf(String value) {
