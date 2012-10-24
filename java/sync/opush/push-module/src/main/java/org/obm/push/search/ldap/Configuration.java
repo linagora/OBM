@@ -31,74 +31,118 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.search.ldap;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
+import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.IniFile;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
+@Singleton
 class Configuration {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private final Logger logger;
 	
 	private static final String LDAP_CONF_FILE = "/etc/opush/ldap_conf.ini";
 	private static final String SEARCH_LDAP_URL = "search.ldap.url";
 	private static final String SEARCH_LDAP_BASE = "search.ldap.basedn";
 	private static final String SEARCH_LDAP_FILTER = "search.ldap.filter";
+	private static final String PROTOCOL_LDAP = "ldap";
+	private static final String PROTOCOL_LDAPS = "ldaps";
+	private static final String PROTOCOL_DEFAULT = PROTOCOL_LDAP;
 
-	private String baseDn;
-	private String filter;
-	private Properties env;
-	private boolean validConf;
+	private final String url;
+	private final String baseDn;
+	private final String filter;
+	private final Properties settings;
+	private final boolean isValidConfiguration;
 
-	public Configuration() {
-		IniFile ini = new IniFile(LDAP_CONF_FILE) {
-			@Override
-			public String getCategory() {
-				return null;
+	@Inject
+	@VisibleForTesting Configuration(IniFile.Factory iniFileFactory,
+			@Named(LoggerModule.CONFIGURATION) Logger configurationLogger) {
+		IniFile ini = iniFileFactory.build(LDAP_CONF_FILE);
+
+		logger = configurationLogger;
+		url = validUrlOrNull(ini.getData().get(SEARCH_LDAP_URL));
+		baseDn = Strings.emptyToNull(ini.getData().get(SEARCH_LDAP_BASE));
+		filter = Strings.emptyToNull(ini.getData().get(SEARCH_LDAP_FILTER));
+		settings = buildSettings();
+		isValidConfiguration = checkConfigurationValidity();
+		
+		logConfiguration();
+	}
+
+	private String validUrlOrNull(String url) {
+		if (!Strings.isNullOrEmpty(url)) {
+			try {
+				return sanitizeURL(url);
+			} catch (URISyntaxException e) {
+				logger.error("A url is found but is invalid", e);
 			}
-		};
-		init(ini);
+		}
+		return null;
 	}
 
-	DirContext getConnection() throws NamingException {
-		try {
-			return new InitialDirContext(env);
-		} catch (NamingException e) {
-			logger.error(e.getMessage(), e);
-			throw e;
+	private String sanitizeURL(String url) throws URISyntaxException {
+		URI parsedUrl = new URI(url);
+		String scheme = parsedUrl.getScheme();
+		if (Strings.isNullOrEmpty(scheme)) {
+			return String.format("%s://%s", PROTOCOL_DEFAULT, parsedUrl.toString());
+		}
+		else if (scheme.equals(PROTOCOL_LDAP) || scheme.equals(PROTOCOL_LDAPS)) {
+			return parsedUrl.toString();
+		}
+		throw new URISyntaxException(url, "url format must respect pattern : ldap(s)://my_server");
+	}
+
+	private void logConfiguration() {
+		logger.info("LDAP configuration done, url={} basedn={} filter={} (valid conf={})",
+				new Object[] {url, baseDn, filter, isValidConfiguration()});
+		if (!isValidConfiguration()) {
+			logger.error("{} configuration seems not valid, ldap connection will not be activated", LDAP_CONF_FILE);
 		}
 	}
 
-	public void init(IniFile ini) {
-		String url = ini.getData().get(SEARCH_LDAP_URL);
-		baseDn = ini.getData().get(SEARCH_LDAP_BASE);
-		filter = ini.getData().get(SEARCH_LDAP_FILTER);
+	private boolean checkConfigurationValidity() {
+		return !Strings.isNullOrEmpty(url)
+			&& !Strings.isNullOrEmpty(baseDn)
+			&& !Strings.isNullOrEmpty(filter);
+	}
 
-		env = new Properties();
-		if (url != null && baseDn != null && filter != null) {
-			validConf = true;
-		} else {
-			logger.error("Can not find data in file " + LDAP_CONF_FILE
-					+ ", research in ldap will not be activated");
-			return;
+	private Properties buildSettings() {
+		Properties settings = new Properties();
+		settings.put("java.naming.factory.initial", "com.sun.jndi.ldap.LdapCtxFactory");
+		if (!Strings.isNullOrEmpty(url)) {
+			settings.put("java.naming.provider.url", url);
 		}
+		return settings;
+	}
 
-		if (!url.startsWith("ldap://")) {
-			url = "ldap://" + url;
+	public DirContext buildContextConnection() throws NamingException {
+		if (isValidConfiguration()) {
+			try {
+				return new InitialDirContext(settings);
+			} catch (NamingException e) {
+				logger.error(e.getMessage(), e);
+				throw e;
+			}
 		}
-
-		env.put("java.naming.factory.initial",
-				"com.sun.jndi.ldap.LdapCtxFactory");
-		env.put("java.naming.provider.url", url);
-
-		logger.info(" initialised, url: " + url
-				+ " basedn: " + baseDn + " filter: " + filter
-				+ " (valid conf: " + validConf + ")");
+		throw new IllegalStateException("Can't build connection because settings are not valid");
+	}
+	
+	public String getUrl() {
+		return url;
 	}
 
 	public String getBaseDn() {
@@ -118,8 +162,8 @@ class Configuration {
 		}
 	}
 
-	public boolean isValid() {
-		return validConf;
+	public boolean isValidConfiguration() {
+		return isValidConfiguration;
 	}
 
 }

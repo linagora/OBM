@@ -78,11 +78,11 @@ public class BookSource implements ISearchSource {
 	public List<SearchResult> search(UserDataRequest udr, String query,
 			Integer limit) {
 		List<SearchResult> ret = new LinkedList<SearchResult>();
-		if (conf.isValid()) {
+		if (conf.isValidConfiguration()) {
 			DirContext ctx = null;
 			String domain = udr.getUser().getDomain();
 			try {
-				ctx = conf.getConnection();
+				ctx = conf.buildContextConnection();
 				LdapUtils u = new LdapUtils(ctx, conf.getBaseDn().replaceAll(
 						"%d", domain));
 				List<Map<String, List<String>>> l = u.getAttributes(

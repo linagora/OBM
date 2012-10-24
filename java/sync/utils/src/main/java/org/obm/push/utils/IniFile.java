@@ -42,18 +42,35 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is responsible of loading an ini file.
- * 
- * @author tom
- * 
- */
-public abstract class IniFile {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	private Map<String, String> settings;
-	private Logger logger;
+public class IniFile {
+
+	@Singleton
+	public static class Factory {
+
+		@Inject
+		private Factory() {
+			super();
+		}
+		
+		public IniFile build(String path) {
+			return this.build(path, null);
+		}
+		
+		public IniFile build(String path, String category) {
+			return new IniFile(path, category);
+		}
+		
+	}
 	
-	public IniFile(String path) {
+	private final Map<String, String> settings;
+	private final Logger logger;
+	private final String category;
+	
+	private IniFile(String path, String category) {
+		this.category = category;
 		logger = LoggerFactory.getLogger(getClass());
 		settings = new HashMap<String, String>();
 		File f = new File(path);
@@ -72,7 +89,9 @@ public abstract class IniFile {
 		return settings;
 	}
 
-	public abstract String getCategory();
+	public String getCategory() {
+		return category;
+	}
 	
 	private void loadIniFile(File f) {
 		FileInputStream in = null;
