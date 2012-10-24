@@ -275,6 +275,33 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
   if($obm_q->f('diff') > 0) {
     return true;
   }
+  
+  /**
+   * This handles changes in service properties.
+   */
+  if (!is_null($domain_id) && !$domain_global) {
+	$did = sql_parse_id($domain_id, true);
+  	$where = "WHERE domainentity_domain_id $did ";
+  	$query = "	SELECT * FROM (
+				SELECT serviceproperty_service, serviceproperty_property, serviceproperty_value FROM ServiceProperty 
+				INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+				$where
+				UNION ALL
+				SELECT serviceproperty_service, serviceproperty_property, serviceproperty_value FROM P_ServiceProperty 
+				INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+				$where) as props
+				GROUP BY serviceproperty_service, serviceproperty_property, serviceproperty_value
+				HAVING count(*) = 1";
+  
+  	display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
+	$obm_q->query($query);
+	  
+	// Rows that appear in the result set are rows that aren't identical in both serviceproperty and p_serviceproperty
+	// and thus we should update the domain because the're at least one change in service properties for this domain
+	if ($obm_q->num_rows() > 0) {
+		return true;
+	}
+  }
 
   return false;
 }
