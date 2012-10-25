@@ -260,8 +260,7 @@ Obm.CalendarFreeBusy = new Class({
     if (typeof attendee == 'string') 
         attendee = attendee.split(',');
     
-    itemNumber = attendee.length;
-    for(var i = 0; i < itemNumber; i++) {
+    for(var i = 0; i < attendee.length; i++) {
       var a = attendee[i].split('-');
       if (a[1] == 'user') obm.calendarFreeBusy.entities.sel_user_id.push(a[2]);
       else if (a[1] == 'resource') obm.calendarFreeBusy.entities.sel_resource_id.push(a[2]);
