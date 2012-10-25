@@ -163,7 +163,7 @@ def main():
 
     config = ob.read_config(args.configuration_file)
 
-    packages_dir = os.path.join(args.work_dir, args.package_type)
+    packages_dir = args.work_dir
 
     checkout_dir = os.path.dirname(os.path.abspath('.'))
 
