@@ -28,7 +28,7 @@ endef
 export WEBAPP_FILE
 
 build:
-ifneq ($(OBM_NO_COMPILE), 1)
+ifneq ($(OBM_NOCOMPILE), 1)
 	$(MVN_BIN) install
 endif
 

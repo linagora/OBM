@@ -141,8 +141,8 @@ class Packager(object):
         logging.info("Building package %s" % self.package.name)
         command = None
         if self.package_type == "deb":
-            command = 'debuild -e OBM_NO_COMPILE --no-tgz-check -us -uc -sa'
-            os.putenv('OBM_NO_COMPILE', "%d" % self.nocompile)
+            command = 'debuild -e OBM_NOCOMPILE --no-tgz-check -us -uc -sa'
+            os.putenv('OBM_NOCOMPILE', "%d" % self.nocompile)
         elif self.package_type == "rpm":
             distname, version, id = platform.linux_distribution()
             # If we're not building on RedHat/CentOS, we need to make sure we're
@@ -154,7 +154,7 @@ class Packager(object):
                 "--define '_rpmdir %s' --define '_srcrpmdir %s' " \
                 "--define 'obm_version %s' --define 'obm_release %s' " % \
                 (topdir, target_dir, target_dir, self.version, self.release)
-            command += "--define 'obm_no_compile %d' " % self.nocompile
+            command += "--define 'obm_nocompile %d' " % self.nocompile
             if redefine_platform_params:
                 # Override the Perl module destination directory
                 if self.perl_vendorlib is None or self.perl_module_compat is None:
