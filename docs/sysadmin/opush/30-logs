@@ -1,0 +1,42 @@
+# Logs
+The Opush log file is located at _/var/log/opush/opush.log_
+
+## Format
+Opush logs are printed following a specific format, this is an example of a log line.
+
+	05:26:36.669 [INFO ] {IMAP.COMMAND} [t10079/cFolderSync/r942/userlogin@obm.lng.org]:true
+
+**Details :**
+
+* **05:26:36.669** is the time when the action was done
+* **[INFO ]** is the log level
+* **{IMAP.COMMAND}** is the name of the logger which has printed the line
+* **t10079** is the thread id
+* **cFolderSync** is the ActiveSync command name preceed by c. Here the command was "FolderSync"
+* **r942** is the request id
+* **userlogin@obm.lng.org** is the user
+* **true** is the logged data
+
+## Logger module
+Opush, like all java component of obm, use a logger API to generate information useful to developers to investigate bugs.
+This section documents how to configure the right log level for your needs as an end user.
+
+The configuration file to change which logs are printed is located at : _/etc/opush/logback.xml_. Modification are taken into account every minute.
+You can check that everything is applied correctly by looking to logs in _/var/log/jetty/*stderrout.log_ .
+
+A sample file looks like :
+
+	<included>
+		<logger name="AUTHENTICATION" level="INFO" />
+		<logger name="REQUEST.FULL" level="INFO" />
+	</included>
+
+
+You can use the following logger modules :
+
+* **AUTHENTICATION** for authentication information
+* **REQUEST.FULL** for requests and responses from and to the server, with sensitive data
+* **REQUEST.TRIMMED** for requests and responses from and to the server, without sensitive data
+* **IMAP.COMMAND** for imap conversations
+* **OBM_SYNC** for data exchanged between opush and obm-sync web services
+* **CONFIGURATION** for configuration details, printed at application startup
