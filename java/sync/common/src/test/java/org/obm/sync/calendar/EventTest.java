@@ -1413,5 +1413,23 @@ public class EventTest {
 		
 		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
 	}
+
+	@Test
+	public void testTitleIsTruncated() {
+		Event event = new Event();
+		String title = "abcdefghijklmnopqrstuvwxyz" + // 1
+						"abcdefghijklmnopqrstuvwxyz" +// 2
+						"abcdefghijklmnopqrstuvwxyz" +// 3
+						"abcdefghijklmnopqrstuvwxyz" +// 4
+						"abcdefghijklmnopqrstuvwxyz" +// 5
+						"abcdefghijklmnopqrstuvwxyz" +// 6
+						"abcdefghijklmnopqrstuvwxyz" +// 7
+						"abcdefghijklmnopqrstuvwxyz" +// 8
+						"abcdefghijklmnopqrstuvwxyz" +// 9
+						"abcdefghijklmnopqrstuv"// 10
+						;
+		event.setTitle(title);
+		assertThat(event.getTitle().length()).isEqualTo(Event.DATABASE_TITLE_MAX_LENGTH);
+	}
 	
 }
