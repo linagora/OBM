@@ -667,24 +667,13 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @see OBM_IObserver::update
    */
   public function update($old, $new) {
-    if($old === null) {
-      $attendees['new']['user'] = $new->user;
-      $attendees['new']['resource'] = $new->resource;
-      $attendees['new']['contact'] = $new->contact;
-      $attendees['old'] = array('user'=>array(), 'resource' => array(), 'contact' => array());
-      $attendees['current'] = array('user'=>array(), 'resource' => array(), 'contact' => array());        
-      $this->send($old, $new, $attendees);
-    } elseif($new === null) {
-      $attendees['old']['user'] = $old->user;
-      $attendees['old']['resource'] = $old->resource;
-      $attendees['old']['contact'] = $old->contact;
-      $attendees['new'] = array('user'=>array(), 'resource' => array(), 'contact' => array());
-      $attendees['current'] = array('user'=>array(), 'resource' => array(), 'contact' => array());        
-      $this->send($old, $new, $attendees);
+    $eventDiff = new OBM_EventDiff($old, $new);
+    $attendees = $eventDiff->getAttendeesDiff();
+    if ( $old !== null && $new !== null ) {
+      $attendeesDecisionOrComment = $eventDiff->getAttendeesStateOrCommentDiff();
+      $this->send($old, $new, $attendees, $attendeesDecisionOrComment);
     } else {
-      $attendees = self::diffAttendees($old, $new);
-      $attendeesState = self::diffAttendeesDecisionOrComment($old, $new);
-      $this->send($old, $new, $attendees, $attendeesState);
+      $this->send($old, $new, $attendees);
     }
   }
 
