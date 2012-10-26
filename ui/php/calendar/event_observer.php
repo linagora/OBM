@@ -785,7 +785,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
 
     foreach($attendees as $state => $attendeesList) {
       foreach($attendeesList as $kind => $recipients) {
-        if(count($recipients) > 0) {
+        if( $kind != "resource" && count($recipients) > 0) {
           $fn = 'send'.ucfirst($state).ucfirst($kind).'Mail';
           if(method_exists($this, $fn)) {
             $this->$fn($old, $new, $recipients);
@@ -1092,6 +1092,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
       || $new->description != $old->description;
   }
 }
+
 
 /**
  * This class define a basic Observer.

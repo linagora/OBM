@@ -130,7 +130,9 @@ require_once('calendar_js.inc');
 require_once("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once('calendar_mailer.php');
+require_once('obm_eventdiff.php');
 require_once('event_observer.php');
+require_once('event_resource_mail_observer.php');
 require_once('../contact/addressbook.php');
 
 if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
@@ -163,6 +165,7 @@ $perm->check_permissions($module, $action);
 page_close();
 
 OBM_EventFactory::getInstance()->attach(new OBM_EventMailObserver());
+OBM_EventFactory::getInstance()->attach(new OBM_EventResourceMailObserver());
 if( isset($GLOBALS['ccalendar_ics_eventStompObserver']) && $GLOBALS['ccalendar_ics_eventStompObserver']) {
   OBM_EventFactory::getInstance()->attach(new OBM_EventStompObserver());
 }
