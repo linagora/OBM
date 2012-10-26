@@ -106,6 +106,7 @@ public class ContactsBackendTest {
 		loginService = mocks.createMock(LoginService.class);
 		contactConfiguration = mocks.createMock(ContactConfiguration.class);
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
+		expectDefaultAddressAndParentForContactConfiguration();
 	}
 	
 	@Test
@@ -157,7 +158,6 @@ public class ContactsBackendTest {
 		
 		expectBuildCollectionPath("folder");
 		
-		expectDefaultAddressAndParentForContactConfiguration();
 		expectMappingServiceCollectionIdBehavior();
 		
 		expect(mappingService.getServerIdFor(contactUid, "2"))
@@ -197,8 +197,6 @@ public class ContactsBackendTest {
 		expect(mappingService.getServerIdFor(contactId, serverId))
 			.andReturn(serverId);
 
-		expectDefaultAddressAndParentForContactConfiguration();
-		
 		mocks.replay();
 		
 		MSContact msContact = new MSContact();
@@ -228,8 +226,6 @@ public class ContactsBackendTest {
 		expectMappingServiceCollectionIdBehavior();
 
 		expectBuildCollectionPath("folder");
-		
-		expectDefaultAddressAndParentForContactConfiguration();
 		
 		mocks.replay();
 		
@@ -261,8 +257,6 @@ public class ContactsBackendTest {
 		expect(mappingService.getServerIdFor(contactId, "1"))
 			.andReturn(serverId).once();
 	
-		expectDefaultAddressAndParentForContactConfiguration();
-
 		expectBuildCollectionPath("folder");
 		
 		mocks.replay();
@@ -282,7 +276,6 @@ public class ContactsBackendTest {
 	@Test
 	public void testGetParentIdFailedReturnsDefaultParentId() throws Exception {
 		expectBuildCollectionPath(DEFAULT_PARENT_BOOK_NAME);
-		expectDefaultAddressAndParentForContactConfiguration();
 		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + DEFAULT_PARENT_BOOK_NAME))
 			.andThrow(new CollectionNotFoundException());
 
@@ -396,6 +389,7 @@ public class ContactsBackendTest {
 		
 		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folderOneName);
 		ImmutableSet<CollectionPath> lastKnown = ImmutableSet.<CollectionPath>of(f1CollectionPath);
+		ImmutableSet<CollectionPath> adds = ImmutableSet.<CollectionPath>of();
 
 		expectBuildCollectionPath(folderOneName);
 		expectBuildCollectionPath(folderTwoName);
@@ -403,7 +397,7 @@ public class ContactsBackendTest {
 		mocks.replay();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
-		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown);
+		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown, adds);
 		
 		mocks.verify();
 		

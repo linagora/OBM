@@ -79,8 +79,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -116,12 +114,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			FolderChanges folderChanges = listAddressBooksChanged(udr, lastKnownState);
 			Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
 			
-			Iterable<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
-			Iterable<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges, lastKnownCollections);
+			Set<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
+			Set<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges, lastKnownCollections, changedCollections);
 			
 			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
 			
-			return computeChanges(udr, changedCollections, deletedCollections);
+			Set<CollectionPath> addCollections = Sets.difference(changedCollections, lastKnownCollections);
+			return buildHierarchyItemsChanges(udr, addCollections, deletedCollections);
 		} catch (CollectionNotFoundException e) {
 			throw new HierarchyChangesException(e);
 		}
@@ -147,19 +146,12 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private void snapshotHierarchy(UserDataRequest udr, Set<CollectionPath> lastKnownCollections,
-			Iterable<CollectionPath> changedItems, Iterable<CollectionPath> deletedItems,
+			Set<CollectionPath> changedItems, Set<CollectionPath> deletedItems,
 			FolderSyncState outgoingSyncState) throws DaoException {
 
-		Set<CollectionPath> remainingKnownCollections = Sets.difference(lastKnownCollections, ImmutableSet.copyOf(deletedItems));
-		Iterable<CollectionPath> currentCollections = Iterables.concat(remainingKnownCollections, changedItems);
+		Set<CollectionPath> remainingKnownCollections = Sets.difference(lastKnownCollections, deletedItems);
+		Set<CollectionPath> currentCollections = Sets.union(remainingKnownCollections, changedItems);
 		snapshotHierarchy(udr, currentCollections, outgoingSyncState);
-	}
-
-	private HierarchyItemsChanges computeChanges(UserDataRequest udr,
-			Iterable<CollectionPath> changedCollections, Iterable<CollectionPath> deletedCollections)
-			throws DaoException, CollectionNotFoundException {
-		
-		return buildHierarchyItemsChanges(udr, changedCollections, deletedCollections);
 	}
 
 	@Override
@@ -173,22 +165,23 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return new ItemChange(serverId, parentId, collectionPath.displayName(), itemType, isNew);
 	}
 
-	@VisibleForTesting Iterable<CollectionPath> deletedCollections(
-			final UserDataRequest udr, FolderChanges folderChanges, 
-			Set<CollectionPath> lastKnownCollections) {
+	@VisibleForTesting Set<CollectionPath> deletedCollections(UserDataRequest udr, FolderChanges folderChanges, 
+			Set<CollectionPath> lastKnownCollections, Set<CollectionPath> changedCollections) {
 		
 		return FluentIterable
 				.from(foldersToCollectionPaths(udr, folderChanges.getRemoved()))
-				.filter(Predicates.in(lastKnownCollections));
+				.filter(Predicates.in(lastKnownCollections))
+				.filter(Predicates.not(Predicates.in(changedCollections)))
+				.toImmutableSet();
 	}
 
-	private Iterable<CollectionPath> changedCollections(final UserDataRequest udr, FolderChanges folderChanges) {
+	private Set<CollectionPath> changedCollections(UserDataRequest udr, FolderChanges folderChanges) {
 		Iterable<Folder> folderChangesSorted = 
 				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
 		return foldersToCollectionPaths(udr, folderChangesSorted);
 	}
 
-	private Iterable<CollectionPath> foldersToCollectionPaths(final UserDataRequest udr, Iterable<Folder> folders) {
+	private Set<CollectionPath> foldersToCollectionPaths(final UserDataRequest udr, Iterable<Folder> folders) {
 		return FluentIterable
 				.from(folders)
 				.transform(new Function<Folder, CollectionPath>() {
