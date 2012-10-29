@@ -155,6 +155,12 @@ def main():
     argument_parser = build_argument_parser(sys.argv)
     args = argument_parser.parse_args()
 
+    logging.info("The following parameters will be used from the environment and the command line :")
+    argsd = vars(args)
+    for key in argsd.iterkeys():
+        logging.info("\t[%s] = %s" % (key, argsd[key]))
+    logging.info("End of parameter list")
+
     config = ob.read_config(args.configuration_file)
 
     packages_dir = os.path.join(args.work_dir, args.package_type)
