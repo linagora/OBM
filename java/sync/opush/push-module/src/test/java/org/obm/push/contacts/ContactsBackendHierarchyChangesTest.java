@@ -31,16 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.contacts;
 
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Set;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -92,21 +91,24 @@ public class ContactsBackendHierarchyChangesTest {
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	
 	private ContactsBackend contactsBackend;
+
+	private IMocksControl mocks;
 	
 	@Before
 	public void setUp() {
-		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
-		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
-		this.accessToken = new AccessToken(0, "OBM");
+		user = Factory.create().createUser("test@test", "test@domain", "displayName");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		accessToken = new AccessToken(0, "OBM");
 
-		this.mappingService = createMock(MappingService.class);
-		this.bookClient = createMock(BookClient.class);
-		this.loginService = createMock(LoginService.class);
-		this.contactConfiguration = publicContactConfiguration();
-		this.collectionPathBuilderProvider = createMock(Provider.class);
+		mocks = createControl();
+		mappingService = mocks.createMock(MappingService.class);
+		bookClient = mocks.createMock(BookClient.class);
+		loginService = mocks.createMock(LoginService.class);
+		contactConfiguration = publicContactConfiguration();
+		collectionPathBuilderProvider = mocks.createMock(Provider.class);
 		
-		this.contactsBackend = new ContactsBackend(mappingService, 
+		contactsBackend = new ContactsBackend(mappingService, 
 				bookClient, 
 				loginService, 
 				contactConfiguration, 
@@ -141,13 +143,13 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(collectionMappingId));
 		expectMappingServiceLookupCollection(contactCollectionPath, collectionMappingId);
 		
-		Builder collectionPathBuilder = expectBuildCollectionPath(contactDisplayName);
+		expectBuildCollectionPath(contactDisplayName);
 
-		replay(loginService, bookClient, mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mocks.replay();
 		
 		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, bookClient, mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mocks.verify();
 		
 		ItemChange expectedItemChange = new ItemChangeBuilder()
 				.serverId(String.valueOf(collectionMappingId))
@@ -179,11 +181,11 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceFindCollection(contactCollectionPath, collectionMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(collectionMappingId));
 		
-		replay(loginService, bookClient, mappingService, collectionPathBuilderProvider);
+		mocks.replay();
 		
 		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, bookClient, mappingService, collectionPathBuilderProvider);
+		mocks.verify();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
@@ -215,16 +217,14 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceLookupCollection(contactCollectionPath, contactMappingId);
 		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
 
-		Builder collectionPathBuilder = expectBuildCollectionPath(otherCollectionDisplayName);
-		Builder findParentCollectionPathBuilder = expectBuildCollectionPath(contactDisplayName);
+		expectBuildCollectionPath(otherCollectionDisplayName);
+		expectBuildCollectionPath(contactDisplayName);
 		
-		replay(loginService, bookClient, mappingService, collectionPathBuilderProvider,
-				findParentCollectionPathBuilder, collectionPathBuilder);
+		mocks.replay();
 		
 		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, bookClient, mappingService, collectionPathBuilderProvider,
-				findParentCollectionPathBuilder, collectionPathBuilder);
+		mocks.verify();
 
 		ItemChange expectedItemChange = new ItemChangeBuilder()
 				.serverId(String.valueOf(otherCollectionMappingId))
@@ -263,17 +263,15 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
 		expectMappingServiceLookupCollection(contactCollectionPath, contactMappingId);
 
-		Builder contactCollectionPathBuilder = expectBuildCollectionPath(contactDisplayName);
-		Builder otherCollectionPathBuilder = expectBuildCollectionPath(otherCollectionDisplayName);
-		Builder findParentCollectionPathBuilder = expectBuildCollectionPath(contactDisplayName);
+		expectBuildCollectionPath(contactDisplayName);
+		expectBuildCollectionPath(otherCollectionDisplayName);
+		expectBuildCollectionPath(contactDisplayName);
 		
-		replay(loginService, bookClient, mappingService, collectionPathBuilderProvider,
-				contactCollectionPathBuilder, otherCollectionPathBuilder, findParentCollectionPathBuilder);
+		mocks.replay();
 		
 		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, bookClient, mappingService, collectionPathBuilderProvider,
-				contactCollectionPathBuilder, otherCollectionPathBuilder, findParentCollectionPathBuilder);
+		mocks.verify();
 
 		ItemChange expectedItemDeletion = new ItemChangeBuilder()
 				.serverId(String.valueOf(contactMappingId))
@@ -302,7 +300,7 @@ public class ContactsBackendHierarchyChangesTest {
 	}
 
 	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath, String displayName) {
-		CollectionPath.Builder collectionPathBuilder = createMock(CollectionPath.Builder.class);
+		CollectionPath.Builder collectionPathBuilder = mocks.createMock(CollectionPath.Builder.class);
 		expect(collectionPathBuilder.userDataRequest(userDataRequest))
 			.andReturn(collectionPathBuilder).once();
 		
