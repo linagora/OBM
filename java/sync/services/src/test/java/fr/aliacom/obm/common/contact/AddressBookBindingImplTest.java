@@ -54,6 +54,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -115,41 +116,20 @@ public class AddressBookBindingImplTest {
 		allRemovedContacts.addAll(removalCandidates);
 		allRemovedContacts.addAll(archivedUserIds);
 
-		Folder updatedContactFolder1 = new Folder();
-		updatedContactFolder1.setUid(1);
-		updatedContactFolder1.setName("updatedContactFolder1");
+		Set<Folder> updatedContactFolders = Sets.newHashSet(
+				Folder.builder().uid(1).name("updatedContactFolder1").build(),
+				Folder.builder().uid(2).name("updatedContactFolder2").build());				
 
-		Folder updatedContactFolder2 = new Folder();
-		updatedContactFolder2.setUid(2);
-		updatedContactFolder2.setName("updatedContactFolder2");
+		List<Folder> updatedUserFolders = ImmutableList.of(Folder.builder().uid(-1).name("users").build());
 
-		Set<Folder> updatedContactFolders = new HashSet<Folder>();
-		updatedContactFolders.add(updatedContactFolder1);
-		updatedContactFolders.add(updatedContactFolder2);
-
-		Folder updatedUserFolder = new Folder();
-		int defautUsersIdFolder = -1;
-		String defaultUsersNameFolder = "users";
-		updatedUserFolder.setUid(defautUsersIdFolder);
-		updatedUserFolder.setName(defaultUsersNameFolder);
-
-		List<Folder> updatedUserFolders = ImmutableList.of(updatedUserFolder);
-
-		Set<Folder> allUpdatedFolders = new HashSet<Folder>();
+		Set<Folder> allUpdatedFolders = Sets.newHashSet();
 		allUpdatedFolders.addAll(updatedContactFolders);
 		allUpdatedFolders.addAll(updatedUserFolders);
 
-		Set<Folder> removedContactFolders =  new HashSet<Folder>();
-		Folder removedContactFolder1 = new Folder();
-		removedContactFolder1.setUid(10);
-		removedContactFolder1.setName("removedContactFolder1");
-		Folder removedContactFolder2 = new Folder();
-		removedContactFolder2.setUid(11);
-		removedContactFolder2.setName("removedContactFolder2");
+		Set<Folder> removedContactFolders = Sets.newHashSet(
+				Folder.builder().uid(10).name("removedContactFolder1").build(),
+				Folder.builder().uid(11).name("removedContactFolder2").build());
 		
-		removedContactFolders.add(removedContactFolder1);
-		removedContactFolders.add(removedContactFolder2);
-
 		ObmHelper helper = mockHelper();
 
 		ContactDao contactDao = EasyMock.createMock(ContactDao.class);
@@ -174,8 +154,8 @@ public class AddressBookBindingImplTest {
 		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
 
 		ContactConfiguration contactConfiguration = EasyMock.createMock(ContactConfiguration.class);
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(defautUsersIdFolder);
-		expect(contactConfiguration.getAddressBookUsersName()).andReturn(defaultUsersNameFolder);
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1);
+		expect(contactConfiguration.getAddressBookUsersName()).andReturn("users");
 		
 		Object[] mocks = { helper, contactDao, userDao, configuration, contactConfiguration };
 		EasyMock.replay(mocks);
@@ -223,30 +203,15 @@ public class AddressBookBindingImplTest {
 		allRemovedContacts.addAll(archivedContactIds);
 		allRemovedContacts.addAll(removalCandidates);
 
-		Folder updatedContactFolder1 = new Folder();
-		updatedContactFolder1.setUid(1);
-		updatedContactFolder1.setName("updatedContactFolder1");
+		Set<Folder> updatedContactFolders = Sets.newHashSet(
+				Folder.builder().uid(1).name("updatedContactFolder1").build(),
+				Folder.builder().uid(2).name("updatedContactFolder2").build());				
 
-		Folder updatedContactFolder2 = new Folder();
-		updatedContactFolder2.setUid(2);
-		updatedContactFolder2.setName("updatedContactFolder2");
+		Set<Folder> allUpdatedFolders = Sets.newHashSet(updatedContactFolders);
 
-		Set<Folder> updatedContactFolders = new HashSet<Folder>();
-		updatedContactFolders.add(updatedContactFolder1);
-		updatedContactFolders.add(updatedContactFolder2);
-
-		Set<Folder> allUpdatedFolders = new HashSet<Folder>(updatedContactFolders);
-
-		Set<Folder> removedContactFolders =  new HashSet<Folder>();
-		Folder removedContactFolder1 = new Folder();
-		removedContactFolder1.setUid(10);
-		removedContactFolder1.setName("removedContactFolder1");
-		Folder removedContactFolder2 = new Folder();
-		removedContactFolder2.setUid(11);
-		removedContactFolder2.setName("removedContactFolder2");
-		
-		removedContactFolders.add(removedContactFolder1);
-		removedContactFolders.add(removedContactFolder2);
+		Set<Folder> removedContactFolders = Sets.newHashSet(
+				Folder.builder().uid(10).name("removedContactFolder1").build(),
+				Folder.builder().uid(11).name("removedContactFolder2").build());
 
 		ObmHelper helper = mockHelper();
 

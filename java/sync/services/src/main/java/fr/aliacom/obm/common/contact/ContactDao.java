@@ -1641,15 +1641,15 @@ public class ContactDao {
 	}
 	
 	private Folder buildFolder(AccessToken at, ResultSet rs) throws SQLException {
-		Folder f = new Folder();
-		f.setUid(rs.getInt(1));
-		f.setName(rs.getString(2));
+		Folder.Builder folderBuilder = Folder.builder()
+				.uid(rs.getInt(1))
+				.name(rs.getString(2));
 		if (rs.getInt(3) != at.getObmId()) {
 			String ownerFirstName = rs.getString(4);
 			String ownerLastName = rs.getString(5);
-			f.setOwnerDisplayName(ownerFirstName + " " + ownerLastName);
+			folderBuilder.ownerDisplayName(ownerFirstName + " " + ownerLastName);
 		}
-		return f;
+		return folderBuilder.build();
 	}
 
 	public int markUpdated(int databaseId) throws SQLException {

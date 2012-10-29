@@ -35,36 +35,61 @@ import com.google.common.base.Objects;
 
 public class Folder {
 
-	private Integer uid;
-	private String name;
-	private String ownerDisplayName;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	public Folder() {
-		super();
+	public static class Builder {
+		
+		private Integer uid;
+		private String name;
+		private String ownerDisplayName;
+
+		private Builder() {
+			super();
+		}
+		
+		public Builder uid(int uid) {
+			this.uid = uid;
+			return this;
+		}
+		
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder ownerDisplayName(String ownerDisplayName) {
+			this.ownerDisplayName = ownerDisplayName;
+			return this;
+		}
+		
+		public Folder build() {
+			return new Folder(uid, name, ownerDisplayName);
+		}
+	}
+	
+	
+	private final Integer uid;
+	private final String name;
+	private final String ownerDisplayName;
+	
+	private Folder(Integer uid, String name, String ownerDisplayName) {
+		this.uid = uid;
+		this.name = name;
+		this.ownerDisplayName = ownerDisplayName;
 	}
 
 	public Integer getUid() {
 		return uid;
 	}
 
-	public void setUid(Integer uid) {
-		this.uid = uid;
-	}
-
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	public String getOwnerDisplayName() {
 		return ownerDisplayName;
-	}
-	
-	public void setOwnerDisplayName(String ownerDisplayName) {
-		this.ownerDisplayName = ownerDisplayName;
 	}
 	
 	@Override

@@ -347,10 +347,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private List<Folder> createAddressBookForUsers(Date timestamp) {
 		if (isFirstSync(timestamp)) {
-			Folder folder = new Folder();
-			folder.setUid(contactConfiguration.getAddressBookUserId());
-			folder.setName(contactConfiguration.getAddressBookUsersName());
-			return ImmutableList.of(folder);
+			return ImmutableList.of(Folder.builder()
+					.uid(contactConfiguration.getAddressBookUserId())
+					.name(contactConfiguration.getAddressBookUsersName())
+					.build());
 		}
 		return ImmutableList.of();
 	}

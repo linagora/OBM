@@ -370,11 +370,11 @@ public class ContactsBackendHierarchyChangesTest {
 	}
 
 	private Folder newFolderObject(String displayName, int folderId) {
-		Folder folder = new Folder();
-		folder.setUid(folderId);
-		folder.setOwnerDisplayName(displayName);
-		folder.setName(displayName);
-		return folder;
+		return Folder.builder()
+			.uid(folderId)
+			.ownerDisplayName(displayName)
+			.name(displayName)
+			.build();
 	}
 
 	private void expectLoginBehavior() throws AuthFault {

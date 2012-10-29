@@ -275,13 +275,13 @@ public class BookItemsParser extends AbstractItemsParser {
 	}
 	
 	private Folder parseFolder(Element root) {
-		Folder f = new Folder();
+		Folder.Builder folderBuilder = Folder.builder()
+				.name(s(root, "name"))
+				.ownerDisplayName(DOMUtils.getElementTextInChildren(root, "ownerDisplayName"));
 		if (root.hasAttribute("uid")) {
-			f.setUid(Integer.parseInt(root.getAttribute("uid")));
+			folderBuilder.uid(Integer.parseInt(root.getAttribute("uid")));
 		}
-		f.setName(s(root, "name"));
-		f.setOwnerDisplayName(DOMUtils.getElementTextInChildren(root, "ownerDisplayName"));
-		return f;
+		return folderBuilder.build();
 	}
 
 	public Folder parseFolder(String parameter) throws SAXException,
