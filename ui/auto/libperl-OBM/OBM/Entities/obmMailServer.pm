@@ -143,7 +143,7 @@ sub _init {
 
     @{$self->{'entityDesc'}->{'smtpOutServerId'}} = keys(%smtpOutServerId);
     @{$self->{'entityDesc'}->{'smtpOutServer'}} = keys(%smtpOutServer);
-    if( $#{$self->{'entityDesc'}->{'smtpOutServerId'}} < 0 ) {
+    if( $@{$self->{'entityDesc'}->{'smtpOutServerId'}} ) {
         delete( $self->{'entityDesc'}->{'smtpOutServerId'} );
         delete( $self->{'entityDesc'}->{'smtpOutServer'} );
     }
