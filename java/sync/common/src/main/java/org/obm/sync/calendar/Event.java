@@ -58,7 +58,6 @@ import com.google.common.collect.Maps;
 public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializable {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
-	public static final int DATABASE_TITLE_MAX_LENGTH = 255;
 	
 	private String title;
 	private String description;
@@ -112,10 +111,6 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	}
 
 	public void setTitle(String title) {
-		if ( title.length() > DATABASE_TITLE_MAX_LENGTH ) {
-			this.title = title.substring(0, DATABASE_TITLE_MAX_LENGTH);
-			return ;
-		}
 		this.title = title;
 	}
 
