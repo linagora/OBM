@@ -116,10 +116,9 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			
 			Set<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
 			Set<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges, lastKnownCollections, changedCollections);
-			
-			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
-			
 			Set<CollectionPath> addCollections = Sets.difference(changedCollections, lastKnownCollections);
+			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
+
 			return buildHierarchyItemsChanges(udr, addCollections, deletedCollections);
 		} catch (CollectionNotFoundException e) {
 			throw new HierarchyChangesException(e);

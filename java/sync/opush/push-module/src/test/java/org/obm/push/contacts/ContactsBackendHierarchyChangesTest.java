@@ -335,7 +335,126 @@ public class ContactsBackendHierarchyChangesTest {
 		assertThat(changes.getChangedItems()).isEmpty();
 		assertThat(changes.getDeletedItems()).isEmpty();
 	}
+	
+	@Test
+	public void testTwoSameLastKnownAndAdd() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
+				new ContactCollectionPath("both"), new ContactCollectionPath("both2"));
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both2", 3));
+		Set<Folder> removed = ImmutableSet.of();
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
+		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "both2", 3);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
+
+		expectBuildCollectionPath("both");
+		expectBuildCollectionPath("both2");
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).isEmpty();
+		assertThat(changes.getDeletedItems()).isEmpty();
+	}
+
+	@Test
+	public void testOneLastKnownInTwoAdd() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known"));
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("known", 2), newFolderObject("add", 3));
+		Set<Folder> removed = ImmutableSet.of();
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
+		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
+
+		expectBuildCollectionPath("add");
+		expectBuildCollectionPath("known");
+		expectBuildCollectionPath(contactParentName);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).containsOnly(
+				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getDeletedItems()).isEmpty();
+	}
+
+	@Test
+	public void testOneAddOneKnownDelete() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known"));
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("add", 3));
+		Set<Folder> removed = ImmutableSet.of(newFolderObject("known", 2));
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
+		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
+		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
+		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
+
+		expectBuildCollectionPath("add");
+		expectBuildCollectionPath("known");
+		expectBuildCollectionPath(contactParentName);
+		expectBuildCollectionPath(contactParentName);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).containsOnly(
+				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getDeletedItems()).containsOnly(
+				new ItemChange("2", contactParentIdAsString, "known", FolderType.USER_CREATED_CONTACTS_FOLDER, false));
+	}
+	
+	@Test
+	public void testOneAddOneUnknownDelete() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("add", 3));
+		Set<Folder> removed = ImmutableSet.of(newFolderObject("unknown", 2));
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
+		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
+
+		expectBuildCollectionPath("add");
+		expectBuildCollectionPath("unknown");
+		expectBuildCollectionPath(contactParentName);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).containsOnly(
+				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getDeletedItems()).isEmpty();
+	}
+	
 	private Builder expectBuildCollectionPath(String displayName) {
 		CollectionPath collectionPath = new ContactCollectionPath(displayName);
 		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath, displayName);
