@@ -17,6 +17,9 @@ import sys
 
 import obm.build as ob
 
+def boolean_value_of(envstr):
+    return envstr.lower() in ['true', 't', '1', 'yes']
+
 def build_argument_parser(args):
     """
     Builds the argument parser. The *args* parameters should be a list of parameters to
@@ -24,28 +27,28 @@ def build_argument_parser(args):
     """
     parser = argparse.ArgumentParser(description='Packages OBM')
 
-    parser.add_argument('-o', '--oncommit', help='triggers an oncommit build',
-            default=False, action='store_true', dest='oncommit')
+    parser.add_argument('-o', '--oncommit', help="triggers an oncommit build. Defaults to $OBM_ONCOMMIT or 'False'",
+            default=boolean_value_of(os.environ.get('OBM_ONCOMMIT', '0')), action='store_true', dest='oncommit')
 
-    parser.add_argument('-c', '--config', help='build configuration file',
-            default='build.cfg', dest='configuration_file', type=file)
+    parser.add_argument('-c', '--config', help="build configuration file. Defaults to $OBM_BUILDCFG or './build.cfg'",
+            default=os.environ.get('OBM_BUILDCFG', 'build.cfg'), dest='configuration_file', type=file)
 
-    parser.add_argument('-V', '--version', help='version of OBM',
-            default=None, dest='obm_version')
+    parser.add_argument('-V', '--version', help="version of OBM. Defaults to $OBM_VERSION or 'None'",
+            default=os.environ.get('OBM_VERSION', None), dest='obm_version')
 
-    parser.add_argument('-r', '--release', help='release of OBM',
-            default=None, dest='obm_release')
+    parser.add_argument('-r', '--release', help="release of OBM. Defaults to $OBM_RELEASE or 'None'",
+            default=os.environ.get('OBM_RELEASE', None), dest='obm_release')
 
-    parser.add_argument('--perl-version', help='perl flavor (only for RPMs)',
-            default='5.8', dest='perl_version', choices=['5.8', '5.10'])
+    parser.add_argument('--perl-version', help="perl flavor (only for RPMs). Defaults to $OBM_PERLVERSION or '5.8'",
+            default=os.environ.get('OBM_PERLVERSION', '5.8'), dest='perl_version', choices=['5.8', '5.10'])
 
-    parser.add_argument('-n', '--nocompile', help='Do not attempt to compile anything',
-            default=False, action='store_true', dest='nocompile');
+    parser.add_argument('-n', '--nocompile', help="Do not attempt to compile anything. Defaults to $OBM_NOCOMPILE or 'False'",
+            default=boolean_value_of(os.environ.get('OBM_NOCOMPILE', '0')), action='store_true', dest='nocompile');
 
     package_types = ['deb', 'rpm']
     parser.add_argument('-p', '--package-type', metavar='PACKAGETYPE',
-            help="package type, may be one of: %s" % ", ".join(package_types),
-            choices=package_types, default='deb', dest='package_type')
+            help="package type, may be one of: %s. Defaults to $OBM_PACKAGETYPE or 'deb' " % ", ".join(package_types),
+            choices=package_types, default=os.environ.get('OBM_PACKAGETYPE', 'deb'), dest='package_type')
 
     parser.add_argument('work_dir', metavar='WORKDIR', help='directory where '
             'the packages will be built')
