@@ -2127,9 +2127,12 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
   run_query_calendar_solr_store($event_id);
 
   $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
-  if (OBM_EventMailObserver::hasEventFullyChanged($oldEvent, $newEvent, false) 
+  $eventDiff = new OBM_EventDiff($oldEvent, $newEvent);
+  if ($eventDiff->hasEventFullyChanged($oldEvent, $newEvent, false)
   	|| count($new_users) > 0 
-  	|| count($removed_users) > 0) {
+  	|| count($removed_users) > 0
+    || $eventDiff->hasResourcesAdded()
+    || $eventDiff->hasResourcesRemoved() ) {
     // Send mail session var
     $GLOBALS['send_notification_mail'] = $calendar['attendees_notification'];
     // Notify Observers
