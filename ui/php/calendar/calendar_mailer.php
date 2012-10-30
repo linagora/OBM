@@ -47,7 +47,14 @@ class CalendarMailer extends OBM_Mailer {
     $this->attachIcs = $GLOBALS['ccalendar_send_ics'];
     $this->icsEncoding = $GLOBALS['ccalendar_ics_encoding'];
   }
-  
+
+  public function prepare($method_name, $args) {
+    $mail = parent::prepare($method_name, $args);
+    $mail->set_header("X-OBM-NOTIFICATION-EMAIL", $GLOBALS['obm_version'], true);
+
+    return $mail;
+  }
+
   protected function eventInvitation($event, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
