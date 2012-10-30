@@ -74,6 +74,7 @@ public class LeafPartsFinder {
 			leaves.add(mp);
 		} else {
 			if (mp != root && mp.isNested() && filterNested) {
+				leaves.add(mp);
 				return;
 			}
 			for (IMimePart m : mp.getChildren()) {

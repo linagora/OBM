@@ -57,6 +57,8 @@ import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.minig.imap.UIDEnvelope;
+import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.BodyParams;
 import org.minig.imap.mime.ContentType;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
@@ -500,6 +502,53 @@ public class EmailViewPartsFetcherImplTest {
 		partsFetcher.fetchAttachments(shouldGetEmptyAttachmentListViewBuilder, fetchInstruction, messageUid);
 		
 		verify(parentMimePart, shouldGetEmptyAttachmentListViewBuilder);
+	}
+	
+	@Test
+	public void testEmlAttachmentIsALeaf() {
+		String attachmentName = "attachment.eml";
+		long attachmentMailUid = 3;
+		int attachmentCollection = 12;
+		int attachmentSize = 1337;
+		
+		MimePart textPlain = MimePart.builder().contentType("text/plain").build();
+		MimePart rfc822EmbeddedAttachment = MimePart.builder()
+				.contentType("message/rfc822")
+				.contentDisposition("attachment")
+				.size(attachmentSize)
+				.bodyParams(BodyParams.builder().add(new BodyParam("name", attachmentName)).build())
+				.addChild(MimePart.builder()
+						.contentType("multipart/alternative")
+						.addChild(MimePart.builder().contentType("text/plain").build())
+						.addChild(MimePart.builder().contentType("text/html").build())
+						.build())
+				.build();
+		MimeMessage message = MimeMessage.builder().addChild(
+				MimePart.builder()
+					.contentType("multipart/mixed")
+					.addChild(textPlain)
+					.addChild(rfc822EmbeddedAttachment)
+					.build())
+				.build();
+
+		String expectedId = "at_" + attachmentMailUid + "_" + "0";
+		String expectedFileReference = AttachmentHelper
+				.getAttachmentId(
+					String.valueOf(attachmentCollection), String.valueOf(attachmentMailUid), 
+					rfc822EmbeddedAttachment.getAddress().getAddress(),
+					rfc822EmbeddedAttachment.getFullMimeType(),
+					rfc822EmbeddedAttachment.getContentTransfertEncoding());
+		EmailViewAttachment expectedAttachment = new EmailViewAttachment(expectedId, attachmentName, expectedFileReference, attachmentSize);
+		
+		EmailView.Builder emailViewBuilder = createStrictMock(EmailView.Builder.class);
+		expect(emailViewBuilder.attachments(Lists.newArrayList(expectedAttachment))).andReturn(emailViewBuilder);
+		replay(emailViewBuilder);
+
+		FetchInstruction fetchInstruction = FetchInstruction.builder().mimePart(message).build();
+		new EmailViewPartsFetcherImpl(identityMailTransformerFactory(), null, null, null, null, attachmentCollection)
+				.fetchAttachments(emailViewBuilder, fetchInstruction, attachmentMailUid);
+		
+		verify(emailViewBuilder);
 	}
 	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
