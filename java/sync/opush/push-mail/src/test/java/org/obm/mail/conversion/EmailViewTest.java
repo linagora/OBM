@@ -41,10 +41,13 @@ import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
 import org.obm.DateUtils;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
@@ -55,6 +58,7 @@ import org.obm.push.exception.EmailViewBuildException;
 
 import com.google.common.collect.Lists;
 
+@RunWith(SlowFilterRunner.class)
 public class EmailViewTest {
 
 	@Test(expected=EmailViewBuildException.class)
@@ -251,7 +255,7 @@ public class EmailViewTest {
 		assertThat(emailView.getAttachments()).containsOnly(emailViewAttachment);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testICalendar() throws IOException, ParserException, EmailViewBuildException {
 		ICalendar iCalendar = anyICalendar("attendee.ics");
 		

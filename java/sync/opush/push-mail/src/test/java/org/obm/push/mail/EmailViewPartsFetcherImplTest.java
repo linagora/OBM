@@ -62,6 +62,7 @@ import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailViewAttachment;
@@ -405,7 +406,7 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailViewAttachment.getId()).equals(messageFixture.contentId);
 	}
 	
-	@Test
+	@Test @Slow
 	public void testInvitation() throws Exception {
 		messageFixture.isAttachment = true;
 		messageFixture.isInvitation = true;
