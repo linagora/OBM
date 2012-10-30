@@ -37,6 +37,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Set;
 
 import org.minig.imap.Flag;
+import org.minig.imap.mime.ContentType;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.mail.conversation.EmailView;
@@ -72,6 +73,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	private static final Logger logger = LoggerFactory.getLogger(MailViewToMSEmailConverterImpl.class);
 	private static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
+	private static final String CONTENT_TYPE_RFC_822 = "message/rfc822";
 
 	private final MSEmailHeaderConverter emailHeaderConverter;
 	private final EventService eventService;
@@ -170,13 +172,20 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 				msAttachment.setDisplayName(attachment.getDisplayName());
 				msAttachment.setEstimatedDataSize(attachment.getSize());
 				msAttachment.setFileReference(attachment.getFileReference());
-				msAttachment.setMethod(MethodAttachment.NormalAttachment);
+				msAttachment.setMethod(method(attachment.getContentType()));
 				msAttachments.add(msAttachment);
 			}
 		}
 		return msAttachments;
 	}
 	
+	@VisibleForTesting MethodAttachment method(ContentType contentType) {
+		if (contentType != null && CONTENT_TYPE_RFC_822.equalsIgnoreCase(contentType.getFullMimeType())) {
+			return MethodAttachment.EmbeddedMessage;
+		}
+		return MethodAttachment.NormalAttachment;
+	}
+
 	private boolean isSupportedICalendar(EmailView emailView) {
 		ICalendar iCalendar = emailView.getICalendar();
 		if (iCalendar != null && iCalendar.hasEvent()) {

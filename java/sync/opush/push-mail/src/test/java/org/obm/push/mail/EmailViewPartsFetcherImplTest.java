@@ -546,6 +546,10 @@ public class EmailViewPartsFetcherImplTest {
 				.displayName(attachmentName)
 				.fileReference(expectedFileReference)
 				.size(attachmentSize)
+				.contentType(ContentType.builder()
+						.contentType("message/rfc822")
+						.add(BodyParams.builder().add(new BodyParam("name", attachmentName)).build())
+						.build())
 				.build();
 		
 		EmailView.Builder emailViewBuilder = createStrictMock(EmailView.Builder.class);
@@ -685,6 +689,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
 		expect(mimePart.getFullMimeType()).andReturn(messageFixture.fullMimeType).anyTimes();
+		expect(mimePart.getContentType()).andReturn(ContentType.builder().contentType(messageFixture.fullMimeType).build()).anyTimes();
 		expect(mimePart.getContentTransfertEncoding()).andReturn(messageFixture.encoding).anyTimes();
 		expect(mimePart.getSize()).andReturn(messageFixture.estimatedDataSize).anyTimes();
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);

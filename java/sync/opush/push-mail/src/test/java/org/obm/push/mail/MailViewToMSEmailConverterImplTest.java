@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -45,11 +46,13 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.minig.imap.Address;
 import org.minig.imap.Envelope;
 import org.minig.imap.Flag;
+import org.minig.imap.mime.ContentType;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
@@ -61,6 +64,7 @@ import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
@@ -499,6 +503,60 @@ public class MailViewToMSEmailConverterImplTest {
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
 		assertThat(convertedMSEmail.getBody().isTruncated()).isTrue();
+	}
+	
+	@Test
+	public void testMethodWhenNullContentType() {
+		ContentType contentType = null;
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+	
+	@Test
+	public void testMethodWhenTextPlain() {
+		ContentType contentType = ContentType.builder().contentType("text/plain").build();
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+
+	@Test
+	public void testMethodWhenTextHtml() {
+		ContentType contentType = ContentType.builder().contentType("text/html").build();
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+
+	@Test
+	public void testMethodWhenMultipart() {
+		ContentType contentType = ContentType.builder().contentType("multipart/mixed").build();
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+
+	@Test
+	public void testMethodWhenApplicationPDF() {
+		ContentType contentType = ContentType.builder().contentType("application/pdf").build();
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+
+	@Test
+	public void testMethodWhenImage() {
+		ContentType contentType = ContentType.builder().contentType("image/jpeg").build();
+		assertMethodForContentType(contentType, MethodAttachment.NormalAttachment);
+	}
+
+	@Test
+	public void testMethodWhenRfc822() {
+		ContentType contentType = ContentType.builder().contentType("message/rfc822").build();
+		assertMethodForContentType(contentType, MethodAttachment.EmbeddedMessage);
+	}
+
+	private void assertMethodForContentType(ContentType contentType, MethodAttachment expectedMethod) {
+		IMocksControl mocks = createControl();
+		MSEmailHeaderConverter converter = mocks.createMock(MSEmailHeaderConverter.class);
+		EventService service = mocks.createMock(EventService.class);
+		
+		mocks.replay();
+		MethodAttachment method = new MailViewToMSEmailConverterImpl(converter, service).method(contentType);
+		mocks.verify();
+		
+		assertThat(method).isEqualTo(expectedMethod);
 	}
 	
 	private MSEmail makeConversionFromEmailViewFixture() throws IOException, ParserException, DaoException {

@@ -214,6 +214,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 					.displayName(displayName.get())
 					.fileReference(fileReference)
 					.size(mp.getSize())
+					.contentType(mp.getContentType())
 					.build();
 		}
 		return null;

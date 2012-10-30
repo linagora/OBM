@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.mail.conversation;
 
+import org.minig.imap.mime.ContentType;
+
 import com.google.common.base.Objects;
 
 
@@ -46,6 +48,7 @@ public class EmailViewAttachment {
 		private String displayName;
 		private String fileReference;
 		private Integer size;
+		private ContentType contentType;
 		
 		private Builder() {
 			super();
@@ -73,9 +76,14 @@ public class EmailViewAttachment {
 			this.size = size;
 			return this;
 		}
+		
+		public Builder contentType(ContentType contentType) {
+			this.contentType = contentType;
+			return this;
+		}
 
 		public EmailViewAttachment build() {
-			return new EmailViewAttachment(id, displayName, fileReference, size);
+			return new EmailViewAttachment(id, displayName, fileReference, size, contentType);
 		}
 	}
 	
@@ -83,12 +91,14 @@ public class EmailViewAttachment {
 	private final String displayName;
 	private final String fileReference;
 	private final Integer size;
+	private final ContentType contentType;
 	
-	private EmailViewAttachment(String id, String displayName, String fileReference, Integer size) {
+	private EmailViewAttachment(String id, String displayName, String fileReference, Integer size, ContentType contentType) {
 		this.id = id;
 		this.displayName = displayName;
 		this.fileReference = fileReference;
 		this.size = size;
+		this.contentType = contentType;
 	}
 
 	public String getId() {
@@ -107,9 +117,13 @@ public class EmailViewAttachment {
 		return fileReference;
 	}
 
+	public ContentType getContentType() {
+		return contentType;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(id, displayName, fileReference, size);
+		return Objects.hashCode(id, displayName, fileReference, size, contentType);
 	}
 	
 	@Override
@@ -119,7 +133,8 @@ public class EmailViewAttachment {
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.displayName, that.displayName)
 				&& Objects.equal(this.fileReference, that.fileReference)
-				&& Objects.equal(this.size, that.size);
+				&& Objects.equal(this.size, that.size)
+				&& Objects.equal(this.contentType, that.contentType);
 		}
 		return false;
 	}
@@ -131,6 +146,7 @@ public class EmailViewAttachment {
 			.add("displayName", displayName)
 			.add("fileReference", fileReference)
 			.add("size", size)
+			.add("contentType", contentType)
 			.toString();
 	}
 }

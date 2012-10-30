@@ -138,6 +138,11 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
+	public ContentType getContentType() {
+		return from.getContentType();
+	}
+
+	@Override
 	public String getPrimaryType() {
 		return from.getPrimaryType();
 	}

@@ -34,6 +34,8 @@ package org.obm;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.minig.imap.mime.BodyParam;
+import org.minig.imap.mime.BodyParams;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.push.mail.FetchInstruction;
@@ -55,9 +57,14 @@ public class BeansTest {
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
-					.add(EmailViewAttachment.class)
 					.add(FetchInstruction.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+		
+		equalsVerifierUtilsTest.createEqualsVerifier(EmailViewAttachment.class)
+			.withPrefabValues(BodyParams.class, 
+					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
+					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
+			.verify();
 	}
 }

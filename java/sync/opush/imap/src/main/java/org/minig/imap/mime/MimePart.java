@@ -181,6 +181,11 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
+	public ContentType getContentType() {
+		return contentType;
+	}
+	
+	@Override
 	public String getPrimaryType() {
 		return contentType.getPrimaryType();
 	}

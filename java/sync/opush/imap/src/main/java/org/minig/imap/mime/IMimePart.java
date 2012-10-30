@@ -44,6 +44,8 @@ public interface IMimePart {
 		Builder<T> addChild(IMimePart mimePart);
 		
 	}
+
+	ContentType getContentType();
 	
 	String getPrimaryType();
 
