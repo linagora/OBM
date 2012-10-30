@@ -31,69 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.io.InputStream;
-import java.util.Set;
+import org.minig.imap.IMAPException;
+import org.minig.imap.StoreClient;
 
-import org.obm.sync.stream.ListenableInputStream;
-import org.obm.sync.tag.InputStreamListener;
+import com.google.inject.Singleton;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
+public class MinigStoreClientImpl implements MinigStoreClient {
+	
+	@Singleton
+	public static class Factory implements MinigStoreClient.Factory {
 
-public class ImapStoreManagerImpl implements InputStreamListener, ImapStoreManager {
-
-	private final Set<InputStream> streams;
-	private ManagedLifecycleImapStore imapStore;
-	private boolean closeRequired;
-	
-	@VisibleForTesting ImapStoreManagerImpl() {
-		this.closeRequired = false;
-		this.streams = Sets.newHashSet();
-	}
-	
-	public synchronized InputStream bindTo(InputStream stream) {
-		ListenableInputStream listenableInputStream = new ListenableInputStream(stream, this);
-		streams.add(listenableInputStream);
-		return listenableInputStream;
-	}
-	
-	@Override
-	public synchronized void onClose(InputStream source) {
-		streams.remove(source);
-		closeIfNeeded();
-	}
-	
-	private void closeIfNeeded() {
-		if (streams.isEmpty() && closeRequired) {
-			imapStore.close();
+		@Override
+		public MinigStoreClient create(StoreClient storeClient) {
+			return new MinigStoreClientImpl(storeClient);
 		}
-	}
-
-	@Override
-	public void closeWhenDone() {
-		closeRequired = true;
-		closeIfNeeded();
-	}
-
-	@Override
-	public void setImapStore(ManagedLifecycleImapStore imapStore) {
-		this.imapStore = imapStore;
-	}
-
-	@VisibleForTesting void setCloseRequired(boolean closeRequired) {
-		this.closeRequired = closeRequired;
-	}
-
-	@VisibleForTesting ManagedLifecycleImapStore getImapStore() {
-		return imapStore;
-	}
-
-	@VisibleForTesting Set<InputStream> getStreams() {
-		return streams;
-	}
-
-	@VisibleForTesting boolean isCloseRequired() {
-		return closeRequired;
+		
 	}
 	
+	private final StoreClient storeClient;
+	
+	protected MinigStoreClientImpl(StoreClient storeClient) {
+		this.storeClient = storeClient;
+	}
+
+	@Override
+	public void close() {
+		storeClient.logout();
+	}
+
+	@Override
+	public StoreClient getStoreClient() {
+		return storeClient;
+	}
+
+	@Override
+	public void login(Boolean activeteTLS) throws IMAPException {
+		storeClient.login(activeteTLS);
+	}
 }

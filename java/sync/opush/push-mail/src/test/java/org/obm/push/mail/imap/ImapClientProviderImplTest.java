@@ -49,8 +49,8 @@ public class ImapClientProviderImplTest {
 				return 123456;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(
-				emailConfiguration, null, null);
+		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null, 
+				emailConfiguration, null, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.timeout", 123456),
@@ -65,8 +65,8 @@ public class ImapClientProviderImplTest {
 				return true;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(
-				emailConfiguration, null, null);
+		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
+				emailConfiguration, null, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", true));
@@ -80,8 +80,8 @@ public class ImapClientProviderImplTest {
 				return false;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(
-				emailConfiguration, null, null);
+		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
+				emailConfiguration, null, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", false));
@@ -95,8 +95,8 @@ public class ImapClientProviderImplTest {
 				return 987;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(
-				emailConfiguration, null, null);
+		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
+				emailConfiguration, null, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.fetchsize", 987),

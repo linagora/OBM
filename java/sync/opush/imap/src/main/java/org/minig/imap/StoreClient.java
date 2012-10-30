@@ -222,4 +222,7 @@ public class StoreClient {
 		return cs.namespace();
 	}
 
+	public boolean isConnected() {
+		return cs.isConnected();
+	}
 }

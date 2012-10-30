@@ -31,36 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.io.InputStream;
+import org.minig.imap.IMAPException;
+import org.minig.imap.StoreClient;
+import org.obm.push.bean.Resource;
 
-import org.obm.push.mail.MimeAddress;
+public interface MinigStoreClient extends Resource {
 
-import com.sun.mail.imap.IMAPMessage;
+	interface Factory {
+		MinigStoreClient create(StoreClient storeClient);
+	}
 
-public class ImapStoreMessageInputStreamProvider implements MessageInputStreamProvider {
-
-	private final MessageInputStreamProvider messageInputStreamProvider;
-	private final ImapStoreManager imapStoreManager;
+	StoreClient getStoreClient();
 	
-	public ImapStoreMessageInputStreamProvider(MessageInputStreamProvider messageInputStreamProvider,
-			ImapStoreManager imapStoreManager) {
-		this.messageInputStreamProvider = messageInputStreamProvider;
-		this.imapStoreManager = imapStoreManager;
-	}
-	
-	@Override
-	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress) {
-		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(messageToFetch, mimePartAddress);
-		return imapStoreManager.bindTo(messageStream);
-	}
-
-	@Override
-	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit) {
-		InputStream messageStream = messageInputStreamProvider.createMessageInputStream(messageToFetch, mimePartAddress, limit);
-		return imapStoreManager.bindTo(messageStream);
-	}
-
-	protected ImapStoreManager getImapStoreManager() {
-		return imapStoreManager;
-	}
+	void login(Boolean activeteTLS) throws IMAPException ;
 }

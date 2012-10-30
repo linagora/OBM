@@ -52,14 +52,25 @@ import org.obm.push.mail.MailboxFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
 public class ImapStoreImpl implements ImapStore {
 
-	private static final Logger logger = LoggerFactory.getLogger(ImapStoreImpl.class);
+	@Singleton
+	public static class Factory implements ImapStore.Factory {
 
+		@Override
+		public ImapStore create(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
+				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host, int port) {
+			return new ImapStoreImpl(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port);
+		}
+		
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ImapStoreImpl.class);
 	
 	private final Session session;
 	private final IMAPStore store;
@@ -113,9 +124,9 @@ public class ImapStoreImpl implements ImapStore {
 			throw new ImapLoginException("attempt imap login failed", e);
 		}
 	}
-
+	
 	@Override
-	public void logout() {
+	public void close() {
 		try {
 			store.close();
 		} catch (MessagingException e) {

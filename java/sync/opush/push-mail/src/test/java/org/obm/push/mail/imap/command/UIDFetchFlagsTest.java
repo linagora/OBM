@@ -202,9 +202,6 @@ public class UIDFetchFlagsTest {
 	}
 	
 	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {
-		
-		StoreClient client = clientProvider.getImapClient(udr);
-		client.login(false);
-		return client;
+		return clientProvider.getImapClient(udr);
 	}
 }

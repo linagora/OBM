@@ -172,11 +172,7 @@ public class UIDFetchMessageTest {
 		return client.uidFetchMessage(uid);
 	}
 	
-	private StoreClient loggedClient()
-			throws LocatorClientException, IMAPException  {
-		
-		StoreClient store = clientProvider.getImapClient(udr);
-		store.login(false);
-		return store;
+	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {
+		return clientProvider.getImapClient(udr);
 	}
 }

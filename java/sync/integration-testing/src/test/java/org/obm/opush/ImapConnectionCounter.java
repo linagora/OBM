@@ -29,16 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.opush;
 
-import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public interface ImapStoreManager {
+import com.google.inject.Singleton;
 
-	void setImapStore(ManagedLifecycleImapStore imapStore);
 
-	void closeWhenDone();
+@Singleton
+public class ImapConnectionCounter {
 
-	InputStream bindTo(InputStream stream);
-
+	public AtomicInteger loginCounter;
+	public AtomicInteger closeCounter;
+	
+	public ImapConnectionCounter() {
+		this.loginCounter = new AtomicInteger();
+		this.closeCounter = new AtomicInteger();
+	}
+	
 }

@@ -190,9 +190,9 @@ public class ClientSupport {
 		// grab lock, this one should be ok, except on first call
 		// where we might wait for cyrus welcome text.
 		lock();
-		cmd.execute(session, tagsProducer, lock, lastResponses);
-		lock(); // this one should wait until this.setResponses is called
 		try {
+			cmd.execute(session, tagsProducer, lock, lastResponses);
+			lock(); // this one should wait until this.setResponses is called
 			cmd.responseReceived(lastResponses);
 		} finally {
 			lock.release();
@@ -334,5 +334,9 @@ public class ClientSupport {
 
 	public void stopIdle() {
 		run(new StopIdleCommand());
+	}
+	
+	public boolean isConnected() {
+		return session.isConnected();
 	}
 }

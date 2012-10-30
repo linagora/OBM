@@ -357,8 +357,6 @@ public class UIDFetchPartTest {
 	}
 	
 	private StoreClient loggedClient() throws Exception {
-		StoreClient imapClient = clientProvider.getImapClient(udr);
-		imapClient.login(false);
-		return imapClient;
+		return clientProvider.getImapClient(udr);
 	}
 }

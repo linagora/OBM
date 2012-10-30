@@ -37,13 +37,17 @@ import java.util.Set;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
+import org.minig.imap.IMAPException;
 import org.minig.imap.IdleClient;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.NoImapClientAvailableException;
+import org.obm.push.mail.imap.ImapStore.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,23 +59,36 @@ import com.sun.mail.imap.IMAPStore;
 public class ImapClientProviderImpl implements ImapClientProvider {
 
 	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
+	private static final String IMAP_STORE_RESOURCE = "imap-store";
+	private static final String STORE_CLIENT_RESOURCE = "store-client";
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
 
 	
+	private final Factory imapStoreFactory;
+	private final MinigStoreClient.Factory minigStoreClientFactory;
 	private final LocatorService locatorService;
-	private final ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory;
+	private final ImapMailBoxUtils imapMailBoxUtils;
+	private final MessageInputStreamProvider messageInputStreamProvider;
 	private final boolean loginWithDomain;
 	private final int imapPort;
+	private final boolean activateTLS;
 	@VisibleForTesting final Session defaultSession;
 
 	@Inject
-	@VisibleForTesting ImapClientProviderImpl(EmailConfiguration emailConfiguration, LocatorService locatorService,
-			ManagedLifecycleImapStore.Factory managedLifecycleImapStoreFactory) {
+	@VisibleForTesting ImapClientProviderImpl(ImapStore.Factory imapStoreFactory,
+			MinigStoreClient.Factory minigStoreClientFactory,
+			EmailConfiguration emailConfiguration, LocatorService locatorService, 
+			ImapMailBoxUtils imapMailBoxUtils, MessageInputStreamProvider messageInputStreamProvider) {
+		
+		this.imapStoreFactory = imapStoreFactory;
+		this.minigStoreClientFactory = minigStoreClientFactory;
 		this.locatorService = locatorService;
-		this.managedLifecycleImapStoreFactory = managedLifecycleImapStoreFactory;
+		this.imapMailBoxUtils = imapMailBoxUtils;
+		this.messageInputStreamProvider = messageInputStreamProvider;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.imapPort = emailConfiguration.imapPort();
+		this.activateTLS = emailConfiguration.activateTls();
 		
 		Properties imapProperties = buildProperties(emailConfiguration);
 		this.defaultSession = Session.getInstance(imapProperties);
@@ -107,20 +124,80 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	}
 
 	@Override
-	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException {
+	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException {
+		StoreClient storeClient = retrieveWorkingStoreClient(udr);
+		if (storeClient != null) {
+			return storeClient;
+		}
+		
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
-		StoreClient storeClient = new StoreClient(imapHost, imapPort, login, udr.getPassword()); 
+		StoreClient newStoreClient = new StoreClient(imapHost, imapPort, login, udr.getPassword());
 		
-		logger.debug("Creating storeClient with login {} : " +
-				"loginWithDomain = {}", 
-				new Object[]{login, loginWithDomain});
+		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(newStoreClient);
+		newMinigStoreClient.login(activateTLS);
+		udr.putResource(STORE_CLIENT_RESOURCE, newMinigStoreClient);
 		
-		return storeClient; 
+		logger.debug("Creating storeClient with login {} : loginWithDomain = {}", login, loginWithDomain);
+		
+		return newMinigStoreClient.getStoreClient(); 
+	}
+
+	private StoreClient retrieveWorkingStoreClient(UserDataRequest udr) {
+		MinigStoreClient minigStoreClient = (MinigStoreClient) udr.getResource(STORE_CLIENT_RESOURCE);
+		if (minigStoreClient != null) {
+			try {
+				StoreClient storeClient = minigStoreClient.getStoreClient();
+				if (storeClient.isConnected()) {
+					return storeClient;
+				} else {
+					minigStoreClient.close();
+				}
+			} catch (RuntimeException e) {
+				minigStoreClient.close();
+			}
+		}
+		return null;
 	}
 	
 	@Override
-	public ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException {
+	public ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException, ImapLoginException {
+		ImapStore imapStore = retrieveWorkingImapStore(udr);
+		if (imapStore != null) {
+			return imapStore;
+		} else {
+			ImapStore newStore = buildImapStore(udr);
+			try {
+				newStore.login();
+				udr.putResource(IMAP_STORE_RESOURCE, newStore);
+				return newStore;
+			} catch (ImapLoginException e) {
+				newStore.close();
+				throw e;
+			} catch (RuntimeException e) {
+				newStore.close();
+				throw e;
+			}
+		}
+	}
+
+	private ImapStore retrieveWorkingImapStore(UserDataRequest udr) {
+		ImapStore imapStore = (ImapStore) udr.getResource(IMAP_STORE_RESOURCE);
+		if (imapStore != null) {
+			try {
+				if (imapStore.isConnected()) {
+					return imapStore;
+				} else {
+					imapStore.close();
+				}
+			} catch (RuntimeException e) {
+				imapStore.close();
+			}
+		}
+		return null;
+	}
+
+	private ImapStore buildImapStore(UserDataRequest udr) throws NoImapClientAvailableException {
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
 		
@@ -128,9 +205,8 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 			logger.debug("Creating storeClient with login {} : loginWithDomain = {}", 
 					new Object[]{login, loginWithDomain});
 
-			IMAPStore javaMailStore = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
-			return managedLifecycleImapStoreFactory.create(
-					defaultSession, javaMailStore, login, udr.getPassword(), imapHost, imapPort);
+			IMAPStore store = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
+			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, imapMailBoxUtils, login, udr.getPassword(), imapHost, imapPort);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);
@@ -138,14 +214,12 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	}
 
 	private String getLogin(UserDataRequest udr) {
-		String login = udr.getUser().getLoginAtDomain();
-		if (!loginWithDomain) {
-			int at = login.indexOf("@");
-			if (at > 0) {
-				login = login.substring(0, at);
-			}
+		User user = udr.getUser();
+		if (loginWithDomain) {
+			return user.getLoginAtDomain();
+		} else {
+			return user.getLogin();
 		}
-		return login;
 	}
 
 

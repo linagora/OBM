@@ -29,21 +29,54 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.opush;
 
-import org.minig.imap.IMAPException;
-import org.minig.imap.IdleClient;
-import org.minig.imap.StoreClient;
-import org.obm.locator.LocatorClientException;
+import java.math.BigDecimal;
+
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
 
-public interface ImapClientProvider {
+import com.google.common.base.Throwables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	String locateImap(UserDataRequest udr) throws LocatorClientException;
-	StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException;
-	@Deprecated ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException, ImapLoginException;
-	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
+public class TrackableUserDataRequest extends UserDataRequest {
 	
+	private PendingQueriesLock pendingQueries;
+
+	@Singleton
+	public static class Factory extends UserDataRequest.Factory {
+
+		private PendingQueriesLock pendingQueries;
+
+		@Inject
+		private Factory(PendingQueriesLock pendingQueries) {
+			this.pendingQueries = pendingQueries;
+		}
+		
+		@Override
+		public UserDataRequest createUserDataRequest(Credentials credentials,
+				String command, Device device, BigDecimal protocolVersion) {
+			return new TrackableUserDataRequest(credentials, command, device, protocolVersion, pendingQueries);
+		}
+	}
+	
+	
+	public TrackableUserDataRequest(Credentials credentials, String command, Device device, BigDecimal protocolVersion, PendingQueriesLock pendingQueries) {
+		super(credentials, command, device, protocolVersion);
+		this.pendingQueries = pendingQueries;
+		
+		try {
+			pendingQueries.acquire();
+		} catch (InterruptedException e) {
+			Throwables.propagate(e);
+		}
+	}
+	
+	@Override
+	public void closeResources() {
+		super.closeResources();
+		pendingQueries.release();
+	}
 }

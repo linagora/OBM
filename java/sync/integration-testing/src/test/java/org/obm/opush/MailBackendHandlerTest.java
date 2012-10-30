@@ -40,12 +40,14 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -115,6 +117,8 @@ public class MailBackendHandlerTest {
 	@Inject GreenMail greenMail;
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject ImapClientProvider clientProvider;
+	@Inject ImapConnectionCounter imapConnectionCounter;
+	@Inject PendingQueriesLock pendingQueries;
 	
 	private String mailbox;
 	private GreenMailUser greenMailUser;
@@ -169,6 +173,9 @@ public class MailBackendHandlerTest {
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_TRASH_NAME, 1);
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 	}
 
 	private void bindCollectionIdToPath(int syncEmailCollectionId) {

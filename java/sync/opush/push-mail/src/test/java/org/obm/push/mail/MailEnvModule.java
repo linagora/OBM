@@ -43,10 +43,12 @@ import org.obm.push.exception.SmtpLocatorException;
 import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.ImapClientProviderImpl;
 import org.obm.push.mail.imap.ImapMailboxService;
-import org.obm.push.mail.imap.ImapStoreManager;
-import org.obm.push.mail.imap.ImapStoreManagerImpl;
+import org.obm.push.mail.imap.ImapStore;
+import org.obm.push.mail.imap.ImapStoreImpl;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
+import org.obm.push.mail.imap.MinigStoreClient;
+import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
@@ -93,8 +95,9 @@ public class MailEnvModule extends AbstractModule {
 			}
 		});
 
-		bind(ImapStoreManager.class).to(ImapStoreManagerImpl.class);
 		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
+		bind(ImapStore.Factory.class).to(ImapStoreImpl.Factory.class);
+		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(MailboxService.class).to(ImapMailboxService.class);
 		bind(PrivateMailboxService.class).to(ImapMailboxService.class);

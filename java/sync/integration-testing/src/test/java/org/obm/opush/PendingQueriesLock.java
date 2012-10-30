@@ -29,21 +29,31 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.opush;
 
-import org.minig.imap.IMAPException;
-import org.minig.imap.IdleClient;
-import org.minig.imap.StoreClient;
-import org.obm.locator.LocatorClientException;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
-public interface ImapClientProvider {
+import com.google.inject.Singleton;
 
-	String locateImap(UserDataRequest udr) throws LocatorClientException;
-	StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException;
-	@Deprecated ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException, ImapLoginException;
-	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
+@Singleton
+public class PendingQueriesLock {
+
+	private final Semaphore lock;
 	
+	public PendingQueriesLock() {
+		lock = new Semaphore(1);
+	}
+
+	public void acquire() throws InterruptedException {
+		lock.acquire();
+	}
+
+	public boolean waitingClose(long timeout, TimeUnit unit) throws InterruptedException {
+		return lock.tryAcquire(timeout, unit);
+	}
+
+	public void release() {
+		lock.release();
+	}
 }

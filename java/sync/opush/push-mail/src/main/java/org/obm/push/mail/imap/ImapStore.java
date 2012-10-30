@@ -38,7 +38,9 @@ import java.util.Map;
 import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 
+import org.obm.push.bean.Resource;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
@@ -46,13 +48,19 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxFolder;
 
 import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPStore;
 
-public interface ImapStore {
+public interface ImapStore extends Resource {
 
+	interface Factory {
+		ImapStore create(Session session, IMAPStore store, 
+				MessageInputStreamProvider messageInputStreamProvider, ImapMailBoxUtils imapMailBoxUtils,
+				String userId, String password, String host, int port);
+	}
+	
 	String getUserId();
 	
 	void login() throws ImapLoginException;
-	void logout();
 	boolean isConnected();
 
 	Message createMessage();

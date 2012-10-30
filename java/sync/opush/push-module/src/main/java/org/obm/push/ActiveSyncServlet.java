@@ -215,6 +215,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			throws IOException, DaoException {
 
 		UserDataRequest userDataRequest = null;
+		Responder responder = null;
 		try {
 			userDataRequest = sessionService.getSession(credentials, devId, request);
 			logger.debug("incoming query");
@@ -231,7 +232,7 @@ public class ActiveSyncServlet extends AuthenticatedServlet {
 			}
 	
 			sendASHeaders(response);
-			Responder responder = responderFactory.createResponder(response);
+			responder = responderFactory.createResponder(response);
 			rh.process(continuation, userDataRequest, request, responder);
 		} finally {
 			if (userDataRequest != null) {
