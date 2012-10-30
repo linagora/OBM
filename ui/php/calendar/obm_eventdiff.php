@@ -128,4 +128,13 @@ class OBM_EventDiff {
       || $this->newEvent->description != $this->oldEvent->description;
   }
 
+  public function hasResourcesAdded() {
+    $diff = $this->getAttendeesDiff();
+    return ( count($diff["new"]["resource"]) > 0);
+  }
+
+  public function hasResourcesRemoved() {
+    $diff = $this->getAttendeesDiff();
+    return ( count($diff["old"]["resource"]) > 0);
+  }
 }

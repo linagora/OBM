@@ -36,6 +36,10 @@ class OBM_EventResourceMailObserver implements  OBM_IObserver {
         $resourcesDiff = $attendeesDiff["current"]["resource"];
         $this->sendCurrentResourceMail($old, $new, $resourcesDiff);
       }
+      if ( $eventDiff->hasResourcesAdded() ) {
+        $resourcesDiff = $attendeesDiff["new"]["resource"];
+        $this->sendNewResourceMail($old, $new, $resourcesDiff);
+      }
     }
   }
 
