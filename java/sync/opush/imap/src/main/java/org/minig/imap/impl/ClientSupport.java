@@ -136,6 +136,9 @@ public class ClientSupport {
 		cf.join();
 		if (!cf.isConnected()) {
 			lock.release();
+			// This method call will throws the original exception  
+			cf.getSession();
+			// This should never occur
 			throw new IMAPException("Cannot log into imap server");
 		}
 		session = cf.getSession();
