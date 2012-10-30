@@ -651,7 +651,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
 
   private $mailer;
   private static $cache;
-
+  private $eventDiff;
 
   /**
    * __construct 
@@ -667,10 +667,10 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @see OBM_IObserver::update
    */
   public function update($old, $new) {
-    $eventDiff = new OBM_EventDiff($old, $new);
-    $attendees = $eventDiff->getAttendeesDiff();
+    $this->eventDiff = new OBM_EventDiff($old, $new);
+    $attendees = $this->eventDiff->getAttendeesDiff();
     if ( $old !== null && $new !== null ) {
-      $attendeesDecisionOrComment = $eventDiff->getAttendeesStateOrCommentDiff();
+      $attendeesDecisionOrComment = $this->eventDiff->getAttendeesStateOrCommentDiff();
       $this->send($old, $new, $attendees, $attendeesDecisionOrComment);
     } else {
       $this->send($old, $new, $attendees);
@@ -839,14 +839,14 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendCurrentUserMail($old, $new, $recipients) {
     list($invit_recipients, $notice_recipients) = $this->sortObmUsersRecipients($recipients);
-    if (!empty($invit_recipients) && self::hasEventFullyChanged($old, $new)) {
+    if (!empty($invit_recipients) && $this->eventDiff->hasEventFullyChanged()) {
       if ($new->repeat_kind == 'none') {
       	$this->mailer->sendEventUpdate($new, $old, $invit_recipients);
       } else {
       	$this->mailer->sendRecurrentEventUpdate($new, $old, $invit_recipients);
       }
     }
-    if (!empty($notice_recipients) && self::hasEventFullyChanged($old, $new)) {
+    if (!empty($notice_recipients) && $this->eventDiff->hasEventFullyChanged()) {
       if ($new->repeat_kind == 'none') {
         $this->mailer->sendEventUpdateNotice($new, $old, $notice_recipients);
       } else {
@@ -919,31 +919,13 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    * @return void
    */
   private function sendCurrentContactMail($old, $new, $recipients) {
-    if (self::hasEventFullyChanged($old, $new)) {
+    if ($this->eventDiff->hasEventFullyChanged()) {
     	if ($new->repeat_kind == 'none') {
       	  $this->mailer->sendContactUpdate($new, $old, $recipients);
     	} else {
     	  $this->mailer->sendRecurrentContactUpdate($new, $old, $recipients);
     	}
     }
-  }
-
-  /**
-   * Perform delta between old and new event
-   * 
-   * @param OBM_Event $old 
-   * @param OBM_Event $new 
-   * @access public 
-   * @return void
-   */
-  public static function hasEventFullyChanged($old, $new, $exceptionsMatter = true) {
-    return $new->shouldIncrementSequence($old, $exceptionsMatter)
-      || $new->title != $old->title
-      || $new->category1 != $old->category1
-      || $new->privacy != $old->privacy
-      || $new->priority != $old->priority
-      || $new->color != $old->color
-      || $new->description != $old->description;
   }
 }
 
