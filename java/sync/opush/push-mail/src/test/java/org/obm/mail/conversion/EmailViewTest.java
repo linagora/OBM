@@ -338,7 +338,12 @@ public class EmailViewTest {
 	}
 	
 	private EmailViewAttachment anyEmailViewAttachment(String id) {
-		return new EmailViewAttachment(id, "Name", "/file", 20);
+		return EmailViewAttachment.builder()
+				.id(id)
+				.displayName("Name")
+				.fileReference("/file")
+				.size(20)
+				.build();
 	}
 	
 	private ICalendar anyICalendar(String filename) throws IOException, ParserException {

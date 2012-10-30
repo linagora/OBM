@@ -36,12 +36,55 @@ import com.google.common.base.Objects;
 
 public class EmailViewAttachment {
 
-	private String id;
-	private String displayName;
-	private String fileReference;
-	private Integer size;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	public EmailViewAttachment(String id, String displayName, String fileReference, Integer size) {
+	public static class Builder {
+
+		private String id;
+		private String displayName;
+		private String fileReference;
+		private Integer size;
+		
+		private Builder() {
+			super();
+		}
+
+		public Builder id(String id) {
+			this.id = id;
+			return this;
+		}
+
+
+		public Builder displayName(String displayName) {
+			this.displayName = displayName;
+			return this;
+		}
+
+
+		public Builder fileReference(String fileReference) {
+			this.fileReference = fileReference;
+			return this;
+		}
+
+
+		public Builder size(Integer size) {
+			this.size = size;
+			return this;
+		}
+
+		public EmailViewAttachment build() {
+			return new EmailViewAttachment(id, displayName, fileReference, size);
+		}
+	}
+	
+	private final String id;
+	private final String displayName;
+	private final String fileReference;
+	private final Integer size;
+	
+	private EmailViewAttachment(String id, String displayName, String fileReference, Integer size) {
 		this.id = id;
 		this.displayName = displayName;
 		this.fileReference = fileReference;

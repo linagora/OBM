@@ -90,7 +90,12 @@ public class MailViewToMSEmailConverterImplTest {
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
 		int estimatedDataSize = 0;
 		MSEmailBodyType bodyType = MSEmailBodyType.PlainText;
-		List<EmailViewAttachment> attachments = ImmutableList.of(new EmailViewAttachment("id", subject, "file", 20));
+		List<EmailViewAttachment> attachments = ImmutableList.of(EmailViewAttachment.builder()
+				.id("id")
+				.displayName(subject)
+				.fileReference("file")
+				.size(20)
+				.build());
 		InputStream attachmentInputStream = resourceAsStream("ics/attendee.ics");
 		ICalendar iCalendar = null;
 		EmailViewInvitationType invitationType = EmailViewInvitationType.REQUEST;

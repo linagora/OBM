@@ -62,6 +62,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -201,19 +204,28 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	
 	private EmailViewAttachment extractEmailViewAttachment(IMimePart mp, int nbAttachments, long uid) {
 		String id = "at_" + uid + "_" + nbAttachments;
-		String partName = mp.getName();
-		
 		String fileReference = AttachmentHelper.getAttachmentId(String.valueOf(collectionId), String.valueOf(uid), 
 				mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
 		
-		if (partName != null) {
-			return new EmailViewAttachment(id, partName, fileReference, mp.getSize());
-		}
-		String contentId = mp.getContentId();
-		if (contentId != null) {
-			return new EmailViewAttachment(id, contentId, fileReference, mp.getSize());
+		Optional<String> displayName = selectAttachmentDisplayName(mp);
+		if (displayName.isPresent()) {
+			return EmailViewAttachment.builder()
+					.id(id)
+					.displayName(displayName.get())
+					.fileReference(fileReference)
+					.size(mp.getSize())
+					.build();
 		}
 		return null;
+	}
+
+	@VisibleForTesting Optional<String> selectAttachmentDisplayName(IMimePart attachment) {
+		String partName = attachment.getName();
+		String contentId = attachment.getContentId();
+		if (!Strings.isNullOrEmpty(partName) || !Strings.isNullOrEmpty(contentId)) {
+			return Optional.of(Objects.firstNonNull(partName, contentId));
+		}
+		return Optional.absent();
 	}
 	
 	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage, long uid) 

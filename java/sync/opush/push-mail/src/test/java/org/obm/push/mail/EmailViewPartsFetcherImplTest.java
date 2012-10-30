@@ -33,6 +33,7 @@ package org.obm.push.mail;
 
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expect;
@@ -49,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.Base64InputStream;
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +82,7 @@ import org.obm.push.mail.transformer.TestIdentityTransformerFactory;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
@@ -538,7 +541,12 @@ public class EmailViewPartsFetcherImplTest {
 					rfc822EmbeddedAttachment.getAddress().getAddress(),
 					rfc822EmbeddedAttachment.getFullMimeType(),
 					rfc822EmbeddedAttachment.getContentTransfertEncoding());
-		EmailViewAttachment expectedAttachment = new EmailViewAttachment(expectedId, attachmentName, expectedFileReference, attachmentSize);
+		EmailViewAttachment expectedAttachment = EmailViewAttachment.builder()
+				.id(expectedId)
+				.displayName(attachmentName)
+				.fileReference(expectedFileReference)
+				.size(attachmentSize)
+				.build();
 		
 		EmailView.Builder emailViewBuilder = createStrictMock(EmailView.Builder.class);
 		expect(emailViewBuilder.attachments(Lists.newArrayList(expectedAttachment))).andReturn(emailViewBuilder);
@@ -549,6 +557,68 @@ public class EmailViewPartsFetcherImplTest {
 				.fetchAttachments(emailViewBuilder, fetchInstruction, attachmentMailUid);
 		
 		verify(emailViewBuilder);
+	}
+	
+	@Test
+	public void testDisplayNameWhenNoNameNoContentId() {
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+				.contentType("text/plain")
+				.build());
+		
+		assertThat(displayName.isPresent()).isFalse();
+	}
+	
+	@Test
+	public void testDisplayNameWhenName() {
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+				.contentType("text/plain")
+				.bodyParams(BodyParams.builder().add(
+						new BodyParam("name", "hello"))
+						.build())
+				.build());
+		
+		assertThat(displayName.isPresent()).isTrue();
+		assertThat(displayName.get()).isEqualTo("hello");
+	}
+	
+	@Test
+	public void testDisplayNameWhenContentId() {
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+				.contentType("text/plain")
+				.contentId("hello")
+				.build());
+		
+		assertThat(displayName.isPresent()).isTrue();
+		assertThat(displayName.get()).isEqualTo("hello");
+	}
+	
+	@Test
+	public void testDisplayNameGetNameWhenBoth() {
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+				.contentType("text/plain")
+				.contentId("hello contentId")
+				.bodyParams(BodyParams.builder().add(
+						new BodyParam("name", "hello Name"))
+						.build())
+				.build());
+		
+		assertThat(displayName.isPresent()).isTrue();
+		assertThat(displayName.get()).isEqualTo("hello Name");
+	}
+
+	private Optional<String> getDisplayNameOfMimePart(IMimePart attachment) {
+		IMocksControl mocks = createControl();
+		TransformersFactory transformer = mocks.createMock(TransformersFactory.class);
+		PrivateMailboxService mailboxService = mocks.createMock(PrivateMailboxService.class);
+		List<BodyPreference> preferences = mocks.createMock(List.class);
+		
+		
+		mocks.replay();
+		Optional<String> displayName = new EmailViewPartsFetcherImpl(transformer, mailboxService, preferences, udr, "name", 15)
+			.selectAttachmentDisplayName(attachment);
+	
+		mocks.verify();
+		return displayName;
 	}
 	
 	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
