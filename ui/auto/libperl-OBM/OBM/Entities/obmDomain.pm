@@ -110,10 +110,14 @@ sub _init {
     if( $domainAlias ) {
         my @aliases = split( /\r\n/, $domainAlias );
         for( my $i=0; $i<=$#aliases; $i++ ) {
-            if( $aliases[$i] !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
-                $self->_log( 'alias de domaine \''.$aliases[$i].'\' incorrect', 1 );
-            }else {
-                push( @{$domainDesc->{'domain_alias'}}, $aliases[$i] );
+            my $alias = $aliases[$i];
+        	
+            if( $alias !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
+                $self->_log( 'alias de domaine \''.$alias.'\' incorrect', 1 );
+            } elsif ( grep(/^$alias$/, @{$domainDesc->{'domain_alias'}}) ) {
+            	$self->_log( 'l\' alias de domaine \'' . $alias . '\' existe déjà, le doublon sera ignoré', 3 );
+            } else {
+                push( @{$domainDesc->{'domain_alias'}}, $alias );
             }
         }
     }
