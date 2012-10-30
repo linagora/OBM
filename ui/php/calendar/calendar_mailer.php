@@ -44,7 +44,6 @@ class CalendarMailer extends OBM_Mailer {
   
   public function __construct() {
     parent::__construct();
-    $this->add_header("X-OBM-NOTIFICATION-EMAIL", $GLOBALS['obm_version']);
     $this->attachIcs = $GLOBALS['ccalendar_send_ics'];
     $this->icsEncoding = $GLOBALS['ccalendar_ics_encoding'];
   }
