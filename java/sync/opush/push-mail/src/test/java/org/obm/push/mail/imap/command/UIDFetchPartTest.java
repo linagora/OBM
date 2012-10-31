@@ -50,6 +50,7 @@ import org.minig.imap.StoreClient;
 import org.minig.imap.mime.MimeMessage;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BodyPreference;
@@ -77,7 +78,7 @@ import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchPartTest {
 
 	@Rule
