@@ -181,7 +181,7 @@ function dis_calendar_search_result($calendar, $current_view) {
   $GLOBALS['display']['search'] .= dis_back_to_calendar($action);
 
   $block = "<h1>$GLOBALS[l_search_result]</h1>";
-  $block .= dis_calendar_list_view($current_view, $calendar_entity, $readable_entity, $begin, $end, $events);
+  $block .= dis_calendar_list_view($current_view, $calendar_entity, $readable_entity, $begin, $end, $events, false);
 
   return $block;
 }
@@ -1717,7 +1717,7 @@ function dis_calendar_month_list($current_view, $calendar_entity, $writable_enti
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $events=null) {
+function dis_calendar_list_view($current_view, $calendar_entity, $writable_entity, $date, $end, $events=null, $occurences=true) {
   global $obm;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
@@ -1760,7 +1760,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
   $category_filter = $current_view->get_category_filter();
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$events);
+  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$events,null,$occurences);
   $today_mark = false;
   $charset = mb_internal_encoding();
   $target = "";

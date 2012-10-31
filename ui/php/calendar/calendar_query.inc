@@ -5179,7 +5179,7 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null) {
+function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null, $occurences=true) {
 
   // Get all non repeating events and construct occurences & events model
   $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events, $opac);
@@ -5247,29 +5247,42 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $timezone = $r_q->f('event_timezone');
       $opacity = $r_q->f('event_opacity');
       $tag = $r_q->f('eventtag_id');
-      if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
-        $endrepeat = $end;
-      }
-      $addOcc = true;
-      if (isset($of->events[$id])) {
-        $event = $of->events[$id];
-        if ($unique) {
-          $addOcc = false;
+
+      if ($occurences) {
+        if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
+          $endrepeat = $end;
+        }
+        $addOcc = true;
+        if (isset($of->events[$id])) {
+          $event = $of->events[$id];
+          if ($unique) {
+            $addOcc = false;
+          }
+        } else {
+          $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
+          $event->setTimezone($timezone);
+        }
+        $tz = new DateTimeZone($timezone);
+        $date->setTimezone($tz);
+        $event_start = clone $start;
+        $event_start->setTimezone($tz);
+        $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
+        $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end;
+        $event_end->setTimezone($tz);
+        $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
+        if ($addOcc) {
+          calendar_add_anonymous_occurrences($repeatkind,$date,$event_start,$event_end,$repeatfrequence,$event,$entity_id, $entity,$entity_state,$repeatdays);
         }
       } else {
-        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
-        $event->setTimezone($timezone);
-      }
-      $tz = new DateTimeZone($timezone);
-      $date->setTimezone($tz);
-      $event_start = clone $start;
-      $event_start->setTimezone($tz); 
-      $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
-      $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
-      $event_end->setTimezone($tz);
-      $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond(1);
-      if ($addOcc) {
-        calendar_add_anonymous_occurrences($repeatkind,$date,$event_start,$event_end,$repeatfrequence,$event,$entity_id, $entity,$entity_state,$repeatdays);
+        if (isset($of->events[$id])) {
+          $event = $of->events[$id];
+          if (!$unique) {
+            $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
+          }
+        } else {
+          $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color,$opacity,$tag);
+          $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
+        }
       }
     }
   }
