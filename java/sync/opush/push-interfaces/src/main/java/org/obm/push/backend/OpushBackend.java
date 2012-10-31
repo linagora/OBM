@@ -84,14 +84,6 @@ public abstract class OpushBackend {
 		}
 	}
 
-	protected CollectionPath collectionPathForItem(UserDataRequest udr, PIMDataType pimType, ItemChange itemChange) {
-		return collectionPathBuilderProvider.get()
-				.userDataRequest(udr)
-				.pimType(pimType)
-				.displayName(itemChange.getDisplayName())
-				.build();
-	}
-
 	protected ImmutableSet<CollectionPath> lastKnownCollectionPath(UserDataRequest udr,
 			FolderSyncState lastKnownState, final PIMDataType filterPimDataType) throws DaoException {
 		
