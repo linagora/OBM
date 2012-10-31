@@ -32,7 +32,7 @@
 		<fest.version>2.0-mbaechler-SNAPSHOT</fest.version>
 		<guava.version>13.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
-		<commons-io.version>2.0.1</commons-io.version>
+		<commons-io.version>2.3</commons-io.version>
 		<jms.version>1.1</jms.version>
 		<netty.version>3.2.4.Final</netty.version>		
 		<jta.version>1.1</jta.version>
@@ -418,7 +418,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.5</version>
+				<version>1.6</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-lang</groupId>
