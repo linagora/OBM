@@ -30,7 +30,7 @@
 		<junit.version>4.10</junit.version>
 		<easymock.version>3.0</easymock.version>
 		<fest.version>2.0-mbaechler-SNAPSHOT</fest.version>
-		<guava.version>12.0</guava.version>
+		<guava.version>13.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.0.1</commons-io.version>
 		<jms.version>1.1</jms.version>

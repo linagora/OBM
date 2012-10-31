@@ -31,23 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import nl.jqno.equalsverifier.Warning;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.Login;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.RecurrenceDays;
+import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.trust.TrustToken;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -61,8 +64,26 @@ public class BeansTest {
 	
 	@Test
 	public void test() {
-		equalsVerifierUtilsTest.test(ObmDomain.class, RecurrenceDays.class, Event.class,
-				EventRecurrence.class, EventChanges.class, Contact.class, TrustToken.class, Login.class, SyncRange.class);
+		equalsVerifierUtilsTest.test(
+				ObmDomain.class,
+				Event.class,
+				EventRecurrence.class,
+				EventChanges.class,
+				Contact.class,
+				TrustToken.class,
+				Login.class,
+				SyncRange.class,
+				EventExtId.class,
+				EventObmId.class,
+				EventRecurrence.class,
+				RecurrenceId.class);
 	}
 	
+	@Test
+	public void testWhereNullableFields() {
+		equalsVerifierUtilsTest
+			.createEqualsVerifier(RecurrenceDays.class)
+			.suppress(Warning.NULL_FIELDS)
+			.verify();
+	}
 }

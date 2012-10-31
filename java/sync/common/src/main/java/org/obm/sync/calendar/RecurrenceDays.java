@@ -37,8 +37,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -47,8 +45,7 @@ public class RecurrenceDays implements Set<RecurrenceDay>, Serializable {
 	
 	public static final RecurrenceDays ALL_DAYS = new RecurrenceDays(RecurrenceDay.values());
 	
-	@Nonnull
-	private Set<RecurrenceDay> value;
+	private final Set<RecurrenceDay> value;
 
 	public RecurrenceDays() {
 		value = ImmutableSet.of();
