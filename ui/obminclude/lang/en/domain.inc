@@ -55,6 +55,7 @@ $l_link_host_no = "The domain has no hosts";
 $l_link_user_mailserver = "Mailserver stores some users in the domain";
 $l_mailserver_cant_delete = "Mailserver can be removed from the domain";
 $l_name_in_use = "Those names or aliases are already in use"; 
+$l_alias_duplicated = "Those aliases are duplicated";
 $l_alias_user_used = "Cannot change or remove aliases used in email adress";
 $l_fill_title = "You have to fill in the Title before submitting."; 
 $l_domain_confirm_delete = "CAUTION : You will delete a domain ! This operation is irreversible.\\nContinue anyway ?";

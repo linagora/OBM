@@ -59,6 +59,7 @@ $l_link_host = "Le domaine a des hôtes";
 $l_link_host_no = "Le domaine n'a pas d'hôtes";
 $l_link_user_mailserver = "Le serveur de messagerie contient des utilisateurs du domaine";
 $l_name_in_use = "Le nom de domaine ou l'un des alias est déjà utilisé";
+$l_alias_duplicated = "Les alias suivant sont dupliqués";
 $l_alias_user_used = "Impossible de modifier ou supprimer des alias utilisés dans des adresses mails";
 
 // JavaScript Messages

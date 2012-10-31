@@ -654,7 +654,7 @@ function run_query_domain_delete($p_id) {
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
-  global $err, $l_label_error,$l_alias_user_used,$l_name_in_use;
+  global $err, $l_label_error,$l_alias_user_used,$l_alias_duplicated,$l_name_in_use;
   global $l_name_error, $cgp_use, $l_mailshares_quota_error, $l_max_quota ;
 
   $label = $domain['label'];
@@ -678,6 +678,18 @@ function check_domain_data_form($d_id, $domain) {
     return false;
   }
   if ($d_id && !empty($alias)) {
+    $alias_array = preg_split('/\s+/', $alias);
+    $duplicated_alias_array = array();
+    foreach($alias_array as $key => $domain) {
+      unset($alias_array[$key]);
+      if (in_array($domain, $alias_array)) {
+        $duplicated_alias_array[] = $domain;
+      }
+    }
+    if ($duplicated_alias_array) {
+      $err['msg'] = "$l_alias_duplicated : ". implode(', ', array_unique($duplicated_alias_array));
+      return false;
+    }
     $users_aliases = run_query_domain_get_users_aliases($alias, $d_id);
     if (count($users_aliases) > 0) {
       $err['msg'] = "$l_alias_user_used : ".implode(', ',$users_aliases);
