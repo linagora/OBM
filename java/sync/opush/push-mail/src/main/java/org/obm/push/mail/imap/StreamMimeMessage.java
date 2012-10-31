@@ -73,7 +73,7 @@ public class StreamMimeMessage extends MimeMessage {
 	}
 	
 	@Override
-	protected void updateHeaders() throws MessagingException {
+	protected synchronized void updateHeaders() throws MessagingException {
 		// Do nothing, this message should already have its headers 
 	}
 }
