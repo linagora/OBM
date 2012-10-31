@@ -1,6 +1,6 @@
 <div id='searchHolder'>
   <div id='basicSearch'>
-    <form id='searchForm' onsubmit='obm.contact.addressbook.searchContact(this); return false;'>
+    <form id='searchForm' onsubmit='return obm.contact.addressbook.searchContact();'>
       <input type='text' id='searchpattern' name='searchpattern' value='<?php echo $searchpattern ?>' />
       <input type='submit' value='<?php echo __('Search') ?>' />
       <input type='hidden' name='action' value='search' />
@@ -15,7 +15,7 @@
       <span class='title'><?php echo __('Advanced search') ?></span>
     </div>
     <div class='content'>
-      <form id='advancedSearchForm' onsubmit='obm.contact.addressbook.searchContact(this);return false;'>
+      <form id='advancedSearchForm' onsubmit='return obm.contact.addressbook.advancedSearchContact();'>
         <table>
           <tbody>
             <tr>            

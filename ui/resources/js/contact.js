@@ -175,7 +175,15 @@ Obm.Contact.AddressBook = new Class ({
     this.dataRequest.write({ajax:1, action:'moveContact', 'id':contact, 'addressbook':addressbook});
   },
 
-  searchContact: function(form) {
+  searchContact: function () {
+      return this._searchContact($('searchForm'));
+  },
+  
+  advancedSearchContact: function () {
+      return this._searchContact($('advancedSearchForm'));
+  },
+  
+  _searchContact: function(form) {
     $('contactfilter').set('value','');
     this.hideContact();
     if(form.get('id') == 'advancedSearchForm') {
@@ -211,7 +219,9 @@ Obm.Contact.AddressBook = new Class ({
     // Display "search results" folder
     $('addressbook-search').getParent().show();
     $('addressbook-search').set('class', 'current');
-    $('addressbook-search').store('search',$('searchpattern').value)
+    $('addressbook-search').store('search',$('searchpattern').value);
+    
+    return false; // No form submission
   },
 
 
