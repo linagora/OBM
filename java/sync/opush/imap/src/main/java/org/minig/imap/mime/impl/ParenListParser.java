@@ -102,11 +102,6 @@ public class ParenListParser {
 		case '(':
 			int close = ParenMatcher.closingParenIndex(s, cur);
 			lastReadToken = substring(s, cur + 1, close);
-			// FIXME
-			if (startsWith(lastReadToken, "\"TEXT\"")) {
-				lastReadToken = ("(" + new String(lastReadToken) + ")")
-						.getBytes();
-			}
 			lastTokenType = TokenType.LIST;
 			return close + 1;
 		case '{':

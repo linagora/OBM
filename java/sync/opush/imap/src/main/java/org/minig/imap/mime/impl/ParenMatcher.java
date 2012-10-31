@@ -84,7 +84,10 @@ public class ParenMatcher {
 				currentPosition++;
 			}
 		}
-		return currentPosition - 1;
+		if (open == 0) {
+			return currentPosition - 1;
+		}
+		throw new IllegalArgumentException("No matching bracket found");
 	}
 
 }

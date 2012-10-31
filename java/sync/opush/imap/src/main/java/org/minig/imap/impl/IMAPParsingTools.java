@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.impl;
 
+import org.minig.imap.mime.impl.ParenListParser;
+
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -60,26 +63,17 @@ public class IMAPParsingTools {
 		}
 
 		char openingChar = '(';
-		char closingChar = ')';
-		int indexOf = content.indexOf(openingChar);
-		if (indexOf != -1) {
-			return substringFromOpeningToClosingChar(openingChar, closingChar, content.substring(indexOf));
-		}
-		return null;
-	}
-
-	private static String substringFromOpeningToClosingChar(char openingChar, char closingChar, String interestingContent) {
-		int scope = 0;
-		int position = 0;
-		ImmutableList<Character> chars = Lists.charactersOf(interestingContent);
-		for (Character c: chars) {
-			position++;
-			if (c == openingChar) scope++;
-			if (c == closingChar) scope--;
-			if (scope == 0) {
-				return interestingContent.substring(0, position);
+		int openingCharIndex = content.indexOf(openingChar);
+		if (openingCharIndex != -1) {
+			ParenListParser parenListParser = new ParenListParser();
+			try {
+				parenListParser.consumeToken(0, content.substring(openingCharIndex).getBytes(Charsets.US_ASCII));
+				return '(' + new String(parenListParser.getLastReadToken(), Charsets.US_ASCII) + ')';
+			} catch (IllegalArgumentException e) {
+				return null;
 			}
 		}
 		return null;
 	}
+
 }
