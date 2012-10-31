@@ -39,6 +39,14 @@ class Packager(object):
         """
         Updates the changelog and copies the packages to the build directory.
         """
+        self.logs_dir = self.build_dir + os.sep + 'log' + os.sep
+        self.logfile = self.logs_dir + os.sep + self.package.name + ".log"
+        self.logger = logging.getLogger(self.package.name)
+        hdlr = logging.FileHandler(self.logfile)
+        hdlr.setFormatter(logging.Formatter('%(levelname)s:%(name)s:%(message)s'))
+        hdlr.setLevel(logging.DEBUG)
+        self.logger.addHandler(hdlr)
+        self.logger.propagate = False;
         if self.package_type == 'deb':
             self._copy()
             self._update_changelog()
@@ -72,7 +80,7 @@ class Packager(object):
         archive_name = "%s.tar.gz" % root
         archive_path = os.path.join(self._target_dir, "rpm", "SOURCES", archive_name)
         source_file_or_dirs = os.listdir(source_path)
-        logging.info("Compressing sources to %s" % archive_path)
+        self.logger.info("Compressing sources to %s" % archive_path)
         gzfd = tarfile.open(archive_path, mode='w:gz')
         try:
             for source_file_or_dir in source_file_or_dirs:
@@ -85,9 +93,8 @@ class Packager(object):
         """
         Copies the packages to the work directory.
         """
-        logging.info("Copying package %s" % self.package.name)
-        logging.debug("Package %s: copying %s to %s" % (self.package.name,
-            self.package.path, self._target_dir))
+        self.logger.info("Copying package directory")
+        self.logger.debug("Copying %s to %s" % (self.package.path, self._target_dir))
         shutil.copytree(self.package.path, self._target_dir)
 
     def _update_changelog(self):
@@ -100,8 +107,8 @@ class Packager(object):
         if self.changelog_updater:
             changelog = get_changelog(self.package.name, self.package_type, self._target_dir)
             if not os.path.exists(changelog):
-                raise PackagingError("No changelog for package %s (expected to "
-                        "find one in %s)" % (self.package.name, changelog))
+                raise PackagingError("No changelog for package (expected to "
+                        "find one in %s)" % changelog)
             self.changelog_updater.update(self.package.name, changelog)
 
     def _move_rpms_to_target_dir(self):
@@ -121,24 +128,24 @@ class Packager(object):
             generated_rpms.append(target_path)
         if not generated_rpms:
             raise PackagingError("No RPM package generated!")
-        logging.info("Created %d RPM package(s)" % len(generated_rpms))
+        self.logger.info("Created %d RPM package(s)" % len(generated_rpms))
         for rpm in sorted(generated_rpms):
-            logging.info("Created RPM package: %s" % rpm)
+            self.logger.info("Created RPM package: %s" % rpm)
 
     def _list_debs(self):
         # Lists the Debian packages generated
         generated_debs = sorted(glob.glob("%s/*.deb" % self.build_dir))
         if not generated_debs:
             raise PackagingError("No Debian package generated!")
-        logging.info("Created %d Debian package(s)" % len(generated_debs))
+        self.logger.info("Created %d Debian package(s)" % len(generated_debs))
         for deb in generated_debs:
-            logging.info("Created Debian package: %s" % deb)
+            self.logger.info("Created Debian package: %s" % deb)
 
     def build(self):
         """
         Builds the package itself.
         """
-        logging.info("Building package %s" % self.package.name)
+        self.logger.info("Building package")
         command = None
         if self.package_type == "deb":
             command = 'debuild -e OBM_NOCOMPILE --no-tgz-check -us -uc -sa'
@@ -167,8 +174,9 @@ class Packager(object):
         else:
             raise PackagingError("Unknown packaging type: %s" % \
                     self.package_type)
-        subp.check_call(command, cwd=self._target_dir, stdout=sys.stdout,
-                stderr=sys.stderr, shell=True)
+        subp_stderrout = open(self.logfile, 'a')
+        subp.check_call(command, cwd=self._target_dir, stdout=subp_stderrout,
+                stderr=subp_stderrout, shell=True)
         if self.package_type == "rpm":
             self._move_rpms_to_target_dir()
         elif self.package_type == "deb":

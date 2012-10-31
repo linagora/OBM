@@ -3,6 +3,16 @@
 """
 OBM build script. This script is responsible for building OBM as Debian and RPM packages.
 
+Designed to run on Debian Squeeze.
+
+Needs:
+    python 2.x, >= 2.6
+    python-argparse
+
+Desgined to run on Debian Squeeze with packages:
+    dev-scripts
+    rpm
+
 See the documentation at http://obm.org/doku.php?id=building_obm_packages
 """
 
@@ -14,6 +24,8 @@ import logging
 import os.path
 import string
 import sys
+import multiprocessing
+import errno
 
 import obm.build as ob
 
@@ -43,7 +55,12 @@ def build_argument_parser(args):
             default=os.environ.get('OBM_PERLVERSION', '5.8'), dest='perl_version', choices=['5.8', '5.10'])
 
     parser.add_argument('-n', '--nocompile', help="Do not attempt to compile anything. Defaults to $OBM_NOCOMPILE or 'False'",
-            default=boolean_value_of(os.environ.get('OBM_NOCOMPILE', '0')), action='store_true', dest='nocompile');
+            default=boolean_value_of(os.environ.get('OBM_NOCOMPILE', '0')), action='store_true', dest='nocompile')
+
+    parser.add_argument('-P', '--processcount', help="set the number of concurrent processes usedused  to build the packages. "
+                       "One process by Debian control file or RPM .SPEC file. Defaults to $OBM_PROCESSCOUNT or "
+                       "number of available cores",
+                       default=int(os.environ.get('OBM_PROCESSCOUNT', multiprocessing.cpu_count())), dest='processcount')
 
     package_types = ['deb', 'rpm']
     parser.add_argument('-p', '--package-type', metavar='PACKAGETYPE',
@@ -145,6 +162,45 @@ def assert_package_option_is_correct(usage, package_names, available_packages):
                     formatted_available_packages))
         sys.exit(2)
 
+def launch_packager(packager):
+    try:
+        logging.info("\tBUILD PREPARE: %s" % packager.package.name)
+        packager.prepare_build()
+        logging.info("\tBUILD START: %s" % packager.package.name)
+        packager.build()
+        logging.info("\tBUILD COMPLETE: %s" % packager.package.name)
+        return True
+    except (Exception, SystemExit, KeyboardInterrupt) as ex:
+        logging.exception("\tBUILD ERROR: %s" % packager.package.name)
+        return False
+
+def exit_failure(pool):
+    logging.error("TERMINATING CHILD PROCESSES")
+    pool.terminate()
+    pool.join()
+    logging.error("BUILD FAILURE")
+    sys.exit(1)
+
+def exit_success(pool):
+    logging.info("WAITING FOR CHILD PROCESSES TO FINISH")
+    pool.join()
+    logging.info("BUILD SUCCESS")
+
+def mkdir_lenient(path):
+    try:
+        os.mkdir(path)
+    except (OSError) as err:
+        if err.errno != errno.EEXIST:
+            logging.exception("BUILD ERROR:")
+            logging.error("BUILD FAILURE")
+            sys.exit(1)
+        else:
+            logging.warn("It seems directory at %s already exists, skipping..." % path)
+
+def prepare_dirs(workdir):
+    mkdir_lenient(workdir)
+    mkdir_lenient(workdir + os.sep + "log")
+
 def main():
     logging.basicConfig(level=logging.DEBUG)
 
@@ -162,13 +218,9 @@ def main():
     logging.info("End of parameter list")
 
     config = ob.read_config(args.configuration_file)
-
-    packages_dir = args.work_dir
-
     checkout_dir = os.path.dirname(os.path.abspath('.'))
 
     available_packages = ob.read_packages(config, checkout_dir)
-
     package_names = set(args.packages)
     assert_package_option_is_correct(argument_parser.format_usage(),
             package_names, available_packages)
@@ -178,12 +230,30 @@ def main():
     else:
         packages = [p for p in available_packages if p.name in package_names]
 
-    packagers = make_packagers(config, args, packages_dir, checkout_dir,
+    prepare_dirs(args.work_dir)
+
+    packagers = make_packagers(config, args, args.work_dir, checkout_dir,
             packages)
 
-    for packager in packagers:
-        packager.prepare_build()
-        packager.build()
+    try:
+        pool = multiprocessing.Pool(args.processcount)
+        tasks = set([pool.apply_async(launch_packager, [packager]) for packager in packagers])
+        pending_tasks = tasks.copy()
+        pool.close()
+        logging.info("Processing %d packaging tasks..." % len(tasks))
+        while len(pending_tasks) > 0:
+            for task in tasks:
+                if task in pending_tasks and task.ready() is True:
+                    if task.get() is False:
+                        exit_failure(pool)
+                    else:
+                        pending_tasks.discard(task)
+                        logging.info("%d packaging tasks remaining..." % len(pending_tasks))
+                task.wait(1.)
+        exit_success(pool)
+    except (KeyboardInterrupt) as ex:
+        logging.warning("KEYBOARD INTERRUPT")
+        exit_failure(pool)
 
 if __name__ == "__main__":
     main()
