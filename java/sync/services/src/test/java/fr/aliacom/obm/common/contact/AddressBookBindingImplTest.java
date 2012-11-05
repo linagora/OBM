@@ -44,8 +44,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.ContactConfiguration;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -60,8 +60,6 @@ import com.google.common.collect.Sets;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class AddressBookBindingImplTest {
@@ -126,6 +124,7 @@ public class AddressBookBindingImplTest {
 
 		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+
 		Set<Folder> updatedContactFolders = new HashSet<Folder>();
 		updatedContactFolders.add(updatedContactFolder1);
 		updatedContactFolders.add(updatedContactFolder2);

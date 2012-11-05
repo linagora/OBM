@@ -259,5 +259,4 @@ public class HierarchyExporterTest {
 		expect(backend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncState))
 			.andReturn(hierarchyItemsChanges).once();
 	}
-	
 }

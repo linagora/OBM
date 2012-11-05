@@ -59,7 +59,6 @@ public class SizeLimitingInputStreamTest {
 		byte[] testArray = new byte[4096];
 		ByteStreams.toByteArray(
 				new SizeLimitingInputStream(new ByteArrayInputStream(testArray), 2048));
-		
 	}
 
 	@Test(expected=IOException.class)
