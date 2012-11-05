@@ -241,7 +241,7 @@ public class ImapMailboxServiceTest {
 		mailboxService.storeInSent(udr, inputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent\r\n\r\n");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
@@ -283,7 +283,7 @@ public class ImapMailboxServiceTest {
 		mailboxService.storeInSent(udr, inputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
-		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent\r\n\r\n");
 
 		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}

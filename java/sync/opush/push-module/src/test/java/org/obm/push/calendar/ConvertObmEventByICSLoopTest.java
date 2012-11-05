@@ -31,6 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.obm.push.exception.ConversionException;
+
 
 public class ConvertObmEventByICSLoopTest extends ConvertObmEventToMsEventIntegrityTest {
 	
@@ -38,5 +42,11 @@ public class ConvertObmEventByICSLoopTest extends ConvertObmEventToMsEventIntegr
 	protected ObmEventToMSEventConverter newObmEventToMSEventConverter() {
 		return new ObmEventToMSEventByICSLoopConverter();
 	}
-	
+
+	@Ignore("OBMFULL-4295")
+	@Test
+	@Override
+	public void testTimeZoneConversion() throws ConversionException {
+		super.testTimeZoneConversion();
+	}
 }

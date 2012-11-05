@@ -1307,14 +1307,12 @@ public class CalendarBindingImplTest {
 		
 		List<Event> updatedEvents = sortedChanges.getUpdated();
 		
-		List<Event> updatedRecurrentEvents = Lists.newArrayList(
+		assertThat(updatedEvents).containsOnly(
 				getFakeEvent(RecurrenceKind.daily),
 				getFakeEvent(RecurrenceKind.monthlybydate),
 				getFakeEvent(RecurrenceKind.monthlybyday),
 				getFakeEvent(RecurrenceKind.weekly),
 				getFakeEvent(RecurrenceKind.yearly));
-		
-		assertThat(updatedEvents).containsOnly(updatedRecurrentEvents.toArray());
 	}
 
 	private EventChanges mockGetSyncWithSortedChanges(String calendar, String userName,

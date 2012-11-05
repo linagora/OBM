@@ -125,7 +125,7 @@ public class EventServiceImplTest {
 		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
 
 		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
-		Assertions.assertThat(msEvent).equals(expectedMsEvent);
+		Assertions.assertThat(msEvent).isEqualTo(expectedMsEvent);
 
 		EasyMock.verify(mocks);
 	}
@@ -171,7 +171,7 @@ public class EventServiceImplTest {
 		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
 
 		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
-		Assertions.assertThat(msEvent).equals(expectedMsEvent);
+		Assertions.assertThat(msEvent).isEqualTo(expectedMsEvent);
 
 		EasyMock.verify(mocks);
 	}

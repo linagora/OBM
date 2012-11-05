@@ -39,11 +39,9 @@ import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChang
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
@@ -66,40 +64,12 @@ import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 public class EmailSyncTestUtils {
 	
-	public static void checkSyncDefaultMailFolderHasNoChange(Folder inbox, SyncResponse syncEmailResponse) {
-		checkSyncDefaultMailFolderHasItems(inbox, syncEmailResponse, ImmutableList.<Add>of(), ImmutableList.<Delete>of());
-	}
-
-	public static void checkSyncDefaultMailFolderHasAddItems(Folder inbox, SyncResponse response, Add... changes) {
-		checkSyncDefaultMailFolderHasItems(inbox, response, Arrays.asList(changes), ImmutableList.<Delete>of());
-	}
-
-	public static void checkSyncDefaultMailFolderHasDeleteItems(Folder inbox, SyncResponse response, Delete... deletes) {
-		checkSyncDefaultMailFolderHasItems(inbox, response, ImmutableList.<Add>of(), Arrays.asList(deletes));
-	}
-
-	
-	public static void checkSyncDefaultMailFolderHasItems(
-			Folder inbox, SyncResponse response, Iterable<Add> adds, Iterable<Delete> deletes) {
-		Assertions.assertThat(response).isNotNull();
-		Collection inboxCollection = response.getCollection(String.valueOf(inbox.getServerId()));
-		Assertions.assertThat(inboxCollection).isNotNull();
-		Assertions.assertThat(inboxCollection.getAdds()).containsOnly(Iterables.toArray(adds, Object.class));
-		Assertions.assertThat(inboxCollection.getDeletes()).containsOnly(Iterables.toArray(deletes, Object.class));
-	}
-
 	public static void mockEmailSyncClasses(
 			String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)

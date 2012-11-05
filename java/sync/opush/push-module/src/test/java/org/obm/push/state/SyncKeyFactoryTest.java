@@ -35,6 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -55,6 +56,7 @@ public class SyncKeyFactoryTest {
 		assertThat(new SyncKeyFactory().randomSyncKey()).isNotEmpty();
 	}
 	
+	@Ignore("too slow : https://github.com/alexruiz/fest-assert-2.x/issues/122")
 	@Test @Slow
 	public void testNotSameKeyForMillionsGeneration() {
 		int syncKeyGenerationCount = 1000000;

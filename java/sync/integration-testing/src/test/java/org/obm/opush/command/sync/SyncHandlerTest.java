@@ -36,11 +36,8 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasAddItems;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasDeleteItems;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasItems;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.checkSyncDefaultMailFolderHasNoChange;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -74,6 +71,7 @@ import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
+import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.Folder;
 import org.obm.sync.push.client.FolderSyncResponse;
@@ -125,7 +123,11 @@ public class SyncHandlerTest {
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId());
 
-		checkSyncDefaultMailFolderHasNoChange(inbox, syncEmailResponse);
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).isEmpty();
+		assertThat(inboxCollection.getDeletes()).isEmpty();
 	}
 	
 	@Test
@@ -153,8 +155,12 @@ public class SyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId());
-		checkSyncDefaultMailFolderHasAddItems(inbox, syncEmailResponse, 
-				new Add(syncEmailCollectionId + ":" + 0));
+		
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).containsOnly(new Add(syncEmailCollectionId + ":" + 0));
+		assertThat(inboxCollection.getDeletes()).isEmpty();
 	}
 
 	@Test
@@ -186,9 +192,13 @@ public class SyncHandlerTest {
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId());
 
-		checkSyncDefaultMailFolderHasAddItems(inbox, syncEmailResponse, 
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).containsOnly(
 				new Add(syncEmailCollectionId + ":" + 0),
 				new Add(syncEmailCollectionId + ":" + 1));
+		assertThat(inboxCollection.getDeletes()).isEmpty();
 	}
 
 	@Test
@@ -215,8 +225,12 @@ public class SyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId());
-		checkSyncDefaultMailFolderHasDeleteItems(inbox, syncEmailResponse, 
-				new Delete(syncEmailCollectionId + ":" + 0));
+		
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).isEmpty();
+		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":" + 0));
 	}
 
 	@Test
@@ -246,10 +260,12 @@ public class SyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId());
-		
-		checkSyncDefaultMailFolderHasItems(inbox, syncEmailResponse, 
-				Arrays.asList(new Add(syncEmailCollectionId + ":123")),
-				Arrays.asList(new Delete(syncEmailCollectionId + ":122")));
+
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).containsOnly(new Add(syncEmailCollectionId + ":123"));
+		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":122"));
 	}
 	
 	private FolderSyncState newSyncState(String syncEmailSyncKey) {
