@@ -34,7 +34,7 @@
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.3</commons-io.version>
 		<jms.version>1.1</jms.version>
-		<netty.version>3.2.4.Final</netty.version>		
+		<netty.version>3.5.9.Final</netty.version>		
 		<jta.version>1.1</jta.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<slf4j.version>1.6.2</slf4j.version>
@@ -431,7 +431,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${jms.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.netty</groupId>
+				<groupId>io.netty</groupId>
 				<artifactId>netty</artifactId>
 				<version>${netty.version}</version>
 			</dependency>			
