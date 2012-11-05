@@ -32,7 +32,6 @@
 package org.obm.push;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -176,8 +175,7 @@ public class ActiveSyncServletTest {
 
 	private Logger createLogger() {
 		Logger logger = mocksControl.createMock(Logger.class);
-		Object[] array = new Object[] { user.getEmail(), deviceType};
-		logger.info(anyObject(String.class), aryEq(array));
+		logger.info(anyObject(String.class), eq(user.getEmail()), eq(deviceType));
 		mocksControl.anyTimes();
 		logger.debug(anyObject(String.class));
 		mocksControl.anyTimes();
