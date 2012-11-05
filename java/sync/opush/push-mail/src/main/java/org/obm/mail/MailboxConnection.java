@@ -29,38 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.mail;
 
-import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.push.backend.MailMonitoringBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.mail.imap.ImapMonitoringImpl;
-import org.obm.push.mail.smtp.SmtpProvider;
-import org.obm.push.mail.smtp.SmtpProviderImpl;
-import org.obm.push.mail.transformer.HtmlToText;
-import org.obm.push.mail.transformer.Identity;
-import org.obm.push.mail.transformer.Transformer;
+import java.io.InputStream;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-
-public class OpushMailModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
-		bind(MailBackend.class).to(MailBackendImpl.class);
-		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
-		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
-		Multibinder<PIMBackend> pimBackends = 
-				Multibinder.newSetBinder(binder(), PIMBackend.class);
-		pimBackends.addBinding().to(MailBackend.class);
-		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
-		Multibinder<Transformer.Factory> transformers = 
-				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
-		transformers.addBinding().to(Identity.Factory.class);
-		transformers.addBinding().to(HtmlToText.Factory.class);
-	}
-
+public interface MailboxConnection {
+	
+	InputStream uidFetchPart(long uid, String address);
 }

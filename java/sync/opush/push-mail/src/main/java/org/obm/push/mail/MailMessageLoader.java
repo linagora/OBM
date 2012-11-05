@@ -42,17 +42,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.minig.imap.Address;
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
-import org.minig.imap.StoreClient;
+import org.minig.imap.FastFetch;
 import org.minig.imap.UIDEnvelope;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
+import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.conversation.MessageId;
 import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
+import org.obm.mail.message.MessageFetcher;
+import org.obm.mail.message.MessageFetcher.Factory;
 import org.obm.mail.message.MessageLoader;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
@@ -64,13 +65,14 @@ import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -78,39 +80,41 @@ import com.google.common.io.ByteStreams;
  */
 public class MailMessageLoader {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(MailMessageLoader.class);
+	private static final Logger logger = LoggerFactory.getLogger(MailMessageLoader.class);
 	
 	private final List<String> htmlMimeSubtypePriority;
-	private final StoreClient storeClient;
+	private final MailboxConnection mailboxConnection;
 	private final EventService eventService;
+	private final Factory fetcherFactory;
+	private final PrivateMailboxService privateMailboxService;
+
 	
-	public MailMessageLoader(StoreClient store, EventService eventService) {
-		this.storeClient = store;
+	public MailMessageLoader(PrivateMailboxService privateMailboxService, MailboxConnection mailboxConnection, EventService eventService, 
+			MessageFetcher.Factory fetcherFactory) {
+		
+		this.privateMailboxService = privateMailboxService;
+		this.mailboxConnection = mailboxConnection;
 		this.eventService = eventService;
+		this.fetcherFactory = fetcherFactory;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain");
 	}
 
-	public MSEmail fetch(final Integer collectionId, final long messageId, final UserDataRequest udr) {
+	public MSEmail fetch(final String collectionPath, final Integer collectionId, final long messageId, final UserDataRequest udr) 
+			throws CollectionNotFoundException {
+		
 		MSEmail msEmail = null;
 		try {
-			
-			final List<Long> messageIdAsList = Arrays.asList(messageId);
-			final Collection<UIDEnvelope> envelopes = storeClient.uidFetchEnvelope(messageIdAsList);
-			if (envelopes.size() != 1 || envelopes.iterator().next() == null) {
-				return null;
-			}
-			
-			final MimeMessage mimeMessage = getFirstMimeMessage(messageIdAsList);
+			final UIDEnvelope envelope = privateMailboxService.fetchEnvelope(udr, collectionPath, messageId);
+			final MimeMessage mimeMessage = privateMailboxService.fetchBodyStructure(udr, collectionPath, messageId);
 			if (mimeMessage != null) {
-				final MessageFetcherImpl messageFetcherImpl = new MessageFetcherImpl(storeClient);
-				final MessageLoader helper = new MessageLoader(messageFetcherImpl, htmlMimeSubtypePriority, false, mimeMessage);
+				final MessageFetcher messageFetcher = fetcherFactory.create(mailboxConnection);
+				final MessageLoader helper = new MessageLoader(messageFetcher, htmlMimeSubtypePriority, false, mimeMessage);
 				final MailMessage message = helper.fetch();
 				
-				msEmail = convertMailMessageToMSEmail(message, udr, mimeMessage.getUid(), collectionId, messageId);
-				setMsEmailFlags(msEmail, messageIdAsList);
-				fetchMimeData(msEmail, messageId);
-				msEmail.setSmtpId(envelopes.iterator().next().getEnvelope().getMessageId());
+				msEmail = convertMailMessageToMSEmail(message, udr, mimeMessage.getUid(), collectionId, messageId, collectionPath);
+				setMsEmailFlags(msEmail, udr, collectionPath, messageId);
+				fetchMimeData(msEmail, udr, collectionPath, messageId);
+				msEmail.setSmtpId(envelope.getEnvelope().getMessageId());
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
@@ -124,30 +128,24 @@ public class MailMessageLoader {
 		}
 		return msEmail;
 	}
-
-	private MimeMessage getFirstMimeMessage(final List<Long> messageIdAsList) {
-		final Collection<MimeMessage> mts = storeClient.uidFetchBodyStructure(messageIdAsList);
-		final MimeMessage tree = Iterables.getFirst(mts, null);
-		return tree;
-	}
 	
-	private void setMsEmailFlags(final MSEmail msEmail, final List<Long> messageIdAsList) {
-		final Collection<FlagsList> fl = storeClient.uidFetchFlags(messageIdAsList).values();
+	private void setMsEmailFlags(final MSEmail msEmail, final UserDataRequest udr, final String collectionPath, final long messageId) {
+		final Collection<FastFetch> fl = privateMailboxService.fetchFast(udr, collectionPath, ImmutableList.<Long> of(messageId));
 		if (!fl.isEmpty()) {
-			final FlagsList fl0 = fl.iterator().next();
-			msEmail.setRead(fl0.contains(Flag.SEEN));
-			msEmail.setStarred(fl0.contains(Flag.FLAGGED));
-			msEmail.setAnswered(fl0.contains(Flag.ANSWERED));
+			final FastFetch fl0 = fl.iterator().next();
+			msEmail.setRead(fl0.isRead());
+			msEmail.setStarred(fl0.isFlagged());
+			msEmail.setAnswered(fl0.isAnswered());
 		}
 	}
 	
-	private void fetchMimeData(final MSEmail mm, final long messageId) {
-		final InputStream mimeData = storeClient.uidFetchMessage(messageId);
+	private void fetchMimeData(final MSEmail mm, final UserDataRequest udr, final String collectionPath, final long messageId) {
+		final InputStream mimeData = privateMailboxService.fetchMailStream(udr, collectionPath, messageId);
 		mm.setMimeData(mimeData);
 	}
 
 	private MSEmail convertMailMessageToMSEmail(final MailMessage mailMessage, final UserDataRequest udr, 
-			final long uid, final Integer collectionId, long messageId) throws ConversionException {
+			final long uid, final Integer collectionId, long messageId, String collectionPath) throws ConversionException {
 		
 		final MSEmail msEmail = new MSEmail();
 		msEmail.setSubject(mailMessage.getSubject());
@@ -155,7 +153,7 @@ public class MailMessageLoader {
 		msEmail.setFrom(convertAdressToMSAddress(mailMessage.getSender()));
 		msEmail.setDate(mailMessage.getDate());
 		msEmail.setHeaders(mailMessage.getHeaders());
-		msEmail.setAttachements(convertMailMessageAttachmentToMSAttachment(mailMessage, uid, collectionId, messageId));	
+		msEmail.setAttachements(convertMailMessageAttachmentToMSAttachment(mailMessage, uid, collectionId, messageId, udr, collectionPath));	
 		msEmail.setUid(mailMessage.getUid());
 		
 		msEmail.setTo(convertAllAdressToMSAddress(mailMessage.getTo()));
@@ -163,17 +161,17 @@ public class MailMessageLoader {
 		msEmail.setCc(convertAllAdressToMSAddress(mailMessage.getCc()));
 		
 		if (mailMessage.getInvitation() != null) {
-			setInvitation(msEmail, udr, mailMessage.getInvitation(), uid);
+			setInvitation(msEmail, udr, mailMessage.getInvitation(), collectionPath, messageId);
 		}
 		
 		return msEmail;
 	}
 
-	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final long uid)
+	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final String collectionPath, final long messageId)
 			throws ConversionException {
 		
 		try {	
-			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, uid);
+			final InputStream inputStreamInvitation = extractInputStreamInvitation(mimePart, udr, collectionPath, messageId);
 			final MSEvent event = getInvitation(udr, inputStreamInvitation);
 			if (mimePart.isInvitation()) {
 				msEmail.setInvitation(event, MSMessageClass.SCHEDULE_MEETING_REQUEST);
@@ -185,8 +183,10 @@ public class MailMessageLoader {
 		}
 	}
 	
-	private InputStream extractInputStreamInvitation(final IMimePart mp, final long uid) throws IOException {
-		final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
+	private InputStream extractInputStreamInvitation(final IMimePart mp, final UserDataRequest udr, final String collectionPath, final long messageId) 
+			throws IOException {
+		
+		final InputStream part = privateMailboxService.findAttachment(udr, collectionPath, messageId, mp.getAddress());
 		byte[] data = extractPartData(mp, part);
 		if (data != null) {
 			return new ByteArrayInputStream(data);
@@ -207,14 +207,14 @@ public class MailMessageLoader {
 	}
 
 	private Set<MSAttachement> convertMailMessageAttachmentToMSAttachment(MailMessage mailMessage, long uid, 
-			Integer collectionId, long messageId) {
+			Integer collectionId, long messageId, UserDataRequest udr, String collectionPath) {
 		
 		Set<MSAttachement> msAttachements = new HashSet<MSAttachement>();
 		for (MailMessageAttachment mailMessageAttachment: mailMessage.getAttachments()) {			
 			
 			IMimePart part = mailMessageAttachment.getPart();
 			if (part != null && !part.isInvitation()) {
-				MSAttachement extractAttachments = extractAttachmentData(part, uid, collectionId, messageId);
+				MSAttachement extractAttachments = extractAttachmentData(part, uid, collectionId, messageId, udr, collectionPath);
 				if (isNotICSAttachments(extractAttachments)) {
 					msAttachements.add(extractAttachments);
 				}
@@ -275,11 +275,11 @@ public class MailMessageLoader {
 	}
 	
 	private MSAttachement extractAttachmentData(final IMimePart mp, final long uid, 
-			final Integer collectionId, final long messageId) {
+			final Integer collectionId, final long messageId, final UserDataRequest udr, final String collectionPath) {
 		try {
 			
 			if (mp.getName() != null || mp.getContentId() != null) {
-				final InputStream part = storeClient.uidFetchPart(uid, mp.getAddress().getAddress());
+				final InputStream part = privateMailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());
 				byte[] data = extractPartData(mp, part);
 				
 				final String id = AttachmentHelper.getAttachmentId(collectionId.toString(), String.valueOf(messageId), 

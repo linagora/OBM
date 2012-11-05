@@ -29,14 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.greenmail;
+package org.obm.push.mail.imap;
 
-import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Date;
-import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -46,84 +44,96 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailTestsUtils;
+import org.obm.push.mail.MailboxFolder;
+import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.inject.Inject;
-import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.GreenMail;
 
 @Ignore("Waiting for mail backend testing module")
 @RunWith(SlowFilterRunner.class) @Slow
-public class ExternalGreenMailTest {
+public class MailboxServiceSubscribedFoldersTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject MailboxService mailboxService;
-	@Inject EmailConfiguration emailConfiguration;
-	@Inject LocatorService locatorService;
-
+	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
+
+	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
+	private MailboxTestUtils testUtils;
+	private Date beforeTest;
 	private UserDataRequest udr;
-	
-	private ClosableProcess greenMailProcess;
 
 	@Before
-	public void setUp() throws ExternalProcessException, InterruptedException {
+	public void setUp() {
+		beforeTest = new Date();
+		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
+		greenMail.setUser(mailbox, password);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
-		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
+		testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
-	public void tearDown() throws InterruptedException {
-		greenMailProcess.closeProcess();
-	}
-	
-	@Test
-	public void testExternalGreenMail() throws MailException {
-		Date before = new Date();
-		Set<Email> emails = sendOneEmailAndFetchAll(before);
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	public void tearDown() {
+		greenMail.stop();
 	}
 
 	@Test
-	public void testMailsArePurgedBetweenTwoTest() throws MailException, ExternalProcessException, InterruptedException {
-		Date before = new Date();
+	public void testNewFolderIsCreatedUnsubscribed() throws MailException {
+		OpushImapFolder newFolder = createUnsubscribedFolder("newFolder");
 		
-		Set<Email> emailsOfFirstTest = sendOneEmailAndFetchAll(before);
-		reinitTestContext();
-		Set<Email> emailsOfSecondTest = sendOneEmailAndFetchAll(before);
+		MailboxFolders subscribedFolders = mailboxService.listSubscribedFolders(udr);
 		
-		Assertions.assertThat(emailsOfFirstTest).isNotNull().hasSize(1);
-		Assertions.assertThat(emailsOfSecondTest).isNotNull().hasSize(1);
+		assertThat(newFolder.isSubscribed()).isFalse();
+		assertThat(subscribedFolders).isEmpty();
 	}
 
-	private void reinitTestContext() throws ExternalProcessException, InterruptedException {
-		tearDown();
-		setUp();
+	@Test
+	public void testNoResultWhenNoSubscription() throws MailException {
+		MailboxFolders subscribedFolders = mailboxService.listSubscribedFolders(udr);
+		
+		assertThat(subscribedFolders).isEmpty();
 	}
 
-	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
-		return mailboxService.fetchEmails(udr, inboxPath, before);
+	@Test
+	public void testNoResultWhenRegularFoldersExist() throws MailException {
+		createUnsubscribedFolder(EmailConfiguration.IMAP_DRAFTS_NAME);
+		createUnsubscribedFolder(EmailConfiguration.IMAP_SENT_NAME);
+		createUnsubscribedFolder(EmailConfiguration.IMAP_TRASH_NAME);
+		
+		MailboxFolders subscribedFolders = mailboxService.listSubscribedFolders(udr);
+		
+		assertThat(subscribedFolders).isEmpty();
+	}
+
+	@Test
+	public void testNoResultWhenSubfolderExist() throws MailException {
+		createUnsubscribedFolder(EmailConfiguration.IMAP_INBOX_NAME + ".SUBFOLDER");
+		
+		MailboxFolders subscribedFolders = mailboxService.listSubscribedFolders(udr);
+
+		assertThat(subscribedFolders).isEmpty();
+	}
+
+	private OpushImapFolder createUnsubscribedFolder(String folderName) throws MailException {
+		MailboxFolder folder = testUtils.folder(folderName);
+		return privateMailboxService.createFolder(udr, folder);
 	}
 }

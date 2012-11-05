@@ -43,15 +43,8 @@ import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.SmtpLocatorException;
-import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
 import org.obm.push.mail.TestEmailConfiguration;
-import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.ImapClientProviderImpl;
-import org.obm.push.mail.imap.ImapMailboxService;
 import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.service.EventService;
@@ -96,10 +89,6 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
 		bind(UserDataRequest.Factory.class).to(TrackableUserDataRequest.Factory.class);
-		bind(ImapClientProvider.class).to(ImapClientProviderImpl.class);
-		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
-		bind(MailboxService.class).to(ImapMailboxService.class);
-		bind(PrivateMailboxService.class).to(ImapMailboxService.class);
 	}
 	
 }

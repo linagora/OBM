@@ -47,6 +47,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 
@@ -54,29 +55,29 @@ public interface MailboxService {
 	
 	MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException;
 	
-	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionName, 
-			Collection<Long> uids) throws MailException;
+	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionPath, 
+			Collection<Long> uids) throws MailException, CollectionNotFoundException, DaoException;
 
-	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName, 
+	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath, 
 			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException;
 	
-	void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
+	void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 
-	String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException;
+	String parseMailBoxName(UserDataRequest udr, String collectionPath) throws MailException;
 
 	void delete(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
 
 	long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
 			throws MailException, DaoException, ImapMessageNotFoundException, UnsupportedBackendFunctionException;
 
-	InputStream fetchMailStream(UserDataRequest udr, String collectionName, long uid) throws MailException;
+	InputStream fetchMailStream(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 
-	void setAnsweredFlag(UserDataRequest udr, String collectionName, long uid) throws MailException, ImapMessageNotFoundException;
+	void setAnsweredFlag(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
 
 	void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;
 
-	InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
+	InputStream findAttachment(UserDataRequest udr, String collectionPath, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 
 	Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 
@@ -90,8 +91,8 @@ public interface MailboxService {
 
 	boolean getActivateTLS();
 	
-	Collection<Email> fetchEmails(UserDataRequest udr, String collectionName, Collection<Long> uids) throws MailException;
+	Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
-	Set<Email> fetchEmails(UserDataRequest udr, String collectionName, Date windows) throws MailException;
+	Set<Email> fetchEmails(UserDataRequest udr, String collectionPath, Date windows) throws MailException;
 
 }

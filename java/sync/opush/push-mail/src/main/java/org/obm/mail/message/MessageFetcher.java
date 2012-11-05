@@ -37,12 +37,17 @@ import java.io.InputStream;
 import org.minig.imap.IMAPHeaders;
 import org.minig.imap.mime.IMimePart;
 import org.minig.imap.mime.MimeMessage;
+import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.imap.StoreException;
 
 
 public interface MessageFetcher {
 
+	interface Factory {
+		MessageFetcher create(MailboxConnection mailboxConnection);
+	}
+	
 	IMAPHeaders fetchPartHeaders(MimeMessage message, IMimePart mimePart) throws IOException, StoreException;
 
 	InputStream fetchPart(MimeMessage message, IMimePart mimePart) throws IOException, StoreException;

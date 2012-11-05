@@ -53,12 +53,12 @@ public interface PrivateMailboxService extends MailboxService {
 	
 	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
 
-	Collection<Flag> fetchFlags(UserDataRequest udr, String inbox, long uid) throws MailException;
+	Collection<Flag> fetchFlags(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 
-	InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, FetchInstruction fetchInstruction) 
+	InputStream fetchMimePartData(UserDataRequest udr, String collectionPath, long uid, FetchInstruction fetchInstruction) 
 			throws MailException;
 
 	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 	
-	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress) throws MailException;
+	public InputStream findAttachment(UserDataRequest udr, String collectionPath, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 }

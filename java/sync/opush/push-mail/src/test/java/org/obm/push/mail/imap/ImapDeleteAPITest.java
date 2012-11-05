@@ -61,6 +61,7 @@ import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+@Ignore("Waiting for mail backend testing module")
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapDeleteAPITest {
 
@@ -82,7 +83,7 @@ public class ImapDeleteAPITest {
 	private UserDataRequest udr;
 	
 	private Date beforeTest;
-	private ImapTestUtils testUtils;
+	private MailboxTestUtils testUtils;
 	
 	@Before
 	public void setUp() throws MailException {
@@ -95,7 +96,7 @@ public class ImapDeleteAPITest {
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 
-	    testUtils = new ImapTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	    testUtils.createFolders(TRASH);
 	}
 	

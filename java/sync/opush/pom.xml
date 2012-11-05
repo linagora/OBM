@@ -29,7 +29,7 @@
 		<module>push</module>
 		<module>wbxml</module>
 		<module>client</module>
-		<module>imap</module>
+		<module>linagora-mail</module>
 		<module>technical-log</module>
 		<module>push-dao</module>
 		<module>push-bean</module>

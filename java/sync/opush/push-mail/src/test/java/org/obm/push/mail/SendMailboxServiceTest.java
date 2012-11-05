@@ -29,12 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.greenmail;
-
-import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
-
-import java.util.Date;
-import java.util.Set;
+package org.obm.push.mail;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -46,84 +41,94 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.MailEnvModule;
-import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailTestsUtils;
-import org.obm.push.mail.MailboxService;
 
 import com.google.inject.Inject;
-import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.GreenMail;
 
 @Ignore("Waiting for mail backend testing module")
 @RunWith(SlowFilterRunner.class) @Slow
-public class ExternalGreenMailTest {
+public class SendMailboxServiceTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject MailboxService mailboxService;
-	@Inject EmailConfiguration emailConfiguration;
-	@Inject LocatorService locatorService;
+	@Inject PrivateMailboxService privateMailboxService;
 
+	@Inject GreenMail greenMail;
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
-	
-	private ClosableProcess greenMailProcess;
+
 
 	@Before
-	public void setUp() throws ExternalProcessException, InterruptedException {
-		mailbox = "to@localhost.com";
-		password = "password";
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
-		udr = new UserDataRequest(
+	public void setUp() {
+	    greenMail.start();
+	    mailbox = "to@localhost.com";
+	    password = "password";
+	    greenMail.setUser(mailbox, password);
+	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
-		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
 	}
 	
 	@After
-	public void tearDown() throws InterruptedException {
-		greenMailProcess.closeProcess();
+	public void tearDown() {
+		greenMail.stop();
+	}
+
+	@Test
+	public void testParseSentMailBox() throws Exception {
+		privateMailboxService.createFolder(udr, folder("Sent"));
+
+		String userSentFolder = 
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
+	}
+
+	@Test
+	public void testParseSentMailBoxSentIsInsensitive() throws Exception {
+		privateMailboxService.createFolder(udr, folder("SeNt"));
+
+		String userSentFolder = 
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo("SeNt");
+	}
+
+	@Test
+	public void testParseSentMailBoxWhenManyNamedSentBox() throws Exception {
+		privateMailboxService.createFolder(udr, folder("AnyFolderSent"));
+		privateMailboxService.createFolder(udr, folder("Sent"));
+		privateMailboxService.createFolder(udr, folder("AnotherSentfolder"));
+
+		String userSentFolder = 
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
 	
 	@Test
-	public void testExternalGreenMail() throws MailException {
-		Date before = new Date();
-		Set<Email> emails = sendOneEmailAndFetchAll(before);
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
-	}
+	public void testParseSentMailBox_OBMFULL3133() throws Exception {
+		privateMailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
+		privateMailboxService.createFolder(udr, folder("Sent"));
+		privateMailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
 
-	@Test
-	public void testMailsArePurgedBetweenTwoTest() throws MailException, ExternalProcessException, InterruptedException {
-		Date before = new Date();
-		
-		Set<Email> emailsOfFirstTest = sendOneEmailAndFetchAll(before);
-		reinitTestContext();
-		Set<Email> emailsOfSecondTest = sendOneEmailAndFetchAll(before);
-		
-		Assertions.assertThat(emailsOfFirstTest).isNotNull().hasSize(1);
-		Assertions.assertThat(emailsOfSecondTest).isNotNull().hasSize(1);
+		String userSentFolder = 
+				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
+		String parsedMailbox = mailboxService.parseMailBoxName(udr, userSentFolder);
+		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_SENT_NAME);
 	}
-
-	private void reinitTestContext() throws ExternalProcessException, InterruptedException {
-		tearDown();
-		setUp();
-	}
-
-	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
-		return mailboxService.fetchEmails(udr, inboxPath, before);
+	
+	private MailboxFolder folder(String name) {
+		return new MailboxFolder(name);
 	}
 }

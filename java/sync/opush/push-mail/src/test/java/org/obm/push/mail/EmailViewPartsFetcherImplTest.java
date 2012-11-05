@@ -78,7 +78,6 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.imap.ImapMailboxService;
 import org.obm.push.mail.transformer.TestIdentityTransformerFactory;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
@@ -632,8 +631,8 @@ public class EmailViewPartsFetcherImplTest {
 		return displayName;
 	}
 	
-	private ImapMailboxService messageFixtureToMailboxServiceMock() throws Exception {
-		ImapMailboxService mailboxService = createStrictMock(ImapMailboxService.class);
+	private PrivateMailboxService messageFixtureToMailboxServiceMock() throws Exception {
+		PrivateMailboxService mailboxService = createStrictMock(PrivateMailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
 		mockMailboxServiceEnvelope(mailboxService);
 		mockMailboxServiceBody(mailboxService);
@@ -641,7 +640,7 @@ public class EmailViewPartsFetcherImplTest {
 		return mailboxService;
 	}
 
-	private void mockMailboxServiceFlags(ImapMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceFlags(PrivateMailboxService mailboxService) throws MailException {
 		Builder<Flag> flagsListBuilder = ImmutableList.builder();
 		if (messageFixture.answered) {
 			flagsListBuilder.add(Flag.ANSWERED);
@@ -656,7 +655,7 @@ public class EmailViewPartsFetcherImplTest {
 				.andReturn(flagsListBuilder.build()).once();
 	}
 
-	private void mockMailboxServiceEnvelope(ImapMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceEnvelope(PrivateMailboxService mailboxService) throws MailException {
 		Envelope envelope = Envelope.builder()
 			.from(messageFixture.from)
 			.to(messageFixture.to)
@@ -669,7 +668,7 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
 	}
 	
-	private void mockMailboxServiceBody(ImapMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceBody(PrivateMailboxService mailboxService) throws MailException {
 		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, messageFixture.uid))
 			.andReturn(mockAggregateMimeMessage()).once();
 

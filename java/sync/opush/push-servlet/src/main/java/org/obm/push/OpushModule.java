@@ -30,6 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
+import org.minig.imap.LinagoraImapModule;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.mail.OpushMailModule;
 
@@ -40,6 +41,7 @@ public class OpushModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		install(new LinagoraImapModule());
 		install(new OpushImplModule());
 		install(new OpushMailModule());
 		install(new LoggerModule());

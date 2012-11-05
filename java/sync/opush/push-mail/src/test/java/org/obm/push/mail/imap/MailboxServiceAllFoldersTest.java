@@ -29,12 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.greenmail;
-
-import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
+package org.obm.push.mail.imap;
 
 import java.util.Date;
-import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
@@ -43,87 +40,124 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailEnvModule;
-import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailTestsUtils;
+import org.obm.push.mail.MailboxFolder;
+import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.PrivateMailboxService;
 
 import com.google.inject.Inject;
-import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.GreenMail;
 
 @Ignore("Waiting for mail backend testing module")
 @RunWith(SlowFilterRunner.class) @Slow
-public class ExternalGreenMailTest {
+public class MailboxServiceAllFoldersTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
 
 	@Inject MailboxService mailboxService;
-	@Inject EmailConfiguration emailConfiguration;
-	@Inject LocatorService locatorService;
-
+	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
+
+	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
+	private MailboxTestUtils testUtils;
+	private Date beforeTest;
 	private UserDataRequest udr;
-	
-	private ClosableProcess greenMailProcess;
 
 	@Before
-	public void setUp() throws ExternalProcessException, InterruptedException {
+	public void setUp() {
+		beforeTest = new Date();
+		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
+		greenMail.setUser(mailbox, password);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
-		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
+		testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
-	public void tearDown() throws InterruptedException {
-		greenMailProcess.closeProcess();
+	public void tearDown() {
+		greenMail.stop();
 	}
 	
 	@Test
-	public void testExternalGreenMail() throws MailException {
-		Date before = new Date();
-		Set<Email> emails = sendOneEmailAndFetchAll(before);
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
+	public void testDefaultFolderList() throws Exception {
+		MailboxFolders emails = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(emails).containsOnly(inbox());
+	}
+	
+
+	@Test
+	public void testListTwoFolders() throws Exception {
+		MailboxFolder newFolder = folder("NEW");
+		privateMailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).containsOnly(
+				inbox(),
+				newFolder);
 	}
 
 	@Test
-	public void testMailsArePurgedBetweenTwoTest() throws MailException, ExternalProcessException, InterruptedException {
-		Date before = new Date();
-		
-		Set<Email> emailsOfFirstTest = sendOneEmailAndFetchAll(before);
-		reinitTestContext();
-		Set<Email> emailsOfSecondTest = sendOneEmailAndFetchAll(before);
-		
-		Assertions.assertThat(emailsOfFirstTest).isNotNull().hasSize(1);
-		Assertions.assertThat(emailsOfSecondTest).isNotNull().hasSize(1);
+	public void testListInboxSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.NEW");
+		privateMailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).containsOnly(
+				inbox(),
+				newFolder);
+	}
+	
+	@Test
+	public void testListInboxDeepSubfolder() throws Exception {
+		MailboxFolder newFolder = folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4");
+		privateMailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).containsOnly(
+				inbox(),
+				folder("INBOX.LEVEL1"),
+				folder("INBOX.LEVEL1.LEVEL2"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3"),
+				folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4"));
 	}
 
-	private void reinitTestContext() throws ExternalProcessException, InterruptedException {
-		tearDown();
-		setUp();
+	@Test
+	public void testListToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP");
+		privateMailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).containsOnly(
+				inbox(),
+				folder("TOP"));
+	}
+	
+	@Test
+	public void testListNestedToplevelFolder() throws Exception {
+		MailboxFolder newFolder = folder("TOP.LEVEL1");
+		privateMailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		Assertions.assertThat(after).containsOnly(
+				inbox(),
+				folder("TOP"),
+				folder("TOP.LEVEL1"));
 	}
 
-	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
-		return mailboxService.fetchEmails(udr, inboxPath, before);
+	protected MailboxFolder folder(String name) {
+		return testUtils.folder(name);
+	}
+	
+	protected MailboxFolder inbox() {
+		return testUtils.inbox();
 	}
 }
