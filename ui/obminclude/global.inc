@@ -39,7 +39,7 @@ applicable to the OBM software.
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.4.2.0-beta1';
+$obm_version = '2.4.2.0-SNAPSHOT';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
