@@ -2127,6 +2127,82 @@ public class CalendarBindingImplTest {
 			verify(mocks);
 		}
 	}
+	
+	@Test
+	public void testApplyParticipationStateModificationsWithoutDelegations() {
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.applyParticipationStateModifications(before, event);
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+	}
+	
+	@Test
+	public void testApplyParticipationStateModificationsWithDelegations() {
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		att1.setCanWriteOnCalendar(true);
+		calendarService.applyParticipationStateModifications(before, event);
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+	}
+	
+	@Test
+	public void testApplyParticipationStateModificationsWithDelegationsWithExceptions() {
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.NEEDSACTION).build();
+		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
+		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		att1.setCanWriteOnCalendar(true);
+		att1ForExc.setCanWriteOnCalendar(true);
+		event.addEventException(exception);
+		calendarService.applyParticipationStateModifications(before, event);
+		
+		assertThat(att1.getState()).isEqualTo(ParticipationState.ACCEPTED);
+		assertThat(att1ForExc.getState()).isEqualTo(ParticipationState.ACCEPTED);
+	}
+	
+	@Test
+	public void testInitDefaultParticipationState() {
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Event event = createEvent(Arrays.asList(organizer, att1));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		calendarService.initDefaultParticipationState(event);
+		
+		assertThat(organizer.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+	}
+	
+	@Test
+	public void testInitDefaultParticipationStateWithExceptions() {
+		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participationState(ParticipationState.ACCEPTED).build();
+		Event event = createEvent(Arrays.asList(organizer, att1));
+		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		event.addEventException(exception);
+		calendarService.initDefaultParticipationState(event);
+		
+		assertThat(organizer.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(att1.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(organizerForExc.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+		assertThat(att1ForExc.getState()).isEqualTo(ParticipationState.NEEDSACTION);
+	}
 
 	private Event createEvent(List<Attendee> expectedAttendees) {
 		Event event = new Event();

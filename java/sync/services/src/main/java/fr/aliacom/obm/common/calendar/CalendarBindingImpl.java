@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
@@ -88,7 +89,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
-import java.util.Arrays;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -448,6 +448,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			assignDelegationRightsOnAttendees(token, event);
+			initDefaultParticipationState(event);
 			inheritsParticipationStateFromExistingEvent(before, event);
 			applyParticipationStateModifications(before, event);
 			
@@ -462,6 +463,49 @@ public class CalendarBindingImpl implements ICalendar {
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
+		}
+	}
+	
+	@VisibleForTesting
+	void initDefaultParticipationState(Event event) {
+		initDefaultParticipationStateOnEvent(event);
+		for (Event eventException : event.getEventsExceptions()) {
+			initDefaultParticipationStateOnEvent(eventException);
+		}
+	}
+	
+	private void initDefaultParticipationStateOnEvent(Event event) {
+		List<Attendee> attendees = event.getAttendees();
+		
+		if (attendees != null) {
+			for (Attendee attendee : attendees) {
+				attendee.setState(ParticipationState.NEEDSACTION);
+			}
+		}
+	}
+	
+	private void ensureNewAttendeesWithDelegationAreAccepted(Event before, Event event) {
+		ensureNewAttendeesWithDelegationAreAcceptedOnEvent(before, event);
+		
+		List<Event> eventExceptions = event.getEventsExceptions();
+		TreeMap<Event, Event> beforeExceptions = buildTreeMap(before.getEventsExceptions());
+		
+		for (Event eventException : eventExceptions) {
+			ensureNewAttendeesWithDelegationAreAcceptedOnEvent(beforeExceptions.get(eventException), eventException);
+		}
+	}
+	
+	private void ensureNewAttendeesWithDelegationAreAcceptedOnEvent(Event before, Event event) {
+		List<Attendee> newAttendees = new ArrayList<Attendee>(event.getAttendees());
+		
+		if (before != null) {
+			newAttendees.removeAll(before.getAttendees());
+		}
+		
+		for (Attendee attendee : newAttendees) {
+			if (attendee.isCanWriteOnCalendar()) {
+				attendee.setState(ParticipationState.ACCEPTED);
+			}
 		}
 	}
 
@@ -552,6 +596,8 @@ public class CalendarBindingImpl implements ICalendar {
 				exception.updateParticipationState();
 			}
 		}
+		
+		ensureNewAttendeesWithDelegationAreAccepted(before, event);
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
