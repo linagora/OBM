@@ -1,3 +1,9 @@
+obm-jetty (2.4.2.0~0.beta1) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon,  5 Nov 2012 10:28:38 +0000
+
 obm-jetty (2.4.2.0~0.alpha3) stable; urgency=low
 
   * New upstream release.
