@@ -34,14 +34,9 @@ package org.obm.push.mail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
-
-import javax.mail.FolderClosedException;
-import javax.net.SocketFactory;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -56,9 +51,6 @@ import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.easymock.EasyMock;
-import org.fest.assertions.api.Assertions;
-import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.MSAttachement;
@@ -71,48 +63,10 @@ import org.obm.push.utils.Mime4jUtils;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 
-public class MailTestsUtils {
+public class MSMailTestsUtils {
 
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
-
-	public static void assertThatIsJavaSocketTimeoutException(Exception e) {
-		FolderClosedException hasTimeoutException = 
-				getThrowableInCauseOrNull(e, FolderClosedException.class);
-		Assertions.assertThat(hasTimeoutException).hasMessageContaining(SocketTimeoutException.class.getName());
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T extends Throwable> T getThrowableInCauseOrNull(Throwable from, Class<T> seekingCause) {
-		if (from.getClass().equals(seekingCause)) {
-			return (T) from; // Cast unchecked
-		} else if (from.getCause() != null){
-			return getThrowableInCauseOrNull(from.getCause(), seekingCause);
-		} else {
-			return null;
-		}
-	}
 	
-	public static InputStream loadEmail(String name) {
-		return ClassLoader.getSystemResourceAsStream("eml/" + name);
-	}
-	
-	public static Message loadMimeMessage(String name) throws MimeException, IOException {
-		InputStream eml = loadEmail(name);
-		return loadMimeMessage(eml);
-	}
-	
-	public static Message loadMimeMessage(InputStream stream) throws MimeException, IOException {
-		Message message = mime4jUtils.parseMessage(stream);
-		return message;
-	}
-	
-	public static ConfigurationService mockOpushConfigurationService() {
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.getDefaultEncoding()).andReturn(Charsets.UTF_8).anyTimes();
-		EasyMock.replay(configurationService);
-		return configurationService;
-	}
-
 	public static MSEmail createMSEmailPlainText(String content, Charset charset) {
 		MSEmail original = new MSEmail();
 		MSEmailBody msEmailBody = new MSEmailBody();
@@ -191,7 +145,7 @@ public class MailTestsUtils {
 		params.put(ContentTypeField.PARAM_BOUNDARY, boundary);
 
 		MessageImpl msg = mime4jUtils.createMessage();
-		Multipart bodyMulti = MailTestsUtils.createMultipartTextAndHtml(
+		Multipart bodyMulti = MSMailTestsUtils.createMultipartTextAndHtml(
 				mime4jUtils, text, html);
 		msg.setBody(bodyMulti, "multipart/alternative", params);
 		return msg;
@@ -210,7 +164,7 @@ public class MailTestsUtils {
 	public static MessageImpl createMessageMultipartMixed(Mime4jUtils mime4jUtils, String text, byte[] imageData) throws IOException {
 		Multipart multi = mime4jUtils.createMultipartMixed();
 		multi.addBodyPart(mime4jUtils.bodyToBodyPart(mime4jUtils.createBody(text), ContentTypeField.TYPE_TEXT_PLAIN));
-        multi.addBodyPart(MailTestsUtils.createImagePart(imageData));
+        multi.addBodyPart(MSMailTestsUtils.createImagePart(imageData));
         MessageImpl msg = mime4jUtils.createMessage();
         msg.setMultipart(multi);
         return msg;
@@ -240,21 +194,25 @@ public class MailTestsUtils {
 		return new Address(addr);
 	}
 	
-	public static void waitForGreenmailAvailability(String imapHost, int imapPort) throws InterruptedException {
-		SocketFactory socketFactory = SocketFactory.getDefault();
-		DateTime end = new DateTime().plusSeconds(30);
-		
-		while (true) {
-			try {
-				Socket socket = socketFactory.createSocket(imapHost, imapPort);
-				socket.close();
-				return;
-			} catch (IOException e) {
-				if (new DateTime().isAfter(end)) {
-					Assert.fail("greenmail is not reachable");
-				}
-				Thread.sleep(50);
-			}
-		}
+
+	public static ConfigurationService mockOpushConfigurationService() {
+		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
+		EasyMock.expect(configurationService.getDefaultEncoding()).andReturn(Charsets.UTF_8).anyTimes();
+		EasyMock.replay(configurationService);
+		return configurationService;
+	}
+
+	public static InputStream loadEmail(String name) {
+		return ClassLoader.getSystemResourceAsStream("eml/" + name);
+	}
+	
+	public static Message loadMimeMessage(String name) throws MimeException, IOException {
+		InputStream eml = loadEmail(name);
+		return loadMimeMessage(eml);
+	}
+	
+	public static Message loadMimeMessage(InputStream stream) throws MimeException, IOException {
+		Message message = mime4jUtils.parseMessage(stream);
+		return message;
 	}
 }

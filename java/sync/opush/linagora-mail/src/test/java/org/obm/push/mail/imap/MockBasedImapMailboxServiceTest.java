@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
+import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 
 import java.io.InputStream;
 import java.util.Set;

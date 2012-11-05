@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.obm.push.mail.MailTestsUtils.addr;
-import static org.obm.push.mail.MailTestsUtils.loadMimeMessage;
+import static org.obm.push.mail.MSMailTestsUtils.addr;
+import static org.obm.push.mail.MSMailTestsUtils.loadMimeMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

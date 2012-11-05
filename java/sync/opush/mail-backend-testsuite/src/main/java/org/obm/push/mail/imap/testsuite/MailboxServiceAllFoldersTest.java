@@ -29,39 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail.imap.testsuite;
 
 import java.util.Date;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@Ignore("Waiting for mail backend testing module")
-@RunWith(SlowFilterRunner.class) @Slow
-public class MailboxServiceAllFoldersTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
+@RunWith(SlowGuiceRunner.class) @Slow
+public abstract class MailboxServiceAllFoldersTest {
 
 	@Inject MailboxService mailboxService;
 	@Inject PrivateMailboxService privateMailboxService;

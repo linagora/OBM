@@ -29,40 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.minig.imap.testsuite;
 
-import org.obm.configuration.EmailConfiguration;
+import org.minig.imap.MailEnvModule;
+import org.obm.push.mail.imap.GuiceModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.icegreen.greenmail.util.ServerSetupTest;
-
-public class TimeoutMailEnvModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		int imapTimeoutInSecond = 3;
-		MailEnvModule mailEnvModule = new MailEnvModule();
-		ImapTimeoutModule imapTimeoutModule = new ImapTimeoutModule(imapTimeoutInSecond);
-		
-		Module timeoutMailEnvModule = Modules.override(mailEnvModule).with(imapTimeoutModule);
-		timeoutMailEnvModule.configure(binder());
-	}
-	
-	public static class ImapTimeoutModule extends AbstractModule {
-		
-		private final int imapTimeoutInSecond;
-
-		public ImapTimeoutModule(int imapTimeoutInSecond) {
-			this.imapTimeoutInSecond = imapTimeoutInSecond;
-		}
-		
-		@Override
-		protected void configure() {
-			TestEmailConfiguration testConfiguration = new TestEmailConfiguration(ServerSetupTest.IMAP.getPort());
-			testConfiguration.setImapTimeoutInSecond(imapTimeoutInSecond);
-			bind(EmailConfiguration.class).toInstance(testConfiguration);
-		}
-	}
+@GuiceModule(MailEnvModule.class)
+public class MailboxServiceAllFoldersTest extends
+		org.obm.push.mail.imap.testsuite.MailboxServiceAllFoldersTest {
 }

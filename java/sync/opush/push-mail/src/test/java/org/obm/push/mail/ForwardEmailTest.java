@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.obm.push.mail.MailTestsUtils.loadMimeMessage;
-import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
+import static org.obm.push.mail.MSMailTestsUtils.loadMimeMessage;
+import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageMixedMultiPartWithAttachment() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
 		Message message = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 		
 		ForwardEmail forwardEmail = 
@@ -94,7 +94,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageAlternativeMultiPart() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
 		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		ForwardEmail forwardEmail = 
@@ -111,7 +111,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageWithAddingOriginalMailAttachments() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
 		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		String text = "It\'s my attachment";
@@ -141,7 +141,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardSampleBodyMessageWithAddingOriginalMailAttachments() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MailTestsUtils.createMSEmailPlainText("origin");
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
 		Message message = loadMimeMessage("plainText.eml");
 		
 		String text = "It\'s my attachment";

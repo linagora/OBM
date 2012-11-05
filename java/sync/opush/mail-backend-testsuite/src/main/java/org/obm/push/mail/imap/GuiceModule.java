@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.filter;
+package org.obm.push.mail.imap;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -37,11 +37,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.google.inject.Module;
+
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Inherited
-public @interface Slow {
-	
-	public static final String CONFIGURATION_ENVIRONMENT_KEY = "AllowSlowTest"; 
-	
+public @interface GuiceModule {
+
+       Class<? extends Module> value();
 }

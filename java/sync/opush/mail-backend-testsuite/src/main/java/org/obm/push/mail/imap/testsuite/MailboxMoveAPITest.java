@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail.imap.testsuite;
 
 import java.util.Date;
 import java.util.Set;
@@ -39,13 +39,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
@@ -53,26 +50,24 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.imap.ImapMailBoxUtils;
+import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@Ignore("Waiting for mail backend testing module")
-@RunWith(SlowFilterRunner.class) @Slow
-public class MailboxMoveAPITest {
+@RunWith(SlowGuiceRunner.class) @Slow
+public abstract class MailboxMoveAPITest {
 
 	private static final String INBOX = EmailConfiguration.IMAP_INBOX_NAME;
 	private static final String SENTBOX = EmailConfiguration.IMAP_SENT_NAME;
 	private static final String DRAFT = EmailConfiguration.IMAP_DRAFTS_NAME;
 	private static final String TRASH = EmailConfiguration.IMAP_TRASH_NAME;
 	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
-
 	@Inject MailboxService mailboxService;
 	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;

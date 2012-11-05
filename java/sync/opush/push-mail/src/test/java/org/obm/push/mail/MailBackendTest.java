@@ -39,8 +39,8 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
-import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
+import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
+import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;

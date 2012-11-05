@@ -39,6 +39,7 @@
 		<module>push-servlet</module>
 		<module>protocol</module>
 		<module>push-module</module>
+		<module>mail-backend-testsuite</module>
 	</modules>
 
 	<dependencyManagement>

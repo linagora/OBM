@@ -29,8 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail.imap.testsuite;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -43,7 +44,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.minig.imap.Address;
@@ -55,19 +55,19 @@ import org.minig.imap.mime.IMimePart;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MailEnvModule;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.imap.ImapMailBoxUtils;
+import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -79,12 +79,8 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
-@Ignore("Waiting for mail backend testing module")
-@RunWith(SlowFilterRunner.class) @Slow
-public class MailboxFetchAPITest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
+@RunWith(SlowGuiceRunner.class) @Slow
+public abstract class MailboxFetchAPITest {
 
 	@Inject MailboxService mailboxService;
 	@Inject PrivateMailboxService privateMailboxService;
@@ -121,7 +117,7 @@ public class MailboxFetchAPITest {
 
 	@Ignore("AppendCommand should send optional message's internal date-time in command")
 	@Test
-	public void testFetchEnvelope() throws MailException {
+	public void testFetchEnvelope() throws MailException, IOException {
 		Envelope envelope = Envelope.builder().date(DateUtils.date("2010-09-17T17:12:26")).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
@@ -141,7 +137,7 @@ public class MailboxFetchAPITest {
 	}
 	
 	@Test(expected=MailException.class)
-	public void testFetchEnvelopeWithWrongUID() throws MailException {
+	public void testFetchEnvelopeWithWrongUID() throws MailException, IOException {
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
 		mailboxService.storeInInbox(udr, inputStream, true);
 		
@@ -247,7 +243,7 @@ public class MailboxFetchAPITest {
 	}
 	
 	@Test
-	public void testFetchBodyStructureOneComplexMultipartMixedMessage() throws MailException, UserException {
+	public void testFetchBodyStructureOneComplexMultipartMixedMessage() throws MailException, UserException, IOException {
 		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartMixed.eml");
 		testUtils.deliverToUserInbox(greenMailUser, 
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
@@ -287,7 +283,7 @@ public class MailboxFetchAPITest {
 	}
 	
 	@Test
-	public void testFetchBodyStructureOneComplexMultipartAlternativeMessage() throws MailException, UserException {
+	public void testFetchBodyStructureOneComplexMultipartAlternativeMessage() throws MailException, UserException, IOException {
 		InputStream messageInputStream = MailTestsUtils.loadEmail("multipartAlternative.eml");
 		testUtils.deliverToUserInbox(greenMailUser, 
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
@@ -325,7 +321,7 @@ public class MailboxFetchAPITest {
 	
 	@Ignore("The parsing of a message complex rfc822 is not implemented in GreenMail")
 	@Test
-	public void testFetchBodyStructureOneComplexRFC822Message() throws MailException, UserException {
+	public void testFetchBodyStructureOneComplexRFC822Message() throws MailException, UserException, IOException {
 		InputStream messageInputStream = MailTestsUtils.loadEmail("messageRfc822ContentType.eml");
 		testUtils.deliverToUserInbox(greenMailUser, 
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
