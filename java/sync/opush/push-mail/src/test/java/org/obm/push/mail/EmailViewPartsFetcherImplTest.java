@@ -51,6 +51,7 @@ import java.util.List;
 
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.easymock.IMocksControl;
+import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,8 +114,10 @@ public class EmailViewPartsFetcherImplTest {
 		String fullMimeType = bodyPrimaryType + "/" + bodySubType;
 		String bodyCharset = Charsets.UTF_8.displayName();
 		InputStream bodyData = StreamMailTestsUtils.newInputStreamFromString("message data");
+		InputStream bodyDataDecoded = StreamMailTestsUtils.newInputStreamFromString("message data");
+		InputStream attachment;
+		InputStream attachmentDecoded;
 		String contentId = "contentId";
-		InputStream attachmentInputStream;
 		boolean isAttachment = false;
 		boolean isInvitation = false;
 		boolean isICSAttachment = false;
@@ -139,7 +142,8 @@ public class EmailViewPartsFetcherImplTest {
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		
 		messageFixture = new MessageFixture();
-		messageFixture.attachmentInputStream = Resources.getResource("ics/attendee.ics").openStream();
+		messageFixture.attachment = Resources.getResource("ics/attendee.ics").openStream();
+		messageFixture.attachmentDecoded = Resources.getResource("ics/attendee.ics").openStream();
 		messageCollectionName = IMAP_INBOX_NAME;
 		messageCollectionId = 1;
 		mimeAddress = new MimeAddress("address");
@@ -362,7 +366,7 @@ public class EmailViewPartsFetcherImplTest {
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 		
-		assertThat(emailView.getEstimatedDataSize()).equals(0);
+		assertThat(emailView.getEstimatedDataSize()).isEqualTo(0);
 	}
 	
 	@Test
@@ -377,6 +381,7 @@ public class EmailViewPartsFetcherImplTest {
 	@Test
 	public void testBodyMimePartDataNull() throws Exception {
 		messageFixture.bodyData = null;
+		messageFixture.bodyDataDecoded = null;
 
 		Assertions.assertThat(newFetcherFromExpectedFixture()
 				.fetch(messageFixture.uid)).isNull();
@@ -385,9 +390,10 @@ public class EmailViewPartsFetcherImplTest {
 	@Test
 	public void testBodyMimePartData() throws Exception {
 		messageFixture.bodyData = StreamMailTestsUtils.newInputStreamFromString("email data");
+		messageFixture.bodyDataDecoded = StreamMailTestsUtils.newInputStreamFromString("email data");
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-		
+
 		assertThat(emailView.getBodyMimePartData())
 			.hasContentEqualTo(StreamMailTestsUtils.newInputStreamFromString("email data"));
 	}
@@ -408,7 +414,7 @@ public class EmailViewPartsFetcherImplTest {
 
 		assertThat(emailView.getAttachments()).hasSize(1);
 		EmailViewAttachment emailViewAttachment = Iterables.getOnlyElement(emailView.getAttachments());
-		assertThat(emailViewAttachment.getId()).equals(messageFixture.contentId);
+		assertThat(emailViewAttachment.getId()).isEqualTo("at_" + messageFixture.uid + "_0");
 	}
 	
 	@Test @Slow
@@ -419,17 +425,17 @@ public class EmailViewPartsFetcherImplTest {
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
 		assertThat(emailView.getICalendar()).isNotNull();
-		assertThat(emailView.getInvitationType()).equals(EmailViewInvitationType.REQUEST);
+		assertThat(emailView.getInvitationType()).isEqualTo(EmailViewInvitationType.REQUEST);
 	}
 	
 	@Test
 	public void testContentType() throws Exception {
 		String mimeType = "text/html";
-		messageFixture.fullMimeType = mimeType;
+		messageFixture.bodyType = MSEmailBodyType.fromMimeType(mimeType);
 		
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
-		assertThat(emailView.getBodyType()).equals(mimeType);
+		assertThat(emailView.getBodyType().getMimeType()).isEqualTo(mimeType);
 	}
 
 	@Test
@@ -437,7 +443,8 @@ public class EmailViewPartsFetcherImplTest {
 		messageFixture.isAttachment = true;
 		messageFixture.isInvitation = true;
 		messageFixture.encoding = "BASE64";
-		messageFixture.attachmentInputStream = new Base64InputStream(Resources.getResource("ics/base64.ics").openStream());
+		messageFixture.attachment = Resources.getResource("ics/base64.ics").openStream();
+		messageFixture.attachmentDecoded = new Base64InputStream(Resources.getResource("ics/base64.ics").openStream());
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
@@ -449,23 +456,23 @@ public class EmailViewPartsFetcherImplTest {
 	public void testInvitationInBadEncodingFormat() throws Exception {
 		messageFixture.isAttachment = true;
 		messageFixture.isInvitation = true;
-		messageFixture.encoding = "Bit7";
-		messageFixture.attachmentInputStream = Resources.getResource("ics/base64.ics").openStream();
+		messageFixture.encoding = "QUOTED-PRINTABLE";
+		messageFixture.attachment = Resources.getResource("ics/base64.ics").openStream();
+		messageFixture.attachmentDecoded = new QuotedPrintableInputStream(Resources.getResource("ics/base64.ics").openStream());
 
-		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
-
-		assertThat(emailView.getICalendar()).isNotNull();
-		assertThat(emailView.getICalendar().getICalendar()).contains("DESCRIPTION:Encoding Invitation to BASE64 !");
+		newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 	}
 	
 	@Test
 	public void testBodyDataInBASE64() throws Exception {
 		messageFixture.encoding = "BASE64";
 		messageFixture.bodyData = StreamMailTestsUtils.newInputStreamFromString("RW5jb2RpbmcgYm9keURhdGEgdG8gQkFTRTY0ICE=");
+		messageFixture.bodyDataDecoded = new Base64InputStream( 
+				StreamMailTestsUtils.newInputStreamFromString("RW5jb2RpbmcgYm9keURhdGEgdG8gQkFTRTY0ICE="));
 
 		EmailView emailView = newFetcherFromExpectedFixture().fetch(messageFixture.uid);
 
-		assertThat(emailView.getBodyMimePartData()).equals(
+		assertThat(emailView.getBodyMimePartData()).hasContentEqualTo(
 				StreamMailTestsUtils.newInputStreamFromString("Encoding bodyData to BASE64 !"));
 	}
 	
@@ -674,7 +681,7 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(messageFixture.bodyData).once();
 		
 		expect(mailboxService.findAttachment(udr, messageCollectionName, messageFixture.uid, mimeAddress))
-			.andReturn(messageFixture.attachmentInputStream);
+			.andReturn(messageFixture.attachment);
 	}
 
 	private MimeMessage mockAggregateMimeMessage() {
@@ -696,8 +703,10 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId);
 		expect(mimePart.isICSAttachment()).andReturn(messageFixture.isICSAttachment);
-		expect(mimePart.decodeMimeStream(anyObject(InputStream.class))).andReturn(messageFixture.bodyData);
-		expect(mimePart.decodeMimeStream(anyObject(InputStream.class))).andReturn(messageFixture.attachmentInputStream);
+		expect(mimePart.decodeMimeStream(anyObject(InputStream.class)))
+			.andReturn(messageFixture.bodyDataDecoded);
+		expect(mimePart.decodeMimeStream(anyObject(InputStream.class)))
+			.andReturn(messageFixture.attachmentDecoded);
 
 		MimeMessage mimeMessage = createMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);

@@ -125,13 +125,11 @@ public class ContactsBackendTest {
 		Folder f3 = Folder.builder().name(defaultFolderName).uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		Folder f4 = Folder.builder().name("my address book").uid(4).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		
-		ImmutableList<Folder> immutableList = ImmutableList.of(f1, f2, f3, f4);
-		TreeSet<Folder> treeset = new TreeSet<Folder>(
-				new ComparatorUsingFolderName(defaultFolderName));
-		treeset.addAll(immutableList);
+		TreeSet<Folder> treeset = new TreeSet<Folder>(new ComparatorUsingFolderName(defaultFolderName));
+		treeset.addAll(ImmutableList.of(f1, f2, f3, f4));
 		
 		assertThat(treeset).hasSize(4);
-		assertThat(treeset).contains(immutableList.toArray());
+		assertThat(treeset).contains(f1, f2, f3, f4);
 		assertThat(treeset.first().getName()).isEqualTo(defaultFolderName);
 		assertThat(treeset.last().getName()).isEqualTo("users");
 	}

@@ -29,7 +29,7 @@
 		<hornetq.version>2.2.21.Final</hornetq.version>
 		<junit.version>4.10</junit.version>
 		<easymock.version>3.1</easymock.version>
-		<fest.version>2.0-mbaechler-SNAPSHOT</fest.version>
+		<fest.version>2.0M8</fest.version>
 		<guava.version>13.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.3</commons-io.version>

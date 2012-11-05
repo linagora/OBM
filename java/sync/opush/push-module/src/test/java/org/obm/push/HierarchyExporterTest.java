@@ -40,7 +40,6 @@ import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +53,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.HierarchyItemsChanges.Builder;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
@@ -69,6 +67,7 @@ import org.obm.push.mail.MailBackend;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -181,11 +180,24 @@ public class HierarchyExporterTest {
 
 		expectGetPIMDataType(contactsBackend, calendarBackend, mailBackend);
 		
-		HierarchyItemsChanges contactHierarchyItemsChanges = buildHierarchyItemsChanges(contactCollectionId);
-		expectHierarchyChangesForBackend(contactsBackend, incomingSyncState, outgoingSyncState, contactHierarchyItemsChanges);
-		expectHierarchyChangesForBackend(calendarBackend, incomingSyncState, outgoingSyncState, buildEmptyHierarchyItemsChanges());
-		HierarchyItemsChanges mailHierarchyItemsChanges = buildHierarchyItemsChanges(mailCollectionId);
-		expectHierarchyChangesForBackend(mailBackend, incomingSyncState, outgoingSyncState, mailHierarchyItemsChanges);
+		ItemChange contact1 = new ItemChange("1", contactCollectionId, "ONE", FolderType.USER_CREATED_CONTACTS_FOLDER, true);
+		ItemChange contact2 = new ItemChange("2", contactCollectionId, "TWO", FolderType.USER_CREATED_CONTACTS_FOLDER, true);
+		ItemDeletion contactDeleted = ItemDeletion.builder().serverId("3").build();
+		expectHierarchyChangesForBackend(contactsBackend, incomingSyncState, outgoingSyncState,
+				HierarchyItemsChanges.builder()
+					.changes(ImmutableList.of(contact1, contact2))
+					.deletions(ImmutableList.of(contactDeleted)).build());
+
+		ItemChange mail1 = new ItemChange("1", mailCollectionId, "ONE", FolderType.USER_CREATED_EMAIL_FOLDER, true);
+		ItemChange mail2 = new ItemChange("2", mailCollectionId, "TWO", FolderType.USER_CREATED_EMAIL_FOLDER, true);
+		ItemDeletion mailDeleted = ItemDeletion.builder().serverId("3").build();
+		expectHierarchyChangesForBackend(mailBackend, incomingSyncState, outgoingSyncState, 
+				HierarchyItemsChanges.builder()
+				.changes(ImmutableList.of(mail1, mail2))
+				.deletions(ImmutableList.of(mailDeleted)).build());
+		
+		expectHierarchyChangesForBackend(calendarBackend, incomingSyncState, outgoingSyncState,
+				buildEmptyHierarchyItemsChanges());
 
 		MappingService mappingService = createMock(MappingService.class);
 		
@@ -202,10 +214,8 @@ public class HierarchyExporterTest {
 		
 		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
-		Builder builder = HierarchyItemsChanges.builder()
-			.mergeItems(mailHierarchyItemsChanges);
-		
-		assertThat(hierarchyItemsChanges).equals(builder.build());
+		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(contact1, contact2, mail1, mail2);
+		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(contactDeleted, mailDeleted);
 	}
 
 	private void expectCreateBackendMappingForBackends(MappingService mappingService,
@@ -248,23 +258,6 @@ public class HierarchyExporterTest {
 		
 		expect(backend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncState))
 			.andReturn(hierarchyItemsChanges).once();
-	}
-
-	private HierarchyItemsChanges buildHierarchyItemsChanges(String collectionId) {
-		return HierarchyItemsChanges.builder()
-			.changes(buildItemChanged(collectionId))
-			.deletions(buildItemDeleted())
-			.build();
-	}
-	
-	private List<ItemChange> buildItemChanged(String collectionId) {
-		return Lists.newArrayList(
-				new ItemChange(collectionId, "1", "FOLDER ONE", FolderType.USER_CREATED_EMAIL_FOLDER, false),
-				new ItemChange(collectionId, "2", "FOLDER TWO", FolderType.USER_CREATED_EMAIL_FOLDER, false));
-	}
-	
-	private List<ItemDeletion> buildItemDeleted() {
-		return Lists.newArrayList(ItemDeletion.builder().serverId("3").build());
 	}
 	
 }

@@ -269,7 +269,7 @@ public class EmailViewTest {
 			.truncated(false)
 			.build();
 		
-		assertThat(emailView.getICalendar()).equals(iCalendar);
+		assertThat(emailView.getICalendar()).isEqualTo(iCalendar);
 	}
 	
 	@Test
@@ -286,7 +286,7 @@ public class EmailViewTest {
 			.truncated(false)
 			.build();
 		
-		assertThat(emailView.getInvitationType()).equals(invitationType);
+		assertThat(emailView.getInvitationType()).isEqualTo(invitationType);
 	}
 	
 	@Test(expected=EmailViewBuildException.class)

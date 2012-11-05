@@ -12,3 +12,4 @@ Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
 
 <b>Content of part 1-2</b>
+------=_Part_2_1330682067197--

@@ -71,49 +71,49 @@ public class UserDataRequestTest {
 	@Test
 	public void testGetUser() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getUser()).equals(credentials.getUser());
+		assertThat(userDataRequest.getUser()).isEqualTo(credentials.getUser());
 	}
 	
 	@Test
 	public void testGetPasword() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getPassword()).equals(credentials.getPassword());
+		assertThat(userDataRequest.getPassword()).isEqualTo(credentials.getPassword());
 	}
 	
 	@Test
 	public void testGetDevId() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getDevId()).equals(device.getDevId());
+		assertThat(userDataRequest.getDevId()).isEqualTo(device.getDevId());
 	}
 	
 	@Test
 	public void testGetDevType() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getDevType()).equals(device.getDevType());
+		assertThat(userDataRequest.getDevType()).isEqualTo(device.getDevType());
 	}
 	
 	@Test
 	public void testGetCommand() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getCommand()).equals(command);
+		assertThat(userDataRequest.getCommand()).isEqualTo(command);
 	}
 	
 	@Test
 	public void testGetProtocolVersion() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getProtocolVersion()).equals(protocolVersion);
+		assertThat(userDataRequest.getProtocolVersion()).isEqualTo(protocolVersion);
 	}
 	
 	@Test
 	public void testGetCredentials() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getCredentials()).equals(credentials);
+		assertThat(userDataRequest.getCredentials()).isEqualTo(credentials);
 	}
 	
 	@Test
 	public void testGetDevice() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getDevice()).equals(device);
+		assertThat(userDataRequest.getDevice()).isEqualTo(device);
 	}
 	
 	@Test
@@ -193,7 +193,7 @@ public class UserDataRequestTest {
 		
 		userDataRequest.putAllResources(resources);
 		
-		assertThat(userDataRequest.getResource(key)).equals(resource);
+		assertThat(userDataRequest.getResource(key)).isEqualTo(resource);
 	}
 	
 	@Test

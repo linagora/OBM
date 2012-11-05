@@ -124,24 +124,19 @@ public class AddressBookBindingImplTest {
 		allUpdatedContacts.addAll(updatedContacts);
 		allUpdatedContacts.addAll(updatedUsers);
 
-		Set<Integer> allRemovedContacts = new HashSet<Integer>();
-		allRemovedContacts.addAll(archivedContactIds);
-		allRemovedContacts.addAll(removalCandidates);
-		allRemovedContacts.addAll(archivedUserIds);
+		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
+		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+		Set<Folder> updatedContactFolders = new HashSet<Folder>();
+		updatedContactFolders.add(updatedContactFolder1);
+		updatedContactFolders.add(updatedContactFolder2);
 
-		Set<Folder> updatedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
-				Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build());				
+		int defautUsersIdFolder = -1;
+		String defaultUsersNameFolder = "users";
+		Folder updatedUserFolder = Folder.builder().uid(defautUsersIdFolder).name(defaultUsersNameFolder).ownerLoginAtDomain("login@obm.org").build();
 
-		List<Folder> updatedUserFolders = ImmutableList.of(Folder.builder().uid(-1).name("users").ownerLoginAtDomain("login@obm.org").build());
-
-		Set<Folder> allUpdatedFolders = Sets.newHashSet();
-		allUpdatedFolders.addAll(updatedContactFolders);
-		allUpdatedFolders.addAll(updatedUserFolders);
-
-		Set<Folder> removedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
-				Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build());
+		Folder removedContactFolder1 = Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
+		Folder removedContactFolder2 = Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
 		
 		ObmHelper helper = mockHelper();
 
@@ -179,10 +174,10 @@ public class AddressBookBindingImplTest {
 
 		EasyMock.verify(mocks);
 
-		assertThat(changes.getContactChanges().getUpdated()).containsOnly(allUpdatedContacts.toArray());
-		assertThat(changes.getRemovedContacts()).containsOnly(allRemovedContacts.toArray());
-		assertThat(changes.getUpdatedAddressBooks()).containsOnly(allUpdatedFolders.toArray());
-		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolders.toArray());
+		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact, newUser);
+		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3, 5, 7, 8);
+		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2, updatedUserFolder);
+		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
 
 	/**
@@ -210,19 +205,16 @@ public class AddressBookBindingImplTest {
 		Set<Contact> allUpdatedContacts = new HashSet<Contact>();
 		allUpdatedContacts.addAll(updatedContacts);
 
-		Set<Integer> allRemovedContacts = new HashSet<Integer>();
-		allRemovedContacts.addAll(archivedContactIds);
-		allRemovedContacts.addAll(removalCandidates);
+		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
+		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+		Set<Folder> updatedContactFolders = Sets.newHashSet(updatedContactFolder1, updatedContactFolder2);
 
-		Set<Folder> updatedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
-				Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build());				
-
-		Set<Folder> allUpdatedFolders = Sets.newHashSet(updatedContactFolders);
-
-		Set<Folder> removedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
-				Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build());
+		Folder removedContactFolder1 = Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
+		Folder removedContactFolder2 = Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
+		
+		removedContactFolders.add(removedContactFolder1);
+		removedContactFolders.add(removedContactFolder2);
 
 		ObmHelper helper = mockHelper();
 
@@ -253,9 +245,9 @@ public class AddressBookBindingImplTest {
 
 		EasyMock.verify(mocks);
 
-		assertThat(changes.getContactChanges().getUpdated()).containsOnly(allUpdatedContacts.toArray());
-		assertThat(changes.getRemovedContacts()).containsOnly(allRemovedContacts.toArray());
-		assertThat(changes.getUpdatedAddressBooks()).containsOnly(allUpdatedFolders.toArray());
-		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolders.toArray());
+		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact);
+		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3);
+		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2);
+		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
 }

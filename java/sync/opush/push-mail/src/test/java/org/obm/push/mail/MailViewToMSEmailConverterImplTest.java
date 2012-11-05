@@ -378,7 +378,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).equals(0);
+		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).isEqualTo(0);
 	}
 	
 	@Test
@@ -387,7 +387,7 @@ public class MailViewToMSEmailConverterImplTest {
 
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).equals(1024);
+		assertThat(convertedMSEmail.getBody().getEstimatedDataSize()).isEqualTo(1024);
 	}
 	
 	@Test
@@ -461,14 +461,14 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.NOTE);
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.NOTE);
 	}
 	
 	@Test
 	public void testRequestedMessageClass() throws IOException, ParserException, DaoException {
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.SCHEDULE_MEETING_REQUEST);
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_REQUEST);
 	}
 	
 	@Test
@@ -477,7 +477,7 @@ public class MailViewToMSEmailConverterImplTest {
 		
 		MSEmail convertedMSEmail = makeConversionFromEmailViewFixture();
 		
-		assertThat(convertedMSEmail.getMessageClass()).equals(MSMessageClass.SCHEDULE_MEETING_REQUEST);
+		assertThat(convertedMSEmail.getMessageClass()).isEqualTo(MSMessageClass.SCHEDULE_MEETING_CANCELED);
 	}
 	
 	@Test(expected=EmailViewBuildException.class)

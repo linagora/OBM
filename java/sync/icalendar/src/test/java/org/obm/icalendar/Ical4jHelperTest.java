@@ -251,6 +251,7 @@ public class Ical4jHelperTest {
 		getIcal4jHelper().getRecur(eventRecurrence, new Date());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetRecur() {
 		Calendar cal = getCalendarPrecisionOfSecond();
@@ -291,6 +292,7 @@ public class Ical4jHelperTest {
 		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.DAILY);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetMonthlyByDayRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.monthlybyday, new Date());
@@ -637,6 +639,7 @@ public class Ical4jHelperTest {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetExDate() {
 		Calendar cal = getCalendarPrecisionOfSecond();
@@ -685,6 +688,7 @@ public class Ical4jHelperTest {
 		assertNull(exDate);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetExDateWhenDeletedAndRegularExceptionsExists() {
 		Calendar cal = getCalendarPrecisionOfSecond();

@@ -939,7 +939,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Assertions.assertThat(convertedRecurrence.getKind()).isEqualTo(RecurrenceKind.weekly);
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isNull();
-		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(daySetOf(RecurrenceDay.Friday));
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(RecurrenceDay.Friday);
 	}
 
 	@Test
@@ -1064,7 +1064,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		Event converted = convertToOBMEvent(msEventRecurrent);
 
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
-		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(daySetOf(RecurrenceDay.Monday));
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(RecurrenceDay.Monday);
 	}
 
 	@Test
@@ -1087,8 +1087,7 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		EventRecurrence convertedRecurrence = converted.getRecurrence();
 		Assertions.assertThat(convertedRecurrence.getFrequence()).isEqualTo(msRecurrence.getInterval());
 		Assertions.assertThat(convertedRecurrence.getEnd()).isEqualTo(msRecurrence.getUntil());
-		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(
-				daySetOf(RecurrenceDay.Friday, RecurrenceDay.Sunday));
+		Assertions.assertThat(convertedRecurrence.getDays()).containsOnly(RecurrenceDay.Friday, RecurrenceDay.Sunday);
 	}
 
 	@Test(expected=ConversionException.class)
@@ -1342,9 +1341,5 @@ public class MSEventToObmEventConverterRecurrenceTest {
 	
 	private Date date(String date) {
 		return DateUtils.date(date);
-	}
-	
-	private Object[] daySetOf(RecurrenceDay... days) {
-		return Sets.newHashSet(days).toArray();
 	}
 }
