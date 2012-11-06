@@ -33,7 +33,9 @@ package org.obm.push.mail.imap;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
+import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -255,11 +257,11 @@ public class ImapMailboxServiceTest {
 	}
 
 	@Test
-	public void testStoreInSentBoxWithNoDirectlyResetableInputStream() throws MailException {
+	public void testStoreInSentBoxWithNoDirectlyResetableInputStream() throws Exception {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(udr, newFolder);
 
-		InputStream emailData = testUtils.getInputStreamFromFile("plainText.eml");
+		InputStream emailData = new BufferedInputStream(loadEmail("plainText.eml"));
 		boolean isResetable = true;
 		try {
 			emailData.reset();
@@ -318,7 +320,7 @@ public class ImapMailboxServiceTest {
 	
 	@Test
 	public void testFetchMimeSinglePartBase64Email() throws Exception {
-		InputStream mailStream = testUtils.getInputStreamFromFile("SinglePartBase64.eml");
+		InputStream mailStream = loadEmail("SinglePartBase64.eml");
 		mailboxService.storeInInbox(udr, mailStream, false);
 		
 		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
@@ -326,13 +328,13 @@ public class ImapMailboxServiceTest {
 				Arrays.asList(1l), 
 				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build()));
 		MSEmail actual = Iterables.getOnlyElement(emails);
-		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(testUtils.getInputStreamFromFile("SinglePartBase64.eml"));
+		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("SinglePartBase64.eml"));
 	}
 
 	@Ignore("greenmail seems to unexpectedly decode base64 part on-the-fly")
 	@Test
 	public void testFetchTextPlainSinglePartBase64Email() throws Exception {
-		InputStream mailStream = testUtils.getInputStreamFromFile("SinglePartBase64.eml");
+		InputStream mailStream = loadEmail("SinglePartBase64.eml");
 		mailboxService.storeInInbox(udr, mailStream, false);
 		
 		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
@@ -346,7 +348,7 @@ public class ImapMailboxServiceTest {
 	
 	@Test
 	public void testFetchWithoutCorrespondingBodyPreference() throws Exception {
-		InputStream mailStream = testUtils.getInputStreamFromFile("OBMFULL-4123.eml");
+		InputStream mailStream = loadEmail("OBMFULL-4123.eml");
 		mailboxService.storeInInbox(udr, mailStream, false);
 		
 		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
@@ -354,7 +356,7 @@ public class ImapMailboxServiceTest {
 				Arrays.asList(1l), 
 				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
 		MSEmail actual = Iterables.getOnlyElement(emails);
-		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(testUtils.getInputStreamFromFile("OBMFULL-4123.eml"));
+		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("OBMFULL-4123.eml"));
 	}
 	
 	private void consumeInputStream(InputStream inputStream) throws IOException {
