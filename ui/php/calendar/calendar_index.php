@@ -583,7 +583,7 @@ if ($action == 'search') {
   $id = $params['calendar_id'];
   if (check_calendar_access($id)) {
     $eve_q = run_query_calendar_detail($id);
-    json_delete_event_data($id, $params, $current_view);
+    $response = json_delete_event_data($id, $params, $current_view);
 	$deleted_evt_ids = array();
     if($eve_q->f('event_repeatkind') == 'none' || $params['all'] == 1) {
     	$deleted_evt_ids = run_query_calendar_delete($params,false);
@@ -591,9 +591,10 @@ if ($action == 'search') {
       	run_query_calendar_event_exception_insert($params,'',true);
       	run_query_increment_sequence($eve_q->f('event_ext_id'));
     }
-	
-    json_ok_msg("$l_event : $l_delete_ok");
-    echo "({".$display['json'].",deleted_ids: [".implode(",",$deleted_evt_ids)."]})";
+    $response["error"] = 0;
+    $response["message"] = "$l_event : $l_delete_ok";
+    $response["deleted_ids"] = $deleted_evt_ids;
+    echo "(".json_encode($response).")";
     exit();
   } else {
     json_error_msg($l_invalid_data . " : $err[msg]");

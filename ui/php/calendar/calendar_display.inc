@@ -7513,8 +7513,10 @@ function json_delete_event_data($id,$calendar,$current_view) {
   global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
   global $ccalendar_max_users;
   global $l_user, $l_resource;
-
   $attendees = array();
+  $event_data = array();
+  $json = array();
+  $events = array();
   $element_id = $calendar['element_id'];
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
@@ -7540,60 +7542,46 @@ function json_delete_event_data($id,$calendar,$current_view) {
       foreach($att_entities as $at) {
         $ent[] = phpStringToJsString($at);
       }
-      $attendees[] = "{label:'".$label_entity."', entities:['".implode("','",$ent)."']}"; 
+      $attendees[] = array("label"=> $label_entity, "entities" => $ent);
     }
   }
-	
-  $ed[] = 'id:'.$id;
-  $ed[] = "opacity:'$opacity'";
-  $ed[] = 'duration:'.$duration;
-  $ed[] = 'time:'.$date->getTimestamp();
-  $ed[] = 'all_day:'.$all_day;
-  $ed[] = "title:'$title'";
-  $ed[] = "attendees:[".implode(',',$attendees)."]";
-  $ed[] = 'updatable:true';
-  $ed[] = "description:''";
-  $ed[] = "location:''";
-  $ed[] = "category:''";
-  $ed[] = "colors:{}";
-  $ed[] = "all:$all";
+  $event_data["id"] = $id;
+  $event_data["opacity"] = $opacity;
+  $event_data["duration"] = $duration;
+  settype($event_data["duration"],"float");
+  $event_data["time"] = $date->getTimestamp();
+  settype($event_data["time"],"float");
+  $event_data["all_day"] = $all_day;
+  $event_data["title"] = htmlspecialchars($title);
+  $event_data["attendees"] = $attendees;
+  $event_data["updatable"] = true;
+  $event_data["description"] = "";
+  $event_data["location"] = "";
+  $event_data["category"] = "";
+  $event_data["colors"] = new stdClass();
+  $event_data["all"] = $all;
  
   $calendar_entity = $current_view->get_entities();
-  $updatable[] = "draggable:'true'"; 
-  if(!$all_day) {
-    $updatable[] = "resizable:'true'"; 
-  }
   foreach ($calendar_entity as $entity => $data) {
     foreach ($data as $entity_id => $entity_data) {
       if($entities[$entity]['entity'][$entity_id]) {
-        $info = $ed;
-        $info[] = "entity:'$entity'";
-        $info[] = "entity_id:$entity_id";
-        $info[] = "klass:'".$entity_data['class']."'";
-        $info[] = "status:'".$entities[$entity]['entity'][$entity_id]['state']."'";
-        if($json != '') {
-          $json .= ',';
-        }
-        $json .= "{event:{".implode(',',$info)."}}";
+        $info = $event_data;
+        $info["entity"] = $entity;
+        $info["entity_id"] = $entity_id;
+        $info["klass"] = $entity_data['class'];
+        $info["status"] = $entities[$entity]['entity'][$entity_id]['state'];
+        $events[] = array("event" => $info);
       }
     }
   }
 
-  if($display['json'] != '') {
-    $display['json'] .= ',';
-  }
-  if($all_day) {
-    $display['json'] .= "day:'$all_day',";
-  }
-  if($element_id != '') {
-    $display['json'] .= "elementId:'$element_id',";
-  }
-  $display['json'] .= "isPeriodic:$periodic,";
-  $display['json'] .= "all:$all,";
-  $display['json'] .=  "eventsData:[$json]";
+  $json["day"] = $all_day;
+  $json["elementId"] = $element_id;
+  $json["isPeriodic"] = $periodic;
+  $json["all"] = $all;
+  $json["eventsData"] = $events;
+  return $json;
 }
-
-
 
 function parse_item($item) {
   if ($item == '') {
