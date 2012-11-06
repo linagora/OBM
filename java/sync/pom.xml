@@ -51,6 +51,7 @@
 		<plugin.war.version>2.3</plugin.war.version>
 		<plugin.surefire.version>2.12.4</plugin.surefire.version>
 		<plugin.compiler.version>2.5.1</plugin.compiler.version>
+		<plugin.eclipse.version>2.9</plugin.eclipse.version>
 	</properties>
 
 	<repositories>
@@ -131,7 +132,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.8</version>
+					<version>${plugin.eclipse.version}</version>
 					<configuration>
 						<buildOutputDirectory>eclipse-build</buildOutputDirectory>
 						<downloadJavadocs>true</downloadJavadocs>
