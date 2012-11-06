@@ -2173,9 +2173,9 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   
   $opt = json_encode($options);
   if ($day) {
-    $display_events = "obm.calendarManager.newDayEvent(".json_encode($event_data).",$opt);";
+    $display_events = str_replace("'","\'","obm.calendarManager.newDayEvent(".json_encode($event_data).",$opt);");
   } else {
-    $display_events = "obm.calendarManager.newEvent(".json_encode($event_data).",$opt);";
+    $display_events = str_replace("'","\'","obm.calendarManager.newEvent(".json_encode($event_data).",$opt);");
   }
 
   return $display_events;
@@ -7411,7 +7411,7 @@ function json_build_html_event($calendar, $current_view, $id) {
             if ($occurrence->end->compare($endWeek) > 0) {
                $occurrence->right = true;
             }
-            $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, "day", $calendar_entity, $writable_entity))."'";
+            $dis_events[] = "'".dis_calendar_event($occurrence, "day", $calendar_entity, $writable_entity)."'";
           }
         }
       }
@@ -7425,7 +7425,7 @@ function json_build_html_event($calendar, $current_view, $id) {
       foreach($occurrences as $occurrence) {
         if ($occurrence->event->id == $id) {
           $occurrence->index = $occurrence->date;
-          $dis_events[] = "'".phpStringToJsString(dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity))."'";
+          $dis_events[] = "'".dis_calendar_event($occurrence, $unit, $calendar_entity, $writable_entity)."'";
         }
       }
     }
@@ -7504,7 +7504,7 @@ function json_insert_event_data($id,$calendar,$current_view) {
   }
 
   $GLOBALS['display']['json'] .= "id:$id,";
-  $GLOBALS['display']['json'] .= "event:['".phpStringToJsString($dis_event)."']";
+  $GLOBALS['display']['json'] .= "event:['".$dis_event."']";
 }
 
 
