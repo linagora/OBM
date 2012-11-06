@@ -88,11 +88,19 @@ public class BodyParams implements Iterable<BodyParam> {
 				String key = Iterables.getFirst(Splitter.on("=").split(next), null);
 				if (!Strings.isNullOrEmpty(key)) {
 					String value = next.substring(key.length() + equalCharacter.length());
+					value = stripDQuote(value);
 					BodyParam bodyParam = new BodyParam(key, value.trim());
 					this.add(bodyParam);
 				}
 			}
 			return this;
+		}
+
+		private String stripDQuote(String value) {
+			if (value.startsWith("\"") && value.endsWith("\"")) {
+				return value.substring(1, value.length() - 1);
+			}
+			return value;
 		}
 
 		public BodyParams build() {

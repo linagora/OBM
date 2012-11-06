@@ -42,6 +42,8 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import org.minig.imap.FlagsList;
+import org.minig.imap.SearchQuery;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MimeAddress;
 
@@ -61,10 +63,14 @@ public interface OpushImapFolder {
 
 	Message fetchEnvelope(long anyMessageUID) throws MessagingException, ImapMessageNotFoundException;
 
+	FlagsList uidFetchFlags(long messageUid) throws MessagingException, ImapMessageNotFoundException;
+	
 	IMAPMessage getMessageByUID(long uid) throws MessagingException, ImapMessageNotFoundException;
 
 	Folder[] list(String string) throws MessagingException;
 
+	Folder[] listSubscribed(String pattern) throws MessagingException;
+	
 	InputStream uidFetchMessage(long uid) throws MessagingException, ImapMessageNotFoundException;
 
 	void appendMessageStream(StreamedLiteral streamedLiteral, Flags flags, Date messageDate) throws MessagingException;
@@ -75,11 +81,15 @@ public interface OpushImapFolder {
 
 	void deleteMessage(Message messageToMove) throws MessagingException;
 
+	void expunge() throws MessagingException;
+	
 	void open(int mode) throws MessagingException;
 
 	Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException;
 
+	Collection<Long> uidSearch(SearchQuery query) throws MessagingException;
+	
 	Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException;
 
-	
+	void noop() throws MessagingException;
 }

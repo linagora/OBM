@@ -67,7 +67,7 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.PrivateMailboxService;
-import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.utils.Mime4jUtils;
 
@@ -83,7 +83,7 @@ public class UIDFetchPartTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
 
-	@Inject ImapClientProvider clientProvider;
+	@Inject LinagoraImapClientProvider clientProvider;
 
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;

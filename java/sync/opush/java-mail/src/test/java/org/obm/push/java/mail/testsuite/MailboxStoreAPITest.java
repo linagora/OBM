@@ -29,59 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm.push.java.mail.testsuite;
 
-import javax.mail.Session;
+import org.obm.push.java.mail.MailEnvModule;
+import org.obm.push.mail.imap.GuiceModule;
 
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.java.mail.ImapStoreImpl;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.sun.mail.imap.IMAPStore;
-
-public class CountingImapStore extends ImapStoreImpl {
-
-	private ImapConnectionCounter counter;
-
-	@Singleton
-	public static class Factory implements ImapStore.Factory {
-
-		private ImapConnectionCounter counter;
-
-		@Inject
-		private Factory(ImapConnectionCounter counter) {
-			this.counter = counter;
-		}
-		
-		@Override
-		public ImapStore create(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
-				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host, int port) {
-			return new CountingImapStore(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port, counter);
-		}
-		
-	}
-	
-	private CountingImapStore(Session session, IMAPStore store, 
-			MessageInputStreamProvider messageInputStreamProvider, ImapMailBoxUtils imapMailBoxUtils,
-			String userId, String password, String host, int port, ImapConnectionCounter counter) {
-		super(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port);
-		this.counter = counter;
-	}
-	
-	@Override
-	public void login() throws ImapLoginException {
-		super.login();
-		counter.loginCounter.incrementAndGet();
-	}
-	
-	@Override
-	public void close() {
-		super.close();
-		counter.closeCounter.incrementAndGet();
-	}
-	
+@GuiceModule(MailEnvModule.class)
+public class MailboxStoreAPITest extends
+	org.obm.push.mail.imap.testsuite.MailboxStoreAPITest {
 }

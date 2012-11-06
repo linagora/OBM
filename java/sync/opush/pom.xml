@@ -30,6 +30,7 @@
 		<module>wbxml</module>
 		<module>client</module>
 		<module>linagora-mail</module>
+		<module>java-mail</module>
 		<module>technical-log</module>
 		<module>push-dao</module>
 		<module>push-bean</module>

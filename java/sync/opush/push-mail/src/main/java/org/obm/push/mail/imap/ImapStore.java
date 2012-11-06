@@ -40,6 +40,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 
+import org.minig.imap.FlagsList;
+import org.minig.imap.SearchQuery;
+import org.obm.mail.MailboxConnection;
 import org.obm.push.bean.Resource;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
@@ -50,7 +53,7 @@ import org.obm.push.mail.MailboxFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
-public interface ImapStore extends Resource {
+public interface ImapStore extends MailboxConnection, Resource {
 
 	interface Factory {
 		ImapStore create(Session session, IMAPStore store, 
@@ -92,4 +95,10 @@ public interface ImapStore extends Resource {
 
 	Map<Long, IMAPMessage> fetchBodyStructure(String folderSrc, Collection<Long> uids) 
 			throws ImapCommandException, ImapMessageNotFoundException;
+	
+	Collection<Long> uidSearch(String folderName, SearchQuery sq) throws ImapCommandException;
+	
+	boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set);
+	
+	void expunge();
 }

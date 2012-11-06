@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.mime;
 
-import org.fest.assertions.api.Assertions;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class ContentTypeTest {
@@ -40,18 +41,18 @@ public class ContentTypeTest {
 	public void testContentType() {
 		ContentType contentType = ContentType.builder().contentType("text/plain").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).isEmpty();
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).isEmpty();
 	}
 	
 	@Test
 	public void testContentTypeWithSeparator() {
 		ContentType contentType = ContentType.builder().contentType("text/plain;").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).isEmpty();
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -70,18 +71,18 @@ public class ContentTypeTest {
 	public void testContentTypeWithParameter() {
 		ContentType contentType = ContentType.builder().contentType("text/plain; charset=utf-8").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
 	}
 	
 	@Test
 	public void testContentTypeWithParameterAndSepartor() {
 		ContentType contentType = ContentType.builder().contentType("text/plain; charset=utf-8;").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
 	}
 	
 	@Test
@@ -89,9 +90,9 @@ public class ContentTypeTest {
 		ContentType contentType = ContentType.builder().
 				contentType("text/plain; charset=utf-8; method=REQUEST").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).
 			containsOnly(new BodyParam("charset", "utf-8"), new BodyParam("method", "REQUEST"));
 	}
 	
@@ -99,23 +100,35 @@ public class ContentTypeTest {
 	public void testContentTypeWithSpaceCharacterInParameter() {
 		ContentType contentType = ContentType.builder().contentType("text/plain; charset= utf-8").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
 	}
 	
 	@Test
 	public void testContentTypeWithInSensitiveParameter() {
 		ContentType contentType = ContentType.builder().contentType("text/plain; CHARSET=utf-8").build();
 		
-		Assertions.assertThat(contentType.getPrimaryType()).isEqualTo("text");
-		Assertions.assertThat(contentType.getSubType()).isEqualTo("plain");
-		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+		assertThat(contentType.getPrimaryType()).isEqualTo("text");
+		assertThat(contentType.getSubType()).isEqualTo("plain");
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
 	}
 	
 	@Test
 	public void testTrimKeyOnContentTypeBodyParams() {
 		ContentType contentType = ContentType.builder().contentType("text/plain;         charset=utf-8").build();
-		Assertions.assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("charset", "utf-8"));
+	}
+	
+	@Test
+	public void testBoundaryWithoutQuote() {
+		ContentType contentType = ContentType.builder().contentType("multipart/mixed; boundary=----=_Part_0_1330682067197").build();
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("boundary", "----=_Part_0_1330682067197"));
+	}
+	
+	@Test
+	public void testBoundaryWithQuote() {
+		ContentType contentType = ContentType.builder().contentType("multipart/mixed; boundary=\"----=_Part_0_1330682067197\"").build();
+		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("boundary", "----=_Part_0_1330682067197"));
 	}
 }

@@ -35,7 +35,7 @@ import static org.easymock.EasyMock.expect;
 
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.smtp.SmtpSender;
 
 public final class EmailModule extends AbstractOverrideModule {
@@ -46,7 +46,7 @@ public final class EmailModule extends AbstractOverrideModule {
 
 	@Override
 	protected void configureImpl() {
-		bindWithMock(ImapClientProvider.class);
+		bindWithMock(LinagoraImapClientProvider.class);
 		bindWithMock(SmtpSender.class);
 		bindWithMock(MailBackend.class);
 		MailBackend mailBackend = getMock(MailBackend.class);

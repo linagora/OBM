@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -59,6 +59,10 @@ import org.obm.push.bean.EmailHeader;
 import org.obm.push.bean.EmailHeaders;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.imap.ImapMailBoxUtils;
+import org.obm.push.mail.imap.MessageInputStreamProvider;
+import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.mail.imap.StreamedLiteral;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
 
@@ -83,6 +87,17 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
+	public void noop() throws MessagingException {
+		folder.doCommand(new ProtocolCommand() {
+			@Override
+			public Object doCommand(IMAPProtocol protocol) throws ProtocolException {
+				protocol.noop();
+				return true;
+			}
+		});
+	}
+	
+	@Override
 	public void appendMessageStream(final StreamedLiteral literal, final Flags flags, final Date messageDate) throws MessagingException {
 		folder.doCommand(new ProtocolCommand() {
 			
@@ -106,6 +121,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		expunge();
 	}
 
+	@Override
 	public void expunge() throws MessagingException {
 		folder.expunge();
 	}
@@ -123,6 +139,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		return folder.list(pattern);
 	}
 
+	@Override
 	public Folder[] listSubscribed(String pattern) throws MessagingException {
 		return folder.listSubscribed(pattern);
 	}
@@ -173,6 +190,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		return fetch(messageUid, fetchProfile);
 	}
 
+	@Override
 	public FlagsList uidFetchFlags(long messageUid) throws MessagingException, ImapMessageNotFoundException {
 		IMAPMessage messageToFetch = getMessageByUID(messageUid);
 		folder.fetch(new Message[]{messageToFetch}, getFetchFlagsProfile());
@@ -233,6 +251,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		return fetchProfile;
 	}
 	
+	@Override
 	public Collection<Long> uidSearch(SearchQuery query) throws MessagingException {
 		final SearchTerm searchTerm = toSearchTerm(query);
 		return (Collection<Long>) folder.doCommand(new ProtocolCommand() {
@@ -243,7 +262,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 					int[] array = protocol.search(searchTerm);
 					List<Long> result = Lists.newArrayList();
 					for (int i: array) {
-						result.add(Long.valueOf(i));
+						result.add(protocol.fetchUID(i).uid);
 					}
 					return result;
 				} catch (SearchException e) {

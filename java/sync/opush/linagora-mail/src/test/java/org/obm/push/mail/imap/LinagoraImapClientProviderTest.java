@@ -39,7 +39,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.TestEmailConfiguration;
 
 @RunWith(SlowFilterRunner.class)
-public class ImapClientProviderImplTest {
+public class LinagoraImapClientProviderTest {
 
 	@Test
 	public void testImapTimeout() {
@@ -49,8 +49,7 @@ public class ImapClientProviderImplTest {
 				return 123456;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null, 
-				emailConfiguration, null, null, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.timeout", 123456),
@@ -65,8 +64,7 @@ public class ImapClientProviderImplTest {
 				return true;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
-				emailConfiguration, null, null, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", true));
@@ -80,8 +78,7 @@ public class ImapClientProviderImplTest {
 				return false;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
-				emailConfiguration, null, null, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", false));
@@ -95,8 +92,7 @@ public class ImapClientProviderImplTest {
 				return 987;
 			}
 		};
-		ImapClientProviderImpl imapClientProvider = new ImapClientProviderImpl(null, null,
-				emailConfiguration, null, null, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.fetchsize", 987),

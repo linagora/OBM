@@ -80,12 +80,12 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class ImapMailboxServiceTest {
+public class LinagoraMailboxServiceTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
 
-	@Inject ImapMailboxService mailboxService;
+	@Inject LinagoraMailboxService mailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;

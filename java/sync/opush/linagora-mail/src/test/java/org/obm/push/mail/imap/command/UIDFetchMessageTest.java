@@ -58,7 +58,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
-import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 
 import com.google.inject.Inject;
@@ -70,7 +70,7 @@ public class UIDFetchMessageTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
 
-	@Inject ImapClientProvider clientProvider;
+	@Inject LinagoraImapClientProvider clientProvider;
 
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;

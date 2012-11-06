@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -43,12 +43,22 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.minig.imap.FlagsList;
+import org.minig.imap.SearchQuery;
+import org.obm.mail.MailboxConnection;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.ImapLogoutException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxFolder;
+import org.obm.push.mail.imap.ImapCapability;
+import org.obm.push.mail.imap.ImapMailBoxUtils;
+import org.obm.push.mail.imap.ImapStore;
+import org.obm.push.mail.imap.MessageInputStreamProvider;
+import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.mail.imap.StreamMimeMessage;
+import org.obm.push.mail.imap.StreamedLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +67,7 @@ import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
-public class ImapStoreImpl implements ImapStore {
+public class ImapStoreImpl implements MailboxConnection, ImapStore {
 
 	@Singleton
 	public static class Factory implements ImapStore.Factory {
@@ -136,7 +146,15 @@ public class ImapStoreImpl implements ImapStore {
 
 	@Override
 	public boolean isConnected() {
-		return store.isConnected();
+		try {
+			OpushImapFolder folder = select("INBOX");
+			folder.noop();
+			return true;
+		} catch (MessagingException e) {
+			return false;
+		} catch (ImapCommandException e) {
+			return false;
+		}
 	}
 
 	@Override
@@ -280,5 +298,35 @@ public class ImapStoreImpl implements ImapStore {
 
 	protected MessageInputStreamProvider getMessageInputStreamProvider() {
 		return messageInputStreamProvider;
+	}
+
+	@Override
+	public InputStream uidFetchPart(long uid, String address) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override 
+	public Collection<Long> uidSearch(String folderName, SearchQuery sq) throws ImapCommandException {
+		try {
+			OpushImapFolder opushImapFolder = openFolder(folderName, Folder.READ_ONLY);
+			return opushImapFolder.uidSearch(sq);
+		} catch (MessagingException e) {
+			String msg = String.format(
+					"IMAP command uid search failed. user=%s", userId);
+			throw new ImapCommandException(msg, e);
+		}
+	}
+
+	@Override
+	public boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void expunge() {
+		// TODO Auto-generated method stub
+		
 	}
 }

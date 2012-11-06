@@ -33,17 +33,13 @@ package org.obm.push.mail.imap;
 
 import org.minig.imap.IMAPException;
 import org.minig.imap.IdleClient;
-import org.minig.imap.StoreClient;
 import org.obm.locator.LocatorClientException;
+import org.obm.mail.MailboxConnection;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
 
 public interface ImapClientProvider {
 
-	String locateImap(UserDataRequest udr) throws LocatorClientException;
-	StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException;
-	@Deprecated ImapStore getImapClientWithJM(UserDataRequest udr) throws LocatorClientException, NoImapClientAvailableException, ImapLoginException;
+	MailboxConnection getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException;
 	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
 	
 }

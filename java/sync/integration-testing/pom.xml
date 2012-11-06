@@ -102,6 +102,11 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>java-mail</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>

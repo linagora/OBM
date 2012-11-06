@@ -43,6 +43,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.minig.imap.FlagsList;
+import org.minig.imap.SearchQuery;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MimeAddress;
 
@@ -147,6 +149,33 @@ public class MinigOpushImapFolderImpl implements OpushImapFolder {
 	@Override
 	public Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids)
 			throws MessagingException, ImapMessageNotFoundException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public FlagsList uidFetchFlags(long messageUid) throws MessagingException,
+		ImapMessageNotFoundException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Folder[] listSubscribed(String pattern) throws MessagingException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void expunge() throws MessagingException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Collection<Long> uidSearch(SearchQuery query)
+		throws MessagingException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void noop() throws MessagingException {
 		throw new NotImplementedException();
 	}
 }

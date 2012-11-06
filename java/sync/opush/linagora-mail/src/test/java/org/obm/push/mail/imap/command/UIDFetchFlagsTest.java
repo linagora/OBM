@@ -62,7 +62,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.PrivateMailboxService;
-import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 
 import com.google.common.collect.Iterables;
@@ -75,7 +75,7 @@ public class UIDFetchFlagsTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
 
-	@Inject ImapClientProvider clientProvider;
+	@Inject LinagoraImapClientProvider clientProvider;
 	@Inject MailboxService mailboxService;
 	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;

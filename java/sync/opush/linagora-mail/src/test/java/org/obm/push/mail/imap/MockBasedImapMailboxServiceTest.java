@@ -92,8 +92,8 @@ public class MockBasedImapMailboxServiceTest {
 		
 		EasyMock.replay(smtpSender);
 		
-		ImapMailboxService emailManager = 
-				new ImapMailboxService(emailConfiguration, smtpSender, null, null, null, null, null, null);
+		LinagoraMailboxService emailManager = 
+				new LinagoraMailboxService(emailConfiguration, smtpSender, null, null, null, null, null, null);
 
 		emailManager.sendEmail(udr,
 				new Address("test@test.fr"),
@@ -111,7 +111,7 @@ public class MockBasedImapMailboxServiceTest {
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 		
-		ImapMailboxService emailManager = new ImapMailboxService(
+		LinagoraMailboxService emailManager = new LinagoraMailboxService(
 				emailConfiguration, null, null, null, collectionPathHelper, null, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
@@ -124,7 +124,7 @@ public class MockBasedImapMailboxServiceTest {
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 
-		ImapMailboxService emailManager = new ImapMailboxService(
+		LinagoraMailboxService emailManager = new LinagoraMailboxService(
 				emailConfiguration, null, null, null, collectionPathHelper, null, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
@@ -136,20 +136,20 @@ public class MockBasedImapMailboxServiceTest {
 		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
 
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(folderEndingByINBOX);
-		ImapClientProvider imapClientProvider = newImapClientProviderMock(folderEndingByINBOX);
+		LinagoraImapClientProvider imapClientProvider = newImapClientProviderMock(folderEndingByINBOX);
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 
-		ImapMailboxService emailManager = new ImapMailboxService(
+		LinagoraMailboxService emailManager = new LinagoraMailboxService(
 				emailConfiguration, null, null, imapClientProvider, collectionPathHelper, null, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(folderEndingByINBOX));
 		Assertions.assertThat(parsedMailbox).isEqualTo(folderEndingByINBOX);
 	}
 
-	private ImapClientProvider newImapClientProviderMock(String...allUserFolders) throws Exception {
+	private LinagoraImapClientProvider newImapClientProviderMock(String...allUserFolders) throws Exception {
 		StoreClient storeClient = newStoreClientMock(allUserFolders);
 		
-		ImapClientProvider imapClientProvider = EasyMock.createMock(ImapClientProvider.class);
+		LinagoraImapClientProvider imapClientProvider = EasyMock.createMock(LinagoraImapClientProvider.class);
 		EasyMock.expect(imapClientProvider.getImapClient(udr)).andReturn(storeClient);
 		
 		EasyMock.replay(storeClient, imapClientProvider);

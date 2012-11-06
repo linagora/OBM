@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.util.Date;
 
@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.minig.imap.SearchQuery;
+import org.obm.push.java.mail.OpushImapFolderImpl;
 import org.obm.push.utils.DateUtils;
 
 
