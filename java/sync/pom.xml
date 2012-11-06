@@ -52,6 +52,7 @@
 		<plugin.surefire.version>2.12.4</plugin.surefire.version>
 		<plugin.compiler.version>2.5.1</plugin.compiler.version>
 		<plugin.eclipse.version>2.9</plugin.eclipse.version>
+		<plugin.dependency.version>2.5.1</plugin.dependency.version>
 	</properties>
 
 	<repositories>
@@ -267,7 +268,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.3</version>
+					<version>${plugin.dependency.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
