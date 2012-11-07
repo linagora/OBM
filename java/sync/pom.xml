@@ -47,6 +47,7 @@
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
 		<btm.version>2.2.0-SNAPSHOT</btm.version>
 
+		<plugin.jar.version>2.4</plugin.jar.version>
 		<plugin.war.version>2.3</plugin.war.version>
 		<plugin.surefire.version>2.12.4</plugin.surefire.version>
 	</properties>
@@ -254,7 +255,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.4</version>
+					<version>${plugin.jar.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
