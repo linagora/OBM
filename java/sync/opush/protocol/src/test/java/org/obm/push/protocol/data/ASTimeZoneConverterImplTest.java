@@ -54,7 +54,7 @@ public class ASTimeZoneConverterImplTest {
 	public void before() {
 		asTimeZoneConverter = new ASTimeZoneConverterImpl(new TimeZoneConverterImpl());
 	}
-
+	
 	@Test
 	public void testConvertEuropeParisTimeZone() {
 		TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
@@ -62,7 +62,7 @@ public class ASTimeZoneConverterImplTest {
 
 		TimeZone expectedTimeZone = asTimeZoneConverter.convert(asTimeZone);
 
-		Assertions.assertThat(timeZone.getID()).isEqualTo(expectedTimeZone.getID());
+		Assertions.assertThat(expectedTimeZone.getID()).isEqualTo(timeZone.getID());
 	}
 	
 	@Test
@@ -100,7 +100,7 @@ public class ASTimeZoneConverterImplTest {
 	
 	private void assertTimezoneIdsAreCorrect(Map<String, TimeZone> map) {
 		for (java.util.Map.Entry<String, TimeZone> e: map.entrySet()) {
-			Assertions.assertThat(e.getKey()).isEqualTo(e.getValue().getID());
+			Assertions.assertThat(e.getValue().getID()).isEqualTo(e.getKey());
 		}
 	}
 	
