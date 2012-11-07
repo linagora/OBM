@@ -10,7 +10,7 @@
 	
 	<artifactId>tnefconverter</artifactId>
 	<packaging>jar</packaging>
-	<name>opush tnefconverter</name>
+	<name>OPush TNEF Converter</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

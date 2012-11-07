@@ -10,7 +10,7 @@
 
 	<artifactId>technical-log</artifactId>
 	<packaging>jar</packaging>
-	<name>opush technical-log</name>
+	<name>OPush Technical Logger</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

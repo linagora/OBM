@@ -10,7 +10,7 @@
 	
 	<artifactId>protocol</artifactId>
 	<packaging>jar</packaging>
-	<name>opush protocol</name>
+	<name>OPush ActiveSync Protocol</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

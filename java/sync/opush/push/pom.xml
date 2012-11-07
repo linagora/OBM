@@ -10,7 +10,7 @@
 
 	<artifactId>push</artifactId>
 	<packaging>war</packaging>
-	<name>opush org.obm.push</name>
+	<name>OPush War Package</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

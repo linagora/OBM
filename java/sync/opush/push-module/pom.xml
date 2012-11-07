@@ -10,7 +10,7 @@
 
 	<artifactId>push-module</artifactId>
 	<packaging>jar</packaging>
-	<name>opush org.obm.push</name>
+	<name>OPush Module Manager</name>
 	<url>http://www.obm.org/</url>
 
 	<dependencies>

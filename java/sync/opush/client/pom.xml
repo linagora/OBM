@@ -10,7 +10,7 @@
 	
 	<artifactId>client-opush</artifactId>
 	<packaging>jar</packaging>
-	<name>opush org.obm.push.client</name>
+	<name>OPush ActiveSync Client</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

@@ -10,7 +10,7 @@
 
 	<artifactId>push-service</artifactId>
 	<packaging>jar</packaging>
-	<name>OPush Service</name>
+	<name>OPush Services</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>

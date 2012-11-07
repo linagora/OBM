@@ -10,7 +10,7 @@
 	
 	<artifactId>wbxml</artifactId>
 	<packaging>jar</packaging>
-	<name>opush org.obm.push.wbxml</name>
+	<name>OPush WBXML Encoder/Decoder</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>
