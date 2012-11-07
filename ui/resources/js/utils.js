@@ -340,3 +340,9 @@ Obm.utils.decodeSpecialChars = function(str) {
   return tmpTa.value; 
 };
 
+Obm.utils.locationDecode = function(str) {
+  var locationValue = Obm.utils.decodeSpecialChars(str);
+  locationValue = locationValue.replace(/\\/g, '');
+  return locationValue; 
+};
+

@@ -1630,7 +1630,7 @@ Obm.CalendarInDayEvent = new Class({
   setTitle: function() {
     var location = '';
     if (this.event.location != '') {
-      location = '(' + this.event.location + ')';
+      location = '(' + Obm.utils.locationDecode(this.event.location) + ')';
     }
     var title = this.event.title + ' ';
     if (this.event.duration <= obm.vars.consts.timeUnit) {
@@ -2392,7 +2392,7 @@ Obm.CalendarQuickForm = new Class({
     this.description.set('text',evt.event.description);
     this.item.set('html',evt.event.item);
     this.category.set('html',evt.event.category);
-    this.location.set('text',evt.event.location);
+    this.location.set('text',Obm.utils.locationDecode(evt.event.location));
     this.organizer.set('text',evt.event.organizer_name);
 
     this.data.setStyle('display','block');
