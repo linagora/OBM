@@ -266,11 +266,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<version>${plugin.war.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>${plugin.dependency.version}</version>
 				</plugin>
