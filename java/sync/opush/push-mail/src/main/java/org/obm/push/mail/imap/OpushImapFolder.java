@@ -92,4 +92,10 @@ public interface OpushImapFolder {
 	Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException;
 
 	void noop() throws MessagingException;
+	
+	void close() throws MessagingException;
+
+	String getFullName();
+	
+	boolean isOpen() throws MessagingException;
 }

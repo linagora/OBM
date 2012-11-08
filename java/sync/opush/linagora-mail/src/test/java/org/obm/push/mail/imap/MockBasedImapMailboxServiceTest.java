@@ -150,7 +150,7 @@ public class MockBasedImapMailboxServiceTest {
 		StoreClient storeClient = newStoreClientMock(allUserFolders);
 		
 		LinagoraImapClientProvider imapClientProvider = EasyMock.createMock(LinagoraImapClientProvider.class);
-		EasyMock.expect(imapClientProvider.getImapClient(udr)).andReturn(storeClient);
+		EasyMock.expect(imapClientProvider.getImapClient(udr, null)).andReturn(storeClient);
 		
 		EasyMock.replay(storeClient, imapClientProvider);
 		return imapClientProvider;

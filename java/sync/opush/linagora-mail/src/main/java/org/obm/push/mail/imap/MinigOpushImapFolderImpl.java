@@ -178,4 +178,19 @@ public class MinigOpushImapFolderImpl implements OpushImapFolder {
 	public void noop() throws MessagingException {
 		throw new NotImplementedException();
 	}
+
+	@Override
+	public void close() throws MessagingException {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public String getFullName() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public boolean isOpen() throws MessagingException {
+		throw new NotImplementedException();
+	}
 }

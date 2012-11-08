@@ -126,6 +126,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		folder.expunge();
 	}
 
+	@Override
 	public String getFullName() {
 		return folder.getFullName();
 	}
@@ -159,7 +160,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		throw new ImapMessageNotFoundException("No message correspond to given UID, UID:" + String.valueOf(messageUid));
 	}
 
-	public <T> T doCommand(IMAPCommand<T> command) throws MessagingException {
+	private <T> T doCommand(IMAPCommand<T> command) throws MessagingException {
 		return (T) folder.doCommand(command);
 	}
 
@@ -329,6 +330,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		return fetchProfile;
 	}
 
+	@Override
 	public InputStream uidFetchPart(long messageUid, MimeAddress mimePartAddress, Integer limit) 
 			throws MessagingException, ImapMessageNotFoundException {
 		
@@ -347,5 +349,15 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	@Override
 	public boolean isSubscribed() {
 		return folder.isSubscribed();
+	}
+	
+	@Override
+	public void close() throws MessagingException {
+		folder.close(false);
+	}
+	
+	@Override
+	public boolean isOpen() throws MessagingException {
+		return folder.isOpen();
 	}
 }

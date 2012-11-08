@@ -39,7 +39,7 @@ import org.obm.push.bean.UserDataRequest;
 
 public interface ImapClientProvider {
 
-	MailboxConnection getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException;
+	MailboxConnection getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException;
 	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
 	
 }

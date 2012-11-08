@@ -64,7 +64,7 @@ public interface ImapStore extends MailboxConnection, Resource {
 	String getUserId();
 	
 	void login() throws ImapLoginException;
-	boolean isConnected();
+	boolean isConnected(OpushImapFolder opushImapFolder);
 
 	Message createMessage();
 
@@ -72,11 +72,11 @@ public interface ImapStore extends MailboxConnection, Resource {
 
 	Message createStreamedMessage(InputStream messageContent, int mailSize);
 
-	void appendMessageStream(String folderName, StreamedLiteral streamedLiteral, Flags flags) throws ImapCommandException;
+	void appendMessageStream(OpushImapFolder opushImapFolder, StreamedLiteral streamedLiteral, Flags flags) throws ImapCommandException;
 	
-	void appendMessage(String folderName, Message message) throws ImapCommandException;
+	void appendMessage(OpushImapFolder opushImapFolder, Message message) throws ImapCommandException;
 	
-	void deleteMessage(String folderSrc, long messageUid) throws MessagingException, ImapMessageNotFoundException;
+	void deleteMessage(OpushImapFolder sourceFolder, long messageUid) throws MessagingException, ImapMessageNotFoundException;
 
 	OpushImapFolder select(String folderName) throws ImapCommandException;
 
@@ -86,19 +86,21 @@ public interface ImapStore extends MailboxConnection, Resource {
 
 	boolean hasCapability(ImapCapability imapCapability) throws MessagingException;
 
-	long moveMessageUID(final String folderSrc, final String folderDst, final Long messageUid)
+	long moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, final Long messageUid)
 			throws ImapCommandException, ImapMessageNotFoundException;
 
-	Message fetchEnvelope(String folderSrc, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;
+	Message fetchEnvelope(OpushImapFolder opushImapFolder, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;
 	
-	Map<Long, IMAPMessage> fetchFast(String folderSrc, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException;
 
-	Map<Long, IMAPMessage> fetchBodyStructure(String folderSrc, Collection<Long> uids) 
+	Map<Long, IMAPMessage> fetchBodyStructure(OpushImapFolder opushImapFolder, Collection<Long> uids) 
 			throws ImapCommandException, ImapMessageNotFoundException;
 	
-	Collection<Long> uidSearch(String folderName, SearchQuery sq) throws ImapCommandException;
+	Collection<Long> uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException;
 	
 	boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set);
 	
 	void expunge();
+
+	OpushImapFolder openFolder(String folderName, int mode) throws MessagingException;
 }

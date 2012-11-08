@@ -34,6 +34,7 @@ package org.obm.push.java.mail;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
@@ -52,6 +53,7 @@ import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapStore.Factory;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
+import org.obm.push.mail.imap.OpushImapFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,42 +123,64 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	}
 
 	@Override
-	public ImapStore getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException {
-		ImapStore imapStore = retrieveWorkingImapStore(udr);
-		if (imapStore != null) {
-			return imapStore;
-		} else {
-			ImapStore newStore = null;
-			try {
-				newStore = buildImapStore(udr);
-				
-				newStore.login();
-				udr.putResource(IMAP_STORE_RESOURCE, newStore);
-				return newStore;
-			} catch (NoImapClientAvailableException e) {
-				throw new IMAPException(e);
-			} catch (ImapLoginException e) {
-				throw new IMAPException(e);
-			} catch (RuntimeException e) {
-				throw e;
+	public ImapStore getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException {
+		try {
+			ImapStore imapStore = retrieveWorkingImapStore(udr, opushImapFolder);
+			if (imapStore != null) {
+				return imapStore;
+			} else {
+				ImapStore newStore = null;
+					newStore = buildImapStore(udr);
+					
+					newStore.login();
+					udr.putResource(IMAP_STORE_RESOURCE, newStore);
+					return newStore;
 			}
+		} catch (NoImapClientAvailableException e) {
+			throw new IMAPException(e);
+		} catch (ImapLoginException e) {
+			throw new IMAPException(e);
+		} catch (MessagingException e) {
+			throw new IMAPException(e);
+		} catch (RuntimeException e) {
+			throw e;
 		}
 	}
 
-	private ImapStore retrieveWorkingImapStore(UserDataRequest udr) {
+	@VisibleForTesting ImapStore retrieveWorkingImapStore(UserDataRequest udr, OpushImapFolder opushImapFolder) throws MessagingException {
 		ImapStore imapStore = (ImapStore) udr.getResource(IMAP_STORE_RESOURCE);
-		if (imapStore != null) {
+		if (imapStore != null && opushImapFolder != null) {
 			try {
-				if (imapStore.isConnected()) {
+				if (imapStore.isConnected(opushImapFolder)) {
 					return imapStore;
 				} else {
-					imapStore.close();
+					closeFolderAndStore(opushImapFolder, imapStore);
 				}
 			} catch (RuntimeException e) {
-				imapStore.close();
+				closeFolderAndStore(opushImapFolder, imapStore);
 			}
+			return null;
+		}
+		if (imapStore != null) {
+			closeStore(imapStore);
+		}
+		if (opushImapFolder != null) {
+			closeFolder(opushImapFolder);
 		}
 		return null;
+	}
+
+	private void closeFolderAndStore(OpushImapFolder opushImapFolder, ImapStore imapStore) throws MessagingException {
+		closeFolder(opushImapFolder);
+		closeStore(imapStore);
+	}
+	
+	private void closeStore(ImapStore imapStore) {
+		imapStore.close();
+	}
+	
+	private void closeFolder(OpushImapFolder opushImapFolder) throws MessagingException {
+		opushImapFolder.close();
 	}
 
 	private ImapStore buildImapStore(UserDataRequest udr) throws NoImapClientAvailableException {

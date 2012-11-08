@@ -151,7 +151,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
 		try {
-			final StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String collectionPath = parseMailBoxName(udr, collectionName);
 			store.select(collectionPath);
 			
@@ -166,6 +166,11 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			throw new MailException(e);
 		}
 		return mails;
+	}
+
+	private StoreClient getImapStore(UserDataRequest udr) throws IMAPException {
+		StoreClient store = imapClientProvider.getImapClient(udr, null);
+		return store;
 	}
 
 	@Override
@@ -188,7 +193,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			store.select(parseMailBoxName(udr, collectionName));
 			Map<Long, FlagsList> fetchFlags = store.uidFetchFlags(ImmutableList.of(uid));
 			FlagsList flagsList = fetchFlags.get(uid);
@@ -206,7 +211,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public MailboxFolders listAllFolders(UserDataRequest udr) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			return mailboxFolders(store.listAll());
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -218,7 +223,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			return mailboxFolders(store.listSubscribed());
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -239,7 +244,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			if (!store.create(folder.getName())) {
 				throw new MailException("Folder creation failed for : " + folder.getName());
 			}
@@ -262,7 +267,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			boolean status) throws MailException {
 		
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailBoxName = parseMailBoxName(udr, collectionName);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
@@ -302,7 +307,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			throws MailException, ImapMessageNotFoundException {
 
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailBoxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailBoxName);
 			FlagsList fl = new FlagsList();
@@ -322,7 +327,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			assertMoveItemIsSupported(store);
 			
 			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
@@ -372,7 +377,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	private InputStream getMessageInputStream(UserDataRequest udr, String collectionName, long messageUID) 
 			throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailBoxName = parseMailBoxName(udr, collectionName);
 			store.select(mailBoxName);
 			return store.uidFetchMessage(messageUID);
@@ -451,7 +456,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			throws MailException {
 		
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailBoxName = parseMailBoxName(udr, collectionName);
 			store.select(mailBoxName);
 			return store.uidFetchPart(mailUid, Objects.firstNonNull(mimePartAddress.getAddress(), ""));
@@ -468,7 +473,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 		
 		long time = System.currentTimeMillis();
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailBoxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailBoxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
@@ -498,7 +503,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 			throws MailException {
 
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String folderName = parseMailBoxName(udr, collectionPath);
 			FlagsList fl = new FlagsList();
 			if(isRead){
@@ -541,7 +546,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public Set<Email> fetchEmails(UserDataRequest udr, String collectionName, Date windows) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			store.select( parseMailBoxName(udr, collectionName) );
 			SearchQuery query = SearchQuery.builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
@@ -555,7 +560,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailboxName);
 			Collection<UIDEnvelope> uidFetchEnvelopes = store.uidFetchEnvelope(Arrays.asList(uid));
@@ -572,7 +577,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			store.select(parseMailBoxName(udr, collectionPath));
 			return store.uidFetchFast(uids);
 		} catch (LocatorClientException e) {
@@ -590,7 +595,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 	@Override
 	public Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			store.select(parseMailBoxName(udr, collectionPath));
 			return store.uidFetchBodyStructure(uids);
 		} catch (LocatorClientException e) {
@@ -606,7 +611,7 @@ public class LinagoraMailboxService implements PrivateMailboxService {
 
 		Preconditions.checkNotNull(fetchInstruction);
 		try {
-			StoreClient store = imapClientProvider.getImapClient(udr);
+			StoreClient store = getImapStore(udr);
 			store.select(parseMailBoxName(udr, collectionName));
 			
 			MimeAddress address = fetchInstruction.getMimePart().getAddress();

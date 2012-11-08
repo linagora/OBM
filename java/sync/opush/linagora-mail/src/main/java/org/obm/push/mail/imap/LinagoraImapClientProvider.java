@@ -112,7 +112,7 @@ public class LinagoraImapClientProvider implements ImapClientProvider {
 	}
 
 	@Override
-	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException {
+	public StoreClient getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException {
 		StoreClient storeClient = retrieveWorkingStoreClient(udr);
 		if (storeClient != null) {
 			return storeClient;
