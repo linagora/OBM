@@ -31,77 +31,57 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.List;
+import java.io.Serializable;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 
-public class HierarchyItemsChanges {
-
+public class ItemDeletion implements Serializable {
+	
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		private List<ItemChange> changes;
-		private List<ItemDeletion> deletions;
-
+		
+		private String serverId;
+		
 		private Builder() {
-			changes = Lists.newArrayList();
-			deletions = Lists.newArrayList();
+			super();
 		}
 		
-		public Builder changes(List<ItemChange> changes) {
-			Preconditions.checkNotNull(changes);
-			this.changes.addAll(changes);
+		public Builder serverId(String serverId) {
+			this.serverId = serverId;
 			return this;
 		}
 		
-		public Builder deletions(List<ItemDeletion> deletions) {
-			Preconditions.checkNotNull(deletions);
-			this.deletions.addAll(deletions);
-			return this;
-		}
-		
-		public Builder mergeItems(HierarchyItemsChanges hierarchyItemsChanges) {
-			changes(hierarchyItemsChanges.getChangedItems());
-			deletions(hierarchyItemsChanges.getDeletedItems());
-			return this;
-		}
-		
-		public HierarchyItemsChanges build() {
-			return new HierarchyItemsChanges(changes, deletions);
+		public ItemDeletion build() {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(serverId));
+			return new ItemDeletion(serverId);
 		}
 	}
 	
-	private final List<ItemChange> changes;
-	private final List<ItemDeletion> deletions;
+	private final String serverId;
 
-	private HierarchyItemsChanges(List<ItemChange> changes, List<ItemDeletion> deletions) {
-		this.changes = changes;
-		this.deletions = deletions;
+	private ItemDeletion(String serverId) {
+		this.serverId = serverId;
 	}
 	
-	public List<ItemChange> getChangedItems() {
-		return changes;
-	}
-	
-	public List<ItemDeletion> getDeletedItems() {
-		return deletions;
+	public String getServerId() {
+		return serverId;
 	}
 
 	@Override
-	public int hashCode(){
-		return Objects.hashCode(changes, deletions);
+	public final int hashCode(){
+		return Objects.hashCode(serverId);
 	}
 	
 	@Override
-	public boolean equals(Object object){
-		if (object instanceof HierarchyItemsChanges) {
-			HierarchyItemsChanges that = (HierarchyItemsChanges) object;
-			return Objects.equal(this.changes, that.changes)
-				&& Objects.equal(this.deletions, that.deletions);
+	public final boolean equals(Object object){
+		if (object instanceof ItemDeletion) {
+			ItemDeletion that = (ItemDeletion) object;
+			return Objects.equal(this.serverId, that.serverId);
 		}
 		return false;
 	}
@@ -109,8 +89,7 @@ public class HierarchyItemsChanges {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("changes", changes)
-			.add("deletions", deletions)
+			.add("serverId", serverId)
 			.toString();
 	}
 }

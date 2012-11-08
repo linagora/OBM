@@ -55,6 +55,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -252,11 +253,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
 		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 
 		expectBuildCollectionPath(contactParentName);
 		expectBuildCollectionPath(otherCollectionDisplayName);
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		
@@ -264,19 +263,11 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		mocks.verify();
 
-		ItemChange expectedItemDeletion = new ItemChangeBuilder()
+		ItemDeletion expectedItemDeletion = ItemDeletion.builder()
 				.serverId(String.valueOf(contactParentId))
-				.parentId("0")
-				.displayName(contactParentName)
-				.itemType(FolderType.DEFAULT_CONTACTS_FOLDER)
-				.withNewFlag(false)
 				.build();
-		ItemChange expectedItem2Deletion = new ItemChangeBuilder()
+		ItemDeletion expectedItem2Deletion = ItemDeletion.builder()
 				.serverId(String.valueOf(otherCollectionMappingId))
-				.parentId(contactParentIdAsString)
-				.displayName(otherCollectionDisplayName)
-				.itemType(FolderType.USER_CREATED_CONTACTS_FOLDER)
-				.withNewFlag(false)
 				.build();
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 		assertThat(hierarchyItemsChanges.getDeletedItems()).hasSize(2);
@@ -409,11 +400,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
 		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 
 		expectBuildCollectionPath("add");
 		expectBuildCollectionPath("known");
-		expectBuildCollectionPath(contactParentName);
 		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
@@ -423,7 +412,7 @@ public class ContactsBackendHierarchyChangesTest {
 		assertThat(changes.getChangedItems()).containsOnly(
 				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
 		assertThat(changes.getDeletedItems()).containsOnly(
-				new ItemChange("2", contactParentIdAsString, "known", FolderType.USER_CREATED_CONTACTS_FOLDER, false));
+				ItemDeletion.builder().serverId("2").build());
 	}
 	
 	@Test

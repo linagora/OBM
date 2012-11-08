@@ -66,6 +66,7 @@ import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -245,6 +246,16 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			.build();
 	}
 
+	@Override
+	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath imapFolder)
+			throws CollectionNotFoundException, DaoException {
+
+		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
+		return ItemDeletion.builder()
+				.serverId(mappingService.collectionIdToString(collectionId))
+				.build();
+	}
+	
 	private CollectionPath getWasteBasketPath(UserDataRequest udr) {
 		return collectionPathBuilderProvider.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).backendName(EmailConfiguration.IMAP_TRASH_NAME).build();
 	}

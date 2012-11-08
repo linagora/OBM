@@ -56,6 +56,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.HierarchyItemsChanges.Builder;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -107,7 +108,7 @@ public class HierarchyExporterTest {
 		ItemChange item1 = new ItemChange("1-ADD");
 		ItemChange item2 = new ItemChange("1.1-ADD");
 		ItemChange item3 = new ItemChange("2-ADD");
-		ItemChange item4 = new ItemChange("2-REMOVE");
+		ItemDeletion item4 = ItemDeletion.builder().serverId("2-REMOVE").build();
 
 		HierarchyItemsChanges hierarchyItemsChanges1 = HierarchyItemsChanges.builder()
 			.changes(Lists.newArrayList(item1, item2)).build();
@@ -252,7 +253,7 @@ public class HierarchyExporterTest {
 	private HierarchyItemsChanges buildHierarchyItemsChanges(String collectionId) {
 		return HierarchyItemsChanges.builder()
 			.changes(buildItemChanged(collectionId))
-			.deletions(buildItemDeleted(collectionId))
+			.deletions(buildItemDeleted())
 			.build();
 	}
 	
@@ -262,9 +263,8 @@ public class HierarchyExporterTest {
 				new ItemChange(collectionId, "2", "FOLDER TWO", FolderType.USER_CREATED_EMAIL_FOLDER, false));
 	}
 	
-	private List<ItemChange> buildItemDeleted(String collectionId) {
-		return Lists.newArrayList(
-				new ItemChange(collectionId, "3", "FOLDER DELETED", FolderType.USER_CREATED_EMAIL_FOLDER, false));
+	private List<ItemDeletion> buildItemDeleted() {
+		return Lists.newArrayList(ItemDeletion.builder().serverId("3").build());
 	}
 	
 }

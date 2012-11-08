@@ -63,6 +63,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -318,11 +319,8 @@ public class MailBackendTest {
 
 		verifyCommonMocks();
 		
-		ItemChange deletedFolderItemChange = new ItemChangeBuilder().serverId("5")
-			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("deletedFolder").withNewFlag(false).build();
-		
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(deletedFolderItemChange);
+		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(
+				ItemDeletion.builder().serverId("5").build());
 		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
 	}
 	
@@ -362,12 +360,10 @@ public class MailBackendTest {
 			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
 			.displayName("changedFolder").withNewFlag(true).build();
 		
-		ItemChange oldFolderItemChange = new ItemChangeBuilder().serverId("6")
-			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("deletedFolder").withNewFlag(false).build();
+		ItemDeletion oldFolderItemDeleted = ItemDeletion.builder().serverId("6").build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemChange);
+		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemDeleted);
 	}
 
 	private void expectMappingServiceSearchThenCreateCollection(Map<String, Integer> mailboxesIds)

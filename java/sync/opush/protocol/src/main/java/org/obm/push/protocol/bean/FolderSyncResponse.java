@@ -35,6 +35,7 @@ import java.util.Collection;
 
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 
 public class FolderSyncResponse {
 	
@@ -61,7 +62,7 @@ public class FolderSyncResponse {
 		return hierarchyItemsChanges.getChangedItems();
 	}
 	
-	public Collection<ItemChange> getItemsDeleted() {
+	public Collection<ItemDeletion> getItemsDeleted() {
 		return hierarchyItemsChanges.getDeletedItems();
 	}
 	

@@ -48,6 +48,7 @@ import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
@@ -193,6 +194,16 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return ic;
 	}
 
+	@Override
+	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+			throws CollectionNotFoundException, DaoException {
+		
+		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
+		return ItemDeletion.builder()
+				.serverId(mappingService.collectionIdToString(collectionId))
+				.build();
+	}
+	
 	private boolean isDefaultCalendarCollectionPath(UserDataRequest udr, CollectionPath collectionPath) {
 		return udr.getUser().getLoginAtDomain().equalsIgnoreCase(collectionPath.backendName());
 	}

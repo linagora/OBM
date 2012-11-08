@@ -48,6 +48,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -162,6 +163,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		String parentId = getParentId(udr, collectionPath);
 		FolderType itemType = getItemType(collectionPath);
 		return new ItemChange(serverId, parentId, collectionPath.backendName(), itemType, isNew);
+	}
+
+	@Override
+	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+			throws CollectionNotFoundException, DaoException {
+		
+		return ItemDeletion.builder()
+				.serverId(getServerIdFromCollectionPath(udr, collectionPath.collectionPath()))
+				.build();
 	}
 
 	@VisibleForTesting Set<CollectionPath> deletedCollections(UserDataRequest udr, FolderChanges folderChanges, 

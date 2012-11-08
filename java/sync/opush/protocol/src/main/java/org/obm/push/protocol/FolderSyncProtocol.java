@@ -35,6 +35,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
@@ -78,9 +79,9 @@ public class FolderSyncProtocol {
 			addItemChange(addedOrUpdated, itemChange);
 		}
 		
-		for (ItemChange itemChange: folderSyncResponse.getItemsDeleted()) {
+		for (ItemDeletion itemDeleted: folderSyncResponse.getItemsDeleted()) {
 			Element deleted = DOMUtils.createElement(changes, "Delete");
-			DOMUtils.createElementAndText(deleted, "ServerId", itemChange.getServerId());
+			DOMUtils.createElementAndText(deleted, "ServerId", itemDeleted.getServerId());
 		}
 		
 		return ret;

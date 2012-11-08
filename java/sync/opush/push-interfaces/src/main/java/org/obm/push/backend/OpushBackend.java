@@ -39,6 +39,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
@@ -104,34 +105,35 @@ public abstract class OpushBackend {
 					throws DaoException, CollectionNotFoundException {
 		
 		return HierarchyItemsChanges.builder()
-			.changes(itemChangesTaggedNew(udr, changedCollections))
-			.deletions(itemChangesTaggedDeleted(udr, deletedCollections))
+			.changes(itemsChanged(udr, changedCollections))
+			.deletions(itemsDeleted(udr, deletedCollections))
 			.build();
 	}
 
 
-	private List<ItemChange> itemChangesTaggedNew(UserDataRequest udr, Iterable<CollectionPath> changedCollections)
+	private List<ItemChange> itemsChanged(UserDataRequest udr, Iterable<CollectionPath> changedCollections)
 			throws DaoException, CollectionNotFoundException {
-		return itemChanges(udr, changedCollections, true);
-	}
-
-	private List<ItemChange> itemChangesTaggedDeleted(UserDataRequest udr, Iterable<CollectionPath> deletedCollections)
-			throws DaoException, CollectionNotFoundException {
-		return itemChanges(udr, deletedCollections, false);
-	}
-	
-	private List<ItemChange> itemChanges(UserDataRequest udr, Iterable<CollectionPath> collectionPaths, boolean isNew)
-			throws DaoException, CollectionNotFoundException {
-
 		List<ItemChange> changes = Lists.newArrayList();
-		for (CollectionPath collectionPath: collectionPaths) {
+		for (CollectionPath collectionPath: changedCollections) {
 			ItemChange itemChange = createItemChange(udr, collectionPath);
-			itemChange.setNew(isNew);
+			itemChange.setNew(true);
 			changes.add(itemChange);
 		}
 		return changes;
 	}
 
+	private List<ItemDeletion> itemsDeleted(UserDataRequest udr, Iterable<CollectionPath> deletedCollections)
+			throws DaoException, CollectionNotFoundException {
+		List<ItemDeletion> deletes = Lists.newArrayList();
+		for (CollectionPath collectionPath: deletedCollections) {
+			deletes.add(createItemDeleted(udr, collectionPath));
+		}
+		return deletes;
+	}
+	
 	protected abstract ItemChange createItemChange(UserDataRequest udr, CollectionPath collectionPath)
+			throws DaoException, CollectionNotFoundException;
+
+	protected abstract ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
 			throws DaoException, CollectionNotFoundException;
 }

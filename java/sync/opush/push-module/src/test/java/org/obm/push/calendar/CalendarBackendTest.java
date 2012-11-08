@@ -64,6 +64,7 @@ import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -306,12 +307,8 @@ public class CalendarBackendTest {
 				.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
 				.withNewFlag(true)
 				.build();
-		ItemChange expectedItemChange2 = new ItemChangeBuilder()
+		ItemDeletion expectedItemChange2 = ItemDeletion.builder()
 				.serverId(String.valueOf(calendar2MappingId))
-				.parentId("0")
-				.displayName(calendar2DisplayName + " calendar")
-				.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
-				.withNewFlag(false)
 				.build();
 		
 		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(1);

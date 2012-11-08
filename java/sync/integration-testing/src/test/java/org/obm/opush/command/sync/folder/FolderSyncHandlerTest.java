@@ -62,6 +62,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
@@ -211,12 +212,10 @@ public class FolderSyncHandlerTest {
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 
 		String serverId = "4:1";
-		String parentId = "23";
 		
-		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
 		HierarchyItemsChanges mailboxChanges = HierarchyItemsChanges.builder()
 			.deletions(Lists.newArrayList(
-					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
+					ItemDeletion.builder().serverId(serverId).build()))
 			.build();
 		
 		mockUsersAccess(classToInstanceMap, userAsList);

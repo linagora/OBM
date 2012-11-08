@@ -71,6 +71,7 @@ public class BeansTest {
 					.add(Device.class)
 					.add(Email.class)
 					.add(ItemChange.class)
+					.add(ItemDeletion.class)
 					.add(MeetingResponse.class)
 					.add(MoveItem.class)
 					.add(MSAddress.class)
