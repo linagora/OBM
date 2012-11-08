@@ -48,15 +48,12 @@ import org.minig.imap.IMAPException;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
-import org.obm.mail.conversation.EmailView;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -64,10 +61,8 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
-import org.obm.push.mail.EmailViewPartsFetcherImpl;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.FastFetch;
@@ -84,12 +79,10 @@ import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.smtp.SmtpSender;
-import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -112,42 +105,17 @@ public class LinagoraMailboxService implements MailboxService {
 	private final LinagoraImapClientProvider imapClientProvider;
 	private final CollectionPathHelper collectionPathHelper;
 
-	private final MailViewToMSEmailConverter msEmailConverter;
-
-	private final TransformersFactory transformersFactory;
-
 	@Inject
 	LinagoraMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, 
 			LinagoraImapClientProvider imapClientProvider, 
-			CollectionPathHelper collectionPathHelper, 
-			MailViewToMSEmailConverter msEmailConverter,
-			TransformersFactory transformersFactory) {
+			CollectionPathHelper collectionPathHelper) {
 		
 		this.smtpProvider = smtpSender;
 		this.imapClientProvider = imapClientProvider;
 		this.collectionPathHelper = collectionPathHelper;
-		this.msEmailConverter = msEmailConverter;
-		this.transformersFactory = transformersFactory;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
-	}
-
-	@Override
-	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
-			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
-		
-		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
-		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
-				new EmailViewPartsFetcherImpl(transformersFactory, this, bodyPreferences, udr, collectionName, collectionId);
-		
-		for (Long uid: uids) {
-			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
-			if (emailView != null) {
-				msEmails.add(msEmailConverter.convert(emailView, udr));
-			}
-		}
-		return msEmails;
 	}
 	
 	@Override
@@ -222,7 +190,7 @@ public class LinagoraMailboxService implements MailboxService {
 		updateMailFlag(udr, collectionName, uid, Flag.SEEN, read);
 	}
 
-	/* package */ void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flag flag, 
+	private void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flag flag, 
 			boolean status) throws MailException {
 		
 		try {
@@ -380,7 +348,8 @@ public class LinagoraMailboxService implements MailboxService {
 		}
 	}	
 	
-	@VisibleForTesting void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
+	@Override
+	public void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
 			String sentboxPath = 

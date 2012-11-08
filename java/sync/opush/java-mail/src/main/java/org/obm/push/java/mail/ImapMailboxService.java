@@ -49,14 +49,11 @@ import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.IMAPException;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
-import org.obm.mail.conversation.EmailView;
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.SendEmailException;
@@ -66,10 +63,8 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
-import org.obm.push.mail.EmailViewPartsFetcherImpl;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Envelope;
@@ -89,12 +84,10 @@ import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.smtp.SmtpSender;
-import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
@@ -119,10 +112,6 @@ public class ImapMailboxService implements MailboxService {
 	private final ImapClientProviderImpl imapClientProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final CollectionPathHelper collectionPathHelper;
-
-	private final MailViewToMSEmailConverter msEmailConverter;
-	
-	private final TransformersFactory transformersFactory;
 	
 	private OpushImapFolderConnection opushImapFolderConnection;
 	
@@ -131,38 +120,17 @@ public class ImapMailboxService implements MailboxService {
 			SmtpSender smtpSender, 
 			ImapClientProviderImpl imapClientProvider, 
 			ImapMailBoxUtils imapMailBoxUtils, 
-			CollectionPathHelper collectionPathHelper, 
-			MailViewToMSEmailConverter msEmailConverter,
-			TransformersFactory transformersFactory) {
+			CollectionPathHelper collectionPathHelper) {
 		
 		this.smtpProvider = smtpSender;
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.collectionPathHelper = collectionPathHelper;
-		this.msEmailConverter = msEmailConverter;
-		this.transformersFactory = transformersFactory;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.opushImapFolderConnection = new OpushImapFolderConnection();
 	}
 
-	@Override
-	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
-			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
-		
-		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
-		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
-				new EmailViewPartsFetcherImpl(transformersFactory, this, bodyPreferences, udr, collectionName, collectionId);
-		
-		for (Long uid: uids) {
-			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
-			if (emailView != null) {
-				msEmails.add(msEmailConverter.convert(emailView, udr));
-			}
-		}
-		return msEmails;
-	}
-	
 	@Override
 	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
 		try {
@@ -232,7 +200,7 @@ public class ImapMailboxService implements MailboxService {
 		updateMailFlag(udr, collectionName, uid, Flags.Flag.SEEN, read);
 	}
 
-	/* package */ void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flags.Flag flag, 
+	private void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flags.Flag flag, 
 			boolean status) throws MailException, ImapMessageNotFoundException {
 		
 		try {
@@ -402,7 +370,8 @@ public class ImapMailboxService implements MailboxService {
 		}
 	}	
 	
-	@VisibleForTesting void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
+	@Override
+	public void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
 			String sentboxPath = 

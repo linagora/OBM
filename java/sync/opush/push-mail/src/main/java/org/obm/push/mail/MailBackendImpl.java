@@ -53,6 +53,7 @@ import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
+import org.obm.mail.conversation.EmailView;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushBackend;
@@ -92,6 +93,7 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
@@ -149,6 +151,9 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final EmailDao emailDao;
 	private final EmailSync emailSync;
 	private final EventService eventService;
+	private final TransformersFactory transformersFactory;
+
+	private final MailViewToMSEmailConverter msEmailConverter;
 
 
 	@Inject
@@ -158,6 +163,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			MappingService mappingService,
 			EventService eventService,
+			TransformersFactory transformersFactory,
+			MailViewToMSEmailConverter msEmailConverter,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
 
 		super(mappingService, collectionPathBuilderProvider);
@@ -169,6 +176,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.calendarClient = calendarClient;
 		this.login = login;
 		this.eventService = eventService;
+		this.transformersFactory = transformersFactory;
+		this.msEmailConverter = msEmailConverter;
 	}
 
 	@Override
@@ -337,8 +346,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
-			List<org.obm.push.bean.ms.MSEmail> msMails = 
-					mailboxService.fetch(udr, collectionId, collection, emailsUids, bodyPreferences);
+			List<org.obm.push.bean.ms.MSEmail> msMails = fetch(udr, collectionId, collection, emailsUids, bodyPreferences);
 			for (org.obm.push.bean.ms.MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -379,7 +387,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		try {
 			final Builder<ItemChange> ret = ImmutableList.builder();
 			final String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			final List<org.obm.push.bean.ms.MSEmail> emails = mailboxService.
+			final List<org.obm.push.bean.ms.MSEmail> emails = 
 					fetch(udr, collectionId, collectionPath, uids, bodyPreferences);
 			
 			for (final org.obm.push.bean.ms.MSEmail email: emails) {
@@ -398,6 +406,22 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		}
 	}
 
+	private List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
+			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
+		
+		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
+		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
+				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionName, collectionId);
+		
+		for (Long uid: uids) {
+			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
+			if (emailView != null) {
+				msEmails.add(msEmailConverter.convert(emailView, udr));
+			}
+		}
+		return msEmails;
+	}
+	
 	@Override
 	public void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash)
 			throws CollectionNotFoundException, DaoException,
@@ -605,7 +629,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		} 
 	}
 
-	public List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
+	private List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
 			String collectionName, Collection<Long> uids) throws MailException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();

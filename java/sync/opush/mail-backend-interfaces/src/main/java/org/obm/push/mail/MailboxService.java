@@ -35,14 +35,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.obm.push.bean.Address;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -62,9 +59,6 @@ import org.obm.push.mail.mime.MimeMessage;
 public interface MailboxService {
 	
 	MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException;
-	
-	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath, 
-			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException;
 	
 	void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
 
@@ -121,4 +115,7 @@ public interface MailboxService {
 	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 
 	IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException;
+
+	void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException;
+
 }

@@ -108,6 +108,7 @@ public class MailBackendTest {
 	private MappingService mappingService;
 	private Provider<Builder> collectionPathBuilderProvider;
 	private CollectionPath.Builder collectionPathBuilder;
+	private MailBackend testee;
 
 	@Before
 	public void setUp() {
@@ -121,6 +122,7 @@ public class MailBackendTest {
 		expect(collectionPathBuilderProvider.get()).andReturn(collectionPathBuilder).anyTimes();
 		mailboxService = createMock(MailboxService.class);
 		mappingService = createMock(MappingService.class);
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, null, null, collectionPathBuilderProvider);
 	}
 	
 	private void replayCommonMocks() {
@@ -158,7 +160,7 @@ public class MailBackendTest {
 				
 		MailBackend mailBackend = new MailBackendImpl(
 				mailboxService, calendarClient, null, null, 
-				login, new Mime4jUtils(), mockOpushConfigurationService(), mappingService, null, collectionPathBuilderProvider);
+				login, new Mime4jUtils(), mockOpushConfigurationService(), mappingService, null, null, null, collectionPathBuilderProvider);
 
 		replay(mailboxService, calendarClient, userDataRequest, login);
 		replayCommonMocks();
@@ -199,8 +201,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 		
@@ -247,8 +248,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 		
@@ -282,8 +282,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 
@@ -319,8 +318,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
 		verifyCommonMocks();
 		
@@ -356,8 +354,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, collectionPathBuilderProvider);
-		HierarchyItemsChanges hierarchyItemsChanges = mailBackend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
 		verifyCommonMocks();
 		

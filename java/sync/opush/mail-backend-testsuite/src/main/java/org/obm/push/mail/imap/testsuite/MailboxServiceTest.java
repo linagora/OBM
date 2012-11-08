@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail.imap.testsuite;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
@@ -38,54 +38,43 @@ import static org.obm.push.mail.MailTestsUtils.loadEmail;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@RunWith(SlowFilterRunner.class) @Slow
-public class LinagoraMailboxServiceTest {
+@RunWith(SlowGuiceRunner.class) @Slow
+public abstract class MailboxServiceTest {
 
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
-
-	@Inject LinagoraMailboxService mailboxService;
+	@Inject MailboxService mailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
@@ -160,7 +149,7 @@ public class LinagoraMailboxServiceTest {
 		
 		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(udr, mailBoxPath, date));
 		
-		mailboxService.updateMailFlag(udr, mailBoxPath, email.getUid(), Flag.SEEN, true);
+		mailboxService.updateReadFlag(udr, mailBoxPath, email.getUid(), true);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
@@ -170,7 +159,7 @@ public class LinagoraMailboxServiceTest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testUpdateMailFlagWithBadUID() throws Exception {
 		long mailUIDNotExist = 1l;
-		mailboxService.updateMailFlag(udr, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, Flag.SEEN, true);
+		mailboxService.updateReadFlag(udr, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, true);
 	}
 	
 	@Test
@@ -313,47 +302,6 @@ public class LinagoraMailboxServiceTest {
 		mailboxService.createFolder(udr, trashFolder);
 		
 		mailboxService.moveItem(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), testUtils.mailboxPath(trash), 1);
-	}
-	
-	@Test
-	public void testFetchMimeSinglePartBase64Email() throws Exception {
-		InputStream mailStream = loadEmail("SinglePartBase64.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
-		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
-		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("SinglePartBase64.eml"));
-	}
-
-	@Ignore("greenmail seems to unexpectedly decode base64 part on-the-fly")
-	@Test
-	public void testFetchTextPlainSinglePartBase64Email() throws Exception {
-		InputStream mailStream = loadEmail("SinglePartBase64.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
-		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
-		String bodyText = new String(ByteStreams.toByteArray(actual.getBody().getMimeData()), Charsets.UTF_8);
-		assertThat(bodyText).contains("Envoyé de mon iPhone");
-	}
-	
-	@Test
-	public void testFetchWithoutCorrespondingBodyPreference() throws Exception {
-		InputStream mailStream = loadEmail("OBMFULL-4123.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
-		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
-		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("OBMFULL-4123.eml"));
 	}
 	
 	private void consumeInputStream(InputStream inputStream) throws IOException {
