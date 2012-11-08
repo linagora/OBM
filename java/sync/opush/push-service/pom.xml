@@ -79,11 +79,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>imap</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
 			<version>${obm.version}</version>

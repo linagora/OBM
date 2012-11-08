@@ -49,7 +49,7 @@ public class LinagoraImapClientProviderTest {
 				return 123456;
 			}
 		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.timeout", 123456),
@@ -64,7 +64,7 @@ public class LinagoraImapClientProviderTest {
 				return true;
 			}
 		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", true));
@@ -78,7 +78,7 @@ public class LinagoraImapClientProviderTest {
 				return false;
 			}
 		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", false));
@@ -92,7 +92,7 @@ public class LinagoraImapClientProviderTest {
 				return 987;
 			}
 		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null);
+		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.fetchsize", 987),

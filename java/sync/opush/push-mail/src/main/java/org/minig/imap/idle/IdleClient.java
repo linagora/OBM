@@ -29,49 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.minig.imap.idle;
 
-package org.minig.imap;
+import org.minig.imap.IMAPException;
 
-import org.junit.Ignore;
-
-@Ignore("It's necessary to do again all tests")
-public class IdleClientLoginTests extends IMAPTestCase {
-
-	public void testConstructor() {
-		create();
+public interface IdleClient {
+	
+	interface Factory {
+		IdleClient create(String hostname, int port, String loginAtDomain, String password);
 	}
+	
+	void login(Boolean activateTLS) throws IMAPException;
 
-	private IdleClientImpl create() {
-		return new IdleClientImpl(confValue("imap"), 143, confValue("login"),
-				confValue("password"));
-	}
+	void logout();
 
-	public void testLoginLogout() {
-		IdleClientImpl sc = create();
-		try {
-			sc.login(true);
-			sc.select("INBOX");
-			sc.stopIdle();
-		} catch (Throwable e) {
-			fail(e.getMessage());
-		} finally {
-			try {
-				sc.logout();
-			} catch (Throwable e) {
-				fail(e.getMessage());
-			}
-		}
-	}
+	void startIdle(IIdleCallback observer);
 
-	public void testLoginLogoutSpeed() throws IMAPException {
-		IdleClientImpl sc = create();
-		int COUNT = 1000;
-		for (int i = 0; i < COUNT; i++) {
-			sc.login(true);
-			sc.select("INBOX");
-			sc.stopIdle();
-			sc.logout();
-		}
-	}
+	void stopIdle();
 
+	boolean select(String mailbox);
 }

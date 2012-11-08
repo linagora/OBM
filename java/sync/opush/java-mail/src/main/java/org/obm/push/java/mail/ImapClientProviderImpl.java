@@ -37,8 +37,9 @@ import java.util.Set;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.minig.imap.IMAPException;
-import org.minig.imap.IdleClient;
+import org.minig.imap.idle.IdleClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -187,9 +188,7 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 	@Override
 	public IdleClient getImapIdleClient(UserDataRequest udr)
 			throws LocatorClientException {
-		String login = getLogin(udr);
-		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, loginWithDomain);
-		return new IdleClient(locateImap(udr), 143, login, udr.getPassword());
+		throw new NotImplementedException();
 	}
 
 }

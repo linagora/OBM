@@ -36,25 +36,40 @@ import java.net.SocketAddress;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.minig.imap.idle.IIdleCallback;
+import org.minig.imap.idle.IdleClient;
 import org.minig.imap.idle.IdleClientCallback;
 import org.minig.imap.impl.ClientHandler;
 import org.minig.imap.impl.ClientSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IdleClient {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(IdleClient.class);
+public class IdleClientImpl implements IdleClient {
+
+	private static final Logger logger = LoggerFactory.getLogger(IdleClientImpl.class);
 	
-	private String login;
-	private String password;
-	private String hostname;
-	private int port;
-	private ClientSupport cs;
-	private IdleClientCallback icb;
+	@Singleton
+	public static class Factory implements IdleClient.Factory {
 
-	public IdleClient(String hostname, int port, String loginAtDomain,
+		@Override
+		public IdleClient create(String hostname, int port, String loginAtDomain, String password) {
+			return new IdleClientImpl(hostname, port, loginAtDomain, password);
+		}
+		
+	}
+	
+	private final String login;
+	private final String password;
+	private final String hostname;
+	private final int port;
+	private final ClientSupport cs;
+	private final IdleClientCallback icb;
+
+	@Inject
+	@VisibleForTesting IdleClientImpl(String hostname, int port, String loginAtDomain,
 			String password) {
 		this.login = loginAtDomain;
 		this.password = password;

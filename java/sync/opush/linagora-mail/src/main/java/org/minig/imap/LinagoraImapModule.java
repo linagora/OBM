@@ -1,5 +1,6 @@
 package org.minig.imap;
 
+import org.minig.imap.idle.IdleClient;
 import org.obm.mail.message.MessageFetcher;
 import org.obm.mail.message.MessageFetcherImpl;
 import org.obm.push.mail.MailboxService;
@@ -24,6 +25,7 @@ public class LinagoraImapModule extends AbstractModule {
 		bind(MailboxService.class).to(LinagoraMailboxService.class);
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(MessageFetcher.Factory.class).to(MessageFetcherImpl.Factory.class);
+		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);
 	}
 	
 }

@@ -37,8 +37,8 @@ import java.util.Set;
 import javax.mail.Session;
 
 import org.minig.imap.IMAPException;
-import org.minig.imap.IdleClient;
 import org.minig.imap.StoreClient;
+import org.minig.imap.idle.IdleClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -64,17 +64,20 @@ public class LinagoraImapClientProvider implements ImapClientProvider {
 	private final boolean loginWithDomain;
 	private final int imapPort;
 	private final boolean activateTLS;
+	private final IdleClient.Factory idleClientFactory;
 	@VisibleForTesting final Session defaultSession;
 
 	@Inject
 	@VisibleForTesting LinagoraImapClientProvider(MinigStoreClient.Factory minigStoreClientFactory,
-			EmailConfiguration emailConfiguration, LocatorService locatorService) {
+			EmailConfiguration emailConfiguration, LocatorService locatorService,
+			IdleClient.Factory idleClientFactory) {
 		
 		this.minigStoreClientFactory = minigStoreClientFactory;
 		this.locatorService = locatorService;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.imapPort = emailConfiguration.imapPort();
 		this.activateTLS = emailConfiguration.activateTls();
+		this.idleClientFactory = idleClientFactory;
 		
 		Properties imapProperties = buildProperties(emailConfiguration);
 		this.defaultSession = Session.getInstance(imapProperties);
@@ -160,7 +163,7 @@ public class LinagoraImapClientProvider implements ImapClientProvider {
 			throws LocatorClientException {
 		String login = getLogin(udr);
 		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, loginWithDomain);
-		return new IdleClient(locateImap(udr), 143, login, udr.getPassword());
+		return idleClientFactory.create(locateImap(udr), 143, login, udr.getPassword());
 	}
 
 }

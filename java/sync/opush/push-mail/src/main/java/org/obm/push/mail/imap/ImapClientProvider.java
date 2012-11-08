@@ -32,7 +32,7 @@
 package org.obm.push.mail.imap;
 
 import org.minig.imap.IMAPException;
-import org.minig.imap.IdleClient;
+import org.minig.imap.idle.IdleClient;
 import org.obm.locator.LocatorClientException;
 import org.obm.mail.MailboxConnection;
 import org.obm.push.bean.UserDataRequest;
